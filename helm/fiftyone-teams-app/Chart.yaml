@@ -1,0 +1,7 @@
+apiVersion: v2
+name: fiftyone-teams-app
+namespace: fiftyone-teams
+description: A fiftyone-teams-app Helm Chart
+type: application
+version: 0.1.7
+appVersion: "v0.1.7"
