@@ -1,0 +1,36 @@
+version: "2.4"
+services:
+  app:
+    depends_on: [db]
+    image: "voxel51/fiftyone-teams-app:v0.1.7"
+    restart: always
+    ports:
+            - "5151:5151"
+    environment:
+      - FIFTYONE_DATABASE_URI=mongodb://${FIFTYONE_DB_USERNAME}:${FIFTYONE_DB_PASSWORD}@db:27017/?authSource=admin
+      - FIFTYONE_TEAMS_ORGANIZATION=org_from_Voxel51
+      - FIFTYONE_TEAMS_CLIENT_ID=Client_ID_from_Voxel51
+      # use one of these variables to provide credentials for cloud storage
+      # - GOOGLE_APPLICATION_CREDENTIALS=/fiftyone/google.json
+      # - AWS_CONFIG_FILE=/fiftyone/aws-credentials
+      # - MINIO_CONFIG_FILE=/fiftyone/minio-credentials-file
+      - FIFTYONE_MEDIA_CACHE_APP_IMAGES=false
+      - FIFTYONE_DATABASE_NAME=fiftyone
+      - FIFTYONE_DATABASE_ADMIN=true
+      - FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1
+    volumes:
+      - type: bind
+        source: ${FIFTYONE_BASE_DIR}
+        target: /fiftyone
+  db:
+    image: "mongo:4.4"
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${FIFTYONE_DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${FIFTYONE_DB_PASSWORD}
+    volumes:
+      - type: bind
+        source: ${FIFTYONE_DB_DIR}
+        target: /data/db
