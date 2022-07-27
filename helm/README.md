@@ -106,10 +106,10 @@ gcloud compute addresses describe fiftyone-teams-static-ip --global
 Record the IP address and either create a DNS entry or contact your Voxel51 support team to have them create an appropriate `fiftyone.ai` DNS entry for you.
 
 ```
-kubectl namespace create fiftyone-teams
+kubectl create namespace fiftyone-teams
 kubectl config set-context --current --namespace fiftyone-teams
 kubectl create secret generic regcred \
-    --from-file=.dockerconfigjson=./gke-example/voxel51-docker.json \
+    --from-file=.dockerconfigjson=./voxel51-docker.json \
     --type kubernetes.io/dockerconfigjson
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
 ```
