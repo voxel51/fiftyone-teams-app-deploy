@@ -18,9 +18,14 @@ You must provide `FIFTYONE_TEAMS_ORGANIZATION`, `FIFTYONE_TEAMS_CLIENT_ID`, and 
 
 Please contact [Voxel51](https://voxel51.com/#teams-form) if you would like more information regarding Fiftyone Teams.
 
-Once you have edited the `values.yaml` file you can deploy your FiftyOne Teams instance with:
+To get the default `values.yaml` file, try:
+`curl -o values.yaml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/values.yaml`
 
-  `helm install releasename ./fiftyone-teams-app-0.1.7.tgz -f values.yaml`
+Once you have edited the `values.yaml` file you can deploy your FiftyOne Teams instance with:
+```
+helm repo add voxel51 https://helm.fiftyone.ai
+helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
+```
 
 ---
 
@@ -33,7 +38,31 @@ The following instructions represent a full deployment using:
 
 These instructions assume you have [kubectl](https://kubernetes.io/docs/tasks/tools/) and [Helm](https://helm.sh/docs/intro/install/) installed and operating, that you have cloned the [fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy) repository, and you are in the `helm` subdirectory of that repository.
 
-These instructions assume you have [contacted Voxel51](https://voxel51.com/#teams-form) and obtained your Organization ID, Client ID, and Docker Hub credentials.
+### Download the example configuration files
+
+Download the example configuration files from the [Voxel51 GitHub](https://github.com/voxel51/fiftyone-teams-app-deploy) repository:
+
+```
+curl -o values.yaml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/values.yaml
+curl -o clusterissuer.yml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/clusterissuer.yml
+```
+
+You will need to edit the `values.yaml` file to include your `mongodbConnectionString`, your `organiationId`, your `clientId`, and your `host` values (search for `replace.this.dns.name` - it appears in two locations).
+
+You will most likely want to edit the `values.yaml` file to include a `volume` and `volumenMounts` entry for your cloud storage credentials, and set the appropriate `AWS_CONFIG_FILE`, `GOOGLE_APPLICATION_CREDIALS`, or `MINIO_CONFIG_FILE` `nonsensitive` environment variable and follow the instructions to create the appropriate secret.
+
+These instructions assume you have placed your `voxel51-docker.json` file in the current directory; if you have not please modify the command lines as appropriate.
+
+### Create the necessary Helm repos
+
+Create the jetstack, bitnami, and voxel51 Helm repositories:
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add jetstack https://charts.jetstack.io
+helm repo add voxel51 https://helm.fiftyone.ai
+helm repo update
+```
+
 
 ### Install and configure cert-manager
 
@@ -42,10 +71,8 @@ If you are using a GKE Autopilot cluster, please review the information [provide
 ```
 kubectl create namespace cert-manager
 kubectl config set-context --current --namespace cert-manager
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
-helm install cert-manager jetstack/cert-manager --version v1.9.0 --set installCRDs=true
-kubectl apply -f gke-example/clusterissuer.yaml
+helm install cert-manager jetstack/cert-manager --set installCRDs=true
+kubectl apply -f ./clusterissuer.yaml
 ```
 
 ### Install and configure MongoDB
@@ -57,24 +84,18 @@ These instructions deploy a single-node MongoDB instance in your GKE cluster.  I
 ```
 kubectl create namespace fiftyone-mongodb
 kubectl config set-context --current --namespace fiftyone-mongodb
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
 helm install fiftyone-mongodb \
     --set image.tag=4.4 \
     --set auth.rootPassword=REPLACEME \
-	--set auth.rootUser=admin \
-	--set global.namespaceOverride=fiftyone-mongodb \
-	--set namespaceOverride=fiftyone-mongodb \
-	bitnami/mongodb
+    --set auth.rootUser=admin \
+    --set global.namespaceOverride=fiftyone-mongodb \
+    --set namespaceOverride=fiftyone-mongodb \
+    bitnami/mongodb
 ```
 
+Wait until the MongoDB pods have been created and are OK.
+
 ### Install and configure FiftyOne Teams App
-
-You will need to edit the `gke-example/values.yaml` file to include your `mongodbConnectionString`, your `organiationId`, your `clientId`, and your `host` values (search for `replace.this.dns.name` - it appears in two locations).
-
-You will most likely want to edit the `gke-examples/values.yaml` file to include a `volume` and `volumenMounts` entry for your cloud storage credentials, and set the appropriate `AWS_CONFIG_FILE`, `GOOGLE_APPLICATION_CREDIALS`, or `MINIO_CONFIG_FILE` `nonsensitive` environment variable.
-
-These instructions assume you have placed your `voxel51-docker.json` file in the `gke-example` directory; if you have not please modify the command lines as appropriate.
 
 First, reserve a global static IP address:
 ```
@@ -89,8 +110,8 @@ kubectl namespace create fiftyone-teams
 kubectl config set-context --current --namespace fiftyone-teams
 kubectl create secret generic regcred \
     --from-file=.dockerconfigjson=./gke-example/voxel51-docker.json \
-	--type kubernetes.io/dockerconfigjson
-helm install fiftyone-teams-app ./fiftyone-teams-app -f ./gke-example/values.yaml
+    --type kubernetes.io/dockerconfigjson
+helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
 ```
 
 You can verify that your SSL certificates have been properly issued with the following curl command:
