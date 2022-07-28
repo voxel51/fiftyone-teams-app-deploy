@@ -1,3 +1,15 @@
+<div align="center">
+<p align="center">
+
+<img src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
+<img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
+
+**Deploying FiftyOne Teams App Using Helm**
+</p>
+</div>
+
+---
+
 # Deploying FiftyOne Teams App Using Helm
 
 To obtain the default `values.yaml` file, try:
@@ -46,7 +58,7 @@ These instructions assume you have received Docker Hub credentials from Voxel51 
 
 These instructions assume you have received your Auth0 Organization ID and Client ID from Voxel51.  If you have not received these IDs, please contact your [Voxel51 Support Team](mailto:support@voxel51.com).
 
-### Download the example configuration files
+### Download the Example Configuration Files
 
 Download the example configuration files from the [Voxel51 GitHub](https://github.com/voxel51/fiftyone-teams-app-deploy) repository:
 
@@ -59,7 +71,7 @@ You will need to edit the `values.yaml` file to include your `mongodbConnectionS
 
 If you have not configured IAM to allow your GKE cluster to access your Cloud Storage you will want to edit the `values.yaml` file to include a `volume` and `volumeMounts` entry for your cloud storage credentials, set the appropriate `GOOGLE_APPLICATION_CREDIALS` `nonsensitive` environment variable, and follow the instructions in the `values.yaml` to create the appropriate secret.
 
-### Create the necessary Helm repos
+### Create the Necessary Helm Repos
 
 Add the jetstack, bitnami, and voxel51 Helm repositories to your local configuration:
 ```
@@ -69,7 +81,7 @@ helm repo add voxel51 https://helm.fiftyone.ai
 helm repo update
 ```
 
-### Install and configure cert-manager
+### Install and Configure cert-manager
 
 If you are using a GKE Autopilot cluster, please review the information [provided by cert-manager](https://github.com/cert-manager/cert-manager/issues/3717#issuecomment-919299192) and adjust your installation accordingly.
 
@@ -82,31 +94,33 @@ helm install cert-manager jetstack/cert-manager --set installCRDs=true
 You can use the cert-manager instructions to [verify the cert-manager Installation](https://cert-manager.io/v1.4-docs/installation/verify/).
 
 ### Create a ClusterIssuer
-ClusterIssuers are Kubernetes resources that represent certificate authorities that are able to generate signed certificates by honoring certificate signing requests.  You must create either an Issuer (namespace scoped) or a ClusterIssuer (cluster scoped) as part of your cert-manager configuration.  Voxel51 has provided an example ClusterIssuer configuration (downloaded [earlier](#download-the-example-configuration-files) in this guide).
+`ClusterIssuers` are Kubernetes resources that represent certificate authorities that are able to generate signed certificates by honoring certificate signing requests.  You must create either an `Issuer` in each namespace or a `ClusterIssuer` as part of your cert-manager configuration.  Voxel51 has provided an example `ClusterIssuer` configuration (downloaded [earlier](#download-the-example-configuration-files) in this guide).
 
 ```
 kubectl apply -f ./clusterissuer.yml
 ```
 
-### Install and configure MongoDB
+### Install and Configure MongoDB
 
 These instructions deploy a single-node MongoDB instance in your GKE cluster.  If you would like to deploy MongoDB with a replicaset configuration, please refer to the [MongoDB Helm Chart](https://github.com/bitnami/charts/tree/master/bitnami/mongodb) documentation.
 
-**You will definitely want to edit the `rootPassword` and `rootUser` defined below.**
+**You will definitely want to edit the `rootUser` and `rootPassword` defined below.**
 
 ```
 kubectl create namespace fiftyone-mongodb
 kubectl config set-context --current --namespace fiftyone-mongodb
 helm install fiftyone-mongodb \
     --set image.tag=4.4 \
-    --set auth.rootPassword=REPLACEME \
     --set auth.rootUser=admin \
+    --set auth.rootPassword=REPLACEME \
     --set global.namespaceOverride=fiftyone-mongodb \
     --set namespaceOverride=fiftyone-mongodb \
     bitnami/mongodb
 ```
 
-Wait until the MongoDB pods have been created and are in the `Running` state.
+Wait until the MongoDB pods are in the `Ready` state before beginning the "Install FiftyOne Teams App" instructions.
+
+You should [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry) while you wait.
 
 You can use `kubectl get pods` to determine the state of the `fiftyone-mongodb` pods.
 
@@ -138,11 +152,11 @@ You can verify that your SSL certificates have been properly issued with the fol
 
 `curl -I https://replace.this.dns.name`
 
-Your SSL certificates have been correctly issued if you see `HTTP/2 200` at the top of the response.  If, however, you encounter a `SSL certificate problem: unable to get local issuer certificate` message you should delete the certificate and allow it to be recreated.
+Your SSL certificates have been correctly issued if you see `HTTP/2 200` at the top of the response.  If, however, you encounter a `SSL certificate problem: unable to get local issuer certificate` message you should delete the certificate and allow it to recreate.
 
 `kubectl delete secret fiftyone-teams-cert-secret`
 
-Further instructions for debugging ACME certificates can be found on the [cert-manager docs site](https://cert-manager.io/docs/faq/acme/).
+Further instructions for debugging ACME certificates are on the [cert-manager docs site](https://cert-manager.io/docs/faq/acme/).
 
 ### Installation Complete
 
