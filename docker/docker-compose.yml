@@ -2,7 +2,7 @@ version: "2.4"
 services:
   app:
     depends_on: [db]
-    image: "voxel51/fiftyone-teams-app:v0.1.7"
+    image: "voxel51/fiftyone-teams-app:v0.1.8"
     restart: always
     ports:
             - "5151:5151"
@@ -16,7 +16,7 @@ services:
       # - MINIO_CONFIG_FILE=/fiftyone/minio-credentials-file
       - FIFTYONE_MEDIA_CACHE_APP_IMAGES=false
       - FIFTYONE_DATABASE_NAME=fiftyone
-      - FIFTYONE_DATABASE_ADMIN=true
+      - FIFTYONE_DATABASE_ADMIN=false
       - FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1
     volumes:
       - type: bind

@@ -26,7 +26,7 @@ env:
   # non sensitive variables
   nonsensitive:
     FIFTYONE_DEFAULT_APP_PORT: 5151
-    FIFTYONE_DATABASE_ADMIN: true
+    FIFTYONE_DATABASE_ADMIN: false
     # These are nonsensitive since you're mounting them from secrets below
     # AWS_CONFIG_FILE=/opt/secrets/aws/aws-credentials-file
     # GOOGLE_APPLICATION_CREDENTIALS=/opt/secrets/google/service-account
