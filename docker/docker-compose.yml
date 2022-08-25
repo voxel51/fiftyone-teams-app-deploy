@@ -2,7 +2,7 @@ version: "2.4"
 services:
   app:
     depends_on: [db]
-    image: "voxel51/fiftyone-teams-app:v0.1.7"
+    image: "voxel51/fiftyone-teams-app:v0.1.8"
     restart: always
     ports:
             - "5151:5151"
