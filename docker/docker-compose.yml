@@ -16,7 +16,7 @@ services:
       # - MINIO_CONFIG_FILE=/fiftyone/minio-credentials-file
       - FIFTYONE_MEDIA_CACHE_APP_IMAGES=false
       - FIFTYONE_DATABASE_NAME=fiftyone
-      - FIFTYONE_DATABASE_ADMIN=true
+      - FIFTYONE_DATABASE_ADMIN=false
       - FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1
     volumes:
       - type: bind
