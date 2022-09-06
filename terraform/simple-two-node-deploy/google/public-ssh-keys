@@ -1,0 +1,1 @@
+username:$(cat ~/.ssh/id_[dsa|rsa|ecdsa|whatever].pub)
