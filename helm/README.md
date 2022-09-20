@@ -12,6 +12,8 @@
 
 # Deploying FiftyOne Teams App Using Helm
 
+Due to the number of elements that are unique in each deployment, there is no default `values.yaml` in the Helm chart.  You must provide all parameters to use this Chart.
+
 To obtain the default `values.yaml` file, try:
 
 ```
@@ -35,6 +37,10 @@ Edit the `values.yaml` file, paying particular attention to
 
 You must provide `FIFTYONE_TEAMS_ORGANIZATION`, `FIFTYONE_TEAMS_CLIENT_ID`, and `FIFTYONE_DATABASE_URI` environment variables with values provided by Voxel51.  Without those variables the environment will not load correctly.
 
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades do not break existing client installs.
+- If you are performing a new install, consider setting `env.nonsensitive.FIFTYONE_DATABASE_ADMIN` to `true`
+- If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
+
 Please contact [Voxel51](https://voxel51.com/#teams-form) if you would like more information regarding Fiftyone Teams.
 
 Once you have edited the `values.yaml` file you can deploy your FiftyOne Teams instance with:
@@ -42,6 +48,19 @@ Once you have edited the `values.yaml` file you can deploy your FiftyOne Teams i
 helm repo add voxel51 https://helm.fiftyone.ai
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
 ```
+
+---
+
+## Upgrade Process Recommendations
+
+The FiftyOne Teams 0.8.8 Database is forward-compatible with the FiftyOne Teams 0.9.0 Client.  Voxel51 recommends the following upgrade process:
+
+1. Ensure all Python clients set `FIFTYONE_DATABASE_ADMIN=false`
+1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams 0.9.0
+1. Upgrade your FiftyOne Teams Kubernetes deploy to Helm version v0.2.0
+1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
+1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
+1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.17.0
 
 ---
 
@@ -110,10 +129,11 @@ These instructions deploy a single-node MongoDB instance in your GKE cluster.  I
 kubectl create namespace fiftyone-mongodb
 kubectl config set-context --current --namespace fiftyone-mongodb
 helm install fiftyone-mongodb \
-    --set image.tag=4.4 \
-    --set auth.rootUser=admin \
     --set auth.rootPassword=REPLACEME \
+    --set auth.rootUser=admin \
     --set global.namespaceOverride=fiftyone-mongodb \
+    --set image.tag=4.4 \
+    --set ingress.enabled=true \
     --set namespaceOverride=fiftyone-mongodb \
     bitnami/mongodb
 ```
@@ -161,3 +181,4 @@ Further instructions for debugging ACME certificates are on the [cert-manager do
 ### Installation Complete
 
 Congratulations! You should now be able to access your FiftyOne Teams installation at the DNS address you created [earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+
