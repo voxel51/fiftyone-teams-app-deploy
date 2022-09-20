@@ -37,7 +37,7 @@ Edit the `values.yaml` file, paying particular attention to
 
 You must provide `FIFTYONE_TEAMS_ORGANIZATION`, `FIFTYONE_TEAMS_CLIENT_ID`, and `FIFTYONE_DATABASE_URI` environment variables with values provided by Voxel51.  Without those variables the environment will not load correctly.
 
-`FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades to not break existing client installs.
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades do not break existing client installs.
 - If you are performing a new install, consider setting `env.nonsensitive.FIFTYONE_DATABASE_ADMIN` to `true`
 - If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
