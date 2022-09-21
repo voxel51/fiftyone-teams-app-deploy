@@ -95,7 +95,7 @@ RUN pip --no-cache-dir install --upgrade pip setuptools wheel ipython
 ARG TOKEN
 
 # The Teams App version to install, or "latest"
-ARG TEAMS_APP_VERSION=0.2.0
+ARG TEAMS_APP_VERSION=0.2.1
 
 RUN if [ "${TEAMS_APP_VERSION}" = "latest" ]; then \
         pip --no-cache-dir install --index-url https://${TOKEN}@pypi.fiftyone.ai fiftyone-teams-app; \

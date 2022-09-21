@@ -2,10 +2,10 @@ version: "2.4"
 services:
   app:
     depends_on: [db]
-    image: "voxel51/fiftyone-teams-app:v0.2.0"
+    image: "voxel51/fiftyone-teams-app:v0.2.1"
     restart: always
     ports:
-            - "5151:5151"
+      - "5151:5151"
     environment:
       - FIFTYONE_DATABASE_URI=mongodb://${FIFTYONE_DB_USERNAME}:${FIFTYONE_DB_PASSWORD}@db:27017/?authSource=admin
       - FIFTYONE_TEAMS_ORGANIZATION=org_from_Voxel51
