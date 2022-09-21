@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   fiftyone-teams-app:
   - apiVersion: v2
+    appVersion: v0.2.1
+    created: "2022-09-21T15:27:19.153778204Z"
+    description: A fiftyone-teams-app Helm Chart
+    digest: 1215cb326d6ef74f742ca2a8b13ff15336d0e56ffd6bc232cfbd6bb596eb6309
+    name: fiftyone-teams-app
+    type: application
+    urls:
+    - https://github.com/voxel51/fiftyone-teams-app-deploy/releases/download/fiftyone-teams-app-0.2.1/fiftyone-teams-app-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
     appVersion: v0.2.0
     created: "2022-09-20T18:15:28.52803311Z"
     description: A fiftyone-teams-app Helm Chart
@@ -31,4 +41,4 @@ entries:
     urls:
     - https://github.com/voxel51/fiftyone-teams-app-deploy/releases/download/fiftyone-teams-app-0.1.7/fiftyone-teams-app-0.1.7.tgz
     version: 0.1.7
-generated: "2022-09-20T18:15:28.528057311Z"
+generated: "2022-09-21T15:27:19.153796205Z"
