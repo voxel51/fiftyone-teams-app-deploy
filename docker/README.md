@@ -12,10 +12,25 @@ In a directory that contains the `Dockerfile` included in this repository, on a 
 
 `docker build --no-cache --build-arg TOKEN=${TOKEN} -t voxel51/fiftyone-teams-app:v0.2.2 .`
 
+## Initial Installation vs. Upgrades
+
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades do not break existing client installs.
+
+- If you are performing a new install, consider setting `FIFTYONE_DATABASE_ADMIN` to `true`
+- If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
+
+### Upgrade Process Recommendations
+
+The FiftyOne Teams 0.8.8 Database (version `0.16.6`) is forward-compatible with the FiftyOne Teams 0.9.2 Client (database version `0.17.2`).  Voxel51 recommends the following upgrade process:
+
+1. Ensure all Python clients set `FIFTYONE_DATABASE_ADMIN=false` (this should generally be your default)
+1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams v0.9.2
+1. Upgrade your FiftyOne Teams App deploy to version v0.2.2
+1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
+1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
+1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.17.2`
 
 ## Deploying the FiftyOne Teams App container
-
-
 
 In a directory that contains the `docker-compose.yml` and `.env` files included in this directory, on a system with docker-compose installed, edit the `.env` file to set the four parameters required for this deployment.
 
@@ -29,6 +44,5 @@ In a directory that contains the `docker-compose.yml` and `.env` files included 
 In the same directory, run the following command:
 
 `docker-compose up -d`
-
 
 The FiftyOne Teams App is now exposed on port 5151; an SSL endpoint (Load Balancer or Nginx Proxy or something similar) will need to be configured to route traffic from the SSL endpoint to port 5151 on the host running the FiftyOne Teams App.
