@@ -53,7 +53,7 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
 
 ## Upgrade Process Recommendations
 
-The FiftyOne Teams 0.8.8 Database (version `0.16.6`) is forward-compatible with the FiftyOne Teams 0.9.2 Client.  Voxel51 recommends the following upgrade process:
+The FiftyOne Teams 0.8.8 Database (version `0.16.6`) is forward-compatible with the FiftyOne Teams 0.9.2 Client (database version `0.17.2`).  Voxel51 recommends the following upgrade process:
 
 1. Ensure all Python clients set `FIFTYONE_DATABASE_ADMIN=false`
 1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams 0.9.2
