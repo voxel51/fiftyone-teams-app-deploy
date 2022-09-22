@@ -57,7 +57,7 @@ The FiftyOne Teams 0.8.8 Database is forward-compatible with the FiftyOne Teams 
 
 1. Ensure all Python clients set `FIFTYONE_DATABASE_ADMIN=false`
 1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams 0.9.2
-1. Upgrade your FiftyOne Teams Kubernetes deploy to Helm version v0.2.1
+1. Upgrade your FiftyOne Teams Kubernetes deploy to Helm version v0.2.2
 1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
 1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.17.2

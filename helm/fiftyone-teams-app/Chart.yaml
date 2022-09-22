@@ -3,5 +3,5 @@ name: fiftyone-teams-app
 namespace: fiftyone-teams
 description: A fiftyone-teams-app Helm Chart
 type: application
-version: 0.2.1
-appVersion: "v0.2.1"
+version: 0.2.2
+appVersion: "v0.2.2"
