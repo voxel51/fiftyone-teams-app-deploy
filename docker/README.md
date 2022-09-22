@@ -10,7 +10,7 @@ The fiftyone-teams-app container is avaialable via Docker Hub, with the appropri
 
 In a directory that contains the `Dockerfile` included in this repository, on a system with docker installed, run the following command:
 
-`docker build --no-cache --build-arg TOKEN=${TOKEN} -t voxel51/fiftyone-teams-app:v0.2.1 .`
+`docker build --no-cache --build-arg TOKEN=${TOKEN} -t voxel51/fiftyone-teams-app:v0.2.2 .`
 
 
 ## Deploying the FiftyOne Teams App container
