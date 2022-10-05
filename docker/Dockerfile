@@ -41,76 +41,42 @@
 # voxel51.com
 #
 
-# The base image to build from; must be Debian-based (eg Ubuntu)
-ARG BASE_IMAGE=ubuntu:20.04
-FROM $BASE_IMAGE
+ARG PYTHON_VERSION=3.10
 
-# The Python version to install. Must be >= 3.9
-ARG PYTHON_VERSION=3.9
+FROM python:${PYTHON_VERSION}-buster as builder
 
-#
-# Install system packages
-#
-
-RUN apt -y update \
-    && apt -y --no-install-recommends install software-properties-common \
-    && add-apt-repository -y ppa:deadsnakes/ppa \
-    && apt -y update \
-    && apt -y upgrade \
-    && apt -y --no-install-recommends install tzdata \
-    && TZ=Etc/UTC \
-    && apt -y --no-install-recommends install \
-        build-essential \
-        ca-certificates \
-        cmake \
-        cmake-data \
-        pkg-config \
-        libcurl4 \
-        libsm6 \
-        libxext6 \
-        libssl-dev \
-        libffi-dev \
-        libxml2-dev \
-        libxslt1-dev \
-        zlib1g-dev \
-        unzip \
-        curl \
-        wget \
-        python${PYTHON_VERSION} \
-        python${PYTHON_VERSION}-dev \
-        python${PYTHON_VERSION}-distutils \
-        ffmpeg \
-    && ln -s /usr/bin/python${PYTHON_VERSION} /usr/local/bin/python \
-    && ln -s /usr/local/lib/python${PYTHON_VERSION} /usr/local/lib/python \
-    && curl https://bootstrap.pypa.io/get-pip.py | python \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip --no-cache-dir install --upgrade pip setuptools wheel ipython
-
-#
-# Install FiftyOne Teams
-#
-
-# Your install token
+ARG TEAMS_APP_VERSION
 ARG TOKEN
+ARG INDEX_URL=https://${TOKEN}@pypi.fiftyone.ai
 
-# The Teams App version to install, or "latest"
-ARG TEAMS_APP_VERSION=0.2.2
+RUN pip --no-cache-dir install --upgrade pip setuptools wheel ipython \
+    && pip wheel --wheel-dir=/tmp/wheels --index-url ${INDEX_URL} fiftyone-teams-app==${TEAMS_APP_VERSION}
 
-RUN if [ "${TEAMS_APP_VERSION}" = "latest" ]; then \
-        pip --no-cache-dir install --index-url https://${TOKEN}@pypi.fiftyone.ai fiftyone-teams-app; \
-    else \
-        pip --no-cache-dir install --index-url https://${TOKEN}@pypi.fiftyone.ai fiftyone-teams-app==${TEAMS_APP_VERSION}; \
-    fi
 
-#
-# Configure shared storage
-#
+FROM python:${PYTHON_VERSION}-slim-buster as release
 
-ENV FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1 \
+WORKDIR /opt
+
+ENV FIFTYONE_DATABASE_ADMIN=false \
+    FIFTYONE_DATABASE_NAME=fiftyone \
     FIFTYONE_MEDIA_CACHE_APP_IMAGES=false \
-    FIFTYONE_DATABASE_ADMIN=false \
-    FIFTYONE_DATABASE_NAME=fiftyone
+    FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1 \
+    VIRTUAL_ENV=/opt/fiftyone-teams-app \
+    PATH="${VIRTUAL_ENV}/bin:${PATH}" \
+    TZ=Etc/UTC
+
+# Update the base image, install ffmpeg, create the voxel51 user, install fiftyone-teams-app
+RUN --mount=type=cache,from=builder,target=/builder,ro \
+    apt -y update && apt -y upgrade \
+    && apt install -y --no-install-recommends ffmpeg \
+    && apt clean && rm -rf /var/lib/apt/lists/* \
+    && useradd -l -U -d /opt voxel51 \
+    && python3 -m venv "${VIRTUAL_ENV}" \
+    && pip --no-cache-dir install --no-index --find-links=/builder/tmp/wheels fiftyone-teams-app \
+    && chown --changes --silent --no-dereference --recursive voxel51:voxel51 /opt
+
+# run as the voxel51 user
+USER voxel51
 
 #
 # Serve the app
