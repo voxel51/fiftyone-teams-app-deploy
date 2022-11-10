@@ -8,7 +8,7 @@
 # OPTIONAL BUILD ARGs::
 #
 #   PYTHON_VERSION (3.10): The Python version to install. Must be >= 3.9
-#   TEAMS_APP_VERSION (0.2.2): The version of fiftyone-teams-app to install.
+#   TEAMS_APP_VERSION (0.3.0): The version of fiftyone-teams-app to install.
 #   INDEX_URL (https://${TOKEN}@pypi.fiftyone.ai): The URL to install fiftyone-teams-app from
 #
 # REQUIRED RUNTIME ENV VARS::
@@ -47,7 +47,7 @@ ARG PYTHON_VERSION=3.10
 
 FROM python:${PYTHON_VERSION}-buster as builder
 
-ARG TEAMS_APP_VERSION=0.2.2
+ARG TEAMS_APP_VERSION=0.3.0
 ARG TOKEN
 ARG INDEX_URL=https://${TOKEN}@pypi.fiftyone.ai
 
