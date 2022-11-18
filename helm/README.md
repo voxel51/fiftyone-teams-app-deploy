@@ -12,30 +12,119 @@
 
 # Deploying FiftyOne Teams App Using Helm
 
-Due to the number of elements that are unique in each deployment, there is no default `values.yaml` in the Helm chart.  You must provide all parameters to use this Chart.
+You can find an example, minimal, `values.yaml` [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
-To obtain the default `values.yaml` file, try:
+| Required Values                           | Default | Description                                 |
+|-------------------------------------------|---------|---------------------------------------------|
+| `secret.fiftyone.apiClientId`             | None    | Voxel51-provided Auth0 API Client ID        |
+| `secret.fiftyone.apiClientSecret`         | None    | Voxel51-provided Auth0 API Client Secret    |
+| `secret.fiftyone.auth0Domain`             | None    | Voxel51-provided Auth0 Domain               |
+| `secret.fiftyone.clientId`                | None    | Voxel51-provided Auth0 Client ID            |
+| `secret.fiftyone.cookieSecret`            | None    | Random string for cookie encryption         |
+| `secret.fiftyone.mongodbConnectionString` | None    | MongoDB Connnection String                  |
+| `secret.fiftyone.organizationId`          | None    | Voxel51-provided Auth0 Organization ID      |
+| `teamsAppSettings.dnsName`                | None    | DNS Name for the FiftyOne Teams App Service |
 
-```
-curl -o values.yaml \
-  https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/values.yaml
-```
-
-Edit the `values.yaml` file, paying particular attention to
-
-| Name                   | Description                                                                                  |
-|------------------------|----------------------------------------------------------------------------------------------|
-| `namespace.name`       | Create a unique namespace for your deployment, or deploy in `default`                        |
-| `secret.name`          | Create a secret to store the FiftyOne Teams secrets                                          |
-| `secret.createSecrets` | If you set `secret.create` to `true` you can have this Helm chart create secrets for you.    |
-| `env.nonsensitive`     | Non-sensitive environment variables and their values                                         |
-| `env.sensitive`        | A mapping of sensitive environment variables and the key that stores their value             |
-| `image.repository`     | The image to deploy                                                                          |
-| `ingress.hosts.host`   | The Fully Qualified Domain Name [FQDN] of the deployment                                     |
-| `tls.secretName`       | The name of the secret that contains `tls.crt` and `tls.key` values for your SSL Certificate |
-| `tls.hosts`            | The FQDN of the deployment                                                                   |
-
-You must provide `FIFTYONE_TEAMS_ORGANIZATION`, `FIFTYONE_TEAMS_CLIENT_ID`, and `FIFTYONE_DATABASE_URI` environment variables with values provided by Voxel51.  Without those variables the environment will not load correctly.
+| Optional Values                                                  | Default                    | Description                                                               |
+|------------------------------------------------------------------|----------------------------|---------------------------------------------------------------------------|
+| `apiSettings.affinity`                                           | None                       | FiftyOne Teams API service affinity rules                                 |
+| `apiSettings.env`                                                | defined below              | Arbitrary environment variables to pass to the FiftyOne Teams API pod     |
+| `apiSettings.env.FIFTYONE_ENV`                                   | production                 | Verbosity for GraphQL query output                                        |
+| `apiSettings.env.GRAPHQL_DEFAULT_LIMIT`                          | 10                         | Default GraphQL limit for results                                         |
+| `apiSettings.env.LOGGING_LEVEL`                                  | INFO                       | Logging Verbosity                                                         |
+| `apiSettings.image.repository`                                   | voxel51/fiftyone-teams-api | Container Image for FiftyOne Teams API containers                         |
+| `apiSettings.image.tag`                                          | Helm Chart Version         | Container Image Tag for FiftyOne Teams API containers                     |
+| `apiSettings.nodeSelector`                                       | None                       | FiftyOne Teams API pod node selector rules                                |
+| `apiSettings.podAnnotations`                                     | None                       | FiftyOne Teams API pod annotation rules                                   |
+| `apiSettings.podSecurityContext`                                 | None                       | FiftyOne Teams API pod security context rules                             |
+| `apiSettings.resources.limits.cpu`                               | None                       | CPU resource limits for FiftyOne Teams API containers                     |
+| `apiSettings.resources.limits.memory`                            | None                       | Memory resource limits for FiftyOne Teams API containers                  |
+| `apiSettings.resources.requests.cpu`                             | None                       | CPU resource requests for FiftyOne Teams API containers                   |
+| `apiSettings.resources.requests.memory`                          | None                       | Memory resource requests for FiftyOne Teams API containers                |
+| `apiSettings.securityContext`                                    | None                       | FiftyOne Teams API service security context rules                         |
+| `apiSettings.service.containerPort`                              | 8000                       | Port for FiftyOne Teams API Containers                                    |
+| `apiSettings.service.liveness.initialDelaySeconds`               | 45                         | Delay before Liveness checks for FiftyOne Teams API containers            |
+| `apiSettings.service.name`                                       | teams-api                  | FiftyOne Teams API service name                                           |
+| `apiSettings.service.port`                                       | 80                         | FiftyOne Teams API service port                                           |
+| `apiSettings.service.readiness.initialDelaySeconds`              | 45                         | Delay before Readiness checks for FiftyOne Teams API containers           |
+| `apiSettings.service.shortname`                                  | teams-api                  | Short name for port definitions (less than 15 characters)                 |
+| `apiSettings.service.type`                                       | ClusterIP                  | FiftyOne Teams API service type                                           |
+| `apiSettings.tolerations`                                        | None                       | FiftyOne Teams API service toleration rules                               |
+| `apiSettings.volumeMounts`                                       | None                       | FiftyOne Teams API pod volume mount definitions                           |
+| `apiSettings.volumes`                                            | None                       | FiftyOne Teams API pod volume definitions                                 |
+| `appSettings.affinity`                                           | None                       | FiftyOne App service affinity rules                                       |
+| `appSettings.autoscaling.enabled`                                | false                      | Enable Horizontal Autoscaling for the FiftyOne App Pod                    |
+| `appSettings.autoscaling.maxReplicas`                            | 20                         | Maximum Replicas for Horizontal Autoscaling in the FiftyOne App pod       |
+| `appSettings.autoscaling.minReplicas`                            | 2                          | Minimum Replicas for Horizontal Autoscaling in the FiftyOne App pod       |
+| `appSettings.autoscaling.targetCPUUtilizationPercentage`         | 80                         | Percent CPU Utilization for autoscaling the FiftyOne App pod              |
+| `appSettings.autoscaling.targetMemoryUtilizationPercentage`      | 80                         | Percent Memory Utilization for autoscaling the FiftyOne App pod           |
+| `appSettings.env`                                                | defined below              | Arbitrary environment variables to pass to the FiftyOne App pod           |
+| `appSettings.env.FIFTYONE_DATABASE_ADMIN`                        | false                      | Toggles MongoDB database admin privileges for the FiftyOne App pod        |
+| `appSettings.env.FIFTYONE_MEDIA_CACHE_IMAGES`                    | false                      | Toggle image caching for the local FiftyOne App processes                 |
+| `appSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES`                | -1 (disabled)              | Set the media cache size for the local FiftyOne App processes             |
+| `appSettings.image.repository`                                   | voxel51/fiftyone-app       | Container Image for FiftyOne App containers                               |
+| `appSettings.image.tag`                                          | Helm Chart Version         | Container Image tag for FiftyOne App containers                           |
+| `appSettings.nodeSelector`                                       | None                       | FiftyOne App pod node selector rules                                      |
+| `appSettings.podAnnotations`                                     | None                       | FiftyOne App pod annotation rules                                         |
+| `appSettings.podSecurityContext`                                 | None                       | FiftyOne App pod security context rules                                   |
+| `appSettings.replicaCount`                                       | 2                          | FiftyOne App replica count if autoscaling is disabled                     |
+| `appSettings.resources.limits.cpu`                               | None                       | CPU resource limits for FiftyOne App containers                           |
+| `appSettings.resources.limits.memory`                            | None                       | Memory resource limits for FiftyOne App containers                        |
+| `appSettings.resources.requests.cpu`                             | None                       | CPU resource requests for FiftyOne App containers                         |
+| `appSettings.resources.requests.memory`                          | None                       | Memory resource requests for FiftyOne App containers                      |
+| `appSettings.securityContext`                                    | None                       | FiftyOne App service security context rules                               |
+| `appSettings.service.containerPort`                              | 5151                       | Port for FiftyOne App Containers                                          |
+| `appSettings.service.liveness.initialDelaySeconds`               | 45                         | Delay before Liveness checks for FiftyOne App containers                  |
+| `appSettings.service.name`                                       | fiftyone-app               | FiftyOne App service name                                                 |
+| `appSettings.service.port`                                       | 80                         | FiftyOne App service port                                                 |
+| `appSettings.service.readiness.initialDelaySeconds`              | 45                         | Delay before Readiness checks for FiftyOne App containers                 |
+| `appSettings.service.shortname`                                  | fiftyone-app               | Shirt name for port definitions (less than 15 characters)                 |
+| `appSettings.service.type`                                       | ClusterIP                  | FiftyOne App service type                                                 |
+| `appSettings.tolerations`                                        | None                       | FiftyOne App service toleration rules                                     |
+| `appSettings.volumeMounts`                                       | None                       | FiftyOne App pod volume mount definitions                                 |
+| `appSettings.volumes`                                            | None                       | FiftyOne App pod volume definitions                                       |
+| `ingress.annotations`                                            | None                       | Ingress annotations (if required)                                         |
+| `ingress.className`                                              | ""                         | Ingress class name (if required)                                          |
+| `ingress.enabled`                                                | true                       | Toggle enabling ingress                                                   |
+| `ingress.tlsEnabled`                                             | true                       | Enable TLS for Ingress Controller                                         |
+| `ingress.tlsSecretName`                                          | fiftyone-teams-tls-secret  | TLS Secret for certificate with all three DNS Names                       |
+| `namespace.name`                                                 | fiftyone-teams             | Kubernetes Namespace already created for FiftyOne Teams                   |
+| `secret.create`                                                  | true                       | Toggle creation of the FiftyOne secret by Helm                            |
+| `secret.name`                                                    | fiftyone-teams-secrets     | Name for the FiftyOne Teams configuration secrets                         |
+| `secret.fiftyone.fiftyoneDatabaseName`                           | fiftyone                   | MongoDB Database Name for FiftyOne Teams                                  |
+| `serviceAccount.annotations`                                     | None                       | Service account annotations                                               |
+| `serviceAccount.create``                                         | true                       | Toggle creation of a service account for the FiftyOne Teams deployment    |
+| `serviceAccount.name`                                            | fiftyone-teams             | Service account name                                                      |
+| `teamsAppSettings.affinity`                                      | None                       | FiftyOne Teams App service affinity rules                                 |
+| `teamsAppSettings.autoscaling.enabled`                           | false                      | Enable Horizontal Autoscaling for the FiftyOne Teams App Pod              |
+| `teamsAppSettings.autoscaling.maxReplicas`                       | 20                         | Maximum Replicas for Horizontal Autoscaling in the FiftyOne Teams App pod |
+| `teamsAppSettings.autoscaling.minReplicas`                       | 2                          | Minimum Replicas for Horizontal Autoscaling in the FiftyOne Teams App pod |
+| `teamsAppSettings.autoscaling.targetCPUUtilizationPercentage`    | 80                         | Percent CPU Utilization for autoscaling the FiftyOne Teams App pod        |
+| `teamsAppSettings.autoscaling.targetMemoryUtilizationPercentage` | 80                         | Percent Memory Utilization for autoscaling the FiftyOne Teams App pod     |
+| `teamsAppSettings.env`                                           | defined below              | Arbitrary environment variables to pass to the FiftyOne Teams App pod     |
+| `teamsAppSettings.env.APP_USE_HTTPS`                             | true                       | Set to `false` if Ingress does not use HTTPS                              |
+| `teamsAppSettings.image.repository`                              | voxel51/fiftyone-teams-app | Container Image for FiftyOne Teams App containers                         |
+| `teamsAppSettings.image.tag`                                     | Helm Chart Version         | Container Image tag for FiftyOne Teams App containers                     |
+| `teamsAppSettings.nodeSelector`                                  | None                       | FiftyOne Teams App pod node selector rules                                |
+| `teamsAppSettings.podAnnotations`                                | None                       | FiftyOne Teams App pod annotation rules                                   |
+| `teamsAppSettings.podSecurityContext`                            | None                       | FiftyOne Teams App pod security context rules                             |
+| `teamsAppSettings.replicaCount`                                  | 2                          | FiftyOne Teams App replica count if autoscaling is disabled               |
+| `teamsAppSettings.resources.limits.cpu`                          | None                       | CPU resource limits for FiftyOne Teams App containers                     |
+| `teamsAppSettings.resources.limits.memory`                       | None                       | Memory resource limits for FiftyOne Teams App containers                  |
+| `teamsAppSettings.resources.requests.cpu`                        | None                       | CPU resource requests for FiftyOne Teams App containers                   |
+| `teamsAppSettings.resources.requests.memory`                     | None                       | Memory resource requests for FiftyOne Teams App containers                |
+| `teamsAppSettings.securityContext`                               | None                       | FiftyOne Teams App service security context rules                         |
+| `teamsAppSettings.serverPathPrefix`                              | `/`                        | FiftyOne App prefix for path-based Ingress routing                        |
+| `teamsAppSettings.service.containerPort`                         | 3000                       | Port for FiftyOne Teams App containers                                    |
+| `teamsAppSettings.service.liveness.initialDelaySeconds`          | 45                         | Delay before Liveness checks for FiftyOne Teams App containers            |
+| `teamsAppSettings.service.name`                                  | teams-app                  | FiftyOne Teams App service name                                           |
+| `teamsAppSettings.service.port`                                  | 80                         | FiftyOne Teams App service port                                           |
+| `teamsAppSettings.service.readiness.initialDelaySeconds`         | 45                         | Delay before Readiness checks for FiftyOne Teams App containers           |
+| `teamsAppSettings.service.shortname`                             | teams-app                  | Short name for port definitions (less than 15 characters)                 |
+| `teamsAppSettings.service.type`                                  | ClusterIP                  | FiftyOne Teams App service type                                           |
+| `teamsAppSettings.tolerations`                                   | None                       | FiftyOne Teams App service toleration rules                               |
+| `teamsAppSettings.volumeMounts`                                  | None                       | FiftyOne Teams App pod volume mount definitions                           |
+| `teamsAppSettings.volumes`                                       | None                       | FiftyOne Teams App pod volume definitions                                 |
 
 `FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades do not break existing client installs.
 - If you are performing a new install, consider setting `env.nonsensitive.FIFTYONE_DATABASE_ADMIN` to `true`
@@ -62,6 +151,19 @@ The FiftyOne Teams 0.8.8 Database (version `0.16.6`) is forward-compatible with 
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
 1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.18.0`
 
+
+## Notes and Considerations
+
+While not all parameters are required, Voxel51 frequently sees deployments use the following parameters:
+
+	appSettings.env.[AWS_CONFIG_FILE|GOOGLE_APPLICATION_CREDENTIALS|MINIO_CONFIG_FILE]
+	appSettings.volumeMounts
+	appSettings.volumes
+	imagePullSecrets
+	ingress.annotations
+
+Please consider if you will require these settings for your deployment.
+
 ---
 
 ## A Full GKE Deployment Example
@@ -86,7 +188,7 @@ curl -o values.yaml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app
 curl -o clusterissuer.yml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/clusterissuer.yml
 ```
 
-You will need to edit the `values.yaml` file to include your `mongodbConnectionString`, your `organiationId`, your `clientId`, and your `host` values (search for `replace.this.dns.name` - it appears in two locations).  Assuming you follow these directions your MongoDB host will be `fiftyone-mongodb.fiftyone-mongodb.svc.cluster.local`; please modify that hostname if you modify these instructions.
+You will need to edit the `values.yaml` file to include the Auth0 configuration provided by Voxel51, your MongoDB username and password, to set a cookieSecret, and your `host` values (search for `replace.this.dns.name` - it appears in two locations).  Assuming you follow these directions your MongoDB host will be `fiftyone-mongodb.fiftyone-mongodb.svc.cluster.local`; please modify that hostname if you modify these instructions.
 
 If you have not configured IAM to allow your GKE cluster to access your Cloud Storage you will want to edit the `values.yaml` file to include a `volume` and `volumeMounts` entry for your cloud storage credentials, set the appropriate `GOOGLE_APPLICATION_CREDIALS` `nonsensitive` environment variable, and follow the instructions in the `values.yaml` to create the appropriate secret.
 

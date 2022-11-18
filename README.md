@@ -14,6 +14,6 @@
 | `docker`  | Contains the Dockerfile used to build Fiftyone Teams App                                 |
 | `helm`    | Contains the Helm Chart and `values.yaml` for deploying Fiftyone Teams App in Kubernetes |
 
-In order to use the Dockerfile provided, you must obtain an install token from Voxel51.
+In order to use these instructions you will need Auth0 information and Docker Hub credentials from Voxel51.
 
 Please contact [Voxel51](https://voxel51.com/#teams-form) if you are interested in Fiftyone Teams.

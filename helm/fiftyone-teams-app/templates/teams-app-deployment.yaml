@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "teams-app.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-teams-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.teamsAppSettings.autoscaling.enabled }}
+  replicas: {{ .Values.teamsAppSettings.replicaCount | default 2 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "fiftyone-teams-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.teamsAppSettings.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "fiftyone-teams-app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.teamsAppSettings.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "teams-app.name" . }}
+          securityContext:
+            {{- toYaml .Values.teamsAppSettings.securityContext | nindent 12 }}
+          image: "{{ .Values.teamsAppSettings.image.repository }}:{{ .Values.teamsAppSettings.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.teamsAppSettings.image.pullPolicy | default "Always" }}
+          env:
+            {{- include "fiftyone-teams-app.env-vars-list" . | indent 12 }}
+          ports:
+            - name: {{ .Values.teamsAppSettings.service.shortname }}
+              containerPort: {{ .Values.teamsAppSettings.service.containerPort | default 3000 }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/hello
+              port: {{ .Values.teamsAppSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.teamsAppSettings.service.liveness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /api/hello
+              port: {{ .Values.teamsAppSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.teamsAppSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.teamsAppSettings.resources | nindent 12 }}
+          {{- with .Values.teamsAppSettings.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.teamsAppSettings.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.teamsAppSettings.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.teamsAppSettings.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.teamsAppSettings.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

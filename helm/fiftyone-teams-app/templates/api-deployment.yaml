@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fiftyone-teams-api.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: {{ include "fiftyone-teams-api.name" . }}
+    {{- include "fiftyone-teams-api.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "fiftyone-teams-api.name" . }}
+      {{- include "fiftyone-teams-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.apiSettings.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ include "fiftyone-teams-api.name" . }}
+        {{- include "fiftyone-teams-api.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.apiSettings.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "fiftyone-teams-api.name" . }}
+          securityContext:
+            {{- toYaml .Values.apiSettings.securityContext | nindent 12 }}
+          image: "{{ .Values.apiSettings.image.repository }}:{{ .Values.apiSettings.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.apiSettings.image.pullPolicy | default "Always" }}
+          env:
+            {{- include "fiftyone-teams-api.env-vars-list" . | indent 12 }}
+          ports:
+            - name: {{ .Values.apiSettings.service.shortname }}
+              containerPort: {{ .Values.apiSettings.service.containerPort | default 8000 }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: {{ .Values.apiSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.apiSettings.service.liveness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: {{ .Values.apiSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.apiSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.apiSettings.resources | nindent 12 }}
+          {{- with .Values.apiSettings.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.apiSettings.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiSettings.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiSettings.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiSettings.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

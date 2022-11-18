@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  teams-api:
+    image: voxel51/fiftyone-teams-api:v1.0.0
+    environment:
+      AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
+      AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_API_CLIENT_ID: ${AUTH0_API_CLIENT_ID}
+      AUTH0_API_CLIENT_SECRET: ${AUTH0_API_CLIENT_SECRET}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENV: ${FIFTYONE_ENV}
+      GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
+      LOGGING_LEVEL: ${API_LOGGING_LEVEL}
+      MONGO_DEFAULT_DB: ${MONGO_DEFAULT_DB}
+    ports:
+      - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
+  teams-app:
+    image: voxel51/fiftyone-teams-app:v1.0.0
+    environment:
+      API_URL: ${API_URL}
+      AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
+      AUTH0_BASE_URL: ${AUTH0_BASE_URL}
+      AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
+      AUTH0_CLIENT_SECRET: ${AUTH0_CLIENT_SECRET}
+      AUTH0_ISSUER_BASE_URL: ${AUTH0_ISSUER_BASE_URL}
+      AUTH0_ORGANIZATION: ${AUTH0_ORGANIZATION}
+      AUTH0_SECRET: ${AUTH0_SECRET}
+      APP_USE_HTTPS: ${APP_USE_HTTPS:-true}
+      FIFTYONE_SERVER_ADDRESS: ""
+      FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
+      FIFTYONE_TEAMS_PROXY_URL: ${FIFTYONE_TEAMS_PROXY_URL}
+    ports:
+      - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
+  fiftyone-app:
+    image: voxel51/fiftyone-app:v1.0.0
+    environment:
+      FIFTYONE_DATABASE_ADMIN: true
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DEFAULT_APP_ADDRESS: 0.0.0.0
+      FIFTYONE_DEFAULT_APP_PORT: 5151
+      FIFTYONE_MEDIA_CACHE_IMAGES: false
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_TEAMS_AUDIENCE: ${AUTH0_AUDIENCE}
+      FIFTYONE_TEAMS_CLIENT_ID: ${AUTH0_CLIENT_ID}
+      FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
+      FIFTYONE_TEAMS_ORGANIZATION: ${AUTH0_ORGANIZATION}
+      # If you are including cloud credentials you may want one of these
+      # AWS_CONFIG_FILE=/fiftyone/aws-credentials-file
+      # GOOGLE_APPLICATION_CREDENTIALS=/fiftyone/service-account
+      # MINIO_CONFIG_FILE=/fiftyone/minio-credentials-file
+    ports:
+      - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
+    volumes:
+      - type: bind
+        source: ${FIFTYONE_BASE_DIR}
+        target: /fiftyone

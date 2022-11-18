@@ -1,0 +1,33 @@
+{{- if .Values.appSettings.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "fiftyone-app.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-app.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "fiftyone-app.name" . }}
+  minReplicas: {{ .Values.appSettings.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.appSettings.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.appSettings.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.appSettings.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.appSettings.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.appSettings.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}
