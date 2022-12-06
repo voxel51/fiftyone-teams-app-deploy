@@ -3,7 +3,7 @@
 #    --from-file=.dockerconfigjson=./voxel51-docker.json --type kubernetes.io/dockerconfigjson
 # If you use the Voxel51 command above your imagePullSecrets would look like:
 imagePullSecrets:
- - name: regcred
+  - name: regcred
 
 secret:
   fiftyone:
