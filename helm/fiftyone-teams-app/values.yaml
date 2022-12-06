@@ -2,6 +2,8 @@
 namespace:
   name: fiftyone-teams
 
+imagePullSecrets: []
+
 secret:
   create: true
   # The name of the secret to use in the namespace.name namespace
