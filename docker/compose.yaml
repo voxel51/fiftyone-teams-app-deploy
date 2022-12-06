@@ -11,8 +11,8 @@ services:
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
       FIFTYONE_ENV: ${FIFTYONE_ENV}
       GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
-      LOGGING_LEVEL: ${API_LOGGING_LEVEL}
-      MONGO_DEFAULT_DB: ${MONGO_DEFAULT_DB}
+      LOGGING_LEVEL: ${API_LOGGING_LEVEL:-INFO}
+      MONGO_DEFAULT_DB: ${FIFTYONE_DATABASE_NAME}
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
   teams-app:
@@ -30,6 +30,7 @@ services:
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
       FIFTYONE_TEAMS_PROXY_URL: ${FIFTYONE_TEAMS_PROXY_URL}
+      NODE_ENV: production
     ports:
       - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
   fiftyone-app:
@@ -47,9 +48,9 @@ services:
       FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
       FIFTYONE_TEAMS_ORGANIZATION: ${AUTH0_ORGANIZATION}
       # If you are including cloud credentials you may want one of these
-      # AWS_CONFIG_FILE=/fiftyone/aws-credentials-file
-      # GOOGLE_APPLICATION_CREDENTIALS=/fiftyone/service-account
-      # MINIO_CONFIG_FILE=/fiftyone/minio-credentials-file
+      # AWS_CONFIG_FILE: /fiftyone/aws-credentials-file
+      # GOOGLE_APPLICATION_CREDENTIALS: /fiftyone/google.json
+      # MINIO_CONFIG_FILE: /fiftyone/minio-credentials-file
     ports:
       - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
     volumes:
