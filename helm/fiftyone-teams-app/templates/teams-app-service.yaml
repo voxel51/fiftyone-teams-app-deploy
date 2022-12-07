@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "fiftyone-teams-app.fullname" . }}
+  name: {{ include "teams-app.name" . }}
   namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "fiftyone-teams-app.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.teamsAppSettings.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ include "fiftyone-teams.port" . }}
+    - port: {{ .Values.teamsAppSettings.service.port }}
+      targetPort: {{ .Values.teamsAppSettings.service.containerPort | default 3000 }}
       protocol: TCP
       name: http
   selector:

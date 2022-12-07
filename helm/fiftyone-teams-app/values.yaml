@@ -1,0 +1,194 @@
+# Declare variables to be passed into your templates.
+namespace:
+  name: fiftyone-teams
+
+imagePullSecrets: []
+
+secret:
+  create: true
+  # The name of the secret to use in the namespace.name namespace
+  name: fiftyone-teams-secrets
+
+apiSettings:
+  env:
+    FIFTYONE_ENV: production
+    GRAPHQL_DEFAULT_LIMIT: 10
+    LOGGING_LEVEL: INFO
+  image:
+    repository: voxel51/fiftyone-teams-api
+  resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 2
+  #   memory: 6Gi
+  # requests:
+  #   cpu: 500m
+  #   memory: 512Mi
+  service:
+    containerPort: 8000
+    liveness:
+      initialDelaySeconds: 45
+    name: teams-api
+    readiness:
+      initialDelaySeconds: 45
+    port: 80
+    # port names must be less than 15 characters
+    shortname: teams-api
+    type: ClusterIP
+
+  affinity: {}
+  nodeSelector: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  tolerations: []
+  volumes: []
+  volumeMounts: []
+
+appSettings:
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  env:
+    FIFTYONE_DATABASE_ADMIN: false
+    FIFTYONE_MEDIA_CACHE_IMAGES: false
+    FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+    # These are nonsensitive since you're mounting them from secrets below
+    # AWS_CONFIG_FILE=/opt/secrets/aws/aws-credentials-file
+    # GOOGLE_APPLICATION_CREDENTIALS=/opt/secrets/google/service-account
+    # MINIO_CONFIG_FILE=/opt/secrets/minio/minio-credentials-file
+  image:
+    repository: voxel51/fiftyone-app
+  replicaCount: 2
+  resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 2
+  #   memory: 6Gi
+  # requests:
+  #   cpu: 500m
+  #   memory: 1Gi
+  service:
+    containerPort: 5151
+    liveness:
+      initialDelaySeconds: 45
+    name: fiftyone-app
+    port: 80
+    readiness:
+      initialDelaySeconds: 45
+    # port names must be less than 15 characters
+    shortname: fiftyone-app
+    type: ClusterIP
+
+  # To create volumes, remove the []'s below and uncomment the appropriate volume section
+  #  volumes and volumeMounts can be created for any service, but examples are only provided
+  #  for `fiftyone-app``
+
+  # You might create your secret with a command similar to:
+  #  kubectl create secret generic aws-credentials-secret --from-file=aws-credentials-file=./myfile
+  volumes: []
+  #   - name: aws-credentials-volume
+  #     secret:
+  #       secretName: aws-credentials-secret
+  #       optional: false
+  #   - name: google-credentials-volume
+  #     secret:
+  #       secretName: google-credentials-secret
+  #       optional: false
+  #   - name: minio-credentials-volume
+  #     secret:
+  #       secretName: minio-credentials-secret
+  #       optional: false
+  #   - name: google-persistent-volume
+  #     gcePersistentDisk:
+  #       pdName: fiftyone-data-disk
+  #       fsType: ext4
+
+  # To add volumeMounts create volumes and uncomment the appropriate appSettings.env line above,
+  #  remove the []''s below, and uncomment or add apppropriate entries.
+  volumeMounts: []
+  #   - mountPath: /opt/secrets/aws
+  #     name: aws-credentials-volume
+  #   - mountPath: /opt/secrets/google
+  #     name: google-credentials-volume
+  #   - mountPath: /opt/secrets/minio
+  #     name: minio-credentials-volume
+  #   - mountPath: /opt/persistent/data
+  #     name: google-persistent-volume
+
+  affinity: {}
+  nodeSelector: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  tolerations: []
+
+teamsAppSettings:
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  env:
+    APP_USE_HTTPS: true
+  image:
+    repository: voxel51/fiftyone-teams-app
+  replicaCount: 2
+  resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 1
+  #   memory: 2Gi
+  # requests:
+  #   cpu: 500m
+  #   memory: 1Gi
+  serverPathPrefix: /
+  service:
+    containerPort: 3000
+    liveness:
+      initialDelaySeconds: 45
+    name: teams-app
+    port: 80
+    readiness:
+      initialDelaySeconds: 45
+    # port names must be less than 15 characters
+    shortname: teams-app
+    type: ClusterIP
+
+  affinity: {}
+  nodeSelector: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  tolerations: []
+  volumes: {}
+  volumeMounts: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  name: "fiftyone-teams"
+
+ingress:
+  # If you are configuring your own ingress controller, set this to 'false'
+  enabled: true
+  className: ""
+  annotations: {}
+  tlsEnabled: true
+  tlsSecretName: fiftyone-teams-tls-secret

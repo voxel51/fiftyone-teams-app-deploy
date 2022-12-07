@@ -1,16 +1,6 @@
-# Deploying FiftyOne Teams App using a Dockerfile and Docker Compose
+# Deploying FiftyOne Teams App using Docker Compose
 
-To build this container image you will require an authentication token from Voxel51.  If you are already a Voxel51 customer please contact your support team to obtain a token, otherwise please contact [Voxel51](https://voxel51.com/#teams-form) if you would like more information regarding FiftyOne Teams.
-
-To deploy this image you will require an Organization ID, and a Client ID provided by Voxel51.  If you are already a Voxel51 customer please contact your support team to obtain an Organization ID and Client ID, otherwise please contact [Voxel51](https://voxel51.com/#teams-form) if you would like more information regarding FiftyOne Teams.
-
-The fiftyone-teams-app container is avaialable via Docker Hub, with the appropriate credentials.  If you would like to use the Voxel51-built container image, please contact your support team for Docker Hub credentials.
-
-## Building the FiftyOne Teams App image
-
-In a directory that contains the `Dockerfile` included in this repository, on a system with docker installed, run the following command:
-
-`docker build --no-cache --build-arg TOKEN=${TOKEN} -t voxel51/fiftyone-teams-app:v0.3.0 .`
+The fiftyone-teams-app, fiftyone-teams-api, and fiftyone-app containers are avaialable via Docker Hub, with the appropriate credentials.  If you do not have Docker Hub credentials, please contact your support team for Docker Hub credentials.
 
 ## Initial Installation vs. Upgrades
 
@@ -25,23 +15,40 @@ The FiftyOne Teams 0.10.0 Client (database version `0.18.0`) is backwards-compat
 
 1. Ensure all Python clients set `FIFTYONE_DATABASE_ADMIN=false` (this should generally be your default)
 1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams v0.10.0
-1. Upgrade your FiftyOne Teams App deploy to version v0.3.0
+1. Upgrade your FiftyOne Teams deploy to v1.0.0
 1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
 1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.18.0``
 
 ## Deploying the FiftyOne Teams App container
 
-In a directory that contains the `docker-compose.yml` and `.env` files included in this directory, on a system with docker-compose installed, edit the `.env` file to set the four parameters required for this deployment.
+In a directory that contains the `docker-compose.yml` and `.env` files included in this directory, on a system with docker-compose installed, edit the `.env` file to set the |parameters required for this deployment.
 
-| Variable                    | Purpose                                                                                                                                          |
-|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| FIFTYONE_BASE_DIR           | This will be mounted as `/fiftyone` in the `fiftyone-teams-app` container and can be used to pass cloud storage credentials into the environment |
-| FIFTYONE_DB_DIR             | This will be mounted as `/data/db` in the `db` container and is used to store MongoDB data files                                                 |
-| FIFTYONE_DB_PASSWORD        | This will set the root user password and add it to the MongoDB connection string                                                                 |
-| FIFTYONE_DB_USERNAME        | This will set the root user username and add it to the MongoDB connection string                                                                 |
-| FIFTYONE_TEAMS_CLIENT_ID    | This Auth0 Client ID is provided by Voxel51                                                                                                      |
-| FIFTYONE_TEAMS_ORGANIZATION | This Auth0 Organization ID is provided by Voxel51                                                                                                |
+| Variable                       | Purpose                                                                                                                                          |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `AUTH0_API_CLIENT_ID`          | The Auth0 API Client ID from Voxel51                                                                                                             |
+| `AUTH0_API_CLIENT_SECRET`      | The Auth0 API Client Secret from Voxel51                                                                                                         |
+| `AUTH0_AUDIENCE`               | The Auth0 Audience from Voxel51                                                                                                                  |
+| `AUTH0_CLIENT_ID`              | The Auth0 Application Client ID from Voxel51                                                                                                     |
+| `AUTH0_CLIENT_SECRET`          | The Auth0 Application Client Secret from Voxel51                                                                                                 |
+| `AUTH0_DOMAIN`                 | The Auth0 Domain from Voxel51                                                                                                                    |
+| `AUTH0_ISSUER_BASE_URL`        | The Auth0 Issuer URL from Voxel51                                                                                                                |
+| `AUTH0_ORGANIZATION`           | The Auth0 Organization from Voxel51                                                                                                              |
+| `AUTH0_SECRET`                 | A random string used to encrypt cookies; use something like `openssl rand -hex 32` to generate this string                                       |
+| `AUTH0_BASE_URL`               | The URL where you plan to deploy your FiftyOne Teams application                                                                                 |
+| `API_BIND_ADDRESS`             | The host address that `fiftyone-teams-api` should bind to; `127.0.0.1` is appropriate for this in most cases                                     |
+| `API_BIND_PORT`                | The host port that `fiftyone-teams-api` should bind to; the default is `8000`                                                                    |
+| `API_URL`                      | The URL that `fiftyone-teams-app` should use to communicate with `fiftyone-teams-api`; `teams-api` is the compose service name                   |
+| `FIFTYONE_ENV`                 | GraphQL verbosity for the `fiftyone-teams-api` service; `production` will not log every GraphQL qury, any other value will                       |
+| `GRAPHQL_DEFAULT_LIMIT`        | Default GraphQL limit for results                                                                                                                |
+| `FIFTYONE_BASE_DIR`            | This will be mounted as `/fiftyone` in the `fiftyone-teams-app` container and can be used to pass cloud storage credentials into the environment |
+| `FIFTYONE_DEFAULT_APP_ADDRESS` | The host address that `fiftyone-app` should bind to; `127.0.0.1` is appropriate for this in most cases                                           |
+| `FIFTYONE_DEFAULT_APP_PORT`    | The host port that `fiftyone-app` should bind to; the default is `5151`                                                                          |
+| `APP_USE_HTTPS`                | Set this to true if your Application endpoint uses TLS; this should be 'true` in most cases'                                                     |
+| `APP_BIND_ADDRESS`             | The host address that `fiftyone-teams-app` should bind to; this should be an externally-facing IP in most cases                                  |
+| `APP_BIND_PORT`                | The host port that `fiftyone-teams-app` should bind tothe default is `3000`                                                                      |
+| `FIFTYONE_TEAMS_PROXY_URL`     | The URL that `fiftyone-teams-app` will use to proxy requests to `fiftyone-app`                                                                   |
+
 
 You will need to edit the `docker-compose.yml` if you want to include cloud storage credentials for accessing samples; examples are included in the `docker-compose.yml` file.
 

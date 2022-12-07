@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fiftyone-app.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.appSettings.autoscaling.enabled }}
+  replicas: {{ .Values.appSettings.replicaCount | default 2 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "fiftyone-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.appSettings.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "fiftyone-app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.appSettings.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "fiftyone-app.name" . }}
+          securityContext:
+            {{- toYaml .Values.appSettings.securityContext | nindent 12 }}
+          image: "{{ .Values.appSettings.image.repository }}:{{ .Values.appSettings.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.appSettings.image.pullPolicy | default "Always" }}
+          env:
+            {{- include "fiftyone-app.env-vars-list" . | indent 12 }}
+          ports:
+            - name: {{ .Values.appSettings.service.shortname }}
+              containerPort: {{ .Values.appSettings.service.containerPort | default 5151 }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.appSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.appSettings.service.liveness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.appSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.appSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.appSettings.resources | nindent 12 }}
+          {{- with .Values.appSettings.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.appSettings.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.appSettings.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.appSettings.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.appSettings.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
