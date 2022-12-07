@@ -3,8 +3,6 @@
 
 <img src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
 <img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
-<br>
-<strong>Deploying FiftyOne Teams App Using Helm**</strong>
 </p>
 </div>
 
@@ -104,7 +102,7 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 | `secret.name`                                                    | fiftyone-teams-secrets     | Name for the FiftyOne Teams configuration secrets                         |
 | `secret.fiftyone.fiftyoneDatabaseName`                           | fiftyone                   | MongoDB Database Name for FiftyOne Teams                                  |
 | `serviceAccount.annotations`                                     | None                       | Service account annotations                                               |
-| `serviceAccount.create``                                         | true                       | Toggle creation of a service account for the FiftyOne Teams deployment    |
+| `serviceAccount.create`                                          | true                       | Toggle creation of a service account for the FiftyOne Teams deployment    |
 | `serviceAccount.name`                                            | fiftyone-teams             | Service account name                                                      |
 | `teamsAppSettings.affinity`                                      | None                       | FiftyOne Teams App service affinity rules                                 |
 | `teamsAppSettings.autoscaling.enabled`                           | false                      | Enable Horizontal Autoscaling for the FiftyOne Teams App Pod              |
