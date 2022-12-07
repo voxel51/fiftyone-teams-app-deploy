@@ -3,14 +3,18 @@
 
 <img src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
 <img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
-
-**Deploying FiftyOne Teams App Using Helm**
 </p>
 </div>
 
 ---
 
+FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
+
+Please contact [Voxel51](https://voxel51.com/#teams-form) if you would like more information regarding Fiftyone Teams.
+
 # Deploying FiftyOne Teams App Using Helm
+
+## Required Helm Chart Values
 
 You can find an example, minimal, `values.yaml` [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
@@ -24,6 +28,11 @@ You can find an example, minimal, `values.yaml` [here](https://github.com/voxel5
 | `secret.fiftyone.mongodbConnectionString` | None    | MongoDB Connnection String                  |
 | `secret.fiftyone.organizationId`          | None    | Voxel51-provided Auth0 Organization ID      |
 | `teamsAppSettings.dnsName`                | None    | DNS Name for the FiftyOne Teams App Service |
+
+
+## Optional Helm Chart Values
+
+You can find a full `values.yaml` with all of the optional values [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml)
 
 | Optional Values                                                  | Default                    | Description                                                               |
 |------------------------------------------------------------------|----------------------------|---------------------------------------------------------------------------|
@@ -93,7 +102,7 @@ You can find an example, minimal, `values.yaml` [here](https://github.com/voxel5
 | `secret.name`                                                    | fiftyone-teams-secrets     | Name for the FiftyOne Teams configuration secrets                         |
 | `secret.fiftyone.fiftyoneDatabaseName`                           | fiftyone                   | MongoDB Database Name for FiftyOne Teams                                  |
 | `serviceAccount.annotations`                                     | None                       | Service account annotations                                               |
-| `serviceAccount.create``                                         | true                       | Toggle creation of a service account for the FiftyOne Teams deployment    |
+| `serviceAccount.create`                                          | true                       | Toggle creation of a service account for the FiftyOne Teams deployment    |
 | `serviceAccount.name`                                            | fiftyone-teams             | Service account name                                                      |
 | `teamsAppSettings.affinity`                                      | None                       | FiftyOne Teams App service affinity rules                                 |
 | `teamsAppSettings.autoscaling.enabled`                           | false                      | Enable Horizontal Autoscaling for the FiftyOne Teams App Pod              |
@@ -126,18 +135,19 @@ You can find an example, minimal, `values.yaml` [here](https://github.com/voxel5
 | `teamsAppSettings.volumeMounts`                                  | None                       | FiftyOne Teams App pod volume mount definitions                           |
 | `teamsAppSettings.volumes`                                       | None                       | FiftyOne Teams App pod volume definitions                                 |
 
+---
+
+## Installation Considerations
+
 `FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades do not break existing client installs.
 - If you are performing a new install, consider setting `env.nonsensitive.FIFTYONE_DATABASE_ADMIN` to `true`
 - If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
-
-Please contact [Voxel51](https://voxel51.com/#teams-form) if you would like more information regarding Fiftyone Teams.
 
 Once you have edited the `values.yaml` file you can deploy your FiftyOne Teams instance with:
 ```
 helm repo add voxel51 https://helm.fiftyone.ai
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
 ```
-
 ---
 
 ## Upgrade Process Recommendations
@@ -151,6 +161,8 @@ The FiftyOne Teams 0.8.8 Database (version `0.16.6`) is forward-compatible with 
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
 1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.18.0`
 
+
+---
 
 ## Notes and Considerations
 
