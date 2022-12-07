@@ -25,6 +25,7 @@ You can find an example, minimal, `values.yaml` [here](https://github.com/voxel5
 | `secret.fiftyone.organizationId`          | None    | Voxel51-provided Auth0 Organization ID      |
 | `teamsAppSettings.dnsName`                | None    | DNS Name for the FiftyOne Teams App Service |
 
+
 | Optional Values                                                  | Default                    | Description                                                               |
 |------------------------------------------------------------------|----------------------------|---------------------------------------------------------------------------|
 | `apiSettings.affinity`                                           | None                       | FiftyOne Teams API service affinity rules                                 |
