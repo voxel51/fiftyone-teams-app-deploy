@@ -14,9 +14,40 @@ Please contact [Voxel51](https://voxel51.com/#teams-form) if you would like more
 
 # Deploying FiftyOne Teams App Using Helm
 
-## Required Helm Chart Values
+---
+
+## Installation Considerations
+
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades do not break existing client installs.
+- If you are performing a new install, consider setting `appSettings.env.FIFTYONE_DATABASE_ADMIN` to `true`
+- If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
 You can find an example, minimal, `values.yaml` [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+
+Once you have edited the `values.yaml` file you can deploy your FiftyOne Teams instance with:
+```
+helm repo add voxel51 https://helm.fiftyone.ai
+helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
+```
+
+---
+
+## Notes and Considerations
+
+While not all parameters are required, Voxel51 frequently sees deployments use the following parameters:
+
+	appSettings.env.[AWS_CONFIG_FILE|GOOGLE_APPLICATION_CREDENTIALS|MINIO_CONFIG_FILE]
+	appSettings.volumeMounts
+	appSettings.volumes
+	imagePullSecrets
+	ingress.annotations
+
+Please consider if you will require these settings for your deployment.
+
+---
+
+## Required Helm Chart Values
+
 
 | Required Values                           | Default | Description                                 |
 |-------------------------------------------|---------|---------------------------------------------|
@@ -137,19 +168,6 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 
 ---
 
-## Installation Considerations
-
-`FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades do not break existing client installs.
-- If you are performing a new install, consider setting `env.nonsensitive.FIFTYONE_DATABASE_ADMIN` to `true`
-- If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
-
-Once you have edited the `values.yaml` file you can deploy your FiftyOne Teams instance with:
-```
-helm repo add voxel51 https://helm.fiftyone.ai
-helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
-```
----
-
 ## Upgrade Process Recommendations
 
 The FiftyOne Teams 0.8.8 Database (version `0.16.6`) is forward-compatible with the FiftyOne Teams 0.10.0 Client (database version `0.18.0`).  Voxel51 recommends the following upgrade process:
@@ -160,21 +178,6 @@ The FiftyOne Teams 0.8.8 Database (version `0.16.6`) is forward-compatible with 
 1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
 1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.18.0`
-
-
----
-
-## Notes and Considerations
-
-While not all parameters are required, Voxel51 frequently sees deployments use the following parameters:
-
-	appSettings.env.[AWS_CONFIG_FILE|GOOGLE_APPLICATION_CREDENTIALS|MINIO_CONFIG_FILE]
-	appSettings.volumeMounts
-	appSettings.volumes
-	imagePullSecrets
-	ingress.annotations
-
-Please consider if you will require these settings for your deployment.
 
 ---
 

@@ -23,7 +23,13 @@ secret:
 
 # apiSettings:
 
+# If you are performing an initial install you should either connect to your database with the SDK first or
+#   set FIFTYONE_DATABASE_ADMIN to true.  We highly recommend setting this to false during normal operations
+#   to prevent upgrading dataset versions before new SDKs have been deployed.
+#   https://helm.fiftyone.ai/#installation-considerations
 # appSettings:
+#   env:
+#     FIFTYONE_DATABASE_ADMIN: true
 
 teamsAppSettings:
   dnsName: teams-upgrade.dev.fiftyone.ai
