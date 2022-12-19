@@ -10,7 +10,7 @@ The fiftyone-teams-app container is avaialable via Docker Hub, with the appropri
 
 In a directory that contains the `Dockerfile` included in this repository, on a system with docker installed, run the following command:
 
-`docker build --no-cache --build-arg TOKEN=${TOKEN} -t voxel51/fiftyone-teams-app:v0.3.0 .`
+`docker build --no-cache --build-arg TOKEN=${TOKEN} -t voxel51/fiftyone-teams-app:v0.3.1 .`
 
 ## Initial Installation vs. Upgrades
 
@@ -25,7 +25,7 @@ The FiftyOne Teams 0.10.0 Client (database version `0.18.0`) is backwards-compat
 
 1. Ensure all Python clients set `FIFTYONE_DATABASE_ADMIN=false` (this should generally be your default)
 1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams v0.10.0
-1. Upgrade your FiftyOne Teams App deploy to version v0.3.0
+1. Upgrade your FiftyOne Teams App deploy to version v0.3.1
 1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
 1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.18.0``
