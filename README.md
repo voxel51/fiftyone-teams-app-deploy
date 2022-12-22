@@ -126,6 +126,9 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 | `ingress.annotations`                                            | None                       | Ingress annotations (if required)                                         |
 | `ingress.className`                                              | ""                         | Ingress class name (if required)                                          |
 | `ingress.enabled`                                                | true                       | Toggle enabling ingress                                                   |
+| `ingress.paths`                                                  | See Below                  | List of ingress `path` and `pathType`                                     |
+| `ingress.paths.path`                                             | `/*`                       | path to associate with the FiftyOne Teams App service                     |
+| `ingress.paths.path.pathType`                                    | ImplementationSpecific     | Ingress path type (`ImplementationSpecific`, `Exact`, `Prefix`)           |
 | `ingress.tlsEnabled`                                             | true                       | Enable TLS for Ingress Controller                                         |
 | `ingress.tlsSecretName`                                          | fiftyone-teams-tls-secret  | TLS Secret for certificate with all three DNS Names                       |
 | `namespace.name`                                                 | fiftyone-teams             | Kubernetes Namespace already created for FiftyOne Teams                   |
