@@ -15,7 +15,7 @@ The FiftyOne Teams 0.10.0 Client (database version `0.18.0`) is backwards-compat
 
 1. Ensure all Python clients set `FIFTYONE_DATABASE_ADMIN=false` (this should generally be your default)
 1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams v0.10.0
-1. Upgrade your FiftyOne Teams deploy to v1.0.0
+1. Upgrade your FiftyOne Teams deploy to v1.0.1
 1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
 1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.18.0``
