@@ -1,8 +1,8 @@
 apiVersion: v2
 name: fiftyone-teams-app
 namespace: fiftyone-teams
-description: A fiftyone-teams-app Helm Chart
+description: A FiftyOne Teams Helm Chart
 type: application
-version: 1.0.0
-appVersion: "v1.0.0"
+version: 1.0.1
+appVersion: "v1.0.1"
 icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png

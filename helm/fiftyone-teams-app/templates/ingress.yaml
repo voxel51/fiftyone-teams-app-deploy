@@ -39,10 +39,12 @@ spec:
     - host: {{ .Values.teamsAppSettings.dnsName | quote }}
       http:
         paths:
-          - path: /*
+          {{- range .Values.ingress.paths }}
+          - path: {{ .path }}
             {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
-            pathType: ImplementationSpecific
+            pathType: {{ .pathType }}
             {{- end }}
+          {{- end }}
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
