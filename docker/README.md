@@ -56,4 +56,41 @@ In the same directory, run the following command:
 
 `docker-compose up -d`
 
-The FiftyOne Teams App is now exposed on port 5151; an SSL endpoint (Load Balancer or Nginx Proxy or something similar) will need to be configured to route traffic from the SSL endpoint to port 5151 on the host running the FiftyOne Teams App.
+The FiftyOne Teams App is now exposed on port 3000; an SSL endpoint (Load Balancer or Nginx Proxy or something similar) will need to be configured to route traffic from the SSL endpoint to port 3000 on the host running the FiftyOne Teams App.
+
+An example nginx site configuration that forwards http traffic to https, and https traffic for `your.server.name` to port 3000 might look like:
+
+```
+upstream teams-app {
+  server localhost:3000;
+}
+
+server {
+  server_name your.server.name;
+
+  proxy_busy_buffers_size   512k;
+  proxy_buffers   4 512k;
+  proxy_buffer_size   256k;
+
+  location / {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_pass http://teams-app;
+  }
+
+    listen 443 ssl;
+    ssl_certificate /path/to/your/certificate.pem;
+    ssl_certificate_key /path/to/your/key.pem;
+    ssl_dhparam /path/to/your/dhparams.pem;
+}
+
+server {
+    if ($host = your.server.name) {
+        return 301 https://$host$request_uri;
+    }
+
+  listen 80;
+  server_name your.server.name;
+    return 404;
+}
+```

@@ -53,7 +53,9 @@ services:
       # MINIO_CONFIG_FILE: /fiftyone/minio-credentials-file
     ports:
       - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
-    volumes:
-      - type: bind
-        source: ${FIFTYONE_BASE_DIR}
-        target: /fiftyone
+    # If you are including cloud credentials you may want to mount this and set FIFTYONE_BASE_DIR
+    #  to an existing directory with your credentials included
+    # volumes:
+    #   - type: bind
+    #     source: ${FIFTYONE_BASE_DIR}
+    #     target: /fiftyone
