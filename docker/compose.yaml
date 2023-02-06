@@ -9,10 +9,20 @@ services:
       AUTH0_API_CLIENT_ID: ${AUTH0_API_CLIENT_ID}
       AUTH0_API_CLIENT_SECRET: ${AUTH0_API_CLIENT_SECRET}
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
       FIFTYONE_ENV: ${FIFTYONE_ENV}
       GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
       LOGGING_LEVEL: ${API_LOGGING_LEVEL:-INFO}
       MONGO_DEFAULT_DB: ${FIFTYONE_DATABASE_NAME}
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then uncomment the environment variables below
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
   teams-app:
@@ -31,6 +41,19 @@ services:
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
       FIFTYONE_TEAMS_PROXY_URL: ${FIFTYONE_TEAMS_PROXY_URL}
       NODE_ENV: production
+      RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then uncomment the environment variables below
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
+      # GLOBAL_AGENT_HTTP_PROXY: ${HTTP_PROXY_URL}
+      # GLOBAL_AGENT_HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # GLOBAL_AGENT_NO_PROXY: ${NO_PROXY_LIST}
     ports:
       - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
   fiftyone-app:
@@ -41,21 +64,21 @@ services:
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
       FIFTYONE_DEFAULT_APP_ADDRESS: 0.0.0.0
       FIFTYONE_DEFAULT_APP_PORT: 5151
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
       FIFTYONE_MEDIA_CACHE_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_TEAMS_AUDIENCE: ${AUTH0_AUDIENCE}
       FIFTYONE_TEAMS_CLIENT_ID: ${AUTH0_CLIENT_ID}
       FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
       FIFTYONE_TEAMS_ORGANIZATION: ${AUTH0_ORGANIZATION}
-      # If you are including cloud credentials you may want one of these
-      # AWS_CONFIG_FILE: /fiftyone/aws-credentials-file
-      # GOOGLE_APPLICATION_CREDENTIALS: /fiftyone/google.json
-      # MINIO_CONFIG_FILE: /fiftyone/minio-credentials-file
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then uncomment the environment variables below
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
     ports:
       - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
-    # If you are including cloud credentials you may want to mount this and set FIFTYONE_BASE_DIR
-    #  to an existing directory with your credentials included
-    # volumes:
-    #   - type: bind
-    #     source: ${FIFTYONE_BASE_DIR}
-    #     target: /fiftyone

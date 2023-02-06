@@ -56,7 +56,7 @@ appSettings:
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
   env:
-    FIFTYONE_DATABASE_ADMIN: false
+    FIFTYONE_DATABASE_ADMIN: true
     FIFTYONE_MEDIA_CACHE_IMAGES: false
     FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
     # These are nonsensitive since you're mounting them from secrets below
@@ -88,6 +88,11 @@ appSettings:
     # port names must be less than 15 characters
     shortname: fiftyone-app
     type: ClusterIP
+
+  # You should default to using the in-app `/settings/cloud_storage_credentials` configuration for
+  # setting storage credentials - the legacy environment-variable option is included for
+  # backwards compatibility, but is no longer the preferred solution and may be deprecated in the
+  # future.
 
   # To create volumes, remove the []'s below and uncomment the appropriate volume section
   #  volumes and volumeMounts can be created for any service, but examples are only provided
@@ -141,6 +146,7 @@ teamsAppSettings:
     targetMemoryUtilizationPercentage: 80
   env:
     APP_USE_HTTPS: true
+    RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
   image:
     repository: voxel51/fiftyone-teams-app
   replicaCount: 2
