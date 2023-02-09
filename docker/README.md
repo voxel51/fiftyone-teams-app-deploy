@@ -24,7 +24,7 @@ from cryptography.fernet import Fernet
 print(Fernet.generate_key().decode())
 ```
 
-Voxel51 does not have access to this encryption key and cannot reproduce it.  If this key is lost you will need to schedule an outage window to drop the storage credentials collection, replace the encryption key, and readd the storage credentials via the UI.  Voxel51 strongly recommends storing this key in a safe place.
+Voxel51 does not have access to this encryption key and cannot reproduce it.  If this key is lost you will need to schedule an outage window to drop the storage credentials collection, replace the encryption key, and add the storage credentials via the UI again.  Voxel51 strongly recommends storing this key in a safe place.
 
 Storage credentials no longer need to be mounted into containers with appropriate environment variables being set; users with `Admin` permissions can use `/settings/cloud_storage_credentials` in the Web UI to add supported storage credentials.
 

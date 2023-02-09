@@ -59,7 +59,7 @@ from cryptography.fernet import Fernet
 print(Fernet.generate_key().decode())
 ```
 
-Voxel51 does not have access to this encryption key and cannot reproduce it.  If this key is lost you will need to schedule an outage window to drop the storage credentials collection, replace the encryption key, and readd the storage credentials via the UI.  Voxel51 strongly recommends storing this key in a safe place.
+Voxel51 does not have access to this encryption key and cannot reproduce it.  If this key is lost you will need to schedule an outage window to drop the storage credentials collection, replace the encryption key, and add the storage credentials via the UI again.  Voxel51 strongly recommends storing this key in a safe place.
 
 Storage credentials no longer need to be mounted into containers with appropriate environment variables being set; users with `Admin` permissions can use `/settings/cloud_storage_credentials` in the Web UI to add supported storage credentials.
 
@@ -87,8 +87,13 @@ GLOBAL_AGENT_HTTPS_PROXY: https://proxy.yourconpay.tld:3128
 GLOBAL_AGENT_NO_PROXY: apiSettings.service.name, appSettings.service.name, teamsAppSettings.service.name
 ```
 
-The `NO_PROXY_LIST` value must include the names of the kubernetes services to allow FiftyOne Teams services to talk to each other without going through a proxy server.  By default these service names are `teams-api`, `teams-app`, and `fiftyone-app`.
+The `NO_PROXY` and `GLOBAL_AGENT_NO_PROXY` values must include the names of the kubernetes services to allow FiftyOne Teams services to talk to each other without going through a proxy server.  By default these service names are `teams-api`, `teams-app`, and `fiftyone-app`.
 
+By default the Global Agent Proxy will log all outbound connections and identify which connections are routed through the proxy.  You can reduce the verbosity of the logging output by adding the following environment variable to your `teamsAppSettings.env`:
+
+```
+ROARR_LOG: false
+```
 
 ---
 

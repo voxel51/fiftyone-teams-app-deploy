@@ -147,7 +147,6 @@ teamsAppSettings:
   env:
     APP_USE_HTTPS: true
     RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
-    ROARR_LOG: false
   image:
     repository: voxel51/fiftyone-teams-app
   replicaCount: 2
