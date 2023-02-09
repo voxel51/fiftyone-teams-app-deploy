@@ -55,6 +55,11 @@ The `NO_PROXY_LIST` value must include the names of the compose services to allo
 
 Examples of these settings are included in the `v1.1.0` [compose.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/compose.yaml) and [.env](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/.env) files.
 
+By default the Global Agent Proxy will log all outbound connections and identify which connections are routed through the proxy.  You can reduce the verbosity of the logging output by adding the following environment variable to your `teamsAppSettings.env`:
+
+```
+ROARR_LOG: false
+```
 
 ### Upgrade Process Recommendations
 
