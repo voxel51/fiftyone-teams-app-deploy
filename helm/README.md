@@ -107,7 +107,7 @@ ROARR_LOG: false
 | `secret.fiftyone.auth0Domain`             | None    | Voxel51-provided Auth0 Domain               |
 | `secret.fiftyone.clientId`                | None    | Voxel51-provided Auth0 Client ID            |
 | `secret.fiftyone.cookieSecret`            | None    | Random string for cookie encryption         |
-| `secret.fiftyone.encryptionKey            | None    | Encryption key for storage credentials      |
+| `secret.fiftyone.encryptionKey`           | None    | Encryption key for storage credentials      |
 | `secret.fiftyone.mongodbConnectionString` | None    | MongoDB Connnection String                  |
 | `secret.fiftyone.organizationId`          | None    | Voxel51-provided Auth0 Organization ID      |
 | `teamsAppSettings.dnsName`                | None    | DNS Name for the FiftyOne Teams App Service |
