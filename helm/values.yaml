@@ -20,16 +20,21 @@ secret:
     # This secret is a required random string used to encrypt session cookies
     # Use something like `openssl rand -hex 32` to generate this string
     cookieSecret:
+    # This key is required and is used to encrypt storage credentials in the MongoDB
+    #   do NOT lose this key!
+    # generate keys by executing the following in python:
+    #
+    # from cryptography.fernet import Fernet
+    # print(Fernet.generate_key().decode())
+    encryptionKey:
 
 # apiSettings:
 
-# If you are performing an initial install you should either connect to your database with the SDK first or
-#   set FIFTYONE_DATABASE_ADMIN to true.  We highly recommend setting this to false during normal operations
-#   to prevent upgrading dataset versions before new SDKs have been deployed.
-#   https://helm.fiftyone.ai/#installation-considerations
-# appSettings:
-#   env:
-#     FIFTYONE_DATABASE_ADMIN: true
+appSettings:
+ env:
+   # This value is set to `true` by default for v1.1.0 installs as v1.1.0 is not backwards
+   #  compatible with previous versions.
+   FIFTYONE_DATABASE_ADMIN: true
 
 teamsAppSettings:
   dnsName: teams-upgrade.dev.fiftyone.ai

@@ -164,6 +164,11 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
+- name: FIFTYONE_ENCRYPTION_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: encryptionKey
 - name: MONGO_DEFAULT_DB
   valueFrom:
     secretKeyRef:
@@ -190,6 +195,11 @@ Create a merged list of environment variables for fiftyone-api
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
+- name: FIFTYONE_ENCRYPTION_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: encryptionKey
 - name: FIFTYONE_TEAMS_DOMAIN
   valueFrom:
     secretKeyRef:
