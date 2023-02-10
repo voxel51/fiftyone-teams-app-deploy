@@ -18,8 +18,8 @@ Please contact [Voxel51](https://voxel51.com/#teams-form) if you would like more
 
 ## Installation Considerations
 
-`FIFTYONE_DATABASE_ADMIN` is set to `false` by default.  This is in order to make sure that upgrades do not break existing client installs.
-- If you are performing a new install, consider setting `appSettings.env.FIFTYONE_DATABASE_ADMIN` to `true`
+`FIFTYONE_DATABASE_ADMIN` is set to `true` by default for FiftyOne Teams v1.1.0 upgrades and installations.   This is because FiftyOne Teams v1.1.0 is not backwards compatible with previous versions of the FiftyOne Teams database schema.
+
 - If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
 You can find an example, minimal, `values.yaml` [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
@@ -46,6 +46,57 @@ Please consider if you will require these settings for your deployment.
 
 ---
 
+### v1.1.0 Upgrade Notes
+
+#### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
+
+The FiftyOne Teams v1.1.0 now requires the inclusion of the `encryptionKey` secret.  This key is used to encrypt storage credentials in the MongoDB database.
+
+The `encryptionKey` secret can be generated using the following python:
+
+```
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+```
+
+Voxel51 does not have access to this encryption key and cannot reproduce it.  If this key is lost you will need to schedule an outage window to drop the storage credentials collection, replace the encryption key, and add the storage credentials via the UI again.  Voxel51 strongly recommends storing this key in a safe place.
+
+Storage credentials no longer need to be mounted into containers with appropriate environment variables being set; users with `Admin` permissions can use `/settings/cloud_storage_credentials` in the Web UI to add supported storage credentials.
+
+FiftyOne Teams v1.1.0 continues to support the use of environment variables to set storage credentials in the application context but is providing an alternate configuration path for future functionality.
+
+#### Environment Proxies
+
+FiftyOne Teams now supports routing traffic through proxy servers; this can be configured by setting the following environment variables on all containers in the environment (`*.env`):
+
+```
+http_proxy: http://proxy.yourcompany.tld:3128
+https_proxy: https://proxy.yourcompany.tld:3128
+no_proxy: apiSettings.service.name, appSettings.service.name, teamsAppSettings.service.name
+HTTP_PROXY: http://proxy.yourcompany.tld:3128
+HTTPS_PROXY: https://proxy.yourcompany.tld:3128
+NO_PROXY: apiSettings.service.name, appSettings.service.name, teamsAppSettings.service.name
+
+```
+
+You must also set the following environment variables on containers based on the `fiftyone-teams-app` image (`teamsAppSettings.env`):
+
+```
+GLOBAL_AGENT_HTTP_PROXY: http://proxy.yourcompany.tld:3128
+GLOBAL_AGENT_HTTPS_PROXY: https://proxy.yourconpay.tld:3128
+GLOBAL_AGENT_NO_PROXY: apiSettings.service.name, appSettings.service.name, teamsAppSettings.service.name
+```
+
+The `NO_PROXY` and `GLOBAL_AGENT_NO_PROXY` values must include the names of the kubernetes services to allow FiftyOne Teams services to talk to each other without going through a proxy server.  By default these service names are `teams-api`, `teams-app`, and `fiftyone-app`.
+
+By default the Global Agent Proxy will log all outbound connections and identify which connections are routed through the proxy.  You can reduce the verbosity of the logging output by adding the following environment variable to your `teamsAppSettings.env`:
+
+```
+ROARR_LOG: false
+```
+
+---
+
 ## Required Helm Chart Values
 
 
@@ -56,6 +107,7 @@ Please consider if you will require these settings for your deployment.
 | `secret.fiftyone.auth0Domain`             | None    | Voxel51-provided Auth0 Domain               |
 | `secret.fiftyone.clientId`                | None    | Voxel51-provided Auth0 Client ID            |
 | `secret.fiftyone.cookieSecret`            | None    | Random string for cookie encryption         |
+| `secret.fiftyone.encryptionKey`           | None    | Encryption key for storage credentials      |
 | `secret.fiftyone.mongodbConnectionString` | None    | MongoDB Connnection String                  |
 | `secret.fiftyone.organizationId`          | None    | Voxel51-provided Auth0 Organization ID      |
 | `teamsAppSettings.dnsName`                | None    | DNS Name for the FiftyOne Teams App Service |
@@ -126,6 +178,9 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 | `ingress.annotations`                                            | None                       | Ingress annotations (if required)                                         |
 | `ingress.className`                                              | ""                         | Ingress class name (if required)                                          |
 | `ingress.enabled`                                                | true                       | Toggle enabling ingress                                                   |
+| `ingress.paths`                                                  | See Below                  | List of ingress `path` and `pathType`                                     |
+| `ingress.paths.path`                                             | `/*`                       | path to associate with the FiftyOne Teams App service                     |
+| `ingress.paths.path.pathType`                                    | ImplementationSpecific     | Ingress path type (`ImplementationSpecific`, `Exact`, `Prefix`)           |
 | `ingress.tlsEnabled`                                             | true                       | Enable TLS for Ingress Controller                                         |
 | `ingress.tlsSecretName`                                          | fiftyone-teams-tls-secret  | TLS Secret for certificate with all three DNS Names                       |
 | `namespace.name`                                                 | fiftyone-teams             | Kubernetes Namespace already created for FiftyOne Teams                   |
@@ -170,14 +225,12 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 
 ## Upgrade Process Recommendations
 
-The FiftyOne Teams 0.8.8 Database (version `0.16.6`) is forward-compatible with the FiftyOne Teams 0.10.0 Client (database version `0.18.0`).  Voxel51 recommends the following upgrade process:
+The FiftyOne Teams 0.11.0 Client (database version `0.19.0`) is _NOT_ backwards-compatible with any FiftyOne Teams Database Version.  Upgrading the Web server will require upgrading `fiftyone` SDK versions. Voxel51 recommends the following upgrade process:
 
-1. Ensure all Python clients set `FIFTYONE_DATABASE_ADMIN=false`
-1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams 0.10.0
-1. Upgrade your FiftyOne Teams Kubernetes deploy to Helm version v0.3.0
-1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
-1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
-1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.18.0`
+1. Update your `values.yaml` to include an `encryptionKey` secret
+1. Upgrade to FiftyOne Teams v1.1.0 with `FIFTYONE_DATABASE_ADMIN=true` (this is the default in the Helm chart for this release).
+1. Upgrade your `fiftyone` SDKs to version 0.11.0 (`pip install -U --index-url https://${TOKEN}@pypi.fiftyone.ai fiftyone==0.11.0`)
+1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.19.0`
 
 ---
 
@@ -272,6 +325,11 @@ gcloud compute addresses describe fiftyone-teams-static-ip --global
 
 Record the IP address and either create a DNS entry or contact your Voxel51 support team to have them create an appropriate `fiftyone.ai` DNS entry for you.
 
+### Set up http to https forwarding
+```
+kubectl apply -f frontendconfig.yml
+```
+
 ### Install FiftyOne Teams App
 
 ```
@@ -294,6 +352,8 @@ Your SSL certificates have been correctly issued if you see `HTTP/2 200` at the 
 `kubectl delete secret fiftyone-teams-cert-secret`
 
 Further instructions for debugging ACME certificates are on the [cert-manager docs site](https://cert-manager.io/docs/faq/acme/).
+
+Once your installation is complete, browse to `/settings/cloud_storage_credentials` and add your storage credentials to access sample data.
 
 ### Installation Complete
 
