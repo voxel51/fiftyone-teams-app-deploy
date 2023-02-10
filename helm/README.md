@@ -229,6 +229,7 @@ The FiftyOne Teams 0.11.0 Client (database version `0.19.0`) is _NOT_ backwards-
 1. Update your `values.yaml` to include an `encryptionKey` secret
 1. Upgrade to FiftyOne Teams v1.1.0 with `FIFTYONE_DATABASE_ADMIN=true` (this is the default in the Helm chart for this release).
 1. Upgrade your `fiftyone` SDKs to version 0.11.0 (`pip install -U --index-url https://${TOKEN}@pypi.fiftyone.ai fiftyone==0.11.0`)
+1. Run `fiftyone migrate --all` to upgrade datasets to `0.19.0`
 1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.19.0`
 
 ---
