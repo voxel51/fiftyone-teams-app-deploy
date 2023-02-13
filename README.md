@@ -107,7 +107,7 @@ ROARR_LOG: false
 | `secret.fiftyone.auth0Domain`             | None    | Voxel51-provided Auth0 Domain               |
 | `secret.fiftyone.clientId`                | None    | Voxel51-provided Auth0 Client ID            |
 | `secret.fiftyone.cookieSecret`            | None    | Random string for cookie encryption         |
-| `secret.fiftyone.encryptionKey            | None    | Encryption key for storage credentials      |
+| `secret.fiftyone.encryptionKey`           | None    | Encryption key for storage credentials      |
 | `secret.fiftyone.mongodbConnectionString` | None    | MongoDB Connnection String                  |
 | `secret.fiftyone.organizationId`          | None    | Voxel51-provided Auth0 Organization ID      |
 | `teamsAppSettings.dnsName`                | None    | DNS Name for the FiftyOne Teams App Service |
@@ -230,7 +230,7 @@ The FiftyOne Teams 0.11.0 Client (database version `0.19.0`) is _NOT_ backwards-
 1. Update your `values.yaml` to include an `encryptionKey` secret
 1. Upgrade to FiftyOne Teams v1.1.0 with `FIFTYONE_DATABASE_ADMIN=true` (this is the default in the Helm chart for this release).
 1. Upgrade your `fiftyone` SDKs to version 0.11.0 (`pip install -U --index-url https://${TOKEN}@pypi.fiftyone.ai fiftyone==0.11.0`)
-1. Use `fiftyone migrate --info` to ensure that all datasets are now at version `0.19.0`
+1. Use `fiftyone migrate --all` to upgrade all datasets to version `0.19.0`
 
 ---
 
