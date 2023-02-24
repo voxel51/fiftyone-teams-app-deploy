@@ -214,6 +214,8 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 
 ---
 
+## Upgrade Process Recommendations
+
 ### Upgrade Process Recommendations From Before FiftyOne Teams Version 1.1.0
 
 The FiftyOne 0.11.1 SDK (database version 0.19.1) is _NOT_ backwards-compatible with previous FiftyOne Teams Database Versions, and the FiftyOne 0.10 SDK is not forwards compatible with current FiftyOne Teams Database Versions.  If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
