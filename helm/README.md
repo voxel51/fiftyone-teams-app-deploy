@@ -106,7 +106,7 @@ ROARR_LOG: false
 
 ## Optional Helm Chart Values
 
-You can find a full `values.yaml` with all of the optional values [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml)
+You can find a full `values.yaml` with all of the optional values [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/values.yaml)
 
 | Optional Values                                                  | Default                    | Description                                                               |
 |------------------------------------------------------------------|----------------------------|---------------------------------------------------------------------------|
