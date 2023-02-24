@@ -222,7 +222,7 @@ The FiftyOne 0.11.1 SDK (database version 0.19.1) is _NOT_ backwards-compatible 
 
 Voxel51 recommends the following upgrade process for upgrading from versions prior to FiftyOne Teams version 1.1.0:
 
-1. [Upgrade to FiftyOne Teams version 1.1.1](#deploying-fiftyone-teams) with `FIFTYONE_DATABASE_ADMIN=true` (this is the default in the `config.yaml` for this release).<br>
+1. [Upgrade to FiftyOne Teams version 1.1.1](#deploying-fiftyone-teams) with `FIFTYONE_DATABASE_ADMIN=true` (this is the default in the Helm chart for this release).<br>
     **NOTE:** FiftyOne SDK 0.10 users will lose access to the FiftyOne Teams Database at this step.
 1. Upgrade your FiftyOne SDKs to version 0.11.1<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
@@ -239,7 +239,7 @@ Voxel51 always recommends using the latest version of the FiftyOne SDK compatibl
 Voxel51 recommends the following upgrade process for upgrading from FiftyOne Teams version 1.1.0:
 
 1. Ensure all FiftyOne SDK users set `FIFTYONE_DATABASE_ADMIN=false` or `unset FIFTYONE_DATABASE_ADMIN` (this should generally be your default)
-1. Set `FIFTYONE_DATABASE_ADMIN` to `false` in your `compose.yaml` (this is not the default for this release)
+1. Set `appSettings.env.FIFTYONE_DATABASE_ADMIN` to `false` in your `values.yaml` (this is not the default for this release)
 1. [Upgrade to FiftyOne Teams version 1.1.1](#deploying-fiftyone-teams)
 1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams version 0.11.1<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
