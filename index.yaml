@@ -3,6 +3,17 @@ entries:
   fiftyone-teams-app:
   - apiVersion: v2
     appVersion: v1.1.1
+    created: "2023-03-06T18:16:11.15206592Z"
+    description: A FiftyOne Teams Helm Chart
+    digest: 15996818dc60d8cd07c4d176b09b7c58416eb60f9c0d4cc078a3203435a20703
+    icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
+    name: fiftyone-teams-app
+    type: application
+    urls:
+    - https://github.com/voxel51/fiftyone-teams-app-deploy/releases/download/fiftyone-teams-app-1.1.2-beta1/fiftyone-teams-app-1.1.2-beta1.tgz
+    version: 1.1.2-beta1
+  - apiVersion: v2
+    appVersion: v1.1.1
     created: "2023-02-24T16:27:49.4293442Z"
     description: A FiftyOne Teams Helm Chart
     digest: b6afb8696b26cc839b8812de420d20d6ba590ca170532686708449e342cc1bad
@@ -105,4 +116,4 @@ entries:
     urls:
     - https://github.com/voxel51/fiftyone-teams-app-deploy/releases/download/fiftyone-teams-app-0.1.7/fiftyone-teams-app-0.1.7.tgz
     version: 0.1.7
-generated: "2023-02-24T16:27:49.429395403Z"
+generated: "2023-03-06T18:16:11.15211872Z"
