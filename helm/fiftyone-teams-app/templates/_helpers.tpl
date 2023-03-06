@@ -229,7 +229,7 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- define "fiftyone-teams-app.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
-  value: {{ printf "http://%s" .Values.apiSettings.service.name | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
 - name: AUTH0_DOMAIN
   valueFrom:
     secretKeyRef:
@@ -266,7 +266,7 @@ Create a merged list of environment variables for fiftyone-teams-app
 - name: FIFTYONE_SERVER_PATH_PREFIX
   value: "/api/proxy/fiftyone-teams"
 - name: FIFTYONE_TEAMS_PROXY_URL
-  value: {{ printf "http://%s" .Values.appSettings.service.name | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name .Values.appSettings.service.port | quote }}
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
