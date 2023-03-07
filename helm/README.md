@@ -128,6 +128,7 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 | `apiSettings.service.containerPort`                              | 8000                       | Port for FiftyOne Teams API Containers                                    |
 | `apiSettings.service.liveness.initialDelaySeconds`               | 45                         | Delay before Liveness checks for FiftyOne Teams API containers            |
 | `apiSettings.service.name`                                       | teams-api                  | FiftyOne Teams API service name                                           |
+| `apiSettings.service.nodePort`                                   | None                       | `nodePort` for Service Type `NodePort`                                    |
 | `apiSettings.service.port`                                       | 80                         | FiftyOne Teams API service port                                           |
 | `apiSettings.service.readiness.initialDelaySeconds`              | 45                         | Delay before Readiness checks for FiftyOne Teams API containers           |
 | `apiSettings.service.shortname`                                  | teams-api                  | Short name for port definitions (less than 15 characters)                 |
@@ -159,6 +160,7 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 | `appSettings.service.containerPort`                              | 5151                       | Port for FiftyOne App Containers                                          |
 | `appSettings.service.liveness.initialDelaySeconds`               | 45                         | Delay before Liveness checks for FiftyOne App containers                  |
 | `appSettings.service.name`                                       | fiftyone-app               | FiftyOne App service name                                                 |
+| `appSettings.service.nodePort`                                   | None                       | `nodePort` for Service Type `NodePort`                                    |
 | `appSettings.service.port`                                       | 80                         | FiftyOne App service port                                                 |
 | `appSettings.service.readiness.initialDelaySeconds`              | 45                         | Delay before Readiness checks for FiftyOne App containers                 |
 | `appSettings.service.shortname`                                  | fiftyone-app               | Shirt name for port definitions (less than 15 characters)                 |
@@ -204,6 +206,7 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 | `teamsAppSettings.service.containerPort`                         | 3000                       | Port for FiftyOne Teams App containers                                    |
 | `teamsAppSettings.service.liveness.initialDelaySeconds`          | 45                         | Delay before Liveness checks for FiftyOne Teams App containers            |
 | `teamsAppSettings.service.name`                                  | teams-app                  | FiftyOne Teams App service name                                           |
+| `teamsAppSettings.service.nodePort`                              | None                       | `nodePort` for Service Type `NodePort`                                    |
 | `teamsAppSettings.service.port`                                  | 80                         | FiftyOne Teams App service port                                           |
 | `teamsAppSettings.service.readiness.initialDelaySeconds`         | 45                         | Delay before Readiness checks for FiftyOne Teams App containers           |
 | `teamsAppSettings.service.shortname`                             | teams-app                  | Short name for port definitions (less than 15 characters)                 |

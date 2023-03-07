@@ -12,5 +12,8 @@ spec:
       targetPort: {{ .Values.apiSettings.service.containerPort | default 8000 }}
       protocol: TCP
       name: http
+      {{- if and (eq .Values.apiSettings.service.type "NodePort") (.Values.apiSettings.service.nodePort) }}
+      nodePort: {{ .Values.apiSettings.service.nodePort }}
+      {{- end }}
   selector:
     {{- include "fiftyone-teams-api.selectorLabels" . | nindent 4 }}

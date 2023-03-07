@@ -12,5 +12,8 @@ spec:
       targetPort: {{ .Values.teamsAppSettings.service.containerPort | default 3000 }}
       protocol: TCP
       name: http
+      {{- if and (eq .Values.teamsAppSettings.service.type "NodePort") (.Values.teamsAppSettings.service.nodePort) }}
+      nodePort: {{ .Values.teamsAppSettings.service.nodePort }}
+      {{- end }}
   selector:
     {{- include "fiftyone-teams-app.selectorLabels" . | nindent 4 }}

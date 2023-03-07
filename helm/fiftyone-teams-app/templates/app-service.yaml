@@ -12,5 +12,8 @@ spec:
       targetPort: {{ .Values.appSettings.service.containerPort | default 5151 }}
       protocol: TCP
       name: http
+      {{- if and (eq .Values.appSettings.service.type "NodePort") (.Values.appSettings.service.nodePort) }}
+      nodePort: {{ .Values.appSettings.service.nodePort }}
+      {{- end }}
   selector:
     {{- include "fiftyone-app.selectorLabels" . | nindent 4 }}
