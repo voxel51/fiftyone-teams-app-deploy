@@ -37,7 +37,7 @@ Create a default name for the fiftyone app service
 {{/*
 Create a default name for the teams api service
 */}}
-{{- define "fiftyone-teams-api.name" -}}
+{{- define "teams-api.name" -}}
 {{- if .Values.apiSettings.service.name }}
 {{- .Values.apiSettings.service.name | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -78,7 +78,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 API Selector labels
 */}}
 {{- define "fiftyone-teams-api.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "fiftyone-teams-api.name" . }}
+app.kubernetes.io/name: {{ include "teams-api.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
