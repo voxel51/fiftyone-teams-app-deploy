@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "fiftyone-teams-api.name" . }}
+  name: {{ include "teams-api.name" . }}
   namespace: {{ .Values.namespace.name }}
   labels:
-    app: {{ include "fiftyone-teams-api.name" . }}
+    app: {{ include "teams-api.name" . }}
     {{- include "fiftyone-teams-api.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ include "fiftyone-teams-api.name" . }}
+      app: {{ include "teams-api.name" . }}
       {{- include "fiftyone-teams-api.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app: {{ include "fiftyone-teams-api.name" . }}
+        app: {{ include "teams-api.name" . }}
         {{- include "fiftyone-teams-api.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -30,7 +30,7 @@ spec:
       securityContext:
         {{- toYaml .Values.apiSettings.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ include "fiftyone-teams-api.name" . }}
+        - name: {{ include "teams-api.name" . }}
           securityContext:
             {{- toYaml .Values.apiSettings.securityContext | nindent 12 }}
           image: "{{ .Values.apiSettings.image.repository }}:{{ .Values.apiSettings.image.tag | default .Chart.AppVersion }}"

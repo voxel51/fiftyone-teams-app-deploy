@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "fiftyone-teams-api.name" . }}
+  name: {{ include "teams-api.name" . }}
   namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "fiftyone-teams-api.labels" . | nindent 4 }}

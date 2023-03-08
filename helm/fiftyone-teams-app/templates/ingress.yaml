@@ -33,18 +33,37 @@ spec:
   tls:
     - hosts:
         - {{ .Values.teamsAppSettings.dnsName | quote }}
+        {{- if .Values.apiSettings.dnsName }}
+        - {{ .Values.apiSettings.dnsName | quote }}
+        {{- end }}
       secretName: {{ .Values.ingress.tlsSecretName }}
   {{- end }}
   rules:
     - host: {{ .Values.teamsAppSettings.dnsName | quote }}
       http:
         paths:
+          {{- if .Values.ingress.paths }}
           {{- range .Values.ingress.paths }}
           - path: {{ .path }}
             {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
             pathType: {{ .pathType }}
             {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ include "teams-app.name" $ }}
+                port:
+                  number: {{ $.Values.teamsAppSettings.service.port }}
+              {{- else }}
+              serviceName: {{ include "teams-app.name" $ }}
+              servicePort: {{ $.Values.teamsAppSettings.service.port }}
+              {{- end }}
           {{- end }}
+          {{- else }}
+          - path: {{ .Values.ingress.teamsApp.path }}
+            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+            pathType: {{ .Values.ingress.teamsApp.pathType }}
+            {{- end }}
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
@@ -55,4 +74,24 @@ spec:
               serviceName: {{ include "teams-app.name" . }}
               servicePort: {{ .Values.teamsAppSettings.service.port }}
               {{- end }}
+          {{- end }}
+    {{- if .Values.apiSettings.dnsName }}
+    - host: {{ .Values.apiSettings.dnsName | quote }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.api.path }}
+            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+            pathType: {{ .Values.ingress.api.pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ include "teams-api.name" . }}
+                port:
+                  number: {{ .Values.apiSettings.service.port }}
+              {{- else }}
+              serviceName: {{ include "teams-api.name" . }}
+              servicePort: {{ .Values.apiSettings.service.port }}
+              {{- end }}
+    {{- end }}
 {{- end }}
