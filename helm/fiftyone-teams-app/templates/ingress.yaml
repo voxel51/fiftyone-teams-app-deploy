@@ -44,15 +44,15 @@ spec:
             {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
             pathType: {{ .pathType }}
             {{- end }}
-          {{- end }}
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ include "teams-app.name" . }}
+                name: {{ include "teams-app.name" $ }}
                 port:
-                  number: {{ .Values.teamsAppSettings.service.port }}
+                  number: {{ $.Values.teamsAppSettings.service.port }}
               {{- else }}
-              serviceName: {{ include "teams-app.name" . }}
-              servicePort: {{ .Values.teamsAppSettings.service.port }}
+              serviceName: {{ include "teams-app.name" $ }}
+              servicePort: {{ $.Values.teamsAppSettings.service.port }}
               {{- end }}
+          {{- end }}
 {{- end }}
