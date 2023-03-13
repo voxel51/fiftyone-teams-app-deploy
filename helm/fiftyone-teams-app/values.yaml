@@ -59,6 +59,7 @@ appSettings:
     FIFTYONE_DATABASE_ADMIN: true
     FIFTYONE_MEDIA_CACHE_IMAGES: false
     FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+    FIFTYONE_INTERNAL_SERVICE: true
     # These are nonsensitive since you're mounting them from secrets below
     # AWS_CONFIG_FILE=/opt/secrets/aws/aws-credentials-file
     # GOOGLE_APPLICATION_CREDENTIALS=/opt/secrets/google/service-account
