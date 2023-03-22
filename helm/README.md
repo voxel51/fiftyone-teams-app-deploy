@@ -20,7 +20,9 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 ## Initial Installation vs. Upgrades
 
-`FIFTYONE_DATABASE_ADMIN` is set to `true` by default for FiftyOne Teams version 1.1.1 upgrades and installations.   This is because FiftyOne Teams version 1.1.1 is not backwards compatible with versions of the FiftyOne Teams database schema prior to version 0.19.0.
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.2.0 upgrades and installations.   This is because FiftyOne Teams version 1.2.0 is backwards compatible with FiftyOne Teams database schema 0.19 (Teams Version 1.1).
+
+- If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.12.0 SDK before performing the FiftyOne Teams installation, or you will want to add `FIFTYONE_DATABASE_ADMIN: true` in the `env` section of the `appSettings` configuration.
 
 - If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
@@ -37,11 +39,11 @@ Please consider if you will require these settings for your deployment.
 
 ---
 
-### FiftyOne Teams version 1.1.1 Upgrade Notes
+### FiftyOne Teams Upgrade Notes
 
 #### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-The FiftyOne Teams version 1.1.1 Helm chart now requires the inclusion of the `encryptionKey` secret.  This key is used to encrypt storage credentials in the MongoDB database.
+Containers based on the `fiftyone-teams-api` and `fiftyone-app` images now _REQUIRE_ the inclusion of the `FIFTYONE_ENCRYPTION_KEY` variable.  This key is used to encrypt storage credentials in the MongoDB database.
 
 The `encryptionKey` secret can be generated using the following python:
 
@@ -84,6 +86,18 @@ By default the Global Agent Proxy will log all outbound connections and identify
 
 ```
 ROARR_LOG: false
+```
+
+#### Text Similarity
+
+FiftyOne Teams now supports using text similarity searches for images that are indexed with a model that [supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text).  If you choose to make use of this feature, you must use the `fiftyone-app-torch` image provided by Voxel51 instead of the `fiftyone-app` image.
+
+You can override the default image by providing a new `appSettings.image.repository` value to the Helm Chart.  Using the included `values.yaml` this configuration might look like:
+
+```
+appSettings:
+  image:
+    repository: voxel51/fiftyone-app-torch
 ```
 
 ---
@@ -217,42 +231,50 @@ You can find a full `values.yaml` with all of the optional values [here](https:/
 
 ---
 
+## Upgrade Process Recommendations
+
+### Upgrade Process Recommendations From Early Adopter Versions
+
+Please contact your Voxel51 Customer Success team member to coordinate this upgrade.  You will need to either create a new IdP or modify your existing configuration in order to migrate to a new Auth0 Tenant.
+
 ### Upgrade Process Recommendations From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.11.1 SDK (database version 0.19.1) is _NOT_ backwards-compatible with previous FiftyOne Teams Database Versions, and the FiftyOne 0.10 SDK is not forwards compatible with current FiftyOne Teams Database Versions.  If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
+The FiftyOne 0.12.0 SDK (database version 0.20.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0, and the FiftyOne 0.10 SDK is not forwards compatible with current FiftyOne Teams Database Versions.  If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
 Voxel51 recommends the following upgrade process for upgrading from versions prior to FiftyOne Teams version 1.1.0:
 
-1. [Upgrade to FiftyOne Teams version 1.1.1](#deploying-fiftyone-teams) with `FIFTYONE_DATABASE_ADMIN=true` (this is the default in the `config.yaml` for this release).<br>
-    **NOTE:** FiftyOne SDK 0.10 users will lose access to the FiftyOne Teams Database at this step.
-1. Upgrade your FiftyOne SDKs to version 0.11.1<br>
+1. Make sure your installation includes the required [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes) environment variable
+1. [Upgrade to FiftyOne Teams version 1.2.0](#deploying-fiftyone-teams) with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true` (this is not the default in the Helm Chart for this release).<br>
+    **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.12.0`
+1. Upgrade your FiftyOne SDKs to version 0.12.0<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
-1. Use `fiftyone migrate --info` to make sure that all datasets have been migrated to version 0.19.1.
+1. Use `fiftyone migrate --info` to make sure that all datasets have been migrated to version 0.20.0.
     - If not all datasets have been upgraded, have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local environment
 	- Have that admin use `fiftyone migrate --all` to upgrade any remaining datasets
 
-### Upgrade Process Recommendations From FiftyOne Teams Version 1.1.0
+### Upgrade Process Recommendations From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.11.1 SDK (database version 0.19.1) is _NOT_ backwards-compatible with previous FiftyOne Teams Database Versions, but the FiftyOne 0.11.0 SDK _is_ forwards compatible with FiftyOne Teams Database Version 0.19.1.  If you are already using FiftyOne SDK version 0.11.0 you will not be required to upgrade your FiftyOne SDKs as part of the upgrade process.
+The FiftyOne 0.12.0 SDK (database version 0.20.0) is backwards-compatible with FiftyOne Teams Database Versions after 0.19.0, but the FiftyOne 0.11.0 SDK is _NOT_ forwards compatible with FiftyOne Teams Database Version 0.20.0.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
-Voxel51 recommends the following upgrade process for upgrading from FiftyOne Teams version 1.1.0:
+Voxel51 recommends the following upgrade process for upgrading from FiftyOne Teams version 1.1.0 or later:
 
 1. Ensure all FiftyOne SDK users set `FIFTYONE_DATABASE_ADMIN=false` or `unset FIFTYONE_DATABASE_ADMIN` (this should generally be your default)
-1. Set `FIFTYONE_DATABASE_ADMIN` to `false` in your `compose.yaml` (this is not the default for this release)
-1. [Upgrade to FiftyOne Teams version 1.1.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams Python clients to FiftyOne Teams version 0.11.1<br>
+1. [Upgrade to FiftyOne Teams version 1.2.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.12.0<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
-1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local Python client
+1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local environment
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
-1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.19.1
+1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.20.0
 
 ---
 
 ## Deploying FiftyOne Teams
 
 You can find an example, minimal, `values.yaml` [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+
+The author of this document recommends the use of [helm diff](https://github.com/databus23/helm-diff) to determine what changes will be applied during installations and upgrades.  Voxel51 is not affiliated with the author of this plugin.
 
 Once you have edited the `values.yaml` file you can deploy your FiftyOne Teams instance with:
 ```
@@ -261,6 +283,13 @@ helm repo update voxel51
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
 ```
 
+You can upgrade an existing deployment with:
+```
+helm repo update voxel51
+helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
+```
+
+---
 
 ## A Full GKE Deployment Example
 
