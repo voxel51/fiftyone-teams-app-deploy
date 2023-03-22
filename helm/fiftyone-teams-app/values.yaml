@@ -12,6 +12,7 @@ secret:
 apiSettings:
   env:
     FIFTYONE_ENV: production
+    FIFTYONE_INTERNAL_SERVICE: true
     GRAPHQL_DEFAULT_LIMIT: 10
     LOGGING_LEVEL: INFO
   image:
@@ -56,7 +57,7 @@ appSettings:
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
   env:
-    FIFTYONE_DATABASE_ADMIN: true
+    FIFTYONE_DATABASE_ADMIN: false
     FIFTYONE_MEDIA_CACHE_IMAGES: false
     FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
     FIFTYONE_INTERNAL_SERVICE: true
@@ -148,7 +149,7 @@ teamsAppSettings:
   env:
     APP_USE_HTTPS: true
     RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.11.1
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.12.0
   image:
     repository: voxel51/fiftyone-teams-app
   replicaCount: 2
