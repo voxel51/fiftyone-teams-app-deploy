@@ -89,7 +89,7 @@ services:
 
 ## Upgrade Process Recommendations
 
-### Upgrade Process Recommendations From Early Adopter Versions
+### Upgrade Process Recommendations From Early Adopter Versions (Versions less than 1.0)
 
 Please contact your Voxel51 Customer Success team member to coordinate this upgrade.  You will need to either create a new IdP or modify your existing configuration in order to migrate to a new Auth0 Tenant.
 
