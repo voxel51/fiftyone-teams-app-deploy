@@ -22,7 +22,7 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 `FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.2.1 upgrades and installations.   This is because FiftyOne Teams version 1.2.1 is backwards compatible with FiftyOne Teams database schema 0.19 (Teams Version 1.1).
 
-- If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.12.0 SDK before performing the FiftyOne Teams installation, or you will want to add `FIFTYONE_DATABASE_ADMIN: true` in the `env` section of the `appSettings` configuration.
+- If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.12.1 SDK before performing the FiftyOne Teams installation, or you will want to add `FIFTYONE_DATABASE_ADMIN: true` in the `env` section of the `appSettings` configuration.
 
 - If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
@@ -239,34 +239,34 @@ Please contact your Voxel51 Customer Success team member to coordinate this upgr
 
 ### Upgrade Process Recommendations From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.12.0 SDK (database version 0.20.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0, and the FiftyOne 0.10 SDK is not forwards compatible with current FiftyOne Teams Database Versions.  If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
+The FiftyOne 0.12.1 SDK (database version 0.20.1) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0, and the FiftyOne 0.10 SDK is not forwards compatible with current FiftyOne Teams Database Versions.  If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
 Voxel51 recommends the following upgrade process for upgrading from versions prior to FiftyOne Teams version 1.1.0:
 
 1. Make sure your installation includes the required [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes) environment variable
-1. [Upgrade to FiftyOne Teams version 1.2.1](#deploying-fiftyone-teams) with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true` (this is not the default in the Helm Chart for this release).<br>
-    **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.12.0`
-1. Upgrade your FiftyOne SDKs to version 0.12.0<br>
+1. [Upgrade to FiftyOne Teams version 1.2.0](#deploying-fiftyone-teams) with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true` (this is not the default in the Helm Chart for this release).<br>
+    **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.12.1`
+1. Upgrade your FiftyOne SDKs to version 0.12.1<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
-1. Use `fiftyone migrate --info` to make sure that all datasets have been migrated to version 0.20.0.
+1. Use `fiftyone migrate --info` to make sure that all datasets have been migrated to version 0.20.1.
     - If not all datasets have been upgraded, have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local environment
 	- Have that admin use `fiftyone migrate --all` to upgrade any remaining datasets
 
 ### Upgrade Process Recommendations From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.12.0 SDK (database version 0.20.0) is backwards-compatible with FiftyOne Teams Database Versions after 0.19.0, but the FiftyOne 0.11.0 SDK is _NOT_ forwards compatible with FiftyOne Teams Database Version 0.20.0.
+The FiftyOne 0.12.1 SDK (database version 0.20.1) is backwards-compatible with FiftyOne Teams Database Versions after 0.19.0, but the FiftyOne 0.11.0 SDK is _NOT_ forwards compatible with FiftyOne Teams Database Version 0.20.1.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
 Voxel51 recommends the following upgrade process for upgrading from FiftyOne Teams version 1.1.0 or later:
 
 1. Ensure all FiftyOne SDK users set `FIFTYONE_DATABASE_ADMIN=false` or `unset FIFTYONE_DATABASE_ADMIN` (this should generally be your default)
-1. [Upgrade to FiftyOne Teams version 1.2.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.12.0<br>
+1. [Upgrade to FiftyOne Teams version 1.2.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.12.1<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
 1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local environment
 1. Have the admin run `fiftyone migrate --all` to upgrade all datasets
-1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.20.0
+1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.20.1
 
 ---
 
