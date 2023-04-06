@@ -102,7 +102,7 @@ Voxel51 recommends the following upgrade process for upgrading from versions pri
 1. Make sure your installation includes the required [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes) environment variable
 1. If you are using a proxy server, make sure you have configured the appropriate [proxy environment variables](#environment-proxies)
 
-1. [Upgrade to FiftyOne Teams version 1.2.1](#deploying-fiftyone-teams-version) with `FIFTYONE_DATABASE_ADMIN=true` (this is not the default in the `config.yaml` for this release).<br>
+1. [Upgrade to FiftyOne Teams version 1.2.1](#deploying-fiftyone-teams) with `FIFTYONE_DATABASE_ADMIN=true` (this is not the default in the `config.yaml` for this release).<br>
     **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.12.1`
 1. Upgrade your FiftyOne SDKs to version 0.12.1<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
