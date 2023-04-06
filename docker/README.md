@@ -16,7 +16,7 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 ## Initial Installation vs. Upgrades
 
-`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.2.0 installations and upgrades.  This is because FiftyOne Teams version 1.2.0 is backwards compatible with FiftyOne Teams database schema version 0.19 (Teams Version 1.1).
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.2.1 installations and upgrades.  This is because FiftyOne Teams version 1.2.1 is backwards compatible with FiftyOne Teams database schema version 0.19 (Teams Version 1.1).
 
 - If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.12.0 SDK before performing the FiftyOne Teams installation, or you will want to set `FIFTYONE_DATABASE_ADMIN: true` in the `environment` section of the `fiftyone-app` service definition.
 
@@ -84,7 +84,7 @@ Voxel51 recommends using a `compose.override.yaml` to [override the image select
 version: '3.8'
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.2.0
+    image: voxel51/fiftyone-app-torch:v1.2.1
 ```
 
 ## Upgrade Process Recommendations
@@ -101,7 +101,7 @@ Voxel51 recommends the following upgrade process for upgrading from versions pri
 
 1. Make sure your installation includes the required [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes) environment variable
 1. If you are using a proxy server, make sure you have configured the appropriate [proxy environment variables](#environment-proxies)
-1. [Upgrade to FiftyOne Teams version 1.2.0](#deploying-fiftyone-teams-version) with `FIFTYONE_DATABASE_ADMIN=true` (this is not the default in the `config.yaml` for this release).<br>
+1. [Upgrade to FiftyOne Teams version 1.2.1](#deploying-fiftyone-teams-version) with `FIFTYONE_DATABASE_ADMIN=true` (this is not the default in the `config.yaml` for this release).<br>
     **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.12.0`
 1. Upgrade your FiftyOne SDKs to version 0.12.0<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
@@ -118,7 +118,7 @@ Voxel51 always recommends using the latest version of the FiftyOne SDK compatibl
 Voxel51 recommends the following upgrade process for upgrading from FiftyOne Teams version 1.1.0 or later:
 
 1. Ensure all FiftyOne SDK users set `FIFTYONE_DATABASE_ADMIN=false` or `unset FIFTYONE_DATABASE_ADMIN` (this should generally be your default)
-1. [Upgrade to FiftyOne Teams version 1.2.0](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.2.1](#deploying-fiftyone-teams)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.12.0<br>
     The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
 1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local environment
