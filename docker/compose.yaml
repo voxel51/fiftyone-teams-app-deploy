@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   teams-api:
-    image: voxel51/fiftyone-teams-api:v1.2.0
+    image: voxel51/fiftyone-teams-api:v1.2.1
     environment:
       AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
       AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
@@ -27,7 +27,7 @@ services:
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
   teams-app:
-    image: voxel51/fiftyone-teams-app:v1.2.0
+    image: voxel51/fiftyone-teams-app:v1.2.1
     environment:
       API_URL: ${API_URL}
       AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
@@ -59,7 +59,7 @@ services:
     ports:
       - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
   fiftyone-app:
-    image: voxel51/fiftyone-app:v1.2.0
+    image: voxel51/fiftyone-app:v1.2.1
     environment:
       FIFTYONE_DATABASE_ADMIN: false
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
