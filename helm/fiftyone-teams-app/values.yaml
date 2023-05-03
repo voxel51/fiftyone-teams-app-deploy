@@ -29,13 +29,14 @@ apiSettings:
   #   cpu: 500m
   #   memory: 512Mi
   service:
+    annotations: {}
     containerPort: 8000
     liveness:
       initialDelaySeconds: 45
     name: teams-api
+    port: 80
     readiness:
       initialDelaySeconds: 45
-    port: 80
     # port names must be less than 15 characters
     shortname: teams-api
     type: ClusterIP
@@ -80,6 +81,7 @@ appSettings:
   #   cpu: 500m
   #   memory: 1Gi
   service:
+    annotations: {}
     containerPort: 5151
     liveness:
       initialDelaySeconds: 45
@@ -148,8 +150,8 @@ teamsAppSettings:
     targetMemoryUtilizationPercentage: 80
   env:
     APP_USE_HTTPS: true
-    RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
     FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.12.1
+    RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
   image:
     repository: voxel51/fiftyone-teams-app
   replicaCount: 2
@@ -166,6 +168,7 @@ teamsAppSettings:
   #   memory: 1Gi
   serverPathPrefix: /
   service:
+    annotations: {}
     containerPort: 3000
     liveness:
       initialDelaySeconds: 45
