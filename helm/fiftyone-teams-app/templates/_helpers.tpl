@@ -181,10 +181,12 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- end -}}
 
 {{/*
-Create a merged list of environment variables for fiftyone-api
+Create a merged list of environment variables for fiftyone-app
 */}}
 {{- define "fiftyone-app.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
+- name: API_URL
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
