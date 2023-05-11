@@ -61,6 +61,7 @@ services:
   fiftyone-app:
     image: voxel51/fiftyone-app:v1.2.1
     environment:
+      API_URL: ${API_URL}
       FIFTYONE_DATABASE_ADMIN: false
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
