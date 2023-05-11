@@ -3,6 +3,6 @@ name: fiftyone-teams-app
 namespace: fiftyone-teams
 description: A FiftyOne Teams Helm Chart
 type: application
-version: 1.3.0-dev4
-appVersion: "v1.3.0.dev4"
+version: 1.3.0-dev6
+appVersion: "v1.3.0.dev6"
 icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png

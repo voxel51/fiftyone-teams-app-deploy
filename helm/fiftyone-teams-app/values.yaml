@@ -123,7 +123,7 @@ appSettings:
   #       fsType: ext4
 
   # To add volumeMounts create volumes and uncomment the appropriate appSettings.env line above,
-  #  remove the []''s below, and uncomment or add apppropriate entries.
+  #  remove the {}''s below, and uncomment or add apppropriate entries.
   volumeMounts: []
   #   - mountPath: /opt/secrets/aws
   #     name: aws-credentials-volume
@@ -140,6 +140,55 @@ appSettings:
   podSecurityContext: {}
   securityContext: {}
   tolerations: []
+
+pluginsSettings:
+  enabled: false
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  env:
+    FIFTYONE_MEDIA_CACHE_IMAGES: false
+    FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+    FIFTYONE_INTERNAL_SERVICE: true
+  image:
+    repository: voxel51/fiftyone-app
+  replicaCount: 2
+  resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 2
+  #   memory: 6Gi
+  # requests:
+  #   cpu: 500m
+  #   memory: 1Gi
+  service:
+    annotations: {}
+    containerPort: 5151
+    liveness:
+      initialDelaySeconds: 45
+    name: teams-plugins
+    port: 80
+    readiness:
+      initialDelaySeconds: 45
+    # port names must be less than 15 characters
+    shortname: teams-plugins
+    type: ClusterIP
+
+  affinity: {}
+  nodeSelector: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  tolerations: []
+  volumeMounts: []
+  volumes: []
+
 
 teamsAppSettings:
   autoscaling:
@@ -186,8 +235,8 @@ teamsAppSettings:
   podSecurityContext: {}
   securityContext: {}
   tolerations: []
-  volumes: {}
-  volumeMounts: {}
+  volumes: []
+  volumeMounts: []
 
 serviceAccount:
   # Specifies whether a service account should be created
