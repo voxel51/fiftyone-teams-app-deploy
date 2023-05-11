@@ -117,8 +117,6 @@ services:
       # HTTP_PROXY: ${HTTP_PROXY_URL}
       # HTTPS_PROXY: ${HTTPS_PROXY_URL}
       # NO_PROXY: ${NO_PROXY_LIST}
-    ports:
-      - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
     volumes:
       - plugins-vol:/opt/plugins:ro
 volumes:

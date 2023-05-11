@@ -28,7 +28,7 @@ services:
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
     volumes:
-      - plugins-volume:/opt/plugins
+      - plugins-vol:/opt/plugins
   teams-app:
     image: voxel51/fiftyone-teams-app:v1.2.1
     environment:
@@ -44,7 +44,6 @@ services:
       FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.12.1
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
-      FIFTYONE_TEAMS_PLUGIN_URL: ${FIFTYONE_TEAMS_PLUGIN_URL}
       FIFTYONE_TEAMS_PROXY_URL: ${FIFTYONE_TEAMS_PROXY_URL}
       NODE_ENV: production
       RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
