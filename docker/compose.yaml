@@ -26,6 +26,7 @@ services:
       # NO_PROXY: ${NO_PROXY_LIST}
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
+    restart: always
   teams-app:
     image: voxel51/fiftyone-teams-app:v1.2.1
     environment:
@@ -58,6 +59,7 @@ services:
       # GLOBAL_AGENT_NO_PROXY: ${NO_PROXY_LIST}
     ports:
       - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
+    restart: always
   fiftyone-app:
     image: voxel51/fiftyone-app:v1.2.1
     environment:
@@ -86,3 +88,4 @@ services:
       # NO_PROXY: ${NO_PROXY_LIST}
     ports:
       - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
+    restart: always
