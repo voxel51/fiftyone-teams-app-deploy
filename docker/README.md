@@ -27,6 +27,24 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 ### FiftyOne Teams Upgrade Notes
 
+#### Enabling FiftyOne Teams Plugins
+
+FiftyOne Teams v1.3.0 officially introduces [Plugins](https://docs.voxel51.com/plugins/index.html) to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins:
+
+- Builtin Plugins Only - no changes are required for this mode.
+- Plugins run in the `fiftyone-app` deployment - to enabled this mode:
+    - you should use the `compose.plugins.yaml` instead of the `compose.yaml` in this repository.  Your `docker compose` command might look like:<br>
+        `docker compose -f compose.plugins.yaml -f compose.override.yaml up -d`
+    - expose the `teams-api` for SDK access
+- Plugins run in a dedicated `teams-plugins` deployment - to enable this mode:
+    - you should use the `compose.dedicated-plugins.yaml` instead of the `compose.yaml` in this repository.  Your `docker compose` command might look like:<br>
+        `docker compose -f compose.dedicated-plugins.yaml -f compose.override.yaml up -d`
+	- expose the `teams-api` for SDK access
+
+Both the `compose.plugins.yaml` and the `compose.dedicated-plugins.yaml` create a new Docker Volume that is shared between FiftyOne Teams services.  If you have a multi-node deployment you will need to establish a storage solution that allows the appropriate deployments to access the deployed plugins.
+
+Plugins are deployed using the FiftyOne Teams SDK; any early-adopter plugins installed via manual methods will need to be redeployed using the FiftyOne Teams SDK.
+
 #### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
 As of FiftyOne Teams 1.1, containers based on the `fiftyone-teams-api` and `fiftyone-app` images now _REQUIRE_ the inclusion of the `FIFTYONE_ENCRYPTION_KEY` variable. This key is used to encrypt storage credentials in the MongoDB database.
@@ -108,7 +126,8 @@ Voxel51 recommends the following upgrade process for upgrading from versions pri
 1. Upgrade your FiftyOne SDKs to version 0.13.0<br>
    The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
 1. Use `fiftyone migrate --info` to make sure that all datasets have been migrated to version 0.21.0.
-   - If not all datasets have been upgraded, an admin can run `FIFTYONE_DATABASE_ADMIN=true fiftyone migreat --all` in their local environment
+   - If not all datasets have been upgraded, an admin can run `FIFTYONE_DATABASE_ADMIN=true fiftyone migrate
+   --all` in their local environment
 
 
 ### Upgrade Process Recommendations From FiftyOne Teams Version 1.1.0 and later
