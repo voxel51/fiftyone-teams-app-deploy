@@ -249,9 +249,9 @@ serviceAccount:
 ingress:
   # If you are configuring your own ingress controller, set this to 'false'
   annotations: {}
-  # api:
-  #   path: /*
-  #   pathType: ImplementationSpecific
+  api:
+    path: /*
+    pathType: ImplementationSpecific
   className: ""
   enabled: true
   teamsApp:
