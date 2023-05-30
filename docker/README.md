@@ -17,9 +17,9 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 ## Initial Installation vs. Upgrades
 
-`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.2.1 installations and upgrades. This is because FiftyOne Teams version 1.2.1 is backwards compatible with FiftyOne Teams database schema version 0.19 (Teams Version 1.1).
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.3.0 installations and upgrades. This is because FiftyOne Teams version 1.3.0 is backwards compatible with FiftyOne Teams database schema version 0.19 (Teams Version 1.1) and newer.
 
-- If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.12.1 SDK before performing the FiftyOne Teams installation, or you will want to set `FIFTYONE_DATABASE_ADMIN: true` in the `environment` section of the `fiftyone-app` service definition.
+- If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.13.0 SDK before performing the FiftyOne Teams installation, or you will want to set `FIFTYONE_DATABASE_ADMIN: true` in the `environment` section of the `fiftyone-app` service definition.
 
 - If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
@@ -29,7 +29,7 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 #### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-Containers based on the `fiftyone-teams-api` and `fiftyone-app` images now _REQUIRE_ the inclusion of the `FIFTYONE_ENCRYPTION_KEY` variable. This key is used to encrypt storage credentials in the MongoDB database.
+As of FiftyOne Teams 1.1, containers based on the `fiftyone-teams-api` and `fiftyone-app` images now _REQUIRE_ the inclusion of the `FIFTYONE_ENCRYPTION_KEY` variable. This key is used to encrypt storage credentials in the MongoDB database.
 
 The `FIFTYONE_ENCRYPTION_KEY` can be generated using the following python:
 
@@ -42,7 +42,7 @@ Voxel51 does not have access to this encryption key and cannot reproduce it. If 
 
 Storage credentials no longer need to be mounted into containers with appropriate environment variables being set; users with `Admin` permissions can use `/settings/cloud_storage_credentials` in the Web UI to add supported storage credentials.
 
-FiftyOne Teams version 1.2 continues to support the use of environment variables to set storage credentials in the application context but is providing an alternate configuration path for future functionality.
+FiftyOne Teams version 1.3 continues to support the use of environment variables to set storage credentials in the application context but is providing an alternate configuration path for future functionality.
 
 #### Environment Proxies
 
@@ -77,7 +77,7 @@ ROARR_LOG: false
 
 #### Text Similarity
 
-FiftyOne Teams now supports using text similarity searches for images that are indexed with a model that [supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text). If you choose to make use of this feature, you must use the `fiftyone-app-torch` image provided by Voxel51 instead of the `fiftyone-app` image.
+FiftyOne Teams version 1.2 and higher supports using text similarity searches for images that are indexed with a model that [supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text). If you choose to make use of this feature, you must use the `fiftyone-app-torch` image provided by Voxel51 instead of the `fiftyone-app` image, or build your own base image including torch.
 
 Voxel51 recommends using a `compose.override.yaml` to [override the image selection](https://docs.docker.com/compose/extends/); this will allow you to update your `compose.yaml` in future releases without having to port this change forward. An example `compose.override.yaml` for this situation might look like:
 
@@ -85,7 +85,7 @@ Voxel51 recommends using a `compose.override.yaml` to [override the image select
 version: '3.8'
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.2.1
+    image: voxel51/fiftyone-app-torch:v1.3.0
 ```
 
 ## Upgrade Process Recommendations
@@ -96,37 +96,36 @@ Please contact your Voxel51 Customer Success team member to coordinate this upgr
 
 ### Upgrade Process Recommendations From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.12.1 SDK (database version 0.20.1) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0, and the FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions. If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
+The FiftyOne 0.13.0 SDK (database version 0.21.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0, and the FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions. If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
 Voxel51 recommends the following upgrade process for upgrading from versions prior to FiftyOne Teams version 1.1.0:
 
 1. Make sure your installation includes the required [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes) environment variable
 1. If you are using a proxy server, make sure you have configured the appropriate [proxy environment variables](#environment-proxies)
 
-1. [Upgrade to FiftyOne Teams version 1.2.1](#deploying-fiftyone-teams) with `FIFTYONE_DATABASE_ADMIN=true` (this is not the default in the `config.yaml` for this release).<br>
-   **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.12.1`
-1. Upgrade your FiftyOne SDKs to version 0.12.1<br>
+1. [Upgrade to FiftyOne Teams version 1.3.0](#deploying-fiftyone-teams) with `FIFTYONE_DATABASE_ADMIN=true` (this is not the default in the `config.yaml` for this release).<br>
+   **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.13.0`
+1. Upgrade your FiftyOne SDKs to version 0.13.0<br>
    The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
-1. Use `fiftyone migrate --info` to make sure that all datasets have been migrated to version 0.20.1.
-   - If not all datasets have been upgraded, have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local environment
-   - Have that admin use `fiftyone migrate --all` to upgrade any remaining datasets
+1. Use `fiftyone migrate --info` to make sure that all datasets have been migrated to version 0.21.0.
+   - If not all datasets have been upgraded, an admin can run `FIFTYONE_DATABASE_ADMIN=true fiftyone migreat --all` in their local environment
+
 
 ### Upgrade Process Recommendations From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.12.1 SDK (database version 0.20.1) is backwards-compatible with FiftyOne Teams Database Versions after 0.19.0, but the FiftyOne 0.11.0 SDK is _NOT_ forward compatible with FiftyOne Teams Database Version 0.20.1.
+The FiftyOne 0.13.0 SDK (database version 0.21.0) is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later, but the FiftyOne 0.11.0 SDK is _NOT_ forward compatible with FiftyOne Teams Database Version 0.21.0.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
 Voxel51 recommends the following upgrade process for upgrading from FiftyOne Teams version 1.1.0 or later:
 
 1. Ensure all FiftyOne SDK users set `FIFTYONE_DATABASE_ADMIN=false` or `unset FIFTYONE_DATABASE_ADMIN` (this should generally be your default)
-1. [Upgrade to FiftyOne Teams version 1.2.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.12.1<br>
+1. [Upgrade to FiftyOne Teams version 1.3.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.13.0<br>
    The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
-1. Have an admin set `FIFTYONE_DATABASE_ADMIN=true` in their local environment
-1. Have the admin run `fiftyone migrate --all` to upgrade all datasets<br>
-   **NOTE** Any FiftyOne SDK less than 0.12.1 will lose database connectivity at this point; upgrading to `fiftyone==0.12.1` is required
-1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.20.1
+1. Have the admin run `FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all` to upgrade all datasets<br>
+   **NOTE** Any FiftyOne SDK less than 0.13.0 will lose database connectivity at this point; upgrading to `fiftyone==0.13.0` is required
+1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.21.0
 
 ---
 
@@ -145,7 +144,7 @@ An example nginx site configuration that forwards http traffic to https, and htt
 ## FiftyOne Teams Environment Variables
 
 | Variable                                     | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Required |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+|----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
 | `API_BIND_ADDRESS`                           | The host address that `fiftyone-teams-api` should bind to; `127.0.0.1` is appropriate for this in most cases                                                                                                                                                                                                                                                                                                                                                                                                                                    | Yes      |
 | `API_BIND_PORT`                              | The host port that `fiftyone-teams-api` should bind to; the default is `8000`                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Yes      |
 | `API_URL`                                    | The URL that `fiftyone-teams-app` should use to communicate with `fiftyone-teams-api`; `teams-api` is the compose service name                                                                                                                                                                                                                                                                                                                                                                                                                  | Yes      |
@@ -170,8 +169,9 @@ An example nginx site configuration that forwards http traffic to https, and htt
 | `FIFTYONE_DEFAULT_APP_PORT`                  | The host port that `fiftyone-app` should bind to; the default is `5151`                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Yes      |
 | `FIFTYONE_ENCRYPTION_KEY`                    | Used to encrypt storage credentials in MongoDB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Yes      |
 | `FIFTYONE_ENV`                               | GraphQL verbosity for the `fiftyone-teams-api` service; `production` will not log every GraphQL query, any other value will                                                                                                                                                                                                                                                                                                                                                                                                                     | No       |
+| `FIFTYONE_PLUGINS_DIR`                       | Persistent directory for plugins to be stored in. `teams-api` must have write access to this directory, all plugin nodes must have read access to this directory.                                                                                                                                                                                                                                                                                                                                                                               | No       |
 | `FIFTYONE_TEAMS_PROXY_URL`                   | The URL that `fiftyone-teams-app` will use to proxy requests to `fiftyone-app`                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Yes      |
 | `GRAPHQL_DEFAULT_LIMIT`                      | Default GraphQL limit for results                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | No       |
-| `HTTPS_PROXY_URL`                            | The URL for your environment https proxy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | No       |
 | `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | No       |
+| `HTTPS_PROXY_URL`                            | The URL for your environment https proxy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | No       |
 | `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`teams-api, teams-app, fiftyone-app`)                                                                                                                                                                                                                                                                                                                                                                                   | No       |
