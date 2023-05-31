@@ -11,7 +11,7 @@
 
 # Exposing the `teams-api` service
 
-There are some limited instances in which you may wish to expose your FiftyOne Teams API for SDK access.
+You may wish to expose your FiftyOne Teams API for SDK access.
 
 You can expose your `teams-api` service in any manner that suits your deployment strategy; the following are two possible solutions but do not represent the entirety of possible solutions.  Essentially any solution that allows the FiftyOne Teams SDK to access port 8000 on the `teams-api` container should work.
 
