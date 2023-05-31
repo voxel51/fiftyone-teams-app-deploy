@@ -27,6 +27,12 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 ### FiftyOne Teams Upgrade Notes
 
+#### Enabling FiftyOne Teams Authenticated API
+
+FiftyOne Teams v1.3.0 introduces the capability to connect FiftyOne Teams SDKs through the FiftyOne Teams API instead of creating a direct connection to MongoDB.
+
+In order to enable the FiftyOne Teams Authenticated API you will need to [expose the FiftyOne Teams API endpoint](docs/expose-teams-api.md) and [configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+
 #### Enabling FiftyOne Teams Plugins
 
 FiftyOne Teams v1.3.0 includes significant enhancements for [Plugins](https://docs.voxel51.com/plugins/index.html) to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins:

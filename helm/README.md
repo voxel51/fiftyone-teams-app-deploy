@@ -42,6 +42,12 @@ Please consider if you will require these settings for your deployment.
 
 ### FiftyOne Teams Upgrade Notes
 
+#### Enabling FiftyOne Teams Authenticated API
+
+FiftyOne Teams v1.3.0 introduces the capability to connect FiftyOne Teams SDKs through the FiftyOne Teams API instead of creating a direct connection to MongoDB.
+
+In order to enable the FiftyOne Teams Authenticated API you will need to [expose the FiftyOne Teams API endpoint](docs/expose-teams-api.md) and [configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+
 #### Enabling FiftyOne Teams Plugins
 
 FiftyOne Teams v1.3.0 includes significant enhancements for [Plugins](https://docs.voxel51.com/plugins/index.html) to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins:
@@ -50,14 +56,14 @@ FiftyOne Teams v1.3.0 includes significant enhancements for [Plugins](https://do
 - Plugins run in the `fiftyone-app` deployment - to enable this mode you must:
     - set `appSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `fiftyone-app` deployments
 	- set `apiSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `fiftyone-app` deployments
-	- mount a Persistent Volume Claim that provides `ReadWrite` permissions to the `teams-api` deployment at the `FIFTYONE_PLUGINS_DIR` path
-	- mount a Persistent Volume Claim that provides `ReadOnly` permission to the `fiftyone-app` deployment at the `FIFTYONE_PLUGINS_DIR` path
+	- mount a [Persistent Volume Claim](docs/plugins-storage.md) that provides `ReadWrite` permissions to the `teams-api` deployment at the `FIFTYONE_PLUGINS_DIR` path
+	- mount a [Persistent Volume Claim](docs/plugins-storage.md) that provides `ReadOnly` permission to the `fiftyone-app` deployment at the `FIFTYONE_PLUGINS_DIR` path
 - Plugins run in a dedicated `teams-plugins` deployment - to enable this mode you must:
     - set `pluginsSettings.enabled: true`
 	- set `pluginsSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `teams-plugins` deployments
 	- set `apiSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `teams-plugins` deployments
-	- mount a Persistent Volume Claim that provides `ReadWrite` permissions to the `teams-api` deployment at the `FIFTYONE_PLUGINS_DIR` path
-	- mount a Persistent Volume Claim that provides `ReadOnly` permission to the `teams-plugins` deployment at the `FIFTYONE_PLUGINS_DIR` path
+	- mount a [Persistent Volume Claim](docs/plugins-storage.md) that provides `ReadWrite` permissions to the `teams-api` deployment at the `FIFTYONE_PLUGINS_DIR` path
+	- mount a [Persistent Volume Claim](docs/plugins-storage.md) that provides `ReadOnly` permission to the `teams-plugins` deployment at the `FIFTYONE_PLUGINS_DIR` path
 
 Plugins are deployed using the FiftyOne Teams UI at `/settings/plugins`; any early-adopter plugins installed via manual methods will need to be redeployed using the FiftyOne Teams UI.
 
