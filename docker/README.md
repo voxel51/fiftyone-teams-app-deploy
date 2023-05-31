@@ -19,7 +19,7 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 `FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.3.0. This is because FiftyOne Teams version 1.3.0 is backwards compatible with FiftyOne Teams database schema version 0.19 (Teams Version 1.1) and newer.
 
-- If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.13.0 SDK before performing the FiftyOne Teams installation, or you will want to set `FIFTYONE_DATABASE_ADMIN: true` in the `environment` section of the `fiftyone-app` service definition.
+- If you are performing an initial install, you will either want to set `FIFTYONE_DATABASE_ADMIN: true` in the `environment` section of the `fiftyone-app` service definition.
 
 - If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
