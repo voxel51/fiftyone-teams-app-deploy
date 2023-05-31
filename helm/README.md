@@ -52,16 +52,14 @@ FiftyOne Teams v1.3.0 includes significant enhancements for [Plugins](https://do
 	- set `apiSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `fiftyone-app` deployments
 	- mount a Persistent Volume Claim that provides `ReadWrite` permissions to the `teams-api` deployment at the `FIFTYONE_PLUGINS_DIR` path
 	- mount a Persistent Volume Claim that provides `ReadOnly` permission to the `fiftyone-app` deployment at the `FIFTYONE_PLUGINS_DIR` path
-	- expose the `teams-api` service for SDK access
 - Plugins run in a dedicated `teams-plugins` deployment - to enable this mode you must:
     - set `pluginsSettings.enabled: true`
 	- set `pluginsSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `teams-plugins` deployments
 	- set `apiSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `teams-plugins` deployments
 	- mount a Persistent Volume Claim that provides `ReadWrite` permissions to the `teams-api` deployment at the `FIFTYONE_PLUGINS_DIR` path
 	- mount a Persistent Volume Claim that provides `ReadOnly` permission to the `teams-plugins` deployment at the `FIFTYONE_PLUGINS_DIR` path
-	- expose the `teams-api` service for SDK access
 
-Plugins are deployed using the FiftyOne Teams SDK; any early-adopter plugins installed via manual methods will need to be redeployed using the FiftyOne Teams SDK.
+Plugins are deployed using the FiftyOne Teams UI at `/settings/plugins`; any early-adopter plugins installed via manual methods will need to be redeployed using the FiftyOne Teams UI.
 
 
 #### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
