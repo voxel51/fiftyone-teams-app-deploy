@@ -276,6 +276,8 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
+- name: FIFTYONE_PLUGINS_CACHE_ENABLED
+  value: "true"
 - name: FIFTYONE_TEAMS_DOMAIN
   valueFrom:
     secretKeyRef:
