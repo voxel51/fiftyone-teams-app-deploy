@@ -21,7 +21,7 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 ## Initial Installation vs. Upgrades
 
-`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.3.0 upgrades. This is because FiftyOne Teams version 1.3.0 is backwards compatible with FiftyOne Teams database schema 0.20 (Teams Version 1.2).
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.3.0. This is because FiftyOne Teams version 1.3.0 is backwards compatible with FiftyOne Teams database schema 0.19 (Teams Version 1.1) and newer.
 
 - If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.13.0 SDK before performing the FiftyOne Teams installation, or you will want to add `FIFTYONE_DATABASE_ADMIN: true` in the `env` section of the `appSettings` configuration.
 
@@ -44,10 +44,10 @@ Please consider if you will require these settings for your deployment.
 
 #### Enabling FiftyOne Teams Plugins
 
-FiftyOne Teams v1.3.0 officially introduces [Plugins](https://docs.voxel51.com/plugins/index.html) to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins:
+FiftyOne Teams v1.3.0 includes significant enhancements for [Plugins](https://docs.voxel51.com/plugins/index.html) to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins:
 
 - Builtin Plugins Only - no changes are required for this mode.
-- Plugins run in the `fiftyone-app` deployment - to enabled this mode you must:
+- Plugins run in the `fiftyone-app` deployment - to enable this mode you must:
     - set `appSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `fiftyone-app` deployments
 	- set `apiSettings.env.FIFTYONE_PLUGINS_DIR` to the path for a Persistent Volume Claim mounted to the `teams-api` and `fiftyone-app` deployments
 	- mount a Persistent Volume Claim that provides `ReadWrite` permissions to the `teams-api` deployment at the `FIFTYONE_PLUGINS_DIR` path

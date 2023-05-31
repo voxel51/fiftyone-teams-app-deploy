@@ -17,7 +17,7 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 ## Initial Installation vs. Upgrades
 
-`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.3.0 installations and upgrades. This is because FiftyOne Teams version 1.3.0 is backwards compatible with FiftyOne Teams database schema version 0.19 (Teams Version 1.1) and newer.
+`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.3.0. This is because FiftyOne Teams version 1.3.0 is backwards compatible with FiftyOne Teams database schema version 0.19 (Teams Version 1.1) and newer.
 
 - If you are performing an initial install, you will either want to connect to your MongoDB database with the 0.13.0 SDK before performing the FiftyOne Teams installation, or you will want to set `FIFTYONE_DATABASE_ADMIN: true` in the `environment` section of the `fiftyone-app` service definition.
 
@@ -29,21 +29,22 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 #### Enabling FiftyOne Teams Plugins
 
-FiftyOne Teams v1.3.0 officially introduces [Plugins](https://docs.voxel51.com/plugins/index.html) to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins:
+FiftyOne Teams v1.3.0 includes significant enhancements for [Plugins](https://docs.voxel51.com/plugins/index.html) to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins:
 
 - Builtin Plugins Only - no changes are required for this mode.
-- Plugins run in the `fiftyone-app` deployment - to enabled this mode:
+- Plugins run in the `fiftyone-app` deployment - to enable this mode:
     - you should use the `compose.plugins.yaml` instead of the `compose.yaml` in this repository.  Your `docker compose` command might look like:<br>
         `docker compose -f compose.plugins.yaml -f compose.override.yaml up -d`
-    - expose the `teams-api` for SDK access
 - Plugins run in a dedicated `teams-plugins` deployment - to enable this mode:
     - you should use the `compose.dedicated-plugins.yaml` instead of the `compose.yaml` in this repository.  Your `docker compose` command might look like:<br>
         `docker compose -f compose.dedicated-plugins.yaml -f compose.override.yaml up -d`
-	- expose the `teams-api` for SDK access
 
 Both the `compose.plugins.yaml` and the `compose.dedicated-plugins.yaml` create a new Docker Volume that is shared between FiftyOne Teams services.  If you have a multi-node deployment you will need to establish a storage solution that allows the appropriate deployments to access the deployed plugins.
 
-Plugins are deployed using the FiftyOne Teams SDK; any early-adopter plugins installed via manual methods will need to be redeployed using the FiftyOne Teams SDK.
+    - If plugins share the `fiftyone-app` deployment, `fiftyone-app` containers require `read` access to plugin storage while `fiftyone-api` containers require `read-write` access to plugin storage
+	- If plugins are run in a dedicated `teams-plugins` deployment, `teams-plugins` containers require `read` access to plugin storage while `fiftyone-api` containers require `read-write` access to plugin storage
+
+Plugins are deployed using the FiftyOne Teams UI at `/settings/plugins`; any early-adopter plugins installed via manual methods will need to be redeployed using the FiftyOne Teams UI.
 
 #### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
