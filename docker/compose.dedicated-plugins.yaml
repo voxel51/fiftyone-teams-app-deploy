@@ -111,7 +111,6 @@ services:
       FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
       FIFTYONE_TEAMS_ORGANIZATION: ${AUTH0_ORGANIZATION}
       FIFTYONE_PLUGINS_DIR: /opt/plugins
-      FIFTYONE_PLUGINS_CACHE_ENABLED: true
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then uncomment the environment variables below
