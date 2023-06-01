@@ -1,0 +1,78 @@
+{{- if .Values.pluginsSettings.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "teams-plugins.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "teams-plugins.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.pluginsSettings.autoscaling.enabled }}
+  replicas: {{ .Values.pluginsSettings.replicaCount | default 2 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "teams-plugins.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.pluginsSettings.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "teams-plugins.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.pluginsSettings.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "teams-plugins.name" . }}
+          securityContext:
+            {{- toYaml .Values.pluginsSettings.securityContext | nindent 12 }}
+          image: "{{ .Values.pluginsSettings.image.repository }}:{{ .Values.pluginsSettings.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.pluginsSettings.image.pullPolicy | default "Always" }}
+          env:
+            {{- include "teams-plugins.env-vars-list" . | indent 12 }}
+          ports:
+            - name: {{ .Values.pluginsSettings.service.shortname }}
+              containerPort: {{ .Values.pluginsSettings.service.containerPort | default 5151 }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.pluginsSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.pluginsSettings.service.liveness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.pluginsSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.pluginsSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.pluginsSettings.resources | nindent 12 }}
+          {{- with .Values.pluginsSettings.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.pluginsSettings.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pluginsSettings.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pluginsSettings.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pluginsSettings.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

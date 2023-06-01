@@ -42,7 +42,24 @@ spec:
     - host: {{ .Values.teamsAppSettings.dnsName | quote }}
       http:
         paths:
-          {{- if .Values.ingress.paths }}
+          {{- if and .Values.ingress.paths (gt (len .Values.ingress.paths) 1) }}
+          {{- range .Values.ingress.paths }}
+          - path: {{ .path }}
+            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ .serviceName }}
+                port:
+                  number: {{ .servicePort }}
+              {{- else }}
+              serviceName: {{ .serviceName }}
+              servicePort: {{ .servicePort }}
+              {{- end }}
+          {{- end }}
+          {{- else if and .Values.ingress.paths  (eq (len .Values.ingress.paths) 1) }}
           {{- range .Values.ingress.paths }}
           - path: {{ .path }}
             {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}

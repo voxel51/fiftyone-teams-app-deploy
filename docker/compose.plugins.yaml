@@ -12,6 +12,7 @@ services:
       FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
       FIFTYONE_ENV: ${FIFTYONE_ENV}
       FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
       GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
       LOGGING_LEVEL: ${API_LOGGING_LEVEL:-INFO}
       MONGO_DEFAULT_DB: ${FIFTYONE_DATABASE_NAME}
@@ -27,6 +28,8 @@ services:
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
     restart: always
+    volumes:
+      - plugins-vol:/opt/plugins
   teams-app:
     image: voxel51/fiftyone-teams-app:v1.3.0
     environment:
@@ -73,6 +76,7 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
       FIFTYONE_TEAMS_AUDIENCE: ${AUTH0_AUDIENCE}
       FIFTYONE_TEAMS_CLIENT_ID: ${AUTH0_CLIENT_ID}
       FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
@@ -89,3 +93,7 @@ services:
     ports:
       - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
     restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+volumes:
+  plugins-vol:

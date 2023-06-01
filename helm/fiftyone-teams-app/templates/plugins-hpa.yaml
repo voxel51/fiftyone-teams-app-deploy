@@ -1,0 +1,33 @@
+{{- if .Values.pluginsSettings.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "teams-plugins.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "teams-plugins.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "teams-plugins.name" . }}
+  minReplicas: {{ .Values.pluginsSettings.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.pluginsSettings.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.pluginsSettings.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.pluginsSettings.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.pluginsSettings.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.pluginsSettings.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

@@ -57,6 +57,17 @@ Create a default name for the teams app service
 {{- end }}
 
 {{/*
+Create a default name for the teams plugins service
+*/}}
+{{- define "teams-plugins.name" -}}
+{{- if .Values.pluginsSettings.service.name }}
+{{- .Values.pluginsSettings.service.name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+"fiftyone-teams-plugins"
+{{- end }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "fiftyone-teams-app.chart" -}}
@@ -105,6 +116,22 @@ APP Combined labels
 {{- define "fiftyone-app.labels" -}}
 {{ include "fiftyone-teams-app.commonLabels" . }}
 {{ include "fiftyone-app.selectorLabels" . }}
+{{- end }}
+
+{{/*
+Plugins Selector labels
+*/}}
+{{- define "teams-plugins.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "teams-plugins.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Plugins Combined labels
+*/}}
+{{- define "teams-plugins.labels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+{{ include "teams-plugins.selectorLabels" . }}
 {{- end }}
 
 {{/*
@@ -181,10 +208,12 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- end -}}
 
 {{/*
-Create a merged list of environment variables for fiftyone-api
+Create a merged list of environment variables for fiftyone-app
 */}}
 {{- define "fiftyone-app.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
+- name: API_URL
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -222,6 +251,54 @@ Create a merged list of environment variables for fiftyone-api
   value: {{ $val | quote }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Create a merged list of environment variables for fiftyone-teams-plugins
+*/}}
+{{- define "teams-plugins.env-vars-list" -}}
+{{- $secretName := .Values.secret.name }}
+- name: API_URL
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+- name: FIFTYONE_DATABASE_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneDatabaseName
+- name: FIFTYONE_DATABASE_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: mongodbConnectionString
+- name: FIFTYONE_DATABASE_ADMIN
+  value: "false"
+- name: FIFTYONE_ENCRYPTION_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: encryptionKey
+- name: FIFTYONE_TEAMS_DOMAIN
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: auth0Domain
+- name: FIFTYONE_TEAMS_AUDIENCE
+  value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
+- name: FIFTYONE_TEAMS_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: clientId
+- name: FIFTYONE_TEAMS_ORGANIZATION
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: organizationId
+{{- range $key, $val := .Values.pluginsSettings.env }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end -}}
+
 
 {{/*
 Create a merged list of environment variables for fiftyone-teams-app
@@ -267,6 +344,12 @@ Create a merged list of environment variables for fiftyone-teams-app
   value: "/api/proxy/fiftyone-teams"
 - name: FIFTYONE_TEAMS_PROXY_URL
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name .Values.appSettings.service.port | quote }}
+- name: FIFTYONE_TEAMS_PLUGIN_URL
+{{- if .Values.pluginsSettings.enabled }}
+  value: {{ printf "http://%s:%.0f" .Values.pluginsSettings.service.name .Values.pluginsSettings.service.port | quote }}
+{{- else }}
+  value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name .Values.appSettings.service.port | quote }}
+{{- end }}
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
