@@ -13,7 +13,10 @@
 
 You may wish to expose your FiftyOne Teams API for SDK access.
 
-You can expose your `teams-api` service in any manner that suits your deployment strategy; the following are two possible solutions but do not represent the entirety of possible solutions.  Essentially any solution that allows the FiftyOne Teams SDK to access port 8000 on the `teams-api` container should work.
+You can expose your `teams-api` service in any manner that suits your deployment strategy; the following are two possible solutions but do not represent the entirety of possible solutions.  Essentially any solution that allows the FiftyOne Teams SDK to use websockets to access port 8000 on the `teams-api` container should work.
+
+**NOTE**: The `teams-api` service uses websockets to maintain connections and allow for long-running processes to complete.  Please ensure your Infrastructure supports websockets before attempting
+to expose the `teams-api` service. (e.g. You will have to migrate from AWS Classic Load Balancers to AWS Application Load Balancers to provide websockets support.)
 
 
 ## Expose `teams-api` directly
