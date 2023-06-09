@@ -315,7 +315,6 @@ Voxel51 recommends the following upgrade process for upgrading from versions pri
    **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.13.1`
 1. Upgrade your FiftyOne SDKs to version 0.13.1<br>
    The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
-1. Upgrade `pymongo` and `motor` for your SDK installation (There is a bug that will be fixed soon) - `pip install -U pymongo motor`
 1. Have an admin run `FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all` in their local environment to upgrade all datasets to version 0.21.1
 
 ### Upgrade Process Recommendations From FiftyOne Teams Version 1.1.0 and later
