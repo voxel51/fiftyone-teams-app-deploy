@@ -18,6 +18,8 @@ You can expose your `teams-api` service in any manner that suits your deployment
 **NOTE**: The `teams-api` service uses websockets to maintain connections and allow for long-running processes to complete.  Please ensure your Infrastructure supports websockets before attempting
 to expose the `teams-api` service. (e.g. You will have to migrate from AWS Classic Load Balancers to AWS Application Load Balancers to provide websockets support.)
 
+**NOTE**: If you are using file-based storage credentials, or setting environment variables, you will need to make sure the same credentials are shared with the `fiftyone-app` and `teams-api` containers.  Voxel51 recommends the use of Database Cloud Storage Credentials, which can be configured at `/settings/cloud_storage_credentials`.
+
 
 ## Expose `teams-api` directly
 
