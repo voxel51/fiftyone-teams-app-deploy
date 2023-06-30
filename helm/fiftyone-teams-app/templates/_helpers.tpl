@@ -190,7 +190,7 @@ Create a merged list of environment variables for fiftyone-teams-api
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
-      key: mongodbConnectionString
+      key: fiftyoneDatabaseName
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
