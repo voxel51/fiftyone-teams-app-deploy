@@ -32,5 +32,12 @@ to expose the `teams-api` service. (e.g. You will have to migrate from AWS Class
 ## Expose `teams-api` using Nginx and a unique hostname
 
 1. Create a second hostname for your API (e.g. demo-api.fiftyone.ai) and create SSL certificates for that hostname
-2. Using the [example-nginx-api.conf](../example-nginx-api.conf) as a template, create a second service for your nginx reverse proxy
-3. Access your FiftyOne Teams API using the new hostname
+1. Using [example-nginx-api.conf](../example-nginx-api.conf) as a template, create a second service for your nginx reverse proxy
+1. Reload your nginx configuration
+1. Access your FiftyOne Teams API using the new hostname
+
+## Expose `teams-api` using path-based routing
+
+1. Using [example-nginx-path-routing.conf](../example-nginx-path-routing.conf) as a template, configure additional `locations` for api-based routes
+1. Reload your nginx configuration
+1. Access your FiftyOne Teams API using the same hostname

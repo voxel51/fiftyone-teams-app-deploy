@@ -22,24 +22,40 @@ You can expose your `teams-api` service in any manner that suits your deployment
 ## Adding a second host to the Ingress Controller (host-based routing)
 
 1. set `apiSettings.dnsName` to the hostname to route API requests to (e.g. demo-api.fiftyone.ai)
-2. upgrade your deployment using the v1.3.0 Helm chart:
+1. upgrade your deployment using the v1.3.1 Helm chart:
     ```
 	helm repo update voxel51
     helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
 	```
 
+Modifications to the `teams-api` paths should be done using `ingress.teamsApi`.
+
 ## Use `ingress.paths` at the Ingress Controller (path-based routing)
 
-Some ingress controllers allow for rewriting paths to allow for path-based routing.  This solution can be implemented as long as the prefix path is stripped from the request before it is passed to the `teams-api` service.
+Configure path-based routing for your ingress to route API paths to the `teams-api` service.
 
-A configuration for path-based routing might look like:
+Depending on your ingress controller, a configuration for path-based routing might look like:
 ```
 ingress:
   paths:
-    - path: /sdk/
-	  pathType: Prefix
-	- path: /
-	  pathType: Prefix
+    - path: /_pymongo
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /health
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /graphql/v1
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /file
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /
+      pathType: Prefix
+      serviceName: teams-app
+      servicePort: 80
 ```
-
-Configuring path rewrites (using ingress annotations or other tools)is beyond the scope of this document.
