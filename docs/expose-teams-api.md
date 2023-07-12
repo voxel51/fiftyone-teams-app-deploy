@@ -22,7 +22,7 @@ You can expose your `teams-api` service in any manner that suits your deployment
 ## Adding a second host to the Ingress Controller (host-based routing)
 
 1. set `apiSettings.dnsName` to the hostname to route API requests to (e.g. demo-api.fiftyone.ai)
-1. upgrade your deployment using the v1.3.2 Helm chart:
+1. upgrade your deployment using the latest Helm chart:
     ```
 	helm repo update voxel51
     helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
