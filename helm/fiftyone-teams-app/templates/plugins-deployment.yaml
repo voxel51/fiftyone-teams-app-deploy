@@ -42,14 +42,12 @@ spec:
               containerPort: {{ .Values.pluginsSettings.service.containerPort | default 5151 }}
               protocol: TCP
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: {{ .Values.pluginsSettings.service.shortname }}
             initialDelaySeconds: {{ .Values.pluginsSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: {{ .Values.pluginsSettings.service.shortname }}
             initialDelaySeconds: {{ .Values.pluginsSettings.service.readiness.initialDelaySeconds }}
             timeoutSeconds: 5

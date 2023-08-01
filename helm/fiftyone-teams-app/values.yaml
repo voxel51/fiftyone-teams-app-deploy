@@ -199,7 +199,7 @@ teamsAppSettings:
     targetMemoryUtilizationPercentage: 80
   env:
     APP_USE_HTTPS: true
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.13.3
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.13.5
     RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
   image:
     repository: voxel51/fiftyone-teams-app

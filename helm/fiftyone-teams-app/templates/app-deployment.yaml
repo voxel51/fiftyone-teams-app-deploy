@@ -41,14 +41,12 @@ spec:
               containerPort: {{ .Values.appSettings.service.containerPort | default 5151 }}
               protocol: TCP
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
             initialDelaySeconds: {{ .Values.appSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
             initialDelaySeconds: {{ .Values.appSettings.service.readiness.initialDelaySeconds }}
             timeoutSeconds: 5
