@@ -9,25 +9,30 @@
 
 ---
 
-# Exposing the `teams-api` service
+# Exposing the `teams-api` Service
 
 You may wish to expose your FiftyOne Teams API for SDK access.
 
-You can expose your `teams-api` service in any manner that suits your deployment strategy; the following are two possible solutions but do not represent the entirety of possible solutions.  Essentially any solution that allows the FiftyOne Teams SDK to use websockets to access port 8000 on the `teams-api` container should work.
+You may expose your `teams-api` service in any manner that suits your deployment strategy.
+The following are two possible solutions but do not represent the entirety of possible solutions.
+Any solution allowing the FiftyOne Teams SDK to use websockets to access the `teams-api` container on port 8000 should work.
 
-**NOTE**: The `teams-api` service uses websockets to maintain connections and allow for long-running processes to complete.  Please ensure your Infrastructure supports websockets before attempting
-to expose the `teams-api` service. (e.g. You will have to migrate from AWS Classic Load Balancers to AWS Application Load Balancers to provide websockets support.)
+**NOTE**: The `teams-api` service uses websockets to maintain connections and allow for long-running processes to complete.
+Please ensure your Infrastructure supports websockets before attempting to expose the `teams-api` service.
+(e.g. You will have to migrate from AWS Classic Load Balancers to AWS Application Load Balancers to provide websockets support.)
 
-**NOTE**: If you are using file-based storage credentials, or setting environment variables, you will need to make sure the same credentials are shared with the `fiftyone-app` and `teams-api` containers.  Voxel51 recommends the use of Database Cloud Storage Credentials, which can be configured at `/settings/cloud_storage_credentials`.
+**NOTE**: If you are using file-based storage credentials, or setting environment variables, the same credentials must be shared with the `fiftyone-app` and `teams-api` containers.
+Voxel51 recommends the use of Database Cloud Storage Credentials, which can be configured at `/settings/cloud_storage_credentials`.
 
+## Expose `teams-api` Directly
 
-## Expose `teams-api` directly
+**NOTE**: This method does not protect your API endpoint with TLS and will send API Keys in clear text.
+While it is the simplest mechanism, consider the security implications before using this method.
 
-1. Edit your `.env` file and set `API_BIND_ADDRESS` to `0.0.0.0`
-1. Recreate your environment using [the appropriate](./README.md#enabling-fiftyone-teams-plugins) `docker compose` command
+1. Edit your `.env` file setting `API_BIND_ADDRESS` to `0.0.0.0`
+1. Recreate your environment using
+   [plugin specific](./README.md#enabling-fiftyone-teams-plugins) `docker compose` command
 1. Access your FiftyOne Teams API using the same hostname as your FiftyOne Teams App using port 8000
-
-**NOTE**: This method does not protect your API endpoint with TLS and will send API Keys in clear text.  While it is the simplest mechanism, there are security considerations that you should assess before using this method.
 
 ## Expose `teams-api` using Nginx and a unique hostname
 
@@ -36,8 +41,10 @@ to expose the `teams-api` service. (e.g. You will have to migrate from AWS Class
 1. Reload your nginx configuration
 1. Access your FiftyOne Teams API using the new hostname
 
-## Expose `teams-api` using path-based routing
+## Expose `teams-api` Using Path-Based Routing
 
-1. Using [example-nginx-path-routing.conf](../example-nginx-path-routing.conf) as a template, configure additional `locations` for api-based routes
+1. Use
+   [example-nginx-path-routing.conf](../example-nginx-path-routing.conf)
+   as a template and configure additional `locations` for api-based routes
 1. Reload your nginx configuration
 1. Access your FiftyOne Teams API using the same hostname

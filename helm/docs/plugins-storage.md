@@ -9,30 +9,43 @@
 
 ---
 
-# Adding shared storage for FiftyOne Teams Plugins
+# Adding Shared Storage for FiftyOne Teams Plugins
 
-This document will provide guidance for adding shared storage for FiftyOne Teams Plugins using Persistent Volumes [PVs], Persistent Volume Claims [PVCs], and NFS.
+This document will provide guidance for adding shared storage for FiftyOne Teams Plugins using
 
-Alternate solutions for storage vary based on cloud providers and infrastructure services.  PVCs can also be configured using Google Cloud [Filestore](https://cloud.google.com/filestore/docs), Amazon [EFS](https://aws.amazon.com/efs/), or Azure [Files](https://learn.microsoft.com/en-us/azure/storage/files/).
+* Persistent Volumes (PVs)
+* Persistent Volume Claims (PVCs)
+* NFS
+
+Alternate storage solutions vary based on cloud providers and infrastructure services.
+PVCs may be configured using provider specfic services
+
+* Google Cloud [Filestore](https://cloud.google.com/filestore/docs)
+* Amazon [EFS](https://aws.amazon.com/efs/)
+* Azure [Files](https://learn.microsoft.com/en-us/azure/storage/files/).
 
 ## NFS Share
 
-To start, you must have a configured NFS server with an exported share that grants permission to the kubernetes cluster.  One such configuration would be to share the `/exports/deployment_name/plugins` directory using a configuration like:
+Configured NFS server with an exported share that grants permission to the kubernetes cluster.
+One such configuration would be to share the `/exports/deployment_name/plugins` directory using a configuration like
 
-```
+```shell
 $ cat /etc/exports
 /exports 10.202.15.0/24(rw,insecure,fsid=0,root_squash,all_squash,no_subtree_check)
 /exports/fiftyone_teams_app 10.202.15.0/24(rw,insecure,no_root_squash,anonuid=1000,anongid=1000,no_subtree_check)
 /exports/fiftyone_teams_app/plugins 10.202.15.0/24(rw,insecure,no_root_squash,anonuid=1000,anongid=1000,no_subtree_check)
 ```
 
-It is recommended that you test this export to make sure the NFS configuration is accurate before proceeding; testing now will save frustration later.
+We recommend that you test this export to make sure the NFS configuration is accurate before proceeding.
+Testing now will save frustration later.
 
-## PV and PVC creation
+## PV and PVC Creation
 
-The following configuration file will create a PV and PVC designed to access the NFS share established above:
+The following yaml configuration will create a PV and PVC designed to access the NFS share established above
 
-```
+```yaml
+# nfs-pv-pvc.yaml
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -62,21 +75,28 @@ spec:
       storage: 10Gi
 ```
 
-Apply the configuration to create the PV and PVC for plugins storage:
+Apply the configuration to create the PV and PVC for plugins storage
 
-```
+```shell
 kubectl apply -f nfs-pv-pvc.yaml
 ```
 
 ## Add PVs to `values.yaml`
 
-If you are planning to run plugins in the `fiftyone-app` deployment, you will need to provide `ReadOnly` access to the `fiftyone-app` deployment and `ReadWrite` access to the `teams-api` deployment.
+To run plugins in the `fiftyone-app` deployment, provide
 
-If you are planning to run plugins in a dedicated `teams-plugins` deployment, you will need to provide `ReadOnly` access to the `teams-plugins` deployment and `ReadWrite` access to the `teams-api` deployment.
+* `ReadOnly` access to the `fiftyone-app` deployment
+* `ReadWrite` access to the `teams-api` deployment
 
-Add the appropriate `volumes` and `volumeMounts` configurations to the `apiSettings` section of your `values.yaml`:
+To run plugins in a dedicated `teams-plugins` deployment, provide
 
-```
+* `ReadOnly` access to the `teams-plugins` deployment
+* `ReadWrite` access to the `teams-api` deployment
+
+Add the appropriate `volumes` and `volumeMounts` configurations to the `apiSettings` section of your `values.yaml`
+
+```yaml
+# values.yaml
 apiSettings:
   [...existing config...]
   volumes:
@@ -89,9 +109,10 @@ apiSettings:
   [...existing config...]
 ```
 
-Add the appropriate `volumes` and `volumeMounts` configurations to either the `pluginsSettings` or `appSettings` section of your `values.yaml`:
+Add the `volumes` and `volumeMounts` configurations to either the `pluginsSettings` or `appSettings` section of your `values.yaml`
 
-```
+```yaml
+# values.yaml
 [plugins|app]Settings:
   [...existing config...]
   volumes:
@@ -105,10 +126,11 @@ Add the appropriate `volumes` and `volumeMounts` configurations to either the `p
   [...existing config...]
 ```
 
-## Apply the changes to the existing fiftyone-teams-app deployment
+## Apply the Changes to the Existing fiftyone-teams-app Deployment
 
-Apply the changes to the existing fiftyone-teams-app deployment using Helm:
+Apply the changes to the existing fiftyone-teams-app deployment using Helm
 
-```
-helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
+```shell
+helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+  -f values.yaml
 ```
