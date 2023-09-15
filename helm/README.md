@@ -89,8 +89,8 @@ There are three modes for plugins
         - In `values.yaml`, set
             - `pluginsSettings.enabled: true`
             - The path for a Persistent Volume Claim mounted to the `teams-api` and `teams-plugins` deployments in both
-            - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
-            - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
+                - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
+                - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
         - Mount a [Persistent Volume Claim](docs/plugins-storage.md) that provides
             - `ReadWrite` permissions to the `teams-api` deployment
               at the `FIFTYONE_PLUGINS_DIR` path
@@ -174,7 +174,7 @@ FiftyOne Teams version 1.2 and higher supports using text similarity searches fo
 To use this feature, use a container image containing `torch` (PyTorch) instead of the `fiftyone-app` image.
 Use the Voxel51 provided image `fiftyone-app-torch` or build your own base image including `torch`.
 
-To override the default image, providing a new `appSettings.image.repository` stanza to the Helm Chart.
+To override the default image, add a new `appSettings.image.repository` stanza to the Helm Chart.
 Using the included `values.yaml` this configuration might look like:
 
 ```yaml

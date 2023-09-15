@@ -257,12 +257,13 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
        [See table below](#fiftyone-teams-environment-variables).
 1. In the same directory, run
 
-   ```shell
-   docker-compose up -d
-   ```
+    ```shell
+    docker-compose up -d
+    ```
+
 1. Have the admin run  to upgrade all datasets
 
-   ```shell
+    ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
@@ -271,7 +272,6 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     ```shell
     fiftyone migrate --info
     ```
-
 
 The FiftyOne Teams App is now exposed on port 3000.
 An SSL endpoint (Load Balancer or Nginx Proxy or something similar) will need to be configured to route traffic from the SSL endpoint to port 3000 on the host running the FiftyOne Teams App.

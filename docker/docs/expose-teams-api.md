@@ -30,7 +30,7 @@ Voxel51 recommends the use of Database Cloud Storage Credentials, which can be c
 While it is the simplest mechanism, consider the security implications before using this method.
 
 1. Edit your `.env` file setting `API_BIND_ADDRESS` to `0.0.0.0`
-1. Recreate your environment using
+1. Recreate your environment using the
    [plugin specific](./README.md#enabling-fiftyone-teams-plugins) `docker compose` command
 1. Access your FiftyOne Teams API using the same hostname as your FiftyOne Teams App using port 8000
 
