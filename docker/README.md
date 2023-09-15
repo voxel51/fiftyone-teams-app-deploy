@@ -268,7 +268,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
 
 1. To ensure that all datasets are now at version 0.22.0, run
 
-	```shell
+    ```shell
     fiftyone migrate --info
     ```
 
