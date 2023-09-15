@@ -251,7 +251,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
 ## Deploying FiftyOne Teams
 
 1. Install docker-comose
-1. From a directory containing the files `compose.yml` and `env.template` files (included in this repository),
+1. From a directory containing the files `compose.yaml` and `env.template` files (included in this repository),
     1. Rename the `env.template` file to `.env`
     1. Edit the `.env` file, setting the parameters required for this deployment.
        [See table below](#fiftyone-teams-environment-variables).
