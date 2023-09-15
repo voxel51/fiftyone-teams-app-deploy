@@ -21,9 +21,11 @@ for more information regarding Fiftyone Teams.
 
 We publish container images to these Docker Hub repositories
 
-- `voxel51/fiftyone-teams-app`
-- `voxel51/fiftyone-teams-api`
 - `voxel51/fiftyone-app`
+- `voxel51/fiftyone-app-gpt`
+- `voxel51/fiftyone-app-torch`
+- `voxel51/fiftyone-teams-api`
+- `voxel51/fiftyone-teams-app`
 
 For Docker Hub credentials, please contact your Voxel51 support team.
 
@@ -31,8 +33,7 @@ For Docker Hub credentials, please contact your Voxel51 support team.
 
 ## Initial Installation vs. Upgrades
 
-By default, `FIFTYONE_DATABASE_ADMIN` is set to `false` for FiftyOne Teams version 1.3.6.
-FiftyOne Teams version 1.3.6 is backwards compatible with FiftyOne Teams database schema 0.19 (Teams Version 1.1) and newer.
+By default, `FIFTYONE_DATABASE_ADMIN` is set to `false` for FiftyOne Teams version 1.4.0.
 
 - When performing an initial installation, in `values.yaml`, set
   `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
@@ -67,7 +68,9 @@ and
 
 FiftyOne Teams v1.3+ includes significant enhancements for
 [Plugins](https://docs.voxel51.com/plugins/index.html)
-to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins
+to customize and extend the functionality of FiftyOne Teams in your environment.
+
+There are three modes for plugins
 
 1. Builtin Plugins Only
     - No changes are required for this mode
@@ -166,12 +169,12 @@ ROARR_LOG: false
 
 #### Text Similarity
 
-FiftyOne Teams supports using text similarity searches for images that are indexed with a model that
+FiftyOne Teams version 1.2 and higher supports using text similarity searches for images that are indexed with a model that
 [supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text).
-To use of this feature, use a container image containing torch instead of the `fiftyone-app` image.
-Use the Voxel51 provided image `fiftyone-app-torch` or build your own base image including torch (PyTorch).
+To use this feature, use a container image containing `torch` (PyTorch) instead of the `fiftyone-app` image.
+Use the Voxel51 provided image `fiftyone-app-torch` or build your own base image including `torch`.
 
-To override the default image, providing a new stanza `appSettings.image.repository`  to the Helm Chart.
+To override the default image, providing a new `appSettings.image.repository` stanza to the Helm Chart.
 Using the included `values.yaml` this configuration might look like:
 
 ```yaml
@@ -361,24 +364,24 @@ You will need to either create a new IdP or modify your existing configuration i
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.13.6 SDK (database version 0.21.6) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
-The FiftyOne 0.10 SDK is not forwards compatible with current FiftyOne Teams Database Versions.
-If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations before the SDK can interact with the database.
+The FiftyOne 0.14.0 SDK (database version 0.22.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
+The FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions.
+If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
 Voxel51 recommends the following upgrade process for upgrading from versions prior to FiftyOne Teams version 1.1.0:
 
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.3.6](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.4.0](#deploying-fiftyone-teams)
    with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
    (this is not the default in the Helm Chart for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.13.6`
-1. Upgrade your FiftyOne SDKs to version 0.13.6
+      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.14.0`
+1. Upgrade your FiftyOne SDKs to version 0.14.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Have an admin run this to upgrade all datasets to version 0.21.6
+1. Have an admin run this to upgrade all datasets to version 0.22.0
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -386,19 +389,19 @@ Voxel51 recommends the following upgrade process for upgrading from versions pri
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.13.6 SDK (database version 0.21.6) is backwards-compatible with FiftyOne Teams Database Versions after-and-including 0.19.0.
-The FiftyOne SDKs before version 0.13.6 are _not_ forwards-compatible with FiftyOne Database Version 0.21.6.
+The FiftyOne 0.14.0 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
+You will not be able to connect to a FiftyOne Teams 1.4.0 database (version 0.22.0) with any FiftyOne SDK before 0.14.0.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
 Voxel51 recommends the following upgrade process for upgrading from FiftyOne Teams version 1.1.0 or later:
 
-1. Ensure all FiftyOne SDK users set either
-    - `FIFTYONE_DATABASE_ADMIN=false`
+1. Ensure all FiftyOne SDK users either
+    - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.3.6](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.13.6
+1. [Upgrade to FiftyOne Teams version 1.4.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.14.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Have the admin run  to upgrade all datasets
@@ -407,7 +410,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 0.21.6, run
+1. To ensure that all datasets are now at version 0.22.0, run
 
     ```shell
     fiftyone migrate --info
