@@ -29,14 +29,17 @@ secret:
     encryptionKey:
 
 # apiSettings:
+#   Set `dnsName` to expose the API with host-based routing.
+#   See https://helm.fiftyone.ai/docs/expose-teams-api.html for more information.
+#   dnsName: your-api.hostname.here
+#   env:
 #     Set FIFTYONE_PLUGINS_DIR if you are enabling plugins in a dedicated
 #       `teams-plugins` deployment
 #     See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm#enabling-fiftyone-teams-plugins
-#   env:
 #     FIFTYONE_PLUGINS_DIR: /opt/plugins
 
+
 # appSettings:
-#   dnsName: your-api.hostname.here
 #   env:
 #    FIFTYONE_DATABASE_ADMIN is set to `false` by default for v1.4.0 installs
 #     If you are performing a new install or an upgrade from v1.0 or earlier you may want to set
