@@ -30,7 +30,6 @@ secret:
 
 
 # apiSettings:
-#   dnsName: your-api.hostname.here
 
 # appSettings:
 #   env:
