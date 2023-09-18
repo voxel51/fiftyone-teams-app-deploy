@@ -29,11 +29,12 @@ secret:
     encryptionKey:
 
 
-#apiSettings:
+# apiSettings:
+#   dnsName: your-api.hostname.here
 
-#appSettings:
-#  env:
-#    FIFTYONE_DATABASE_ADMIN: true
+# appSettings:
+#   env:
+#     FIFTYONE_DATABASE_ADMIN: true
 
 teamsAppSettings:
   dnsName: replace.this.dns.name
