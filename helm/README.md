@@ -486,8 +486,8 @@ One way to do this might be:
 
 ```shell
 curl -o values.yaml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/values.yaml
-curl -o clusterissuer.yml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/clusterissuer.yml
-curl -o frontendconfig.yml https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/frontendconfig.yml
+curl -o cluster-issuer.yaml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/cluster-issuer.yaml
+curl -o frontend-config.yaml https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/frontend-config.yaml
 ```
 
 Update the `values.yaml` file to include
@@ -534,7 +534,7 @@ You must create either an `Issuer` in each namespace or a `ClusterIssuer` as par
 Voxel51 has provided an example `ClusterIssuer` configuration (downloaded [earlier](#download-the-example-configuration-files) in this guide).
 
 ```shell
-kubectl apply -f ./clusterissuer.yml
+kubectl apply -f ./cluster-issuer.yml
 ```
 
 ### Install and Configure MongoDB
@@ -585,7 +585,7 @@ Record the IP address and either create a DNS entry or contact your Voxel51 supp
 ### Set up http to https Forwarding
 
 ```shell
-kubectl apply -f frontendconfig.yml
+kubectl apply -f frontend-config.yaml
 ```
 
 ### Install FiftyOne Teams App
