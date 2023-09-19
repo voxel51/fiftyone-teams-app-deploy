@@ -534,7 +534,7 @@ You must create either an `Issuer` in each namespace or a `ClusterIssuer` as par
 Voxel51 has provided an example `ClusterIssuer` configuration (downloaded [earlier](#download-the-example-configuration-files) in this guide).
 
 ```shell
-kubectl apply -f ./cluster-issuer.yml
+kubectl apply -f ./cluster-issuer.yaml
 ```
 
 ### Install and Configure MongoDB
