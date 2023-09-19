@@ -33,23 +33,40 @@ For Docker Hub credentials, please contact your Voxel51 support team.
 
 ## Initial Installation vs. Upgrades
 
-By default, `FIFTYONE_DATABASE_ADMIN` is set to `false` for FiftyOne Teams version 1.4.0.
+Upgrades are more frequent than new installations.
+Thus, the chart's default behavior supports
+upgrades and the `values.yaml` contains
 
-- When performing an initial installation, in `values.yaml`, set
-  `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
-- When performing an upgrade, please review our
-  [Upgrade Process Recommendations](#upgrade-process-recommendations)
+```yaml
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: false
+```
+
+When performing an initial installation,
+in your `values.yaml`, set
+
+```yaml
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: true
+```
+
+After the initial installation, either comment this environment variable or change the value to false.
+
+When performing an upgrade, please review our
+[Upgrade Process Recommendations](#upgrade-process-recommendations)
 
 ---
 
 ## Notes and Considerations
 
-While not all parameters are required, Voxel51 frequently sees deployments use the following parameters:
+While not all parameters are required, we frequently see deployments use these values
 
 - `imagePullSecrets`
 - `ingress.annotations`
 
-Please consider if you will require these settings for your deployment.
+Consider if you will require these settings for your deployment.
 
 ---
 
@@ -193,9 +210,10 @@ appSettings:
 | `secret.fiftyone.apiClientSecret`         | None    | Voxel51-provided Auth0 API Client Secret    |
 | `secret.fiftyone.auth0Domain`             | None    | Voxel51-provided Auth0 Domain               |
 | `secret.fiftyone.clientId`                | None    | Voxel51-provided Auth0 Client ID            |
+| `secret.fiftyone.clientSecret`            | None    | Voxel51-provided Auth0 Client Secret        |
 | `secret.fiftyone.cookieSecret`            | None    | Random string for cookie encryption         |
 | `secret.fiftyone.encryptionKey`           | None    | Encryption key for storage credentials      |
-| `secret.fiftyone.mongodbConnectionString` | None    | MongoDB Connnection String                  |
+| `secret.fiftyone.mongodbConnectionString` | None    | MongoDB Connection String                   |
 | `secret.fiftyone.organizationId`          | None    | Voxel51-provided Auth0 Organization ID      |
 | `teamsAppSettings.dnsName`                | None    | DNS Name for the FiftyOne Teams App Service |
 
@@ -479,27 +497,40 @@ These instructions assume you have
 ### Download the Example Configuration Files
 
 Download the example configuration files from the
-[Voxel51 GitHub](https://github.com/voxel51/fiftyone-teams-app-deploy/helm/gke-examples)
-repository.
+[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy/helm/gke-examples)
+GitHub repository.
 
 One way to do this might be:
 
 ```shell
-curl -o values.yaml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/values.yaml
-curl -o cluster-issuer.yaml https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/cluster-issuer.yaml
-curl -o frontend-config.yaml https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/frontend-config.yaml
+curl -o values.yaml \
+  https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/values.yaml
+curl -o cluster-issuer.yaml \
+  https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/cluster-issuer.yaml
+curl -o frontend-config.yaml \
+  https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/frontend-config.yaml
 ```
 
-Update the `values.yaml` file to include
+Update the `values.yaml` file with
 
-- The Auth0 configuration provided by Voxel51 in `secret.fiftyone`
-- MongoDB username and password in `secret.fiftyone.mongodbConnectionString`
-- `secret.fiftyone.cookieSecret`
-- `secret.fiftyone.encryptionKey`
-- `host` values in `teamsAppSettings.dnsName`
+- In `secret.fiftyone`
+  - Set the Auth0 configuration provided by Voxel51
+    - `apiClientId`
+    - `apiClientSecret`
+    - `auth0Domain`
+    - `clientId`
+    - `clientSecret`
+    - `organizationId`
+  - MongoDB
+    - Set `fiftyoneDatabaseName`
+    - Set `mongodbConnectionString` containing your MongoDB username and password
+  - Set `cookieSecret`
+  - Set `encryptionKey`
+- In `teamsAppSettings.dnsName`
+  - Set ingress `host` values
 
 Assuming you follow these directions your MongoDB host will be `fiftyone-mongodb.fiftyone-mongodb.svc.cluster.local`.
-<!-- Please modify that hostname if you modify these instructions. -->
+<!-- Please modify this hostname if you modify these instructions. -->
 
 ### Create the Necessary Helm Repos
 
@@ -550,18 +581,18 @@ documentation.
 kubectl create namespace fiftyone-mongodb
 kubectl config set-context --current --namespace fiftyone-mongodb
 helm install fiftyone-mongodb \
-    --set auth.rootPassword=<REPLACE_ME> \
-    --set auth.rootUser=admin \
-    --set global.namespaceOverride=fiftyone-mongodb \
-    --set image.tag=4.4 \
-    --set ingress.enabled=true \
-    --set namespaceOverride=fiftyone-mongodb \
-    bitnami/mongodb
+  --set auth.rootPassword=<REPLACE_ME> \
+  --set auth.rootUser=admin \
+  --set global.namespaceOverride=fiftyone-mongodb \
+  --set image.tag=4.4 \
+  --set ingress.enabled=true \
+  --set namespaceOverride=fiftyone-mongodb \
+  bitnami/mongodb
 ```
 
 Wait until the MongoDB pods are in the `Ready` state before beginning the "Install FiftyOne Teams App" instructions.
 
-While watiing, [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+While waiting, [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
 
 To determine the state of the `fiftyone-mongodb` pods, run
 
@@ -588,15 +619,19 @@ Record the IP address and either create a DNS entry or contact your Voxel51 supp
 kubectl apply -f frontend-config.yaml
 ```
 
+For more information, see
+[HTTP to HTTPS redirects](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#https_redirect).
+
 ### Install FiftyOne Teams App
 
 ```shell
 kubectl create namespace fiftyone-teams
 kubectl config set-context --current --namespace fiftyone-teams
 kubectl create secret generic regcred \
-    --from-file=.dockerconfigjson=./voxel51-docker.json \
-    --type kubernetes.io/dockerconfigjson
-helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
+  --from-file=.dockerconfigjson=./voxel51-docker.json \
+  --type kubernetes.io/dockerconfigjson
+helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
+  --values ./values.yaml
 ```
 
 Issuing SSL Certificates can take up to 15 minutes.
