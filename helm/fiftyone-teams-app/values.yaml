@@ -197,6 +197,7 @@ teamsAppSettings:
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
+  # dnsName: ""
   env:
     APP_USE_HTTPS: true
     FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.14.0
