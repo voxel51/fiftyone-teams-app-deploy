@@ -514,15 +514,7 @@ curl -o frontend-config.yaml \
 Update the `values.yaml` file with
 
 - In `secret.fiftyone`
-  - Set the Auth0 configuration provided by Voxel51
-    - `apiClientId`
-    - `apiClientSecret`
-    - `auth0Domain`
-    - `clientId`
-    - `clientSecret`
-    - `organizationId`
   - MongoDB
-    - Set `fiftyoneDatabaseName`
     - Set `mongodbConnectionString` containing your MongoDB username and password
   - Set `cookieSecret`
   - Set `encryptionKey`
