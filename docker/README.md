@@ -9,19 +9,28 @@
 
 ---
 
-# Deploying FiftyOne Teams App using Docker Compose
+# Deploying FiftyOne Teams App with Docker Compose
 
-The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are available via Docker Hub, with the appropriate credentials. If you do not have Docker Hub credentials for the `voxel51` repositories, please contact your support team for Docker Hub credentials.
+We publish container images to these Docker Hub repositories
+
+- `voxel51/fiftyone-app`
+- `voxel51/fiftyone-app-gpt`
+- `voxel51/fiftyone-app-torch`
+- `voxel51/fiftyone-teams-api`
+- `voxel51/fiftyone-teams-app`
+
+For Docker Hub credentials, please contact your Voxel51 support team.
 
 ---
 
 ## Initial Installation vs. Upgrades
 
-`FIFTYONE_DATABASE_ADMIN` is set to `false` by default for FiftyOne Teams version 1.3.6. This is because FiftyOne Teams version 1.3.6 is backwards compatible with FiftyOne Teams database schema version 0.19 (Teams Version 1.1) and newer.
+By default, `FIFTYONE_DATABASE_ADMIN` is set to `false` for FiftyOne Teams version 1.4.0.
 
-- If you are performing an initial install, you will either want to set `FIFTYONE_DATABASE_ADMIN: true` in the `environment` section of the `fiftyone-app` service definition.
-
-- If you are performing an upgrade, please review our [Upgrade Process Recommendations](#upgrade-process-recommendations)
+- When performing an initial installation, in `compose.yaml` set
+  `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`
+- When performing an upgrade, please review our
+  [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
 ---
 
@@ -29,143 +38,250 @@ The `fiftyone-teams-app`, `fiftyone-teams-api`, and `fiftyone-app` images are av
 
 #### Enabling FiftyOne Teams Authenticated API
 
-FiftyOne Teams v1.3+ introduces the capability to connect FiftyOne Teams SDKs through the FiftyOne Teams API instead of creating a direct connection to MongoDB.
+FiftyOne Teams v1.3 introduces the capability to connect FiftyOne Teams SDKs through the FiftyOne Teams API (instead of creating a direct connection to MongoDB).
 
-If you would like to enable the FiftyOne Teams Authenticated API you will need to [expose the FiftyOne Teams API endpoint](docs/expose-teams-api.md) and [configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+To enable the FiftyOne Teams Authenticated API you will need to
+[expose the FiftyOne Teams API endpoint](docs/expose-teams-api.md)
+and
+[configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
 
 #### Enabling FiftyOne Teams Plugins
 
-FiftyOne Teams v1.3+ includes significant enhancements for [Plugins](https://docs.voxel51.com/plugins/index.html) to customize and extend the functionality of FiftyOne Teams in your environment.  There are three modes for plugins:
+FiftyOne Teams v1.3+ includes significant enhancements for
+[Plugins](https://docs.voxel51.com/plugins/index.html)
+to customize and extend the functionality of FiftyOne Teams in your environment.
 
-- Builtin Plugins Only - no changes are required for this mode.
-- Plugins run in the `fiftyone-app` deployment - to enable this mode:
-    - you should use the `compose.plugins.yaml` instead of the `compose.yaml` in this repository.  Your `docker compose` command might look like:<br>
-        `docker compose -f compose.plugins.yaml -f compose.override.yaml up -d`
-- Plugins run in a dedicated `teams-plugins` deployment - to enable this mode:
-    - you should use the `compose.dedicated-plugins.yaml` instead of the `compose.yaml` in this repository.  Your `docker compose` command might look like:<br>
-        `docker compose -f compose.dedicated-plugins.yaml -f compose.override.yaml up -d`
+There are three modes for plugins
 
-Both the `compose.plugins.yaml` and the `compose.dedicated-plugins.yaml` create a new Docker Volume that is shared between FiftyOne Teams services.  If you have a multi-node deployment you will need to establish a storage solution that allows the appropriate deployments to access the deployed plugins.
+1. Builtin Plugins Only
+    - No changes are required for this mode
+1. Plugins run in the `fiftyone-app` deployment
+    - To enable this mode, use the file
+      [./compose.plugins.yaml](./compose.plugins.yaml)
+      instead of
+      [./compose.yaml](./compose.yaml)
+    - Example `docker compose` command for this mode
 
-    - If plugins share the `fiftyone-app` deployment, `fiftyone-app` containers require `read` access to plugin storage while `fiftyone-api` containers require `read-write` access to plugin storage
-	- If plugins are run in a dedicated `teams-plugins` deployment, `teams-plugins` containers require `read` access to plugin storage while `fiftyone-api` containers require `read-write` access to plugin storage
+        ```shell
+        docker compose \
+          -f compose.plugins.yaml \
+          -f compose.override.yaml \
+          up -d
+        ```
 
-Plugins are deployed using the FiftyOne Teams UI at `/settings/plugins`; any early-adopter plugins installed via manual methods will need to be redeployed using the FiftyOne Teams UI.
+1. Plugins run in a dedicated `teams-plugins` deployment
+    - To enable this mode, use the file
+      [./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
+      instead of the
+      [./compose.yaml](./compose.yaml)
+    - Example `docker compose` command for this mode
+
+        ```shell
+        docker compose \
+          -f compose.dedicated-plugins.yaml \
+          -f compose.override.yaml \
+          up -d
+        ```
+
+Both [./compose.plugins.yaml](./compose.plugins.yaml)
+and
+[./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
+create a new Docker Volume shared between FiftyOne Teams services.
+For multi-node deployments, please implement a storage solution allowing the access the deployed plugins.
+
+- If plugins share the `fiftyone-app` deployment
+  - `fiftyone-app` containers require `read` access to plugin storage
+  - `fiftyone-api` containers require `read-write` access to plugin storage
+- If plugins are run in a dedicated `teams-plugins` deployment
+  - `teams-plugins` containers require `read` access to plugin storage
+  - `fiftyone-api` containers require `read-write` access to plugin storage
+
+Deploy plugins using the FiftyOne Teams UI at `/settings/plugins`.
+Any early-adopter plugins installed via manual methods must be redeployed using the FiftyOne Teams UI.
 
 #### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-As of FiftyOne Teams 1.1, containers based on the `fiftyone-teams-api` and `fiftyone-app` images now _REQUIRE_ the inclusion of the `FIFTYONE_ENCRYPTION_KEY` variable. This key is used to encrypt storage credentials in the MongoDB database.
+As of FiftyOne Teams 1.1, containers based on the `fiftyone-teams-api` and `fiftyone-app` images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
+This key is used to encrypt storage credentials in the MongoDB database.
 
-The `FIFTYONE_ENCRYPTION_KEY` can be generated using the following python:
+To  generate `FIFTYONE_ENCRYPTION_KEY`, run this Python code
 
-```
+```python
 from cryptography.fernet import Fernet
 print(Fernet.generate_key().decode())
 ```
 
-Voxel51 does not have access to this encryption key and cannot reproduce it. If this key is lost you will need to schedule an outage window to drop the storage credentials collection, replace the encryption key, and add the storage credentials via the UI again. Voxel51 strongly recommends storing this key in a safe place.
+Voxel51 does not have access to this encryption key and cannot reproduce it.
+If the key is lost, you will need to
 
-Storage credentials no longer need to be mounted into containers with appropriate environment variables being set; users with `Admin` permissions can use `/settings/cloud_storage_credentials` in the Web UI to add supported storage credentials.
+1. Schedule an outage window
+    1. Drop the storage credentials collection
+    1. Replace the encryption key
+    1. Add the storage credentials via the UI again.
 
-FiftyOne Teams version 1.3 continues to support the use of environment variables to set storage credentials in the application context but is providing an alternate configuration path for future functionality.
+Voxel51 strongly recommends storing this key in a safe place.
+
+Storage credentials no longer need to be mounted into containers with appropriate environment variables being set.
+Users with `Admin` permissions may add supported storage credentials using `/settings/cloud_storage_credentials` in the Web UI.
+
+FiftyOne Teams version 1.3+ continues to support the use of environment variables to set storage credentials and is providing an alternate UI-centric configuration path.
 
 #### Environment Proxies
 
-FiftyOne Teams version 1.1 and higher support routing traffic through proxy servers; this can be configured by setting the following environment variables on all containers in the environment:
+FiftyOne Teams version 1.1 and higher support routing traffic through proxy servers.
+To configure this, set following environment variables on
 
-```
-http_proxy: ${HTTP_PROXY_URL}
-https_proxy: ${HTTPS_PROXY_URL}
-no_proxy: ${NO_PROXY_LIST}
-HTTP_PROXY: ${HTTP_PROXY_URL}
-HTTPS_PROXY: ${HTTPS_PROXY_URL}
-NO_PROXY: ${NO_PROXY_LIST}
-```
+1. All containers
 
-You must also set the following environment variables on containers based on the `fiftyone-teams-app` image:
+    ```yaml
+    http_proxy: ${HTTP_PROXY_URL}
+    https_proxy: ${HTTPS_PROXY_URL}
+    no_proxy: ${NO_PROXY_LIST}
+    HTTP_PROXY: ${HTTP_PROXY_URL}
+    HTTPS_PROXY: ${HTTPS_PROXY_URL}
+    NO_PROXY: ${NO_PROXY_LIST}
+    ```
 
-```
-GLOBAL_AGENT_HTTP_PROXY: ${HTTP_PROXY_URL}
-GLOBAL_AGENT_HTTPS_PROXY: ${HTTPS_PROXY_URL}
-GLOBAL_AGENT_NO_PROXY: ${NO_PROXY_LIST}
-```
+1. All containers based on the `fiftyone-teams-app` image also require
 
-The `NO_PROXY_LIST` value must include the names of the compose services to allow FiftyOne Teams services to talk to each other without going through a proxy server. By default these service names are `teams-api`, `teams-app`, `fiftyone-app`.
+    ```yaml
+    GLOBAL_AGENT_HTTP_PROXY: ${HTTP_PROXY_URL}
+    GLOBAL_AGENT_HTTPS_PROXY: ${HTTPS_PROXY_URL}
+    GLOBAL_AGENT_NO_PROXY: ${NO_PROXY_LIST}
+    ```
 
-Examples of these settings are included in the FiftyOne Teams version 1.1.1 [compose.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/compose.yaml) and [.env](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/.env) files.
+The environment variable `NO_PROXY_LIST` value should be a comma-separated list of Docker Compose services that may communicate without going through a proxy server.
+By default these service names are
 
-By default the Global Agent Proxy will log all outbound connections and identify which connections are routed through the proxy. You can reduce the verbosity of the logging output by adding the following environment variable to your `teamsAppSettings.env`:
+- `teams-api`
+- `teams-app`
+- `fiftyone-app`
 
-```
+Examples of these settings are included in the FiftyOne Teams configuration files
+
+- [compose.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/compose.yaml)
+- [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template)
+
+By default, the Global Agent Proxy will log all outbound connections and identify which connections are routed through the proxy.
+To reduce the logging verbosity, add this environment variable to your `teamsAppSettings.env`
+
+```ini
 ROARR_LOG: false
 ```
 
 #### Text Similarity
 
-FiftyOne Teams version 1.2 and higher supports using text similarity searches for images that are indexed with a model that [supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text). If you choose to make use of this feature, you must use the `fiftyone-app-torch` image provided by Voxel51 instead of the `fiftyone-app` image, or build your own base image including torch.
+FiftyOne Teams version 1.2 and higher supports using text similarity searches for images that are indexed with a model that
+[supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text).
+To use this feature, use a container image containing `torch` (PyTorch) instead of the `fiftyone-app` image.
+Use the Voxel51 provided image `fiftyone-app-torch` or build your own base image including `torch`.
 
-Voxel51 recommends using a `compose.override.yaml` to [override the image selection](https://docs.docker.com/compose/extends/); this will allow you to update your `compose.yaml` in future releases without having to port this change forward. An example `compose.override.yaml` for this situation might look like:
+Voxel51 recommends using a `compose.override.yaml` to
+[override the image selection](https://docs.docker.com/compose/extends/).
+This will allow you to update your `compose.yaml` in future releases without having to port this change forward.
+An example `compose.override.yaml` for this situation might look like:
 
-```
+```yaml
 version: '3.8'
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.3.6
+    image: voxel51/fiftyone-app-torch:v1.4.0
 ```
 
 ## Upgrade Process Recommendations
 
-### Upgrade Process Recommendations From Early Adopter Versions (Versions less than 1.0)
+### From Early Adopter Versions (Versions less than 1.0)
 
-Please contact your Voxel51 Customer Success team member to coordinate this upgrade. You will need to either create a new IdP or modify your existing configuration in order to migrate to a new Auth0 Tenant.
+Please contact your Voxel51 Customer Success team member to coordinate this upgrade.
+You will need to either create a new IdP or modify your existing configuration in order to migrate to a new Auth0 Tenant.
 
-### Upgrade Process Recommendations From Before FiftyOne Teams Version 1.1.0
+### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.13.6 SDK (database version 0.21.6) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0, and the FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions. If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
+The FiftyOne 0.14.0 SDK (database version 0.22.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
+The FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions.
+If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
 Voxel51 recommends the following upgrade process for upgrading from versions prior to FiftyOne Teams version 1.1.0:
 
-1. Make sure your installation includes the required [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes) environment variable
-1. If you are using a proxy server, make sure you have configured the appropriate [proxy environment variables](#environment-proxies)
+1. Make sure your installation includes the required
+   [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
+   environment variable
+1. [Upgrade to FiftyOne Teams version 1.4.0](#deploying-fiftyone-teams)
+   with `FIFTYONE_DATABASE_ADMIN=true`
+   (this is not the default in the `config.yaml` for this release).
+    - **NOTE:** FiftyOne SDK users will lose access to the
+      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.14.0`
+1. Upgrade your FiftyOne SDKs to version 0.14.0
+    - Login to the FiftyOne Teams UI
+    - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Run `fiftyone migrate --info` to ensure all datasets have been migrated to version 0.22.0.
+   - If not all datasets have been upgraded, have an admin run
 
-1. [Upgrade to FiftyOne Teams version 1.3.6](#deploying-fiftyone-teams) with `FIFTYONE_DATABASE_ADMIN=true` (this is not the default in the `config.yaml` for this release).<br>
-   **NOTE:** FiftyOne SDK users will lose access to the FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.13.6`
-1. Upgrade your FiftyOne SDKs to version 0.13.6<br>
-   The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
-1. Use `fiftyone migrate --info` to make sure that all datasets have been migrated to version 0.21.6.
-   - If not all datasets have been upgraded, an admin can run `FIFTYONE_DATABASE_ADMIN=true fiftyone migrate
-   --all` in their local environment
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+      ```
 
+### From FiftyOne Teams Version 1.1.0 and later
 
-### Upgrade Process Recommendations From FiftyOne Teams Version 1.1.0 and later
-
-The FiftyOne 0.13.6 SDK (database version 0.21.6) is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later, but the FiftyOne 0.11.0 SDK is _NOT_ forward compatible with FiftyOne Teams Database Version 0.21.6.
+The FiftyOne 0.14.0 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
+You will not be able to connect to a FiftyOne Teams 1.4.0 database (version 0.22.0) with any FiftyOne SDK before 0.14.0.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
 Voxel51 recommends the following upgrade process for upgrading from FiftyOne Teams version 1.1.0 or later:
 
-1. Ensure all FiftyOne SDK users set `FIFTYONE_DATABASE_ADMIN=false` or `unset FIFTYONE_DATABASE_ADMIN` (this should generally be your default)
-1. [Upgrade to FiftyOne Teams version 1.3.6](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.13.6<br>
-   The command line for installing the FiftyOne SDK associated with your FiftyOne Teams version is available in the FiftyOne Teams UI under `Account > Install FiftyOne` after a user has logged in.
-1. Have the admin run `FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all` to upgrade all datasets<br>
-   **NOTE** Any FiftyOne SDK less than 0.13.6 will lose database connectivity at this point; upgrading to `fiftyone==0.13.6` is required
-1. Use `fiftyone migrate --info` to ensure that all datasets are now at version 0.21.6.
+1. Ensure all FiftyOne SDK users either
+    - set `FIFTYONE_DATABASE_ADMIN=false`
+    - `unset FIFTYONE_DATABASE_ADMIN`
+        - This should generally be your default
+1. [Upgrade to FiftyOne Teams version 1.4.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.14.0
+    - Login to the FiftyOne Teams UI
+    - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Have the admin run this to upgrade all datasets
+
+    ```shell
+    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+    ```
+
+    - **NOTE** Any FiftyOne SDK less than 0.14.0 will lose database connectivity at this point. Upgrading to `fiftyone==0.14.0` is required
 
 ---
 
 ## Deploying FiftyOne Teams
 
-In a directory that contains the `compose.yaml` and `.env` files included in this repository, on a system with docker-compose installed, edit the `.env` file to set the parameters required for this deployment ([see table below](#fiftyone-teams-environment-variables)).
+1. Install docker-compose
+1. From a directory containing the files `compose.yaml` and `env.template` files (included in this repository),
+    1. Rename the `env.template` file to `.env`
+    1. Edit the `.env` file, setting the parameters required for this deployment.
+       [See table below](#fiftyone-teams-environment-variables).
+1. In the same directory, run
 
-In the same directory, run the following command:
+    ```shell
+    docker-compose up -d
+    ```
 
-`docker-compose up -d`
+1. Have the admin run  to upgrade all datasets
 
-The FiftyOne Teams App is now exposed on port 3000; an SSL endpoint (Load Balancer or Nginx Proxy or something similar) will need to be configured to route traffic from the SSL endpoint to port 3000 on the host running the FiftyOne Teams App.
 
-An example nginx site configuration that forwards http traffic to https, and https traffic for `your.server.name` to port 3000, [has been included in this repository](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf).
+    ```shell
+    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+    ```
+
+1. To ensure that all datasets are now at version 0.22.0, run
+
+    ```shell
+    fiftyone migrate --info
+    ```
+
+The FiftyOne Teams App is now exposed on port 3000.
+An SSL endpoint (Load Balancer or Nginx Proxy or something similar) will need to be configured to route traffic from the SSL endpoint to port 3000 on the host running the FiftyOne Teams App.
+
+An example nginx site configuration that forwards http traffic to https, and https traffic for `your.server.name` to port 3000.
+See
+[./example-nginx-site.conf](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf).
+
+---
 
 ## FiftyOne Teams Environment Variables
 
