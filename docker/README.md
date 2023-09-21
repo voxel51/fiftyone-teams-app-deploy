@@ -25,7 +25,7 @@ For Docker Hub credentials, please contact your Voxel51 support team.
 
 ## Initial Installation vs. Upgrades
 
-By default, `FIFTYONE_DATABASE_ADMIN` is set to `false` for FiftyOne Teams version 1.4.0.
+By default, `FIFTYONE_DATABASE_ADMIN` is set to `false` for FiftyOne Teams version 1.4.1.
 
 - When performing an initial installation, in `compose.yaml` set
   `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`
@@ -185,7 +185,7 @@ An example `compose.override.yaml` for this situation might look like:
 version: '3.8'
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.4.0
+    image: voxel51/fiftyone-app-torch:v1.4.1
 ```
 
 ## Upgrade Process Recommendations
@@ -197,7 +197,7 @@ You will need to either create a new IdP or modify your existing configuration i
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.14.0 SDK (database version 0.22.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
+The FiftyOne 0.14.1 SDK (database version 0.22.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions.
 If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
@@ -206,12 +206,12 @@ Voxel51 recommends the following upgrade process for upgrading from versions pri
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.4.0](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.4.1](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default in the `config.yaml` for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.14.0`
-1. Upgrade your FiftyOne SDKs to version 0.14.0
+      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.14.1`
+1. Upgrade your FiftyOne SDKs to version 0.14.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Run `fiftyone migrate --info` to ensure all datasets have been migrated to version 0.22.0.
@@ -223,8 +223,8 @@ Voxel51 recommends the following upgrade process for upgrading from versions pri
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.14.0 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.4.0 database (version 0.22.0) with any FiftyOne SDK before 0.14.0.
+The FiftyOne 0.14.1 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
+You will not be able to connect to a FiftyOne Teams 1.4.1 database (version 0.22.0) with any FiftyOne SDK before 0.14.1.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
@@ -234,8 +234,8 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.4.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.14.0
+1. [Upgrade to FiftyOne Teams version 1.4.1](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.14.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Have the admin run this to upgrade all datasets
@@ -244,7 +244,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.14.0 will lose database connectivity at this point. Upgrading to `fiftyone==0.14.0` is required
+    - **NOTE** Any FiftyOne SDK less than 0.14.1 will lose database connectivity at this point. Upgrading to `fiftyone==0.14.1` is required
 
 ---
 
