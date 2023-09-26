@@ -153,13 +153,14 @@ To configure this, set following environment variables on
 The environment variable `NO_PROXY_LIST` value should be a comma-separated list of Docker Compose services that may communicate without going through a proxy server.
 By default these service names are
 
+- `fiftyone-app`
 - `teams-api`
 - `teams-app`
-- `fiftyone-app`
+- `teams-plugins`
 
 Examples of these settings are included in the FiftyOne Teams configuration files
 
-- [compose.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/compose.yaml)
+- [common-services.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/common-services.yaml)
 - [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template)
 
 By default, the Global Agent Proxy will log all outbound connections and identify which connections are routed through the proxy.
@@ -182,7 +183,6 @@ This will allow you to update your `compose.yaml` in future releases without hav
 An example `compose.override.yaml` for this situation might look like:
 
 ```yaml
-version: '3.8'
 services:
   fiftyone-app:
     image: voxel51/fiftyone-app-torch:v1.4.1

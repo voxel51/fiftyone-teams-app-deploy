@@ -15,9 +15,20 @@ services:
       GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
       LOGGING_LEVEL: ${API_LOGGING_LEVEL:-INFO}
       MONGO_DEFAULT_DB: ${FIFTYONE_DATABASE_NAME}
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then add the following environment variables to your
+      #  `compose.override.yaml``
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
     restart: always
+
   teams-app-common:
     image: voxel51/fiftyone-teams-app:v1.4.1
     environment:
@@ -36,9 +47,24 @@ services:
       FIFTYONE_TEAMS_PROXY_URL: ${FIFTYONE_TEAMS_PROXY_URL}
       NODE_ENV: production
       RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then add the following environment variables to your
+      #  `compose.override.yaml``
+      # GLOBAL_AGENT_HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # GLOBAL_AGENT_HTTP_PROXY: ${HTTP_PROXY_URL}
+      # GLOBAL_AGENT_NO_PROXY: ${NO_PROXY_LIST}
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
+      # ROARR_LOG: false
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
     ports:
       - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
     restart: always
+
   fiftyone-app-common:
     image: voxel51/fiftyone-app:v1.4.1
     environment:
@@ -56,9 +82,20 @@ services:
       FIFTYONE_TEAMS_CLIENT_ID: ${AUTH0_CLIENT_ID}
       FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
       FIFTYONE_TEAMS_ORGANIZATION: ${AUTH0_ORGANIZATION}
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then add the following environment variables to your
+      #  `compose.override.yaml``
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
     ports:
       - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
     restart: always
+
   teams-plugins-common:
     image: voxel51/fiftyone-app:v1.4.1
     environment:
@@ -77,4 +114,14 @@ services:
       FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
       FIFTYONE_TEAMS_ORGANIZATION: ${AUTH0_ORGANIZATION}
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then add the following environment variables to your
+      #  `compose.override.yaml``
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
     restart: always

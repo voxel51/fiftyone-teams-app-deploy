@@ -1,46 +1,15 @@
+# For Proxy Server instructions please see
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 services:
   teams-api:
     extends:
       file: common-services.yaml
       service: teams-api-common
-    # If you are routing through a proxy server you will want to set
-    #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
-    #  then uncomment the environment variables below
-    # environment:
-    #   http_proxy: ${HTTP_PROXY_URL}
-    #   https_proxy: ${HTTPS_PROXY_URL}
-    #   no_proxy: ${NO_PROXY_LIST}
-    #   HTTP_PROXY: ${HTTP_PROXY_URL}
-    #   HTTPS_PROXY: ${HTTPS_PROXY_URL}
-    #   NO_PROXY: ${NO_PROXY_LIST}
   teams-app:
     extends:
       file: common-services.yaml
       service: teams-app-common
-    # If you are routing through a proxy server you will want to set
-    #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
-    #  then uncomment the environment variables below
-    # environment:
-    #   http_proxy: ${HTTP_PROXY_URL}
-    #   https_proxy: ${HTTPS_PROXY_URL}
-    #   no_proxy: ${NO_PROXY_LIST}
-    #   HTTP_PROXY: ${HTTP_PROXY_URL}
-    #   HTTPS_PROXY: ${HTTPS_PROXY_URL}
-    #   NO_PROXY: ${NO_PROXY_LIST}
-    #   GLOBAL_AGENT_HTTP_PROXY: ${HTTP_PROXY_URL}
-    #   GLOBAL_AGENT_HTTPS_PROXY: ${HTTPS_PROXY_URL}
-    #   GLOBAL_AGENT_NO_PROXY: ${NO_PROXY_LIST}
   fiftyone-app:
     extends:
       file: common-services.yaml
       service: fiftyone-app-common
-    # If you are routing through a proxy server you will want to set
-    #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
-    #  then uncomment the environment variables below
-    # environment:
-    #   http_proxy: ${HTTP_PROXY_URL}
-    #   https_proxy: ${HTTPS_PROXY_URL}
-    #   no_proxy: ${NO_PROXY_LIST}
-    #   HTTP_PROXY: ${HTTP_PROXY_URL}
-    #   HTTPS_PROXY: ${HTTPS_PROXY_URL}
-    #   NO_PROXY: ${NO_PROXY_LIST}
