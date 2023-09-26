@@ -18,7 +18,7 @@ services:
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
-      #  `compose.override.yaml``
+      #  `compose.override.yaml`
       # HTTPS_PROXY: ${HTTPS_PROXY_URL}
       # HTTP_PROXY: ${HTTP_PROXY_URL}
       # NO_PROXY: ${NO_PROXY_LIST}
