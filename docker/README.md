@@ -25,12 +25,49 @@ For Docker Hub credentials, please contact your Voxel51 support team.
 
 ## Initial Installation vs. Upgrades
 
-By default, `FIFTYONE_DATABASE_ADMIN` is set to `false` for FiftyOne Teams version 1.4.2.
+Only when performing an initial installation, in `compose.yaml` set
+`services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`.
+Otherwise, set `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
+See [Upgrade Process Recommendations](#upgrade-process-recommendations).
 
-- When performing an initial installation, in `compose.yaml` set
-  `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`
-- When performing an upgrade, please review our
-  [Upgrade Process Recommendations](#upgrade-process-recommendations)
+The environment variable `FIFTYONE_DATABASE_ADMIN` controls whether the database may be migrated.
+This is a safety check to prevent automatic database upgrades that will break other user's SDK connection.
+When false (or unset), either an error will occur
+
+```shell
+$ fiftyone migrate --all
+Traceback (most recent call last):
+...
+OSError: Cannot migrate database from v0.22.1 to v0.22.0 when database_admin=False.
+```
+
+or no action will be taken:
+
+```shell
+$ fiftyone migrate --info
+FiftyOne Teams version: 0.14.2
+
+FiftyOne compatibility version: 0.22.1
+Other compatible versions: >=0.19,<0.23
+
+Database version: 0.22.0
+
+dataset     version
+----------  ---------
+quickstart  0.22.0
+$ fiftyone migrate --all
+$ fiftyone migrate --info
+FiftyOne Teams version: 0.14.2
+
+FiftyOne compatibility version: 0.22.1
+Other compatible versions: >=0.19,<0.23
+
+Database version: 0.22.0
+
+dataset     version
+----------  ---------
+quickstart  0.22.0
+```
 
 ---
 
@@ -60,6 +97,9 @@ There are three modes for plugins
       [./compose.plugins.yaml](./compose.plugins.yaml)
       instead of
       [./compose.yaml](./compose.yaml)
+    - Containers need the following access to the plugin storage
+      - `fiftyone-app` require `read`
+      - `fiftyone-api` require `read-write`
     - Example `docker compose` command for this mode
 
         ```shell
@@ -74,6 +114,9 @@ There are three modes for plugins
       [./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
       instead of the
       [./compose.yaml](./compose.yaml)
+    - Containers need the following access to the plugin storage
+      - `teams-plugins` require `read`
+      - `fiftyone-api` require `read-write`
     - Example `docker compose` command for this mode
 
         ```shell
@@ -83,21 +126,15 @@ There are three modes for plugins
           up -d
         ```
 
-Both [./compose.plugins.yaml](./compose.plugins.yaml)
+Both
+[./compose.plugins.yaml](./compose.plugins.yaml)
 and
 [./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
 create a new Docker Volume shared between FiftyOne Teams services.
 For multi-node deployments, please implement a storage solution allowing the access the deployed plugins.
 
-- If plugins share the `fiftyone-app` deployment
-  - `fiftyone-app` containers require `read` access to plugin storage
-  - `fiftyone-api` containers require `read-write` access to plugin storage
-- If plugins are run in a dedicated `teams-plugins` deployment
-  - `teams-plugins` containers require `read` access to plugin storage
-  - `fiftyone-api` containers require `read-write` access to plugin storage
-
-Deploy plugins using the FiftyOne Teams UI at `/settings/plugins`.
-Any early-adopter plugins installed via manual methods must be redeployed using the FiftyOne Teams UI.
+Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPOY_URL>/settings/plugins`.
+Early-adopter plugins installed manually must be redeployed using the FiftyOne Teams UI.
 
 #### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
@@ -112,6 +149,7 @@ print(Fernet.generate_key().decode())
 ```
 
 Voxel51 does not have access to this encryption key and cannot reproduce it.
+Please store this key in a safe place.
 If the key is lost, you will need to
 
 1. Schedule an outage window
@@ -119,16 +157,14 @@ If the key is lost, you will need to
     1. Replace the encryption key
     1. Add the storage credentials via the UI again.
 
-Voxel51 strongly recommends storing this key in a safe place.
-
 Storage credentials no longer need to be mounted into containers with appropriate environment variables being set.
-Users with `Admin` permissions may add supported storage credentials using `/settings/cloud_storage_credentials` in the Web UI.
+Users with `Admin` permissions may use the FiftyOne Teams UI to manage storage credentials by navigating to `https://<DEPOY_URL>/settings/cloud_storage_credentials`.
 
-FiftyOne Teams version 1.3+ continues to support the use of environment variables to set storage credentials and is providing an alternate UI-centric configuration path.
+FiftyOne Teams version 1.3+ continues to support the use of environment variables to set storage credentials in the application context and is providing an alternate configuration path for future functionality.
 
 #### Environment Proxies
 
-FiftyOne Teams version 1.1 and higher support routing traffic through proxy servers.
+FiftyOne Teams supports routing traffic through proxy servers.
 To configure this, set following environment variables on
 
 1. All containers
@@ -142,7 +178,7 @@ To configure this, set following environment variables on
     NO_PROXY: ${NO_PROXY_LIST}
     ```
 
-1. All containers based on the `fiftyone-teams-app` image also require
+1. All containers based on the `fiftyone-teams-app` image
 
     ```yaml
     GLOBAL_AGENT_HTTP_PROXY: ${HTTP_PROXY_URL}
@@ -176,10 +212,9 @@ FiftyOne Teams version 1.2 and higher supports using text similarity searches fo
 To use this feature, use a container image containing `torch` (PyTorch) instead of the `fiftyone-app` image.
 Use the Voxel51 provided image `fiftyone-app-torch` or build your own base image including `torch`.
 
-Voxel51 recommends using a `compose.override.yaml` to
-[override the image selection](https://docs.docker.com/compose/extends/).
+To override the default image, update `compose.override.yaml` with the value for image.
 This will allow you to update your `compose.yaml` in future releases without having to port this change forward.
-An example `compose.override.yaml` for this situation might look like:
+For example, `compose.override.yaml` might look like:
 
 ```yaml
 version: '3.8'
@@ -188,12 +223,15 @@ services:
     image: voxel51/fiftyone-app-torch:v1.4.2
 ```
 
+For more information, see the docs for
+[Docker Compose Extend](https://docs.docker.com/compose/extends/).
+
 ## Upgrade Process Recommendations
 
 ### From Early Adopter Versions (Versions less than 1.0)
 
 Please contact your Voxel51 Customer Success team member to coordinate this upgrade.
-You will need to either create a new IdP or modify your existing configuration in order to migrate to a new Auth0 Tenant.
+To migrate to a new Auth0 Tenant, you will need to create a new IdP or modify your existing configuration.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
@@ -201,20 +239,24 @@ The FiftyOne 0.14.2 SDK (database version 0.22.1) is _NOT_ backwards-compatible 
 The FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions.
 If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
-Voxel51 recommends the following upgrade process for upgrading from versions prior to FiftyOne Teams version 1.1.0:
+Voxel51 recommends this upgrade process from versions prior to FiftyOne Teams version 1.1.0:
 
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
    environment variable
 1. [Upgrade to FiftyOne Teams version 1.4.2](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
-   (this is not the default in the `config.yaml` for this release).
+   (this is not the default in the `compose.yaml` for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
       FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.14.2`
 1. Upgrade your FiftyOne SDKs to version 0.14.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Run `fiftyone migrate --info` to ensure all datasets have been migrated to version 0.22.1.
+1. Check if datasets have been migrated to version 0.22.1.
+
+    ```shell
+    fiftyone migrate --info
+    ```
    - If not all datasets have been upgraded, have an admin run
 
       ```shell
@@ -246,6 +288,12 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
 
     - **NOTE** Any FiftyOne SDK less than 0.14.2 will lose database connectivity at this point. Upgrading to `fiftyone==0.14.2` is required
 
+1. To ensure that all datasets are now at version 0.22.0, run
+
+    ```shell
+    fiftyone migrate --info
+    ```
+
 ---
 
 ## Deploying FiftyOne Teams
@@ -261,8 +309,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     docker-compose up -d
     ```
 
-1. Have the admin run  to upgrade all datasets
-
+1. Have the admin run to upgrade all datasets
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all

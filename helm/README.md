@@ -114,8 +114,8 @@ There are three modes for plugins
             - `ReadOnly` permission to the `teams-plugins` deployment
               at the `FIFTYONE_PLUGINS_DIR` path
 
-Deploy plugins using the FiftyOne Teams UI at `/settings/plugins`.
-Any early-adopter plugins installed via manual methods must be redeployed using the FiftyOne Teams UI.
+Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPOY_URL>/settings/plugins`.
+Early-adopter plugins installed manually must be redeployed using the FiftyOne Teams UI.
 
 #### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
@@ -130,6 +130,7 @@ print(Fernet.generate_key().decode())
 ```
 
 Voxel51 does not have access to this encryption key and cannot reproduce it.
+Please store this key in a safe place.
 If the key is lost, you will need to
 
 1. Schedule an outage window
@@ -137,12 +138,10 @@ If the key is lost, you will need to
     1. Replace the encryption key
     1. Add the storage credentials via the UI again.
 
-Voxel51 strongly recommends storing this key in a safe place.
-
 Storage credentials no longer need to be mounted into pods with appropriate environment variables being set.
-Users with `Admin` permissions may add supported storage credentials using `/settings/cloud_storage_credentials` in the Web UI.
+Users with `Admin` permissions may use the FiftyOne Teams UI to manage storage credentials by navigating to `https://<DEPOY_URL>/settings/cloud_storage_credentials`.
 
-FiftyOne Teams continues to support the use of environment variables to set storage credentials in the application context but is providing an alternate configuration path for future functionality.
+FiftyOne Teams continues to support the use of environment variables to set storage credentials in the application context and is providing an alternate configuration path for future functionality.
 
 #### Environment Proxies
 
@@ -192,12 +191,12 @@ To use this feature, use a container image containing `torch` (PyTorch) instead 
 Use the Voxel51 provided image `fiftyone-app-torch` or build your own base image including `torch`.
 
 To override the default image, add a new `appSettings.image.repository` stanza to the Helm Chart.
-Using the included `values.yaml` this configuration might look like:
+For example, `values.yaml` might look like:
 
 ```yaml
 appSettings:
   image:
-    repository: voxel51/fiftyone-app-torch
+    repository: voxel51/fiftyone-app-torch:v1.4.1
 ```
 
 ---
@@ -386,7 +385,7 @@ The FiftyOne 0.14.2 SDK (database version 0.22.1) is _NOT_ backwards-compatible 
 The FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions.
 If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
-Voxel51 recommends the following upgrade process for upgrading from versions prior to FiftyOne Teams version 1.1.0:
+Voxel51 recommends this upgrade process from versions prior to FiftyOne Teams version 1.1.0:
 
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
@@ -399,11 +398,17 @@ Voxel51 recommends the following upgrade process for upgrading from versions pri
 1. Upgrade your FiftyOne SDKs to version 0.14.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Have an admin run this to upgrade all datasets to version 0.22.1
+1. Check if datasets have been migrated to version 0.22.1.
 
     ```shell
-    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+    fiftyone migrate --info
     ```
+
+    - If not all datasets have been upgraded, have an admin run
+
+        ```shell
+        FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+        ```
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
@@ -422,11 +427,12 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.14.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Have the admin run  to upgrade all datasets
+1. Have the admin run to upgrade all datasets
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
+    - **NOTE** Any FiftyOne SDK less than 0.14.1 will lose database connectivity at this point. Upgrading to `fiftyone==0.14.1` is required
 
 1. To ensure that all datasets are now at version 0.22.1, run
 
