@@ -196,7 +196,7 @@ For example, `values.yaml` might look like:
 ```yaml
 appSettings:
   image:
-    repository: voxel51/fiftyone-app-torch:v1.4.1
+    repository: voxel51/fiftyone-app-torch
 ```
 
 ---
@@ -432,7 +432,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
-    - **NOTE** Any FiftyOne SDK less than 0.14.1 will lose database connectivity at this point. Upgrading to `fiftyone==0.14.1` is required
+    - **NOTE** Any FiftyOne SDK less than 0.14.2 will lose database connectivity at this point. Upgrading to `fiftyone==0.14.2` is required
 
 1. To ensure that all datasets are now at version 0.22.1, run
 
