@@ -196,7 +196,7 @@ For example, `values.yaml` might look like:
 ```yaml
 appSettings:
   image:
-    repository: voxel51/fiftyone-app-torch:v1.4.1
+    repository: voxel51/fiftyone-app-torch
 ```
 
 ---

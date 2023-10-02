@@ -25,13 +25,13 @@ For Docker Hub credentials, please contact your Voxel51 support team.
 
 ## Initial Installation vs. Upgrades
 
-Only when performing an initial installation, in `compose.yaml` set
+When performing an initial installation, in `compose.yaml` set
 `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`.
-Otherwise, set `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
+When performing a FiftyOne Teams upgrade, set `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
 See [Upgrade Process Recommendations](#upgrade-process-recommendations).
 
 The environment variable `FIFTYONE_DATABASE_ADMIN` controls whether the database may be migrated.
-This is a safety check to prevent automatic database upgrades that will break other user's SDK connection.
+This is a safety check to prevent automatic database upgrades that will break other users' SDK connections.
 When false (or unset), either an error will occur
 
 ```shell
@@ -97,9 +97,9 @@ There are three modes for plugins
       [./compose.plugins.yaml](./compose.plugins.yaml)
       instead of
       [./compose.yaml](./compose.yaml)
-    - Containers need the following access to the plugin storage
-      - `fiftyone-app` require `read`
-      - `fiftyone-api` require `read-write`
+    - Containers need the following access to plugin storage
+      - `fiftyone-app` requires `read`
+      - `fiftyone-api` requires `read-write`
     - Example `docker compose` command for this mode
 
         ```shell
@@ -114,9 +114,9 @@ There are three modes for plugins
       [./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
       instead of the
       [./compose.yaml](./compose.yaml)
-    - Containers need the following access to the plugin storage
-      - `teams-plugins` require `read`
-      - `fiftyone-api` require `read-write`
+    - Containers need the following access to plugin storage
+      - `teams-plugins` requires `read`
+      - `fiftyone-api` requires `read-write`
     - Example `docker compose` command for this mode
 
         ```shell
