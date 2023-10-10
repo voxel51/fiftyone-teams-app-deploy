@@ -381,7 +381,7 @@ You will need to either create a new IdP or modify your existing configuration i
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.14.2 SDK (database version 0.22.1) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
+The FiftyOne 0.14 SDK (database version 0.22.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions.
 If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
@@ -398,7 +398,7 @@ Voxel51 recommends this upgrade process from versions prior to FiftyOne Teams ve
 1. Upgrade your FiftyOne SDKs to version 0.14.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check if datasets have been migrated to version 0.22.1.
+1. Check if datasets have been migrated to version 0.22.0.
 
     ```shell
     fiftyone migrate --info
@@ -412,8 +412,8 @@ Voxel51 recommends this upgrade process from versions prior to FiftyOne Teams ve
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.14.2 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.4.2 database (version 0.22.1) with any FiftyOne SDK before 0.14.2.
+The FiftyOne 0.14 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
+You will not be able to connect to a FiftyOne Teams 1.4.2 database (version 0.22.0) with any FiftyOne SDK before 0.14.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
@@ -434,7 +434,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     ```
     - **NOTE** Any FiftyOne SDK less than 0.14.2 will lose database connectivity at this point. Upgrading to `fiftyone==0.14.2` is required
 
-1. To ensure that all datasets are now at version 0.22.1, run
+1. To ensure that all datasets are now at version 0.22.0, run
 
     ```shell
     fiftyone migrate --info
