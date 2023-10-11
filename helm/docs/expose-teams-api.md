@@ -17,19 +17,23 @@ There are two methods for SDK access to Fiftyone Teams
 - FiftyOne Teams API
 
 The database direct connection requires each user to have root database privileges.
-This is not a preferred security posture and presents risks.
 
 The FiftyOne Teams API provides Role Based Access Control (RBAC) permissions.
 By default, the API is not exposed.
-To expose the FiftyOne Teams API, configure an Kubernetes Ingress to route traffic to the Kubernetes service `teams-api` on port 80 via the WebSocket protocol.
+To expose the FiftyOne Teams API, configure a
+Kubernetes Ingress to route traffic to the Kubernetes
+`teams-api` service on port 80 via the WebSocket protocol.
 
 We use WebSockets to maintain connections and enable long-running process execution.
 Before exposing the `teams-api` service,
 validate that your infrastructure supports the WebSockets protocol.
-(For example, you may need to replace AWS Classic Load Balancers (LB) with AWS Application Load Balancers (ALB) for WebSocket support.)
+(For example, you may need to replace AWS Classic Load Balancers (LB)
+with AWS Application Load Balancers (ALB) for WebSocket support.)
 
-When using file-based storage credentials or setting environment variables, the same credentials must be shared with the `fiftyone-app` and `teams-api` pods.
-We recommend using Database Cloud Storage Credentials configured at `/settings/cloud_storage_credentials`.
+When using file-based storage credentials or setting environment variables, the
+same credentials must be shared with the `fiftyone-app` and `teams-api` pods.
+We recommend using Database Cloud Storage Credentials configured at
+`https://<DEPOY_URL>/settings/cloud_storage_credentials`.
 
 To expose the `teams-api`` service, chose one of these two routing methods
 
@@ -40,12 +44,11 @@ To expose the `teams-api`` service, chose one of these two routing methods
 
 Add a Second Host to the Ingress Controller
 
-1. Obtain a new TLS certificates for the new host
-1. Update DNS for the new host to route to the Ingress
+1. Update the existing TLS certificate for the new host
+1. Add a new DNS entry for the new host to route to the Ingress
 1. Update `values.yaml`
     1. Set `apiSettings.dnsName` to the hostname to route API requests to
       (e.g. `demo-api.fiftyone.ai`)
-    1. Set the `teams-api` paths, set `ingress.teamsApi`
 1. Upgrade the deployment using the latest Helm chart
 
     ```shell
