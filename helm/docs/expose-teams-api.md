@@ -11,23 +11,41 @@
 
 # Exposing the `teams-api` Service
 
-You may wish to expose your FiftyOne Teams API for SDK access.
+There are two methods for SDK access to Fiftyone Teams
 
-You may expose your `teams-api` service in any manner that suits your deployment strategy.
-The following is one solution, but does not represent the entirety of possible solutions.
-Any solution allowing the FiftyOne Teams SDK to use websockets to access the `teams-api` service on port 80 should work.
+- Direct MongoDB connection
+- FiftyOne Teams API
 
-**NOTE**: The `teams-api` service uses websockets to maintain connections and allow for long-running processes to complete.
-Please ensure your Infrastructure supports websockets before attempting to expose the `teams-api` service.
-(e.g. You will have to migrate from AWS Classic Load Balancers to AWS Application Load Balancers to provide websockets support.)
+The database direct connection requires each user to have root database privileges.
+This is not a preferred security posture and presents risks.
 
-**NOTE**: If you are using file-based storage credentials, or setting environment variables, the same credentials must be shared with the `fiftyone-app` and `teams-api` pods.
-Voxel51 recommends the use of Database Cloud Storage Credentials, which can be configured at `/settings/cloud_storage_credentials`.
+The FiftyOne Teams API provides Role Based Access Control (RBAC) permissions.
+By default, the API is not exposed.
+To expose the FiftyOne Teams API, configure an Kubernetes Ingress to route traffic to the Kubernetes service `teams-api` on port 80 via the WebSocket protocol.
 
-## Adding a Second Host to the Ingress Controller (Host-Based Routing)
+We use WebSockets to maintain connections and enable long-running process execution.
+Before exposing the `teams-api` service,
+validate that your infrastructure supports the WebSockets protocol.
+(For example, you may need to replace AWS Classic Load Balancers (LB) with AWS Application Load Balancers (ALB) for WebSocket support.)
 
-1. Set `apiSettings.dnsName` to the hostname to route API requests to
-   (e.g. demo-api.fiftyone.ai)
+When using file-based storage credentials or setting environment variables, the same credentials must be shared with the `fiftyone-app` and `teams-api` pods.
+We recommend using Database Cloud Storage Credentials configured at `/settings/cloud_storage_credentials`.
+
+To expose the `teams-api`` service, chose one of these two routing methods
+
+- Host-Based
+- Path-based
+
+## Host-Based Routing
+
+Add a Second Host to the Ingress Controller
+
+1. Obtain a new TLS certificates for the new host
+1. Update DNS for the new host to route to the Ingress
+1. Update `values.yaml`
+    1. Set `apiSettings.dnsName` to the hostname to route API requests to
+      (e.g. `demo-api.fiftyone.ai`)
+    1. Set the `teams-api` paths, set `ingress.teamsApi`
 1. Upgrade the deployment using the latest Helm chart
 
     ```shell
@@ -36,35 +54,74 @@ Voxel51 recommends the use of Database Cloud Storage Credentials, which can be c
       -f ./values.yaml
     ```
 
-Modifications to the `teams-api` paths should be done using `ingress.teamsApi`.
+## Path-Based Routing
 
-## Use `ingress.paths` at the Ingress Controller (path-based routing)
+Path based routing doesn't require additional DNS entries and TLS certificates.
+This routes traffic to the API paths to the `teams-api` service.
 
-Configure path-based routing for your ingress to route API paths to the `teams-api` service.
+Every Ingress Controller implementation is different.
+Consult your ingress controller documentation.
 
-Depending on your ingress controller, a configuration for path-based routing may look like:
+To use this chart's ingress object
 
-```yaml
-ingress:
-  paths:
-    - path: /_pymongo
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /health
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /graphql/v1
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /file
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /
-      pathType: Prefix
-      serviceName: teams-app
-      servicePort: 80
-```
+1. Update `values.yaml`
+    1. Set `ingress.enabled` to `true`
+    1. Set the other ingress values
+    1. Configure the Ingress paths to include
+
+        ```yaml
+        # values.yaml
+        ingress:
+          paths:
+            - path: /_pymongo
+              pathType: Prefix
+              serviceName: teams-api
+              servicePort: 80
+            - path: /health
+              pathType: Prefix
+              serviceName: teams-api
+              servicePort: 80
+            - path: /graphql/v1
+              pathType: Prefix
+              serviceName: teams-api
+              servicePort: 80
+            - path: /file
+              pathType: Prefix
+              serviceName: teams-api
+              servicePort: 80
+            - path: /
+              pathType: Prefix
+              serviceName: teams-app
+              servicePort: 80
+        ```
+
+1. Upgrade the deployment using the latest Helm chart
+
+    ```shell
+    helm repo update voxel51
+    helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+      -f ./values.yaml
+    ```
+
+## Configure your SDK
+
+1. In `~/.fiftyone/config.json`, set
+
+    ```json
+    {
+      "api_uri": "https://<DEPOY_URL>",
+      "api_key": "[redacted]"
+    }
+    ```
+
+For more information, see
+[API Connection](https://docs.voxel51.com/teams/api_connection.html).
+
+## Validation
+
+1. Verify the connectivity by accessing the FiftyOne Teams API's the health endpoint
+
+    ```shell
+    $ curl https://<DEPOY_URL>/health
+    {"status":"available"}
+    ```
