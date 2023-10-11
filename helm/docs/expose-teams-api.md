@@ -110,7 +110,7 @@ To use this chart's ingress object
     ```json
     {
       "api_uri": "https://<DEPOY_URL>",
-      "api_key": "[redacted]"
+      "api_key": "<REDACTED>"
     }
     ```
 
