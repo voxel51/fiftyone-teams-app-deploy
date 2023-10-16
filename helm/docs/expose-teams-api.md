@@ -1,7 +1,11 @@
+<!-- markdownlint-disable-next-line first-line-heading no-inline-html -->
 <div align="center">
+<!-- markdownlint-disable-next-line no-inline-html -->
 <p align="center">
 
+<!-- markdownlint-disable-next-line no-inline-html line-length -->
 <img src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
+<!-- markdownlint-disable-next-line no-inline-html line-length -->
 <img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
 
 </p>
@@ -30,11 +34,6 @@ validate that your infrastructure supports the WebSockets protocol.
 (For example, you may need to replace AWS Classic Load Balancers (LB)
 with AWS Application Load Balancers (ALB) for WebSocket support.)
 
-When using file-based storage credentials or setting environment variables, the
-same credentials must be shared with the `fiftyone-app` and `teams-api` pods.
-We recommend using Database Cloud Storage Credentials configured at
-`https://<DEPOY_URL>/settings/cloud_storage_credentials`.
-
 To expose the `teams-api`` service, chose one of these two routing methods
 
 - Host-Based
@@ -44,7 +43,10 @@ To expose the `teams-api`` service, chose one of these two routing methods
 
 Add a Second Host to the Ingress Controller
 
-1. Update the existing TLS certificate for the new host
+1. Create or update TLS certificate for the new host by either
+    1. Obtaining a new certificate for the new host
+    1. Updating an existing certificate by adding the new
+       host to the list of Subject Alternative Names (SAN)
 1. Add a new DNS entry for the new host to route to the Ingress
 1. Update `values.yaml`
     1. Set `apiSettings.dnsName` to the hostname to route API requests to
