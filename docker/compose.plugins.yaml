@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   teams-api:
-    image: voxel51/fiftyone-teams-api:v1.4.3
+    image: voxel51/fiftyone-teams-api:v1.4.4
     environment:
       AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
       AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
@@ -32,7 +32,7 @@ services:
     volumes:
       - plugins-vol:/opt/plugins
   teams-app:
-    image: voxel51/fiftyone-teams-app:v1.4.3
+    image: voxel51/fiftyone-teams-app:v1.4.4
     environment:
       API_URL: ${API_URL}
       AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
@@ -43,7 +43,7 @@ services:
       AUTH0_ORGANIZATION: ${AUTH0_ORGANIZATION}
       AUTH0_SECRET: ${AUTH0_SECRET}
       APP_USE_HTTPS: ${APP_USE_HTTPS:-true}
-      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.14.3
+      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.14.4
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
       FIFTYONE_TEAMS_PROXY_URL: ${FIFTYONE_TEAMS_PROXY_URL}
@@ -65,7 +65,7 @@ services:
       - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
     restart: always
   fiftyone-app:
-    image: voxel51/fiftyone-app:v1.4.3
+    image: voxel51/fiftyone-app:v1.4.4
     environment:
       API_URL: ${API_URL}
       FIFTYONE_DATABASE_ADMIN: false
