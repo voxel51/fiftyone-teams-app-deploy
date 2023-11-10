@@ -28,7 +28,7 @@ services:
       # no_proxy: ${NO_PROXY_LIST}
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
-    restart: always helm/values.yaml
+    restart: always
 
   teams-app-common:
     image: voxel51/fiftyone-teams-app:v1.4.4
