@@ -220,7 +220,7 @@ For example, `compose.override.yaml` might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.4.1
+    image: voxel51/fiftyone-app-torch:v1.4.4
 ```
 
 For more information, see the docs for
