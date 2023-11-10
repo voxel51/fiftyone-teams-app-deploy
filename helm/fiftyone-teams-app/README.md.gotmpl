@@ -88,7 +88,7 @@ FiftyOne Teams v1.3 introduced the capability to connect FiftyOne Teams SDKs
 through the FiftyOne Teams API (instead of direct MongoDB connection).
 
 To enable the FiftyOne Teams Authenticated API,
-[expose the FiftyOne Teams API endpoint](../docs/expose-teams-api.md)
+[expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
 and
 [configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
 
@@ -108,7 +108,9 @@ There are three modes for plugins
           mounted to the `teams-api` and `fiftyone-app` deployments in both
             - `appSettings.env.FIFTYONE_PLUGINS_DIR`
             - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
-        - Mount a [Persistent Volume Claim](../docs/plugins-storage.md) that provides
+        - Mount a
+          [Persistent Volume Claim](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+          that provides
             - `ReadWrite` permissions to the `teams-api` deployment
               at the `FIFTYONE_PLUGINS_DIR` path
             - `ReadOnly` permission to the `fiftyone-app` deployment
@@ -121,7 +123,9 @@ There are three modes for plugins
               `teams-api` and `teams-plugins` deployments in both
                 - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
                 - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
-        - Mount a [Persistent Volume Claim](../docs/plugins-storage.md) that provides
+        - Mount a
+          [Persistent Volume Claim](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+          that provides
             - `ReadWrite` permissions to the `teams-api` deployment
               at the `FIFTYONE_PLUGINS_DIR` path
             - `ReadOnly` permission to the `teams-plugins` deployment

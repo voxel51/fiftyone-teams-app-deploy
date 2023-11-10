@@ -33,7 +33,7 @@ secret:
 
 # appSettings:
 #   env:
-#     # FIFTYONE_DATABASE_ADMIN is set to `false` by default for v1.4.4 installs
+#     # FIFTYONE_DATABASE_ADMIN is set to `false` by default for v1.5.0 installs
 #     # If you are performing a new install or an upgrade from v1.0 or earlier
 #     # you may want to set this value to `true`.
 #     # Please see https://helm.fiftyone.ai/#initial-installation-vs-upgrades for details
