@@ -390,7 +390,7 @@ Voxel51 recommends this upgrade process from versions prior to FiftyOne Teams ve
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.4.3](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.4.4](#deploying-fiftyone-teams)
    with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
    (this is not the default in the Helm Chart for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
@@ -413,7 +413,7 @@ Voxel51 recommends this upgrade process from versions prior to FiftyOne Teams ve
 ### From FiftyOne Teams Version 1.1.0 and later
 
 The FiftyOne 0.14.4 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.4.3 database (version 0.22.3) with any FiftyOne SDK before 0.14.4.
+You will not be able to connect to a FiftyOne Teams 1.4.4 database (version 0.22.3) with any FiftyOne SDK before 0.14.4.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
@@ -423,7 +423,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.4.3](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.4.4](#deploying-fiftyone-teams)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.14.4
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
