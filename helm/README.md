@@ -10,6 +10,8 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
+---
+
 # FiftyOne Teams Helm Resources
 
 This directory contains resources and information related to Helm deployments
