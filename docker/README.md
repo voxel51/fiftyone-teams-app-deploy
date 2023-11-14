@@ -38,35 +38,35 @@ When false (or unset), either an error will occur
 $ fiftyone migrate --all
 Traceback (most recent call last):
 ...
-OSError: Cannot migrate database from v0.23.0 to v0.21.6 when database_admin=False.
+OSError: Cannot migrate database from v0.22.0 to v0.22.3 when database_admin=False.
 ```
 
 or no action will be taken:
 
 ```shell
 $ fiftyone migrate --info
-FiftyOne Teams version: 0.14.1
+FiftyOne Teams version: 0.14.4
 
-FiftyOne compatibility version: 0.23.0
+FiftyOne compatibility version: 0.22.3
 Other compatible versions: >=0.19,<0.23
 
-Database version: 0.21.6
+Database version: 0.21.2
 
 dataset     version
 ----------  ---------
-quickstart  0.21.6
+quickstart  0.22.0
 $ fiftyone migrate --all
 $ fiftyone migrate --info
-FiftyOne Teams version: 0.14.1
+FiftyOne Teams version: 0.14.4
 
 FiftyOne compatibility version: 0.23.0
 Other compatible versions: >=0.19,<0.23
 
-Database version: 0.21.6
+Database version: 0.21.2
 
 dataset     version
 ----------  ---------
-quickstart  0.21.6
+quickstart  0.21.2
 ```
 
 ---

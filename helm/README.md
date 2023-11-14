@@ -1,3 +1,15 @@
+<!-- markdownlint-disable no-inline-html line-length -->
+<!-- markdownlint-disable-next-line first-line-heading -->
+<div align="center">
+<p align="center">
+
+<img src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
+<img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
+
+</p>
+</div>
+<!-- markdownlint-enable no-inline-html line-length -->
+
 # FiftyOne Teams Helm Resources
 
 This directory contains resources and information related to Helm deployments
@@ -6,7 +18,8 @@ This directory contains resources and information related to Helm deployments
   - `docs` contains additional documentation for
     - Exposing the teams-api
     - Plugin storage
-  - `fiftyone-teams-app` contains the helm chart voxel51/fiftyone-teams-app
+  - `fiftyone-teams-app` contains the helm chart voxel51/fiftyone-teams-app.
+     For the chart documentation, see the fiftyone-teams-app/README.md file.
   - `gke-example` contains additional kubernetes resources
      to install FiftyOne Teams on Google Kubernetes Engine (GKE).
      See [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
@@ -17,12 +30,14 @@ This directory contains resources and information related to Helm deployments
 
 ### Example with `values.yaml`
 
-A minimal example `values.yaml` may be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+There are some value overrides that you must make for a successful deployment.
+To highlight some of these, see an example
+[`./values.yaml`](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml)
+in this directory.
 
-1. Edit the `values.yaml` file
+1. Edit the `./values.yaml` file
 1. Deploy FiftyOne Teams with `helm install`
-    - For a new installation, run
+    - For new installations, run
 
         ```shell
         helm repo add voxel51 https://helm.fiftyone.ai
@@ -30,16 +45,17 @@ A minimal example `values.yaml` may be found
         helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
         ```
 
-    - To upgrade an existing helm installation, run
+    - For upgrades, run
 
         ```shell
         helm repo update voxel51
         helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
         ```
 
-        > **NOTE**  To view the changes Helm would apply during installations
-        > and upgrades, consider using
-        > [helm diff](https://github.com/databus23/helm-diff).
+        > **NOTE**  Prior to running helm upgrade you may
+        > view the changes Helm would apply by using
+        > [helm diff](https://github.com/databus23/helm-diff)
+        > helm plugin.
         > Voxel51 is not affiliated with the author of this plugin.
         >
         >    For example:
