@@ -335,13 +335,13 @@ appSettings:
 | secret.fiftyone.apiClientId | string | `""` | Voxel51-provided Auth0 API Client ID. |
 | secret.fiftyone.apiClientSecret | string | `""` | Voxel51-provided Auth0 API Client Secret. |
 | secret.fiftyone.auth0Domain | string | `""` | Voxel51-provided Auth0 Domain. |
-| secret.fiftyone.clientId | string | `""` | Voxel51-provided Auth0 Client Secret. |
-| secret.fiftyone.clientSecret | string | `""` | Voxel51-provided Auth0 Client ID. |
+| secret.fiftyone.clientId | string | `""` | Voxel51-provided Auth0 Client ID. |
+| secret.fiftyone.clientSecret | string | `""` | Voxel51-provided Auth0 Client Secret. |
 | secret.fiftyone.cookieSecret | string | `""` | A randomly generated string for cookie encryption. To generate, run `openssl rand -hex 32`. |
 | secret.fiftyone.encryptionKey | string | `""` | Encryption key for storage credentials. [Reference][fiftyone-encryption-key]. |
 | secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Teams. |
 | secret.fiftyone.mongodbConnectionString | string | `""` | MongoDB Connection String. [Reference][mongodb-connection-string]. |
-| secret.fiftyone.organizationId | string | `""` | Voxel51-provided Auth0 Organization ID |
+| secret.fiftyone.organizationId | string | `""` | Voxel51-provided Auth0 Organization ID. |
 | secret.name | string | `"fiftyone-teams-secrets"` | Name of the secret (existing or to be created) in the namespace `namespace.name`. |
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
 | serviceAccount.create | bool | `true` | Controls whether to create the service account named `serviceAccount.name`. |

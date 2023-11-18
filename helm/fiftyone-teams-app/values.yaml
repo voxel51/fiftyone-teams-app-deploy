@@ -347,11 +347,11 @@ secret:
     # -- Voxel51-provided Auth0 Domain.
     auth0Domain: ""
 
-    # -- Voxel51-provided Auth0 Client Secret.
-    clientId: ""
     # -- Voxel51-provided Auth0 Client ID.
+    clientId: ""
+    # -- Voxel51-provided Auth0 Client Secret.
     clientSecret: ""
-    # -- Voxel51-provided Auth0 Organization ID
+    # -- Voxel51-provided Auth0 Organization ID.
     organizationId: ""
 
     # -- MongoDB Database Name for FiftyOne Teams.
