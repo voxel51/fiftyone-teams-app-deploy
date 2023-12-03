@@ -6,6 +6,19 @@ apiSettings:
   # When not an empty string, becomes the value to the `host` in the ingress' rule and
   # set `ingress.api` too.
   dnsName: ""
+  # -- Configuration settings for teams-api autoscaling
+  # Requires `secret.redisConnectionString` to be set
+  autoscaling:
+    # -- Controls horizontal pod autoscaling for teams-api. [Reference][autoscaling].
+    enabled: false
+    # -- Maximum replicas for horizontal pod autoscaling for teams-api.
+    maxReplicas: 20
+    # -- Minimum Replicas for horizontal pod autoscaling for teams-api.
+    minReplicas: 2
+    # -- Percent CPU utilization for autoscaling for teams-api.
+    targetCPUUtilizationPercentage: 80
+    # -- Percent memory utilization for autoscaling for teams-api.
+    targetMemoryUtilizationPercentage: 80
   # Environment Variables are passed to the teams-api containers
   env:
     # -- Controls FiftyOne GraphQL verbosity.
@@ -31,6 +44,10 @@ apiSettings:
     repository: voxel51/fiftyone-teams-api
     # -- Image tag for teams-api. Defaults to the chart version.
     tag: ""
+  # -- Number of pods in the teams-api deployment's ReplicaSet.
+  # Ignored when `apiSettings.autoscaling.enabled: true`. [Reference][deployment].
+  # Requires `secret.redisConnectionURI` to be set
+  replicaCount: 1
 
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -165,6 +182,8 @@ appSettings:
     shortname: fiftyone-app
     # -- Service type for fiftyone-app. [Reference][service-type].
     type: ClusterIP
+  # -- Controls the use of a Redis cache when multiple API pods are deployed.
+  useRedisCache: false
 
   # -- Affinity and anti-affinity for fiftyone-app. [Reference][affinity].
   affinity: {}
@@ -346,24 +365,23 @@ secret:
     apiClientSecret: ""
     # -- Voxel51-provided Auth0 Domain.
     auth0Domain: ""
-
     # -- Voxel51-provided Auth0 Client ID.
     clientId: ""
     # -- Voxel51-provided Auth0 Client Secret.
     clientSecret: ""
-    # -- Voxel51-provided Auth0 Organization ID.
-    organizationId: ""
-
-    # -- MongoDB Database Name for FiftyOne Teams.
-    fiftyoneDatabaseName: ""
-    # -- MongoDB Connection String. [Reference][mongodb-connection-string].
-    mongodbConnectionString: ""
-
     # -- A randomly generated string for cookie encryption.
     # To generate, run `openssl rand -hex 32`.
     cookieSecret: ""
     # -- Encryption key for storage credentials. [Reference][fiftyone-encryption-key].
     encryptionKey: ""
+    # -- MongoDB Database Name for FiftyOne Teams.
+    fiftyoneDatabaseName: ""
+    # -- MongoDB Connection String. [Reference][mongodb-connection-string].
+    mongodbConnectionString: ""
+    # -- Voxel51-provided Auth0 Organization ID.
+    organizationId: ""
+    # -- Redis Connection URI. [Reference][redis-command-line-usage]
+    redisConnectionURI: ""
 
 serviceAccount:
   # -- Service Account annotations. [Reference][annotations].

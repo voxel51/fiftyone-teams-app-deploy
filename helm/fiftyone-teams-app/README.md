@@ -230,6 +230,12 @@ appSettings:
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-api. [Reference][affinity]. |
+| apiSettings.autoscaling | object | `{"enabled":false,"maxReplicas":20,"minReplicas":2,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":80}` | Configuration settings for teams-api autoscaling Requires `secret.redisConnectionString` to be set |
+| apiSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for teams-api. [Reference][autoscaling]. |
+| apiSettings.autoscaling.maxReplicas | int | `20` | Maximum replicas for horizontal pod autoscaling for teams-api. |
+| apiSettings.autoscaling.minReplicas | int | `2` | Minimum Replicas for horizontal pod autoscaling for teams-api. |
+| apiSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for teams-api. |
+| apiSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for teams-api. |
 | apiSettings.dnsName | string | `""` | Controls whether teams-api is added to the chart's ingress. When an empty string, a rule for teams-api is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. |
 | apiSettings.env.FIFTYONE_ENV | string | `"production"` | Controls FiftyOne GraphQL verbosity. When "production", debug mode is disabled and the default logging level is "INFO". When "development", debug mode is enabled and the default logging level is "DEBUG". Can be overridden by setting `apiSettings.env.LOGGING_LEVEL`. |
 | apiSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
@@ -241,6 +247,7 @@ appSettings:
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for teams-api. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for teams-api. [Reference][annotations]. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-api. [Reference][security-context]. |
+| apiSettings.replicaCount | int | `1` | Number of pods in the teams-api deployment's ReplicaSet. Ignored when `apiSettings.autoscaling.enabled: true`. [Reference][deployment]. Requires `secret.redisConnectionURI` to be set |
 | apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-api. [Reference][resources]. |
 | apiSettings.securityContext | object | `{}` | Container security configuration for teams-api. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for teams-api. [Reference][annotations]. |
@@ -284,6 +291,7 @@ appSettings:
 | appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for fiftyone-app. [Reference][service-type]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| appSettings.useRedisCache | bool | `false` | Controls the use of a Redis cache when multiple API pods are deployed. |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
@@ -342,6 +350,7 @@ appSettings:
 | secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Teams. |
 | secret.fiftyone.mongodbConnectionString | string | `""` | MongoDB Connection String. [Reference][mongodb-connection-string]. |
 | secret.fiftyone.organizationId | string | `""` | Voxel51-provided Auth0 Organization ID. |
+| secret.fiftyone.redisConnectionURI | string | `""` | Redis Connection URI. [Reference][redis-command-line-usage] |
 | secret.name | string | `"fiftyone-teams-secrets"` | Name of the secret (existing or to be created) in the namespace `namespace.name`. |
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
 | serviceAccount.create | bool | `true` | Controls whether to create the service account named `serviceAccount.name`. |
@@ -521,6 +530,8 @@ A minimal example `values.yaml` may be found
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 
 [recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
+
+[redis-command-line-usage]: https://redis.io/docs/connect/cli/#command-line-usage
 
 [fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/README.md#storage-credentials-and-fiftyone_encryption_key
 [fiftyone-config]: https://docs.voxel51.com/user_guide/config.html

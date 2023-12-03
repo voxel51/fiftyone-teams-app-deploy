@@ -201,6 +201,13 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
+{{- if or (gt (int .Values.apiSettings.replicaCount) 1) (eq .Values.apiSettings.autoscaling.enabled true) }}
+- name: FIFTYONE_REDIS_URL
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: redisConnectionURI
+{{- end }}
 - name: MONGO_DEFAULT_DB
   valueFrom:
     secretKeyRef:

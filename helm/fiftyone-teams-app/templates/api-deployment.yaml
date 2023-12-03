@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +8,9 @@ metadata:
     app: {{ include "teams-api.name" . }}
     {{- include "fiftyone-teams-api.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  {{- if not .Values.apiSettings.autoscaling.enabled }}
+  replicas: {{ .Values.apiSettings.replicaCount | default 1 }}
+  {{- end }}
   selector:
     matchLabels:
       app: {{ include "teams-api.name" . }}
