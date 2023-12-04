@@ -1,6 +1,7 @@
 ---
 name: Release Charts
 
+# yamllint disable-line rule:truthy
 on:
   push:
     branches:
