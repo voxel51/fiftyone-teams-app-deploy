@@ -1,3 +1,4 @@
+---
 {{- if .Values.appSettings.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
