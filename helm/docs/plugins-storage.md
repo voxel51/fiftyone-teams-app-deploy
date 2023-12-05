@@ -1,3 +1,5 @@
+<!-- markdownlint-disable no-inline-html line-length -->
+<!-- markdownlint-disable-next-line first-line-heading -->
 <div align="center">
 <p align="center">
 
@@ -6,19 +8,21 @@
 
 </p>
 </div>
+<!-- markdownlint-enable no-inline-html line-length -->
 
 ---
 
 # Adding Shared Storage for FiftyOne Teams Plugins
 
-This document will provide guidance for adding shared storage for FiftyOne Teams Plugins using
+This document will provide guidance for adding shared
+storage for FiftyOne Teams Plugins using
 
 * Persistent Volumes (PVs)
 * Persistent Volume Claims (PVCs)
 * NFS
 
 Alternate storage solutions vary based on cloud providers and infrastructure services.
-PVCs may be configured using provider specfic services
+PVCs may be configured using provider specific services
 
 * Google Cloud [Filestore](https://cloud.google.com/filestore/docs)
 * Amazon [EFS](https://aws.amazon.com/efs/)
@@ -26,8 +30,10 @@ PVCs may be configured using provider specfic services
 
 ## NFS Share
 
-Configured NFS server with an exported share that grants permission to the kubernetes cluster.
-One such configuration would be to share the `/exports/deployment_name/plugins` directory using a configuration like
+Configured NFS server with an exported share that
+grants permission to the kubernetes cluster.
+One such configuration would be to share the `/exports/deployment_name/plugins`
+directory using a configuration like
 
 ```shell
 $ cat /etc/exports
@@ -36,12 +42,14 @@ $ cat /etc/exports
 /exports/fiftyone_teams_app/plugins 10.202.15.0/24(rw,insecure,no_root_squash,anonuid=1000,anongid=1000,no_subtree_check)
 ```
 
-We recommend that you test this export to make sure the NFS configuration is accurate before proceeding.
+We recommend that you test this export to make sure
+the NFS configuration is accurate before proceeding.
 Testing now will save frustration later.
 
 ## PV and PVC Creation
 
-The following yaml configuration will create a PV and PVC designed to access the NFS share established above
+The following yaml configuration will create a PV and
+PVC designed to access the NFS share established above
 
 ```yaml
 # nfs-pv-pvc.yaml
@@ -93,7 +101,8 @@ To run plugins in a dedicated `teams-plugins` deployment, provide
 * `ReadOnly` access to the `teams-plugins` deployment
 * `ReadWrite` access to the `teams-api` deployment
 
-Add the appropriate `volumes` and `volumeMounts` configurations to the `apiSettings` section of your `values.yaml`
+Add the appropriate `volumes` and `volumeMounts` configurations
+to the `apiSettings` section of your `values.yaml`
 
 ```yaml
 # values.yaml
@@ -109,7 +118,8 @@ apiSettings:
   [...existing config...]
 ```
 
-Add the `volumes` and `volumeMounts` configurations to either the `pluginsSettings` or `appSettings` section of your `values.yaml`
+Add the `volumes` and `volumeMounts` configurations to either
+the `pluginsSettings` or `appSettings` section of your `values.yaml`
 
 ```yaml
 # values.yaml

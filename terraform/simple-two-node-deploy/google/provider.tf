@@ -3,5 +3,3 @@ provider "google" {
   region  = var.google_region
   zone    = var.google_zone
 }
-
-

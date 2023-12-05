@@ -1,0 +1,382 @@
+<!-- markdownlint-disable no-inline-html line-length -->
+<!-- markdownlint-disable-next-line first-line-heading -->
+<div align="center">
+<p align="center">
+
+<img src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
+<img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
+
+</p>
+</div>
+<!-- markdownlint-enable no-inline-html line-length -->
+
+---
+
+{{ template "chart.header" . }}
+
+{{ template "chart.deprecationWarning" . }}
+
+<!-- markdownlint-disable line-length -->
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+<!-- markdownlint-enable line-length -->
+
+Please contact Voxel51 for more information regarding Fiftyone Teams.
+
+<!-- toc -->
+
+- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [FiftyOne Features](#fiftyone-features)
+  - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
+  - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
+  - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+  - [Proxies](#proxies)
+    - [Text Similarity](#text-similarity)
+- [Upgrading From Previous Versions](#upgrading-from-previous-versions)
+  - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
+  - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
+  - [From FiftyOne Teams Version 1.1.0 and later](#from-fiftyone-teams-version-110-and-later)
+- [Launch FiftyOne Teams](#launch-fiftyone-teams)
+
+<!-- tocstop -->
+
+We publish container images to these Docker Hub repositories
+
+- `voxel51/fiftyone-app`
+- `voxel51/fiftyone-app-gpt`
+- `voxel51/fiftyone-app-torch`
+- `voxel51/fiftyone-teams-api`
+- `voxel51/fiftyone-teams-app`
+
+For Docker Hub credentials, please contact your Voxel51 support team.
+
+## Initial Installation vs. Upgrades
+
+Upgrades are more frequent than new installations.
+Thus, the chart's default behavior supports
+upgrades and the `values.yaml` contains
+
+```yaml
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: false
+```
+
+When performing an initial installation,
+in your `values.yaml`, set
+
+```yaml
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: true
+```
+
+After the initial installation, we recommend either commenting
+this environment variable or changing the value to `false`.
+
+When performing an upgrade, please review
+[Upgrading From Previous Versions](#upgrading-from-previous-versions).
+
+## FiftyOne Features
+
+Consider if you will require these settings for your deployment.
+
+### FiftyOne Teams Authenticated API
+
+FiftyOne Teams v1.3 introduced the capability to connect FiftyOne Teams SDKs
+through the FiftyOne Teams API (instead of direct MongoDB connection).
+
+To enable the FiftyOne Teams Authenticated API,
+[expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
+and
+[configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+
+### FiftyOne Teams Plugins
+
+FiftyOne Teams v1.3 introduced significant enhancements for
+[Plugins](https://docs.voxel51.com/plugins/index.html)
+to customize and enhance functionality.
+
+There are three modes for plugins
+
+1. Builtin Plugins Only
+    - No changes are required for this mode
+1. Plugins run in the `fiftyone-app` deployment
+    - To enable this mode
+        - In `values.yaml`, set the path for a Persistent Volume Claim
+          mounted to the `teams-api` and `fiftyone-app` deployments in both
+            - `appSettings.env.FIFTYONE_PLUGINS_DIR`
+            - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
+        - Mount a
+          [Persistent Volume Claim](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+          that provides
+            - `ReadWrite` permissions to the `teams-api` deployment
+              at the `FIFTYONE_PLUGINS_DIR` path
+            - `ReadOnly` permission to the `fiftyone-app` deployment
+              at the `FIFTYONE_PLUGINS_DIR` path
+1. Plugins run in a dedicated `teams-plugins` deployment
+    - To enable this mode
+        - In `values.yaml`, set
+            - `pluginsSettings.enabled: true`
+            - The path for a Persistent Volume Claim mounted to the
+              `teams-api` and `teams-plugins` deployments in both
+                - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
+                - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
+        - Mount a
+          [Persistent Volume Claim](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+          that provides
+            - `ReadWrite` permissions to the `teams-api` deployment
+              at the `FIFTYONE_PLUGINS_DIR` path
+            - `ReadOnly` permission to the `teams-plugins` deployment
+              at the `FIFTYONE_PLUGINS_DIR` path
+
+Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPOY_URL>/settings/plugins`.
+Early-adopter plugins installed manually must be
+redeployed using the FiftyOne Teams UI.
+
+### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
+
+Pods based on the `fiftyone-teams-api` and `fiftyone-app`
+images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
+This key is used to encrypt storage credentials in the MongoDB database.
+
+The generate an `encryptionKey`, run this Python code
+
+```python
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+```
+
+Voxel51 does not have access to this encryption key and cannot reproduce it.
+Please store this key in a safe place.
+If the key is lost, you will need to
+
+1. Schedule an outage window
+    1. Drop the storage credentials collection
+    1. Replace the encryption key
+    1. Add the storage credentials via the UI again.
+
+Users with `Admin` permissions may use the FiftyOne Teams UI to manage storage
+credentials by navigating to `https://<DEPOY_URL>/settings/cloud_storage_credentials`.
+
+If added via the UI, storage credentials no longer need to be
+mounted into pods or provided via environment variables.
+
+FiftyOne Teams continues to support the use of environment variables to set
+storage credentials in the application context and is providing an alternate
+configuration path for future functionality.
+
+### Proxies
+
+FiftyOne Teams supports routing traffic through proxy servers.
+To configure this, set the following environment variables on
+
+1. All pods, in the environment (`*.env`):
+
+    ```yaml
+    http_proxy: http://proxy.yourcompany.tld:3128
+    https_proxy: https://proxy.yourcompany.tld:3128
+    no_proxy: <apiSettings.service.name>, <appSettings.service.name>, <teamsAppSettings.service.name>
+    HTTP_PROXY: http://proxy.yourcompany.tld:3128
+    HTTPS_PROXY: https://proxy.yourcompany.tld:3128
+    NO_PROXY: <apiSettings.service.name>, <appSettings.service.name>, <teamsAppSettings.service.name>
+    ```
+
+1. The pod based on the `fiftyone-teams-app` image (`teamsAppSettings.env`)
+
+    ```yaml
+    GLOBAL_AGENT_HTTP_PROXY: http://proxy.yourcompany.tld:3128
+    GLOBAL_AGENT_HTTPS_PROXY: https://proxy.yourconpay.tld:3128
+    GLOBAL_AGENT_NO_PROXY: <apiSettings.service.name>, <appSettings.service.name>, <teamsAppSettings.service.name>
+    ```
+
+The `NO_PROXY` and `GLOBAL_AGENT_NO_PROXY` values must include the Kubernetes
+service names that may communicate without going through a proxy server.
+By default, these service names are
+
+- `teams-api`
+- `teams-app`
+- `fiftyone-app`
+
+If the service names were overridden in `*.service.name`, use these values instead.
+
+By default, the Global Agent Proxy will log all outbound connections
+and identify which connections are routed through the proxy.
+To reduce the logging verbosity, add this environment variable to your `teamsAppSettings.env`
+
+```ini
+ROARR_LOG: false
+```
+
+#### Text Similarity
+
+Since version v1.2, FiftyOne Teams supports using text similarity
+searches for images that are indexed with a model that
+[supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text).
+Use the Voxel51 provided image `fiftyone-app-torch` or
+build your own base image including `torch` (PyTorch).
+
+To override the default image, add
+`appSettings.image.repository` to your `values.yaml`.
+For example,
+
+```yaml
+appSettings:
+  image:
+    repository: voxel51/fiftyone-app-torch
+```
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+## Upgrading From Previous Versions
+
+### From Early Adopter Versions (Versions less than 1.0)
+
+Please contact your Voxel51 Customer Success
+team member to coordinate this upgrade.
+You will need to either create a new Identity Provider (IdP)
+or modify your existing configuration to migrate to a new Auth0 Tenant.
+
+### From Before FiftyOne Teams Version 1.1.0
+
+The FiftyOne 0.15.0 SDK (database version 0.23.0) is _NOT_ backwards-compatible
+with FiftyOne Teams Database Versions prior to 0.19.0.
+The FiftyOne 0.10.x SDK is not forwards compatible
+with current FiftyOne Teams Database Versions.
+If you are using a FiftyOne SDK version older than 0.11.0, upgrading the Web
+server will require upgrading all FiftyOne SDK installations.
+
+Voxel51 recommends this upgrade process from
+versions prior to FiftyOne Teams version 1.1.0:
+
+1. In your `values.yaml`, set the required
+   [FIFTYONE_ENCRYPTION_KEY](#storage-credentials-and-fiftyone_encryption_key)
+   environment variable
+1. [Upgrade to FiftyOne Teams version 1.5.0](#launch-fiftyone-teams)
+   with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
+   (this is not the default value in `values.yaml` and must be overridden).
+    > **NOTE:** At this step, FiftyOne SDK users will lose access to the
+    > FiftyOne Teams Database until they upgrade to `fiftyone==0.15.0`
+1. Upgrade your FiftyOne SDKs to version 0.15.0
+    - Login to the FiftyOne Teams UI
+    - To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Check if the datasets were migrated to version 0.23.0
+
+    ```shell
+    fiftyone migrate --info
+    ```
+
+    - If not all datasets have been upgraded, have an admin run
+
+        ```shell
+        FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+        ```
+
+### From FiftyOne Teams Version 1.1.0 and later
+
+The FiftyOne 0.15.0 SDK is backwards-compatible with
+FiftyOne Teams Database Versions 0.19.0 and later.
+You will not be able to connect to a FiftyOne Teams 1.5.0
+database (version 0.23.0) with any FiftyOne SDK before 0.15.0.
+
+We recommend using the latest version of the FiftyOne SDK
+compatible with your FiftyOne Teams deployment.
+
+We recommend the following upgrade process for
+upgrading from FiftyOne Teams version 1.1.0 or later:
+
+1. Ensure all FiftyOne SDK users either
+    - set `FIFTYONE_DATABASE_ADMIN=false`
+    - `unset FIFTYONE_DATABASE_ADMIN`
+        - This should generally be your default
+1. [Upgrade to FiftyOne Teams version 1.5.0](#launch-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.0
+    - Login to the FiftyOne Teams UI
+    - To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Have an admin run to upgrade all datasets
+
+    ```shell
+    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+    ```
+
+    > **NOTE** Any FiftyOne SDK less than 0.15.0 will lose database connectivity
+    >  at this point. Upgrading to `fiftyone==0.15.0` is required
+
+1. Validate that all datasets are now at version 0.23.0, by running
+
+    ```shell
+    fiftyone migrate --info
+    ```
+
+## Launch FiftyOne Teams
+
+A minimal example `values.yaml` may be found
+[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+
+1. Edit the `values.yaml` file
+1. Deploy FiftyOne Teams with `helm install`
+    1. For a new installation, run
+
+        ```shell
+        helm repo add voxel51 https://helm.fiftyone.ai
+        helm repo update voxel51
+        helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
+        ```
+
+    1. To upgrade an existing helm installation, run
+
+        ```shell
+        helm repo update voxel51
+        helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
+        ```
+
+        > **NOTE**  To view the changes Helm would apply during installations
+        > and upgrades, consider using
+        > [helm diff](https://github.com/databus23/helm-diff).
+        > Voxel51 is not affiliated with the author of this plugin.
+        >
+        >    For example:
+        >
+        >    ```shell
+        >    helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
+        >    ```
+
+<!-- Reference Links -->
+[affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+[annotations]: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+[autoscaling]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+[container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+[deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+[image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
+[image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+[ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
+[ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+[ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
+[labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+[node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+[ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+[probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+[resources]: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+[security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+[service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
+[service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+[taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+[volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
+
+[mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
+
+[recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
+
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/README.md#storage-credentials-and-fiftyone_encryption_key
+[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html

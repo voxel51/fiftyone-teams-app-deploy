@@ -1,0 +1,57 @@
+---
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-yaml
+        # We exclude helm template files since in raw form, they are not valid yaml
+        exclude: helm/fiftyone-teams-app/templates
+      - id: detect-aws-credentials
+        args:
+          - --allow-missing-credentials
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: pretty-format-json
+      - id: trailing-whitespace
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - id: forbid-tabs
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.36.0
+    hooks:
+      - id: markdownlint
+      - id: markdownlint-fix
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.5
+    hooks:
+      - id: codespell
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.32.0
+    hooks:
+      - id: yamllint
+        entry: yamllint --config-file .yamllint.yaml
+        # We exclude helm template files since in raw form, they are not valid yaml
+        exclude: helm/fiftyone-teams-app/templates
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.11.3
+    hooks:
+      - id: helm-docs
+        args:
+          # Make the tool search for charts only under the `helm/fiftyone-teams-app` directory
+          - --chart-search-root=helm/fiftyone-teams-app
+
+          # A base filename makes it relative to each chart directory found
+          - --template-files=README.md.gotmpl
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.2
+    hooks:
+      - id: markdown-toc
+        args:
+          - --bullets
+          - '-'
+          - -i
+        files: helm/fiftyone-teams-app/README.md.gotmpl
