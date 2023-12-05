@@ -1,4 +1,3 @@
----
 {{- if .Values.pluginsSettings.enabled }}
 apiVersion: v1
 kind: Service
