@@ -1,8 +1,9 @@
+---
 apiVersion: v2
 name: fiftyone-teams-app
 namespace: fiftyone-teams
-description: A FiftyOne Teams Helm Chart
+description: FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 type: application
-version: 1.4.5
-appVersion: "v1.4.5"
+version: 1.5.0
+appVersion: "v1.5.0"
 icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png

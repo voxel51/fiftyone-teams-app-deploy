@@ -45,7 +45,7 @@ or no action will be taken:
 
 ```shell
 $ fiftyone migrate --info
-FiftyOne Teams version: 0.14.5
+FiftyOne Teams version: 0.14.4
 
 FiftyOne compatibility version: 0.22.3
 Other compatible versions: >=0.19,<0.23
@@ -57,9 +57,9 @@ dataset     version
 quickstart  0.22.0
 $ fiftyone migrate --all
 $ fiftyone migrate --info
-FiftyOne Teams version: 0.14.5
+FiftyOne Teams version: 0.14.4
 
-FiftyOne compatibility version: 0.22.3
+FiftyOne compatibility version: 0.23.0
 Other compatible versions: >=0.19,<0.23
 
 Database version: 0.21.2
@@ -189,13 +189,14 @@ To configure this, set following environment variables on
 The environment variable `NO_PROXY_LIST` value should be a comma-separated list of Docker Compose services that may communicate without going through a proxy server.
 By default these service names are
 
+- `fiftyone-app`
 - `teams-api`
 - `teams-app`
-- `fiftyone-app`
+- `teams-plugins`
 
 Examples of these settings are included in the FiftyOne Teams configuration files
 
-- [compose.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/compose.yaml)
+- [common-services.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/common-services.yaml)
 - [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template)
 
 By default, the Global Agent Proxy will log all outbound connections and identify which connections are routed through the proxy.
@@ -217,10 +218,9 @@ This will allow you to update your `compose.yaml` in future releases without hav
 For example, `compose.override.yaml` might look like:
 
 ```yaml
-version: '3.8'
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.4.5
+    image: voxel51/fiftyone-app-torch:v1.5.0
 ```
 
 For more information, see the docs for
@@ -235,7 +235,7 @@ To migrate to a new Auth0 Tenant, you will need to create a new IdP or modify yo
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.14.5 SDK (database version 0.22.3) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
+The FiftyOne 0.15.0 SDK (database version 0.23.0) is _NOT_ backwards-compatible with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible with current FiftyOne Teams Database Versions.
 If you are using a FiftyOne SDK older than 0.11.0, upgrading the Web server will require upgrading all FiftyOne SDK installations.
 
@@ -252,11 +252,12 @@ Voxel51 recommends this upgrade process from versions prior to FiftyOne Teams ve
 1. Upgrade your FiftyOne SDKs to version 0.14.5
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check if datasets have been migrated to version 0.22.3.
+1. Check if datasets have been migrated to version 0.23.0.
 
     ```shell
     fiftyone migrate --info
     ```
+
    - If not all datasets have been upgraded, have an admin run
 
       ```shell
@@ -265,8 +266,8 @@ Voxel51 recommends this upgrade process from versions prior to FiftyOne Teams ve
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.14.5 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.4.5 database (version 0.22.3) with any FiftyOne SDK before 0.14.5.
+The FiftyOne 0.15.0 SDK is backwards-compatible with FiftyOne Teams Database Versions 0.19.0 and later.
+You will not be able to connect to a FiftyOne Teams 1.5.0 database (version 0.23.0) with any FiftyOne SDK before 0.15.0.
 
 Voxel51 always recommends using the latest version of the FiftyOne SDK compatible with your FiftyOne Teams deployment.
 
@@ -294,6 +295,12 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     fiftyone migrate --info
     ```
 
+1. To ensure that all datasets are now at version 0.23.0, run
+
+    ```shell
+    fiftyone migrate --info
+    ```
+
 ---
 
 ## Deploying FiftyOne Teams
@@ -315,7 +322,7 @@ Voxel51 recommends the following upgrade process for upgrading from FiftyOne Tea
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 0.22.3, run
+1. To ensure that all datasets are now at version 0.23.0, run
 
     ```shell
     fiftyone migrate --info
