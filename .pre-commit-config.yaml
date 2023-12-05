@@ -7,6 +7,8 @@ repos:
       - id: check-case-conflict
       - id: check-shebang-scripts-are-executable
       - id: check-yaml
+        # We exclude helm template files since in raw form, they are not valid yaml
+        exclude: helm/fiftyone-teams-app/templates
       - id: detect-aws-credentials
         args:
           - --allow-missing-credentials
@@ -32,6 +34,8 @@ repos:
     hooks:
       - id: yamllint
         entry: yamllint --config-file .yamllint.yaml
+        # We exclude helm template files since in raw form, they are not valid yaml
+        exclude: helm/fiftyone-teams-app/templates
   - repo: https://github.com/norwoodj/helm-docs
     rev: v1.11.3
     hooks:
