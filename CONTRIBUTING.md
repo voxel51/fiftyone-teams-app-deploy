@@ -6,6 +6,8 @@ generated using the pre-commit hooks for
 * [https://github.com/norwoodj/helm-docs](https://github.com/norwoodj/helm-docs)
 * [https://github.com/Lucas-C/pre-commit-hooks-nodejs](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
 
+1. Install `helm-docs`: https://github.com/norwoodj/helm-docs#installation
+
 1. Install the pre-commit hooks
 
     ```shell
@@ -67,12 +69,12 @@ generated using the pre-commit hooks for
           2 files changed, 10 insertions(+)
           ```
 
-        * Manually run the pre-commit hooks
+      * Manually run the pre-commit hooks
 
-            ```shell
-            git add helm/fiftyone-teams-app/README.md.gotmpl
-            pre-commit run helm-docs
-            pre-commit run markdown-toc
-            git add helm/fiftyone-teams-app/README.md
-            git commit -m '<COMMIT_MESSAGE>'
-            ```
+          ```shell
+          git add helm/fiftyone-teams-app/README.md.gotmpl
+          pre-commit run helm-docs
+          pre-commit run markdown-toc
+          git add helm/fiftyone-teams-app/README.md
+          git commit -m '<COMMIT_MESSAGE>'
+          ```
