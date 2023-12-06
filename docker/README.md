@@ -252,7 +252,7 @@ For more information, see the docs for
 
 Since version v1.5, FiftyOne Teams supports
 [archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
-to cold storage locations to prevent filling up the MongoDB database. To enable
+to cold storage locations in order to prevent filling up the MongoDB database. To enable
 this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` variable to the path
 of a chosen storage location.
 
