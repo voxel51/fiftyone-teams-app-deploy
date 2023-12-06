@@ -6,7 +6,16 @@ generated using the pre-commit hooks for
 * [https://github.com/norwoodj/helm-docs](https://github.com/norwoodj/helm-docs)
 * [https://github.com/Lucas-C/pre-commit-hooks-nodejs](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
 
-1. Install `helm-docs`: https://github.com/norwoodj/helm-docs#installation
+1. Install dependent tools
+    * Using [asdf](https://asdf-vm.com/)
+
+        ```shell
+        make asdf
+        ```
+
+    * Manually
+      * [helm-docs](https://github.com/norwoodj/helm-docs#installation)
+      * [pre-commit](https://pre-commit.com/#installation)
 
 1. Install the pre-commit hooks
 
