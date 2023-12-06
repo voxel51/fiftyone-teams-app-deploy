@@ -31,6 +31,7 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
+  - [Snapshot Archival](#snapshot-archival)
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
@@ -224,6 +225,42 @@ appSettings:
   image:
     repository: voxel51/fiftyone-app-torch
 ```
+
+### Snapshot Archival
+
+Since version v1.5, FiftyOne Teams supports
+[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
+to cold storage locations to prevent filling up the MongoDB database. To enable
+this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` variable to the path
+of a chosen storage location.
+
+Supported locations are network mounted filesystems and cloud storage folders.
+
+1. Network mounted filesystem
+
+    - In `values.yaml`, set the path for a Persistent Volume Claim mounted to the
+      `teams-api` deployment (not necessary to mount to other deployments) in both
+        - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+        - `teamsAppSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+
+    - Mount a Persistent Volume Claim that provides `ReadWrite` permissions to
+      the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path
+      See [Plugins Storage](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+      for an example to follow.
+
+1. Cloud storage folder
+
+    - In `values.yaml`, set the cloud storage path where snapshot archives
+      should go, for example
+      `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`:
+        - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+        - `apiSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+
+    - Ensure the [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
+      loaded in the `teams-api` deployment has full edit capabilities to this bucket.
+
+See the [configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
+for other configuration values that control the behavior of automatic snapshot archival.
 
 ## Values
 
