@@ -207,7 +207,7 @@ To reduce the logging verbosity, add this environment variable to your `teamsApp
 ROARR_LOG: false
 ```
 
-#### Text Similarity
+### Text Similarity
 
 Since version v1.2, FiftyOne Teams supports using text similarity
 searches for images that are indexed with a model that
