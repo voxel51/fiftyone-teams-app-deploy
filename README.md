@@ -30,7 +30,7 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
-    - [Text Similarity](#text-similarity)
+  - [Text Similarity](#text-similarity)
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
