@@ -223,7 +223,7 @@ To reduce the logging verbosity, add this environment variable to your `teamsApp
 ROARR_LOG: false
 ```
 
-#### Text Similarity
+### Text Similarity
 
 FiftyOne Teams version 1.2 and higher supports using text
 similarity searches for images that are indexed with a model that
@@ -247,6 +247,42 @@ services:
 
 For more information, see the docs for
 [Docker Compose Extend](https://docs.docker.com/compose/extends/).
+
+### Snapshot Archival
+
+Since version v1.5, FiftyOne Teams supports
+[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
+to cold storage locations to prevent filling up the MongoDB database. To enable
+this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` variable to the path
+of a chosen storage location.
+
+Supported locations are network mounted filesystems and cloud storage folders.
+
+1. Network mounted filesystem
+
+    - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to the
+      mounted filesystem path in these containers:
+        - `fiftyone-api`
+        - `teams-app`
+
+    - Mount the filesystem to the `fiftyone-api` container (`teams-app` does
+      not need this despite the variable set above). See
+      [./compose.plugins.yaml](./compose.plugins.yaml) for an example to follow.
+
+1. Cloud storage folder
+    - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to the
+      cloud storage path where archives should go, for example
+      `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`, in these
+      containers:
+        - `fiftyone-api`
+        - `teams-app`
+
+    - Ensure the [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
+      loaded in the `fiftyone-api` container have full edit capabilities to
+      this bucket.
+
+See the [configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
+for other configuration values that control the behavior of automatic snapshot archival.
 
 ## Upgrade Process Recommendations
 
@@ -398,6 +434,10 @@ See
 | `FIFTYONE_ENCRYPTION_KEY`                    | Used to encrypt storage credentials in MongoDB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Yes      |
 | `FIFTYONE_ENV`                               | GraphQL verbosity for the `fiftyone-teams-api` service; `production` will not log every GraphQL query, any other value will                                                                                                                                                                                                                                                                                                                                                                                                                     | No       |
 | `FIFTYONE_PLUGINS_DIR`                       | Persistent directory for plugins to be stored in. `teams-api` must have write access to this directory, all plugin nodes must have read access to this directory.                                                                                                                                                                                                                                                                                                                                                                               | No       |
+| `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`            |  Full path to network-mounted file system or a cloud storage path to use for snapshot archive storage. The default `None` means archival is disabled.                                                                                                                                                                                                                                                                                                                                                                                           | No       |
+| `FIFTYONE_SNAPSHOTS_MAX_IN_DB`               | The max total number of Snapshots allowed at once. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                                                                                                                                                                                                                                                                                    | No       |
+| `FIFTYONE_SNAPSHOTS_MAX_PER_DATASET`         | The max number of Snapshots allowed per dataset. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                                                                                                                                                                                                                                                                                      | No       |
+| `FIFTYONE_SNAPSHOTS_MIN_LAST_LOADED_SEC`     | The minimum last-loaded age in seconds (as defined by `now-last_loaded_at`) a snapshot must meet to be considered for automatic archival. This limit is intended to help curtail automatic archival of a snapshot a user is actively working with. The default value is 1 day.                                                                                                                                                                                                                                                                  | No       |
 | `FIFTYONE_TEAMS_PROXY_URL`                   | The URL that `fiftyone-teams-app` will use to proxy requests to `fiftyone-app`                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Yes      |
 | `GRAPHQL_DEFAULT_LIMIT`                      | Default GraphQL limit for results                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | No       |
 | `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | No       |
