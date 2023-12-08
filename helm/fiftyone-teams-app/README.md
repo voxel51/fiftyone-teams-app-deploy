@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.5.0](https://img.shields.io/badge/AppVersion-v1.5.0-informational?style=flat-square)
+![Version: 1.5.1](https://img.shields.io/badge/Version-1.5.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.5.1](https://img.shields.io/badge/AppVersion-v1.5.1-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 <!-- markdownlint-enable line-length -->
@@ -26,11 +26,12 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [FiftyOne Features](#fiftyone-features)
+  - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
-    - [Text Similarity](#text-similarity)
+  - [Text Similarity](#text-similarity)
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
@@ -79,6 +80,38 @@ When performing an upgrade, please review
 ## FiftyOne Features
 
 Consider if you will require these settings for your deployment.
+
+### Snapshot Archival
+
+Since version v1.5, FiftyOne Teams supports
+[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
+to cold storage locations to prevent filling up the MongoDB database.
+To enable this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+environment variable to the path of a chosen storage location.
+
+Supported locations are network mounted filesystems and cloud storage folders.
+
+- Network mounted filesystem
+  - In `values.yaml`, set the path for a Persistent Volume Claim mounted to the
+    `teams-api` deployment (not necessary to mount to other deployments) in both
+    - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+    - `teamsAppSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+  - Mount a Persistent Volume Claim with `ReadWrite` permissions to
+    the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path.
+    For an example, see
+    [Plugins Storage](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md).
+- Cloud storage folder
+  - In `values.yaml`, set the cloud storage path (for example
+    `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
+    in
+    - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+    - `apiSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+  - Ensure the
+    [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
+    loaded in the `teams-api` deployment have full edit capabilities to this bucket
+
+See the [configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
+for other configuration values that control the behavior of automatic snapshot archival.
 
 ### FiftyOne Teams Authenticated API
 
@@ -207,7 +240,7 @@ To reduce the logging verbosity, add this environment variable to your `teamsApp
 ROARR_LOG: false
 ```
 
-#### Text Similarity
+### Text Similarity
 
 Since version v1.2, FiftyOne Teams supports using text similarity
 searches for images that are indexed with a model that
@@ -355,7 +388,7 @@ appSettings:
 | teamsAppSettings.dnsName | string | `""` | DNS Name for the teams-app service. Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`) and teams-app deployment environment variable `AUTH0_BASE_URL`. |
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"0.15.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"0.15.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy]. |
@@ -392,7 +425,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.15.0 SDK (database version 0.23.0) is _NOT_ backwards-compatible
+The FiftyOne 0.15.1 SDK (database version 0.23.1) is _NOT_ backwards-compatible
 with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible
 with current FiftyOne Teams Database Versions.
@@ -405,16 +438,16 @@ versions prior to FiftyOne Teams version 1.1.0:
 1. In your `values.yaml`, set the required
    [FIFTYONE_ENCRYPTION_KEY](#storage-credentials-and-fiftyone_encryption_key)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.5.0](#launch-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.5.1](#launch-fiftyone-teams)
    with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
    (this is not the default value in `values.yaml` and must be overridden).
     > **NOTE:** At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==0.15.0`
-1. Upgrade your FiftyOne SDKs to version 0.15.0
+    > FiftyOne Teams Database until they upgrade to `fiftyone==0.15.1`
+1. Upgrade your FiftyOne SDKs to version 0.15.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check if the datasets were migrated to version 0.23.0
+1. Check if the datasets were migrated to version 0.23.1
 
     ```shell
     fiftyone migrate --info
@@ -428,10 +461,10 @@ versions prior to FiftyOne Teams version 1.1.0:
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.15.0 SDK is backwards-compatible with
+The FiftyOne 0.15.1 SDK is backwards-compatible with
 FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.5.0
-database (version 0.23.0) with any FiftyOne SDK before 0.15.0.
+You will not be able to connect to a FiftyOne Teams 1.5.1
+database (version 0.23.1) with any FiftyOne SDK before 0.15.1.
 
 We recommend using the latest version of the FiftyOne SDK
 compatible with your FiftyOne Teams deployment.
@@ -443,8 +476,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.5.0](#launch-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.0
+1. [Upgrade to FiftyOne Teams version 1.5.1](#launch-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -454,10 +487,10 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.15.0 will lose database connectivity
-    >  at this point. Upgrading to `fiftyone==0.15.0` is required
+    > **NOTE** Any FiftyOne SDK less than 0.15.1 will lose database connectivity
+    >  at this point. Upgrading to `fiftyone==0.15.1` is required
 
-1. Validate that all datasets are now at version 0.23.0, by running
+1. Validate that all datasets are now at version 0.23.1, by running
 
     ```shell
     fiftyone migrate --info

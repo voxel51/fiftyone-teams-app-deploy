@@ -79,6 +79,40 @@ quickstart  0.21.2
 
 ### FiftyOne Teams Upgrade Notes
 
+#### Enabling Snapshot Archival
+
+Since version v1.5, FiftyOne Teams supports
+[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
+to cold storage locations to prevent filling up the MongoDB database.
+To enable this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+environment variable to the path of a chosen storage location.
+
+Supported locations are network mounted filesystems and cloud storage folders.
+
+- Network mounted filesystem
+  - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to the
+    mounted filesystem path in these containers
+    - `fiftyone-api`
+    - `teams-app`
+  - Mount the filesystem to the `fiftyone-api` container
+    (`teams-app` does not need this despite the variable set above).
+    For an example, see
+    [./compose.plugins.yaml](./compose.plugins.yaml).
+- Cloud storage folder
+  - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to a
+    cloud storage path (for example
+    `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
+    in these containers
+    - `fiftyone-api`
+    - `teams-app`
+  - Ensure the
+    [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
+    loaded in the `fiftyone-api` container have full edit capabilities to
+    this bucket
+
+See the [configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
+for other configuration values that control the behavior of automatic snapshot archival.
+
 #### Enabling FiftyOne Teams Authenticated API
 
 FiftyOne Teams v1.3 introduces the capability to connect FiftyOne Teams SDK
@@ -242,7 +276,7 @@ For example, `compose.override.yaml` might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.5.0
+    image: voxel51/fiftyone-app-torch:v1.5.1
 ```
 
 For more information, see the docs for
@@ -258,7 +292,7 @@ create a new IdP or modify your existing configuration.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.15.0 SDK (database version 0.23.0) is _NOT_ backwards-compatible
+The FiftyOne 0.15.1 SDK (database version 0.23.1) is _NOT_ backwards-compatible
 with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible
 with current FiftyOne Teams Database Versions.
@@ -271,16 +305,16 @@ versions prior to FiftyOne Teams version 1.1.0:
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.5.0](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.5.1](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default in the `compose.yaml` for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.0`
-1. Upgrade your FiftyOne SDKs to version 0.15.0
+      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.1`
+1. Upgrade your FiftyOne SDKs to version 0.15.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check if datasets have been migrated to version 0.23.0.
+1. Check if datasets have been migrated to version 0.23.1.
 
     ```shell
     fiftyone migrate --info
@@ -294,10 +328,10 @@ versions prior to FiftyOne Teams version 1.1.0:
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.15.0 SDK is backwards-compatible with
+The FiftyOne 0.15.1 SDK is backwards-compatible with
 FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.5.0
-database (version 0.23.0) with any FiftyOne SDK before 0.15.0.
+You will not be able to connect to a FiftyOne Teams 1.5.1
+database (version 0.23.1) with any FiftyOne SDK before 0.15.1.
 
 Voxel51 always recommends using the latest version of the
 FiftyOne SDK compatible with your FiftyOne Teams deployment.
@@ -309,8 +343,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.5.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.0
+1. [Upgrade to FiftyOne Teams version 1.5.1](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -320,10 +354,10 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.15.0 will lose database connectivity
-      at this point. Upgrading to `fiftyone==0.15.0` is required
+    - **NOTE** Any FiftyOne SDK less than 0.15.1 will lose database connectivity
+      at this point. Upgrading to `fiftyone==0.15.1` is required
 
-1. To ensure that all datasets are now at version 0.23.0, run
+1. To ensure that all datasets are now at version 0.23.1, run
 
     ```shell
     fiftyone migrate --info
@@ -351,7 +385,7 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 0.23.0, run
+1. To ensure that all datasets are now at version 0.23.1, run
 
     ```shell
     fiftyone migrate --info
@@ -398,6 +432,10 @@ See
 | `FIFTYONE_ENCRYPTION_KEY`                    | Used to encrypt storage credentials in MongoDB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Yes      |
 | `FIFTYONE_ENV`                               | GraphQL verbosity for the `fiftyone-teams-api` service; `production` will not log every GraphQL query, any other value will                                                                                                                                                                                                                                                                                                                                                                                                                     | No       |
 | `FIFTYONE_PLUGINS_DIR`                       | Persistent directory for plugins to be stored in. `teams-api` must have write access to this directory, all plugin nodes must have read access to this directory.                                                                                                                                                                                                                                                                                                                                                                               | No       |
+| `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`            | Full path to network-mounted file system or a cloud storage path to use for snapshot archive storage. The default `None` means archival is disabled.                                                                                                                                                                                                                                                                                                                                                                                           | No       |
+| `FIFTYONE_SNAPSHOTS_MAX_IN_DB`               | The max total number of Snapshots allowed at once. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                                                                                                                                                                                                                                                                                    | No       |
+| `FIFTYONE_SNAPSHOTS_MAX_PER_DATASET`         | The max number of Snapshots allowed per dataset. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                                                                                                                                                                                                                                                                                      | No       |
+| `FIFTYONE_SNAPSHOTS_MIN_LAST_LOADED_SEC`     | The minimum last-loaded age in seconds (as defined by `now-last_loaded_at`) a snapshot must meet to be considered for automatic archival. This limit is intended to help curtail automatic archival of a snapshot a user is actively working with. The default value is 1 day.                                                                                                                                                                                                                                                                  | No       |
 | `FIFTYONE_TEAMS_PROXY_URL`                   | The URL that `fiftyone-teams-app` will use to proxy requests to `fiftyone-app`                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Yes      |
 | `GRAPHQL_DEFAULT_LIMIT`                      | Default GraphQL limit for results                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | No       |
 | `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | No       |
