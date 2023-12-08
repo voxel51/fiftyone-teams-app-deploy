@@ -65,7 +65,7 @@ $ fiftyone migrate --all
 $ fiftyone migrate --info
 FiftyOne Teams version: 0.14.4
 
-FiftyOne compatibility version: 0.23.1
+FiftyOne compatibility version: 0.23.0
 Other compatible versions: >=0.19,<0.23
 
 Database version: 0.21.2
