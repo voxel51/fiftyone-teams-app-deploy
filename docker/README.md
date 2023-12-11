@@ -276,7 +276,7 @@ For example, `compose.override.yaml` might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.5.1
+    image: voxel51/fiftyone-app-torch:v1.5.2
 ```
 
 For more information, see the docs for
@@ -292,7 +292,7 @@ create a new IdP or modify your existing configuration.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.15.1 SDK (database version 0.23.1) is _NOT_ backwards-compatible
+The FiftyOne 0.15.2 SDK (database version 0.23.1) is _NOT_ backwards-compatible
 with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible
 with current FiftyOne Teams Database Versions.
@@ -305,12 +305,12 @@ versions prior to FiftyOne Teams version 1.1.0:
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.5.1](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.5.2](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default in the `compose.yaml` for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.1`
-1. Upgrade your FiftyOne SDKs to version 0.15.1
+      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.2`
+1. Upgrade your FiftyOne SDKs to version 0.15.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -328,10 +328,10 @@ versions prior to FiftyOne Teams version 1.1.0:
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.15.1 SDK is backwards-compatible with
+The FiftyOne 0.15.2 SDK is backwards-compatible with
 FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.5.1
-database (version 0.23.1) with any FiftyOne SDK before 0.15.1.
+You will not be able to connect to a FiftyOne Teams 1.5.2
+database (version 0.23.1) with any FiftyOne SDK before 0.15.2.
 
 Voxel51 always recommends using the latest version of the
 FiftyOne SDK compatible with your FiftyOne Teams deployment.
@@ -343,8 +343,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.5.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.1
+1. [Upgrade to FiftyOne Teams version 1.5.2](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -354,8 +354,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.15.1 will lose database connectivity
-      at this point. Upgrading to `fiftyone==0.15.1` is required
+    - **NOTE** Any FiftyOne SDK less than 0.15.2 will lose database connectivity
+      at this point. Upgrading to `fiftyone==0.15.2` is required
 
 1. To ensure that all datasets are now at version 0.23.1, run
 
