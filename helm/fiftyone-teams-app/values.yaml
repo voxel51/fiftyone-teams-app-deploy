@@ -215,7 +215,7 @@ casSettings:
     # -- Service annotations for teams-cas. [Reference][annotations].
     annotations: {}
     # -- Service container port for teams-cas.
-    containerPort: 4000
+    containerPort: 3000
     liveness:
       # -- Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes].
       initialDelaySeconds: 30

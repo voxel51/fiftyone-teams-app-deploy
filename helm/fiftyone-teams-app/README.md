@@ -331,7 +331,7 @@ appSettings:
 | casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-cas. [Reference][resources]. |
 | casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
 | casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
-| casSettings.service.containerPort | int | `4000` | Service container port for teams-cas. |
+| casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
 | casSettings.service.liveness.initialDelaySeconds | int | `30` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | casSettings.service.name | string | `"teams-cas"` | Service name. |
 | casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas. |

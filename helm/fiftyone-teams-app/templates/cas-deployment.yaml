@@ -36,7 +36,7 @@ spec:
             {{- include "teams-cas.env-vars-list" . | indent 12 }}
           ports:
             - name: {{ .Values.casSettings.service.shortname }}
-              containerPort: {{ .Values.casSettings.service.containerPort | default 4000 }}
+              containerPort: {{ .Values.casSettings.service.containerPort | default 3000 }}
               protocol: TCP
           livenessProbe:
             tcpSocket:
