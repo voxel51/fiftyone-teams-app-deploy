@@ -35,6 +35,17 @@ Create a default name for the fiftyone app service
 {{- end }}
 
 {{/*
+Create a default name for the teams cas service
+*/}}
+{{- define "teams-cas.name" -}}
+{{- if .Values.casSettings.service.name }}
+{{- .Values.casSettings.service.name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+"fiftyone-teams-cas"
+{{- end }}
+{{- end }}
+
+{{/*
 Create a default name for the teams api service
 */}}
 {{- define "teams-api.name" -}}
@@ -116,6 +127,22 @@ APP Combined labels
 {{- define "fiftyone-app.labels" -}}
 {{ include "fiftyone-teams-app.commonLabels" . }}
 {{ include "fiftyone-app.selectorLabels" . }}
+{{- end }}
+
+{{/*
+CAS Selector labels
+*/}}
+{{- define "fiftyone-teams-cas.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "teams-cas.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+CAS Combined labels
+*/}}
+{{- define "fiftyone-teams-cas.labels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+{{ include "fiftyone-teams-cas.selectorLabels" . }}
 {{- end }}
 
 {{/*
@@ -206,6 +233,13 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+- name: CAS_BASE_URL
+  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name .Values.casSettings.service.port | quote }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 {{- range $key, $val := .Values.apiSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -251,7 +285,47 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: organizationId
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 {{- range $key, $val := .Values.appSettings.env }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Create a merged list of environment variables for fiftyone-teams-cas
+*/}}
+{{- define "teams-cas.env-vars-list" -}}
+{{- $secretName := .Values.secret.name }}
+- name: CAS_DATABASE_NAME
+  value: {{ .Values.casSettings.databaseName }}
+- name: CAS_MONGODB_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: {{ .Values.casSettings.mongodbUriKey }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
+- name: NEXTAUTH_URL
+  value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
+- name: TEAMS_API_DATABASE_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneDatabaseName
+- name: TEAMS_API_MONGODB_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: mongodbConnectionString
+{{- range $key, $val := .Values.casSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
@@ -298,6 +372,11 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: organizationId
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -351,6 +430,11 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- else }}
   value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName }}
 {{- end }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 - name: FIFTYONE_SERVER_ADDRESS
   value: ""
 - name: FIFTYONE_SERVER_PATH_PREFIX
@@ -363,6 +447,9 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- else }}
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name .Values.appSettings.service.port | quote }}
 {{- end }}
+- name: NEXTAUTH_BASEPATH
+  value: "/cas/api/auth"
+
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

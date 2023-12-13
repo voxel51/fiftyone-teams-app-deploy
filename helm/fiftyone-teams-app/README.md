@@ -323,16 +323,46 @@ appSettings:
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
+| casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
+| casSettings.databaseName | string | `"cas"` | Provide the name for the CAS Database |
+| casSettings.env | object | `{}` |  |
+| casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
+| casSettings.image.repository | string | `"voxel51/teams-cas"` | Container image for teams-cas. |
+| casSettings.image.tag | string | `""` | Image tag for teams-cas. Defaults to the chart version. |
+| casSettings.mongodbUriKey | string | `"mongodbConnectionString"` | Provide the key from secret.fiftyone for the CAS MongoDB Connection String |
+| casSettings.nodeSelector | object | `{}` | nodeSelector for teams-cas. [Reference][node-selector]. |
+| casSettings.podAnnotations | object | `{}` | Annotations for pods for teams-cas. [Reference][annotations]. |
+| casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-cas. [Reference][security-context]. |
+| casSettings.replicaCount | int | `2` | Number of pods in the teams-cas deployment's ReplicaSet. [Reference][deployment]. |
+| casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-cas. [Reference][resources]. |
+| casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
+| casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
+| casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
+| casSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
+| casSettings.service.name | string | `"teams-cas"` | Service name. |
+| casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas. |
+| casSettings.service.port | int | `80` | Service port. |
+| casSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
+| casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for teams-cas. [Reference][ports]. |
+| casSettings.service.type | string | `"ClusterIP"` | Service type for teams-cas. [Reference][service-type]. |
+| casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
+| casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
+| casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty and Kubernetes version is >1.18.0, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
 | ingress.enabled | bool | `true` | Controls whether to create the ingress. When `false`, uses a pre-existing ingress. [Reference][ingress]. |
 | ingress.labels | object | `{}` | Additional labels for the ingress. [Reference][labels-and-selectors]. |
-| ingress.paths | list | `[]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
-| ingress.teamsApp | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule path values for teams-app. [Reference][ingress-rules]. |
-| ingress.teamsApp.path | string | `"/*"` | Path for the FiftyOne Teams App service |
-| ingress.teamsApp.pathType | string | `"ImplementationSpecific"` | Ingress path type (ImplementationSpecific, Exact, Prefix) |
+| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
+| ingress.paths[0] | object | `{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
+| ingress.paths[0].pathType | string | `"Prefix"` | Ingress path type |
+| ingress.paths[0].serviceName | string | `"teams-cas"` | Ingress path service name |
+| ingress.paths[0].servicePort | int | `80` | Ingress path service port |
+| ingress.paths[1] | object | `{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}` | Ingress path for teams-app |
+| ingress.paths[1].pathType | string | `"ImplementationSpecific"` | Ingress path type |
+| ingress.paths[1].serviceName | string | `"teams-app"` | Ingress path service name |
+| ingress.paths[1].servicePort | int | `80` | Ingress path service port |
 | ingress.tlsEnabled | bool | `true` | Controls whether the chart managed ingress contains a `spec.tls` stanza. |
 | ingress.tlsSecretName | string | `"fiftyone-teams-tls-secret"` | Name of secret containing TLS certificate for teams-app. Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`. When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`. |
 | namespace.create | bool | `false` | Controls whether to create the namespace. When `false`, the namespace must already exists. |
