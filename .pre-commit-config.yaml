@@ -55,3 +55,7 @@ repos:
           - '-'
           - -i
         files: helm/fiftyone-teams-app/README.md.gotmpl
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.23
+    hooks:
+      - id: helmlint
