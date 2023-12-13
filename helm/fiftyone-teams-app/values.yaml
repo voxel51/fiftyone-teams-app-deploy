@@ -187,7 +187,7 @@ appSettings:
 # Central Authentication Service (teams-cas) configurations
 casSettings:
   # Environment Variables are passed to the teams-cas containers
-  env: []
+  env: {}
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
@@ -280,9 +280,9 @@ ingress:
   # [Reference][ingress-rules].
   paths:
     # -- Ingress path for teams-cas
-    - path: /cas
+    - path: /cas/*
       # -- Ingress path type
-      pathType: Prefix
+      pathType: ImplementationSpecific
       # -- Ingress path service name
       serviceName: teams-cas
       # -- (int) Ingress path service port
