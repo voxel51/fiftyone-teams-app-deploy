@@ -184,6 +184,74 @@ appSettings:
   # -- Volumes for fiftyone-app. [Reference][volumes].
   volumes: []
 
+# Central Authentication Service (teams-cas) configurations
+casSettings:
+  # Environment Variables are passed to the teams-cas containers
+  env: []
+  image:
+    # -- Instruct when the kubelet should pull (download) the specified image.
+    # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
+    pullPolicy: Always
+    # -- Container image for teams-cas.
+    repository: voxel51/teams-cas
+    # -- Image tag for teams-cas. Defaults to the chart version.
+    tag: ""
+  # -- Number of pods in the teams-cas deployment's ReplicaSet. [Reference][deployment].
+  replicaCount: 2
+
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # -- Container resource requests and limits for teams-cas. [Reference][resources].
+  resources:
+    limits: {}
+    #   cpu: 2
+    #   memory: 6Gi
+    requests: {}
+    #   cpu: 500m
+    #   memory: 512Mi
+  service:
+    # -- Service annotations for teams-cas. [Reference][annotations].
+    annotations: {}
+    # -- Service container port for teams-cas.
+    containerPort: 4000
+    liveness:
+      # -- Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes].
+      initialDelaySeconds: 30
+    # -- Service name.
+    name: teams-cas
+    # -- (int) Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas.
+    nodePort:
+    # -- Service port.
+    port: 80
+    readiness:
+      # -- Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes].
+      initialDelaySeconds: 15
+    # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # -- Port name (maximum length is 15 characters) for teams-cas. [Reference][ports].
+    shortname: teams-cas
+    # -- Service type for teams-cas. [Reference][service-type].
+    type: ClusterIP
+
+  # -- Affinity and anti-affinity for teams-cas. [Reference][affinity].
+  affinity: {}
+  # -- nodeSelector for teams-cas. [Reference][node-selector].
+  nodeSelector: {}
+  # -- Annotations for pods for teams-cas. [Reference][annotations].
+  podAnnotations: {}
+  # -- Pod-level security attributes and common container settings for teams-cas. [Reference][security-context].
+  podSecurityContext: {}
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
+  # -- Container security configuration for teams-cas. [Reference][container-security-context].
+  securityContext: {}
+  # -- Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations].
+  tolerations: []
+  # -- Volume mounts for teams-cas. [Reference][volumes].
+  volumeMounts: []
+  # -- Volumes for teams-cas. [Reference][volumes].
+  volumes: []
+
 # -- Container image registry keys. [Reference][image-pull-secrets].
 imagePullSecrets: []
 
@@ -210,21 +278,24 @@ ingress:
   # -- Additional ingress rules for the host `teamsAppSettings.dnsName` for
   # the chart managed ingress (when `ingress.enabled: true`).
   # [Reference][ingress-rules].
-  paths: []
-  #   -- Ingress path
-  #   - path: ""
-  #   -- Ingress path type
-  #     pathType: ""
-  #   -- Ingress path service name
-  #     serviceName: ""
-  #   -- (int) Ingress path service port
-  #     servicePort:
-  # -- The ingress rule path values for teams-app. [Reference][ingress-rules].
-  teamsApp:
-    # -- Path for the FiftyOne Teams App service
-    path: /*
-    # -- Ingress path type (ImplementationSpecific, Exact, Prefix)
-    pathType: ImplementationSpecific
+  paths:
+    # -- Ingress path for teams-cas
+    - path: /cas/api/auth
+      # -- Ingress path type
+      pathType: ImplementationSpecific
+      # -- Ingress path service name
+      serviceName: teams-cas
+      # -- (int) Ingress path service port
+      servicePort: 80
+    # -- Ingress path for teams-app
+    - path: /*
+      # -- Ingress path type
+      pathType: ImplementationSpecific
+      # -- Ingress path service name
+      serviceName: teams-app
+      # -- (int) Ingress path service port
+      servicePort: 80
+
   # -- Controls whether the chart managed ingress contains a `spec.tls` stanza.
   tlsEnabled: true
 

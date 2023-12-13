@@ -35,6 +35,17 @@ Create a default name for the fiftyone app service
 {{- end }}
 
 {{/*
+Create a default name for the teams cas service
+*/}}
+{{- define "teams-cas.name" -}}
+{{- if .Values.casSettings.service.name }}
+{{- .Values.casSettings.service.name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+"fiftyone-teams-cas"
+{{- end }}
+{{- end }}
+
+{{/*
 Create a default name for the teams api service
 */}}
 {{- define "teams-api.name" -}}
@@ -116,6 +127,22 @@ APP Combined labels
 {{- define "fiftyone-app.labels" -}}
 {{ include "fiftyone-teams-app.commonLabels" . }}
 {{ include "fiftyone-app.selectorLabels" . }}
+{{- end }}
+
+{{/*
+CAS Selector labels
+*/}}
+{{- define "fiftyone-teams-cas.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "teams-cas.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+CAS Combined labels
+*/}}
+{{- define "fiftyone-teams-cas.labels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+{{ include "fiftyone-teams-cas.selectorLabels" . }}
 {{- end }}
 
 {{/*
@@ -252,6 +279,31 @@ Create a merged list of environment variables for fiftyone-app
       name: {{ $secretName }}
       key: organizationId
 {{- range $key, $val := .Values.appSettings.env }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Create a merged list of environment variables for fiftyone-teams-cas
+*/}}
+{{- define "teams-cas.env-vars-list" -}}
+{{- $secretName := .Values.secret.name }}
+- name: CAS_DATABASE_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: mongodbConnectionString
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
+- name: NEXTAUTH_BASEPATH
+  value: "/cas/api/auth"
+- name: NEXTAUTH_URL
+  value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
+{{- range $key, $val := .Values.casSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}

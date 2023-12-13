@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "teams-cas.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-teams-cas.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.casSettings.replicaCount | default 2 }}
+  selector:
+    matchLabels:
+      {{- include "fiftyone-teams-cas.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.casSettings.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "fiftyone-teams-cas.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.casSettings.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "teams-cas.name" . }}
+          securityContext:
+            {{- toYaml .Values.casSettings.securityContext | nindent 12 }}
+          image: "{{ .Values.casSettings.image.repository }}:{{ .Values.casSettings.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.casSettings.image.pullPolicy | default "Always" }}
+          env:
+            {{- include "teams-cas.env-vars-list" . | indent 12 }}
+          ports:
+            - name: {{ .Values.casSettings.service.shortname }}
+              containerPort: {{ .Values.casSettings.service.containerPort | default 4000 }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.casSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.casSettings.service.liveness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.casSettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.casSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.casSettings.resources | nindent 12 }}
+          {{- with .Values.casSettings.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.casSettings.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.casSettings.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.casSettings.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.casSettings.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
