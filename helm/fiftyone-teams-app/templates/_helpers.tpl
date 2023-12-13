@@ -395,6 +395,11 @@ Create a merged list of environment variables for fiftyone-teams-app
     secretKeyRef:
       name: {{ $secretName }}
       key: cookieSecret
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 - name: FIFTYONE_SERVER_ADDRESS
   value: ""
 - name: FIFTYONE_SERVER_PATH_PREFIX
@@ -407,6 +412,9 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- else }}
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name .Values.appSettings.service.port | quote }}
 {{- end }}
+- name: NEXTAUTH_BASEPATH
+  value: "/cas/api/auth"
+
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
