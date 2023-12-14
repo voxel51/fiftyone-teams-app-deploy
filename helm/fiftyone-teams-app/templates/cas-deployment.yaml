@@ -39,12 +39,14 @@ spec:
               containerPort: {{ .Values.casSettings.service.containerPort | default 3000 }}
               protocol: TCP
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /cas/api
               port: {{ .Values.casSettings.service.shortname }}
             initialDelaySeconds: {{ .Values.casSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /cas/api
               port: {{ .Values.casSettings.service.shortname }}
             initialDelaySeconds: {{ .Values.casSettings.service.readiness.initialDelaySeconds }}
             timeoutSeconds: 5

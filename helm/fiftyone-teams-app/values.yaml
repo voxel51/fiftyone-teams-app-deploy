@@ -218,7 +218,7 @@ casSettings:
     containerPort: 3000
     liveness:
       # -- Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 30
+      initialDelaySeconds: 15
     # -- Service name.
     name: teams-cas
     # -- (int) Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas.
@@ -282,7 +282,7 @@ ingress:
     # -- Ingress path for teams-cas
     - path: /cas
       # -- Ingress path type
-      pathType: ImplementationSpecific
+      pathType: Prefix
       # -- Ingress path service name
       serviceName: teams-cas
       # -- (int) Ingress path service port

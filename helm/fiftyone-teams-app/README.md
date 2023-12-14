@@ -332,7 +332,7 @@ appSettings:
 | casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
 | casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
 | casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
-| casSettings.service.liveness.initialDelaySeconds | int | `30` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
+| casSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | casSettings.service.name | string | `"teams-cas"` | Service name. |
 | casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas. |
 | casSettings.service.port | int | `80` | Service port. |
@@ -348,9 +348,9 @@ appSettings:
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty and Kubernetes version is >1.18.0, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
 | ingress.enabled | bool | `true` | Controls whether to create the ingress. When `false`, uses a pre-existing ingress. [Reference][ingress]. |
 | ingress.labels | object | `{}` | Additional labels for the ingress. [Reference][labels-and-selectors]. |
-| ingress.paths | list | `[{"path":"/cas","pathType":"ImplementationSpecific","serviceName":"teams-cas","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
-| ingress.paths[0] | object | `{"path":"/cas","pathType":"ImplementationSpecific","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
-| ingress.paths[0].pathType | string | `"ImplementationSpecific"` | Ingress path type |
+| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
+| ingress.paths[0] | object | `{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
+| ingress.paths[0].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[0].serviceName | string | `"teams-cas"` | Ingress path service name |
 | ingress.paths[0].servicePort | int | `80` | Ingress path service port |
 | ingress.paths[1] | object | `{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}` | Ingress path for teams-app |
