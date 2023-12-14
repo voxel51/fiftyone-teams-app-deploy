@@ -289,7 +289,7 @@ Create a merged list of environment variables for fiftyone-teams-cas
 */}}
 {{- define "teams-cas.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
-- name: CAS_DATABASE_URI
+- name: CAS_MONGODB_URI
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
