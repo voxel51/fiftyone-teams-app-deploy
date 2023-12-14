@@ -280,7 +280,7 @@ ingress:
   # [Reference][ingress-rules].
   paths:
     # -- Ingress path for teams-cas
-    - path: /cas/*
+    - path: /cas
       # -- Ingress path type
       pathType: ImplementationSpecific
       # -- Ingress path service name

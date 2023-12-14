@@ -348,8 +348,8 @@ appSettings:
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty and Kubernetes version is >1.18.0, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
 | ingress.enabled | bool | `true` | Controls whether to create the ingress. When `false`, uses a pre-existing ingress. [Reference][ingress]. |
 | ingress.labels | object | `{}` | Additional labels for the ingress. [Reference][labels-and-selectors]. |
-| ingress.paths | list | `[{"path":"/cas/*","pathType":"ImplementationSpecific","serviceName":"teams-cas","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
-| ingress.paths[0] | object | `{"path":"/cas/*","pathType":"ImplementationSpecific","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
+| ingress.paths | list | `[{"path":"/cas","pathType":"ImplementationSpecific","serviceName":"teams-cas","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
+| ingress.paths[0] | object | `{"path":"/cas","pathType":"ImplementationSpecific","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
 | ingress.paths[0].pathType | string | `"ImplementationSpecific"` | Ingress path type |
 | ingress.paths[0].serviceName | string | `"teams-cas"` | Ingress path service name |
 | ingress.paths[0].servicePort | int | `80` | Ingress path service port |
