@@ -10,6 +10,26 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
+<!-- toc -->
+
+- [Deploying FiftyOne Teams App with Docker Compose](#deploying-fiftyone-teams-app-with-docker-compose)
+  - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+    - [FiftyOne Teams Upgrade Notes](#fiftyone-teams-upgrade-notes)
+      - [Enabling Snapshot Archival](#enabling-snapshot-archival)
+      - [Enabling FiftyOne Teams Authenticated API](#enabling-fiftyone-teams-authenticated-api)
+      - [Enabling FiftyOne Teams Plugins](#enabling-fiftyone-teams-plugins)
+      - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+      - [Environment Proxies](#environment-proxies)
+      - [Text Similarity](#text-similarity)
+  - [Upgrade Process Recommendations](#upgrade-process-recommendations)
+    - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
+    - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
+    - [From FiftyOne Teams Version 1.1.0 and later](#from-fiftyone-teams-version-110-and-later)
+  - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
+  - [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
+
+<!-- tocstop -->
+
 ---
 
 # Deploying FiftyOne Teams App with Docker Compose
