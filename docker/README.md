@@ -158,6 +158,9 @@ There are three modes for plugins
     - Containers need the following access to plugin storage
       - `teams-plugins` requires `read`
       - `fiftyone-api` requires `read-write`
+    - If you are [using a proxy](#environment-proxies), add the
+      `teams-plugins` service name to your `no_proxy` and
+      `NO_PROXY` environment variables.
     - Example `docker compose` command for this mode
 
         ```shell
