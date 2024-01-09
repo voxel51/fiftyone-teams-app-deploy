@@ -219,6 +219,14 @@ Create a merged list of environment variables for fiftyone-app
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+- name: FIFTYONE_API_URI
+{{- if .Values.apiSettings.fiftyoneApiOverride }}
+  value: {{ .Values.apiSettings.fiftyoneApiOverride }}
+{{- else if .Values.apiSettings.dnsName }}
+  value: {{ printf "https://%s" .Values.apiSettings.dnsName }}
+{{- else }}
+  value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName }}
+{{- end }}
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
