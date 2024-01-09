@@ -161,9 +161,9 @@ There are three modes for plugins
               at the `FIFTYONE_PLUGINS_DIR` path
             - `ReadOnly` permission to the `teams-plugins` deployment
               at the `FIFTYONE_PLUGINS_DIR` path
-        - If you are [using a proxy](#proxies), make sure to add the
-              `teams-plugins` service name to your `no_proxy` and
-              `NO_PROXY` environment variables.
+        - If you are [using a proxy](#proxies), add the
+          `teams-plugins` service name to your `no_proxy` and
+          `NO_PROXY` environment variables.
 
 Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must be
