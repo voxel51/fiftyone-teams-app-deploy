@@ -328,6 +328,10 @@ versions prior to FiftyOne Teams version 1.1.0:
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
    environment variable
+1. Make sure you include the required `FIFTYONE_API_URI` environment variable
+   (see
+   [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template#L17)
+   for details)
 1. [Upgrade to FiftyOne Teams version 1.5.3](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default in the `compose.yaml` for this release).
@@ -362,6 +366,10 @@ FiftyOne SDK compatible with your FiftyOne Teams deployment.
 Voxel51 recommends the following upgrade process for
 upgrading from FiftyOne Teams version 1.1.0 or later:
 
+1. Make sure you include the required `FIFTYONE_API_URI` environment variable
+   (see
+   [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template#L17)
+   for details)
 1. Ensure all FiftyOne SDK users either
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
