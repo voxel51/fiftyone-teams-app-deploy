@@ -344,8 +344,8 @@ Create a merged list of environment variables for fiftyone-teams-app
       name: {{ $secretName }}
       key: cookieSecret
 - name: FIFTYONE_API_URI
-{{- if .Values.apiSettings.fiftyoneApiOverride }}
-  value: {{ .Values.apiSettings.fiftyoneApiOverride }}
+{{- if .Values.teamsAppSettings.fiftyoneApiOverride }}
+  value: {{ .Values.teamsAppSettings.fiftyoneApiOverride }}
 {{- else if .Values.apiSettings.dnsName }}
   value: {{ printf "https://%s" .Values.apiSettings.dnsName }}
 {{- else }}
