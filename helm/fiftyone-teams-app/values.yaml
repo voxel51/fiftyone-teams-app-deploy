@@ -422,7 +422,7 @@ teamsAppSettings:
     # -- Image tag for teams-app. Defaults to the chart version.
     tag: ""
 
-  # -- Overrides the `FIFTYONE_API_URI` environment variable when set
+  # -- Overrides the `FIFTYONE_API_URI` environment variable. When set
   # `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance
   # for connecting to the FiftyOne Teams API.
   # `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or
