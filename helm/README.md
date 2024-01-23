@@ -10,6 +10,24 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
+<!-- toc -->
+
+- [FiftyOne Teams Helm Resources](#fiftyone-teams-helm-resources)
+  - [Installing FiftyOne Teams](#installing-fiftyone-teams)
+    - [Example with `values.yaml`](#example-with-valuesyaml)
+    - [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke)
+      - [Download the Example Configuration Files](#download-the-example-configuration-files)
+      - [Create the Necessary Helm Repos](#create-the-necessary-helm-repos)
+    - [Install and Configure cert-manager](#install-and-configure-cert-manager)
+      - [Create a ClusterIssuer](#create-a-clusterissuer)
+      - [Install and Configure MongoDB](#install-and-configure-mongodb)
+      - [Obtain a Global Static IP Address and Configure a DNS Entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry)
+      - [Set up http to https Forwarding](#set-up-http-to-https-forwarding)
+      - [Install FiftyOne Teams App](#install-fiftyone-teams-app)
+      - [Installation Complete](#installation-complete)
+
+<!-- tocstop -->
+
 ---
 
 # FiftyOne Teams Helm Resources

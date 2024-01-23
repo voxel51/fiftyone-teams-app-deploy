@@ -54,7 +54,9 @@ repos:
           - --bullets
           - '-'
           - -i
-        files: helm/fiftyone-teams-app/README.md.gotmpl
+          - docker/README.md
+          - helm/fiftyone-teams-app/README.md.gotmpl
+          - helm/README.md
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
     hooks:
