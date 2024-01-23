@@ -10,6 +10,26 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
+<!-- toc -->
+
+- [Deploying FiftyOne Teams App with Docker Compose](#deploying-fiftyone-teams-app-with-docker-compose)
+  - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+    - [FiftyOne Teams Upgrade Notes](#fiftyone-teams-upgrade-notes)
+      - [Enabling Snapshot Archival](#enabling-snapshot-archival)
+      - [Enabling FiftyOne Teams Authenticated API](#enabling-fiftyone-teams-authenticated-api)
+      - [Enabling FiftyOne Teams Plugins](#enabling-fiftyone-teams-plugins)
+      - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+      - [Environment Proxies](#environment-proxies)
+      - [Text Similarity](#text-similarity)
+  - [Upgrade Process Recommendations](#upgrade-process-recommendations)
+    - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
+    - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
+    - [From FiftyOne Teams Version 1.1.0 and later](#from-fiftyone-teams-version-110-and-later)
+  - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
+  - [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
+
+<!-- tocstop -->
+
 ---
 
 # Deploying FiftyOne Teams App with Docker Compose
@@ -158,6 +178,9 @@ There are three modes for plugins
     - Containers need the following access to plugin storage
       - `teams-plugins` requires `read`
       - `fiftyone-api` requires `read-write`
+    - If you are [using a proxy](#environment-proxies), add the
+      `teams-plugins` service name to your `no_proxy` and
+      `NO_PROXY` environment variables.
     - Example `docker compose` command for this mode
 
         ```shell
@@ -276,7 +299,7 @@ For example, `compose.override.yaml` might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.5.3
+    image: voxel51/fiftyone-app-torch:v1.5.4
 ```
 
 For more information, see the docs for
@@ -292,7 +315,7 @@ create a new IdP or modify your existing configuration.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.15.3 SDK (database version 0.23.2) is _NOT_ backwards-compatible
+The FiftyOne 0.15.4 SDK (database version 0.23.3) is _NOT_ backwards-compatible
 with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible
 with current FiftyOne Teams Database Versions.
@@ -305,16 +328,20 @@ versions prior to FiftyOne Teams version 1.1.0:
 1. Make sure your installation includes the required
    [FIFTYONE_ENCRYPTION_KEY](#fiftyone-teams-upgrade-notes)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.5.3](#deploying-fiftyone-teams)
+1. Make sure you include the required `FIFTYONE_API_URI` environment variable
+   (see
+   [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template#L17)
+   for details)
+1. [Upgrade to FiftyOne Teams version 1.5.4](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default in the `compose.yaml` for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.3`
-1. Upgrade your FiftyOne SDKs to version 0.15.3
+      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.4`
+1. Upgrade your FiftyOne SDKs to version 0.15.4
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check if datasets have been migrated to version 0.23.2.
+1. Check if datasets have been migrated to version 0.23.3.
 
     ```shell
     fiftyone migrate --info
@@ -328,10 +355,10 @@ versions prior to FiftyOne Teams version 1.1.0:
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.15.3 SDK is backwards-compatible with
+The FiftyOne 0.15.4 SDK is backwards-compatible with
 FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.5.3
-database (version 0.23.2) with any FiftyOne SDK before 0.15.3.
+You will not be able to connect to a FiftyOne Teams 1.5.4
+database (version 0.23.3) with any FiftyOne SDK before 0.15.4.
 
 Voxel51 always recommends using the latest version of the
 FiftyOne SDK compatible with your FiftyOne Teams deployment.
@@ -339,12 +366,16 @@ FiftyOne SDK compatible with your FiftyOne Teams deployment.
 Voxel51 recommends the following upgrade process for
 upgrading from FiftyOne Teams version 1.1.0 or later:
 
+1. Make sure you include the required `FIFTYONE_API_URI` environment variable
+   (see
+   [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template#L17)
+   for details)
 1. Ensure all FiftyOne SDK users either
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.5.3](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.3
+1. [Upgrade to FiftyOne Teams version 1.5.4](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.4
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -354,10 +385,10 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.15.3 will lose database connectivity
-      at this point. Upgrading to `fiftyone==0.15.3` is required
+    - **NOTE** Any FiftyOne SDK less than 0.15.4 will lose database connectivity
+      at this point. Upgrading to `fiftyone==0.15.4` is required
 
-1. To ensure that all datasets are now at version 0.23.2, run
+1. To ensure that all datasets are now at version 0.23.3, run
 
     ```shell
     fiftyone migrate --info
@@ -385,7 +416,7 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 0.23.2, run
+1. To ensure that all datasets are now at version 0.23.3, run
 
     ```shell
     fiftyone migrate --info
