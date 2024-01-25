@@ -4,6 +4,6 @@ name: fiftyone-teams-app
 namespace: fiftyone-teams
 description: FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 type: application
-version: 1.5.4
-appVersion: "v1.5.4"
+version: 1.5.5
+appVersion: "v1.5.5"
 icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
