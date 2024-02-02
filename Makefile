@@ -44,7 +44,6 @@ start:   ## Run minikube with ingress and gcp-auth
 	#   --mount-string=/var/tmp/mongodb_data:/tmp/hostpath-provisioner/fiftyone-teams/mongodb
 	minikube start
 	minikube addons enable ingress
-	minikube addons enable ingress-dns
 
 	# Requires setting up GCP credentials (application default credentials)
 	# for the GCP project `computer-vision-team`.
@@ -74,8 +73,10 @@ stop:  ## Stop minikube
 delete:  ## Delete minikube
 	minikube delete
 
-dev:  ## run skaffold dev with keep on failure
-	# skaffold dev
+dev:  ## run skaffold dev
+	skaffold dev
+
+dev-keep:  ## run skaffold dev with keep-runining-on-failure
 	skaffold dev --keep-running-on-failure
 
 port-forward-app:  ## port forward the service `teams-app` on the host port 3000

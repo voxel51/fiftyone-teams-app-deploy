@@ -347,31 +347,27 @@ See
     Password:
     ```
 
-1. Add an entry in to your `/etc/hosts` file to resolve the DNS name
-   `fiftyone.internal` to resolve to localhost
-
-    ```txt
-    127.0.0.1       fiftyone.internal
-    ```
-
 #### Ingress - Login
+
+This section assumes the use of TLS certificates and the `https`` protocol.
 
 1. In a web browser and navigate to
 
     1. Select "Continue with Voxel51 Internal"
 
 1. In a web browser, navigate to
-   [https://fiftyone.internal](https://fiftyone.internal)
+   [https://local.fiftyone.ai](https://local.fiftyone.ai)
 1. Login with `Continue with Voxel51 Internal`
 1. After authentication, you will be redirected to
-   [https://fiftyone.internal/datasets](https://fiftyone.internal/datasets)
+   [https://local.fiftyone.ai/datasets](https://local.fiftyone.ai/datasets)
 
-> _Note:_ For local development, we use the Auth0 Tenant `dev-fiftyone` and
-> the Auth0 Application `local-dev` contains the setting Allowed Callback URLs
-> (aka Redirect URLs) with [https://fiftyone.internal](https://fiftyone.internal).
-> In `skaffold.yaml` we omit `APP_USE_HTTPS=false`
-> to allow the app to set the Redirect URL protocol to `https`.
-> This must be absent in both `appSettings.env` and `teamsAppSettings.env`.
+> _Note:_ For local development with, we use the
+> Auth0 Tenant `dev-fiftyone` and the Auth0 Application `local-dev`.
+> The `local-dev` app contains the setting Allowed Callback URLs
+> (aka Redirect URLs) with [https://local.fiftyone.ai](https://local.fiftyone.ai).
+> In `skaffold.yaml`, in both `appSettings.env` and `teamsAppSettings.env`,
+> either omit `APP_USE_HTTPS=false` or set `APP_USE_HTTPS=true`
+> for the app to set the Redirect URL's protocol to `https`.
 
 #### Port Forward to the `teams-app` Service
 
