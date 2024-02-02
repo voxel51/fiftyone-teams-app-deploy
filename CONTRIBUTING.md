@@ -1,5 +1,7 @@
 # Contributing
 
+## pre-commit hooks
+
 Our Helm Chart's README.md is automatically
 generated using the pre-commit hooks for
 
@@ -87,3 +89,343 @@ generated using the pre-commit hooks for
           git add helm/fiftyone-teams-app/README.md
           git commit -m '<COMMIT_MESSAGE>'
           ```
+
+## Localized Deployments (for internal-testing)
+
+### minikube
+
+[minikube](https://minikube.sigs.k8s.io/docs/)
+provides a local kubernetes cluster
+in VMs (or docker containers) on macOS, Linux and Windows.
+
+```shell
+    minikube start
+```
+
+We use
+[Skaffold](https://skaffold.dev/)
+to deploy our application to the minikube cluster with
+Helm and overrides (`values.yaml`).
+When debugging, it may be helpful to start minikube with the flag
+`--keep-running-on-failure` so that the k8s resources are not deleted
+if the helm installation(s) fail.
+
+```shell
+skaffold dev --keep-running-on-failure
+```
+
+It takes a few minutes for the deployments to stabilize as
+we wait for Helm to install MongoDB and cert-managed (for self-signed certificates).
+The fiftyone-teams app installation also takes a few minutes.
+The fiftyone-app will start and upgrade the database
+(because `FIFTYONE_DATABASE_ADMIN: true`)
+and the teams-api will connect to and configure MongoDB.
+
+We use Skaffold "profiles" to control "modules".
+By default, Skaffold will Helm install
+
+* MongoDB
+* cert-manager
+  * CRDs
+  * self-singed ClusterIssuer
+  * cert-manager from chart defaults
+* FiftyOne Teams
+
+To skip installing MongoDB, run
+
+```shell
+skaffold dev --profile no-mongodb
+```
+
+To skip installing cert-manager, run
+
+```shell
+skaffold dev ---profile no-cert-manager
+```
+
+To skip installing both MongoDB and cert-manager, run
+
+```shell
+skaffold dev --profile only-fiftyone
+```
+
+#### Container Images stored in Private Repositories
+
+Our FiftyOne Teams container images are stored in the private repositories
+
+* Docker Hub
+  * Contains released versions
+* Google Artifact Repository (Docker)
+  * Contains private development images created by our
+    [Google Cloud Build](https://github.com/voxel51/cloud-build-and-deploy/)
+    CI/CD runs
+    * Development
+    * Release Candidates
+
+Accessing images in a private repository requires setting
+up authentication to that container registry.
+
+##### Docker Hub
+
+To run released images from Docker hub, configure minikube and Skaffold
+
+1. Start minikube and enable the addon `registry-creds`
+
+    ```shell
+    minikube start
+    minikube addons configure registry-creds
+    ```
+
+1. Create the file `voxel51-docker.json` file
+    1. Get base64 encoded string of docker username and
+       Docker Personal Access Token (PAT)
+
+        ```shell
+        echo -n 'voxeldocker:<YOUR_DOCKER_PERSONAL_ACCESS_TOKEN>' | base64
+        ```
+
+    1. Using this template, add replace the `<BASE64_ENCODED_STRING_OF_DOCKER_USERNAME_COLON_PAT>`
+       with the output from the previous step
+
+        ```json
+        {
+          "auths": {
+            "https://index.docker.io/v1/": {
+              "auth": "<BASE64_ENCODED_STRING_OF_DOCKER_USERNAME_COLON_PAT>",
+              "email": "docker@voxel51.com"
+            }
+          }
+        }
+        ```
+
+1. Create the Kubernetes namespace configured in
+   [skaffold.yaml](./skaffold.yaml)
+
+    ```shell
+    export NAMESPACE=fiftyone-teams
+    kubectl create namespace "${NAMESPACE}"
+    ```
+
+1. Create the imagePullSecret named `regcred`
+
+    ```shell
+    kubectl create secret generic regcred \
+      --from-file=.dockerconfigjson=/var/tmp/voxel51-docker.json \
+      --type kubernetes.io/dockerconfigjson \
+      --namespace "${NAMESPACE}" \
+    ```
+
+1. In [skaffold.yaml](./skaffold.yaml)
+   set `imagePullSecrets` for the helm release named `fiftyone-teams-app`
+   in `setValueTemplates.imagePullSecrets[0].name=regcred`
+
+    ```yaml
+    deploy:
+      helm:
+        releases:
+          - name: fiftyone-teams-app
+            setValueTemplates:
+              imagePullSecrets:
+                - name: regcred
+    ```
+
+1. Run skaffold
+
+    ```shell
+    skaffold dev
+    ```
+
+For more information, see the Kubernetes documentation
+[Pull an Image from a Private Registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
+
+> _Note:_ When `minikube delete`, the secret `regcred` must be recreated.
+
+##### Google Artifact Repository
+
+To run released images from Google Artifact repository in the
+GCP project `computer-vision-team`, configure minikube and skaffold
+
+1. Configure GCP Credentials
+   [gcloud auth](https://cloud.google.com/sdk/gcloud/reference/auth)
+1. Configure
+   [gcloud auth application-default](https://cloud.google.com/sdk/gcloud/reference/auth/application-default)
+
+1. Start minikube and enable the addon `gcp-auth`
+
+    ```shell
+    minikube start
+    minikube addons enable gcp-auth
+    ```
+
+1. In [skaffold.yaml](./skaffold.yaml)
+   comment `imagePullSecrets` for the helm release named `fiftyone-teams-app`
+   in `setValueTemplates.imagePullSecrets[0].name=regcred`
+
+    ```yaml
+    deploy:
+      helm:
+        releases:
+          - name: fiftyone-teams-app
+            setValueTemplates:
+              # imagePullSecrets:
+              #   - name: regcred
+    ```
+
+1. For each service
+
+    * `apiSettings`
+    * `appSettings`
+    * `pluginsSettings`
+    * `teamsAppSettings`
+
+   update the `image.repository` value to be `<REPOSITORY>/<IMAGE_NAME>` and
+   the corresponding `image.tag` value.  For example for the version `1.6.0` at `dev7`
+
+    ```yaml
+    apiSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
+        tag: v1.6.0.dev7
+    appSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+        tag: v1.6.0.dev7
+    pluginsSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+        tag: v1.6.0.dev7
+    teamsAppSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
+        # Note: the naming convention for the image `fiftyone-teams-app` differs from the other images `fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`
+        # the others are `v1.6.0.dev7` (not `.dev7` vs `-dev7`)
+        tag: v1.6.0-dev.7
+    ```
+
+    > _Note:_ To see the available tags for each image, see
+    > [https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team](https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team)
+
+1. Run skaffold
+
+    ```shell
+    skaffold dev
+
+    # Or with the optional flag
+    # skaffold dev --keep-running-on-failure
+    ```
+
+### Accessing the k8s resources
+
+There are two ways to access resources within the minikube cluster:
+
+* Ingress (recommended)
+* Port Forward
+
+#### Ingress
+
+See
+[Using `minikube tunnel`](https://minikube.sigs.k8s.io/docs/handbook/accessing/#using-minikube-tunnel).
+
+1. Enable the minikube addon `ingress`
+
+    ```shell
+    minikube addons enable ingress
+    ```
+
+1. Install the app via skaffold (see above)
+1. Start the minikube tunnel (and provide sudo password when prompted)
+
+    ```shell
+    $ minikube tunnel
+    ✅  Tunnel successfully started
+
+    📌  NOTE: Please do not close this terminal as this process must stay alive for the tunnel to be accessible ...
+
+    ❗  The service/ingress fiftyone-teams-fiftyone-teams-app requires privileged ports to be exposed: [80 443]
+    🔑  sudo permission will be asked for it.
+    🏃  Starting tunnel for service fiftyone-teams-fiftyone-teams-app.
+    Password:
+    ```
+
+1. Add an entry in to your `/etc/hosts` file to resolve the DNS name
+   `fiftyone.internal` to resolve to localhost
+
+    ```txt
+    127.0.0.1       fiftyone.internal
+    ```
+
+#### Ingress - Login
+
+1. In a web browser and navigate to
+
+    1. Select "Continue with Voxel51 Internal"
+
+1. In a web browser, navigate to
+   [https://fiftyone.internal](https://fiftyone.internal)
+1. Login with `Continue with Voxel51 Internal`
+1. After authentication, you will be redirected to
+   [https://fiftyone.internal/datasets](https://fiftyone.internal/datasets)
+
+> _Note:_ For local development, we use the Auth0 Tenant `dev-fiftyone` and
+> the Auth0 Application `local-dev` contains the setting Allowed Callback URLs
+> (aka Redirect URLs) with [https://fiftyone.internal](https://fiftyone.internal).
+> In `skaffold.yaml` we omit `APP_USE_HTTPS=false`
+> to allow the app to set the Redirect URL protocol to `https`.
+> This must be absent in both `appSettings.env` and `teamsAppSettings.env`.
+
+#### Port Forward to the `teams-app` Service
+
+To access the teams-app webpage, run a kubernetes port forward
+(to forward traffic from the host's port) to the kubernetes service `teams-app`.
+Afterwards, access the FiftyOne Teams app via
+[http://localhost:3000](http://localhost:3000).
+
+1. Initiate the port forward to the service `teams-app` on port 3000
+
+    ```shell
+    kubectl port-forward \
+      --namespace fiftyone-teams \
+      svc/teams-app 3000:80
+    ```
+
+1. Validate port forwarding is working
+
+    ```shell
+    $ curl http://localhost:3000/api/hello
+    {"name":"John Doe"}
+    ```
+
+#### Port Forward to the `teams-api` Service
+
+1. Initiate the port forward to the service `team-api` on port 8000
+
+    ```shell
+    kubectl port-forward --namespace fiftyone-teams svc/teams-api 8000:80
+    ```
+
+1. Validate port forwarding is working
+
+    ```shell
+    $ curl http://localhost:8000/health
+    {"status":"available"}
+    ```
+
+#### Port Forward - Login
+
+With the port forward running,
+
+1. In a web browser, navigate to
+   [http://localhost:3000](http://localhost:3000)
+1. Login with `Continue with Voxel51 Internal`
+1. After authentication, you will be redirected to
+   [http://localhost:3000/datasets](http://localhost:3000/datasets)
+
+> _Note:_ For local development, we use the Auth0 Tenant `dev-fiftyone` and
+> the Auth0 Application `local-dev` contains the setting Allowed Callback URLs
+> (aka Redirect URLs) with [http://localhost:3000](http://localhost:3000).
+> In `skaffold.yaml` we set `APP_USE_HTTPS=false`
+> to prohibit the app from setting the Redirect URL protocol to `https`.
+> Must be set in both `appSettings.env` and `teamsAppSettings.env`.
+> Without this setting, the app code makes the callback URL
+> [https://localhost:3000](https://localhost:3000) and Auth0
+> throws a Callback URL mismatch error.

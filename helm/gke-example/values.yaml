@@ -48,3 +48,6 @@ ingress:
     acme.cert-manager.io/http01-edit-in-place: "true"
     kubernetes.io/ingress.global-static-ip-name: "fiftyone-teams-static-ip"
     networking.gke.io/v1beta1.FrontendConfig: ssl-redirect
+
+pluginsSettings:
+  enabled: false

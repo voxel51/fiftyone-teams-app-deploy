@@ -1,0 +1,143 @@
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
+  name: fiftyone-teams
+
+# Using configuration "modules" (dependency ordering [creation and deletion]).
+# This avoid errors when deleting a CRD prior to all of its instances (which fail if the CRD doesn't exist).
+requires:
+  - configs:
+      - mongodb
+    path: skaffold-mongodb.yaml
+  - configs:
+      - cert-manager
+    path: skaffold-cert-manager.yaml
+
+# Profiles allow us to easily control which resources are created when we run skaffold.
+# Cannot combine `--profile no-mongodb,no-cert-manager`.
+# instead run `--profile only-fiftyone
+profiles:
+  - name: no-mongodb
+    patches:
+      - op: remove
+        path: /requires/0
+  - name: no-cert-manager
+    patches:
+      - op: remove
+        path: /requires/1
+  - name: only-fiftyone
+    patches:
+      - op: remove
+        path: /requires
+
+deploy:
+  helm:
+    releases:
+      - name: fiftyone-teams
+        chartPath: helm/fiftyone-teams-app
+        version: 1.5.5
+        createNamespace: true
+        namespace: fiftyone-teams
+        overrides:
+          apiSettings:
+            env:
+              LOGGING_LEVEL: DEBUG
+              FIFTYONE_ENV: development
+            image:
+              # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+              repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
+              tag: v1.6.0.dev7
+              pullPolicy: IfNotPresent
+          appSettings:
+            env:
+              # Only set to true during the initial installation or during a database upgrade
+              # FIFTYONE_DATABASE_ADMIN: false
+              FIFTYONE_DATABASE_ADMIN: true
+              # For local development, set `APP_USE_HTTPS=false` to prohibit the app from setting Redirect URL protocol to `https`.
+              # Must be set in both `appSettings.env` and `teamsAppSettings.env`.
+              # Can be true, when using cert-manager with self-signed certificates
+              # APP_USE_HTTPS: false
+            image:
+              # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+              repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+              tag: v1.6.0.dev7
+              pullPolicy: IfNotPresent
+          # TODO: Test `minikube addons configure registry-creds` or
+          # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
+          # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+          # imagePullSecrets:
+          #   - name: regcred
+
+          ingress:
+            annotations:
+              # For using the nginx-ingress controller with cert-manager self signed certificates
+              cert-manager.io/cluster-issuer: selfsigned-issuer
+              # Configure nginx-ingress controller proxy buffers for the app
+              nginx.ingress.kubernetes.io/proxy-buffer-size: 256k
+              # Configure nginx-ingress controller proxy buffers for the app
+              nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+            # For using the nginx-ingress controller
+            className: nginx
+            paths:
+              - path: /_pymongo
+                pathType: Prefix
+                serviceName: teams-api
+                servicePort: 80
+              - path: /health
+                pathType: Prefix
+                serviceName: teams-api
+                servicePort: 80
+              - path: /graphql/v1
+                pathType: Prefix
+                serviceName: teams-api
+                servicePort: 80
+              - path: /file
+                pathType: Prefix
+                serviceName: teams-api
+                servicePort: 80
+              - path: /
+                pathType: Prefix
+                serviceName: teams-app
+                servicePort: 80
+            tlsEnabled: true
+          secret:
+            fiftyone:
+              # The Auth0 Tenant `dev-fiftyone` and application `local-dev` are configured for running the app locally with https
+              # Add the Auth0 secrets here.
+              apiClientId: ""
+              apiClientSecret: ""
+              auth0Domain: ""
+              clientId: ""
+              clientSecret: ""
+              organizationId: ""
+
+              fiftyoneDatabaseName: fiftyone-internal
+
+              # This password is randomly generated and is only used to initialize a local (ephemeral) MongoDB in `./skaffold-mongodb.yaml`
+              mongodbConnectionString: mongodb://root:3-9XjJ-gUV?vp^e(WUk>LD&lAjh7yEji@mongodb.fiftyone-teams.svc.cluster.local/?authSource=admin
+
+              # randomly generated value
+              cookieSecret: 5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976
+              # randomly generated value
+              encryptionKey: btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=
+          pluginsSettings:
+            image:
+              # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+              repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+              tag: v1.6.0.dev7
+          teamsAppSettings:
+            dnsName: fiftyone.internal
+            # env:
+            #   # For local development, set `APP_USE_HTTPS=false` to prohibit the app from setting Redirect URL protocol to `https`.
+            #   # Must be set in both `appSettings.env` and `teamsAppSettings.env`.
+            #   # Can be true, when using cert-manager with self-signed certificates
+            #   APP_USE_HTTPS: false
+            image:
+              # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+              repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
+              # Note: the naming convention for the image `fiftyone-teams-app` differs from the other images `fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`
+              # the others are `v1.6.0.dev7` (not `.dev7` vs `-dev7`)
+              tag: v1.6.0-dev.7
+              pullPolicy: IfNotPresent
+  kubeContext: minikube
