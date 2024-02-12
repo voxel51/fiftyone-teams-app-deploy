@@ -87,3 +87,8 @@ port-forward-api:  ## port forward to service `teams-api` on the host port 8000
 
 port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
+
+
+helm-repos:  # add helm repos for the project
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo add jetstack https://charts.jetstack.io
