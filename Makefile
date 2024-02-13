@@ -73,10 +73,10 @@ stop:  ## Stop minikube
 delete:  ## Delete minikube
 	minikube delete
 
-dev:  ## run skaffold dev
+dev: helm-repos  ## run skaffold dev
 	skaffold dev
 
-dev-keep:  ## run skaffold dev with keep-runining-on-failure
+dev-keep: helm-repos  ## run skaffold dev with keep-runining-on-failure
 	skaffold dev --keep-running-on-failure
 
 port-forward-app:  ## port forward the service `teams-app` on the host port 3000
@@ -87,7 +87,6 @@ port-forward-api:  ## port forward to service `teams-api` on the host port 8000
 
 port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
-
 
 helm-repos:  # add helm repos for the project
 	helm repo add bitnami https://charts.bitnami.com/bitnami

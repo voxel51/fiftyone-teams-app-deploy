@@ -1,23 +1,21 @@
 # Contributing
 
-## pre-commit hooks
+1. Install tool dependencies
+    1. Install
+       [asdf](https://asdf-vm.com/)
+    1. Install tools managed by `asdf`
+
+        ```shell
+        make asdf
+        ```
+
+## pre-commit Hooks
 
 Our Helm Chart's README.md is automatically
 generated using the pre-commit hooks for
 
 * [https://github.com/norwoodj/helm-docs](https://github.com/norwoodj/helm-docs)
 * [https://github.com/Lucas-C/pre-commit-hooks-nodejs](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
-
-1. Install dependent tools
-    * Using [asdf](https://asdf-vm.com/)
-
-        ```shell
-        make asdf
-        ```
-
-    * Manually
-      * [helm-docs](https://github.com/norwoodj/helm-docs#installation)
-      * [pre-commit](https://pre-commit.com/#installation)
 
 1. Install the pre-commit hooks
 
@@ -92,6 +90,17 @@ generated using the pre-commit hooks for
 
 ## Localized Deployments (for internal-testing)
 
+1. Install additional dependencies
+
+    * Install
+      [Docker](https://www.docker.com/products/docker-desktop/).
+
+1. Add the helm repos
+
+    ```shell
+    make helm-repos
+    ```
+
 ### minikube
 
 [minikube](https://minikube.sigs.k8s.io/docs/)
@@ -99,13 +108,37 @@ provides a local kubernetes cluster
 in VMs (or docker containers) on macOS, Linux and Windows.
 
 ```shell
-    minikube start
+minikube start
 ```
+
+### skaffold
 
 We use
 [Skaffold](https://skaffold.dev/)
 to deploy our application to the minikube cluster with
 Helm and overrides (`values.yaml`).
+
+In `skaffold.yaml`, set the fiftyone Auth0 secrets:
+
+```yaml
+deploy:
+  helm:
+    releases:
+      - name: fiftyone-teams
+        overrides:
+          secret:
+            fiftyone:
+              # The Auth0 Tenant `dev-fiftyone` and application `local-dev` are configured for running the app locally with https
+              # Add the Auth0 secrets here.
+              # apiClientId: ""
+              # apiClientSecret: ""
+              # auth0Domain: ""
+              # clientId: ""
+              # clientSecret: ""
+              # organizationId: ""
+
+```
+
 When debugging, it may be helpful to start minikube with the flag
 `--keep-running-on-failure` so that the k8s resources are not deleted
 if the helm installation(s) fail.
@@ -131,6 +164,8 @@ By default, Skaffold will Helm install
   * cert-manager from chart defaults
 * FiftyOne Teams
 
+#### profiles
+
 To skip installing MongoDB, run
 
 ```shell
@@ -149,7 +184,7 @@ To skip installing both MongoDB and cert-manager, run
 skaffold dev --profile only-fiftyone
 ```
 
-#### Container Images stored in Private Repositories
+#### Container Images Stored in Private Repositories
 
 Our FiftyOne Teams container images are stored in the private repositories
 
@@ -314,7 +349,7 @@ GCP project `computer-vision-team`, configure minikube and skaffold
     # skaffold dev --keep-running-on-failure
     ```
 
-### Accessing the k8s resources
+### Accessing the k8s Resources
 
 There are two ways to access resources within the minikube cluster:
 
