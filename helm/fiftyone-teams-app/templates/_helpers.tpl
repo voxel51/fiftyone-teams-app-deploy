@@ -255,6 +255,11 @@ Create a merged list of environment variables for fiftyone-app
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -270,11 +275,7 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-- name: FIFTYONE_TEAMS_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
+{{- if .Values.casSettings.env.ENABLE_LEGACY_MODE }}
 - name: FIFTYONE_TEAMS_AUDIENCE
   value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
 - name: FIFTYONE_TEAMS_CLIENT_ID
@@ -282,16 +283,17 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: clientId
+- name: FIFTYONE_TEAMS_DOMAIN
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: auth0Domain
 - name: FIFTYONE_TEAMS_ORGANIZATION
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: organizationId
-- name: FIFTYONE_AUTH_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneAuthSecret
+{{- end }}
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -370,6 +372,13 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
+- name: FIFTYONE_DATABASE_ADMIN
+  value: "false"
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -380,18 +389,12 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
-- name: FIFTYONE_DATABASE_ADMIN
-  value: "false"
 - name: FIFTYONE_ENCRYPTION_KEY
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-- name: FIFTYONE_TEAMS_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
+{{- if .Values.casSettings.env.ENABLE_LEGACY_MODE }}
 - name: FIFTYONE_TEAMS_AUDIENCE
   value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
 - name: FIFTYONE_TEAMS_CLIENT_ID
@@ -399,16 +402,17 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: clientId
+- name: FIFTYONE_TEAMS_DOMAIN
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: auth0Domain
 - name: FIFTYONE_TEAMS_ORGANIZATION
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: organizationId
-- name: FIFTYONE_AUTH_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneAuthSecret
+{{- end }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -424,11 +428,6 @@ Create a merged list of environment variables for fiftyone-teams-app
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
 {{- if .Values.casSettings.env.ENABLE_LEGACY_MODE }}
-- name: AUTH0_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
 - name: AUTH0_AUDIENCE
   value: "https://$(AUTH0_DOMAIN)/api/v2/"
 - name: AUTH0_BASE_URL
@@ -443,6 +442,11 @@ Create a merged list of environment variables for fiftyone-teams-app
     secretKeyRef:
       name: {{ $secretName }}
       key: clientSecret
+- name: AUTH0_DOMAIN
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: auth0Domain
 - name: AUTH0_ISSUER_BASE_URL
   value: "https://$(AUTH0_DOMAIN)"
 - name: AUTH0_ORGANIZATION
