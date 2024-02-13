@@ -186,10 +186,24 @@ appSettings:
 
 # Central Authentication Service (teams-cas) configurations
 casSettings:
-  # -- Provide the name for the CAS Database
-  databaseName: cas
   # Environment Variables are passed to the teams-cas containers
-  env: {}
+  env:
+    # -- Provide the name for the CAS database
+    CAS_DATABASE_NAME: cas
+    # -- Set the default user role for new users
+    # One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN`
+    CAS_DEFAULT_USER_ROLE: GUEST
+    # -- Set the CAS Log Level
+    # One of `DEBUG`, `INFO`, `WARN`, `ERROR`
+    CAS_LOG_LEVEL: INFO
+    # -- The key from `secret.fiftyone` that contains the CAS MongoDB Connection
+    # String.
+    CAS_MONGODB_URI_KEY: mongodbConnectionString
+    # -- Toggle CAS Legacy Mode, which continues to use Auth0 integration
+    ENABLE_LEGACY_MODE: true
+    # -- Allow Admins to invite users by email
+    # NOTE: This is not supported when ENABLE_LEGACY_MODE is `false`
+    FEATURE_FLAG_ENABLE_INVITATIONS: true
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
@@ -198,9 +212,6 @@ casSettings:
     repository: voxel51/teams-cas
     # -- Image tag for teams-cas. Defaults to the chart version.
     tag: ""
-
-  # -- Provide the key from secret.fiftyone for the CAS MongoDB Connection String
-  mongodbUriKey: mongodbConnectionString
 
   # -- Number of pods in the teams-cas deployment's ReplicaSet. [Reference][deployment].
   replicaCount: 2
@@ -441,6 +452,8 @@ secret:
     cookieSecret: ""
     # -- Encryption key for storage credentials. [Reference][fiftyone-encryption-key].
     encryptionKey: ""
+    # -- A randomly generated string for CAS Authentication.
+    fiftyoneAuthSecret: ""
 
 serviceAccount:
   # -- Service Account annotations. [Reference][annotations].

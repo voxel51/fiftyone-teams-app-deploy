@@ -324,12 +324,15 @@ appSettings:
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
-| casSettings.databaseName | string | `"cas"` | Provide the name for the CAS Database |
-| casSettings.env | object | `{}` |  |
+| casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database |
+| casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
+| casSettings.env.CAS_LOG_LEVEL | string | `"INFO"` | Set the CAS Log Level One of `DEBUG`, `INFO`, `WARN`, `ERROR` |
+| casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone` that contains the CAS MongoDB Connection String. |
+| casSettings.env.ENABLE_LEGACY_MODE | bool | `true` | Toggle CAS Legacy Mode, which continues to use Auth0 integration |
+| casSettings.env.FEATURE_FLAG_ENABLE_INVITATIONS | bool | `true` | Allow Admins to invite users by email NOTE: This is not supported when ENABLE_LEGACY_MODE is `false` |
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/teams-cas"` | Container image for teams-cas. |
 | casSettings.image.tag | string | `""` | Image tag for teams-cas. Defaults to the chart version. |
-| casSettings.mongodbUriKey | string | `"mongodbConnectionString"` | Provide the key from secret.fiftyone for the CAS MongoDB Connection String |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for teams-cas. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for teams-cas. [Reference][annotations]. |
 | casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-cas. [Reference][security-context]. |
@@ -406,6 +409,7 @@ appSettings:
 | secret.fiftyone.clientSecret | string | `""` | Voxel51-provided Auth0 Client Secret. |
 | secret.fiftyone.cookieSecret | string | `""` | A randomly generated string for cookie encryption. To generate, run `openssl rand -hex 32`. |
 | secret.fiftyone.encryptionKey | string | `""` | Encryption key for storage credentials. [Reference][fiftyone-encryption-key]. |
+| secret.fiftyone.fiftyoneAuthSecret | string | `""` | A randomly generated string for CAS Authentication. |
 | secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Teams. |
 | secret.fiftyone.mongodbConnectionString | string | `""` | MongoDB Connection String. [Reference][mongodb-connection-string]. |
 | secret.fiftyone.organizationId | string | `""` | Voxel51-provided Auth0 Organization ID. |
