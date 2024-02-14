@@ -1,5 +1,27 @@
 # Contributing
 
+<!-- toc -->
+
+- [General](#general)
+- [pre-commit Hooks](#pre-commit-hooks)
+- [Localized Deployments (for internal-testing)](#localized-deployments-for-internal-testing)
+  - [minikube](#minikube)
+  - [skaffold](#skaffold)
+    - [profiles](#profiles)
+    - [Container Images Stored in Private Repositories](#container-images-stored-in-private-repositories)
+      - [Google Artifact Repository](#google-artifact-repository)
+      - [Docker Hub](#docker-hub)
+  - [Accessing the k8s Resources](#accessing-the-k8s-resources)
+    - [Ingress](#ingress)
+    - [Ingress - Login](#ingress---login)
+    - [Port Forward to the `teams-app` Service](#port-forward-to-the-teams-app-service)
+    - [Port Forward to the `teams-api` Service](#port-forward-to-the-teams-api-service)
+    - [Port Forward - Login](#port-forward---login)
+
+<!-- tocstop -->
+
+## General
+
 1. Install tool dependencies
     1. Install
        [asdf](https://asdf-vm.com/)
@@ -14,8 +36,8 @@
 Our Helm Chart's README.md is automatically
 generated using the pre-commit hooks for
 
-* [https://github.com/norwoodj/helm-docs](https://github.com/norwoodj/helm-docs)
-* [https://github.com/Lucas-C/pre-commit-hooks-nodejs](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
+- [https://github.com/norwoodj/helm-docs](https://github.com/norwoodj/helm-docs)
+- [https://github.com/Lucas-C/pre-commit-hooks-nodejs](https://github.com/Lucas-C/pre-commit-hooks-nodejs)
 
 1. Install the pre-commit hooks
 
@@ -27,9 +49,9 @@ generated using the pre-commit hooks for
   [helm/fiftyone-teams-app/README.md.gotmpl](./helm/fiftyone-teams-app/README.md.gotmpl).
 1. To render
   [helm/fiftyone-teams-app/README.md](./helm/fiftyone-teams-app/README.md)
-    * Add the changed file `helm/fiftyone-teams-app/README.md.gotmpl`
-    * Either
-      * Commit the changes and let the hooks render from the template
+    - Add the changed file `helm/fiftyone-teams-app/README.md.gotmpl`
+    - Either
+      - Commit the changes and let the hooks render from the template
 
           ```shell
           [fiftyone-teams-app-deploy]$ git add helm/fiftyone-teams-app/README.md.gotmpl
@@ -78,7 +100,7 @@ generated using the pre-commit hooks for
           2 files changed, 10 insertions(+)
           ```
 
-      * Manually run the pre-commit hooks
+      - Manually run the pre-commit hooks
 
           ```shell
           git add helm/fiftyone-teams-app/README.md.gotmpl
@@ -92,8 +114,15 @@ generated using the pre-commit hooks for
 
 1. Install additional dependencies
 
-    * Install
-      [Docker](https://www.docker.com/products/docker-desktop/).
+    - Install
+      [Docker](https://www.docker.com/products/docker-desktop/)
+      at version `4.26.1` until we build and publish arm64 container images
+        - Version `4.27.1` causes the container error
+
+            ```txt
+            $ kubectl logs fiftyone-app-76b697dc68-5t26r
+            exec /bin/sh: exec format error
+            ```
 
 1. Add the helm repos
 
@@ -128,14 +157,21 @@ deploy:
         overrides:
           secret:
             fiftyone:
-              # The Auth0 Tenant `dev-fiftyone` and application `local-dev` are configured for running the app locally with https
-              # Add the Auth0 secrets here.
-              # apiClientId: ""
-              # apiClientSecret: ""
-              # auth0Domain: ""
-              # clientId: ""
-              # clientSecret: ""
-              # organizationId: ""
+              # In the `dev-fiftyone` Auth0 Tenant, the `local-dev` and
+              # `fiftyone-dev-api (Test Application)` applications are
+              # configured for running the app locally with https
+              auth0Domain: "dev-fiftyone.us.auth0.com"
+
+              # # Set values for the `fiftyone-dev-api (Test Application)` application
+              apiClientId: ""
+              apiClientSecret: ""
+
+              # Set values for the `local-dev` application
+              clientId: ""
+              clientSecret: ""
+
+              # Set to the Identifier of the `fiftyone-demo` organization
+              organizationId: ""
 
 ```
 
@@ -157,12 +193,12 @@ and the teams-api will connect to and configure MongoDB.
 We use Skaffold "profiles" to control "modules".
 By default, Skaffold will Helm install
 
-* MongoDB
-* cert-manager
-  * CRDs
-  * self-singed ClusterIssuer
-  * cert-manager from chart defaults
-* FiftyOne Teams
+- MongoDB
+- cert-manager
+  - CRDs
+  - self-singed ClusterIssuer
+  - cert-manager from chart defaults
+- FiftyOne Teams
 
 #### profiles
 
@@ -188,19 +224,99 @@ skaffold dev --profile only-fiftyone
 
 Our FiftyOne Teams container images are stored in the private repositories
 
-* Docker Hub
-  * Contains released versions
-* Google Artifact Repository (Docker)
-  * Contains private development images created by our
+- [Google Artifact Repository (Docker)](#google-artifact-repository)
+  - Contains private development images created by our
     [Google Cloud Build](https://github.com/voxel51/cloud-build-and-deploy/)
     CI/CD runs
-    * Development
-    * Release Candidates
+    - Development
+    - Release Candidates
+- [Docker Hub](#docker-hub)
+  - Contains released versions
 
 Accessing images in a private repository requires setting
 up authentication to that container registry.
 
+##### Google Artifact Repository
+
+To run released images from Google Artifact repository in the
+GCP project `computer-vision-team`, configure minikube and skaffold
+
+1. Configure GCP Credentials
+   [gcloud auth](https://cloud.google.com/sdk/gcloud/reference/auth)
+1. Configure
+   [gcloud auth application-default](https://cloud.google.com/sdk/gcloud/reference/auth/application-default)
+
+1. Start minikube and enable the addon `gcp-auth`
+
+    ```shell
+    minikube start
+    minikube addons enable gcp-auth
+    ```
+
+1. In [skaffold.yaml](./skaffold.yaml)
+   comment `imagePullSecrets` for the helm release named `fiftyone-teams-app`
+   in `setValueTemplates.imagePullSecrets[0].name=regcred`
+
+    ```yaml
+    deploy:
+      helm:
+        releases:
+          - name: fiftyone-teams-app
+            setValueTemplates:
+              # imagePullSecrets:
+              #   - name: regcred
+    ```
+
+1. To use an image different than the Helm Chart Version,
+   update the corresponding `image.tag` value.
+   For each service
+
+    - `apiSettings`
+    - `appSettings`
+    - `pluginsSettings`
+    - `teamsAppSettings`
+
+   For example for the version `1.6.0` at `dev7`.
+
+    ```yaml
+    apiSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
+        tag: v1.6.0.dev7
+    appSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+        tag: v1.6.0.dev7
+    pluginsSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+        tag: v1.6.0.dev7
+    teamsAppSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
+        # Note: the naming convention for the image `fiftyone-teams-app` differs from the other images `fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`
+        # the others are `v1.6.0.dev7` (not `.dev7` vs `-dev7`).
+        # This is a byproduct of `npm` versioning versus Python PEP 440.
+        tag: v1.6.0-dev.7
+    ```
+
+    > _Note:_ To see the available tags for each image, see
+    > [https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team](https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team)
+
+1. Run skaffold
+
+    ```shell
+    skaffold dev
+
+    # Or with the optional flag
+    # skaffold dev --keep-running-on-failure
+    ```
+
 ##### Docker Hub
+
+> _Note:_ Release Artifacts are available in the Google Artifact Registry.
+> To obtain a Docker Hub Private Access Token,
+> contact your friendly neighborhood Aloha Shirt.
 
 To run released images from Docker hub, configure minikube and Skaffold
 
@@ -273,88 +389,14 @@ To run released images from Docker hub, configure minikube and Skaffold
 For more information, see the Kubernetes documentation
 [Pull an Image from a Private Registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
 
-> _Note:_ When `minikube delete`, the secret `regcred` must be recreated.
-
-##### Google Artifact Repository
-
-To run released images from Google Artifact repository in the
-GCP project `computer-vision-team`, configure minikube and skaffold
-
-1. Configure GCP Credentials
-   [gcloud auth](https://cloud.google.com/sdk/gcloud/reference/auth)
-1. Configure
-   [gcloud auth application-default](https://cloud.google.com/sdk/gcloud/reference/auth/application-default)
-
-1. Start minikube and enable the addon `gcp-auth`
-
-    ```shell
-    minikube start
-    minikube addons enable gcp-auth
-    ```
-
-1. In [skaffold.yaml](./skaffold.yaml)
-   comment `imagePullSecrets` for the helm release named `fiftyone-teams-app`
-   in `setValueTemplates.imagePullSecrets[0].name=regcred`
-
-    ```yaml
-    deploy:
-      helm:
-        releases:
-          - name: fiftyone-teams-app
-            setValueTemplates:
-              # imagePullSecrets:
-              #   - name: regcred
-    ```
-
-1. For each service
-
-    * `apiSettings`
-    * `appSettings`
-    * `pluginsSettings`
-    * `teamsAppSettings`
-
-   update the `image.repository` value to be `<REPOSITORY>/<IMAGE_NAME>` and
-   the corresponding `image.tag` value.  For example for the version `1.6.0` at `dev7`
-
-    ```yaml
-    apiSettings:
-      image:
-        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
-        tag: v1.6.0.dev7
-    appSettings:
-      image:
-        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-        tag: v1.6.0.dev7
-    pluginsSettings:
-      image:
-        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-        tag: v1.6.0.dev7
-    teamsAppSettings:
-      image:
-        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
-        # Note: the naming convention for the image `fiftyone-teams-app` differs from the other images `fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`
-        # the others are `v1.6.0.dev7` (not `.dev7` vs `-dev7`)
-        tag: v1.6.0-dev.7
-    ```
-
-    > _Note:_ To see the available tags for each image, see
-    > [https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team](https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team)
-
-1. Run skaffold
-
-    ```shell
-    skaffold dev
-
-    # Or with the optional flag
-    # skaffold dev --keep-running-on-failure
-    ```
+> _Note:_ After running `minikube delete`, the secret `regcred` must be recreated.
 
 ### Accessing the k8s Resources
 
 There are two ways to access resources within the minikube cluster:
 
-* Ingress (recommended)
-* Port Forward
+- Ingress (recommended)
+- Port Forward
 
 #### Ingress
 
@@ -384,7 +426,7 @@ See
 
 #### Ingress - Login
 
-This section assumes the use of TLS certificates and the `https`` protocol.
+This section assumes the use of TLS certificates and the `https` protocol.
 
 1. In a web browser and navigate to
 

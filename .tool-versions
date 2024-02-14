@@ -1,7 +1,7 @@
+cmctl 1.13.3
+helm 3.13.2
 helm-docs 1.11.3
+kubectl 1.27.4
+minikube 1.32.0
 pre-commit 3.5.0
 skaffold 2.10.0
-minikube 1.32.0
-kubectl 1.27.4
-helm 3.13.2
-cmctl 1.13.3

@@ -47,7 +47,6 @@ deploy:
             image:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
-              tag: v1.6.0.dev7
               pullPolicy: IfNotPresent
           appSettings:
             env:
@@ -62,7 +61,6 @@ deploy:
             image:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-              tag: v1.6.0.dev7
               pullPolicy: IfNotPresent
           # TODO: Test `minikube addons configure registry-creds` or
           # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
@@ -104,13 +102,20 @@ deploy:
             tlsEnabled: true
           secret:
             fiftyone:
-              # The Auth0 Tenant `dev-fiftyone` and application `local-dev` are configured for running the app locally with https
-              # Add the Auth0 secrets here.
+              # In the `dev-fiftyone` Auth0 Tenant, the `local-dev` and
+              # `fiftyone-dev-api (Test Application)` applications are
+              # configured for running the app locally with https
+              auth0Domain: "dev-fiftyone.us.auth0.com"
+
+              # # Set values for the `fiftyone-dev-api (Test Application)` application
               apiClientId: ""
               apiClientSecret: ""
-              auth0Domain: ""
+
+              # Set values for the `local-dev` application
               clientId: ""
               clientSecret: ""
+
+              # Set to the Identifier of the `fiftyone-demo` organization
               organizationId: ""
 
               fiftyoneDatabaseName: fiftyone-internal
@@ -126,7 +131,6 @@ deploy:
             image:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-              tag: v1.6.0.dev7
           teamsAppSettings:
             dnsName: local.fiftyone.ai
             # env:
@@ -140,6 +144,5 @@ deploy:
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
               # Note: the naming convention for the image `fiftyone-teams-app` differs from the other images `fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`
               # the others are `v1.6.0.dev7` (not `.dev7` vs `-dev7`)
-              tag: v1.6.0-dev.7
               pullPolicy: IfNotPresent
   kubeContext: minikube
