@@ -91,3 +91,6 @@ port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 helm-repos:  # add helm repos for the project
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo add jetstack https://charts.jetstack.io
+
+tunnel:
+	minikube tunnel

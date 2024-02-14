@@ -17,6 +17,7 @@
     - [Port Forward to the `teams-app` Service](#port-forward-to-the-teams-app-service)
     - [Port Forward to the `teams-api` Service](#port-forward-to-the-teams-api-service)
     - [Port Forward - Login](#port-forward---login)
+  - [Makefile Shortcuts](#makefile-shortcuts)
 
 <!-- tocstop -->
 
@@ -294,8 +295,9 @@ GCP project `computer-vision-team`, configure minikube and skaffold
     teamsAppSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
-        # Note: the naming convention for the image `fiftyone-teams-app` differs from the other images `fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`
-        # the others are `v1.6.0.dev7` (not `.dev7` vs `-dev7`).
+        # Note: the naming convention for the image `fiftyone-teams-app` differs from
+        # the other images (`fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`).
+        # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
         # This is a byproduct of `npm` versioning versus Python PEP 440.
         tag: v1.6.0-dev.7
     ```
@@ -502,3 +504,25 @@ With the port forward running,
 > Without this setting, the app code makes the callback URL
 > [https://localhost:3000](https://localhost:3000) and Auth0
 > throws a Callback URL mismatch error.
+
+### Makefile Shortcuts
+
+For advanced users who want to get quickly running:
+
+1. Start Minikube and run Skaffold
+
+    ```shell
+    make start
+    make dev-keep
+    ```
+
+1. Once skaffold is done installing the apps into minikube,
+   open a terminal and run
+
+    ```shell
+    make tunnel
+    # provide sudo password
+    ```
+
+1. Navigate to
+   [https://local.fiftyone.ai](https://local.fiftyone.ai)

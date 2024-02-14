@@ -119,7 +119,6 @@ deploy:
               organizationId: ""
 
               fiftyoneDatabaseName: fiftyone-internal
-
               # This password is randomly generated and is only used to initialize a local (ephemeral) MongoDB in `./skaffold-mongodb.yaml`
               mongodbConnectionString: mongodb://root:3-9XjJ-gUV?vp^e(WUk>LD&lAjh7yEji@mongodb.fiftyone-teams.svc.cluster.local/?authSource=admin
 
@@ -142,7 +141,9 @@ deploy:
             image:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
-              # Note: the naming convention for the image `fiftyone-teams-app` differs from the other images `fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`
-              # the others are `v1.6.0.dev7` (not `.dev7` vs `-dev7`)
+              # Note: the naming convention for the image `fiftyone-teams-app` differs from
+              # the other images (`fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`).
+              # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
+              # This is a byproduct of `npm` versioning versus Python PEP 440.
               pullPolicy: IfNotPresent
   kubeContext: minikube
