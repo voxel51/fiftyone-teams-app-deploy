@@ -3,6 +3,7 @@
 <!-- toc -->
 
 - [General](#general)
+- [Quickstart to Skaffold in Minikube](#quickstart-to-skaffold-in-minikube)
 - [pre-commit Hooks](#pre-commit-hooks)
 - [Localized Deployments (for internal-testing)](#localized-deployments-for-internal-testing)
   - [minikube](#minikube)
@@ -17,7 +18,6 @@
     - [Port Forward to the `teams-app` Service](#port-forward-to-the-teams-app-service)
     - [Port Forward to the `teams-api` Service](#port-forward-to-the-teams-api-service)
     - [Port Forward - Login](#port-forward---login)
-  - [Makefile Shortcuts](#makefile-shortcuts)
 
 <!-- tocstop -->
 
@@ -31,6 +31,45 @@
         ```shell
         make asdf
         ```
+
+## Quickstart to Skaffold in Minikube
+
+1. Auth with gcloud
+
+    ```shell
+    gcloud auth application-default login
+    ```
+
+1. Install the asdf tools
+
+    ```shell
+    make asdf
+    ```
+
+1. In one terminal, start minikube
+
+    ```shell
+    make start
+    ```
+
+1. Set skaffold secrets.
+   See [skaffold](#skaffold)
+
+1. Run skaffold
+
+    ```shell
+    make dev-keep
+    ```
+
+1. In another terminal, run minikube tunnel (and provide your password when prompted)
+
+    ```shell
+    minikube tunnel
+    ```
+
+1. Navigate to
+   [https://local.fiftyone.ai](https://local.fiftyone.ai)
+   and login
 
 ## pre-commit Hooks
 
@@ -504,25 +543,3 @@ With the port forward running,
 > Without this setting, the app code makes the callback URL
 > [https://localhost:3000](https://localhost:3000) and Auth0
 > throws a Callback URL mismatch error.
-
-### Makefile Shortcuts
-
-For advanced users who want to get quickly running:
-
-1. Start Minikube and run Skaffold
-
-    ```shell
-    make start
-    make dev-keep
-    ```
-
-1. Once skaffold is done installing the apps into minikube,
-   open a terminal and run
-
-    ```shell
-    make tunnel
-    # provide sudo password
-    ```
-
-1. Navigate to
-   [https://local.fiftyone.ai](https://local.fiftyone.ai)
