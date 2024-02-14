@@ -1,0 +1,52 @@
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
+  name: cert-manager-crds
+
+# When using cert-manager self-signed clusterIssuer
+manifests:
+  rawYaml:
+    # CRDs from chart version `v1.13.3`.
+    # When chart's CRDs change, these local files needs to be updated.
+    - helm/local-self-signed-example/cert-manger-crds/*.yaml
+deploy:
+  # When using cert-manager self-signed clusterIssuer
+  kubectl: {}
+
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
+  name: cert-manager-self-signed-cluster-issuer
+
+requires:
+  - configs:
+      - cert-manager-crds
+
+# When using cert-manager self-signed clusterIssuer
+manifests:
+  rawYaml:
+    - helm/local-self-signed-example/cluster-issuer.yaml
+deploy:
+  # When using cert-manager self-signed clusterIssuer
+  kubectl: {}
+
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
+  name: cert-manager
+
+requires:
+  - configs:
+      - cert-manager-self-signed-cluster-issuer
+
+deploy:
+  helm:
+    releases:
+      - name: cert-manager
+        remoteChart: jetstack/cert-manager
+        version: 1.13.3
+        createNamespace: true
+        namespace: cert-manager

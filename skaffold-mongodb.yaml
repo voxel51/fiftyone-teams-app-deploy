@@ -1,0 +1,48 @@
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
+  name: mongodb
+
+deploy:
+  helm:
+    releases:
+      - name: mongodb
+        remoteChart: bitnami/mongodb
+        version: 14.4.0
+        createNamespace: true
+        namespace: fiftyone-teams
+        overrides:
+          image:
+            # Bitnami charts only support bitnami container images.
+            # The bitnami/mongo images are Debian with arch linux/amd64 only (linux/arm64 is not provided)
+            # because MongoDB doesn't provide Debian ARM64 packages/binaries.
+            # However, MongoDB provided images supports arm64.
+            repository: mongo
+            tag: "6.0.12-jammy"  # mongodb.fiftyone.ai is version `6.0.11`
+            pullPolicy: IfNotPresent
+          # architecture: standalone  # default is `standalone`. May also be `replicaset`.
+
+          # The `auth` key only applies to bitnami container images
+          # auth:
+          #   rootUser: root  # default is `root`
+          #   # This is a randomly generated string
+          #   rootPassword: "3-9XjJ-gUV?vp^e(WUk>LD&lAjh7yEji"
+
+          # Since we use the MongoDB image (https://hub.docker.com/_/mongo) (not the bitnami/mongo image),
+          # we need to set these environment variables for the initial user.
+          # When using the bitnami image, we would instead set `auth.rootUser` and `auth.rootPassword`.
+          extraEnvVars:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              # This is a randomly generated string
+              value: "3-9XjJ-gUV?vp^e(WUk>LD&lAjh7yEji"
+          persistence:
+            mountPath: /data/db
+
+          # Runs an init container that sets the permissions of the persistence volume.
+          # Without this, mongodb errors on start
+          # {"error":"IllegalOperation: Attempted to create a lock file on a read-only directory: /data/db"}
+          volumePermissions:
+            enabled: true
