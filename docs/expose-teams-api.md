@@ -34,7 +34,7 @@ validate that your infrastructure supports the WebSockets protocol.
 (For example, you may need to replace AWS Classic Load Balancers (LB)
 with AWS Application Load Balancers (ALB) for WebSocket support.)
 
-To expose the `teams-api`` service, chose one of these two routing methods
+To expose the `teams-api` service, chose one of these two routing methods
 
 - Host-Based
 - Path-based
