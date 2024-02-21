@@ -359,6 +359,8 @@ Create a merged list of environment variables for fiftyone-teams-cas
       name: {{ $secretName }}
       key: mongodbConnectionString
 {{- end }}
+- name: NEXTAUTH_URL
+  value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
 {{- range $key, $val := .Values.casSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
