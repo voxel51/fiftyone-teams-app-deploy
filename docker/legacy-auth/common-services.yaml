@@ -1,5 +1,36 @@
 ---
 services:
+  fiftyone-app-common:
+    image: voxel51/fiftyone-app:v1.5.6
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: false
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DEFAULT_APP_ADDRESS: 0.0.0.0
+      FIFTYONE_DEFAULT_APP_PORT: 5151
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_TEAMS_AUDIENCE: ${AUTH0_AUDIENCE}
+      FIFTYONE_TEAMS_CLIENT_ID: ${AUTH0_CLIENT_ID}
+      FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
+      FIFTYONE_TEAMS_ORGANIZATION: ${AUTH0_ORGANIZATION}
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then add the following environment variables to your
+      #  `compose.override.yaml`
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
+    ports:
+      - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
+    restart: always
+
   teams-api-common:
     image: voxel51/fiftyone-teams-api:v1.5.6
     environment:
@@ -65,37 +96,6 @@ services:
       # no_proxy: ${NO_PROXY_LIST}
     ports:
       - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
-    restart: always
-
-  fiftyone-app-common:
-    image: voxel51/fiftyone-app:v1.5.6
-    environment:
-      API_URL: ${API_URL}
-      FIFTYONE_DATABASE_ADMIN: false
-      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
-      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
-      FIFTYONE_DEFAULT_APP_ADDRESS: 0.0.0.0
-      FIFTYONE_DEFAULT_APP_PORT: 5151
-      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
-      FIFTYONE_INTERNAL_SERVICE: true
-      FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
-      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
-      FIFTYONE_TEAMS_AUDIENCE: ${AUTH0_AUDIENCE}
-      FIFTYONE_TEAMS_CLIENT_ID: ${AUTH0_CLIENT_ID}
-      FIFTYONE_TEAMS_DOMAIN: ${AUTH0_DOMAIN}
-      FIFTYONE_TEAMS_ORGANIZATION: ${AUTH0_ORGANIZATION}
-      # If you are routing through a proxy server you will want to set
-      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
-      #  then add the following environment variables to your
-      #  `compose.override.yaml`
-      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
-      # HTTP_PROXY: ${HTTP_PROXY_URL}
-      # NO_PROXY: ${NO_PROXY_LIST}
-      # http_proxy: ${HTTP_PROXY_URL}
-      # https_proxy: ${HTTPS_PROXY_URL}
-      # no_proxy: ${NO_PROXY_LIST}
-    ports:
-      - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
     restart: always
 
   teams-plugins-common:
