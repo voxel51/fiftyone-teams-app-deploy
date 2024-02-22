@@ -1,4 +1,4 @@
- SHELL := $(SHELL) -e
+SHELL := $(SHELL) -e
 
 # Help
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))
@@ -37,3 +37,60 @@ hooks:  ## Install git hooks (pre-commit)
 
 pre-commit:  ## Run pre-commit against all files
 	@pre-commit run -a
+
+start:   ## Run minikube with ingress and gcp-auth
+	# to persist mongodb data, we may want to start minikube with a volume mount
+	# minikube start --mount=true \
+	#   --mount-string=/var/tmp/mongodb_data:/tmp/hostpath-provisioner/fiftyone-teams/mongodb
+	minikube start
+	minikube addons enable ingress
+
+	# Requires setting up GCP credentials (application default credentials)
+	# for the GCP project `computer-vision-team`.
+	# Then run
+	#
+	# ```shell
+	# gcloud auth application-default login
+	# ```
+	#
+	minikube addons enable gcp-auth
+
+	# registery-creds is an alternative methods for accessing private repositories.
+	# If used, needs to be reconfired every time minikube is deleted.
+	# minikube addons configure registry-creds
+
+	# create the regcred secret to allow pulling images from dockerhub
+	# kubectl create namespace fiftyone-teams --context minikube
+	# kubectl --namespace fiftyone-teams \
+	#   --context minikube \
+	#   create secret generic regcred \
+	#   --from-file=.dockerconfigjson=/var/tmp/voxel51-docker.json \
+	#   --type kubernetes.io/dockerconfigjson
+
+stop:  ## Stop minikube
+	minikube stop
+
+delete:  ## Delete minikube
+	minikube delete
+
+dev: helm-repos  ## run skaffold dev
+	skaffold dev
+
+dev-keep: helm-repos  ## run skaffold dev with keep-runining-on-failure
+	skaffold dev --keep-running-on-failure
+
+port-forward-app:  ## port forward the service `teams-app` on the host port 3000
+	kubectl port-forward --namespace fiftyone-teams svc/teams-app 3000:80 --context minikube
+
+port-forward-api:  ## port forward to service `teams-api` on the host port 8000
+	kubectl port-forward --namespace fiftyone-teams svc/teams-api 8000:80 --context minikube
+
+port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
+	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
+
+helm-repos:  # add helm repos for the project
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo add jetstack https://charts.jetstack.io
+
+tunnel:
+	minikube tunnel

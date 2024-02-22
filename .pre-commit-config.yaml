@@ -7,6 +7,8 @@ repos:
       - id: check-case-conflict
       - id: check-shebang-scripts-are-executable
       - id: check-yaml
+        args:
+          - --allow-multiple-document
         # We exclude helm template files since in raw form, they are not valid yaml
         exclude: helm/fiftyone-teams-app/templates
       - id: detect-aws-credentials
@@ -29,6 +31,7 @@ repos:
     rev: v2.2.5
     hooks:
       - id: codespell
+        exclude: helm/local-self-signed-example/cert-manger-crds
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.32.0
     hooks:
@@ -57,6 +60,7 @@ repos:
           - docker/README.md
           - helm/fiftyone-teams-app/README.md.gotmpl
           - helm/README.md
+          - CONTRIBUTING.md
   - repo: https://github.com/gruntwork-io/pre-commit
     rev: v0.1.23
     hooks:
@@ -67,4 +71,4 @@ repos:
       - id: detect-secrets
         args:
           - --exclude-secrets
-          - '(password|REPLACEME|fiftyone-teams-tls-secret)'
+          - '(password|REPLACEME|fiftyone-teams-tls-secret|btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=|5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976)'
