@@ -96,7 +96,7 @@ helm-repos:  ## add helm repos for the project
 tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
 	minikube tunnel
 
-test-unit-helm: install-terratest-log-parser  ## run go test on the tests/unit directory
+test-unit-helm:  ## run go test on the tests/unit directory
 	@cd tests/unit; \
 	go test -v -tags unit -timeout 30m
 
