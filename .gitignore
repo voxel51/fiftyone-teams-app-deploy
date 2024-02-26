@@ -3,3 +3,7 @@ compose.override.yaml
 .env
 helm/gke-example/voxel51-docker.json
 helm/gke-example/values-*.yaml
+tests/unit/test_output.log
+tests/unit/test_output/*
+tests/integration/test_output.log
+tests/integration/test_output/*
