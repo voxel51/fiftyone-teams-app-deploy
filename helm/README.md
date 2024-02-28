@@ -208,8 +208,7 @@ Wait until the MongoDB pods are in the `Ready` state before
 beginning the "Install FiftyOne Teams App" instructions.
 
 While waiting,
-[configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry)
-.
+[configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
 
 To determine the state of the `fiftyone-mongodb` pods, run
 
