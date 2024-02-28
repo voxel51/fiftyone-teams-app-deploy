@@ -100,8 +100,7 @@ Supported locations are network mounted filesystems and cloud storage folders.
   - Mount a Persistent Volume Claim with `ReadWrite` permissions to
     the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path.
     For an example, see
-    [Plugins Storage](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
-    .
+    [Plugins Storage](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md).
 - Cloud storage folder
   - In `values.yaml`, set the cloud storage path (for example
     `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
