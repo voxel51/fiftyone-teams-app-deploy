@@ -337,8 +337,7 @@ versions prior to FiftyOne Teams version 1.1.0:
    for details)
 1. [Upgrade to FiftyOne Teams version 1.5.6](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
-   (this is not the default for this release)
-   .
+   (this is not the default for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
       FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.6`
 1. Upgrade your FiftyOne SDKs to version 0.15.6
