@@ -282,5 +282,4 @@ and add your storage credentials to access sample data.
 
 Congratulations! You should now be able to access your
 FiftyOne Teams installation at the DNS address you created
-[earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry)
-.
+[earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
