@@ -435,8 +435,7 @@ to port 3000 on the host running the FiftyOne Teams App.
 An example nginx site configuration that forwards http traffic to
 https, and https traffic for `your.server.name` to port 3000.
 See
-[./example-nginx-site.conf](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf)
-.
+[./example-nginx-site.conf](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf).
 
 ---
 
