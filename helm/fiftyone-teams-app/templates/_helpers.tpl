@@ -193,7 +193,7 @@ Create a merged list of environment variables for fiftyone-teams-api
 */}}
 {{- define "fiftyone-teams-api.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
-{{- if .Values.casSettings.env.ENABLE_LEGACY_MODE }}
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
 - name: AUTH0_API_CLIENT_ID
   valueFrom:
     secretKeyRef:
@@ -275,7 +275,7 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-{{- if .Values.casSettings.env.ENABLE_LEGACY_MODE }}
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
 - name: FIFTYONE_TEAMS_AUDIENCE
   value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
 - name: FIFTYONE_TEAMS_CLIENT_ID
@@ -315,7 +315,7 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
-{{- if .Values.casSettings.env.ENABLE_LEGACY_MODE }}
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
 - name: AUTH0_AUTH_CLIENT_ID
   valueFrom:
     secretKeyRef:
@@ -396,7 +396,7 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-{{- if .Values.casSettings.env.ENABLE_LEGACY_MODE }}
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
 - name: FIFTYONE_TEAMS_AUDIENCE
   value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
 - name: FIFTYONE_TEAMS_CLIENT_ID
@@ -429,7 +429,7 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
-{{- if .Values.casSettings.env.ENABLE_LEGACY_MODE }}
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
 - name: AUTH0_AUDIENCE
   value: "https://$(AUTH0_DOMAIN)/api/v2/"
 - name: AUTH0_BASE_URL
