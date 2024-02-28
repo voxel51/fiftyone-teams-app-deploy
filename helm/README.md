@@ -43,8 +43,7 @@ This directory contains resources and information related to Helm deployments
   - `gke-example` contains additional kubernetes resources
      to install FiftyOne Teams on Google Kubernetes Engine (GKE).
      See
-  [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke)
-  .
+  [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
 - Files
   - `values.yaml` is example of overrides for the chart's defaults for a deployment
 
