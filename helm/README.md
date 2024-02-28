@@ -165,8 +165,7 @@ helm install cert-manager jetstack/cert-manager --set installCRDs=true
 ```
 
 You can use the cert-manager instructions to
-[verify the cert-manager Installation](https://cert-manager.io/v1.4-docs/installation/verify/)
-.
+[verify the cert-manager Installation](https://cert-manager.io/v1.4-docs/installation/verify/).
 
 #### Create a ClusterIssuer
 
