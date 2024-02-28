@@ -202,7 +202,7 @@ casSettings:
     # -- Allow Admins to invite users by email
     # NOTE: This is not supported when FIFTYONE_AUTH_MODE is `internal`
     FEATURE_FLAG_ENABLE_INVITATIONS: true
-    # -- Configure `legacy` or `internal` Authentication Mode
+    # -- Configure Authentication Mode.
     # One of `legacy` or `internal`
     FIFTYONE_AUTH_MODE: internal
   image:
