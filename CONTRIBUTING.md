@@ -53,7 +53,8 @@
     ```
 
 1. Set skaffold secrets.
-   See [skaffold](#skaffold)
+   See
+   [skaffold](#skaffold)
 
 1. Run skaffold
 
@@ -293,7 +294,8 @@ GCP project `computer-vision-team`, configure minikube and skaffold
     minikube addons enable gcp-auth
     ```
 
-1. In [skaffold.yaml](./skaffold.yaml)
+1. In
+   [skaffold.yaml](./skaffold.yaml)
    comment `imagePullSecrets` for the helm release named `fiftyone-teams-app`
    in `setValueTemplates.imagePullSecrets[0].name=regcred`
 
@@ -407,7 +409,8 @@ To run released images from Docker hub, configure minikube and Skaffold
       --namespace "${NAMESPACE}" \
     ```
 
-1. In [skaffold.yaml](./skaffold.yaml)
+1. In
+   [skaffold.yaml](./skaffold.yaml)
    set `imagePullSecrets` for the helm release named `fiftyone-teams-app`
    in `setValueTemplates.imagePullSecrets[0].name=regcred`
 
@@ -482,7 +485,9 @@ This section assumes the use of TLS certificates and the `https` protocol.
 > _Note:_ For local development with, we use the
 > Auth0 Tenant `dev-fiftyone` and the Auth0 Application `local-dev`.
 > The `local-dev` app contains the setting Allowed Callback URLs
-> (aka Redirect URLs) with [https://local.fiftyone.ai](https://local.fiftyone.ai).
+> (aka Redirect URLs) with
+> [https://local.fiftyone.ai](https://local.fiftyone.ai)
+> .
 > In `skaffold.yaml`, in both `appSettings.env` and `teamsAppSettings.env`,
 > either omit `APP_USE_HTTPS=false` or set `APP_USE_HTTPS=true`
 > for the app to set the Redirect URL's protocol to `https`.
@@ -536,10 +541,11 @@ With the port forward running,
 
 > _Note:_ For local development, we use the Auth0 Tenant `dev-fiftyone` and
 > the Auth0 Application `local-dev` contains the setting Allowed Callback URLs
-> (aka Redirect URLs) with [http://localhost:3000](http://localhost:3000).
+> (aka Redirect URLs) with
+> [http://localhost:3000](http://localhost:3000).
 > In `skaffold.yaml` we set `APP_USE_HTTPS=false`
 > to prohibit the app from setting the Redirect URL protocol to `https`.
 > Must be set in both `appSettings.env` and `teamsAppSettings.env`.
 > Without this setting, the app code makes the callback URL
-> [https://localhost:3000](https://localhost:3000) and Auth0
-> throws a Callback URL mismatch error.
+> [https://localhost:3000](https://localhost:3000)
+> and Auth0 throws a Callback URL mismatch error.

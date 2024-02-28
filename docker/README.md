@@ -48,11 +48,12 @@ For Docker Hub credentials, please contact your Voxel51 support team.
 
 ## Initial Installation vs. Upgrades
 
-When performing an initial installation, in `compose.yaml` set
+When performing an initial installation, in `compose.override.yaml` set
 `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`.
 When performing a FiftyOne Teams upgrade, set
 `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
-See [Upgrade Process Recommendations](#upgrade-process-recommendations).
+See
+[Upgrade Process Recommendations](#upgrade-process-recommendations).
 
 The environment variable `FIFTYONE_DATABASE_ADMIN`
 controls whether the database may be migrated.
@@ -130,7 +131,8 @@ Supported locations are network mounted filesystems and cloud storage folders.
     loaded in the `fiftyone-api` container have full edit capabilities to
     this bucket
 
-See the [configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
+See the
+[configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
 for other configuration values that control the behavior of automatic snapshot archival.
 
 #### Enabling FiftyOne Teams Authenticated API
@@ -173,14 +175,15 @@ There are three modes for plugins
 1. Plugins run in a dedicated `teams-plugins` deployment
     - To enable this mode, use the file
       [./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
-      instead of the
+      instead of
       [./compose.yaml](./compose.yaml)
     - Containers need the following access to plugin storage
       - `teams-plugins` requires `read`
       - `fiftyone-api` requires `read-write`
-    - If you are [using a proxy](#environment-proxies), add the
-      `teams-plugins` service name to your `no_proxy` and
-      `NO_PROXY` environment variables.
+    - If you are
+      [using a proxy](#environment-proxies),
+      add the `teams-plugins` service name to your `no_proxy` and `NO_PROXY`
+      environment variables.
     - Example `docker compose` command for this mode
 
         ```shell
@@ -334,7 +337,7 @@ versions prior to FiftyOne Teams version 1.1.0:
    for details)
 1. [Upgrade to FiftyOne Teams version 1.5.6](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
-   (this is not the default in the `compose.yaml` for this release).
+   (this is not the default for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
       FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.6`
 1. Upgrade your FiftyOne SDKs to version 0.15.6
@@ -404,6 +407,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     1. Rename the `env.template` file to `.env`
     1. Edit the `.env` file, setting the parameters required for this deployment.
        [See table below](#fiftyone-teams-environment-variables).
+    1. Create a `compose.override.yaml` with any configuration overrides for
+       this deployment.
 1. In the same directory, run
 
     ```shell

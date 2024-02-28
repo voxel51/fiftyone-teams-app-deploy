@@ -1,0 +1,34 @@
+---
+# For Proxy Server instructions please see
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+services:
+  fiftyone-app:
+    extends:
+      file: common-services.yaml
+      service: fiftyone-app-common
+  teams-api:
+    extends:
+      file: common-services.yaml
+      service: teams-api-common
+    environment:
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+    volumes:
+      - plugins-vol:/opt/plugins
+  teams-app:
+    extends:
+      file: common-services.yaml
+      service: teams-app-common
+    environment:
+      FIFTYONE_TEAMS_PLUGIN_URL: ${FIFTYONE_TEAMS_PLUGIN_URL}
+  teams-cas:
+    extends:
+      file: common-services.yaml
+      service: teams-cas-common
+  teams-plugins:
+    extends:
+      file: common-services.yaml
+      service: teams-plugins-common
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+volumes:
+  plugins-vol:

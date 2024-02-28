@@ -24,9 +24,12 @@ storage for FiftyOne Teams Plugins using
 Alternate storage solutions vary based on cloud providers and infrastructure services.
 PVCs may be configured using provider specific services
 
-* Google Cloud [Filestore](https://cloud.google.com/filestore/docs)
-* Amazon [EFS](https://aws.amazon.com/efs/)
-* Azure [Files](https://learn.microsoft.com/en-us/azure/storage/files/).
+* Google Cloud
+  [Filestore](https://cloud.google.com/filestore/docs)
+* Amazon
+  [EFS](https://aws.amazon.com/efs/)
+* Azure
+  [Files](https://learn.microsoft.com/en-us/azure/storage/files/).
 
 ## NFS Share
 

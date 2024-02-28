@@ -42,7 +42,8 @@ This directory contains resources and information related to Helm deployments
      For the chart documentation, see the fiftyone-teams-app/README.md file.
   - `gke-example` contains additional kubernetes resources
      to install FiftyOne Teams on Google Kubernetes Engine (GKE).
-     See [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
+     See
+  [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
 - Files
   - `values.yaml` is example of overrides for the chart's defaults for a deployment
 
@@ -206,7 +207,8 @@ helm install fiftyone-mongodb \
 Wait until the MongoDB pods are in the `Ready` state before
 beginning the "Install FiftyOne Teams App" instructions.
 
-While waiting, [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+While waiting,
+[configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
 
 To determine the state of the `fiftyone-mongodb` pods, run
 
