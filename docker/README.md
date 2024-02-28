@@ -48,7 +48,7 @@ For Docker Hub credentials, please contact your Voxel51 support team.
 
 ## Initial Installation vs. Upgrades
 
-When performing an initial installation, in `compose.yaml` set
+When performing an initial installation, in `compose.override.yaml` set
 `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`.
 When performing a FiftyOne Teams upgrade, set
 `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
@@ -156,8 +156,7 @@ There are three modes for plugins
 1. Plugins run in the `fiftyone-app` deployment
     - To enable this mode, use the file
       [./compose.plugins.yaml](./compose.plugins.yaml)
-      instead of
-      [./compose.yaml](./compose.yaml)
+      instead of [./compose.yaml](./compose.yaml)
     - Containers need the following access to plugin storage
       - `fiftyone-app` requires `read`
       - `fiftyone-api` requires `read-write`
@@ -173,8 +172,7 @@ There are three modes for plugins
 1. Plugins run in a dedicated `teams-plugins` deployment
     - To enable this mode, use the file
       [./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
-      instead of the
-      [./compose.yaml](./compose.yaml)
+      instead of [./compose.yaml](./compose.yaml)
     - Containers need the following access to plugin storage
       - `teams-plugins` requires `read`
       - `fiftyone-api` requires `read-write`
@@ -190,10 +188,8 @@ There are three modes for plugins
           up -d
         ```
 
-Both
-[./compose.plugins.yaml](./compose.plugins.yaml)
-and
-[./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
+Both [./compose.plugins.yaml](./compose.plugins.yaml)
+and [./compose.dedicated-plugins.yaml](./compose.dedicated-plugins.yaml)
 create a new Docker Volume shared between FiftyOne Teams services.
 For multi-node deployments, please implement a storage
 solution allowing the access the deployed plugins.
@@ -334,7 +330,7 @@ versions prior to FiftyOne Teams version 1.1.0:
    for details)
 1. [Upgrade to FiftyOne Teams version 1.5.6](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
-   (this is not the default in the `compose.yaml` for this release).
+   (this is not the default for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
       FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.6`
 1. Upgrade your FiftyOne SDKs to version 0.15.6
@@ -404,6 +400,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     1. Rename the `env.template` file to `.env`
     1. Edit the `.env` file, setting the parameters required for this deployment.
        [See table below](#fiftyone-teams-environment-variables).
+    1. Create a `compose.override.yaml` with any configuration overrides for
+    this deployment.
 1. In the same directory, run
 
     ```shell
