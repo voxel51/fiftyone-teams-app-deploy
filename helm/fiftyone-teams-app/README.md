@@ -328,8 +328,8 @@ appSettings:
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
 | casSettings.env.CAS_LOG_LEVEL | string | `"INFO"` | Set the CAS Log Level One of `DEBUG`, `INFO`, `WARN`, `ERROR` |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone` that contains the CAS MongoDB Connection String. |
-| casSettings.env.ENABLE_LEGACY_MODE | bool | `true` | Toggle CAS Legacy Mode, which continues to use Auth0 integration |
-| casSettings.env.FEATURE_FLAG_ENABLE_INVITATIONS | bool | `true` | Allow Admins to invite users by email NOTE: This is not supported when ENABLE_LEGACY_MODE is `false` |
+| casSettings.env.FEATURE_FLAG_ENABLE_INVITATIONS | bool | `true` | Allow Admins to invite users by email NOTE: This is not supported when FIFTYONE_AUTH_MODE is `internal` |
+| casSettings.env.FIFTYONE_AUTH_MODE | string | `"internal"` | Configure Authentication Mode. One of `legacy` or `internal` |
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/teams-cas"` | Container image for teams-cas. |
 | casSettings.image.tag | string | `""` | Image tag for teams-cas. Defaults to the chart version. |
