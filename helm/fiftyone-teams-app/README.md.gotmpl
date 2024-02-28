@@ -78,7 +78,8 @@ After the initial installation, we recommend either commenting
 this environment variable or changing the value to `false`.
 
 When performing an upgrade, please review
-[Upgrading From Previous Versions](#upgrading-from-previous-versions).
+[Upgrading From Previous Versions](#upgrading-from-previous-versions)
+.
 
 ## FiftyOne Features
 
@@ -102,7 +103,8 @@ Supported locations are network mounted filesystems and cloud storage folders.
   - Mount a Persistent Volume Claim with `ReadWrite` permissions to
     the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path.
     For an example, see
-    [Plugins Storage](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md).
+    [Plugins Storage](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+    .
 - Cloud storage folder
   - In `values.yaml`, set the cloud storage path (for example
     `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
@@ -113,7 +115,8 @@ Supported locations are network mounted filesystems and cloud storage folders.
     [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
     loaded in the `teams-api` deployment have full edit capabilities to this bucket
 
-See the [configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
+See the
+[configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
 for other configuration values that control the behavior of automatic snapshot archival.
 
 ### FiftyOne Teams Authenticated API
@@ -124,7 +127,8 @@ through the FiftyOne Teams API (instead of direct MongoDB connection).
 To enable the FiftyOne Teams Authenticated API,
 [expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
 and
-[configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+[configure your SDK](https://docs.voxel51.com/teams/api_connection.html)
+.
 
 ### FiftyOne Teams Plugins
 
@@ -164,8 +168,9 @@ There are three modes for plugins
               at the `FIFTYONE_PLUGINS_DIR` path
             - `ReadOnly` permission to the `teams-plugins` deployment
               at the `FIFTYONE_PLUGINS_DIR` path
-        - If you are [using a proxy](#proxies), add the
-          `teams-plugins` service name to your `no_proxy` and
+        - If you are
+          [using a proxy](#proxies)
+          , add the `teams-plugins` service name to your `no_proxy` and
           `NO_PROXY` environment variables.
 
 Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPOY_URL>/settings/plugins`.
@@ -221,9 +226,9 @@ To configure this, set the following environment variables on
     ```
 
     > **NOTE**: If you have enabled a
-    > [dedicated `teams-plugins`](#fiftyone-teams-plugins) deployment
-    > you will need to include `teams-plugins` in your `NO_PROXY` and `no_proxy`
-    > configurations
+    > [dedicated `teams-plugins`](#fiftyone-teams-plugins)
+    > deployment you will need to include `teams-plugins` in your `NO_PROXY` and
+    > `no_proxy` configurations
 
     ---
 
@@ -240,9 +245,9 @@ To configure this, set the following environment variables on
     ```
 
     > **NOTE**: If you have enabled a
-    > [dedicated `teams-plugins`](#fiftyone-teams-plugins) deployment
-    > you will need to include `teams-plugins` in your `GLOBAL_AGENT_NO_PROXY``
-    > configuration
+    > [dedicated `teams-plugins`](#fiftyone-teams-plugins)
+    > deployment you will need to include `teams-plugins` in your
+    > `GLOBAL_AGENT_NO_PROXY` configuration
 
     ---
 
@@ -279,7 +284,8 @@ ROARR_LOG: false
 
 Since version v1.2, FiftyOne Teams supports using text similarity
 searches for images that are indexed with a model that
-[supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text).
+[supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text)
+.
 Use the Voxel51 provided image `fiftyone-app-torch` or
 build your own base image including `torch` (PyTorch).
 
@@ -390,7 +396,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
 ## Launch FiftyOne Teams
 
 A minimal example `values.yaml` may be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml)
+.
 
 1. Edit the `values.yaml` file
 1. Deploy FiftyOne Teams with `helm install`
@@ -411,7 +418,8 @@ A minimal example `values.yaml` may be found
 
         > **NOTE**  To view the changes Helm would apply during installations
         > and upgrades, consider using
-        > [helm diff](https://github.com/databus23/helm-diff).
+        > [helm diff](https://github.com/databus23/helm-diff)
+        > .
         > Voxel51 is not affiliated with the author of this plugin.
         >
         >    For example:

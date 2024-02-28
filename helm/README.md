@@ -42,7 +42,9 @@ This directory contains resources and information related to Helm deployments
      For the chart documentation, see the fiftyone-teams-app/README.md file.
   - `gke-example` contains additional kubernetes resources
      to install FiftyOne Teams on Google Kubernetes Engine (GKE).
-     See [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
+     See
+  [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke)
+  .
 - Files
   - `values.yaml` is example of overrides for the chart's defaults for a deployment
 
@@ -108,7 +110,8 @@ These instructions assume you have
       please update the command line accordingly.
 - Auth0 configuration information from Voxel51.
   - If you have not received this information, please contact your
-    [Voxel51 Support Team](mailto:support@voxel51.com).
+    [Voxel51 Support Team](mailto:support@voxel51.com)
+ .
 
 #### Download the Example Configuration Files
 
@@ -164,7 +167,8 @@ helm install cert-manager jetstack/cert-manager --set installCRDs=true
 ```
 
 You can use the cert-manager instructions to
-[verify the cert-manager Installation](https://cert-manager.io/v1.4-docs/installation/verify/).
+[verify the cert-manager Installation](https://cert-manager.io/v1.4-docs/installation/verify/)
+.
 
 #### Create a ClusterIssuer
 
@@ -206,7 +210,9 @@ helm install fiftyone-mongodb \
 Wait until the MongoDB pods are in the `Ready` state before
 beginning the "Install FiftyOne Teams App" instructions.
 
-While waiting, [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+While waiting,
+[configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry)
+.
 
 To determine the state of the `fiftyone-mongodb` pods, run
 
@@ -235,7 +241,8 @@ kubectl apply -f frontend-config.yaml
 ```
 
 For more information, see
-[HTTP to HTTPS redirects](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#https_redirect).
+[HTTP to HTTPS redirects](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#https_redirect)
+.
 
 #### Install FiftyOne Teams App
 
@@ -270,7 +277,8 @@ kubectl delete secret fiftyone-teams-cert-secret
 ```
 
 Further instructions for debugging ACME certificates are on the
-[cert-manager docs site](https://cert-manager.io/docs/faq/acme/).
+[cert-manager docs site](https://cert-manager.io/docs/faq/acme/)
+.
 
 Once your installation is complete, browse to
 `/settings/cloud_storage_credentials`
@@ -280,4 +288,5 @@ and add your storage credentials to access sample data.
 
 Congratulations! You should now be able to access your
 FiftyOne Teams installation at the DNS address you created
-[earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+[earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry)
+.
