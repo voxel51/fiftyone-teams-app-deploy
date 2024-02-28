@@ -95,8 +95,8 @@ services:
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE}
       CAS_LOG_LEVEL: ${CAS_LOG_LEVEL}
       CAS_MONGODB_URI: ${CAS_MONGO_DB_URI:-$FIFTYONE_DATABASE_URI}
-      ENABLE_LEGACY_MODE: false
       FEATURE_FLAG_ENABLE_INVITATIONS: false
+      FIFTYONE_AUTH_MODE: internal
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       NEXTAUTH_URL: ${BASE_URL}/cas/api/auth
       # If you are routing through a proxy server you will want to set
