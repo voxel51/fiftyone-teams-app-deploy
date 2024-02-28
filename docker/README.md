@@ -181,8 +181,8 @@ There are three modes for plugins
       - `teams-plugins` requires `read`
       - `fiftyone-api` requires `read-write`
     - If you are
-      [using a proxy](#environment-proxies)
-      , add the `teams-plugins` service name to your `no_proxy` and `NO_PROXY`
+      [using a proxy](#environment-proxies),
+      add the `teams-plugins` service name to your `no_proxy` and `NO_PROXY`
       environment variables.
     - Example `docker compose` command for this mode
 
