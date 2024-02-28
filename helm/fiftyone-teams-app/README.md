@@ -589,8 +589,7 @@ A minimal example `values.yaml` may be found
 
         > **NOTE**  To view the changes Helm would apply during installations
         > and upgrades, consider using
-        > [helm diff](https://github.com/databus23/helm-diff)
-        > .
+        > [helm diff](https://github.com/databus23/helm-diff).
         > Voxel51 is not affiliated with the author of this plugin.
         >
         >    For example:
