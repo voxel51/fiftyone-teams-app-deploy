@@ -288,8 +288,8 @@ ROARR_LOG: false
 
 FiftyOne Teams version 1.2 and higher supports using text
 similarity searches for images that are indexed with a model that
-[supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text)
-. To use this feature, use a container image containing
+[supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text).
+To use this feature, use a container image containing
 `torch` (PyTorch) instead of the `fiftyone-app` image.
 Use the Voxel51 provided image `fiftyone-app-torch` or
 build your own base image including `torch`.
