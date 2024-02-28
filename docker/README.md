@@ -306,8 +306,7 @@ services:
 ```
 
 For more information, see the docs for
-[Docker Compose Extend](https://docs.docker.com/compose/extends/)
-.
+[Docker Compose Extend](https://docs.docker.com/compose/extends/).
 
 ## Upgrade Process Recommendations
 
