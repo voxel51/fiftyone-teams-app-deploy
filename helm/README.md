@@ -272,8 +272,7 @@ kubectl delete secret fiftyone-teams-cert-secret
 ```
 
 Further instructions for debugging ACME certificates are on the
-[cert-manager docs site](https://cert-manager.io/docs/faq/acme/)
-.
+[cert-manager docs site](https://cert-manager.io/docs/faq/acme/).
 
 Once your installation is complete, browse to
 `/settings/cloud_storage_credentials`
