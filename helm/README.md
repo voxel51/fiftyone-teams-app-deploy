@@ -237,8 +237,7 @@ kubectl apply -f frontend-config.yaml
 ```
 
 For more information, see
-[HTTP to HTTPS redirects](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#https_redirect)
-.
+[HTTP to HTTPS redirects](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#https_redirect).
 
 #### Install FiftyOne Teams App
 
