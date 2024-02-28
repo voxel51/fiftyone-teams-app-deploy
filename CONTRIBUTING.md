@@ -485,7 +485,9 @@ This section assumes the use of TLS certificates and the `https` protocol.
 > _Note:_ For local development with, we use the
 > Auth0 Tenant `dev-fiftyone` and the Auth0 Application `local-dev`.
 > The `local-dev` app contains the setting Allowed Callback URLs
-> (aka Redirect URLs) with [https://local.fiftyone.ai](https://local.fiftyone.ai).
+> (aka Redirect URLs) with
+> [https://local.fiftyone.ai](https://local.fiftyone.ai)
+> .
 > In `skaffold.yaml`, in both `appSettings.env` and `teamsAppSettings.env`,
 > either omit `APP_USE_HTTPS=false` or set `APP_USE_HTTPS=true`
 > for the app to set the Redirect URL's protocol to `https`.

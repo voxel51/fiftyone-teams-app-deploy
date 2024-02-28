@@ -11,7 +11,9 @@ We order the resource creation by
 This ordering avoids errors during resource cleanup
 and avoids using Helm to manage CRDs.
 
-See [../../skaffold-cert-manager.yaml](../../skaffold-cert-manager.yaml).
+See
+[../../skaffold-cert-manager.yaml](../../skaffold-cert-manager.yaml)
+.
 
 The ingress will be annotated to obtain a
 certificate from cert-manger for its defined host.
