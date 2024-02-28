@@ -401,7 +401,7 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     1. Edit the `.env` file, setting the parameters required for this deployment.
        [See table below](#fiftyone-teams-environment-variables).
     1. Create a `compose.override.yaml` with any configuration overrides for
-    this deployment.
+        this deployment.
 1. In the same directory, run
 
     ```shell
