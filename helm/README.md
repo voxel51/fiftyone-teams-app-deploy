@@ -109,8 +109,7 @@ These instructions assume you have
       please update the command line accordingly.
 - Auth0 configuration information from Voxel51.
   - If you have not received this information, please contact your
-    [Voxel51 Support Team](mailto:support@voxel51.com)
- .
+    [Voxel51 Support Team](mailto:support@voxel51.com).
 
 #### Download the Example Configuration Files
 
