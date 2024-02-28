@@ -542,8 +542,7 @@ With the port forward running,
 > _Note:_ For local development, we use the Auth0 Tenant `dev-fiftyone` and
 > the Auth0 Application `local-dev` contains the setting Allowed Callback URLs
 > (aka Redirect URLs) with
-> [http://localhost:3000](http://localhost:3000)
-> .
+> [http://localhost:3000](http://localhost:3000).
 > In `skaffold.yaml` we set `APP_USE_HTTPS=false`
 > to prohibit the app from setting the Redirect URL protocol to `https`.
 > Must be set in both `appSettings.env` and `teamsAppSettings.env`.
