@@ -57,19 +57,17 @@ secret:
 #     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==0.15.7
 
 
-# appSettings:
-#   env:
-#     # FIFTYONE_DATABASE_ADMIN is set to `false` by default for installs.
-#     # If you are performing a new install or an upgrade from
-#     # v1.0 or earlier you may want to set this value to `true`.
-#     # Please see https://helm.fiftyone.ai/#initial-installation-vs-upgrades for details.
-#     # FIFTYONE_DATABASE_ADMIN: false
-#     FIFTYONE_DATABASE_ADMIN: true
-#     # Set FIFTYONE_PLUGINS_DIR and FIFTYONE_PLUGINS_CACHE_ENABLED
-#     # when enabling plugins in the `fiftyone-app` deployment
-#     # See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm#enabling-fiftyone-teams-plugins
-#     # FIFTYONE_PLUGINS_DIR: /opt/plugins
-#     # FIFTYONE_PLUGINS_CACHE_ENABLED: true
+appSettings:
+  env:
+    # When performing a new install, use this override.
+    # After the initial installation, remove this value to use the Chart's default value `false.`
+    # Please see https://helm.fiftyone.ai/#initial-installation-vs-upgrades for details.
+    FIFTYONE_DATABASE_ADMIN: true
+    # Set FIFTYONE_PLUGINS_DIR and FIFTYONE_PLUGINS_CACHE_ENABLED
+    # when enabling plugins in the `fiftyone-app` deployment
+    # See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm#enabling-fiftyone-teams-plugins
+    # FIFTYONE_PLUGINS_DIR: /opt/plugins
+    # FIFTYONE_PLUGINS_CACHE_ENABLED: true
 
 # pluginsSettings:
 #   enabled: true
