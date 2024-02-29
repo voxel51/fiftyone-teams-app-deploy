@@ -193,28 +193,19 @@ Create a merged list of environment variables for fiftyone-teams-api
 */}}
 {{- define "fiftyone-teams-api.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
-{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
-- name: AUTH0_API_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: apiClientId
-- name: AUTH0_API_CLIENT_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: apiClientSecret
-- name: AUTH0_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
-- name: AUTH0_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientId
+- name: CAS_BASE_URL
+  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name .Values.casSettings.service.port | quote }}
+- name: FEATURE_FLAG_ENABLE_INVITATIONS
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "internal" }}
+  value: "false"
+{{- else }}
+  value: "{{ .Values.casSettings.enable_invitations }}"
 {{- end }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -235,13 +226,6 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-- name: CAS_BASE_URL
-  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name .Values.casSettings.service.port | quote }}
-- name: FIFTYONE_AUTH_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneAuthSecret
 {{- range $key, $val := .Values.apiSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -275,25 +259,6 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
-- name: FIFTYONE_TEAMS_AUDIENCE
-  value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
-- name: FIFTYONE_TEAMS_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientId
-- name: FIFTYONE_TEAMS_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
-- name: FIFTYONE_TEAMS_ORGANIZATION
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: organizationId
-{{- end }}
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -310,11 +275,15 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: {{ .Values.casSettings.env.CAS_MONGODB_URI_KEY }}
+- name: CAS_URL
+  value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName | quote }}
 - name: FIFTYONE_AUTH_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
+- name: NEXTAUTH_URL
+  value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
 {{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
 - name: AUTH0_AUTH_CLIENT_ID
   valueFrom:
@@ -359,8 +328,6 @@ Create a merged list of environment variables for fiftyone-teams-cas
       name: {{ $secretName }}
       key: mongodbConnectionString
 {{- end }}
-- name: NEXTAUTH_URL
-  value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
 {{- range $key, $val := .Values.casSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -396,25 +363,6 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
-- name: FIFTYONE_TEAMS_AUDIENCE
-  value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
-- name: FIFTYONE_TEAMS_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientId
-- name: FIFTYONE_TEAMS_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
-- name: FIFTYONE_TEAMS_ORGANIZATION
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: organizationId
-{{- end }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -429,38 +377,11 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
-{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
-- name: AUTH0_AUDIENCE
-  value: "https://$(AUTH0_DOMAIN)/api/v2/"
-- name: AUTH0_BASE_URL
-  value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName | quote }}
-- name: AUTH0_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientId
-- name: AUTH0_CLIENT_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientSecret
-- name: AUTH0_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
-- name: AUTH0_ISSUER_BASE_URL
-  value: "https://$(AUTH0_DOMAIN)"
-- name: AUTH0_ORGANIZATION
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: organizationId
-- name: AUTH0_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: cookieSecret
+- name: FEATURE_FLAG_ENABLE_INVITATIONS
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "internal" }}
+  value: "false"
+{{- else }}
+  value: "{{ .Values.casSettings.enable_invitations }}"
 {{- end }}
 - name: FIFTYONE_API_URI
 {{- if .Values.teamsAppSettings.fiftyoneApiOverride }}
@@ -487,9 +408,6 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- else }}
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name .Values.appSettings.service.port | quote }}
 {{- end }}
-- name: NEXTAUTH_BASEPATH
-  value: "/cas/api/auth"
-
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
