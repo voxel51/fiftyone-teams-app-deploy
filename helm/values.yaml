@@ -69,6 +69,7 @@ secret:
 #     # when enabling plugins in the `fiftyone-app` deployment
 #     # See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm#enabling-fiftyone-teams-plugins
 #     # FIFTYONE_PLUGINS_DIR: /opt/plugins
+#     # FIFTYONE_PLUGINS_CACHE_ENABLED: true
 
 # pluginsSettings:
 #   enabled: true
