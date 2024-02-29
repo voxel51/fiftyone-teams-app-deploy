@@ -186,6 +186,9 @@ appSettings:
 
 # Central Authentication Service (teams-cas) configurations
 casSettings:
+  # -- Allow ADMINs to invite users by email
+  # NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal`
+  enable_invitations: true
   # Environment Variables are passed to the teams-cas containers
   env:
     # -- Provide the name for the CAS database
@@ -193,18 +196,18 @@ casSettings:
     # -- Set the default user role for new users
     # One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN`
     CAS_DEFAULT_USER_ROLE: GUEST
-    # -- Set the CAS Log Level
-    # One of `DEBUG`, `INFO`, `WARN`, `ERROR`
-    CAS_LOG_LEVEL: INFO
-    # -- The key from `secret.fiftyone` that contains the CAS MongoDB Connection
-    # String.
+    # -- The key from `secret.fiftyone.name` that contains the CAS MongoDB
+    # Connection String.
     CAS_MONGODB_URI_KEY: mongodbConnectionString
-    # -- Allow Admins to invite users by email
-    # NOTE: This is not supported when FIFTYONE_AUTH_MODE is `internal`
-    FEATURE_FLAG_ENABLE_INVITATIONS: true
+    # -- Set the log level for CAS
+    # examples:
+    # `DEBUG: cas:*` - shows all CAS logs
+    # `DEBUG: cas:*:info` - shows all CAS INFO logs
+    # `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs
+    DEBUG: cas:*,-cas:*:debug
     # -- Configure Authentication Mode.
     # One of `legacy` or `internal`
-    FIFTYONE_AUTH_MODE: internal
+    FIFTYONE_AUTH_MODE: legacy
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
