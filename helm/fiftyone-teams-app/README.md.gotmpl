@@ -318,7 +318,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.15.6 SDK (database version 0.23.5) is _NOT_ backwards-compatible
+The FiftyOne 0.16.0 SDK (database version 0.23.5) is _NOT_ backwards-compatible
 with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible
 with current FiftyOne Teams Database Versions.
@@ -331,12 +331,12 @@ versions prior to FiftyOne Teams version 1.1.0:
 1. In your `values.yaml`, set the required
    [FIFTYONE_ENCRYPTION_KEY](#storage-credentials-and-fiftyone_encryption_key)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.5.6](#launch-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.6.0](#launch-fiftyone-teams)
    with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
    (this is not the default value in `values.yaml` and must be overridden).
     > **NOTE:** At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==0.15.6`
-1. Upgrade your FiftyOne SDKs to version 0.15.6
+    > FiftyOne Teams Database until they upgrade to `fiftyone==0.16.0`
+1. Upgrade your FiftyOne SDKs to version 0.16.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -354,10 +354,10 @@ versions prior to FiftyOne Teams version 1.1.0:
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.15.6 SDK is backwards-compatible with
+The FiftyOne 0.16.0 SDK is backwards-compatible with
 FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.5.6
-database (version 0.23.5) with any FiftyOne SDK before 0.15.6.
+You will not be able to connect to a FiftyOne Teams 1.6.0
+database (version 0.23.5) with any FiftyOne SDK before 0.16.0.
 
 We recommend using the latest version of the FiftyOne SDK
 compatible with your FiftyOne Teams deployment.
@@ -369,8 +369,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.5.6](#launch-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.6
+1. [Upgrade to FiftyOne Teams version 1.6.0](#launch-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -380,8 +380,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.15.6 will lose database connectivity
-    >  at this point. Upgrading to `fiftyone==0.15.6` is required
+    > **NOTE** Any FiftyOne SDK less than 0.16.0 will lose database connectivity
+    >  at this point. Upgrading to `fiftyone==0.16.0` is required
 
 1. Validate that all datasets are now at version 0.23.5, by running
 
