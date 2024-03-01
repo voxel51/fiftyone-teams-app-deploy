@@ -233,7 +233,9 @@ To configure this, set the following environment variables on
     > you will need to include the override service names in your `NO_PROXY` and
     > `no_proxy` configurations instead
 
-1. The pod based on the `fiftyone-teams-app` image (`teamsAppSettings.env`)
+1. The deployments based on the `fiftyone-teams-app` (`teamsAppSettings.env`) or
+   `fiftyone-teams-cas` (`casSettings.env`) images
+
 
     ```yaml
     GLOBAL_AGENT_HTTP_PROXY: http://proxy.yourcompany.tld:3128

@@ -1,7 +1,7 @@
 ---
 services:
   fiftyone-app-common:
-    image: voxel51/fiftyone-app:v1.6.0-beta.1
+    image: voxel51/fiftyone-app:v1.6.0-beta.2
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -29,7 +29,7 @@ services:
     restart: always
 
   teams-api-common:
-    image: voxel51/fiftyone-teams-api:v1.6.0-beta.1
+    image: voxel51/fiftyone-teams-api:v1.6.0-beta.2
     environment:
       CAS_BASE_URL: ${CAS_BASE_URL}
       FEATURE_FLAG_ENABLE_INVITATIONS: false
@@ -57,14 +57,14 @@ services:
     restart: always
 
   teams-app-common:
-    image: voxel51/fiftyone-teams-app:v1.6.0-beta.1
+    image: voxel51/fiftyone-teams-app:v1.6.0-beta.2
     environment:
       API_URL: ${API_URL}
       APP_USE_HTTPS: ${APP_USE_HTTPS:-true}
       FEATURE_FLAG_ENABLE_INVITATIONS: false
       FIFTYONE_API_URI: ${FIFTYONE_API_URI:-"Please contact your Admin for an API URI"}
       FIFTYONE_APP_ALLOW_MEDIA_EXPORT: ${FIFTYONE_APP_ALLOW_MEDIA_EXPORT:-true}
-      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.16.0b1
+      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 0.16.0b2
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
@@ -90,7 +90,7 @@ services:
     restart: always
 
   teams-cas-common:
-    image: voxel51/fiftyone-teams-cas:v1.6.0-beta.1
+    image: voxel51/fiftyone-teams-cas:v1.6.0-beta.2
     environment:
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE}
@@ -119,7 +119,7 @@ services:
     restart: always
 
   teams-plugins-common:
-    image: voxel51/fiftyone-app:v1.6.0-beta.1
+    image: voxel51/fiftyone-app:v1.6.0-beta.2
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}

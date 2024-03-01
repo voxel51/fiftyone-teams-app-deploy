@@ -253,7 +253,8 @@ To configure this, set following environment variables on
     NO_PROXY: ${NO_PROXY_LIST}
     ```
 
-1. All containers based on the `fiftyone-teams-app` image
+1. All containers based on the `fiftyone-teams-app` and `fiftyone-teams-cas`
+   images
 
     ```yaml
     GLOBAL_AGENT_HTTP_PROXY: ${HTTP_PROXY_URL}
@@ -268,16 +269,18 @@ By default these service names are
 - `fiftyone-app`
 - `teams-api`
 - `teams-app`
+- `teams-cas`
 - `teams-plugins`
 
 Examples of these settings are included in the FiftyOne Teams configuration files
 
-- [common-services.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/common-services.yaml)
-- [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template)
+- [common-services.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/internal-auth/common-services.yaml)
+- [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/internal-auth/env.template)
 
 By default, the Global Agent Proxy will log all outbound connections
 and identify which connections are routed through the proxy.
-To reduce the logging verbosity, add this environment variable to your `teamsAppSettings.env`
+To reduce the logging verbosity, add this environment variable to your
+`teams-app` and `teams-cas` services.
 
 ```ini
 ROARR_LOG: false

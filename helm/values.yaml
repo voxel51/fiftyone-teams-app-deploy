@@ -63,9 +63,9 @@ appSettings:
 #    FIFTYONE_PLUGINS_DIR: /opt/plugins
 #    FIFTYONE_PLUGINS_CACHE_ENABLED: true
 
-# casSettings:
-#   env:
-#     FIFTYONE_AUTH_MODE: internal
+casSettings:
+  env:
+    FIFTYONE_AUTH_MODE: internal
 
 # pluginsSettings:
 #   enabled: true
