@@ -213,7 +213,7 @@ casSettings:
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
     # -- Container image for teams-cas.
-    repository: voxel51/teams-cas
+    repository: voxel51/fiftyone-teams-cas
     # -- Image tag for teams-cas. Defaults to the chart version.
     tag: ""
 
