@@ -3,4 +3,4 @@
 
 package unit
 
-const chartPath = "../../helm/fiftyone-teams-app/"
+const chartPath = "../../../helm/fiftyone-teams-app/"
