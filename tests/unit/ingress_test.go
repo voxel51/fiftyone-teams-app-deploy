@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -398,7 +397,7 @@ func (s *ingressTemplateTest) TestTls() {
 				var expectedTls []networkingv1.IngressTLS
 				err := json.Unmarshal([]byte(expectedJSON), &expectedTls)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedTls, tls), "TLS should be equal")
+				s.Equal(expectedTls, tls, "TLS should be equal")
 			},
 		},
 		{
@@ -430,7 +429,7 @@ func (s *ingressTemplateTest) TestTls() {
 				var expectedTls []networkingv1.IngressTLS
 				err := json.Unmarshal([]byte(expectedJSON), &expectedTls)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedTls, tls), "TLS should be equal")
+				s.Equal(expectedTls, tls, "TLS should be equal")
 			},
 		},
 	}
@@ -489,7 +488,7 @@ func (s *ingressTemplateTest) TestRules() {
 				var expectedRules []networkingv1.IngressRule
 				err := json.Unmarshal([]byte(expectedJSON), &expectedRules)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedRules, tls), "Rules should be equal")
+				s.Equal(expectedRules, tls, "Rules should be equal")
 			},
 		},
 		{
@@ -522,7 +521,7 @@ func (s *ingressTemplateTest) TestRules() {
 				var expectedRules []networkingv1.IngressRule
 				err := json.Unmarshal([]byte(expectedJSON), &expectedRules)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedRules, tls), "Rules should be equal")
+				s.Equal(expectedRules, tls, "Rules should be equal")
 			},
 		},
 		{
@@ -574,7 +573,7 @@ func (s *ingressTemplateTest) TestRules() {
 				var expectedRules []networkingv1.IngressRule
 				err := json.Unmarshal([]byte(expectedJSON), &expectedRules)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedRules, tls), "Rules should be equal")
+				s.Equal(expectedRules, tls, "Rules should be equal")
 			},
 		},
 		{
@@ -635,7 +634,7 @@ func (s *ingressTemplateTest) TestRules() {
 				var expectedRules []networkingv1.IngressRule
 				err := json.Unmarshal([]byte(expectedJSON), &expectedRules)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedRules, tls), "Rules should be equal")
+				s.Equal(expectedRules, tls, "Rules should be equal")
 			},
 		},
 		{
@@ -736,7 +735,7 @@ func (s *ingressTemplateTest) TestRules() {
 				var expectedRules []networkingv1.IngressRule
 				err := json.Unmarshal([]byte(expectedJSON), &expectedRules)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedRules, tls), "Rules should be equal")
+				s.Equal(expectedRules, tls, "Rules should be equal")
 			},
 		},
 	}

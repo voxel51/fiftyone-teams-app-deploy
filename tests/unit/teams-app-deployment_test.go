@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -358,7 +357,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "0.15.6"
+            "value": "0.15.7"
           },
           {
             "name": "FIFTYONE_APP_THEME",
@@ -372,7 +371,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 				var expectedEnvVars []corev1.EnvVar
 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedEnvVars, envVars), "Envs should be equal")
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
 			},
 		},
 		{
@@ -473,7 +472,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "0.15.6"
+            "value": "0.15.7"
           },
           {
             "name": "FIFTYONE_APP_THEME",
@@ -491,7 +490,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 				var expectedEnvVars []corev1.EnvVar
 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedEnvVars, envVars), "Envs should be equal")
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
 			},
 		},
 	}
@@ -674,7 +673,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedProbe, probe), "Liveness Probes should be equal")
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 			},
 		},
 		{
@@ -695,7 +694,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedProbe, probe), "Liveness Probes should be equal")
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 			},
 		},
 	}
@@ -738,7 +737,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerPorts() {
 				var expectedPorts []corev1.ContainerPort
 				err := json.Unmarshal([]byte(expectedPortsJSON), &expectedPorts)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedPorts, ports), "Ports should be equal")
+				s.Equal(expectedPorts, ports, "Ports should be equal")
 			},
 		},
 		{
@@ -758,7 +757,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerPorts() {
 				var expectedPorts []corev1.ContainerPort
 				err := json.Unmarshal([]byte(expectedPortsJSON), &expectedPorts)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedPorts, ports), "Ports should be equal")
+				s.Equal(expectedPorts, ports, "Ports should be equal")
 			},
 		},
 	}
@@ -802,7 +801,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedProbe, probe), "Readiness Probes should be equal")
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
 			},
 		},
 		{
@@ -823,7 +822,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedProbe, probe), "Readiness Probes should be equal")
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
 			},
 		},
 	}
@@ -987,7 +986,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerVolumeMounts() {
 				var expectedVolumeMounts []corev1.VolumeMount
 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedVolumeMounts, volumeMounts), "Volume Mounts should be equal")
+				s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
 			},
 		},
 		{
@@ -1012,7 +1011,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerVolumeMounts() {
 				var expectedVolumeMounts []corev1.VolumeMount
 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedVolumeMounts, volumeMounts), "Volume Mounts should be equal")
+				s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
 			},
 		},
 	}
@@ -1079,7 +1078,7 @@ func (s *deploymentTeamsAppTemplateTest) TestAffinity() {
 				err := json.Unmarshal([]byte(affinityJSON), &expectedAffinity)
 				s.NoError(err)
 
-				s.True(reflect.DeepEqual(expectedAffinity, *affinity), "Affinity should be equal")
+				s.Equal(expectedAffinity, *affinity, "Affinity should be equal")
 			},
 		},
 	}
@@ -1415,7 +1414,7 @@ func (s *deploymentTeamsAppTemplateTest) TestTolerations() {
 				s.NoError(err)
 
 				s.Len(tolerations, 1, "Should only have 1 toleration")
-				s.True(reflect.DeepEqual(expectedTolerations[0], tolerations[0]), "Toleration should be equal")
+				s.Equal(expectedTolerations[0], tolerations[0], "Toleration should be equal")
 			},
 		},
 	}
@@ -1469,7 +1468,7 @@ func (s *deploymentTeamsAppTemplateTest) TestVolumes() {
 				var expectedVolumes []corev1.Volume
 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedVolumes, volumes), "Volumes should be equal")
+				s.Equal(expectedVolumes, volumes, "Volumes should be equal")
 			},
 		},
 		{
@@ -1498,7 +1497,7 @@ func (s *deploymentTeamsAppTemplateTest) TestVolumes() {
 				var expectedVolumes []corev1.Volume
 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedVolumes, volumes), "Volumes should be equal")
+				s.Equal(expectedVolumes, volumes, "Volumes should be equal")
 			},
 		},
 	}
