@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -253,7 +252,7 @@ func (s *serviceTeamsAppTemplateTest) TestPorts() {
 				var expectedPorts []corev1.ServicePort
 				err := json.Unmarshal([]byte(expectedPortsJSON), &expectedPorts)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedPorts, ports), "Ports should be equal")
+				s.Equal(expectedPorts, ports, "Ports should be equal")
 			},
 		},
 		{
@@ -273,7 +272,7 @@ func (s *serviceTeamsAppTemplateTest) TestPorts() {
 				var expectedPorts []corev1.ServicePort
 				err := json.Unmarshal([]byte(expectedPortsJSON), &expectedPorts)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedPorts, ports), "Ports should be equal")
+				s.Equal(expectedPorts, ports, "Ports should be equal")
 			},
 		},
 		{
@@ -295,7 +294,7 @@ func (s *serviceTeamsAppTemplateTest) TestPorts() {
 				var expectedPorts []corev1.ServicePort
 				err := json.Unmarshal([]byte(expectedPortsJSON), &expectedPorts)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedPorts, ports), "Ports should be equal")
+				s.Equal(expectedPorts, ports, "Ports should be equal")
 			},
 		},
 		{
@@ -316,7 +315,7 @@ func (s *serviceTeamsAppTemplateTest) TestPorts() {
 				var expectedPorts []corev1.ServicePort
 				err := json.Unmarshal([]byte(expectedPortsJSON), &expectedPorts)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedPorts, ports), "Ports should be equal")
+				s.Equal(expectedPorts, ports, "Ports should be equal")
 			},
 		},
 	}
