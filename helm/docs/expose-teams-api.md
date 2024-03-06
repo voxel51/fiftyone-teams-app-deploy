@@ -62,6 +62,7 @@ Add a Second Host to the Ingress Controller
 ## Path-Based Routing
 
 Path based routing doesn't require additional DNS entries and TLS certificates.
+In `values.yaml`, remove `apiSettings.dnsName`.
 This routes traffic to the API paths to the `teams-api` service.
 
 Every Ingress Controller implementation is different.
