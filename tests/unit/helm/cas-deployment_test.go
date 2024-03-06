@@ -1,5 +1,5 @@
-//go:build kubeall || helm || unit || unitApiDeployment
-// +build kubeall helm unit unitApiDeployment
+//go:build kubeall || helm || unit || unitCasDeployment
+// +build kubeall helm unit unitCasDeployment
 
 package unit
 
@@ -20,7 +20,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-type deploymentApiTemplateTest struct {
+type deploymentCasTemplateTest struct {
 	suite.Suite
 	chartPath   string
 	releaseName string
@@ -28,22 +28,22 @@ type deploymentApiTemplateTest struct {
 	templates   []string
 }
 
-func TestDeploymentApiTemplate(t *testing.T) {
+func TestDeploymentCasTemplate(t *testing.T) {
 	t.Parallel()
 
 	helmChartPath, err := filepath.Abs(chartPath)
 	require.NoError(t, err)
 
-	suite.Run(t, &deploymentApiTemplateTest{
+	suite.Run(t, &deploymentCasTemplateTest{
 		Suite:       suite.Suite{},
 		chartPath:   helmChartPath,
 		releaseName: "fiftyone-test",
 		namespace:   "fiftyone-" + strings.ToLower(random.UniqueId()),
-		templates:   []string{"templates/api-deployment.yaml"},
+		templates:   []string{"templates/cas-deployment.yaml"},
 	})
 }
 
-func (s *deploymentApiTemplateTest) TestMetadataLabels() {
+func (s *deploymentCasTemplateTest) TestMetadataLabels() {
 	// Get chart info (to later obtain the chart's appVersion)
 	cInfo, err := chartInfo(s.T(), s.chartPath)
 	s.NoError(err)
@@ -65,21 +65,19 @@ func (s *deploymentApiTemplateTest) TestMetadataLabels() {
 			"defaultValues",
 			nil,
 			map[string]string{
-				"app":                          "teams-api",
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
-				"app.kubernetes.io/name":       "teams-api",
+				"app.kubernetes.io/name":       "teams-cas",
 				"app.kubernetes.io/instance":   "fiftyone-test",
 			},
 		},
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				"apiSettings.service.name": "test-service-name",
+				"casSettings.service.name": "test-service-name",
 			},
 			map[string]string{
-				"app":                          "test-service-name",
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
@@ -110,7 +108,7 @@ func (s *deploymentApiTemplateTest) TestMetadataLabels() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestMetadataName() {
+func (s *deploymentCasTemplateTest) TestMetadataName() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -119,12 +117,12 @@ func (s *deploymentApiTemplateTest) TestMetadataName() {
 		{
 			"defaultValues",
 			nil,
-			"teams-api",
+			"teams-cas",
 		},
 		{
 			"overrideMetadataName",
 			map[string]string{
-				"apiSettings.service.name": "test-service-name",
+				"casSettings.service.name": "test-service-name",
 			},
 			"test-service-name",
 		},
@@ -148,7 +146,7 @@ func (s *deploymentApiTemplateTest) TestMetadataName() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestMetadataNamespace() {
+func (s *deploymentCasTemplateTest) TestMetadataNamespace() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -186,7 +184,7 @@ func (s *deploymentApiTemplateTest) TestMetadataNamespace() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestReplicas() {
+func (s *deploymentCasTemplateTest) TestReplicas() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -195,7 +193,14 @@ func (s *deploymentApiTemplateTest) TestReplicas() {
 		{
 			"defaultValues",
 			nil,
-			1,
+			2,
+		},
+		{
+			"overrideReplicaCount",
+			map[string]string{
+				"casSettings.replicaCount": "3",
+			},
+			3,
 		},
 	}
 
@@ -217,7 +222,7 @@ func (s *deploymentApiTemplateTest) TestReplicas() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerCount() {
+func (s *deploymentCasTemplateTest) TestContainerCount() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -248,7 +253,7 @@ func (s *deploymentApiTemplateTest) TestContainerCount() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerEnv() {
+func (s *deploymentCasTemplateTest) TestContainerEnv() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -260,12 +265,17 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
-            "name": "CAS_BASE_URL",
-            "value": "http://teams-cas:80/cas/api"
+            "name": "CAS_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
           },
           {
-            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
-            "value": "true"
+            "name": "CAS_URL",
+            "value": "https://"
           },
           {
             "name": "FIFTYONE_AUTH_SECRET",
@@ -277,7 +287,69 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DATABASE_NAME",
+            "name": "NEXTAUTH_URL",
+            "value": "https:///cas/api/auth"
+          },
+          {
+            "name": "AUTH0_AUTH_CLIENT_ID",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "clientId"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_AUTH_CLIENT_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "clientSecret"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_DOMAIN",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "auth0Domain"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_ISSUER_BASE_URL",
+            "value": "https://$(AUTH0_DOMAIN)"
+          },
+          {
+            "name": "AUTH0_MGMT_CLIENT_ID",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "apiClientId"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_MGMT_CLIENT_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "apiClientSecret"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_ORGANIZATION",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "organizationId"
+              }
+            }
+          },
+          {
+            "name": "TEAMS_API_DATABASE_NAME",
             "valueFrom": {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
@@ -286,7 +358,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DATABASE_URI",
+            "name": "TEAMS_API_MONGODB_URI",
             "valueFrom": {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
@@ -295,38 +367,24 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_ENCRYPTION_KEY",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "encryptionKey"
-              }
-            }
+            "name": "CAS_DATABASE_NAME",
+            "value": "cas"
           },
           {
-            "name": "MONGO_DEFAULT_DB",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "fiftyoneDatabaseName"
-              }
-            }
+            "name": "CAS_DEFAULT_USER_ROLE",
+            "value": "GUEST"
           },
           {
-            "name": "FIFTYONE_ENV",
-            "value": "production"
+            "name": "CAS_MONGODB_URI_KEY",
+            "value": "mongodbConnectionString"
           },
           {
-            "name": "FIFTYONE_INTERNAL_SERVICE",
-            "value": "true"
+            "name": "DEBUG",
+            "value": "cas:*,-cas:*:debug"
           },
           {
-            "name": "GRAPHQL_DEFAULT_LIMIT",
-            "value": "10"
-          },
-          {
-            "name": "LOGGING_LEVEL",
-            "value": "INFO"
+            "name": "FIFTYONE_AUTH_MODE",
+            "value": "legacy"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -338,17 +396,22 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 		{
 			"overrideEnv", // legacy auth mode
 			map[string]string{
-				"apiSettings.env.TEST_KEY": "TEST_VALUE",
+				"casSettings.env.TEST_KEY": "TEST_VALUE",
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
-            "name": "CAS_BASE_URL",
-            "value": "http://teams-cas:80/cas/api"
+            "name": "CAS_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
           },
           {
-            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
-            "value": "true"
+            "name": "CAS_URL",
+            "value": "https://"
           },
           {
             "name": "FIFTYONE_AUTH_SECRET",
@@ -360,7 +423,69 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DATABASE_NAME",
+            "name": "NEXTAUTH_URL",
+            "value": "https:///cas/api/auth"
+          },
+          {
+            "name": "AUTH0_AUTH_CLIENT_ID",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "clientId"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_AUTH_CLIENT_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "clientSecret"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_DOMAIN",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "auth0Domain"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_ISSUER_BASE_URL",
+            "value": "https://$(AUTH0_DOMAIN)"
+          },
+          {
+            "name": "AUTH0_MGMT_CLIENT_ID",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "apiClientId"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_MGMT_CLIENT_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "apiClientSecret"
+              }
+            }
+          },
+          {
+            "name": "AUTH0_ORGANIZATION",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "organizationId"
+              }
+            }
+          },
+          {
+            "name": "TEAMS_API_DATABASE_NAME",
             "valueFrom": {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
@@ -369,7 +494,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DATABASE_URI",
+            "name": "TEAMS_API_MONGODB_URI",
             "valueFrom": {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
@@ -378,38 +503,24 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_ENCRYPTION_KEY",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "encryptionKey"
-              }
-            }
+            "name": "CAS_DATABASE_NAME",
+            "value": "cas"
           },
           {
-            "name": "MONGO_DEFAULT_DB",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "fiftyoneDatabaseName"
-              }
-            }
+            "name": "CAS_DEFAULT_USER_ROLE",
+            "value": "GUEST"
           },
           {
-            "name": "FIFTYONE_ENV",
-            "value": "production"
+            "name": "CAS_MONGODB_URI_KEY",
+            "value": "mongodbConnectionString"
           },
           {
-            "name": "FIFTYONE_INTERNAL_SERVICE",
-            "value": "true"
+            "name": "DEBUG",
+            "value": "cas:*,-cas:*:debug"
           },
           {
-            "name": "GRAPHQL_DEFAULT_LIMIT",
-            "value": "10"
-          },
-          {
-            "name": "LOGGING_LEVEL",
-            "value": "INFO"
+            "name": "FIFTYONE_AUTH_MODE",
+            "value": "legacy"
           },
           {
             "name": "TEST_KEY",
@@ -426,17 +537,22 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			"internalAuthMode",
 			map[string]string{
 				"casSettings.env.FIFTYONE_AUTH_MODE": "internal",
-				"apiSettings.env.TEST_KEY":           "TEST_VALUE",
+				"casSettings.env.TEST_KEY":           "TEST_VALUE",
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
-            "name": "CAS_BASE_URL",
-            "value": "http://teams-cas:80/cas/api"
+            "name": "CAS_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
           },
           {
-            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
-            "value": "false"
+            "name": "CAS_URL",
+            "value": "https://"
           },
           {
             "name": "FIFTYONE_AUTH_SECRET",
@@ -448,56 +564,28 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DATABASE_NAME",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "fiftyoneDatabaseName"
-              }
-            }
+            "name": "NEXTAUTH_URL",
+            "value": "https:///cas/api/auth"
           },
           {
-            "name": "FIFTYONE_DATABASE_URI",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "mongodbConnectionString"
-              }
-            }
+            "name": "CAS_DATABASE_NAME",
+            "value": "cas"
           },
           {
-            "name": "FIFTYONE_ENCRYPTION_KEY",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "encryptionKey"
-              }
-            }
+            "name": "CAS_DEFAULT_USER_ROLE",
+            "value": "GUEST"
           },
           {
-            "name": "MONGO_DEFAULT_DB",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "fiftyoneDatabaseName"
-              }
-            }
+            "name": "CAS_MONGODB_URI_KEY",
+            "value": "mongodbConnectionString"
           },
           {
-            "name": "FIFTYONE_ENV",
-            "value": "production"
+            "name": "DEBUG",
+            "value": "cas:*,-cas:*:debug"
           },
           {
-            "name": "FIFTYONE_INTERNAL_SERVICE",
-            "value": "true"
-          },
-          {
-            "name": "GRAPHQL_DEFAULT_LIMIT",
-            "value": "10"
-          },
-          {
-            "name": "LOGGING_LEVEL",
-            "value": "INFO"
+            "name": "FIFTYONE_AUTH_MODE",
+            "value": "internal"
           },
           {
             "name": "TEST_KEY",
@@ -530,7 +618,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerImage() {
+func (s *deploymentCasTemplateTest) TestContainerImage() {
 
 	// Get chart info (to later obtain the chart's appVersion)
 	cInfo, err := chartInfo(s.T(), s.chartPath)
@@ -548,29 +636,29 @@ func (s *deploymentApiTemplateTest) TestContainerImage() {
 		{
 			"defaultValues",
 			nil,
-			fmt.Sprintf("voxel51/fiftyone-teams-api:%s", chartAppVersion),
+			fmt.Sprintf("voxel51/fiftyone-teams-cas:%s", chartAppVersion),
 		},
 		{
 			"overrideImageTag",
 			map[string]string{
-				"apiSettings.image.tag": "testTag",
+				"casSettings.image.tag": "testTag",
 			},
-			"voxel51/fiftyone-teams-api:testTag",
+			"voxel51/fiftyone-teams-cas:testTag",
 		},
 		{
 			"overrideImageRepository",
 			map[string]string{
-				"apiSettings.image.repository": "ghcr.io/fiftyone-teams-api",
+				"casSettings.image.repository": "ghcr.io/fiftyone-teams-cas",
 			},
-			fmt.Sprintf("ghcr.io/fiftyone-teams-api:%s", chartAppVersion),
+			fmt.Sprintf("ghcr.io/fiftyone-teams-cas:%s", chartAppVersion),
 		},
 		{
 			"overrideImageVersionAndRepository",
 			map[string]string{
-				"apiSettings.image.tag":        "testTag",
-				"apiSettings.image.repository": "ghcr.io/fiftyone-teams-api",
+				"casSettings.image.tag":        "testTag",
+				"casSettings.image.repository": "ghcr.io/fiftyone-teams-cas",
 			},
-			"ghcr.io/fiftyone-teams-api:testTag",
+			"ghcr.io/fiftyone-teams-cas:testTag",
 		},
 	}
 
@@ -592,7 +680,7 @@ func (s *deploymentApiTemplateTest) TestContainerImage() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerImagePullPolicy() {
+func (s *deploymentCasTemplateTest) TestContainerImagePullPolicy() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -606,7 +694,7 @@ func (s *deploymentApiTemplateTest) TestContainerImagePullPolicy() {
 		{
 			"overrideImagePullPolicy",
 			map[string]string{
-				"apiSettings.image.pullPolicy": "IfNotPresent",
+				"casSettings.image.pullPolicy": "IfNotPresent",
 			},
 			"IfNotPresent",
 		},
@@ -631,7 +719,7 @@ func (s *deploymentApiTemplateTest) TestContainerImagePullPolicy() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerName() {
+func (s *deploymentCasTemplateTest) TestContainerName() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -640,12 +728,12 @@ func (s *deploymentApiTemplateTest) TestContainerName() {
 		{
 			"defaultValues",
 			nil,
-			"teams-api",
+			"teams-cas",
 		},
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"apiSettings.service.name": "test-service-account",
+				"casSettings.service.name": "test-service-account",
 			},
 			"test-service-account",
 		},
@@ -669,7 +757,7 @@ func (s *deploymentApiTemplateTest) TestContainerName() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
+func (s *deploymentCasTemplateTest) TestContainerLivenessProbe() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -681,10 +769,10 @@ func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "httpGet": {
-            "path": "/health/",
-            "port": "teams-api"
+            "path": "/cas/api",
+            "port": "teams-cas"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -696,13 +784,13 @@ func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
 		{
 			"overrideServiceLivenessInitialDelaySecondsAndShortName",
 			map[string]string{
-				"apiSettings.service.liveness.initialDelaySeconds": "30",
-				"apiSettings.service.shortname":                    "test-service-shortname",
+				"casSettings.service.liveness.initialDelaySeconds": "30",
+				"casSettings.service.shortname":                    "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "httpGet": {
-            "path": "/health/",
+            "path": "/cas/api",
             "port": "test-service-shortname"
           },
           "initialDelaySeconds": 30,
@@ -734,7 +822,7 @@ func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerPorts() {
+func (s *deploymentCasTemplateTest) TestContainerPorts() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -746,8 +834,8 @@ func (s *deploymentApiTemplateTest) TestContainerPorts() {
 			func(ports []corev1.ContainerPort) {
 				expectedPortsJSON := `[
           {
-            "name": "teams-api",
-            "containerPort": 8000,
+            "name": "teams-cas",
+            "containerPort": 3000,
             "protocol": "TCP"
           }
         ]`
@@ -760,14 +848,14 @@ func (s *deploymentApiTemplateTest) TestContainerPorts() {
 		{
 			"overrideServiceContainerPortAndShortName",
 			map[string]string{
-				"apiSettings.service.containerPort": "8051",
-				"apiSettings.service.shortname":     "test-service-shortname",
+				"casSettings.service.containerPort": "3001",
+				"casSettings.service.shortname":     "test-service-shortname",
 			},
 			func(ports []corev1.ContainerPort) {
 				expectedPortsJSON := `[
           {
             "name": "test-service-shortname",
-            "containerPort": 8051,
+            "containerPort": 3001,
             "protocol": "TCP"
           }
         ]`
@@ -797,7 +885,7 @@ func (s *deploymentApiTemplateTest) TestContainerPorts() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
+func (s *deploymentCasTemplateTest) TestContainerReadinessProbe() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -809,10 +897,10 @@ func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "httpGet": {
-            "path": "/health/",
-            "port": "teams-api"
+            "path": "/cas/api",
+            "port": "teams-cas"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -824,13 +912,13 @@ func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
 		{
 			"overrideServiceReadinessInitialDelaySecondsAndShortName",
 			map[string]string{
-				"apiSettings.service.readiness.initialDelaySeconds": "30",
-				"apiSettings.service.shortname":                     "test-service-shortname",
+				"casSettings.service.readiness.initialDelaySeconds": "30",
+				"casSettings.service.shortname":                     "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "httpGet": {
-            "path": "/health/",
+            "path": "/cas/api",
             "port": "test-service-shortname"
           },
           "initialDelaySeconds": 30,
@@ -862,7 +950,7 @@ func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerResourceRequirements() {
+func (s *deploymentCasTemplateTest) TestContainerResourceRequirements() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -880,10 +968,10 @@ func (s *deploymentApiTemplateTest) TestContainerResourceRequirements() {
 		{
 			"overrideResources",
 			map[string]string{
-				"apiSettings.resources.limits.cpu":      "1",
-				"apiSettings.resources.limits.memory":   "1Gi",
-				"apiSettings.resources.requests.cpu":    "500m",
-				"apiSettings.resources.requests.memory": "512Mi",
+				"casSettings.resources.limits.cpu":      "1",
+				"casSettings.resources.limits.memory":   "1Gi",
+				"casSettings.resources.requests.cpu":    "500m",
+				"casSettings.resources.requests.memory": "512Mi",
 			},
 			func(resourceRequirements corev1.ResourceRequirements) {
 				resourceExpected := corev1.ResourceRequirements{
@@ -920,7 +1008,7 @@ func (s *deploymentApiTemplateTest) TestContainerResourceRequirements() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerSecurityContext() {
+func (s *deploymentCasTemplateTest) TestContainerSecurityContext() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -946,8 +1034,8 @@ func (s *deploymentApiTemplateTest) TestContainerSecurityContext() {
 		{
 			"overrideSecurityContext",
 			map[string]string{
-				"apiSettings.securityContext.runAsGroup": "3000",
-				"apiSettings.securityContext.runAsUser":  "1000",
+				"casSettings.securityContext.runAsGroup": "3000",
+				"casSettings.securityContext.runAsUser":  "1000",
 			},
 			func(securityContext *corev1.SecurityContext) {
 				s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
@@ -974,7 +1062,7 @@ func (s *deploymentApiTemplateTest) TestContainerSecurityContext() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
+func (s *deploymentCasTemplateTest) TestContainerVolumeMounts() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -990,8 +1078,8 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 		{
 			"overrideVolumeMountsSingle",
 			map[string]string{
-				"apiSettings.volumeMounts[0].mountPath": "/test-data-volume",
-				"apiSettings.volumeMounts[0].name":      "test-volume",
+				"casSettings.volumeMounts[0].mountPath": "/test-data-volume",
+				"casSettings.volumeMounts[0].name":      "test-volume",
 			},
 			func(volumeMounts []corev1.VolumeMount) {
 				expectedJSON := `[
@@ -1009,10 +1097,10 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 		{
 			"overrideVolumeMountsMultiple",
 			map[string]string{
-				"apiSettings.volumeMounts[0].mountPath": "/test-data-volume1",
-				"apiSettings.volumeMounts[0].name":      "test-volume1",
-				"apiSettings.volumeMounts[1].mountPath": "/test-data-volume2",
-				"apiSettings.volumeMounts[1].name":      "test-volume2",
+				"casSettings.volumeMounts[0].mountPath": "/test-data-volume1",
+				"casSettings.volumeMounts[0].name":      "test-volume1",
+				"casSettings.volumeMounts[1].mountPath": "/test-data-volume2",
+				"casSettings.volumeMounts[1].name":      "test-volume2",
 			},
 			func(volumeMounts []corev1.VolumeMount) {
 				expectedJSON := `[
@@ -1051,7 +1139,7 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestAffinity() {
+func (s *deploymentCasTemplateTest) TestAffinity() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1067,9 +1155,9 @@ func (s *deploymentApiTemplateTest) TestAffinity() {
 		{
 			"overrideAffinity",
 			map[string]string{
-				"apiSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "disktype",
-				"apiSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":  "In",
-				"apiSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]": "ssd",
+				"casSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "disktype",
+				"casSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":  "In",
+				"casSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]": "ssd",
 			},
 			func(affinity *corev1.Affinity) {
 				affinityJSON := `{
@@ -1118,7 +1206,7 @@ func (s *deploymentApiTemplateTest) TestAffinity() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestImagePullSecrets() {
+func (s *deploymentCasTemplateTest) TestImagePullSecrets() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1160,7 +1248,7 @@ func (s *deploymentApiTemplateTest) TestImagePullSecrets() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestNodeSelector() {
+func (s *deploymentCasTemplateTest) TestNodeSelector() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1174,7 +1262,7 @@ func (s *deploymentApiTemplateTest) TestNodeSelector() {
 		{
 			"overrideNodeSelector",
 			map[string]string{
-				"apiSettings.nodeSelector.disktype": "ssd",
+				"casSettings.nodeSelector.disktype": "ssd",
 			},
 			map[string]string{
 				"disktype": "ssd",
@@ -1203,7 +1291,7 @@ func (s *deploymentApiTemplateTest) TestNodeSelector() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestPodAnnotations() {
+func (s *deploymentCasTemplateTest) TestPodAnnotations() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1217,7 +1305,7 @@ func (s *deploymentApiTemplateTest) TestPodAnnotations() {
 		{
 			"overridePodAnnotations",
 			map[string]string{
-				"apiSettings.podAnnotations.annotation-1": "annotation-1-value",
+				"casSettings.podAnnotations.annotation-1": "annotation-1-value",
 			},
 			map[string]string{
 				"annotation-1": "annotation-1-value",
@@ -1250,7 +1338,7 @@ func (s *deploymentApiTemplateTest) TestPodAnnotations() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestPodSecurityContext() {
+func (s *deploymentCasTemplateTest) TestPodSecurityContext() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1275,9 +1363,9 @@ func (s *deploymentApiTemplateTest) TestPodSecurityContext() {
 		{
 			"overridePodSecurityContext",
 			map[string]string{
-				"apiSettings.podSecurityContext.fsGroup":    "2000",
-				"apiSettings.podSecurityContext.runAsGroup": "3000",
-				"apiSettings.podSecurityContext.runAsUser":  "1000",
+				"casSettings.podSecurityContext.fsGroup":    "2000",
+				"casSettings.podSecurityContext.runAsGroup": "3000",
+				"casSettings.podSecurityContext.runAsUser":  "1000",
 			},
 			func(podSecurityContext *corev1.PodSecurityContext) {
 				s.Equal(int64(2000), *podSecurityContext.FSGroup, "fsGroup should be 2000")
@@ -1305,7 +1393,7 @@ func (s *deploymentApiTemplateTest) TestPodSecurityContext() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestSelectorMatchLabels() {
+func (s *deploymentCasTemplateTest) TestSelectorMatchLabels() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1315,18 +1403,16 @@ func (s *deploymentApiTemplateTest) TestSelectorMatchLabels() {
 			"defaultValues",
 			nil,
 			map[string]string{
-				"app":                        "teams-api",
-				"app.kubernetes.io/name":     "teams-api",
+				"app.kubernetes.io/name":     "teams-cas",
 				"app.kubernetes.io/instance": "fiftyone-test",
 			},
 		},
 		{
 			"overrideSelectorMatchLabels",
 			map[string]string{
-				"apiSettings.service.name": "test-service-name",
+				"casSettings.service.name": "test-service-name",
 			},
 			map[string]string{
-				"app":                        "test-service-name",
 				"app.kubernetes.io/name":     "test-service-name",
 				"app.kubernetes.io/instance": "fiftyone-test",
 			},
@@ -1360,7 +1446,7 @@ func (s *deploymentApiTemplateTest) TestSelectorMatchLabels() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestServiceAccountName() {
+func (s *deploymentCasTemplateTest) TestServiceAccountName() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1398,7 +1484,7 @@ func (s *deploymentApiTemplateTest) TestServiceAccountName() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestTolerations() {
+func (s *deploymentCasTemplateTest) TestTolerations() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1414,9 +1500,9 @@ func (s *deploymentApiTemplateTest) TestTolerations() {
 		{
 			"overrideTolerations",
 			map[string]string{
-				"apiSettings.tolerations[0].key":      "example-key",
-				"apiSettings.tolerations[0].operator": "Exists",
-				"apiSettings.tolerations[0].effect":   "NoSchedule",
+				"casSettings.tolerations[0].key":      "example-key",
+				"casSettings.tolerations[0].operator": "Exists",
+				"casSettings.tolerations[0].effect":   "NoSchedule",
 			},
 			func(tolerations []corev1.Toleration) {
 				tolerationJSON := `[
@@ -1454,7 +1540,7 @@ func (s *deploymentApiTemplateTest) TestTolerations() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestVolumes() {
+func (s *deploymentCasTemplateTest) TestVolumes() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -1470,8 +1556,8 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
 		{
 			"overrideVolumesSingle",
 			map[string]string{
-				"apiSettings.volumes[0].name":          "test-volume",
-				"apiSettings.volumes[0].hostPath.path": "/test-volume",
+				"casSettings.volumes[0].name":          "test-volume",
+				"casSettings.volumes[0].hostPath.path": "/test-volume",
 			},
 			func(volumes []corev1.Volume) {
 				expectedJSON := `[
@@ -1491,10 +1577,10 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
 		{
 			"overrideVolumesMultiple",
 			map[string]string{
-				"apiSettings.volumes[0].name":                            "test-volume1",
-				"apiSettings.volumes[0].hostPath.path":                   "/test-volume1",
-				"apiSettings.volumes[1].name":                            "pvc1",
-				"apiSettings.volumes[1].persistentVolumeClaim.claimName": "pvc1",
+				"casSettings.volumes[0].name":                            "test-volume1",
+				"casSettings.volumes[0].hostPath.path":                   "/test-volume1",
+				"casSettings.volumes[1].name":                            "pvc1",
+				"casSettings.volumes[1].persistentVolumeClaim.claimName": "pvc1",
 			},
 			func(volumes []corev1.Volume) {
 				expectedJSON := `[

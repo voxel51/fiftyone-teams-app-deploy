@@ -366,7 +366,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
 			},
 		},
 		{
-			"defaultValuesPluginsEnabled",
+			"defaultValuesPluginsEnabled", // legacy auth mode
 			map[string]string{
 				"pluginsSettings.enabled": "true",
 			},
@@ -375,6 +375,19 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
           },
           {
             "name": "FIFTYONE_DATABASE_NAME",
@@ -395,46 +408,11 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DATABASE_ADMIN",
-            "value": "false"
-          },
-          {
             "name": "FIFTYONE_ENCRYPTION_KEY",
             "valueFrom": {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
                 "key": "encryptionKey"
-              }
-            }
-          },
-          {
-            "name": "FIFTYONE_TEAMS_DOMAIN",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "auth0Domain"
-              }
-            }
-          },
-          {
-            "name": "FIFTYONE_TEAMS_AUDIENCE",
-            "value": "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
-          },
-          {
-            "name": "FIFTYONE_TEAMS_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientId"
-              }
-            }
-          },
-          {
-            "name": "FIFTYONE_TEAMS_ORGANIZATION",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "organizationId"
               }
             }
           },
@@ -458,7 +436,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
 			},
 		},
 		{
-			"overrideEnv",
+			"overrideEnv", // legacy auth mode
 			map[string]string{
 				"pluginsSettings.enabled":      "true",
 				"pluginsSettings.env.TEST_KEY": "TEST_VALUE",
@@ -468,6 +446,19 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
           },
           {
             "name": "FIFTYONE_DATABASE_NAME",
@@ -488,10 +479,6 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DATABASE_ADMIN",
-            "value": "false"
-          },
-          {
             "name": "FIFTYONE_ENCRYPTION_KEY",
             "valueFrom": {
               "secretKeyRef": {
@@ -501,33 +488,78 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_TEAMS_DOMAIN",
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_APP_IMAGES",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "-1"
+          },
+          {
+            "name": "TEST_KEY",
+            "value": "TEST_VALUE"
+          }
+        ]`
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"internalAuthMode",
+			map[string]string{
+				"casSettings.env.FIFTYONE_AUTH_MODE": "internal",
+				"pluginsSettings.enabled":            "true",
+				"pluginsSettings.env.TEST_KEY":       "TEST_VALUE",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
             "valueFrom": {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
-                "key": "auth0Domain"
+                "key": "fiftyoneAuthSecret"
               }
             }
           },
           {
-            "name": "FIFTYONE_TEAMS_AUDIENCE",
-            "value": "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
           },
           {
-            "name": "FIFTYONE_TEAMS_CLIENT_ID",
+            "name": "FIFTYONE_DATABASE_NAME",
             "valueFrom": {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
-                "key": "clientId"
+                "key": "fiftyoneDatabaseName"
               }
             }
           },
           {
-            "name": "FIFTYONE_TEAMS_ORGANIZATION",
+            "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
-                "key": "organizationId"
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
               }
             }
           },
