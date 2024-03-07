@@ -22,6 +22,11 @@ repos:
     rev: v1.5.4
     hooks:
       - id: forbid-tabs
+        exclude_types:
+          - go
+          - go-mod
+          - go-sum
+          - makefile
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.36.0
     hooks:
@@ -31,7 +36,7 @@ repos:
     rev: v2.2.5
     hooks:
       - id: codespell
-        exclude: helm/local-self-signed-example/cert-manger-crds
+        exclude: helm/local-self-signed-example/cert-manger-crds|tests/go.sum
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.32.0
     hooks:
@@ -71,4 +76,9 @@ repos:
       - id: detect-secrets
         args:
           - --exclude-secrets
-          - '(password|REPLACEME|fiftyone-teams-tls-secret|btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=|5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976)'
+          - '(password|REPLACEME|fiftyone-teams-tls-secret|btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=|5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976|test-*|/api/proxy/fiftyone-teams|/opt/plugins)'
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+      - id: go-mod-tidy

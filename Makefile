@@ -1,4 +1,5 @@
 SHELL := $(SHELL) -e
+ASDF := $(shell asdf where golang)
 
 # Help
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))
@@ -88,9 +89,34 @@ port-forward-api:  ## port forward to service `teams-api` on the host port 8000
 port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
 
-helm-repos:  # add helm repos for the project
+helm-repos:  ## add helm repos for the project
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo add jetstack https://charts.jetstack.io
 
-tunnel:
+tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
 	minikube tunnel
+
+test-unit-compose:  ## run go test on the tests/unit/compose directory
+	@cd tests/unit/compose; \
+	go test -count=1 -timeout=10m -v -tags unit
+
+test-unit-helm:  ## run go test on the tests/unit/helm directory
+	@cd tests/unit/helm; \
+	go test -count=1 -timeout=10m -v -tags unit
+
+test-unit-compose-interleaved: install-terratest-log-parser  ## run go test on the tests/unit/compose directory and run the terratest_log_parser for reports
+	@cd tests/unit/compose; \
+	rm -rf test_reports; \
+	mkdir test_reports; \
+	go test -count=1 -timeout=10m -v -tags unit | tee test_output.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
+
+test-unit-helm-interleaved: install-terratest-log-parser  ## run go test on the tests/unit/helm directory and run the terratest_log_parser for reports
+	@cd tests/unit/helm; \
+	rm -rf test_reports; \
+	mkdir test_reports; \
+	go test -count=1 -timeout=10m -v -tags unit | tee test_output.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
+
+install-terratest-log-parser:  ## install terratest_log_parser
+	go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@latest
