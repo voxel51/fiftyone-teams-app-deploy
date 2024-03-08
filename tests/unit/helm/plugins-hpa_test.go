@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -256,7 +255,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestScaleTargetRef() {
 				var expectedRef autoscalingv2.CrossVersionObjectReference
 				err := json.Unmarshal([]byte(expectedRefJSON), &expectedRef)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedRef, ref), "Scale Target Refs should be equal")
+				s.Equal(expectedRef, ref, "Scale Target Refs should be equal")
 			},
 		},
 		{
@@ -273,7 +272,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestScaleTargetRef() {
 				var expectedRef autoscalingv2.CrossVersionObjectReference
 				err := json.Unmarshal([]byte(expectedRefJSON), &expectedRef)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedRef, ref), "Scale Target Refs should be equal")
+				s.Equal(expectedRef, ref, "Scale Target Refs should be equal")
 			},
 		},
 		{
@@ -291,7 +290,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestScaleTargetRef() {
 				var expectedRef autoscalingv2.CrossVersionObjectReference
 				err := json.Unmarshal([]byte(expectedRefJSON), &expectedRef)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedRef, ref), "Scale Target Refs should be equal")
+				s.Equal(expectedRef, ref, "Scale Target Refs should be equal")
 			},
 		},
 	}
@@ -484,7 +483,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetrics() {
 				var expectedMetrics []autoscalingv2.MetricSpec
 				err := json.Unmarshal([]byte(expectedJSON), &expectedMetrics)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedMetrics, metrics), "Volumes should be equal")
+				s.Equal(expectedMetrics, metrics, "Volumes should be equal")
 			},
 		},
 		{
@@ -520,7 +519,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetrics() {
 				var expectedMetrics []autoscalingv2.MetricSpec
 				err := json.Unmarshal([]byte(expectedJSON), &expectedMetrics)
 				s.NoError(err)
-				s.True(reflect.DeepEqual(expectedMetrics, metrics), "Volumes should be equal")
+				s.Equal(expectedMetrics, metrics, "Volumes should be equal")
 			},
 		},
 	}
