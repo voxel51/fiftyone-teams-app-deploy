@@ -49,7 +49,7 @@ We implemented various patterns from these tools in our tests.
 The unit tests are named after the corresponding Helm templates.
 
 For example, the test
-`tests/unit/api-deployment_test.go`
+`tests/unit/helm/api-deployment_test.go`
 covers the Helm template
 `helm/fiftyone-teams-app/templates/api-deployment.yaml`.
 
@@ -62,25 +62,47 @@ tag (found at the top of the test file).
 
     ```shell
     # From repo root
-    make test-unit
+    make test-unit-compose
+    make test-unit-helm
     ```
 
 * With interleaved test output (good for CI runs)
 
     ```shell
     # From repo root
-    cd test/unit
+    cd test/unit/helm
 
-    # replace `unit` with any build tag
-    go test -v -timeout 30m -tags unit
+    # replace the tag `unit` with any build tag
+    go test -count=1 -timeout=3m -v -tags unit
     ```
+
+* To run a specific test function,
+  for example within `plugins-service_test.go`,
+  matching the regex of the test function name `TestMetadataLabels`
+
+    ```shell
+    cd test/unit/helm
+    go test \
+      -count=1 \
+      -timeout=30s \
+      -v \
+      -tags unit \
+      plugins-service_test.go \
+      common_test.go \
+      chartInfo.go \
+      -testify.m '^(TestMetadataLabels|)$'
+    ```
+
+    > **Note:** Include the files `common_test.go` and `chartInfo.go`
+    > to avoid `undefined` errors for `chartPath` and `chartInfo`
+    > **Note:** We pass `-count=1` to disable test caching.
 
 ### Writing Unit Tests
 
 To avoid code duplication, consider
-adding items to `tests/unit/common_test.go`.
+adding items to `tests/unit/helm/common_test.go`.
 When adding a new build tag, add the new tag to
-the test file and to `tests/unit/common_test.go`.
+the test file and to `tests/unit/helm/common_test.go`.
 Currently, `common_test.go` contains the
 variable `chartPath` used in all of the tests.
 
@@ -101,3 +123,11 @@ See
 * [A Tour of Go](https://go.dev/tour/)
 * Kubernetes API Library
   * [apps/v1 Deployment](https://pkg.go.dev/k8s.io/api/apps/v1#Deployment)
+
+## Testing Setup
+
+* [Install delve](https://github.com/go-delve/delve/tree/master/Documentation/installation)
+
+## VSCode Setup
+
+* [Debugging](https://github.com/golang/vscode-go/wiki/debugging)

@@ -6,6 +6,10 @@
 
 <!-- Describe the changes. -->
 
+Checklist
+
+* [ ] This PR maintains parity between Docker Compose and Helm
+
 ## Testing
 
 <!-- Describe the way the changes were tested. -->
