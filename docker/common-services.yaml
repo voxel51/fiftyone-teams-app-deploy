@@ -95,11 +95,11 @@ services:
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE}
       CAS_MONGODB_URI: ${CAS_MONGO_DB_URI:-$FIFTYONE_DATABASE_URI}
-      CAS_URL: ${BASE_URL}
+      CAS_URL: ${BASE_URL:-$AUTH0_BASE_URL}
       DEBUG: ${CAS_DEBUG}
       FIFTYONE_AUTH_MODE: internal
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
-      NEXTAUTH_URL: ${BASE_URL}/cas/api/auth
+      NEXTAUTH_URL: ${BASE_URL:-$AUTH0_BASE_URL}/cas/api/auth
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your

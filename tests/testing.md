@@ -41,6 +41,7 @@ We implemented various patterns from these tools in our tests.
 1. Install go
 
     ```shell
+	# from repo root
     make asdf
     ```
 
