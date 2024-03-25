@@ -1,4 +1,5 @@
 *.tgz
+*~
 .DS_Store
 .env
 compose.override.yaml
