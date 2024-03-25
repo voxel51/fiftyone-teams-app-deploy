@@ -4,27 +4,46 @@
 services:
   fiftyone-app:
     extends:
-      file: common-services.yaml
+      file: ../common-services.yaml
       service: fiftyone-app-common
+
   teams-api:
     extends:
-      file: common-services.yaml
+      file: ../common-services.yaml
       service: teams-api-common
     environment:
       FIFTYONE_PLUGINS_DIR: /opt/plugins
     volumes:
       - plugins-vol:/opt/plugins
+
   teams-app:
     extends:
-      file: common-services.yaml
+      file: ../common-services.yaml
       service: teams-app-common
     environment:
       FIFTYONE_TEAMS_PLUGIN_URL: ${FIFTYONE_TEAMS_PLUGIN_URL}
+
+  teams-cas:
+    extends:
+      file: ../common-services.yaml
+      service: teams-cas-common
+    environment:
+      AUTH0_AUTH_CLIENT_ID: ${AUTH0_CLIENT_ID}
+      AUTH0_AUTH_CLIENT_SECRET: ${AUTH0_CLIENT_SECRET}
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_ISSUER_BASE_URL: ${AUTH0_ISSUER_BASE_URL}
+      AUTH0_MGMT_CLIENT_ID: ${AUTH0_API_CLIENT_ID}
+      AUTH0_MGMT_CLIENT_SECRET: ${AUTH0_API_CLIENT_SECRET}
+      AUTH0_ORGANIZATION: ${AUTH0_ORGANIZATION}
+      TEAMS_API_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      TEAMS_API_MONGODB_URI: ${FIFTYONE_DATABASE_URI}
+
   teams-plugins:
     extends:
-      file: common-services.yaml
+      file: ../common-services.yaml
       service: teams-plugins-common
     volumes:
       - plugins-vol:/opt/plugins:ro
+
 volumes:
   plugins-vol:
