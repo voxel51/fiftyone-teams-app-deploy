@@ -41,7 +41,7 @@ We implemented various patterns from these tools in our tests.
 1. Install go
 
     ```shell
-	# from repo root
+    # from repo root
     make asdf
     ```
 
@@ -111,7 +111,7 @@ For structures (structs), there are two approaches.
 Either write
 
 * Go code referencing the type for each field
-* JSON (easily converted from YAML) and unmarshall it into  the struct
+* JSON (easily converted from YAML) and unmarshall it into the struct
 
 See
 [Debugging interleaved test output](https://terratest.gruntwork.io/docs/testing-best-practices/debugging-interleaved-test-output/#installing-the-utility-binaries).
