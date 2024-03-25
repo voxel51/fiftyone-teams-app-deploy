@@ -4,7 +4,7 @@
 services:
   fiftyone-app:
     extends:
-      file: common-services.yaml
+      file: ../common-services.yaml
       service: fiftyone-app-common
     environment:
       FIFTYONE_PLUGINS_CACHE_ENABLED: true
@@ -14,7 +14,7 @@ services:
 
   teams-api:
     extends:
-      file: common-services.yaml
+      file: ../common-services.yaml
       service: teams-api-common
     environment:
       FIFTYONE_PLUGINS_DIR: /opt/plugins
@@ -23,7 +23,7 @@ services:
 
   teams-app:
     extends:
-      file: common-services.yaml
+      file: ../common-services.yaml
       service: teams-app-common
 
   teams-cas:
