@@ -18,3 +18,5 @@ services:
     extends:
       file: ../common-services.yaml
       service: teams-cas-common
+    environment:
+      FIFTYONE_AUTH_MODE: internal
