@@ -409,7 +409,9 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
    files (included in this repository),
     1. Rename the `env.template` file to `.env`
     1. Edit the `.env` file, setting the parameters required for this deployment.
-       [See table below](#fiftyone-teams-environment-variables).
+       See the
+       [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
+       table.
     1. Create a `compose.override.yaml` with any configuration overrides for
        this deployment.
 1. In the same directory, run
@@ -424,19 +426,24 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
+    > **NOTE**: Skip this step when performing an initial installation with
+    > `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`.
+    > For more information, see
+    > [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+
 1. To ensure that all datasets are now at version 0.23.5, run
 
     ```shell
     fiftyone migrate --info
     ```
 
-The FiftyOne Teams App is now exposed on port 3000.
+The FiftyOne Teams App is now exposed on port `3000`.
 An SSL endpoint (Load Balancer or Nginx Proxy or something similar)
 will need to be configured to route traffic from the SSL endpoint
-to port 3000 on the host running the FiftyOne Teams App.
+to port `3000` on the host running the FiftyOne Teams App.
 
 An example nginx site configuration that forwards http traffic to
-https, and https traffic for `your.server.name` to port 3000.
+https, and https traffic for `your.server.name` to port `3000`.
 See
 [./example-nginx-site.conf](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf).
 
