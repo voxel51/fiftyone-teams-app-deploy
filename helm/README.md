@@ -114,7 +114,7 @@ These instructions assume you have
 #### Download the Example Configuration Files
 
 Download the example configuration files from the
-[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy/helm/gke-examples)
+[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/gke-example)
 GitHub repository.
 
 One way to do this might be:

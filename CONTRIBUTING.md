@@ -266,7 +266,7 @@ skaffold dev --profile only-fiftyone
 Our FiftyOne Teams container images are stored in the private repositories
 
 - [Google Artifact Repository (Docker)](#google-artifact-repository)
-  - Contains private development images created by our
+  - Contains private development images created by our private repository
     [Google Cloud Build](https://github.com/voxel51/cloud-build-and-deploy/)
     CI/CD runs
     - Development
