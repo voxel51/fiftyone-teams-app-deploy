@@ -404,7 +404,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
 
 ## Deploying FiftyOne Teams
 
-1. Install docker-compose
+1. Install
+   [Docker Compose](https://docs.docker.com/compose/install/)
 1. From a directory containing the files `compose.yaml` and `env.template`
    files (included in this repository),
     1. Rename the `env.template` file to `.env`
@@ -414,28 +415,43 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
        table.
     1. Create a `compose.override.yaml` with any configuration overrides for
        this deployment.
-1. In the same directory, run
+       1. For the first installation, set
 
-    ```shell
-    docker-compose up -d
-    ```
+          ```yaml
+          services:
+            fiftyone-app-common:
+              environment:
+                FIFTYONE_DATABASE_ADMIN: true
+          ```
 
-1. Have the admin run to upgrade all datasets
+1. Deploy FiftyOne Teams
+   1. In the same directory, run
 
-    ```shell
-    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-    ```
+      ```shell
+      docker-compose up -d
+      ```
 
-    > **NOTE**: Skip this step when performing an initial installation with
-    > `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`.
-    > For more information, see
-    > [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+1. After the successful installation, and logging into Fiftyone Teams
+    1. In `compose.override.yaml` remove the `FIFTYONE_DATABASE_ADMIN` override
 
-1. To ensure that all datasets are now at version 0.23.5, run
+        ```yaml
+        services:
+          fiftyone-app-common:
+            environment:
+              # FIFTYONE_DATABASE_ADMIN: true
+        ```
 
-    ```shell
-    fiftyone migrate --info
-    ```
+        > **Note**: This example shows commenting this line,
+        > however you may remove the line.
+
+         or set it to `false` like in
+
+        ```yaml
+        services:
+          fiftyone-app-common:
+            environment:
+              # FIFTYONE_DATABASE_ADMIN: false
+        ```
 
 The FiftyOne Teams App is now exposed on port `3000`.
 An SSL endpoint (Load Balancer or Nginx Proxy or something similar)
