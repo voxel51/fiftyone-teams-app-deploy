@@ -425,11 +425,11 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
           ```
 
 1. Deploy FiftyOne Teams
-   1. In the same directory, run
+    1. In the same directory, run
 
-      ```shell
-      docker-compose up -d
-      ```
+        ```shell
+        docker-compose up -d
+        ```
 
 1. After the successful installation, and logging into Fiftyone Teams
     1. In `compose.override.yaml` remove the `FIFTYONE_DATABASE_ADMIN` override
