@@ -415,14 +415,14 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
        table.
     1. Create a `compose.override.yaml` with any configuration overrides for
        this deployment.
-       1. For the first installation, set
+        1. For the first installation, set
 
-          ```yaml
-          services:
-            fiftyone-app-common:
-              environment:
-                FIFTYONE_DATABASE_ADMIN: true
-          ```
+            ```yaml
+            services:
+              fiftyone-app-common:
+                environment:
+                  FIFTYONE_DATABASE_ADMIN: true
+            ```
 
 1. Deploy FiftyOne Teams
     1. In the same directory, run
