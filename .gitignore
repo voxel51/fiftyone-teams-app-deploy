@@ -2,7 +2,7 @@
 *~
 .DS_Store
 .env
-compose.override.yaml
+compose.override*yaml
 helm/gke-example/values-*.yaml
 helm/gke-example/voxel51-docker.json
 tests/integration/*/test_output.log
