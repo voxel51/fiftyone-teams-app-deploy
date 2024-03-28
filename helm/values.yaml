@@ -8,14 +8,14 @@
 
 secret:
   fiftyone:
-    # These secrets come from Voxel51 and are only used when
-    # `casSettings.env.FIFTYONE_AUTH_MODE` is set to `legacy`
-    # apiClientId:
-    # apiClientSecret:
-    # auth0Domain:
-    # clientId:
-    # clientSecret:
-    # organizationId:
+    # These secrets come from Voxel51 and should be omitted when
+    # `casSettings.env.FIFTYONE_AUTH_MODE` is set to `internal`
+    apiClientId:
+    apiClientSecret:
+    auth0Domain:
+    clientId:
+    clientSecret:
+    organizationId:
     # These secrets come from your MongoDB implementation
     fiftyoneDatabaseName: fiftyone
     mongodbConnectionString: mongodb://username:password@somehostname/?authSource=admin
@@ -65,7 +65,7 @@ appSettings:
 
 casSettings:
   env:
-    FIFTYONE_AUTH_MODE: internal
+    FIFTYONE_AUTH_MODE: legacy
 
 # pluginsSettings:
 #   enabled: true
