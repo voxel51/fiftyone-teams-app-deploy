@@ -37,7 +37,7 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
   - [From FiftyOne Teams Version 1.1.0 and later](#from-fiftyone-teams-version-110-and-later)
-- [Launch FiftyOne Teams](#launch-fiftyone-teams)
+- [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
 
 <!-- tocstop -->
 
@@ -508,7 +508,7 @@ versions prior to FiftyOne Teams version 1.1.0:
 1. In your `values.yaml`, set the required
    [FIFTYONE_ENCRYPTION_KEY](#storage-credentials-and-fiftyone_encryption_key)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.6.0](#launch-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
    with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
    (this is not the default value in `values.yaml` and must be overridden).
     > **NOTE:** At this step, FiftyOne SDK users will lose access to the
@@ -546,7 +546,7 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.6.0](#launch-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
@@ -566,7 +566,7 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     fiftyone migrate --info
     ```
 
-## Launch FiftyOne Teams
+## Deploying FiftyOne Teams
 
 A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
