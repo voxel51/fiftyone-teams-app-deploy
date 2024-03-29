@@ -36,7 +36,7 @@ deploy:
     releases:
       - name: fiftyone-teams
         chartPath: helm/fiftyone-teams-app
-        version: 1.5.5
+        version: 1.5.8
         createNamespace: true
         namespace: fiftyone-teams
         overrides:

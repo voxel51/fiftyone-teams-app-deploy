@@ -34,10 +34,10 @@
 
 ## Quickstart to Skaffold in Minikube
 
-1. Auth with gcloud
+1. Auth with gcloud for the project `computer-vision-team`
 
     ```shell
-    gcloud auth application-default login
+    make auth
     ```
 
 1. Install the asdf tools
