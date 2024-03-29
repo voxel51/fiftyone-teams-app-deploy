@@ -571,19 +571,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
 A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
-1. Install
-   [Helm](https://helm.sh/docs/intro/install/)
-1. In the values file (typically `values.yaml`) provided by Voxel51
-   set the deployment specific configurations
-    1. For the first installation, set
-
-        ```yaml
-        appSettings:
-          env:
-            FIFTYONE_DATABASE_ADMIN: true
-        ```
-
-1. Deploy FiftyOne Teams
+1. Edit the `values.yaml` file
+1. Deploy FiftyOne Teams with `helm install`
     1. For a new installation, run
 
         ```shell
@@ -591,27 +580,6 @@ A minimal example `values.yaml` may be found
         helm repo update voxel51
         helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
         ```
-
-        1. After the successful installation, and logging into Fiftyone Teams
-        1. In your values file, remove the
-           `appSettings.env.FIFTYONE_DATABASE_ADMIN` override
-
-            ```yaml
-            appSettings:
-              env:
-                # FIFTYONE_DATABASE_ADMIN: true
-            ```
-
-            > **Note**: This example shows commenting this line,
-            > however you may remove the line.
-
-            or set it to `false` like in
-
-            ```yaml
-            appSettings:
-              env:
-                FIFTYONE_DATABASE_ADMIN: false
-            ```
 
     1. To upgrade an existing helm installation, run
 
@@ -630,24 +598,6 @@ A minimal example `values.yaml` may be found
         >    ```shell
         >    helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
         >    ```
-
-1. When `appSettings.env.FIFTYONE_DATABASE_ADMIN` is not `true`,
-   have the admin run to upgrade all datasets
-
-    ```shell
-    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-    ```
-
-    > **NOTE**: Skip this step when performing an initial installation with
-    > `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`.
-    > For more information, see
-    > [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
-
-1. To ensure that all datasets are now at version 0.23.5, run
-
-    ```shell
-    fiftyone migrate --info
-    ```
 
 <!-- Reference Links -->
 [affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
