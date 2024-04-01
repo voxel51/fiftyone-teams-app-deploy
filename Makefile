@@ -27,6 +27,8 @@ asdf:  ## Update plugins, add plugins, install plugins, set local, reshim
 	@echo "Reshimming.."
 	@asdf reshim
 
+auth:
+	gcloud auth application-default login --project computer-vision-team
 
 hooks:  ## Install git hooks (pre-commit)
 	@pre-commit install
@@ -39,7 +41,7 @@ hooks:  ## Install git hooks (pre-commit)
 pre-commit:  ## Run pre-commit against all files
 	@pre-commit run -a
 
-start:   ## Run minikube with ingress and gcp-auth
+start:  ## Run minikube with ingress and gcp-auth
 	# to persist mongodb data, we may want to start minikube with a volume mount
 	# minikube start --mount=true \
 	#   --mount-string=/var/tmp/mongodb_data:/tmp/hostpath-provisioner/fiftyone-teams/mongodb
