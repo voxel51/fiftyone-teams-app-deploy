@@ -571,7 +571,13 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
 A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
-1. Edit the `values.yaml` file
+1. Edit the `values.yaml` file, setting the required parameters including
+      1. `secret.fiftyone.mongodbConnectionString`
+      1. `secret.fiftyone.cookieSecret`
+      1. `secret.fiftyone.encryptionKey`
+      1. `secret.fiftyone.fiftyoneAuthSecret`
+      1. `apiSettings.dnsName`
+      1. `teamsAppSettings.dnsName`
 1. Deploy FiftyOne Teams with `helm install`
     1. For a new installation, run
 
