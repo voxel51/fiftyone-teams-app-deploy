@@ -409,7 +409,7 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
 1. From a directory containing the files `compose.yaml` and `env.template`
    files (included in this repository),
     1. Rename the `env.template` file to `.env`
-    1. Edit the `.env` file, setting the parameters required for this deployment.
+    1. Edit the `.env` file, setting all the customer provided required settings.
        See the
        [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
        table.
