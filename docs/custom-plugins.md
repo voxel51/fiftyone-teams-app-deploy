@@ -66,7 +66,7 @@ services:
 ```
 
 Please see
-[Enabling FiftyOne Teams Plugins](docker/README.md#enabling-fiftyone-teams-plugins)
+[Enabling FiftyOne Teams Plugins](../docker/README.md#enabling-fiftyone-teams-plugins)
 for example `docker compose` commands for starting and upgrading your
 deployment.
 
@@ -86,5 +86,5 @@ number as the FiftyOne Teams release, the Helm chart will
 automatically use the chart version to pull your image.
 
 Please see
-[FiftyOne Teams Plugins](helm/README.md#fiftyone-teams-plugins)
+[FiftyOne Teams Plugins](../helm/README.md#fiftyone-teams-plugins)
 for additional information regarding `teams-plugins` configuration.
