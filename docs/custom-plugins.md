@@ -86,5 +86,5 @@ number as the FiftyOne Teams release, the Helm chart will
 automatically use the chart version to pull your image.
 
 Please see
-[FiftyOne Teams Plugins](../helm/README.md#fiftyone-teams-plugins)
+[FiftyOne Teams Plugins](../helm/fiftyone-teams-app/README.md#fiftyone-teams-plugins)
 for additional information regarding `teams-plugins` configuration.
