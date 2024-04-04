@@ -168,9 +168,8 @@ There are three modes for plugins
           add the `teams-plugins` service name to your `no_proxy` and
           `NO_PROXY` environment variables.
 
-If you build plugins that have custom dependencies, you will need to build and
-use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/docs/custom-plugins.md)
+When you build plugins with custom dependencies, you must build and use
+[Custom Plugins Images](../../docs/custom-plugins.md)
 
 Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must be

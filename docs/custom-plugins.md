@@ -14,8 +14,8 @@
 
 # Custom Plugins Images
 
-Some plugins have custom python dependencies, which requires the
-creation of a new plugins image.  This document outlines the steps
+Some plugins have custom python dependencies, that require the
+creation of a new plugins image. This document outlines the steps
 Voxel51 recommends for creating those custom plugins containers.
 
 ## Create a New Image From an Existing Voxel51 Image
@@ -24,40 +24,42 @@ By default, dedicated plugins use the `voxel51/fiftyone-app` image.
 Basing your custom image on the existing base image will ensure that
 the required `fiftyone` packages and configurations are available.
 
-As an example, you might use the following Dockerfile to build a
-custom `your-internal-registry/fiftyone-app-internal` image:
+As an example, you might use the following multi-stage Dockerfile to build a
+custom `your-internal-registry/fiftyone-app-internal` image
 
 ```dockerfile
 ARG TEAMS_IMAGE_NAME
 
 FROM python:3.10 as wheelhouse
-
 RUN pip wheel --wheel-dir=/tmp/wheels pandas
 
 FROM ${TEAMS_IMAGE_NAME} as pandarelease
-
 RUN --mount=type=cache,from=wheelhouse,target=/wheelhouse,ro \
     pip --no-cache-dir install -q --no-index \
     --find-links=/wheelhouse/tmp/wheels pandas
 ```
 
-With a Dockerfile like this, you could use the following commands to
-build, and publish, your image to your internal registry
+> **Note**: The first build stage builds wheel(s)
+> that are used by the final build stage.
+> The binaries are not stored in the final image,
+> thus minimizing its image size.
+
+Build, tag, and publish, your image to your internal registry
 
 ```shell
 $ TEAMS_VERSION=v1.6.0
 $ docker buildx build --push \
     --build-arg TEAMS_IMAGE_NAME='voxel51/fiftyone-app:${TEAMS_VERSION}' \
- -t your-internal-registry/fiftyone-app-internal:${TEAMS_VERSION} .
+    -t your-internal-registry/fiftyone-app-internal:${TEAMS_VERSION} .
 ```
 
-You should upgrade your custom plugins image using the `TEAMS_VERSION`
+Upgrade your custom plugins image using the `TEAMS_VERSION`
 you plan to use in your FiftyOne Teams Deployment.
 
-## Using Your Custom Plugins Image in Docker Compose
+## Use Your Custom Plugins Image in Docker Compose
 
-Once you have built a custom plugins image, you can add it to your
-`compose.override.yaml` using something similar to the following:
+After building a custom plugins image, add it to a
+`compose.override.yaml` like
 
 ```yaml
 services:
@@ -70,10 +72,10 @@ Please see
 for example `docker compose` commands for starting and upgrading your
 deployment.
 
-## Using Your Custom Plugins Image in Helm Deployments
+## Use Your Custom Plugins Image in Helm Deployments
 
-Once you have build a custom plugins image, you can add it to your
-`values.yaml` using something similar to the following:
+After building a custom plugins image, add it to your
+`values.yaml` like
 
 ```yaml
 pluginsSettings:
@@ -81,9 +83,17 @@ pluginsSettings:
     repository: your-internal-registry/fiftyone-app-internal
 ```
 
-Assuming you have built your custom container with the same version
+Assuming you tagged the custom image with the same version
 number as the FiftyOne Teams release, the Helm chart will
 automatically use the chart version to pull your image.
+Otherwise, set the image tag like
+
+```yaml
+pluginsSettings:
+  image:
+    repository: your-internal-registry/fiftyone-app-internal
+    tag: v0.0.1
+```
 
 Please see
 [FiftyOne Teams Plugins](../helm/fiftyone-teams-app/README.md#fiftyone-teams-plugins)

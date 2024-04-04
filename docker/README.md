@@ -201,9 +201,8 @@ create a new Docker Volume shared between FiftyOne Teams services.
 For multi-node deployments, please implement a storage
 solution allowing the access the deployed plugins.
 
-If you build plugins that have custom dependencies, you will need to build and
-use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/docs/custom-plugins.md)
+When you build plugins with custom dependencies, you must build and use
+[Custom Plugins Images](../docs/custom-plugins.md).
 
 Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must
