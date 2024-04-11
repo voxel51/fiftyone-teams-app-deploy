@@ -520,15 +520,6 @@ want to carefully review the changes in the
 [Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
 and update your deployment accordingly.
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the
-> Central Authentication Service (CAS) which requires additional configurations
-> and consumes additional resources.  Please review the upgrade instructions
-> , the
-> [Helm Chart Diff](https://github.com/voxel51/fiftyone-teams-app-deploy/compare/fiftyone-teams-app-1.5.8...fiftyone-teams-app-1.6.0)
-> and the
-> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
-> documentation before completing your upgrade.
-
 ### From Early Adopter Versions (Versions less than 1.0)
 
 Please contact your Voxel51 Customer Success team member to coordinate this
@@ -549,7 +540,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 > and consumes additional resources.  Please review the upgrade instructions
 > , the
 > [Central Authentication Service](#central-authentication-service)
-> and the
+> notes and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
 
@@ -600,8 +591,8 @@ existing configuration to migrate to a new Auth0 Tenant.
 > Central Authentication Service (CAS) which requires additional configurations
 > and consumes additional resources.  Please review the upgrade instructions
 > , the
-> [Helm Chart Diff](https://github.com/voxel51/fiftyone-teams-app-deploy/compare/fiftyone-teams-app-1.5.8...fiftyone-teams-app-1.6.0)
-> and the
+> [Central Authentication Service](#central-authentication-service)
+> notes and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
 
