@@ -1,5 +1,5 @@
-//go:build docker || compose || integration || integrationComposeLegacyAuth
-// +build docker compose integration integrationComposeLegacyAuth
+//go:build docker || compose || integration || integrationComposeInternalAuth
+// +build docker compose integration integrationComposeInternalAuth
 
 package integration
 
@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	dockerLegacyAuthDir = "../../../docker/legacy-auth"
+	dockerInternalAuthDir = "../../../docker/internal-auth"
 	// Override FIFTYONE_DATABASE_ADMIN to true (until we can override via environment variable)
 	overrideFile = "../../tests/fixtures/docker/compose.override.yaml"
 	// To run the containers on macOS arm64, we need to set the platform
@@ -30,22 +30,22 @@ const (
 	mongodbComposeFile = "../../tests/fixtures/docker/compose.override.mongodb.yaml"
 )
 
-var legacyAuthComposeFile = "compose.yaml"
-var legacyAuthComposePluginsFile = "compose.plugins.yaml"
-var legacyAuthComposeDedicatedPluginsFile = "compose.dedicated-plugins.yaml"
-var legacyAuthEnvTemplateFilePath = filepath.Join(dockerLegacyAuthDir, "env.template")
+var internalAuthComposeFile = "compose.yaml"
+var internalAuthComposePluginsFile = "compose.plugins.yaml"
+var internalAuthComposeDedicatedPluginsFile = "compose.dedicated-plugins.yaml"
+var internalAuthEnvTemplateFilePath = filepath.Join(dockerInternalAuthDir, "env.template")
 
-type commonServicesLegacyAuthDockerComposeUpTest struct {
+type commonServicesInternalAuthDockerComposeUpTest struct {
 	suite.Suite
 	composeFilePath string
 	dotEnvFiles     []string
 	overrideFiles   []string
 }
 
-func TestDockerComposeUpLegacyAuth(t *testing.T) {
+func TestDockerComposeUpInternalAuth(t *testing.T) {
 	t.Parallel()
 
-	_, err := filepath.Abs(dockerLegacyAuthDir)
+	_, err := filepath.Abs(dockerInternalAuthDir)
 	require.NoError(t, err)
 
 	// Set the override files used for the tests
@@ -59,12 +59,12 @@ func TestDockerComposeUpLegacyAuth(t *testing.T) {
 		overrideFiles = append(overrideFiles, darwinOverrideFile)
 	}
 
-	suite.Run(t, &commonServicesLegacyAuthDockerComposeUpTest{
+	suite.Run(t, &commonServicesInternalAuthDockerComposeUpTest{
 		Suite:           suite.Suite{},
-		composeFilePath: dockerLegacyAuthDir,
+		composeFilePath: dockerInternalAuthDir,
 		dotEnvFiles: []string{
-			legacyAuthEnvTemplateFilePath,
-			legacyAuthEnvFixtureFilePath,
+			internalAuthEnvTemplateFilePath,
+			internalAuthFixtureEnvFilePath,
 		},
 		overrideFiles: overrideFiles,
 	})
@@ -78,7 +78,7 @@ type serviceValidations struct {
 	log              string
 }
 
-func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
+func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 	testCases := []struct {
 		name          string
 		composeFile   string
@@ -88,7 +88,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 	}{
 		{
 			"compose",
-			legacyAuthComposeFile,
+			internalAuthComposeFile,
 			s.overrideFiles,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -125,7 +125,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 		},
 		{
 			"composePlugins",
-			legacyAuthComposePluginsFile,
+			internalAuthComposePluginsFile,
 			s.overrideFiles,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -162,7 +162,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 		},
 		{
 			"composeDedicatedPlugins",
-			legacyAuthComposeDedicatedPluginsFile,
+			internalAuthComposeDedicatedPluginsFile,
 			s.overrideFiles,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -222,7 +222,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 			// ```shell
 			// docker compose \
 			//   -f tests/fixtures/docker/compose.override.mongodb.yaml \
-			//   --env-file tests/fixtures/docker/integration_legacy_auth.env
+			//   --env-file tests/fixtures/docker/integration_internal_auth.env
 
 			//   up -d
 			// ```
@@ -233,7 +233,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 
 			dockerOptions := &docker.Options{
 				ProjectName: "fiftyone-" + strings.ToLower(random.UniqueId()),
-				WorkingDir:  dockerLegacyAuthDir,
+				WorkingDir:  dockerInternalAuthDir,
 				EnvVars:     environmentVariables,
 			}
 

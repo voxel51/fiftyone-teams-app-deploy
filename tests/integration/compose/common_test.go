@@ -1,5 +1,5 @@
-//go:build docker || compose || integration || integrationComposeInternalAuth || integrationComposeLegacyAuth
-// +build docker compose integration integrationComposeInternalAuth integrationComposeLegacyAuth
+//go:build docker || compose || integration || integrationComposeInternalAuth || integrationComposeLegacyAuth || integrationComposeInternalAuth
+// +build docker compose integration integrationComposeInternalAuth integrationComposeLegacyAuth integrationComposeInternalAuth
 
 package integration
 
@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	envFixtureFilePath = "../../fixtures/docker/integration_legacy_auth.env"
+	legacyAuthEnvFixtureFilePath   = "../../fixtures/docker/integration_legacy_auth.env"
+	internalAuthFixtureEnvFilePath = "../../fixtures/docker/integration_internal_auth.env"
 )
 
 func validate_endpoint(t *testing.T, url string, expectedBody string, expectedStatus int) {
