@@ -162,7 +162,7 @@ Supported locations are network mounted filesystems and cloud storage folders.
   - Mount the filesystem to the `fiftyone-api` container
     (`teams-app` does not need this despite the variable set above).
     For an example, see
-    [./compose.plugins.yaml](./compose.plugins.yaml).
+    [legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml).
 - Cloud storage folder
   - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to a
     cloud storage path (for example
@@ -221,7 +221,7 @@ There are three modes for plugins
     - To enable this mode, use the file
       [legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
       instead of
-      [legacy-auth/compose.yaml](./compose.yaml)
+      [legacy-auth/compose.yaml](legacy-auth/compose.yaml)
     - Containers need the following access to plugin storage
       - `teams-plugins` requires `read`
       - `fiftyone-api` requires `read-write`
