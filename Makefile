@@ -91,12 +91,42 @@ port-forward-api:  ## port forward to service `teams-api` on the host port 8000
 port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
 
+tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
+	minikube tunnel
+
 helm-repos:  ## add helm repos for the project
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo add jetstack https://charts.jetstack.io
 
-tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
-	minikube tunnel
+clean: clean-unit-compose clean-unit-helm clean-integration-compose clean-integration-helm  ## delete all test output and reports
+
+clean-integration-compose:  ## delete docker compose integration test output and reports
+	rm -rf tests/integration/compose/test_output || true
+	rm -rf tests/integration/compose/test_reports || true
+	rm tests/integration/compose/test_output.log || true
+
+clean-integration-helm:  ## delete helm integration test output and reports
+	rm -rf tests/integration/helm/test_output || true
+	rm -rf tests/integration/helm/test_reports || true
+	rm tests/integration/helm/test_output.log || true
+
+clean-unit-compose:  ## delete docker compose unit test output and reports
+	rm -rf tests/unit/compose/test_output || true
+	rm -rf tests/unit/compose/test_reports || true
+	rm tests/unit/compose/test_output.log || true
+
+clean-unit-helm:  ## delete helm unit test output and reports
+	rm -rf tests/unit/helm/test_output || true
+	rm -rf tests/unit/helm/test_reports || true
+	rm tests/unit/helm/test_output.log || true
+
+dependencies-integration-compose:  ## create a (temporary) directory for mongodb container
+	mkdir -p /tmp/mongodb
+
+login:  ## Docker login to Google Artifact Registry (for accessing internal gcr.io container images)
+	gcloud auth print-access-token | \
+	  docker login -u oauth2accesstoken \
+	    --password-stdin https://us-central1-docker.pkg.dev
 
 test-unit-compose:  ## run go test on the tests/unit/compose directory
 	@cd tests/unit/compose; \
@@ -118,6 +148,17 @@ test-unit-helm-interleaved: install-terratest-log-parser  ## run go test on the 
 	rm -rf test_reports; \
 	mkdir test_reports; \
 	go test -count=1 -timeout=10m -v -tags unit | tee test_output.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
+
+test-integration-compose: dependencies-integration-compose ## run go test on the tests/integration/compose directory
+	@cd tests/integration/compose; \
+	go test -count=1 -timeout=10m -v -tags integration
+
+test-integration-compose-interleaved: install-terratest-log-parser dependencies-integration-compose clean-integration-compose ## run go test on the tests/integration/compose directory and run the terratest_log_parser for reports
+	@cd tests/integration/compose; \
+	rm -rf test_reports; \
+	mkdir test_reports; \
+	go test -count=1 -timeout=10m -v -tags integration | tee test_output.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
 
 install-terratest-log-parser:  ## install terratest_log_parser

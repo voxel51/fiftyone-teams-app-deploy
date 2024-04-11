@@ -1,0 +1,4 @@
+services:
+  fiftyone-app:
+    environment:
+      FIFTYONE_DATABASE_ADMIN: true
