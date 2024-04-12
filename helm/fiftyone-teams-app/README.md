@@ -85,9 +85,9 @@ Consider if you will require these settings for your deployment.
 
 ### Central Authentication Service
 
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-requires additional configurations and consumes additional resources.  Please
-review these notes, and the
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+CAS requires additional configurations and consumes additional resources.
+Please review these notes, and the
 [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 documentation before completing your upgrade.
 
@@ -99,11 +99,12 @@ to
 [`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
 after confirming your initial upgrade was successful.
 
-The CAS service requires changes to your `values.yaml` files - a brief summary
-of those changes include:
+The CAS service requires changes to your `values.yaml` files.
+A brief summary of those changes include
 
-- adding a `fiftyoneAuthSecret` secret to `secret.fiftyone` or the secret
-    defined by `secret.name`
+- Add the `fiftyoneAuthSecret` secret to either
+  - `secret.fiftyone`
+  - secret specified in `secret.name`
 
 ### Snapshot Archival
 
@@ -205,8 +206,9 @@ Pods based on the `fiftyone-teams-api` and `fiftyone-app`
 images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
 This key is used to encrypt storage credentials in the MongoDB database.
 
-To generate a `secret.fiftyone.encryptionKey`, run this Python code and add the
-output to your `values.yaml` override file, or to your deployment's secret:
+To generate a value for `secret.fiftyone.encryptionKey`, run this
+Python code and add the output to your `values.yaml` override file,
+or to your deployment's secret
 
 ```python
 from cryptography.fernet import Fernet
@@ -514,51 +516,51 @@ appSettings:
 
 ## Upgrading From Previous Versions
 
-Voxel51 assumes you are using the published Helm Chart to deploy your FiftyOne
-Teams environment.  If you are using a custom deployment mechanism you will
-want to carefully review the changes in the
+Voxel51 assumes you are using the published
+Helm Chart to deploy your FiftyOne Teams environment.
+If you are using a custom deployment mechanism, carefully review the changes in the
 [Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
 and update your deployment accordingly.
 
 ### From Early Adopter Versions (Versions less than 1.0)
 
-Please contact your Voxel51 Customer Success team member to coordinate this
-upgrade.
-You will need to either create a new Identity Provider (IdP) or modify your
-existing configuration to migrate to a new Auth0 Tenant.
+Please contact your Voxel51 Customer Success
+team member to coordinate this upgrade.
+You will need to either create a new Identity Provider (IdP)
+or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
 > **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0 requires
-> upgrading the database and will interrupt all SDK connections. You should
-> coordinate this upgrade carefully with your end-users.
+> upgrading the database and will interrupt all SDK connections.
+> You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the
-> Central Authentication Service (CAS) which requires additional configurations
-> and consumes additional resources.  Please review the upgrade instructions
-> , the
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
 > [Central Authentication Service](#central-authentication-service)
-> notes and the
+> documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_ your users to log in
-> after the upgrade is complete.  This will interrupt active workflows in the
-> FiftyOne Teams Hosted Web App; you should coordinate this upgrade carefully
-> with your end-users.
+> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> your users to log in after the upgrade is complete.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
 
-1. In your `values.yaml`, make sure the required `secret.fiftyone.encryptionKey`
-   (or your deployment's equivalent) is set, which will configure the
-   `FIFTYONE_ENCRYPTION_KEY` environment variable in the appropriate service pods
-1. In your `values.yaml`, make sure the required `secret.fiftyone.fiftyoneAuthSecert`
-   (or your deployment's equivalent) is set, which will configure the
-   `FIFTYONE_AUTH_SECRET` environment variable in the appropriate service pods
-1. In your `values.yaml`, set `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`.
-   This is not the default value in the Helm Chart and must be overridden.
+1. In your `values.yaml`, set the required values
+    1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
+           in the appropriate service pods
+    1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
+           in the appropriate service pods
+    1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
+        1. This is not the default value in the Helm Chart and must be overridden
 1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
     > **NOTE:** At this step, FiftyOne SDK users will lose access to the
     > FiftyOne Teams Database until they upgrade to `fiftyone==0.16.0`
@@ -580,19 +582,18 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_ your users to log in
-> after the upgrade is complete.  This will interrupt active workflows in the
-> FiftyOne Teams Hosted Web App; you should coordinate this upgrade carefully
-> with your end-users.
+> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> your users to log in after the upgrade is complete.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the
-> Central Authentication Service (CAS) which requires additional configurations
-> and consumes additional resources.  Please review the upgrade instructions
-> , the
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
 > [Central Authentication Service](#central-authentication-service)
-> notes and the
+> documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
 
@@ -600,12 +601,13 @@ existing configuration to migrate to a new Auth0 Tenant.
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. In your `values.yaml`, make sure the required `secret.fiftyone.encryptionKey`
-   (or your deployment's equivalent) is set, which will configure the
-   `FIFTYONE_ENCRYPTION_KEY` environment variable in the appropriate service pods
-1. In your `values.yaml`, make sure the required `secret.fiftyone.fiftyoneAuthSecert`
-   (or your deployment's equivalent) is set, which will configure the
-   `FIFTYONE_AUTH_SECRET` environment variable in the appropriate service pods
+1. In your `values.yaml`, set the required values
+    1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
+           in the appropriate service pods
+    1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
+           in the appropriate service pods
 1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.0
     - Login to the FiftyOne Teams UI
@@ -617,8 +619,9 @@ existing configuration to migrate to a new Auth0 Tenant.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.16.0 will lose connectivity at this
-    > point. Upgrading to `fiftyone==0.16.0` is required.
+    > **NOTE** Any FiftyOne SDK less than 0.16.0
+    > will lose connectivity at this point.
+    > Upgrading to `fiftyone==0.16.0` is required.
 
 1. Validate that all datasets are now at version 0.23.5
 
