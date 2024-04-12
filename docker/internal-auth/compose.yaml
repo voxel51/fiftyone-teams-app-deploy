@@ -8,6 +8,8 @@ services:
       service: fiftyone-app-common
 
   teams-api:
+    environment:
+      FEATURE_FLAG_ENABLE_INVITATIONS: false
     extends:
       file: ../common-services.yaml
       service: teams-api-common
