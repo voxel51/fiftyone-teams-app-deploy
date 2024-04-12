@@ -104,9 +104,9 @@ quickstart  0.21.2
 
 ### Central Authentication Service
 
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-requires additional configurations and consumes additional resources.  Please
-review these notes, and the
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+CAS requires additional configurations and consumes additional resources.
+Please review these notes, and the
 [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 documentation before completing your upgrade.
 
@@ -118,12 +118,11 @@ to
 [`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
 after confirming your initial upgrade was successful.
 
-The CAS service requires changes to your `.env` files - a brief summary of those
-changes include:
+The CAS service requires changes to your `.env` files.
+A brief summary of those changes include
 
-- adding `FIFTYONE_AUTH_SECRET` variable which populates to each of the
-    defined services.
-- adding the following CAS Service configuration variables:
+- Add the `FIFTYONE_AUTH_SECRET` variable used in every service
+- Add the following CAS Service configuration variables
   - `CAS_BASE_URL`
   - `CAS_BIND_ADDRESS`
   - `CAS_BIND_PORT`
@@ -132,17 +131,17 @@ changes include:
   - `CAS_DEFAULT_USER_ROLE`
 
 Please review these changes in the
-[legacy-auth/env.template](legacy-auth/env.template) and in the appropriate
-`legacy-auth/compose*` files.
+[legacy-auth/env.template](legacy-auth/env.template)
+and in the appropriate `legacy-auth/compose*` files.
 
-To upgrade from versions prior to FiftyOne Teams v1.6:
+To upgrade from versions prior to FiftyOne Teams v1.6
 
-- copy your `.env` file into the `legacy-auth` directory
-- copy your `compose.override.yaml` file into the `legacy-auth` directory
+- Copy your `.env` file into the `legacy-auth` directory
+- Copy your `compose.override.yaml` file into the `legacy-auth` directory
 - `cd` into the `legacy-auth` directory
-- update your `.env` file to add the variables listed above
-- update your `compose.override.yaml` with `teams-cas` changes (if necessary)
-- run `docker compose` commands from the `legacy-auth` directory
+- Update your `.env` file, adding the variables listed above
+- Update your `compose.override.yaml` with `teams-cas` changes (if necessary)
+- Run `docker compose` commands from the `legacy-auth` directory
 
 ### Snapshot Archival
 
@@ -252,8 +251,9 @@ use
 [Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md)
 
 Use the FiftyOne Teams UI to deploy plugins by navigating to
-`https://<DEPLOY_URL>/settings/plugins`. Early-adopter plugins installed
-manually must be redeployed using the FiftyOne Teams UI.
+`https://<DEPLOY_URL>/settings/plugins`.
+Early-adopter plugins installed manually must
+be redeployed using the FiftyOne Teams UI.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
@@ -261,8 +261,8 @@ As of FiftyOne Teams 1.1, containers based on the `fiftyone-teams-api` and
 `fiftyone-app` images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
 This key is used to encrypt storage credentials in the MongoDB database.
 
-To  generate `FIFTYONE_ENCRYPTION_KEY`, run this Python code and add the
-output to your `.env` file:
+To generate a value for `FIFTYONE_ENCRYPTION_KEY`, run this
+Python code and add the output to your `.env` file:
 
 ```python
 from cryptography.fernet import Fernet
@@ -374,15 +374,14 @@ create a new IdP or modify your existing configuration.
 ### From Before FiftyOne Teams Version 1.1.0
 
 > **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0 requires
-> upgrading the database and will interrupt all SDK connections. You should
-> coordinate this upgrade carefully with your end-users.
+> upgrading the database and will interrupt all SDK connections.
+> You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the
-> Central Authentication Service (CAS) which requires additional configurations
-> and consumes additional resources.  Please review the upgrade instructions
-> , the
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
 > [Central Authentication Service](#central-authentication-service)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
@@ -390,10 +389,10 @@ create a new IdP or modify your existing configuration.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_ your users to log in
-> after the upgrade is complete.  This will interrupt active workflows in the
-> FiftyOne Teams Hosted Web App; you should coordinate this upgrade carefully
-> with your end-users.
+> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> your users to log in after the upgrade is complete.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
 
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
@@ -428,15 +427,14 @@ create a new IdP or modify your existing configuration.
 ### From FiftyOne Teams Version 1.1.0 and later
 
 > **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0 requires
-> upgrading the database and will interrupt all SDK connections. You should
-> coordinate this upgrade carefully with your end-users.
+> upgrading the database and will interrupt all SDK connections.
+> You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the
-> Central Authentication Service (CAS) which requires additional configurations
-> and consumes additional resources.  Please review the upgrade instructions
-> , the
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
 > [Central Authentication Service](#central-authentication-service)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
@@ -444,10 +442,10 @@ create a new IdP or modify your existing configuration.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_ your users to log in
-> after the upgrade is complete.  This will interrupt active workflows in the
-> FiftyOne Teams Hosted Web App; you should coordinate this upgrade carefully
-> with your end-users.
+> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> your users to log in after the upgrade is complete.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> you should coordinate this upgrade carefully with your end-users.
 
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
@@ -533,20 +531,29 @@ create a new IdP or modify your existing configuration.
               # FIFTYONE_DATABASE_ADMIN: false
         ```
 
-The FiftyOne Teams App is now exposed on port `3000` and the FiftyOne Teams CAS
-is now exposed on port `3030`.
+The FiftyOne Teams App is now exposed on port `3000` and
+the FiftyOne Teams CAS is now exposed on port `3030`.
 An SSL endpoint (Load Balancer or Nginx Proxy or something similar)
 will need to be configured to route traffic from the SSL endpoint
 to port `3000` on the host running the FiftyOne Teams App and to use path-based
 routing to route `/cas` traffic to port `3030` on the host running the FiftyOne
 Teams CAS.
 
-An example nginx site configuration that forwards http traffic to
-https, https traffic for `your.server.name/cas` to port `3030`, and https
-traffic for `your.server.name` to port `3000`
+Configure an SSL endpoint (like a Load Balancer, Nginx Proxy, or similar)
+to route traffic
+
+- From the SSL endpoint to port `3000`
+  on the host running the FiftyOne Teams App
+- From the path-based route `/cas` to port `3030`
+  on the host running the FiftyOne Teams CAS
 
 See
-[./example-nginx-site.conf](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf).
+[./example-nginx-site.conf](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf)
+for an example Nginx site configuration that forwards
+
+- http traffic to https
+- https traffic for `your.server.name/cas` to port `3030`
+- https traffic for `your.server.name` to port `3000`
 
 ---
 
