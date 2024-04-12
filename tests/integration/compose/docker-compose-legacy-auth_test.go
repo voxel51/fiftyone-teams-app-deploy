@@ -23,11 +23,6 @@ import (
 
 const (
 	dockerLegacyAuthDir = "../../../docker/legacy-auth"
-	// Override FIFTYONE_DATABASE_ADMIN to true (until we can override via environment variable)
-	overrideFile = "../../tests/fixtures/docker/compose.override.yaml"
-	// To run the containers on macOS arm64, we need to set the platform
-	darwinOverrideFile = "../../tests/fixtures/docker/compose.override.darwin.yaml"
-	mongodbComposeFile = "../../tests/fixtures/docker/compose.override.mongodb.yaml"
 )
 
 var legacyAuthComposeFile = "compose.yaml"
@@ -68,14 +63,6 @@ func TestDockerComposeUpLegacyAuth(t *testing.T) {
 		},
 		overrideFiles: overrideFiles,
 	})
-}
-
-type serviceValidations struct {
-	name             string
-	url              string
-	responsePayload  string
-	httpResponseCode int
-	log              string
 }
 
 func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
