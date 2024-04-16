@@ -299,7 +299,7 @@ For example, `compose.override.yaml` might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.5.8
+    image: voxel51/fiftyone-app-torch:v1.5.9
 ```
 
 For more information, see the docs for
@@ -315,7 +315,7 @@ create a new IdP or modify your existing configuration.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.15.8 SDK (database version 0.23.7) is _NOT_ backwards-compatible
+The FiftyOne 0.15.9 SDK (database version 0.23.8) is _NOT_ backwards-compatible
 with FiftyOne Teams Database Versions prior to 0.19.0.
 The FiftyOne 0.10.x SDK is not forwards compatible
 with current FiftyOne Teams Database Versions.
@@ -332,16 +332,16 @@ versions prior to FiftyOne Teams version 1.1.0:
    (see
    [env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/env.template#L17)
    for details)
-1. [Upgrade to FiftyOne Teams version 1.5.8](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.5.9](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default in the `compose.yaml` for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.8`
-1. Upgrade your FiftyOne SDKs to version 0.15.8
+      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.15.9`
+1. Upgrade your FiftyOne SDKs to version 0.15.9
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check if datasets have been migrated to version 0.23.7.
+1. Check if datasets have been migrated to version 0.23.8.
 
     ```shell
     fiftyone migrate --info
@@ -355,10 +355,10 @@ versions prior to FiftyOne Teams version 1.1.0:
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.15.8 SDK is backwards-compatible with
+The FiftyOne 0.15.9 SDK is backwards-compatible with
 FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.5.8
-database (version 0.23.7) with any FiftyOne SDK before 0.15.8.
+You will not be able to connect to a FiftyOne Teams 1.5.9
+database (version 0.23.8) with any FiftyOne SDK before 0.15.9.
 
 Voxel51 always recommends using the latest version of the
 FiftyOne SDK compatible with your FiftyOne Teams deployment.
@@ -374,8 +374,8 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.5.8](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.8
+1. [Upgrade to FiftyOne Teams version 1.5.9](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.9
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -385,10 +385,10 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.15.8 will lose database connectivity
-      at this point. Upgrading to `fiftyone==0.15.8` is required
+    - **NOTE** Any FiftyOne SDK less than 0.15.9 will lose database connectivity
+      at this point. Upgrading to `fiftyone==0.15.9` is required
 
-1. To ensure that all datasets are now at version 0.23.7, run
+1. To ensure that all datasets are now at version 0.23.8, run
 
     ```shell
     fiftyone migrate --info
@@ -416,7 +416,7 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 0.23.7, run
+1. To ensure that all datasets are now at version 0.23.8, run
 
     ```shell
     fiftyone migrate --info
