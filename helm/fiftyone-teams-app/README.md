@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 1.5.8](https://img.shields.io/badge/Version-1.5.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.5.8](https://img.shields.io/badge/AppVersion-v1.5.8-informational?style=flat-square)
+![Version: 1.5.9](https://img.shields.io/badge/Version-1.5.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.5.9](https://img.shields.io/badge/AppVersion-v1.5.9-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 <!-- markdownlint-enable line-length -->
@@ -443,7 +443,7 @@ versions prior to FiftyOne Teams version 1.1.0:
 1. In your `values.yaml`, set the required
    [FIFTYONE_ENCRYPTION_KEY](#storage-credentials-and-fiftyone_encryption_key)
    environment variable
-1. [Upgrade to FiftyOne Teams version 1.5.8](#launch-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.5.9](#launch-fiftyone-teams)
    with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
    (this is not the default value in `values.yaml` and must be overridden).
     > **NOTE:** At this step, FiftyOne SDK users will lose access to the
@@ -468,7 +468,7 @@ versions prior to FiftyOne Teams version 1.1.0:
 
 The FiftyOne 0.15.9 SDK is backwards-compatible with
 FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.5.8
+You will not be able to connect to a FiftyOne Teams 1.5.9
 database (version 0.23.8) with any FiftyOne SDK before 0.15.9.
 
 We recommend using the latest version of the FiftyOne SDK
@@ -481,7 +481,7 @@ upgrading from FiftyOne Teams version 1.1.0 or later:
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.5.8](#launch-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.5.9](#launch-fiftyone-teams)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.9
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
