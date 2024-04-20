@@ -139,28 +139,28 @@ func (s *commonServicesDockerComposeTest) TestServiceImage() {
 			"teams-api",
 			[]string{composeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-api:v1.5.9",
+			"voxel51/fiftyone-teams-api:v1.5.10",
 		},
 		{
 			"defaultTeamsApp",
 			"teams-app",
 			[]string{composeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-app:v1.5.9",
+			"voxel51/fiftyone-teams-app:v1.5.10",
 		},
 		{
 			"defaultFiftyoneApp",
 			"fiftyone-app",
 			[]string{composeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app:v1.5.9",
+			"voxel51/fiftyone-app:v1.5.10",
 		},
 		{
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
 			[]string{composeDedicatedPluginsFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app:v1.5.9",
+			"voxel51/fiftyone-app:v1.5.10",
 		},
 	}
 
