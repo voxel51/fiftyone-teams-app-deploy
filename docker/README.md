@@ -450,10 +450,9 @@ create a new IdP or modify your existing configuration.
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
 1. `cd` into the `legacy-auth` directory
-1. Make sure your `.env` file includes the required `FIFTYONE_API_URI`
-   environment variable
-1. Make sure your `.env` file includes the required `FIFTYONE_AUTH_SECRET`
-   environment variable
+1. In the `.env` file, set the required environment variables
+    - `FIFTYONE_API_URI`
+    - `FIFTYONE_AUTH_SECRET`
 1. Ensure all FiftyOne SDK users either
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
@@ -528,7 +527,7 @@ create a new IdP or modify your existing configuration.
         services:
           fiftyone-app-common:
             environment:
-              # FIFTYONE_DATABASE_ADMIN: false
+              FIFTYONE_DATABASE_ADMIN: false
         ```
 
 The FiftyOne Teams App is now exposed on port `3000` and

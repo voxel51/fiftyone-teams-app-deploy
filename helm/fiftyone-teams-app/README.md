@@ -656,11 +656,11 @@ A minimal example `values.yaml` may be found
         > [helm diff](https://github.com/databus23/helm-diff).
         > Voxel51 is not affiliated with the author of this plugin.
         >
-        >    For example:
+        > For example:
         >
-        >    ```shell
-        >    helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
-        >    ```
+        > ```shell
+        > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
+        > ```
 
 <!-- Reference Links -->
 [affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
