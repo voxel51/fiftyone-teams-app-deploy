@@ -91,12 +91,40 @@ port-forward-api:  ## port forward to service `teams-api` on the host port 8000
 port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
 
+tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
+	minikube tunnel
+
 helm-repos:  ## add helm repos for the project
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo add jetstack https://charts.jetstack.io
 
-tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
-	minikube tunnel
+clean: clean-unit-compose clean-unit-helm clean-integration-compose clean-integration-helm  ## delete all test output and reports
+
+clean-integration-compose:  ## delete docker compose integration test output and reports
+	rm -rf tests/integration/compose/test_output_internal || true
+	rm -rf tests/integration/compose/test_output_legacy || true
+	rm tests/integration/compose/test_output.log || true
+
+clean-integration-helm:  ## delete helm integration test output and reports
+	rm -rf tests/integration/helm/test_output_internal || true
+	rm -rf tests/integration/helm/test_output_legacy || true
+	rm tests/integration/helm/test_output.log || true
+
+clean-unit-compose:  ## delete docker compose unit test output and reports
+	rm -rf tests/unit/compose/test_output || true
+	rm tests/unit/compose/test_output.log || true
+
+clean-unit-helm:  ## delete helm unit test output and reports
+	rm -rf tests/unit/helm/test_output || true
+	rm tests/unit/helm/test_output.log || true
+
+dependencies-integration-compose:  ## create a (temporary) directory for mongodb container
+	mkdir -p /tmp/mongodb
+
+login:  ## Docker login to Google Artifact Registry (for accessing internal gcr.io container images)
+	gcloud auth print-access-token | \
+	  docker login -u oauth2accesstoken \
+	    --password-stdin https://us-central1-docker.pkg.dev
 
 test-unit-compose:  ## run go test on the tests/unit/compose directory
 	@cd tests/unit/compose; \
@@ -108,17 +136,39 @@ test-unit-helm:  ## run go test on the tests/unit/helm directory
 
 test-unit-compose-interleaved: install-terratest-log-parser  ## run go test on the tests/unit/compose directory and run the terratest_log_parser for reports
 	@cd tests/unit/compose; \
-	rm -rf test_reports; \
-	mkdir test_reports; \
+	rm -rf test_output/*; \
 	go test -count=1 -timeout=10m -v -tags unit | tee test_output.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
 
 test-unit-helm-interleaved: install-terratest-log-parser  ## run go test on the tests/unit/helm directory and run the terratest_log_parser for reports
 	@cd tests/unit/helm; \
-	rm -rf test_reports; \
-	mkdir test_reports; \
+	rm -rf test_output/*; \
 	go test -count=1 -timeout=10m -v -tags unit | tee test_output.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
+
+test-integration-compose: test-integration-compose-internal test-integration-compose-legacy ## run go test on the tests/integration/compose directory for both internal and legacy auth modes
+
+test-integration-compose-internal: dependencies-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode
+	@cd tests/integration/compose; \
+	go test -count=1 -timeout=10m -v -tags integrationComposeInternalAuth
+
+test-integration-compose-legacy: dependencies-integration-compose ## run go test on the tests/integration/compose directory for legacy auth mode
+	@cd tests/integration/compose; \
+	go test -count=1 -timeout=10m -v -tags integrationComposeLegacyAuth
+
+test-integration-compose-interleaved:  test-integration-compose-interleaved-internal test-integration-compose-interleaved-legacy  ## run go test on the tests/integration/compose directory and run the terratest_log_parser for reports
+
+test-integration-compose-interleaved-internal: install-terratest-log-parser dependencies-integration-compose clean-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode and run the terratest_log_parser for reports
+	@cd tests/integration/compose; \
+	rm -rf test_output_internal/*; \
+	go test -count=1 -timeout=10m -v -tags integrationComposeInternalAuth | tee test_output_internal.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
+
+test-integration-compose-interleaved-legacy: install-terratest-log-parser dependencies-integration-compose clean-integration-compose ## run go test on the tests/integration/compose directory for legacy auth mode and run the terratest_log_parser for reports
+	@cd tests/integration/compose; \
+	rm -rf test_output_legacy/*; \
+	go test -count=1 -timeout=10m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
 
 install-terratest-log-parser:  ## install terratest_log_parser
 	go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@latest

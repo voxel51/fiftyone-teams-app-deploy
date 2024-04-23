@@ -5,8 +5,8 @@
 compose.override*yaml
 helm/gke-example/values-*.yaml
 helm/gke-example/voxel51-docker.json
-tests/integration/*/test_output.log
-tests/integration/*/test_output/*
+tests/integration/*/test_output*.log
+tests/integration/*/test_output*/*
 tests/integration/*/test_reports/*
 tests/unit/*/test_output.log
 tests/unit/*/test_output/*
