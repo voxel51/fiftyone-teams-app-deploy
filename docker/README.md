@@ -530,13 +530,8 @@ create a new IdP or modify your existing configuration.
               FIFTYONE_DATABASE_ADMIN: false
         ```
 
-The FiftyOne Teams App is now exposed on port `3000` and
-the FiftyOne Teams CAS is now exposed on port `3030`.
-An SSL endpoint (Load Balancer or Nginx Proxy or something similar)
-will need to be configured to route traffic from the SSL endpoint
-to port `3000` on the host running the FiftyOne Teams App and to use path-based
-routing to route `/cas` traffic to port `3030` on the host running the FiftyOne
-Teams CAS.
+The FiftyOne Teams App is exposed on port `3000` and
+the FiftyOne Teams CAS is exposed on port `3030`.
 
 Configure an SSL endpoint (like a Load Balancer, Nginx Proxy, or similar)
 to route traffic

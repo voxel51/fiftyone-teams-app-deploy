@@ -94,6 +94,10 @@ To use this chart's ingress object
               pathType: Prefix
               serviceName: teams-api
               servicePort: 80
+            - path: /cas
+              pathType: Prefix
+              serviceName: teams-cas
+              servicePort: 80
             - path: /
               pathType: Prefix
               serviceName: teams-app
