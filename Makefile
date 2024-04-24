@@ -91,6 +91,12 @@ port-forward-api:  ## port forward to service `teams-api` on the host port 8000
 port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
 
+run: helm-repos  ## run skaffold run
+	skaffold run
+
+run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
+	skaffold run -p only-fiftyone
+
 tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
 	minikube tunnel
 
