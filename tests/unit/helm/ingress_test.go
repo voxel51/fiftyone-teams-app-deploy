@@ -453,7 +453,7 @@ func (s *ingressTemplateTest) TestTls() {
 }
 
 // TODO: Resume here.  Add test cases to cover all of the variants of the rules
-// TODO: Test k8s versions when 1.17-0, 1.18-0 and 1.19-0
+// TODO: Test k8s versions when 1.18-0 and 1.19-0
 func (s *ingressTemplateTest) TestRules() {
 	testCases := []struct {
 		name     string
@@ -470,6 +470,18 @@ func (s *ingressTemplateTest) TestRules() {
             "http": {
               "paths": [
                 {
+                  "path": "/cas",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
                   "backend": {
@@ -477,6 +489,58 @@ func (s *ingressTemplateTest) TestRules() {
                       "name": "teams-app",
                       "port": {
                         "number": 80
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]`
+				var expectedRules []networkingv1.IngressRule
+				err := json.Unmarshal([]byte(expectedJSON), &expectedRules)
+				s.NoError(err)
+				s.Equal(expectedRules, tls, "Rules should be equal")
+			},
+		},
+		{
+			"overridePaths",
+			map[string]string{
+				"ingress.paths[0].path":        "/test-cas",
+				"ingress.paths[0].pathType":    "ImplementationSpecific",
+				"ingress.paths[0].serviceName": "test-teams-cas",
+				"ingress.paths[0].servicePort": "81",
+				"ingress.paths[1].path":        "/**",
+				"ingress.paths[1].pathType":    "Prefix",
+				"ingress.paths[1].serviceName": "test-teams-app",
+				"ingress.paths[1].servicePort": "82",
+			},
+			func(tls []networkingv1.IngressRule) {
+				expectedJSON := `[
+          {
+            "host": "",
+            "http": {
+              "paths": [
+                {
+                  "path": "/test-cas",
+                  "pathType": "ImplementationSpecific",
+                  "backend": {
+                    "service": {
+                      "name": "test-teams-cas",
+                      "port": {
+                        "number": 81
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/**",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "test-teams-app",
+                      "port": {
+                        "number": 82
                       }
                     }
                   }
@@ -502,6 +566,18 @@ func (s *ingressTemplateTest) TestRules() {
             "host": "teams-app.fiftyone.ai",
             "http": {
               "paths": [
+                {
+                  "path": "/cas",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
                 {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
@@ -535,6 +611,18 @@ func (s *ingressTemplateTest) TestRules() {
             "host": "",
             "http": {
               "paths": [
+                {
+                  "path": "/cas",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
                 {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
@@ -579,16 +667,12 @@ func (s *ingressTemplateTest) TestRules() {
 		{
 			"overrideBothDnsNames",
 			map[string]string{
-				"apiSettings.dnsName":           "teams-api.fiftyone.ai",
-				"apiSettings.service.name":      "test-service-name-teams-api",
-				"apiSettings.service.port":      "81",
-				"ingress.api.path":              "/test-api-path",
-				"ingress.api.pathType":          "prefix",
-				"ingress.teamsApp.path":         "/test-app-path",
-				"ingress.teamsApp.pathType":     "prefix",
-				"teamsAppSettings.dnsName":      "teams-app.fiftyone.ai",
-				"teamsAppSettings.service.name": "test-service-name-teams-app",
-				"teamsAppSettings.service.port": "81",
+				"apiSettings.dnsName":      "teams-api.fiftyone.ai",
+				"apiSettings.service.name": "test-service-name-teams-api",
+				"apiSettings.service.port": "81",
+				"ingress.api.path":         "/test-api-path",
+				"ingress.api.pathType":     "prefix",
+				"teamsAppSettings.dnsName": "teams-app.fiftyone.ai",
 			},
 			func(tls []networkingv1.IngressRule) {
 				expectedJSON := `[
@@ -597,13 +681,25 @@ func (s *ingressTemplateTest) TestRules() {
             "http": {
               "paths": [
                 {
-                  "path": "/test-app-path",
-                  "pathType": "prefix",
+                  "path": "/cas",
+                  "pathType": "Prefix",
                   "backend": {
                     "service": {
-                      "name": "test-service-name-teams-app",
+                      "name": "teams-cas",
                       "port": {
-                        "number": 81
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/*",
+                  "pathType": "ImplementationSpecific",
+                  "backend": {
+                    "service": {
+                      "name": "teams-app",
+                      "port": {
+                        "number": 80
                       }
                     }
                   }
@@ -641,26 +737,30 @@ func (s *ingressTemplateTest) TestRules() {
 			"overridePathsWithPathBasedRouting",
 			map[string]string{
 				"teamsAppSettings.dnsName":     "teams-app.fiftyone.ai",
-				"ingress.paths[0].path":        "/_pymongo",
+				"ingress.paths[0].path":        "/cas",
 				"ingress.paths[0].pathType":    "Prefix",
-				"ingress.paths[0].serviceName": "teams-api",
+				"ingress.paths[0].serviceName": "teams-cas",
 				"ingress.paths[0].servicePort": "80",
-				"ingress.paths[1].path":        "/health",
+				"ingress.paths[1].path":        "/_pymongo",
 				"ingress.paths[1].pathType":    "Prefix",
 				"ingress.paths[1].serviceName": "teams-api",
 				"ingress.paths[1].servicePort": "80",
-				"ingress.paths[2].path":        "/graphql/v1",
+				"ingress.paths[2].path":        "/health",
 				"ingress.paths[2].pathType":    "Prefix",
 				"ingress.paths[2].serviceName": "teams-api",
 				"ingress.paths[2].servicePort": "80",
-				"ingress.paths[3].path":        "/file",
+				"ingress.paths[3].path":        "/graphql/v1",
 				"ingress.paths[3].pathType":    "Prefix",
 				"ingress.paths[3].serviceName": "teams-api",
 				"ingress.paths[3].servicePort": "80",
-				"ingress.paths[4].path":        "/",
+				"ingress.paths[4].path":        "/file",
 				"ingress.paths[4].pathType":    "Prefix",
-				"ingress.paths[4].serviceName": "teams-app",
+				"ingress.paths[4].serviceName": "teams-api",
 				"ingress.paths[4].servicePort": "80",
+				"ingress.paths[5].path":        "/",
+				"ingress.paths[5].pathType":    "Prefix",
+				"ingress.paths[5].serviceName": "teams-app",
+				"ingress.paths[5].servicePort": "80",
 			},
 			func(tls []networkingv1.IngressRule) {
 				expectedJSON := `[
@@ -668,6 +768,18 @@ func (s *ingressTemplateTest) TestRules() {
             "host": "teams-app.fiftyone.ai",
             "http": {
               "paths": [
+                {
+                  "path": "/cas",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
                 {
                   "path": "/_pymongo",
                   "pathType": "Prefix",

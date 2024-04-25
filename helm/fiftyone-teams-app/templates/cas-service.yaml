@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  {{- with .Values.casSettings.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "teams-cas.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-teams-cas.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.casSettings.service.type }}
+  ports:
+    - port: {{ .Values.casSettings.service.port }}
+      targetPort: {{ .Values.casSettings.service.containerPort | default 3000 }}
+      protocol: TCP
+      name: http
+      {{- if and (eq .Values.casSettings.service.type "NodePort") (.Values.casSettings.service.nodePort) }}
+      nodePort: {{ .Values.casSettings.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "fiftyone-teams-cas.selectorLabels" . | nindent 4 }}

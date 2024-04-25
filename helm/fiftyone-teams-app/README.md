@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 1.5.10](https://img.shields.io/badge/Version-1.5.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.5.10](https://img.shields.io/badge/AppVersion-v1.5.10-informational?style=flat-square)
+![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.0](https://img.shields.io/badge/AppVersion-v1.6.0-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 <!-- markdownlint-enable line-length -->
@@ -25,7 +25,8 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 <!-- toc -->
 
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
-- [FiftyOne Features](#fiftyone-features)
+- [FiftyOne Teams Features](#fiftyone-teams-features)
+  - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
@@ -37,25 +38,25 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
   - [From FiftyOne Teams Version 1.1.0 and later](#from-fiftyone-teams-version-110-and-later)
-- [Launch FiftyOne Teams](#launch-fiftyone-teams)
+- [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
 
 <!-- tocstop -->
 
-We publish container images to these Docker Hub repositories
+We publish the following FiftyOne Teams private images to Docker Hub:
 
 - `voxel51/fiftyone-app`
 - `voxel51/fiftyone-app-gpt`
 - `voxel51/fiftyone-app-torch`
 - `voxel51/fiftyone-teams-api`
 - `voxel51/fiftyone-teams-app`
+- `voxel51/fiftyone-teams-cas`
 
 For Docker Hub credentials, please contact your Voxel51 support team.
 
 ## Initial Installation vs. Upgrades
 
 Upgrades are more frequent than new installations.
-Thus, the chart's default behavior supports
-upgrades and the `values.yaml` contains
+The chart's default behavior supports upgrades and the `values.yaml` contains
 
 ```yaml
 appSettings:
@@ -78,9 +79,32 @@ this environment variable or changing the value to `false`.
 When performing an upgrade, please review
 [Upgrading From Previous Versions](#upgrading-from-previous-versions).
 
-## FiftyOne Features
+## FiftyOne Teams Features
 
 Consider if you will require these settings for your deployment.
+
+### Central Authentication Service
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+CAS requires additional configurations and consumes additional resources.
+Please review these notes, and the
+[Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
+documentation before completing your upgrade.
+
+Voxel51 recommends upgrading your deployment using
+[`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
+and
+[migrating](https://docs.voxel51.com/teams/pluggable_auth.html#migrating-from-legacy-to-internal-mode)
+to
+[`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
+after confirming your initial upgrade was successful.
+
+The CAS service requires changes to your `values.yaml` files.
+A brief summary of those changes include
+
+- Add the `fiftyoneAuthSecret` secret to either
+  - `secret.fiftyone`
+  - secret specified in `secret.name`
 
 ### Snapshot Archival
 
@@ -111,7 +135,8 @@ Supported locations are network mounted filesystems and cloud storage folders.
     [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
     loaded in the `teams-api` deployment have full edit capabilities to this bucket
 
-See the [configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
+See the
+[configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
 for other configuration values that control the behavior of automatic snapshot archival.
 
 ### FiftyOne Teams Authenticated API
@@ -162,11 +187,16 @@ There are three modes for plugins
               at the `FIFTYONE_PLUGINS_DIR` path
             - `ReadOnly` permission to the `teams-plugins` deployment
               at the `FIFTYONE_PLUGINS_DIR` path
-        - If you are [using a proxy](#proxies), add the
-          `teams-plugins` service name to your `no_proxy` and
+        - If you are
+          [using a proxy](#proxies),
+          add the `teams-plugins` service name to your `no_proxy` and
           `NO_PROXY` environment variables.
 
-Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPOY_URL>/settings/plugins`.
+If you build plugins that have custom dependencies, you will need to build and
+use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md)
+
+Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPLOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must be
 redeployed using the FiftyOne Teams UI.
 
@@ -176,7 +206,9 @@ Pods based on the `fiftyone-teams-api` and `fiftyone-app`
 images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
 This key is used to encrypt storage credentials in the MongoDB database.
 
-The generate an `encryptionKey`, run this Python code
+To generate a value for `secret.fiftyone.encryptionKey`, run this
+Python code and add the output to your `values.yaml` override file,
+or to your deployment's secret
 
 ```python
 from cryptography.fernet import Fernet
@@ -200,7 +232,7 @@ mounted into pods or provided via environment variables.
 
 FiftyOne Teams continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
-configuration path for future functionality.
+configuration path.
 
 ### Proxies
 
@@ -212,29 +244,58 @@ To configure this, set the following environment variables on
     ```yaml
     http_proxy: http://proxy.yourcompany.tld:3128
     https_proxy: https://proxy.yourcompany.tld:3128
-    no_proxy: <apiSettings.service.name>, <appSettings.service.name>, <teamsAppSettings.service.name>
+    no_proxy: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
     HTTP_PROXY: http://proxy.yourcompany.tld:3128
     HTTPS_PROXY: https://proxy.yourcompany.tld:3128
-    NO_PROXY: <apiSettings.service.name>, <appSettings.service.name>, <teamsAppSettings.service.name>
+    NO_PROXY: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
     ```
 
-1. The pod based on the `fiftyone-teams-app` image (`teamsAppSettings.env`)
+    > **NOTE**: If you have enabled a
+    > [dedicated `teams-plugins`](#fiftyone-teams-plugins)
+    > deployment you will need to include `teams-plugins` in your `NO_PROXY` and
+    > `no_proxy` configurations
+
+    ---
+
+    > **NOTE**: If you have overridden your service names with `*.service.name`
+    > you will need to include the override service names in your `NO_PROXY` and
+    > `no_proxy` configurations instead
+
+1. The deployments based on the `fiftyone-teams-app` (`teamsAppSettings.env`) or
+   `fiftyone-teams-cas` (`casSettings.env`) images
 
     ```yaml
     GLOBAL_AGENT_HTTP_PROXY: http://proxy.yourcompany.tld:3128
     GLOBAL_AGENT_HTTPS_PROXY: https://proxy.yourconpay.tld:3128
-    GLOBAL_AGENT_NO_PROXY: <apiSettings.service.name>, <appSettings.service.name>, <teamsAppSettings.service.name>
+    GLOBAL_AGENT_NO_PROXY: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
     ```
 
-The `NO_PROXY` and `GLOBAL_AGENT_NO_PROXY` values must include the Kubernetes
-service names that may communicate without going through a proxy server.
+    > **NOTE**: If you have enabled a
+    > [dedicated `teams-plugins`](#fiftyone-teams-plugins)
+    > deployment you will need to include `teams-plugins` in your
+    > `GLOBAL_AGENT_NO_PROXY` configuration
+
+    ---
+
+    > **NOTE**: If you have overridden your service names with `*.service.name`
+    > you will need to include the override service names in your
+    > `GLOBAL_AGENT_NO_PROXY` configuration instead
+
+The `NO_PROXY`, `no_proxy`, and `GLOBAL_AGENT_NO_PROXY` values must include the
+Kubernetes service names that may communicate without going through a proxy
+server.
 By default, these service names are
 
-- `teams-api`
-- `teams-app`
 - `fiftyone-app`
+- `teams-app`
+- `teams-api`
+- `teams-cas`
 
-If the service names were overridden in `*.service.name`, use these values instead.
+This list may also include `teams-plugins` if you have enabled a dedicated
+plugins service.
+
+If the service names were overridden in `*.service.name`, use the override
+values instead.
 
 By default, the Global Agent Proxy will log all outbound connections
 and identify which connections are routed through the proxy.
@@ -323,16 +384,49 @@ appSettings:
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
+| casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
+| casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
+| casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database |
+| casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
+| casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
+| casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
+| casSettings.env.FIFTYONE_AUTH_MODE | string | `"legacy"` | Configure Authentication Mode. One of `legacy` or `internal` |
+| casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
+| casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for teams-cas. |
+| casSettings.image.tag | string | `""` | Image tag for teams-cas. Defaults to the chart version. |
+| casSettings.nodeSelector | object | `{}` | nodeSelector for teams-cas. [Reference][node-selector]. |
+| casSettings.podAnnotations | object | `{}` | Annotations for pods for teams-cas. [Reference][annotations]. |
+| casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-cas. [Reference][security-context]. |
+| casSettings.replicaCount | int | `2` | Number of pods in the teams-cas deployment's ReplicaSet. [Reference][deployment]. |
+| casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-cas. [Reference][resources]. |
+| casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
+| casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
+| casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
+| casSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
+| casSettings.service.name | string | `"teams-cas"` | Service name. |
+| casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas. |
+| casSettings.service.port | int | `80` | Service port. |
+| casSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
+| casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for teams-cas. [Reference][ports]. |
+| casSettings.service.type | string | `"ClusterIP"` | Service type for teams-cas. [Reference][service-type]. |
+| casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
+| casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
+| casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty and Kubernetes version is >1.18.0, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
 | ingress.enabled | bool | `true` | Controls whether to create the ingress. When `false`, uses a pre-existing ingress. [Reference][ingress]. |
 | ingress.labels | object | `{}` | Additional labels for the ingress. [Reference][labels-and-selectors]. |
-| ingress.paths | list | `[]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
-| ingress.teamsApp | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule path values for teams-app. [Reference][ingress-rules]. |
-| ingress.teamsApp.path | string | `"/*"` | Path for the FiftyOne Teams App service |
-| ingress.teamsApp.pathType | string | `"ImplementationSpecific"` | Ingress path type (ImplementationSpecific, Exact, Prefix) |
+| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
+| ingress.paths[0] | object | `{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
+| ingress.paths[0].pathType | string | `"Prefix"` | Ingress path type |
+| ingress.paths[0].serviceName | string | `"teams-cas"` | Ingress path service name |
+| ingress.paths[0].servicePort | int | `80` | Ingress path service port |
+| ingress.paths[1] | object | `{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}` | Ingress path for teams-app |
+| ingress.paths[1].pathType | string | `"ImplementationSpecific"` | Ingress path type |
+| ingress.paths[1].serviceName | string | `"teams-app"` | Ingress path service name |
+| ingress.paths[1].servicePort | int | `80` | Ingress path service port |
 | ingress.tlsEnabled | bool | `true` | Controls whether the chart managed ingress contains a `spec.tls` stanza. |
 | ingress.tlsSecretName | string | `"fiftyone-teams-tls-secret"` | Name of secret containing TLS certificate for teams-app. Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`. When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`. |
 | namespace.create | bool | `false` | Controls whether to create the namespace. When `false`, the namespace must already exists. |
@@ -376,6 +470,7 @@ appSettings:
 | secret.fiftyone.clientSecret | string | `""` | Voxel51-provided Auth0 Client Secret. |
 | secret.fiftyone.cookieSecret | string | `""` | A randomly generated string for cookie encryption. To generate, run `openssl rand -hex 32`. |
 | secret.fiftyone.encryptionKey | string | `""` | Encryption key for storage credentials. [Reference][fiftyone-encryption-key]. |
+| secret.fiftyone.fiftyoneAuthSecret | string | `""` | A randomly generated string for CAS Authentication. This can be any string you care to use generated by any mechanism you   prefer. This is used for inter-service authentication and for the SuperUser to  authenticate at the CAS UI to configure the Central Authentication Service. |
 | secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Teams. |
 | secret.fiftyone.mongodbConnectionString | string | `""` | MongoDB Connection String. [Reference][mongodb-connection-string]. |
 | secret.fiftyone.organizationId | string | `""` | Voxel51-provided Auth0 Organization ID. |
@@ -392,7 +487,7 @@ appSettings:
 | teamsAppSettings.dnsName | string | `""` | DNS Name for the teams-app service. Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`) and teams-app deployment environment variable `AUTH0_BASE_URL`. |
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"0.15.10"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"0.16.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Teams API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
@@ -421,6 +516,12 @@ appSettings:
 
 ## Upgrading From Previous Versions
 
+Voxel51 assumes you are using the published
+Helm Chart to deploy your FiftyOne Teams environment.
+If you are using a custom deployment mechanism, carefully review the changes in the
+[Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
+and update your deployment accordingly.
+
 ### From Early Adopter Versions (Versions less than 1.0)
 
 Please contact your Voxel51 Customer Success
@@ -430,25 +531,40 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-The FiftyOne 0.15.10 SDK (database version 0.23.8) is _NOT_ backwards-compatible
-with FiftyOne Teams Database Versions prior to 0.19.0.
-The FiftyOne 0.10.x SDK is not forwards compatible
-with current FiftyOne Teams Database Versions.
-If you are using a FiftyOne SDK version older than 0.11.0, upgrading the Web
-server will require upgrading all FiftyOne SDK installations.
+> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0 requires
+> upgrading the database and will interrupt all SDK connections.
+> You should coordinate this upgrade carefully with your end-users.
 
-Voxel51 recommends this upgrade process from
-versions prior to FiftyOne Teams version 1.1.0:
+---
 
-1. In your `values.yaml`, set the required
-   [FIFTYONE_ENCRYPTION_KEY](#storage-credentials-and-fiftyone_encryption_key)
-   environment variable
-1. [Upgrade to FiftyOne Teams version 1.5.10](#launch-fiftyone-teams)
-   with `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
-   (this is not the default value in `values.yaml` and must be overridden).
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
+> [Central Authentication Service](#central-authentication-service)
+> documentation and the
+> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
+> documentation before completing your upgrade.
+
+---
+
+> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> your users to log in after the upgrade is complete.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
+
+1. In your `values.yaml`, set the required values
+    1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
+           in the appropriate service pods
+    1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
+           in the appropriate service pods
+    1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
+        1. This is not the default value in the Helm Chart and must be overridden
+1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
     > **NOTE:** At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==0.15.10`
-1. Upgrade your FiftyOne SDKs to version 0.15.10
+    > FiftyOne Teams Database until they upgrade to `fiftyone==0.16.0`
+1. Upgrade your FiftyOne SDKs to version 0.16.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -458,7 +574,7 @@ versions prior to FiftyOne Teams version 1.1.0:
     fiftyone migrate --info
     ```
 
-    - If not all datasets have been upgraded, have an admin run
+    - If not all datasets have been upgraded, upgrade all the datasets
 
         ```shell
         FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -466,42 +582,54 @@ versions prior to FiftyOne Teams version 1.1.0:
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-The FiftyOne 0.15.10 SDK is backwards-compatible with
-FiftyOne Teams Database Versions 0.19.0 and later.
-You will not be able to connect to a FiftyOne Teams 1.5.10
-database (version 0.23.8) with any FiftyOne SDK before 0.15.10.
+> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> your users to log in after the upgrade is complete.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
 
-We recommend using the latest version of the FiftyOne SDK
-compatible with your FiftyOne Teams deployment.
+---
 
-We recommend the following upgrade process for
-upgrading from FiftyOne Teams version 1.1.0 or later:
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
+> [Central Authentication Service](#central-authentication-service)
+> documentation and the
+> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
+> documentation before completing your upgrade.
 
 1. Ensure all FiftyOne SDK users either
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.5.10](#launch-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.15.10
+1. In your `values.yaml`, set the required values
+    1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
+           in the appropriate service pods
+    1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
+           in the appropriate service pods
+1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Have an admin run to upgrade all datasets
+1. Upgrade all the datasets
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.15.10 will lose database connectivity
-    >  at this point. Upgrading to `fiftyone==0.15.10` is required
+    > **NOTE** Any FiftyOne SDK less than 0.16.0
+    > will lose connectivity at this point.
+    > Upgrading to `fiftyone==0.16.0` is required.
 
-1. Validate that all datasets are now at version 0.23.8, by running
+1. Validate that all datasets are now at version 0.23.5
 
     ```shell
     fiftyone migrate --info
     ```
 
-## Launch FiftyOne Teams
+## Deploying FiftyOne Teams
 
 A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
@@ -528,11 +656,11 @@ A minimal example `values.yaml` may be found
         > [helm diff](https://github.com/databus23/helm-diff).
         > Voxel51 is not affiliated with the author of this plugin.
         >
-        >    For example:
+        > For example:
         >
-        >    ```shell
-        >    helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
-        >    ```
+        > ```shell
+        > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
+        > ```
 
 <!-- Reference Links -->
 [affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
@@ -560,5 +688,5 @@ A minimal example `values.yaml` may be found
 
 [recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
 
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/README.md#storage-credentials-and-fiftyone_encryption_key
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
 [fiftyone-config]: https://docs.voxel51.com/user_guide/config.html

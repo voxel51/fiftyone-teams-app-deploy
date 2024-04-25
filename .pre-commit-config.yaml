@@ -27,6 +27,16 @@ repos:
           - go-mod
           - go-sum
           - makefile
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.11.3
+    hooks:
+      - id: helm-docs
+        args:
+          # Make the tool search for charts only under the `helm/fiftyone-teams-app` directory
+          - --chart-search-root=helm/fiftyone-teams-app
+
+          # A base filename makes it relative to each chart directory found
+          - --template-files=README.md.gotmpl
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.36.0
     hooks:
@@ -44,16 +54,6 @@ repos:
         entry: yamllint --config-file .yamllint.yaml
         # We exclude helm template files since in raw form, they are not valid yaml
         exclude: helm/fiftyone-teams-app/templates
-  - repo: https://github.com/norwoodj/helm-docs
-    rev: v1.11.3
-    hooks:
-      - id: helm-docs
-        args:
-          # Make the tool search for charts only under the `helm/fiftyone-teams-app` directory
-          - --chart-search-root=helm/fiftyone-teams-app
-
-          # A base filename makes it relative to each chart directory found
-          - --template-files=README.md.gotmpl
   - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
     rev: v1.1.2
     hooks:
@@ -66,13 +66,17 @@ repos:
           - helm/fiftyone-teams-app/README.md.gotmpl
           - helm/README.md
           - CONTRIBUTING.md
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.23
+    hooks:
+      - id: helmlint
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
     hooks:
       - id: detect-secrets
         args:
           - --exclude-secrets
-          - '(password|REPLACEME|fiftyone-teams-tls-secret|btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=|5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976|test-*|/api/proxy/fiftyone-teams|/opt/plugins)'
+          - '(password|REPLACEME|fiftyone-teams-tls-secret|3-9XjJ-gUV?vp\^e\(WUk>LD&lAjh7yEji|btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=|5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976|test-*|/api/proxy/fiftyone-teams|/opt/plugins)'
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
     hooks:

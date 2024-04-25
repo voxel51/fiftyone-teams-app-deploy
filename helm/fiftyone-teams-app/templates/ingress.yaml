@@ -59,23 +59,6 @@ spec:
               servicePort: {{ .servicePort }}
               {{- end }}
           {{- end }}
-          {{- else if and .Values.ingress.paths  (eq (len .Values.ingress.paths) 1) }}
-          {{- range .Values.ingress.paths }}
-          - path: {{ .path }}
-            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
-            pathType: {{ .pathType }}
-            {{- end }}
-            backend:
-              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
-              service:
-                name: {{ include "teams-app.name" $ }}
-                port:
-                  number: {{ $.Values.teamsAppSettings.service.port }}
-              {{- else }}
-              serviceName: {{ include "teams-app.name" $ }}
-              servicePort: {{ $.Values.teamsAppSettings.service.port }}
-              {{- end }}
-          {{- end }}
           {{- else }}
           - path: {{ .Values.ingress.teamsApp.path }}
             {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}

@@ -1,5 +1,5 @@
-//go:build docker || compose || unit || unitComposeCommonServices
-// +build docker compose unit unitComposeCommonServices
+//go:build docker || compose || unit || unitComposeLegacyAuth
+// +build docker compose unit unitComposeLegacyAuth
 
 package unit
 
@@ -20,41 +20,40 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-// TODO: Move to `common_test.go`?
 const (
-	dockerDir                   = "../../../docker/"
-	composeFile                 = "../../../docker/compose.yaml"
-	composePluginsFile          = "../../../docker/compose.plugins.yaml"
-	composeDedicatedPluginsFile = "../../../docker/compose.dedicated-plugins.yaml"
-	envTemplateFilePath         = "../../../docker/env.template"
-	envFixtureFilePath          = "../../fixtures/docker/.env"
+	dockerLegacyAuthDir = "../../../docker/legacy-auth"
 )
 
-type commonServicesDockerComposeTest struct {
+var legacyAuthComposeFile = filepath.Join(dockerLegacyAuthDir, "compose.yaml")
+var legacyAuthComposePluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.plugins.yaml")
+var legacyAuthComposeDedicatedPluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.dedicated-plugins.yaml")
+var legacyAuthEnvTemplateFilePath = filepath.Join(dockerLegacyAuthDir, "env.template")
+
+type commonServicesLegacyAuthDockerComposeTest struct {
 	suite.Suite
 	composeFilePath string
 	projectName     string
 	dotEnvFiles     []string
 }
 
-func TestDockerCompose(t *testing.T) {
+func TestDockerComposeLegacyAuth(t *testing.T) {
 	t.Parallel()
 
-	_, err := filepath.Abs(dockerDir)
+	_, err := filepath.Abs(dockerLegacyAuthDir)
 	require.NoError(t, err)
 
-	suite.Run(t, &commonServicesDockerComposeTest{
+	suite.Run(t, &commonServicesLegacyAuthDockerComposeTest{
 		Suite:           suite.Suite{},
-		composeFilePath: dockerDir,
+		composeFilePath: dockerLegacyAuthDir,
 		projectName:     "fiftyone-compose-test",
 		dotEnvFiles: []string{
-			filepath.Join(dockerDir, "env.template"),
-			"../../fixtures/docker/.env",
+			legacyAuthEnvTemplateFilePath,
+			envFixtureFilePath,
 		},
 	})
 }
 
-func (s *commonServicesDockerComposeTest) TestServicesNames() {
+func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 	testCases := []struct {
 		name        string
 		configPaths []string // file paths to one or more Compose files.
@@ -63,32 +62,35 @@ func (s *commonServicesDockerComposeTest) TestServicesNames() {
 	}{
 		{
 			"compose",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
 				"teams-app",
+				"teams-cas",
 			},
 		},
 		{
 			"composePlugins",
-			[]string{composePluginsFile},
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
 				"teams-app",
+				"teams-cas",
 			},
 		},
 		{
 			"composeDedicatedPlugins",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
 				"teams-app",
+				"teams-cas",
 				"teams-plugins",
 			},
 		},
@@ -103,7 +105,7 @@ func (s *commonServicesDockerComposeTest) TestServicesNames() {
 
 			projectOptions, err := cli.NewProjectOptions(
 				testCase.configPaths,
-				cli.WithWorkingDirectory(dockerDir),
+				cli.WithWorkingDirectory(dockerLegacyAuthDir),
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
@@ -118,15 +120,15 @@ func (s *commonServicesDockerComposeTest) TestServicesNames() {
 			// The only next line only prints timestamp on the first line of the yaml file
 			// logger.Log(s.T(), string(projectYAML))
 			for _, line := range strings.Split(string(projectYAML), "\n") {
-				logger.Log(s.T(), line)
+				logger.Log(subT, line)
 			}
 
-			s.Equal(testCase.expected, project.ServiceNames(), "Service Names should be equal")
+			s.Equal(testCase.expected, project.ServiceNames(), fmt.Sprintf("%s - Service Names should be equal", testCase.name))
 		})
 	}
 }
 
-func (s *commonServicesDockerComposeTest) TestServiceImage() {
+func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 	testCases := []struct {
 		name        string
 		serviceName string
@@ -135,32 +137,39 @@ func (s *commonServicesDockerComposeTest) TestServiceImage() {
 		expected    string
 	}{
 		{
+			"defaultFiftyoneApp",
+			"fiftyone-app",
+			[]string{legacyAuthComposeFile},
+			s.dotEnvFiles,
+			"voxel51/fiftyone-app:v1.6.0",
+		},
+		{
 			"defaultTeamsApi",
 			"teams-api",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-api:v1.5.10",
+			"voxel51/fiftyone-teams-api:v1.6.0",
 		},
 		{
 			"defaultTeamsApp",
 			"teams-app",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-app:v1.5.10",
+			"voxel51/fiftyone-teams-app:v1.6.0",
 		},
 		{
-			"defaultFiftyoneApp",
-			"fiftyone-app",
-			[]string{composeFile},
+			"defaultTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app:v1.5.10",
+			"voxel51/fiftyone-teams-cas:v1.6.0",
 		},
 		{
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app:v1.5.10",
+			"voxel51/fiftyone-app:v1.6.0",
 		},
 	}
 
@@ -173,7 +182,7 @@ func (s *commonServicesDockerComposeTest) TestServiceImage() {
 
 			projectOptions, err := cli.NewProjectOptions(
 				testCase.configPaths,
-				cli.WithWorkingDirectory(dockerDir),
+				cli.WithWorkingDirectory(dockerLegacyAuthDir),
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
@@ -189,7 +198,7 @@ func (s *commonServicesDockerComposeTest) TestServiceImage() {
 			// The only next line only prints timestamp on the first line of the yaml file
 			// logger.Log(s.T(), string(projectYAML))
 			for _, line := range strings.Split(string(projectYAML), "\n") {
-				logger.Log(s.T(), line)
+				logger.Log(subT, line)
 			}
 
 			s.Equal(testCase.expected, project.Services[testCase.serviceName].Image, fmt.Sprintf("%s - Image should be equal", testCase.name))
@@ -197,7 +206,7 @@ func (s *commonServicesDockerComposeTest) TestServiceImage() {
 	}
 }
 
-func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
+func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 	testCases := []struct {
 		name        string
 		serviceName string
@@ -206,16 +215,33 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 		expected    []string
 	}{
 		{
-			"defaultTeamsApi",
-			"teams-api",
-			[]string{composeFile},
+			"defaultFiftyoneApp",
+			"fiftyone-app",
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
-				"AUTH0_API_CLIENT_ID=test-auth0-api-client-id",
-				"AUTH0_API_CLIENT_SECRET=test-auth0-api-client-secret",
-				"AUTH0_AUDIENCE=test-auth0-audience",
-				"AUTH0_CLIENT_ID=test-auth0-client-id",
-				"AUTH0_DOMAIN=test-auth0-domain",
+				"API_URL=http://teams-api:8000",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_DATABASE_ADMIN=false",
+				"FIFTYONE_DATABASE_NAME=fiftyone",
+				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"FIFTYONE_DEFAULT_APP_ADDRESS=0.0.0.0",
+				"FIFTYONE_DEFAULT_APP_PORT=5151",
+				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
+				"FIFTYONE_INTERNAL_SERVICE=true",
+				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
+				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+			},
+		},
+		{
+			"defaultTeamsApi",
+			"teams-api",
+			[]string{legacyAuthComposeFile},
+			s.dotEnvFiles,
+			[]string{
+				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
@@ -229,20 +255,16 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 		{
 			"defaultTeamsApp",
 			"teams-app",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"AUTH0_AUDIENCE=test-auth0-audience",
-				"AUTH0_BASE_URL=https://example.fiftyone.ai",
-				"AUTH0_CLIENT_ID=test-auth0-client-id",
-				"AUTH0_CLIENT_SECRET=test-auth0-client-secret",
-				"AUTH0_ISSUER_BASE_URL=test-auth0-issuer-base-url",
-				"AUTH0_ORGANIZATION=test-auth0-organization",
-				"AUTH0_SECRET=test-auth0-secret",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
+				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION0.16.0",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
 				"FIFTYONE_TEAMS_PROXY_URL=http://fiftyone-app:5151",
@@ -251,12 +273,37 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 			},
 		},
 		{
-			"defaultFiftyoneApp",
+			"defaultTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposeFile},
+			s.dotEnvFiles,
+			[]string{
+				"AUTH0_AUTH_CLIENT_ID=test-auth0-client-id",
+				"AUTH0_AUTH_CLIENT_SECRET=test-auth0-client-secret",
+				"AUTH0_DOMAIN=test-auth0-domain",
+				"AUTH0_ISSUER_BASE_URL=test-auth0-issuer-base-url",
+				"AUTH0_MGMT_CLIENT_ID=test-auth0-api-client-id",
+				"AUTH0_MGMT_CLIENT_SECRET=test-auth0-api-client-secret",
+				"AUTH0_ORGANIZATION=test-auth0-organization",
+				"CAS_DATABASE_NAME=fiftyone-cas",
+				"CAS_DEFAULT_USER_ROLE=GUEST",
+				"CAS_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"CAS_URL=https://example.fiftyone.ai",
+				"DEBUG=cas:*,-cas:*:debug",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
+				"TEAMS_API_DATABASE_NAME=fiftyone",
+				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+			},
+		},
+		{
+			"pluginsFiftyoneApp",
 			"fiftyone-app",
-			[]string{composeFile},
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -266,23 +313,19 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
-				"FIFTYONE_TEAMS_AUDIENCE=test-auth0-audience",
-				"FIFTYONE_TEAMS_CLIENT_ID=test-auth0-client-id",
-				"FIFTYONE_TEAMS_DOMAIN=test-auth0-domain",
-				"FIFTYONE_TEAMS_ORGANIZATION=test-auth0-organization",
+				"FIFTYONE_PLUGINS_CACHE_ENABLED=true",
+				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 			},
 		},
 		{
 			"pluginsTeamsApi",
 			"teams-api",
-			[]string{composePluginsFile},
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
-				"AUTH0_API_CLIENT_ID=test-auth0-api-client-id",
-				"AUTH0_API_CLIENT_SECRET=test-auth0-api-client-secret",
-				"AUTH0_AUDIENCE=test-auth0-audience",
-				"AUTH0_CLIENT_ID=test-auth0-client-id",
-				"AUTH0_DOMAIN=test-auth0-domain",
+				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
@@ -297,20 +340,16 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 		{
 			"pluginsTeamsApp",
 			"teams-app",
-			[]string{composePluginsFile},
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"AUTH0_AUDIENCE=test-auth0-audience",
-				"AUTH0_BASE_URL=https://example.fiftyone.ai",
-				"AUTH0_CLIENT_ID=test-auth0-client-id",
-				"AUTH0_CLIENT_SECRET=test-auth0-client-secret",
-				"AUTH0_ISSUER_BASE_URL=test-auth0-issuer-base-url",
-				"AUTH0_ORGANIZATION=test-auth0-organization",
-				"AUTH0_SECRET=test-auth0-secret",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
+				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION0.16.0",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
 				"FIFTYONE_TEAMS_PROXY_URL=http://fiftyone-app:5151",
@@ -319,12 +358,37 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 			},
 		},
 		{
-			"pluginsFiftyoneApp",
+			"pluginsTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposePluginsFile},
+			s.dotEnvFiles,
+			[]string{
+				"AUTH0_AUTH_CLIENT_ID=test-auth0-client-id",
+				"AUTH0_AUTH_CLIENT_SECRET=test-auth0-client-secret",
+				"AUTH0_DOMAIN=test-auth0-domain",
+				"AUTH0_ISSUER_BASE_URL=test-auth0-issuer-base-url",
+				"AUTH0_MGMT_CLIENT_ID=test-auth0-api-client-id",
+				"AUTH0_MGMT_CLIENT_SECRET=test-auth0-api-client-secret",
+				"AUTH0_ORGANIZATION=test-auth0-organization",
+				"CAS_DATABASE_NAME=fiftyone-cas",
+				"CAS_DEFAULT_USER_ROLE=GUEST",
+				"CAS_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"CAS_URL=https://example.fiftyone.ai",
+				"DEBUG=cas:*,-cas:*:debug",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
+				"TEAMS_API_DATABASE_NAME=fiftyone",
+				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+			},
+		},
+		{
+			"dedicatedPluginsFiftyoneApp",
 			"fiftyone-app",
-			[]string{composePluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -334,25 +398,17 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
-				"FIFTYONE_PLUGINS_CACHE_ENABLED=true",
-				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
-				"FIFTYONE_TEAMS_AUDIENCE=test-auth0-audience",
-				"FIFTYONE_TEAMS_CLIENT_ID=test-auth0-client-id",
-				"FIFTYONE_TEAMS_DOMAIN=test-auth0-domain",
-				"FIFTYONE_TEAMS_ORGANIZATION=test-auth0-organization",
 			},
 		},
 		{
 			"dedicatedPluginsTeamsApi",
 			"teams-api",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
-				"AUTH0_API_CLIENT_ID=test-auth0-api-client-id",
-				"AUTH0_API_CLIENT_SECRET=test-auth0-api-client-secret",
-				"AUTH0_AUDIENCE=test-auth0-audience",
-				"AUTH0_CLIENT_ID=test-auth0-client-id",
-				"AUTH0_DOMAIN=test-auth0-domain",
+				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
@@ -367,58 +423,56 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 		{
 			"dedicatedPluginsTeamsApp",
 			"teams-app",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"AUTH0_AUDIENCE=test-auth0-audience",
-				"AUTH0_BASE_URL=https://example.fiftyone.ai",
-				"AUTH0_CLIENT_ID=test-auth0-client-id",
-				"AUTH0_CLIENT_SECRET=test-auth0-client-secret",
-				"AUTH0_ISSUER_BASE_URL=test-auth0-issuer-base-url",
-				"AUTH0_ORGANIZATION=test-auth0-organization",
-				"AUTH0_SECRET=test-auth0-secret",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
+				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION0.16.0",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
-				"FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151",
 				"FIFTYONE_TEAMS_PROXY_URL=http://fiftyone-app:5151",
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
+				"FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151",
 			},
 		},
 		{
-			"dedicatedPluginsFiftyoneApp",
-			"fiftyone-app",
-			[]string{composeDedicatedPluginsFile},
+			"dedicatedPluginsTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
-				"API_URL=http://teams-api:8000",
-				"FIFTYONE_DATABASE_ADMIN=false",
-				"FIFTYONE_DATABASE_NAME=fiftyone",
-				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
-				"FIFTYONE_DEFAULT_APP_ADDRESS=0.0.0.0",
-				"FIFTYONE_DEFAULT_APP_PORT=5151",
-				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
-				"FIFTYONE_INTERNAL_SERVICE=true",
-				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
-				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
-				"FIFTYONE_TEAMS_AUDIENCE=test-auth0-audience",
-				"FIFTYONE_TEAMS_CLIENT_ID=test-auth0-client-id",
-				"FIFTYONE_TEAMS_DOMAIN=test-auth0-domain",
-				"FIFTYONE_TEAMS_ORGANIZATION=test-auth0-organization",
+				"AUTH0_AUTH_CLIENT_ID=test-auth0-client-id",
+				"AUTH0_AUTH_CLIENT_SECRET=test-auth0-client-secret",
+				"AUTH0_DOMAIN=test-auth0-domain",
+				"AUTH0_ISSUER_BASE_URL=test-auth0-issuer-base-url",
+				"AUTH0_MGMT_CLIENT_ID=test-auth0-api-client-id",
+				"AUTH0_MGMT_CLIENT_SECRET=test-auth0-api-client-secret",
+				"AUTH0_ORGANIZATION=test-auth0-organization",
+				"CAS_DATABASE_NAME=fiftyone-cas",
+				"CAS_DEFAULT_USER_ROLE=GUEST",
+				"CAS_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"CAS_URL=https://example.fiftyone.ai",
+				"DEBUG=cas:*,-cas:*:debug",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
+				"TEAMS_API_DATABASE_NAME=fiftyone",
+				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 			},
 		},
 		{
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
-				"FIFTYONE_PLUGINS_CACHE_ENABLED=true",
 				"API_URL=http://teams-api:8000",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -428,11 +482,8 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_PLUGINS_CACHE_ENABLED=true",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
-				"FIFTYONE_TEAMS_AUDIENCE=test-auth0-audience",
-				"FIFTYONE_TEAMS_CLIENT_ID=test-auth0-client-id",
-				"FIFTYONE_TEAMS_DOMAIN=test-auth0-domain",
-				"FIFTYONE_TEAMS_ORGANIZATION=test-auth0-organization",
 			},
 		},
 	}
@@ -446,7 +497,7 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 
 			projectOptions, err := cli.NewProjectOptions(
 				testCase.configPaths,
-				cli.WithWorkingDirectory(dockerDir),
+				cli.WithWorkingDirectory(dockerLegacyAuthDir),
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
@@ -462,15 +513,20 @@ func (s *commonServicesDockerComposeTest) TestServiceEnvironment() {
 			// The only next line only prints timestamp on the first line of the yaml file
 			// logger.Log(s.T(), string(projectYAML))
 			for _, line := range strings.Split(string(projectYAML), "\n") {
-				logger.Log(s.T(), line)
+				logger.Log(subT, line)
 			}
 
-			s.Equal(types.NewMappingWithEquals(testCase.expected), project.Services[testCase.serviceName].Environment, fmt.Sprintf("%s - Environment should be equal", testCase.name))
+			if testCase.expected == nil {
+				s.Nil(project.Services[testCase.serviceName].Environment, fmt.Sprintf("%s - Environment should be equal", testCase.name))
+			} else {
+				s.Equal(types.NewMappingWithEquals(testCase.expected), project.Services[testCase.serviceName].Environment, fmt.Sprintf("%s - Environment should be equal", testCase.name))
+			}
+
 		})
 	}
 }
 
-func (s *commonServicesDockerComposeTest) TestServicePorts() {
+func (s *commonServicesLegacyAuthDockerComposeTest) TestServicePorts() {
 	testCases := []struct {
 		name        string
 		serviceName string
@@ -479,9 +535,25 @@ func (s *commonServicesDockerComposeTest) TestServicePorts() {
 		expected    []types.ServicePortConfig
 	}{
 		{
+			"defaultFiftyoneApp",
+			"fiftyone-app",
+			[]string{legacyAuthComposeFile},
+			s.dotEnvFiles,
+			[]types.ServicePortConfig{
+				{
+					Mode:       "ingress",
+					HostIP:     "127.0.0.1",
+					Target:     5151,
+					Published:  "5151",
+					Protocol:   "tcp",
+					Extensions: nil,
+				},
+			},
+		},
+		{
 			"defaultTeamsApi",
 			"teams-api",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]types.ServicePortConfig{
 				{
@@ -497,7 +569,7 @@ func (s *commonServicesDockerComposeTest) TestServicePorts() {
 		{
 			"defaultTeamsApp",
 			"teams-app",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]types.ServicePortConfig{
 				{
@@ -511,16 +583,16 @@ func (s *commonServicesDockerComposeTest) TestServicePorts() {
 			},
 		},
 		{
-			"defaultFiftyoneApp",
-			"fiftyone-app",
-			[]string{composeFile},
+			"defaultTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]types.ServicePortConfig{
 				{
 					Mode:       "ingress",
 					HostIP:     "127.0.0.1",
-					Target:     5151,
-					Published:  "5151",
+					Target:     3000,
+					Published:  "3030",
 					Protocol:   "tcp",
 					Extensions: nil,
 				},
@@ -537,7 +609,7 @@ func (s *commonServicesDockerComposeTest) TestServicePorts() {
 
 			projectOptions, err := cli.NewProjectOptions(
 				testCase.configPaths,
-				cli.WithWorkingDirectory(dockerDir),
+				cli.WithWorkingDirectory(dockerLegacyAuthDir),
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
@@ -553,7 +625,7 @@ func (s *commonServicesDockerComposeTest) TestServicePorts() {
 			// The only next line only prints timestamp on the first line of the yaml file
 			// logger.Log(s.T(), string(projectYAML))
 			for _, line := range strings.Split(string(projectYAML), "\n") {
-				logger.Log(s.T(), line)
+				logger.Log(subT, line)
 			}
 
 			s.Equal(testCase.expected, project.Services[testCase.serviceName].Ports, fmt.Sprintf("%s - Ports should be equal", testCase.name))
@@ -561,7 +633,7 @@ func (s *commonServicesDockerComposeTest) TestServicePorts() {
 	}
 }
 
-func (s *commonServicesDockerComposeTest) TestServiceRestart() {
+func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceRestart() {
 	testCases := []struct {
 		name        string
 		serviceName string
@@ -570,30 +642,37 @@ func (s *commonServicesDockerComposeTest) TestServiceRestart() {
 		expected    string
 	}{
 		{
+			"defaultFiftyoneApp",
+			"fiftyone-app",
+			[]string{legacyAuthComposeFile},
+			s.dotEnvFiles,
+			types.RestartPolicyAlways,
+		},
+		{
 			"defaultTeamsApi",
 			"teams-api",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
 		{
 			"defaultTeamsApp",
 			"teams-app",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
 		{
-			"defaultFiftyoneApp",
-			"fiftyone-app",
-			[]string{composeFile},
+			"defaultTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			types.RestartPolicyAlways,
+			"always",
 		},
 		{
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
@@ -608,7 +687,7 @@ func (s *commonServicesDockerComposeTest) TestServiceRestart() {
 
 			projectOptions, err := cli.NewProjectOptions(
 				testCase.configPaths,
-				cli.WithWorkingDirectory(dockerDir),
+				cli.WithWorkingDirectory(dockerLegacyAuthDir),
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
@@ -624,7 +703,7 @@ func (s *commonServicesDockerComposeTest) TestServiceRestart() {
 			// The only next line only prints timestamp on the first line of the yaml file
 			// logger.Log(s.T(), string(projectYAML))
 			for _, line := range strings.Split(string(projectYAML), "\n") {
-				logger.Log(s.T(), line)
+				logger.Log(subT, line)
 			}
 
 			s.Equal(testCase.expected, project.Services[testCase.serviceName].Restart, fmt.Sprintf("%s - Restart should be equal", testCase.name))
@@ -632,7 +711,7 @@ func (s *commonServicesDockerComposeTest) TestServiceRestart() {
 	}
 }
 
-func (s *commonServicesDockerComposeTest) TestServiceVolumes() {
+func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceVolumes() {
 	testCases := []struct {
 		name        string
 		serviceName string
@@ -641,30 +720,52 @@ func (s *commonServicesDockerComposeTest) TestServiceVolumes() {
 		expected    []types.ServiceVolumeConfig
 	}{
 		{
+			"defaultFiftyoneApp",
+			"fiftyone-app",
+			[]string{legacyAuthComposeFile},
+			s.dotEnvFiles,
+			nil,
+		},
+		{
 			"defaultTeamsApi",
 			"teams-api",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			nil,
 		},
 		{
 			"defaultTeamsApp",
 			"teams-app",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			nil,
 		},
 		{
-			"defaultFiftyoneApp",
-			"fiftyone-app",
-			[]string{composeFile},
+			"defaultTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			nil,
+		},
+		{
+			"pluginsFiftyoneApp",
+			"fiftyone-app",
+			[]string{legacyAuthComposePluginsFile},
+			s.dotEnvFiles,
+			[]types.ServiceVolumeConfig{
+				{
+					Type:     "volume",
+					Source:   "plugins-vol",
+					Target:   "/opt/plugins",
+					ReadOnly: true,
+					Volume:   &types.ServiceVolumeVolume{},
+				},
+			},
 		},
 		{
 			"pluginsTeamsApi",
 			"teams-api",
-			[]string{composePluginsFile},
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
 				{
@@ -679,29 +780,29 @@ func (s *commonServicesDockerComposeTest) TestServiceVolumes() {
 		{
 			"pluginsTeamsApp",
 			"teams-app",
-			[]string{composePluginsFile},
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			nil,
 		},
 		{
-			"pluginsFiftyoneApp",
-			"fiftyone-app",
-			[]string{composePluginsFile},
+			"pluginsTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
-			[]types.ServiceVolumeConfig{
-				{
-					Type:     "volume",
-					Source:   "plugins-vol",
-					Target:   "/opt/plugins",
-					ReadOnly: true,
-					Volume:   &types.ServiceVolumeVolume{},
-				},
-			},
+			nil,
+		},
+		{
+			"dedicatedPluginsFiftyoneApp",
+			"fiftyone-app",
+			[]string{legacyAuthComposeDedicatedPluginsFile},
+			s.dotEnvFiles,
+			// []types.ServiceVolumeConfig{},
+			nil,
 		},
 		{
 			"dedicatedPluginsTeamsApi",
 			"teams-api",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
 				{
@@ -716,22 +817,21 @@ func (s *commonServicesDockerComposeTest) TestServiceVolumes() {
 		{
 			"dedicatedPluginsTeamsApp",
 			"teams-app",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			nil,
 		},
 		{
-			"dedicatedPluginsFiftyoneApp",
-			"fiftyone-app",
-			[]string{composeDedicatedPluginsFile},
+			"dedicatedPluginsTeamsCas",
+			"teams-cas",
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
-			// []types.ServiceVolumeConfig{},
 			nil,
 		},
 		{
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
 				{
@@ -754,7 +854,7 @@ func (s *commonServicesDockerComposeTest) TestServiceVolumes() {
 
 			projectOptions, err := cli.NewProjectOptions(
 				testCase.configPaths,
-				cli.WithWorkingDirectory(dockerDir),
+				cli.WithWorkingDirectory(dockerLegacyAuthDir),
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
@@ -770,14 +870,14 @@ func (s *commonServicesDockerComposeTest) TestServiceVolumes() {
 			// The only next line only prints timestamp on the first line of the yaml file
 			// logger.Log(s.T(), string(projectYAML))
 			for _, line := range strings.Split(string(projectYAML), "\n") {
-				logger.Log(s.T(), line)
+				logger.Log(subT, line)
 			}
 
 			s.Equal(testCase.expected, project.Services[testCase.serviceName].Volumes, fmt.Sprintf("%s - Service Volumes should be equal", testCase.name))
 		})
 	}
 }
-func (s *commonServicesDockerComposeTest) TestVolumes() {
+func (s *commonServicesLegacyAuthDockerComposeTest) TestVolumes() {
 	testCases := []struct {
 		name        string
 		configPaths []string // file paths to one or more Compose files.
@@ -786,13 +886,13 @@ func (s *commonServicesDockerComposeTest) TestVolumes() {
 	}{
 		{
 			"default",
-			[]string{composeFile},
+			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			nil,
 		},
 		{
 			"plugins",
-			[]string{composePluginsFile},
+			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			types.Volumes{
 				"plugins-vol": {
@@ -802,7 +902,7 @@ func (s *commonServicesDockerComposeTest) TestVolumes() {
 		},
 		{
 			"dedicatedPlugins",
-			[]string{composeDedicatedPluginsFile},
+			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			types.Volumes{
 				"plugins-vol": {
@@ -821,7 +921,7 @@ func (s *commonServicesDockerComposeTest) TestVolumes() {
 
 			projectOptions, err := cli.NewProjectOptions(
 				testCase.configPaths,
-				cli.WithWorkingDirectory(dockerDir),
+				cli.WithWorkingDirectory(dockerLegacyAuthDir),
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
@@ -837,7 +937,7 @@ func (s *commonServicesDockerComposeTest) TestVolumes() {
 			// The only next line only prints timestamp on the first line of the yaml file
 			// logger.Log(s.T(), string(projectYAML))
 			for _, line := range strings.Split(string(projectYAML), "\n") {
-				logger.Log(s.T(), line)
+				logger.Log(subT, line)
 			}
 
 			s.Equal(testCase.expected, project.Volumes, fmt.Sprintf("%s - Volumes should be equal", testCase.name))
