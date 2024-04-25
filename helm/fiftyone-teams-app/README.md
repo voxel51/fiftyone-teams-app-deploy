@@ -106,6 +106,16 @@ A brief summary of those changes include
   - `secret.fiftyone`
   - secret specified in `secret.name`
 
+For customers using path-based routing,
+update your `values.yaml` to include the route
+
+```yaml
+- path: /cas
+  pathType: Prefix
+  serviceName: teams-cas
+  servicePort: 80
+```
+
 ### Snapshot Archival
 
 Since version v1.5, FiftyOne Teams supports
@@ -561,6 +571,17 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
            in the appropriate service pods
     1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
         1. This is not the default value in the Helm Chart and must be overridden
+    1. If you use path based routing, update your ingress with the rule
+
+        ```yaml
+        ingress:
+            paths:
+              - path: /cas
+                pathType: Prefix
+                serviceName: teams-cas
+                servicePort: 80
+        ```
+
 1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
     > **NOTE:** At this step, FiftyOne SDK users will lose access to the
     > FiftyOne Teams Database until they upgrade to `fiftyone==0.16.0`
