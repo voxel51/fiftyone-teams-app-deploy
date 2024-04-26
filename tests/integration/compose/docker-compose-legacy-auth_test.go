@@ -59,7 +59,6 @@ func TestDockerComposeUpLegacyAuth(t *testing.T) {
 	if runtime.GOOS == "darwin" {
 		overrideFiles = append(overrideFiles, darwinOverrideFile)
 		overrideFilesPlugins = append(overrideFilesPlugins, darwinOverrideFile, darwinOverrideFilePlugins)
-		// overrideFilesPlugins = append(overrideFilesPlugins, darwinOverrideFilePlugins)
 	}
 
 	suite.Run(t, &commonServicesLegacyAuthDockerComposeUpTest{
