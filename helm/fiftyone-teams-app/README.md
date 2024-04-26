@@ -94,10 +94,12 @@ documentation before completing your upgrade.
 Voxel51 recommends upgrading your deployment using
 [`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
 and
-[migrating](https://docs.voxel51.com/teams/pluggable_auth.html#migrating-from-legacy-to-internal-mode)
+migrating
 to
 [`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
 after confirming your initial upgrade was successful.
+
+Please reach out to your Voxel51 customer success representative for assistance in migrating to internal mode.
 
 The CAS service requires changes to your `values.yaml` files.
 A brief summary of those changes include
