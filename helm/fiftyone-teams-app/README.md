@@ -106,7 +106,7 @@ A brief summary of those changes include
   - `secret.fiftyone`
   - secret specified in `secret.name`
 
-For customers using path-based routing,
+When using path-based routing,
 update your `values.yaml` to include the route
 
 ```yaml

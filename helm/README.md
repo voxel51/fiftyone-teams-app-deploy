@@ -39,10 +39,10 @@ This directory contains resources and information related to Helm deployments
     - Exposing the teams-api
     - Plugin storage
   - `fiftyone-teams-app` contains the helm chart voxel51/fiftyone-teams-app.
-     For the chart documentation, see the fiftyone-teams-app/README.md file.
+    For the chart documentation, see the fiftyone-teams-app/README.md file.
   - `gke-example` contains additional kubernetes resources
-     to install FiftyOne Teams on Google Kubernetes Engine (GKE).
-     See
+    to install FiftyOne Teams on Google Kubernetes Engine (GKE).
+    See
     [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
 - Files
   - `values.yaml` is example of overrides for the chart's defaults for a deployment
