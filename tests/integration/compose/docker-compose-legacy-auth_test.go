@@ -32,9 +32,10 @@ var legacyAuthEnvTemplateFilePath = filepath.Join(dockerLegacyAuthDir, "env.temp
 
 type commonServicesLegacyAuthDockerComposeUpTest struct {
 	suite.Suite
-	composeFilePath string
-	dotEnvFiles     []string
-	overrideFiles   []string
+	composeFilePath      string
+	dotEnvFiles          []string
+	overrideFiles        []string
+	overrideFilesPlugins []string
 }
 
 func TestDockerComposeUpLegacyAuth(t *testing.T) {
@@ -49,9 +50,16 @@ func TestDockerComposeUpLegacyAuth(t *testing.T) {
 		mongodbComposeFile,
 	}
 
+	// Plugins require overriding the teams-plugin image
+	var overrideFilesPlugins []string
+	overrideFilesPlugins = append(overrideFilesPlugins, overrideFiles...)
+	overrideFilesPlugins = append(overrideFilesPlugins, mongodbComposeFilePlugins)
+
 	// To run the containers on macOS arm64, we need to set the platform
 	if runtime.GOOS == "darwin" {
 		overrideFiles = append(overrideFiles, darwinOverrideFile)
+		overrideFilesPlugins = append(overrideFilesPlugins, darwinOverrideFile, darwinOverrideFilePlugins)
+		// overrideFilesPlugins = append(overrideFilesPlugins, darwinOverrideFilePlugins)
 	}
 
 	suite.Run(t, &commonServicesLegacyAuthDockerComposeUpTest{
@@ -61,7 +69,8 @@ func TestDockerComposeUpLegacyAuth(t *testing.T) {
 			legacyAuthEnvTemplateFilePath,
 			legacyAuthEnvFixtureFilePath,
 		},
-		overrideFiles: overrideFiles,
+		overrideFiles:        overrideFiles,
+		overrideFilesPlugins: overrideFilesPlugins,
 	})
 }
 
@@ -150,7 +159,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 		{
 			"composeDedicatedPlugins",
 			legacyAuthComposeDedicatedPluginsFile,
-			s.overrideFiles,
+			s.overrideFilesPlugins,
 			s.dotEnvFiles,
 			[]serviceValidations{
 				{
@@ -215,7 +224,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 			// ```
 			//
 			// Use existing function to get map[string]string of environment variables from .env file(s)
-			environmentVariables, err := dotenv.Read(s.dotEnvFiles...)
+			environmentVariables, err := dotenv.Read(testCase.envFiles...)
 			s.NoError(err)
 
 			dockerOptions := &docker.Options{
@@ -227,28 +236,40 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 			// In golang, we cannot mix strings with string slice unpacking.
 			// Let's create a slice that will later be unpacked and used as an argument
 			// to the variadic function `docker.RunDockerCompose` parameter `args`.
+			argsConfig := []string{}
 			argsUp := []string{}
 			argsDown := []string{}
 			args := []string{"-f", testCase.composeFile}
 
-			for _, overrideFile := range s.overrideFiles {
+			for _, overrideFile := range testCase.overrideFiles {
 				args = append(args, "-f", overrideFile)
 			}
 
-			argsUp = append(args, "up", "--detach")
-			argsDown = append(args, "down", "--remove-orphans", "--timeout", "2")
+			argsConfig = append(args, "config")
+			argsUp = append(argsUp, args...)
+			argsUp = append(argsUp, "up", "--detach")
+			argsDown = append(argsDown, args...)
+			argsDown = append(argsDown, "down", "--remove-orphans", "--timeout", "2")
+
+			// Config
+			docker.RunDockerCompose(
+				subT,
+				dockerOptions,
+				argsConfig...,
+			)
+
+			// Delete containers after tests complete
+			defer docker.RunDockerCompose(
+				subT,
+				dockerOptions,
+				argsDown...,
+			)
 
 			// Run containers
 			output := docker.RunDockerCompose(
 				subT,
 				dockerOptions,
 				argsUp...,
-			)
-			// Delete containers after tests complete
-			defer docker.RunDockerCompose(
-				subT,
-				dockerOptions,
-				argsDown...,
 			)
 
 			// Validate system health
