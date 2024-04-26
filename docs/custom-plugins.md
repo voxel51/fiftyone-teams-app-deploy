@@ -14,9 +14,10 @@
 
 # Custom Plugins Images
 
-Some plugins have custom python dependencies, which requires the
-creation of a new plugins image.  This document outlines the steps
-Voxel51 recommends for creating those custom plugins containers.
+Some plugins have custom python dependencies,
+which requires the creation of a new plugins image.
+This document outlines the steps Voxel51 recommends
+for creating those custom plugins containers.
 
 ## Create a New Image From an Existing Voxel51 Image
 
@@ -45,10 +46,10 @@ With a Dockerfile like this, you could use the following commands to
 build, and publish, your image to your internal registry
 
 ```shell
-$ TEAMS_VERSION=v1.6.0
-$ docker buildx build --push \
-    --build-arg TEAMS_IMAGE_NAME='voxel51/fiftyone-app:${TEAMS_VERSION}' \
- -t your-internal-registry/fiftyone-app-internal:${TEAMS_VERSION} .
+TEAMS_VERSION=v1.6.0
+docker buildx build --push \
+  --build-arg TEAMS_IMAGE_NAME='voxel51/fiftyone-app:${TEAMS_VERSION}' \
+  -t your-internal-registry/fiftyone-app-internal:${TEAMS_VERSION} .
 ```
 
 You should upgrade your custom plugins image using the `TEAMS_VERSION`
@@ -56,8 +57,8 @@ you plan to use in your FiftyOne Teams Deployment.
 
 ## Using Your Custom Plugins Image in Docker Compose
 
-Once you have built a custom plugins image, you can add it to your
-`compose.override.yaml` using something similar to the following:
+After your custom plugins image is built, you can add it to your
+`compose.override.yaml` file like
 
 ```yaml
 services:
@@ -72,8 +73,8 @@ deployment.
 
 ## Using Your Custom Plugins Image in Helm Deployments
 
-Once you have build a custom plugins image, you can add it to your
-`values.yaml` using something similar to the following:
+After your custom plugins image is built, you can add it to your
+`values.yaml` file like
 
 ```yaml
 pluginsSettings:
@@ -81,7 +82,7 @@ pluginsSettings:
     repository: your-internal-registry/fiftyone-app-internal
 ```
 
-Assuming you have built your custom container with the same version
+Assuming you tagged your custom container with the same version
 number as the FiftyOne Teams release, the Helm chart will
 automatically use the chart version to pull your image.
 

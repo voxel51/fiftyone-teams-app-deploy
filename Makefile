@@ -29,6 +29,7 @@ asdf:  ## Update plugins, add plugins, install plugins, set local, reshim
 
 auth:
 	gcloud auth application-default login --project computer-vision-team
+	gcloud auth configure-docker us-central1-docker.pkg.dev
 
 hooks:  ## Install git hooks (pre-commit)
 	@pre-commit install
