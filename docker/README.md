@@ -142,6 +142,7 @@ To upgrade from versions prior to FiftyOne Teams v1.6
 - Update your `.env` file, adding the variables listed above
 - Update your `compose.override.yaml` with `teams-cas` changes (if necessary)
 - Run `docker compose` commands from the `legacy-auth` directory
+- (If using path-based routing) Configure the path-based route `/cas` to port 3030
 
 ### Snapshot Archival
 
@@ -453,6 +454,7 @@ create a new IdP or modify your existing configuration.
 1. In the `.env` file, set the required environment variables
     - `FIFTYONE_API_URI`
     - `FIFTYONE_AUTH_SECRET`
+    - The `CAS_*` variables referenced [here](#central-authentication-service) in case they were overwritten when copying your `.env` file
 1. Ensure all FiftyOne SDK users either
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
