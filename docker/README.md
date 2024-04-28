@@ -134,12 +134,12 @@ Please review these changes in the
 [legacy-auth/env.template](legacy-auth/env.template)
 and in the appropriate `legacy-auth/compose*` files.
 
-To upgrade from versions prior to FiftyOne Teams v1.6
+To upgrade from versions prior to FiftyOne Teams v1.6 (see also [Upgrade Process Recommendations](#upgrade-process-recommendations)):
 
 - Copy your `.env` file into the `legacy-auth` directory
 - Copy your `compose.override.yaml` file into the `legacy-auth` directory
 - `cd` into the `legacy-auth` directory
-- Update your `.env` file, adding the variables listed above
+- Update your `.env` file, referring to [legacy-auth/env.template](legacy-auth/env.template) and adding the variables listed above
 - Update your `compose.override.yaml` with `teams-cas` changes (if necessary)
 - Run `docker compose` commands from the `legacy-auth` directory
 
@@ -507,7 +507,7 @@ create a new IdP or modify your existing configuration.
         ```
 
 1. After the successful installation, and logging into Fiftyone Teams
-    1. If appropriate, remove the `FIFTYONE_DATABASE_ADMIN` override in `compose.override.yaml` 
+    1. (If appropriate) Remove the `FIFTYONE_DATABASE_ADMIN` override in `compose.override.yaml` 
 
         ```yaml
         services:
