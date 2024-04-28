@@ -397,12 +397,10 @@ create a new IdP or modify your existing configuration.
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
 1. `cd` into the `legacy-auth` directory
-1. Make sure your `.env` file includes the required
-   `FIFTYONE_ENCRYPTION_KEY` environment variable
-1. Make sure your `.env` file includes the required `FIFTYONE_API_URI`
-   environment variable
-1. Make sure your `.env` file includes the required `FIFTYONE_AUTH_SECRET`
-   environment variable
+1. In the .env file, set the required environment variables
+    - `FIFTYONE_ENCRYPTION_KEY`
+    - `FIFTYONE_API_URI`
+    - `FIFTYONE_AUTH_SECRET`
 1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
@@ -426,7 +424,7 @@ create a new IdP or modify your existing configuration.
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0 requires
+> **NOTE**: Upgrading from versions of FiftyOne Teams v1.1.0 and later requires
 > upgrading the database and will interrupt all SDK connections.
 > You should coordinate this upgrade carefully with your end-users.
 
