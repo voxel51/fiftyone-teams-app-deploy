@@ -448,7 +448,7 @@ create a new IdP or modify your existing configuration.
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
 1. `cd` into the `legacy-auth` directory
-1. Update your `.env` file, referring to [legacy-auth/env.template](legacy-auth/env.template) (See [here](#central-authentication-service)) 
+1. Update your `.env` file, referring to [legacy-auth/env.template](legacy-auth/env.template) (See also [here](#central-authentication-service)) 
 1. Ensure all FiftyOne SDK users either
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
