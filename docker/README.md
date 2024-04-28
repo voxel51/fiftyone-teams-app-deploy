@@ -507,7 +507,7 @@ create a new IdP or modify your existing configuration.
         ```
 
 1. After the successful installation, and logging into Fiftyone Teams
-    1. In `compose.override.yaml` remove the `FIFTYONE_DATABASE_ADMIN` override
+    1. If appropriate, remove the `FIFTYONE_DATABASE_ADMIN` override in `compose.override.yaml` 
 
         ```yaml
         services:
