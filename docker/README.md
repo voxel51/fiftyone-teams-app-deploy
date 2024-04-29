@@ -141,9 +141,14 @@ To upgrade from versions prior to FiftyOne Teams v1.6
 - Copy your `compose.override.yaml` file into the `legacy-auth` directory
 - `cd` into the `legacy-auth` directory
 - Update your `.env` file, adding the variables listed above
+  - For seed values, see
+    [legacy-auth/env.template](legacy-auth/env.template)
 - Update your `compose.override.yaml` with `teams-cas` changes (if necessary)
 - Run `docker compose` commands from the `legacy-auth` directory
 - When using path-based routing, configure a `/cas` route to value of the `CAS_BIND_PORT`
+
+> **NOTE**: See
+> [Upgrade Process Recommendations](#upgrade-process-recommendations)
 
 ### Snapshot Archival
 
@@ -399,12 +404,10 @@ create a new IdP or modify your existing configuration.
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
 1. `cd` into the `legacy-auth` directory
-1. Make sure your `.env` file includes the required
-   `FIFTYONE_ENCRYPTION_KEY` environment variable
-1. Make sure your `.env` file includes the required `FIFTYONE_API_URI`
-   environment variable
-1. Make sure your `.env` file includes the required `FIFTYONE_AUTH_SECRET`
-   environment variable
+1. In your `.env` file, set the required environment variables
+    - `FIFTYONE_ENCRYPTION_KEY`
+    - `FIFTYONE_API_URI`
+    - `FIFTYONE_AUTH_SECRET`
 1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
@@ -428,7 +431,7 @@ create a new IdP or modify your existing configuration.
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0 requires
+> **NOTE**: Upgrading from versions of FiftyOne Teams v1.1.0 and later requires
 > upgrading the database and will interrupt all SDK connections.
 > You should coordinate this upgrade carefully with your end-users.
 
@@ -463,10 +466,12 @@ create a new IdP or modify your existing configuration.
     - `CAS_DEFAULT_USER_ROLE`
 
     > **Note**: For the `CAS_*` variables, consider using
-    > the seed values from the `.env.template` file
+    > the seed values from the `.env.template` file.
+    > See
+    > [Central Authentication Service](#central-authentication-service)
 
 1. Ensure all FiftyOne SDK users either
-    - set `FIFTYONE_DATABASE_ADMIN=false`
+    - Set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
 1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
@@ -503,7 +508,7 @@ create a new IdP or modify your existing configuration.
        [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
        table.
     1. Create a `compose.override.yaml` with any configuration overrides for
-       this deployment.
+       this deployment
         1. For the first installation, set
 
             ```yaml
@@ -521,7 +526,7 @@ create a new IdP or modify your existing configuration.
         ```
 
 1. After the successful installation, and logging into Fiftyone Teams
-    1. In `compose.override.yaml` remove the `FIFTYONE_DATABASE_ADMIN` override
+    1. In `compose.override.yaml`, remove the `FIFTYONE_DATABASE_ADMIN` override
 
         ```yaml
         services:
@@ -530,10 +535,10 @@ create a new IdP or modify your existing configuration.
               # FIFTYONE_DATABASE_ADMIN: true
         ```
 
-        > **Note**: This example shows commenting this line,
+        > **NOTE**: This example shows commenting this line,
         > however you may remove the line.
 
-         or set it to `false` like in
+        or set it to `false` like in
 
         ```yaml
         services:
