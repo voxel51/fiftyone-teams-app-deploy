@@ -112,11 +112,12 @@ documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
 [`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
-and
-[migrating](https://docs.voxel51.com/teams/pluggable_auth.html#migrating-from-legacy-to-internal-mode)
-to
+and migrating to
 [`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
 after confirming your initial upgrade was successful.
+
+Please contact your Voxel51 customer success
+representative for assistance in migrating to internal mode.
 
 The CAS service requires changes to your `.env` files.
 A brief summary of those changes include
@@ -144,6 +145,7 @@ To upgrade from versions prior to FiftyOne Teams v1.6
     [legacy-auth/env.template](legacy-auth/env.template)
 - Update your `compose.override.yaml` with `teams-cas` changes (if necessary)
 - Run `docker compose` commands from the `legacy-auth` directory
+- When using path-based routing, configure a `/cas` route to value of the `CAS_BIND_PORT`
 
 > **NOTE**: See
 > [Upgrade Process Recommendations](#upgrade-process-recommendations)
@@ -453,9 +455,21 @@ create a new IdP or modify your existing configuration.
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
 1. `cd` into the `legacy-auth` directory
-1. Update your `.env` file, using the seed values from
-   [legacy-auth/env.template](legacy-auth/env.template).
-   - See [Central Authentication Service](#central-authentication-service)
+1. In the `.env` file, set the required environment variables
+    - `FIFTYONE_API_URI`
+    - `FIFTYONE_AUTH_SECRET`
+    - `CAS_BASE_URL`
+    - `CAS_BIND_ADDRESS`
+    - `CAS_BIND_PORT`
+    - `CAS_DATABASE_NAME`
+    - `CAS_DEBUG`
+    - `CAS_DEFAULT_USER_ROLE`
+
+    > **Note**: For the `CAS_*` variables, consider using
+    > the seed values from the `.env.template` file.
+    > See
+    > [Central Authentication Service](#central-authentication-service)
+
 1. Ensure all FiftyOne SDK users either
     - Set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
