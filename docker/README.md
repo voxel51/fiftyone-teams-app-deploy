@@ -118,7 +118,8 @@ to
 [`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
 after confirming your initial upgrade was successful.
 
-Please reach out to your Voxel51 customer success representative for assistance in migrating to internal mode.
+Please contact your Voxel51 customer success
+representative for assistance in migrating to internal mode.
 
 The CAS service requires changes to your `.env` files.
 A brief summary of those changes include
