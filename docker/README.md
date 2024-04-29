@@ -411,8 +411,6 @@ create a new IdP or modify your existing configuration.
 1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
-    - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.16.0`
 1. Upgrade your FiftyOne SDKs to version 0.16.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
