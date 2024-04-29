@@ -142,7 +142,7 @@ To upgrade from versions prior to FiftyOne Teams v1.6
 - Update your `.env` file, adding the variables listed above
 - Update your `compose.override.yaml` with `teams-cas` changes (if necessary)
 - Run `docker compose` commands from the `legacy-auth` directory
-- (If using path-based routing) Configure the path-based route `/cas` to port 3030
+- When using path-based routing, configure a `/cas` route to value of the `CAS_BIND_PORT`
 
 ### Snapshot Archival
 
