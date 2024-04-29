@@ -112,9 +112,7 @@ documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
 [`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
-and
-migrating
-to
+and migrating to
 [`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
 after confirming your initial upgrade was successful.
 
