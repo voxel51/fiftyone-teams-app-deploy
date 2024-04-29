@@ -454,7 +454,16 @@ create a new IdP or modify your existing configuration.
 1. In the `.env` file, set the required environment variables
     - `FIFTYONE_API_URI`
     - `FIFTYONE_AUTH_SECRET`
-    - The `CAS_*` variables referenced [here](#central-authentication-service) in case they were overwritten when copying your `.env` file
+    - `CAS_BASE_URL`
+    - `CAS_BIND_ADDRESS`
+    - `CAS_BIND_PORT`
+    - `CAS_DATABASE_NAME`
+    - `CAS_DEBUG`
+    - `CAS_DEFAULT_USER_ROLE`
+
+    > **Note**: For the `CAS_*` variables, consider using
+    > the seed values from the `.env.template` file
+
 1. Ensure all FiftyOne SDK users either
     - set `FIFTYONE_DATABASE_ADMIN=false`
     - `unset FIFTYONE_DATABASE_ADMIN`
