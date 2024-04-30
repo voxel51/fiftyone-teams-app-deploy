@@ -91,7 +91,7 @@ services:
   teams-cas-common:
     image: voxel51/fiftyone-teams-cas:v1.6.0
     environment:
-      CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-fiftyone-teams}
+      CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
       CAS_MONGODB_URI: ${CAS_MONGO_DB_URI:-$FIFTYONE_DATABASE_URI}
       DEBUG: ${CAS_DEBUG:-cas:*,-cas:*:debug}
