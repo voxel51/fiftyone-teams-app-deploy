@@ -39,10 +39,11 @@ This directory contains resources and information related to Helm deployments
     - Exposing the teams-api
     - Plugin storage
   - `fiftyone-teams-app` contains the helm chart voxel51/fiftyone-teams-app.
-     For the chart documentation, see the fiftyone-teams-app/README.md file.
+    For the chart documentation, see the fiftyone-teams-app/README.md file.
   - `gke-example` contains additional kubernetes resources
-     to install FiftyOne Teams on Google Kubernetes Engine (GKE).
-     See [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
+    to install FiftyOne Teams on Google Kubernetes Engine (GKE).
+    See
+    [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
 - Files
   - `values.yaml` is example of overrides for the chart's defaults for a deployment
 
@@ -78,11 +79,11 @@ in this directory.
         > helm plugin.
         > Voxel51 is not affiliated with the author of this plugin.
         >
-        >    For example:
+        > For example:
         >
-        >    ```shell
-        >    helm diff --context 1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
-        >    ```
+        > ```shell
+        > helm diff --context 1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
+        > ```
 
 ### A Full Deployment Example on GKE
 
@@ -113,10 +114,10 @@ These instructions assume you have
 #### Download the Example Configuration Files
 
 Download the example configuration files from the
-[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy/helm/gke-examples)
+[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/gke-example)
 GitHub repository.
 
-One way to do this might be:
+For example
 
 ```shell
 curl -o values.yaml \
@@ -134,10 +135,12 @@ Update the `values.yaml` file with
     - Set `mongodbConnectionString` containing your MongoDB username and password
   - Set `cookieSecret`
   - Set `encryptionKey`
+  - Set `fiftyoneAuthSecret`
 - In `teamsAppSettings.dnsName`
   - Set ingress `host` values
 
-Assuming you follow these directions your MongoDB host will be `fiftyone-mongodb.fiftyone-mongodb.svc.cluster.local`.
+Assuming you follow these directions your MongoDB host will be
+`fiftyone-mongodb.fiftyone-mongodb.svc.cluster.local`.
 <!-- Please modify this hostname if you modify these instructions. -->
 
 #### Create the Necessary Helm Repos
@@ -206,7 +209,8 @@ helm install fiftyone-mongodb \
 Wait until the MongoDB pods are in the `Ready` state before
 beginning the "Install FiftyOne Teams App" instructions.
 
-While waiting, [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+While waiting,
+[configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
 
 To determine the state of the `fiftyone-mongodb` pods, run
 

@@ -35,6 +35,17 @@ Create a default name for the fiftyone app service
 {{- end }}
 
 {{/*
+Create a default name for the teams cas service
+*/}}
+{{- define "teams-cas.name" -}}
+{{- if .Values.casSettings.service.name }}
+{{- .Values.casSettings.service.name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+"fiftyone-teams-cas"
+{{- end }}
+{{- end }}
+
+{{/*
 Create a default name for the teams api service
 */}}
 {{- define "teams-api.name" -}}
@@ -119,6 +130,22 @@ APP Combined labels
 {{- end }}
 
 {{/*
+CAS Selector labels
+*/}}
+{{- define "fiftyone-teams-cas.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "teams-cas.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+CAS Combined labels
+*/}}
+{{- define "fiftyone-teams-cas.labels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+{{ include "fiftyone-teams-cas.selectorLabels" . }}
+{{- end }}
+
+{{/*
 Plugins Selector labels
 */}}
 {{- define "teams-plugins.selectorLabels" -}}
@@ -166,26 +193,19 @@ Create a merged list of environment variables for fiftyone-teams-api
 */}}
 {{- define "fiftyone-teams-api.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
-- name: AUTH0_API_CLIENT_ID
+- name: CAS_BASE_URL
+  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name .Values.casSettings.service.port | quote }}
+- name: FEATURE_FLAG_ENABLE_INVITATIONS
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "internal" }}
+  value: "false"
+{{- else }}
+  value: "{{ .Values.casSettings.enable_invitations }}"
+{{- end }}
+- name: FIFTYONE_AUTH_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
-      key: apiClientId
-- name: AUTH0_API_CLIENT_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: apiClientSecret
-- name: AUTH0_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
-- name: AUTH0_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientId
+      key: fiftyoneAuthSecret
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -219,6 +239,11 @@ Create a merged list of environment variables for fiftyone-app
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -234,24 +259,76 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-- name: FIFTYONE_TEAMS_DOMAIN
+{{- range $key, $val := .Values.appSettings.env }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Create a merged list of environment variables for fiftyone-teams-cas
+*/}}
+{{- define "teams-cas.env-vars-list" -}}
+{{- $secretName := .Values.secret.name }}
+- name: CAS_MONGODB_URI
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
-      key: auth0Domain
-- name: FIFTYONE_TEAMS_AUDIENCE
-  value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
-- name: FIFTYONE_TEAMS_CLIENT_ID
+      key: {{ .Values.casSettings.env.CAS_MONGODB_URI_KEY }}
+- name: CAS_URL
+  value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName | quote }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
+- name: NEXTAUTH_URL
+  value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
+- name: AUTH0_AUTH_CLIENT_ID
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: clientId
-- name: FIFTYONE_TEAMS_ORGANIZATION
+- name: AUTH0_AUTH_CLIENT_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: clientSecret
+- name: AUTH0_DOMAIN
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: auth0Domain
+- name: AUTH0_ISSUER_BASE_URL
+  value: "https://$(AUTH0_DOMAIN)"
+- name: AUTH0_MGMT_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: apiClientId
+- name: AUTH0_MGMT_CLIENT_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: apiClientSecret
+- name: AUTH0_ORGANIZATION
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: organizationId
-{{- range $key, $val := .Values.appSettings.env }}
+- name: TEAMS_API_DATABASE_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneDatabaseName
+- name: TEAMS_API_MONGODB_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: mongodbConnectionString
+{{- end }}
+{{- range $key, $val := .Values.casSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
@@ -264,6 +341,13 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
+- name: FIFTYONE_DATABASE_ADMIN
+  value: "false"
 - name: FIFTYONE_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -274,30 +358,11 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
-- name: FIFTYONE_DATABASE_ADMIN
-  value: "false"
 - name: FIFTYONE_ENCRYPTION_KEY
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-- name: FIFTYONE_TEAMS_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
-- name: FIFTYONE_TEAMS_AUDIENCE
-  value: "https://$(FIFTYONE_TEAMS_DOMAIN)/api/v2/"
-- name: FIFTYONE_TEAMS_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientId
-- name: FIFTYONE_TEAMS_ORGANIZATION
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: organizationId
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -312,37 +377,12 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
-- name: AUTH0_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
-- name: AUTH0_AUDIENCE
-  value: "https://$(AUTH0_DOMAIN)/api/v2/"
-- name: AUTH0_BASE_URL
-  value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName | quote }}
-- name: AUTH0_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientId
-- name: AUTH0_CLIENT_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientSecret
-- name: AUTH0_ISSUER_BASE_URL
-  value: "https://$(AUTH0_DOMAIN)"
-- name: AUTH0_ORGANIZATION
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: organizationId
-- name: AUTH0_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: cookieSecret
+- name: FEATURE_FLAG_ENABLE_INVITATIONS
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "internal" }}
+  value: "false"
+{{- else }}
+  value: "{{ .Values.casSettings.enable_invitations }}"
+{{- end }}
 - name: FIFTYONE_API_URI
 {{- if .Values.teamsAppSettings.fiftyoneApiOverride }}
   value: {{ .Values.teamsAppSettings.fiftyoneApiOverride }}
@@ -351,6 +391,11 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- else }}
   value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName }}
 {{- end }}
+- name: FIFTYONE_AUTH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneAuthSecret
 - name: FIFTYONE_SERVER_ADDRESS
   value: ""
 - name: FIFTYONE_SERVER_PATH_PREFIX

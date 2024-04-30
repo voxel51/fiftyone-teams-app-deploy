@@ -262,7 +262,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 		expected func(envVars []corev1.EnvVar)
 	}{
 		{
-			"defaultValues",
+			"defaultValues", // legacy auth mode
 			nil,
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
@@ -271,65 +271,21 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://teams-api:80"
           },
           {
-            "name": "AUTH0_DOMAIN",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "auth0Domain"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_AUDIENCE",
-            "value": "https://$(AUTH0_DOMAIN)/api/v2/"
-          },
-          {
-            "name": "AUTH0_BASE_URL",
-            "value": "https://"
-          },
-          {
-            "name": "AUTH0_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ISSUER_BASE_URL",
-            "value": "https://$(AUTH0_DOMAIN)"
-          },
-          {
-            "name": "AUTH0_ORGANIZATION",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "organizationId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "cookieSecret"
-              }
-            }
+            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_API_URI",
             "value": "https://"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
           },
           {
             "name": "FIFTYONE_SERVER_ADDRESS",
@@ -357,7 +313,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "0.15.10"
+            "value": "0.16.0"
           },
           {
             "name": "FIFTYONE_APP_THEME",
@@ -386,65 +342,21 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://teams-api:80"
           },
           {
-            "name": "AUTH0_DOMAIN",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "auth0Domain"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_AUDIENCE",
-            "value": "https://$(AUTH0_DOMAIN)/api/v2/"
-          },
-          {
-            "name": "AUTH0_BASE_URL",
-            "value": "https://"
-          },
-          {
-            "name": "AUTH0_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ISSUER_BASE_URL",
-            "value": "https://$(AUTH0_DOMAIN)"
-          },
-          {
-            "name": "AUTH0_ORGANIZATION",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "organizationId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "cookieSecret"
-              }
-            }
+            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_API_URI",
             "value": "https://"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
           },
           {
             "name": "FIFTYONE_SERVER_ADDRESS",
@@ -472,7 +384,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "0.15.10"
+            "value": "0.16.0"
           },
           {
             "name": "FIFTYONE_APP_THEME",
