@@ -95,6 +95,14 @@ port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 run: helm-repos  ## run skaffold run
 	skaffold run
 
+run-cert-manager: helm-repos  ## run skaffold run
+	skaffold run \
+	  --filename skaffold-cert-manager.yaml
+
+run-mongodb: helm-repos  ## run skaffold run
+	skaffold run \
+	  --filename skaffold-mongodb.yaml
+
 run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
 	skaffold run -p only-fiftyone
 
@@ -175,6 +183,28 @@ test-integration-compose-interleaved-legacy: install-terratest-log-parser depend
 	@cd tests/integration/compose; \
 	rm -rf test_output_legacy/*; \
 	go test -count=1 -timeout=10m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
+
+test-integration-helm: test-integration-helm-internal test-integration-helm-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
+
+test-integration-helm-internal:  ## run go test on the tests/integration/helm directory for internal auth mode
+	@cd tests/integration/helm; \
+	go test -count=1 -timeout=10m -v -tags integrationHelmInternalAuth
+
+test-integration-helm-legacy:  ## run go test on the tests/integration/helm directory for legacy auth mode
+	@cd tests/integration/helm; \
+	go test -count=1 -timeout=10m -v -tags integrationHelmLegacyAuth
+
+test-integration-helm-interleaved-internal:  ## run go test on the tests/integration/helm directory for internal auth mode
+	@cd tests/integration/helm; \
+	rm -rf test_output_internal/*; \
+	go test -count=1 -timeout=10m -v -tags integrationHelmInternalAuth | tee test_output_internal.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
+
+test-integration-helm-interleaved-legacy:  ## run go test on the tests/integration/helm directory for legacy auth mode
+	@cd tests/integration/helm; \
+	rm -rf test_output_legacy/*; \
+	go test -count=1 -timeout=10m -v -tags integrationHelmLegacyAuth | tee test_output_legacy.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
 
 install-terratest-log-parser:  ## install terratest_log_parser
