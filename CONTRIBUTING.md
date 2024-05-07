@@ -324,15 +324,15 @@ GCP project `computer-vision-team`, configure minikube and skaffold
     apiSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
-        tag: v1.6.0.dev7
+        tag: v1.6.1.dev7
     appSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-        tag: v1.6.0.dev7
+        tag: v1.6.1.dev7
     pluginsSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-        tag: v1.6.0.dev7
+        tag: v1.6.1.dev7
     teamsAppSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
@@ -340,7 +340,7 @@ GCP project `computer-vision-team`, configure minikube and skaffold
         # the other images (`fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`).
         # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
         # This is a byproduct of `npm` versioning versus Python PEP 440.
-        tag: v1.6.0-dev.7
+        tag: v1.6.1-dev.7
     ```
 
     > _Note:_ To see the available tags for each image, see

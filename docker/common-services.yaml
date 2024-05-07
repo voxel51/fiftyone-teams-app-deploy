@@ -31,7 +31,7 @@ services:
   teams-api-common:
     image: voxel51/fiftyone-teams-api:v1.6.1
     environment:
-      CAS_BASE_URL: ${CAS_BASE_URL}
+      CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
@@ -91,10 +91,10 @@ services:
   teams-cas-common:
     image: voxel51/fiftyone-teams-cas:v1.6.1
     environment:
-      CAS_DATABASE_NAME: ${CAS_DATABASE_NAME}
-      CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE}
+      CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
+      CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
       CAS_MONGODB_URI: ${CAS_MONGO_DB_URI:-$FIFTYONE_DATABASE_URI}
-      DEBUG: ${CAS_DEBUG}
+      DEBUG: ${CAS_DEBUG:-cas:*,-cas:*:debug}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
@@ -111,7 +111,7 @@ services:
       # https_proxy: ${HTTPS_PROXY_URL}
       # no_proxy: ${NO_PROXY_LIST}
     ports:
-      - ${CAS_BIND_ADDRESS}:${CAS_BIND_PORT}:3000
+      - ${CAS_BIND_ADDRESS:-127.0.0.1}:${CAS_BIND_PORT:-3030}:3000
     restart: always
 
   teams-plugins-common:
