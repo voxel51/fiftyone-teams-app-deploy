@@ -558,8 +558,11 @@ to route traffic
 - From the path-based route `/cas` to port `3030`
   on the host running the FiftyOne Teams CAS
 
+  > **NOTE**: the `/cas` route must appear before the `/` route or
+  > an infinite redirect loop will occur.
+
 See
-[./example-nginx-site.conf](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf)
+[./example-nginx-site.conf](./example-nginx-site.conf)
 for an example Nginx site configuration that forwards
 
 - http traffic to https
