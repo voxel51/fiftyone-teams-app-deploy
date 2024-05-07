@@ -48,7 +48,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
               pullPolicy: IfNotPresent
-              tag: v1.6.1rc2
+              tag: v1.7.0rc2
           appSettings:
             env:
               # Only set to true during the initial installation or during a database upgrade
@@ -63,7 +63,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v1.6.1rc2
+              tag: v1.7.0rc2
           # TODO: Test `minikube addons configure registry-creds` or
           # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
           # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -141,7 +141,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v1.6.1rc2
+              tag: v1.7.0rc2
           teamsAppSettings:
             dnsName: local.fiftyone.ai
             # env:
@@ -158,7 +158,7 @@ deploy:
               # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
               # This is a byproduct of `npm` versioning versus Python PEP 440.
               pullPolicy: IfNotPresent
-              tag: v1.6.1-rc.1
+              tag: v1.7.0-rc.1
           casSettings:
             env:
               DEBUG: cas:*
@@ -166,5 +166,5 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
               pullPolicy: IfNotPresent
-              tag: v1.6.1-rc.1
+              tag: v1.7.0-rc.1
   kubeContext: minikube
