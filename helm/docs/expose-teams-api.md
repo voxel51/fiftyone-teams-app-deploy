@@ -99,6 +99,7 @@ To use this chart's ingress object
               pathType: Prefix
               serviceName: teams-cas
               servicePort: 80
+            # Note: the ordering matters. This root path must be last.
             - path: /
               pathType: Prefix
               serviceName: teams-app

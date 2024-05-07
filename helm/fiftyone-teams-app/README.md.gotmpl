@@ -109,8 +109,8 @@ A brief summary of those changes include
   - `secret.fiftyone`
   - secret specified in `secret.name`
 
-When using path-based routing,
-update your `values.yaml` to include the route
+When using path-based routing, update your `values.yaml`
+to include the rule (add it before the `path: /` rule)
 
 ```yaml
 - path: /cas
@@ -397,7 +397,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
            in the appropriate service pods
     1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
         1. This is not the default value in the Helm Chart and must be overridden
-    1. If you use path based routing, update your ingress with the rule
+    1. When using path-based routing, update your ingress with the rule
+       (add it before the `path: /` rule)
 
         ```yaml
         ingress:
