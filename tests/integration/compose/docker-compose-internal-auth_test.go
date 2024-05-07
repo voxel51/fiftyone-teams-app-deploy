@@ -11,14 +11,14 @@ import (
 
 	"path/filepath"
 
+	"github.com/compose-spec/compose-go/v2/dotenv"
+
 	"github.com/gruntwork-io/terratest/modules/docker"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/compose-spec/compose-go/v2/dotenv"
 )
 
 const (
@@ -274,10 +274,17 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 			// Validate system health
 			for _, expected := range testCase.expected {
 				logger.Log(subT, fmt.Sprintf("Validating service %s...", expected.name))
+
+				// Validate that docker compose started the container
 				s.Contains(output, fmt.Sprintf("Container %s-%s-1  Started", dockerOptions.ProjectName, expected.name), fmt.Sprintf("%s - %s - docker compose output should contain service container started", testCase.name, expected.name))
+
+				// Validate endpoint response
+				// Skip fiftyone-app and teams-plugins because they do not have callable endpoints that return a response payload.
 				if expected.url != "" {
+					// Validate url endpoint response is expected
 					validate_endpoint(subT, expected.url, expected.responsePayload, expected.httpResponseCode)
 				}
+				// Validate log output is expected
 				s.Contains(get_logs(subT, dockerOptions, expected.name), expected.log, fmt.Sprintf("%s - %s - log should contain matching entry", testCase.name, expected.name))
 			}
 		})
