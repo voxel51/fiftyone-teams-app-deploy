@@ -116,6 +116,47 @@ Either write
 See
 [Debugging interleaved test output](https://terratest.gruntwork.io/docs/testing-best-practices/debugging-interleaved-test-output/#installing-the-utility-binaries).
 
+## Integration Tests
+
+### Running Docker Compose Integration Tests
+
+1. Have Docker desktop running
+1. tests/integration/compose/docker-compose-legacy-auth_test.goRun tests
+
+    ```shell
+    make test-integration-compose
+    ```
+
+### Running Helm Integration Tests
+
+1. Start minikube
+
+    ```shell
+    make start run-cert-manager run-mongodb
+    ```
+
+1. Install cert-manager and mongodb into minikube
+
+    ```shell
+    make run-cert-manager run-mongodb
+    ```
+
+1. In another terminal, run `minikube tunnel`
+   (to expose the services within minikube outside of minikube)
+
+    ```shell
+    make tunnel
+    ```
+
+    > **NOTE**: This command will prompt for sudo permission
+    > on systems where 80 and 443 are privileged ports
+
+1. Run tests
+
+    ```shell
+    make test-integration-helm
+    ```
+
 ## Additional Links
 
 * [Automated Testing for Kubernetes and Helm Charts using Terratest](https://github.com/gruntwork-io/terratest-helm-testing-example)
