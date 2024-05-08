@@ -364,7 +364,7 @@ For example, `compose.override.yaml` might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.6.0
+    image: voxel51/fiftyone-app-torch:v1.7.0
 ```
 
 For more information, see the docs for
@@ -396,7 +396,7 @@ create a new IdP or modify your existing configuration.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -412,8 +412,8 @@ create a new IdP or modify your existing configuration.
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.16.0`
-1. Upgrade your FiftyOne SDKs to version 0.16.0
+      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.17.0`
+1. Upgrade your FiftyOne SDKs to version 0.17.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -447,7 +447,7 @@ create a new IdP or modify your existing configuration.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > you should coordinate this upgrade carefully with your end-users.
@@ -475,7 +475,7 @@ create a new IdP or modify your existing configuration.
     - `unset FIFTYONE_DATABASE_ADMIN`
         - This should generally be your default
 1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.0
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -485,8 +485,8 @@ create a new IdP or modify your existing configuration.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.16.0 will lose database connectivity
-      at this point. Upgrading to `fiftyone==0.16.0` is required
+    - **NOTE** Any FiftyOne SDK less than 0.17.0 will lose database connectivity
+      at this point. Upgrading to `fiftyone==0.17.0` is required
 
 1. To ensure that all datasets are now at version 0.23.8, run
 

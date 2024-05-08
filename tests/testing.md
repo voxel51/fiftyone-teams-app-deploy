@@ -124,7 +124,7 @@ See
 1. tests/integration/compose/docker-compose-legacy-auth_test.goRun tests
 
     ```shell
-    make test-integration-compose
+    make auth test-integration-compose
     ```
 
 ### Running Helm Integration Tests
@@ -132,7 +132,7 @@ See
 1. Start minikube
 
     ```shell
-    make start run-cert-manager run-mongodb
+    make auth start
     ```
 
 1. Install cert-manager and mongodb into minikube

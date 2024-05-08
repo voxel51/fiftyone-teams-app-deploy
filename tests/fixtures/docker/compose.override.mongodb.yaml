@@ -1,0 +1,25 @@
+services:
+  fiftyone-app:
+    depends_on: [mongodb]
+    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app-torch:${FIFTYONE_APP_VERSION}
+  teams-api:
+    depends_on: [mongodb]
+    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api:${FIFTYONE_TEAMS_API_VERSION}
+  teams-app:
+    depends_on: [mongodb]
+    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app:${FIFTYONE_TEAMS_APP_VERSION}
+  teams-cas:
+    depends_on: [mongodb]
+    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas:${FIFTYONE_TEAMS_CAS_VERSION}
+  mongodb:
+    image: "mongo:6.0.12-jammy"
+    restart: always
+    ports:
+      - "${MONGODB_BIND_ADDRESS:-0.0.0.0}:${MONGODB_BIND_PORT:-27017}:27017"
+    environment:
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+    volumes:
+      - type: bind
+        source: ${MONGODB_DIR}
+        target: /data/db
