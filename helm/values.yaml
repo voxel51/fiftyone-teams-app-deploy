@@ -61,13 +61,9 @@ secret:
 #   dnsName: your-api.hostname.here
 #   env:
 #     # Set FIFTYONE_PLUGINS_DIR if you are enabling plugins in a dedicated
-#       `teams-plugins` deployment
+#     # `teams-plugins` deployment
 #     # See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#fiftyone-teams-plugins
 #     FIFTYONE_PLUGINS_DIR: /opt/plugins
-#     # Set FIFTYONE_TEAMS_VERSION_OVERRIDE to override the `Install FiftyOne`
-#     # bash command in the `Settings > Install FiftyOne` modal
-#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==0.17.0
-
 
 appSettings:
   env:
@@ -97,6 +93,10 @@ casSettings:
 
 teamsAppSettings:
   dnsName: your.hostname.here
+#   env:
+#     # Set FIFTYONE_TEAMS_VERSION_OVERRIDE to override the `Install FiftyOne`
+#     # bash command in the `Settings > Install FiftyOne` modal
+#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==0.17.0
 
 # ingress:
 #   annotations:
