@@ -95,11 +95,12 @@ documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
 [`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
-and
-[migrating](https://docs.voxel51.com/teams/pluggable_auth.html#migrating-from-legacy-to-internal-mode)
-to
+and migrating to
 [`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
 after confirming your initial upgrade was successful.
+
+Please contact your Voxel51 customer success representative for assistance
+in migrating to internal mode.
 
 The CAS service requires changes to your `values.yaml` files.
 A brief summary of those changes include
@@ -382,7 +383,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.6.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -407,10 +408,10 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
                 servicePort: 80
         ```
 
-1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 1.6.1](#deploying-fiftyone-teams)
     > **NOTE:** At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==0.16.0`
-1. Upgrade your FiftyOne SDKs to version 0.16.0
+    > FiftyOne Teams Database until they upgrade to `fiftyone==0.16.1`
+1. Upgrade your FiftyOne SDKs to version 0.16.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -428,7 +429,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 1.1.0 and later
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.6.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -454,8 +455,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 1.6.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.0
+1. [Upgrade to FiftyOne Teams version 1.6.1](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -465,9 +466,9 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.16.0
+    > **NOTE** Any FiftyOne SDK less than 0.16.1
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==0.16.0` is required.
+    > Upgrading to `fiftyone==0.16.1` is required.
 
 1. Validate that all datasets are now at version 0.23.5
 
