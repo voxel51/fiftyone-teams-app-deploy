@@ -373,31 +373,29 @@ For more information, see the docs for
 
 ## Upgrading From Previous Versions
 
-Voxel51 assumes you are using the published docker compose files to
-deploy your FiftyOne Teams environment.  If you are using custom
-deployment mechanisms, carefully review the changes in the
+Voxel51 assumes you use the published Docker compose
+files to deploy your FiftyOne Teams environment.
+If you use custom deployment mechanisms, carefully review the changes in the
 [Docker Compose Files](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
 and update your deployment accordingly.
 
 ### From Early Adopter Versions (Versions less than 1.0)
 
-Please contact your Voxel51 Customer Success team member to coordinate
-this upgrade. You will need to either create a new Identity
-Provider (IdP) or modify your existing configuration to migrate to a
-new Auth0 Tenant.
+Please contact your Voxel51 Customer Success team member to coordinate this upgrade.
+You will need to either create a new Identity Provider (IdP) or
+modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
 > **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0
-> requires upgrading the database and will interrupt all SDK
-> connections. You should coordinate this upgrade carefully with your
-> end-users.
+> requires upgrading the database and will interrupt all SDK connections.
+> You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication
-> Service (CAS). CAS requires additional configurations and consumes
-> additional resources. Please review the upgrade instructions, the
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
 > [Central Authentication Service](#central-authentication-service)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
@@ -407,9 +405,8 @@ new Auth0 Tenant.
 
 > **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
 > your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted
-> Web App. You should coordinate this upgrade carefully with your
-> end-users.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
 
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
@@ -419,22 +416,22 @@ new Auth0 Tenant.
     - `FIFTYONE_API_URI`
     - `FIFTYONE_AUTH_SECRET`
 1. Ensure your web server routes are updated to include routing
-   `/cas/*` traffic to the `teams-cas` service.  Example nginx
-   configurations can be found
+   `/cas/*` traffic to the `teams-cas` service.
+   Example nginx configurations can be found
    [here](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
 1. [Upgrade to FiftyOne Teams v1.7.0](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     > **NOTE:** FiftyOne SDK users will lose access to the FiftyOne
-    >
+
  > Teams Database at this step until they upgrade to
  > `fiftyone==0.17.0`
 
 1. Upgrade your FiftyOne SDKs to version 0.17.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
-   with your FiftyOne Teams version, navigate to
-   `Account > Install FiftyOne`
+      with your FiftyOne Teams version, navigate to
+      `Account > Install FiftyOne`
 1. Confirm that datasets have been migrated to version 0.24.0
 
     ```shell
@@ -451,15 +448,14 @@ new Auth0 Tenant.
 
 > **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
 > your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted
-> Web App. You should coordinate this upgrade carefully with your
-> end-users.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication
-> Service (CAS). CAS requires additional configurations and consumes
-> additional resources. Please review the upgrade instructions, the
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
 > [Central Authentication Service](#central-authentication-service)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
@@ -484,22 +480,32 @@ new Auth0 Tenant.
     > [Central Authentication Service](#central-authentication-service)
 
 1. Ensure all FiftyOne SDK users either
-    - Set `FIFTYONE_DATABASE_ADMIN=false`
-    - `unset FIFTYONE_DATABASE_ADMIN`
-        - This should generally be your default
+    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
+
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=false
+      ```
+
+    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
+      (this should generally be your default)
+
+        ```shell
+        `unset FIFTYONE_DATABASE_ADMIN`
+        ```
+
 1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Have the admin run this to upgrade all datasets
+1. Upgrade all the datasets
+    > **NOTE** Any FiftyOne SDK less than 0.17.0
+    > will lose connectivity at this point.
+    > Upgrading to `fiftyone==0.17.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
-
-    - **NOTE** Any FiftyOne SDK less than 0.17.0 will lose database connectivity
-      at this point. Upgrading to `fiftyone==0.17.0` is required
 
 1. To ensure that all datasets are now at version 0.24.0, run
 
