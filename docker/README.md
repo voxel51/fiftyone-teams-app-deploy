@@ -422,10 +422,8 @@ modify your existing configuration to migrate to a new Auth0 Tenant.
 1. [Upgrade to FiftyOne Teams v1.7.0](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
-    > **NOTE:** FiftyOne SDK users will lose access to the FiftyOne
-
- > Teams Database at this step until they upgrade to
- > `fiftyone==0.17.0`
+    > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
+    > Teams Database at this step until they upgrade to `fiftyone==0.17.0`
 
 1. Upgrade your FiftyOne SDKs to version 0.17.0
     - Login to the FiftyOne Teams UI
@@ -474,7 +472,7 @@ modify your existing configuration to migrate to a new Auth0 Tenant.
     - `CAS_DEBUG`
     - `CAS_DEFAULT_USER_ROLE`
 
-    > **Note**: For the `CAS_*` variables, consider using
+    > **NOTE**: For the `CAS_*` variables, consider using
     > the seed values from the `.env.template` file.
     > See
     > [Central Authentication Service](#central-authentication-service)

@@ -587,7 +587,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         ```
 
 1. [Upgrade to FiftyOne Teams v1.7.0](#deploying-fiftyone-teams)
-    > **NOTE:** At this step, FiftyOne SDK users will lose access to the
+    > **NOTE**: At this step, FiftyOne SDK users will lose access to the
     > FiftyOne Teams Database until they upgrade to `fiftyone==0.17.0`
 1. Upgrade your FiftyOne SDKs to version 0.17.0
     - Login to the FiftyOne Teams UI
