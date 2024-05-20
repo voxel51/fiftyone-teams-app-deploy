@@ -490,7 +490,7 @@ modify your existing configuration to migrate to a new Auth0 Tenant.
       (this should generally be your default)
 
         ```shell
-        `unset FIFTYONE_DATABASE_ADMIN`
+        unset FIFTYONE_DATABASE_ADMIN
         ```
 
 1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
@@ -516,9 +516,19 @@ modify your existing configuration to migrate to a new Auth0 Tenant.
 ### From FiftyOne Teams Version 1.6.0
 
 1. Ensure all FiftyOne SDK users either
-    - Set `FIFTYONE_DATABASE_ADMIN=false`
-    - `unset FIFTYONE_DATABASE_ADMIN`
-        - This should generally be your default
+    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
+
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=false
+      ```
+
+    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
+      (this should generally be your default)
+
+        ```shell
+        unset FIFTYONE_DATABASE_ADMIN
+        ```
+
 1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
     - Login to the FiftyOne Teams UI

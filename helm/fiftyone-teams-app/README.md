@@ -624,9 +624,19 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 > documentation before completing your upgrade.
 
 1. Ensure all FiftyOne SDK users either
-    - set `FIFTYONE_DATABASE_ADMIN=false`
-    - `unset FIFTYONE_DATABASE_ADMIN`
-        - This should generally be your default
+    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
+
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=false
+      ```
+
+    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
+      (this should generally be your default)
+
+        ```shell
+        unset FIFTYONE_DATABASE_ADMIN
+        ```
+
 1. In your `values.yaml`, set the required values
     1. `secret.fiftyone.encryptionKey` (or your deployment's
        equivalent)
@@ -669,7 +679,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
       (this should generally be your default)
 
         ```shell
-        `unset FIFTYONE_DATABASE_ADMIN`
+        unset FIFTYONE_DATABASE_ADMIN
         ```
 
 1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
