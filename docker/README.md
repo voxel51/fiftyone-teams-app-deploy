@@ -19,6 +19,9 @@
     - [Snapshot Archival](#snapshot-archival)
     - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
     - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
+      - [Builtin Plugins Only](#builtin-plugins-only)
+      - [Shared Plugins](#shared-plugins)
+      - [Dedicated Plugins](#dedicated-plugins)
     - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
     - [Proxies](#proxies)
     - [Text Similarity](#text-similarity)
@@ -204,63 +207,90 @@ to customize and extend the functionality of FiftyOne Teams in your environment.
 There are three modes for plugins
 
 1. Builtin Plugins Only
-    - No changes are required for this mode
-1. Plugins run in the `fiftyone-app` deployment
-    - To enable this mode, use the file
-      [legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
-      instead of
-      [legacy-auth/compose.yaml](legacy-auth/compose.yaml)
-    - Containers need the following access to plugin storage
-      - `fiftyone-app` requires `read`
-      - `fiftyone-api` requires `read-write`
-    - Example `docker compose` command for this mode from the `legacy-auth`
-   directory
+    - This is the default mode
+    - Users may only run the builtin plugins shipped with Fiftyone Teams
+    - Cannot run custom plugins
+1. Shared Plugins
+    - Users may run builtin and custom plugins
+    - Plugins run in the existing `fiftyone-app` service
+      - Plugins resource consumption may starve `fiftyone-app`,
+        causing the app to be slow or crash
+    - Requires creating a volume mounted to the services
+      - `fiftyone-app` (read-only)
+      - `teams-api` (read-write)
+1. Dedicated Plugins
+    - Users may run builtin and custom plugins
+    - Plugins run in an additional `teams-plugins` service
+    - Plugins run in a dedicated `teams-plugins` service
+      - Plugins resource consumption does not affect `fiftyone-app`
+    - Requires creating a volume mounted to the services
+      - `teams-plugins` (read-only)
+      - `teams-api` (read-write)
 
-        ```shell
-        docker compose \
-          -f compose.plugins.yaml \
-          -f compose.override.yaml \
-          up -d
-        ```
-
-1. Plugins run in a dedicated `teams-plugins` deployment
-    - To enable this mode, use the file
-      [legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
-      instead of
-      [legacy-auth/compose.yaml](legacy-auth/compose.yaml)
-    - Containers need the following access to plugin storage
-      - `teams-plugins` requires `read`
-      - `fiftyone-api` requires `read-write`
-    - If you are
-      [using a proxy](#proxies),
-      add the `teams-plugins` service name to your `no_proxy` and `NO_PROXY`
-      environment variables.
-    - Example `docker compose` command for this mode from the `legacy-auth`
-      directory
-
-        ```shell
-        docker compose \
-          -f compose.dedicated-plugins.yaml \
-          -f compose.override.yaml \
-          up -d
-        ```
-
-Both
-[legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
-and
-[legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
-create a new Docker Volume shared between FiftyOne Teams services.
 For multi-node deployments, please implement a storage
-solution allowing the access the deployed plugins.
+solution that provides access to the deployed plugins.
 
-If you build plugins that have custom dependencies, you will need to build and
-use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md)
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md).
 
-Use the FiftyOne Teams UI to deploy plugins by navigating to
-`https://<DEPLOY_URL>/settings/plugins`.
+To use the FiftyOne Teams UI to deploy plugins,
+navigate to `https://<DEPLOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must
 be redeployed using the FiftyOne Teams UI.
+
+#### Builtin Plugins Only
+
+Enabled by default.
+No additional configurations are required.
+
+#### Shared Plugins
+
+Plugins run in the `fiftyone-app` service.
+To enable this mode, use the file
+[legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
+instead of
+[legacy-auth/compose.yaml](legacy-auth/compose.yaml).
+This compose file creates a new Docker Volume shared between FiftyOne Teams services.
+
+- Configure the services to access to the plugin volume
+  - `fiftyone-app` requires `read`
+  - `fiftyone-api` requires `read-write`
+- Example `docker compose` command for this mode from the `legacy-auth`
+directory
+
+    ```shell
+    docker compose \
+      -f compose.plugins.yaml \
+      -f compose.override.yaml \
+      up -d
+    ```
+
+#### Dedicated Plugins
+
+Plugins run in the `teams-plugins` service.
+To enable this mode, use the file
+[legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
+instead of
+[legacy-auth/compose.yaml](legacy-auth/compose.yaml).
+This compose file creates a new Docker Volume shared between FiftyOne Teams services.
+
+- Configure the services to access to the plugin volume
+  - `teams-plugins` requires `read`
+  - `fiftyone-api` requires `read-write`
+- If you are
+  [using a proxy](#proxies),
+  add the `teams-plugins` service name to your environment variables
+  - `no_proxy`
+  - `NO_PROXY`
+- Example `docker compose` command for this mode from the `legacy-auth`
+  directory
+
+    ```shell
+    docker compose \
+      -f compose.dedicated-plugins.yaml \
+      -f compose.override.yaml \
+      up --d
+    ```
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
