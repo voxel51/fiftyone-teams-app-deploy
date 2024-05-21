@@ -30,6 +30,9 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
+    - [Builtin Plugins Only](#builtin-plugins-only)
+    - [Shared Plugins](#shared-plugins)
+    - [Dedicated Plugins](#dedicated-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
@@ -169,47 +172,77 @@ to customize and enhance functionality.
 There are three modes for plugins
 
 1. Builtin Plugins Only
-    - No changes are required for this mode
-1. Plugins run in the `fiftyone-app` deployment
-    - To enable this mode
-        - In `values.yaml`, set the path for a Persistent Volume Claim
-          mounted to the `teams-api` and `fiftyone-app` deployments in both
-            - `appSettings.env.FIFTYONE_PLUGINS_DIR`
-            - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
-        - Mount a
-          [Persistent Volume Claim](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
-          that provides
-            - `ReadWrite` permissions to the `teams-api` deployment
-              at the `FIFTYONE_PLUGINS_DIR` path
-            - `ReadOnly` permission to the `fiftyone-app` deployment
-              at the `FIFTYONE_PLUGINS_DIR` path
-1. Plugins run in a dedicated `teams-plugins` deployment
-    - To enable this mode
-        - In `values.yaml`, set
-            - `pluginsSettings.enabled: true`
-            - The path for a Persistent Volume Claim mounted to the
-              `teams-api` and `teams-plugins` deployments in both
-                - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
-                - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
-        - Mount a
-          [Persistent Volume Claim](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
-          that provides
-            - `ReadWrite` permissions to the `teams-api` deployment
-              at the `FIFTYONE_PLUGINS_DIR` path
-            - `ReadOnly` permission to the `teams-plugins` deployment
-              at the `FIFTYONE_PLUGINS_DIR` path
-        - If you are
-          [using a proxy](#proxies),
-          add the `teams-plugins` service name to your `no_proxy` and
-          `NO_PROXY` environment variables.
+    - This is the default mode
+    - Users may only run the builtin plugins shipped with Fiftyone Teams
+    - Cannot run custom plugins
+1. Shared Plugins
+    - Users may run builtin and custom plugins
+    - Requires creating a Persistent Volume backed by NFSwith the PVCs
+      - `teams-api` (ReadWrite)
+      - `fiftyone-app` (ReadOnly)
+    - Plugins run in the existing `fiftyone-app` deployment
+      - Plugins resource consumption may starve `fiftyone-app`,
+        causing the app to be slow or crash
+1. Dedicated Plugins
+    - Users may run builtin and custom plugins
+    - Plugins run in an additional `teams-plugins` deployment
+    - Requires creating a Persistent Volume backed by NFS with the PVCs
+      - `teams-plugins` (ReadWrite)
+      - `fiftyone-app` (ReadOnly)
+    - Plugins run in a dedicated `teams-plugins` deployment
+      - Plugins resource consumption does not affect `fiftyone-app`
 
-If you build plugins that have custom dependencies, you will need to build and
-use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md)
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md).
 
-Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPLOY_URL>/settings/plugins`.
-Early-adopter plugins installed manually must be
-redeployed using the FiftyOne Teams UI.
+To use the FiftyOne Teams UI to deploy plugins,
+navigate to `https://<DEPLOY_URL>/settings/plugins`.
+Early-adopter plugins installed manually must
+be redeployed using the FiftyOne Teams UI.
+
+#### Builtin Plugins Only
+
+Enabled by default.
+No additional configurations are required.
+
+#### Shared Plugins
+
+Plugins run in the `fiftyone-app` deployment.
+To enable this mode
+
+- In `values.yaml`, set the path for a Persistent Volume Claim (PVC)
+  mounted to the `teams-api` and `fiftyone-app` deployments in both
+  - `appSettings.env.FIFTYONE_PLUGINS_DIR`
+  - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
+- See
+  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  - Mount a PVC that provides
+    - `ReadWrite` permissions to the `teams-api` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+    - `ReadOnly` permission to the `fiftyone-app` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+
+#### Dedicated Plugins
+
+To enable this mode
+
+- In `values.yaml`, set
+  - `pluginsSettings.enabled: true`
+  - The path for a Persistent Volume Claim mounted to the
+    `teams-api` and `teams-plugins` deployments in both
+    - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
+    - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
+- See
+  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  - Mount a Persistent Volume Claim (PVC) that provides
+    - `ReadWrite` permissions to the `teams-api` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+    - `ReadOnly` permission to the `teams-plugins` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+- If you are
+  [using a proxy](#proxies),
+  add the `teams-plugins` service name to your `no_proxy` and
+  `NO_PROXY` environment variables.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
