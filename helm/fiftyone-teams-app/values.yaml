@@ -51,7 +51,7 @@ apiSettings:
     containerPort: 8000
     liveness:
       # -- Number of seconds to wait before performing the liveness probe for teams-api. [Reference][probes].
-      initialDelaySeconds: 45
+      initialDelaySeconds: 15
     # -- Service name.
     name: teams-api
     # -- (int) Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api.
@@ -60,7 +60,7 @@ apiSettings:
     port: 80
     readiness:
       # -- Number of seconds to wait before performing the readiness probe for teams-api. [Reference][probes].
-      initialDelaySeconds: 45
+      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # -- Port name (maximum length is 15 characters) for teams-api. [Reference][ports].
     shortname: teams-api
@@ -150,7 +150,7 @@ appSettings:
     containerPort: 5151
     liveness:
       # -- Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 45
+      initialDelaySeconds: 15
     # -- Service name.
     name: fiftyone-app
     # -- (int) Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app.
@@ -159,7 +159,7 @@ appSettings:
     port: 80
     readiness:
       # -- Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 45
+      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # -- Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports].
     shortname: fiftyone-app
@@ -392,7 +392,7 @@ pluginsSettings:
     containerPort: 5151
     liveness:
       # -- Number of seconds to wait before performing the liveness probe teams-plugins. [Reference][probes].
-      initialDelaySeconds: 45
+      initialDelaySeconds: 15
     # -- Service name.
     name: teams-plugins
     # -- (int) Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins.
@@ -401,7 +401,7 @@ pluginsSettings:
     port: 80
     readiness:
       # -- Number of seconds to wait before performing the readiness probe for teams-plugins. [Reference][probes].
-      initialDelaySeconds: 45
+      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # -- Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports].
     shortname: teams-plugins
@@ -553,7 +553,7 @@ teamsAppSettings:
     containerPort: 3000
     liveness:
       # -- Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes].
-      initialDelaySeconds: 45
+      initialDelaySeconds: 15
     # -- Service name.
     name: teams-app
     # -- (int) Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app.
@@ -562,7 +562,7 @@ teamsAppSettings:
     port: 80
     readiness:
       # -- Number of seconds to wait before performing the readiness probe for teams-app. [Reference][probes].
-      initialDelaySeconds: 45
+      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # -- Port name (maximum length is 15 characters) for teams-app. [Reference][ports].
     shortname: teams-app
