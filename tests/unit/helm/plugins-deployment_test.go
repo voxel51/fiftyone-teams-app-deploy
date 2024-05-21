@@ -845,7 +845,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "teams-plugins"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1017,7 +1017,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "teams-plugins"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe

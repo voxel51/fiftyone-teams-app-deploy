@@ -684,7 +684,7 @@ func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
             "path": "/health/",
             "port": "teams-api"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -812,7 +812,7 @@ func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
             "path": "/health/",
             "port": "teams-api"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe

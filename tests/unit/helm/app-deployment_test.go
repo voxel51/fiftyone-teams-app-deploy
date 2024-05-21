@@ -649,7 +649,7 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "fiftyone-app"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -775,7 +775,7 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "fiftyone-app"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
