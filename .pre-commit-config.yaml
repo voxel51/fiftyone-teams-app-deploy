@@ -86,3 +86,11 @@ repos:
     rev: v1.7.0
     hooks:
       - id: actionlint
+  - repo: https://github.com/syntaqx/git-hooks
+    rev: v0.0.18
+    hooks:
+      - id: shellcheck
+      - id: shfmt
+        args:
+          - -w
+          - -s
