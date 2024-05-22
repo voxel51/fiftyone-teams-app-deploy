@@ -31,14 +31,22 @@ get_latest_image() {
   _REGEX_VERSION=${2}
 
   # Get latest image version matching the regex pattern
-  _VERSION=$(gcloud artifacts tags list \
-    --location=us-central1 \
-    --repository=dev-docker \
-    --project computer-vision-team \
-    --package "${PACKAGE}" \
-    --filter="name ~ ${_REGEX_VERSION}" 2>/dev/null |
-    tail -n 1 |
-    cut -f 1 -d ' ')
+  _VERSION=$(
+    gcloud artifacts tags list \
+      --location=us-central1 \
+      --repository=dev-docker \
+      --project computer-vision-team \
+      --package "${PACKAGE}" \
+      --filter="name ~ ${_REGEX_VERSION}" \
+      2>/dev/null |
+      sort -V |
+      tail -n 1 |
+      cut -f 1 -d ' '
+  )
+
+  if [ -z "${_VERSION}" ]; then
+    _VERSION="Not found"
+  fi
 
   # Display package and version
   printf "%s\t%s\n" "${1}" "${_VERSION}"
