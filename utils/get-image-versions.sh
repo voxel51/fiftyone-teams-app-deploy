@@ -1,8 +1,40 @@
 #!/usr/bin/env bash
 
-# Get the latest image version matching the parameter value
-
 set -eo pipefail
+
+help() {
+  echo "Get the latest image version matching the parameter value"
+  echo ""
+  echo "Example Usage"
+  echo ""
+  echo "* Get latest v1.7.0 dev version"
+  echo ""
+  echo "    $ /utils/get-image-versions.sh \"v1.7.0\" dev"
+  echo "    fiftyone-app    v1.7.0.dev20"
+  echo "    fiftyone-teams-api    v1.7.0.dev20"
+  echo "    fiftyone-teams-app    v1.7.0-dev.16"
+  echo "    fiftyone-teams-cas    v1.7.0-dev.1"
+  echo ""
+  echo " * Get latest v1.7.0 rc version"
+  echo "    $ ./utils/get-image-versions.sh \"v1.7.0\" rc"
+  echo "    fiftyone-app    v1.7.0rc8"
+  echo "    fiftyone-teams-api    v1.7.0rc8"
+  echo "    fiftyone-teams-app    v1.7.0-rc.7"
+  echo "    fiftyone-teams-cas    v1.7.0-rc.7"
+  echo ""
+  echo "* Get latest versions"
+  echo ""
+  echo "    $ ./utils/get-image-versions.sh latest"
+  echo "    fiftyone-app    v1.8.0.dev14"
+  echo "    fiftyone-teams-api    v1.8.0.dev14"
+  echo "    fiftyone-teams-app    v1.8.0-dev.14"
+  echo "    fiftyone-teams-cas    v1.8.0-dev.14"
+}
+
+if [ "${1}" == 'help' ]; then
+  help
+  exit 0
+fi
 
 IMAGES=(
   fiftyone-app
@@ -28,7 +60,8 @@ get_latest_image() {
     PACKAGE="${1}"
   fi
 
-  _REGEX_VERSION=${2}
+  _VERSION_REGEX="${2}"
+  _FILTER_KEY="${3}"
 
   # Get latest image version matching the regex pattern
   _VERSION=$(
@@ -37,7 +70,7 @@ get_latest_image() {
       --repository=dev-docker \
       --project computer-vision-team \
       --package "${PACKAGE}" \
-      --filter="name ~ ${_REGEX_VERSION}" \
+      --filter="${_FILTER_KEY} ~ ${_VERSION_REGEX}" \
       2>/dev/null |
       sort -V |
       tail -n 1 |
@@ -77,5 +110,21 @@ esac
 
 # Call function with package and regex pattern
 for IMAGE in "${IMAGES[@]}"; do
-  get_latest_image "${IMAGE}" "${VERSION_REGEX}"
+  if [ "${VERSION}" == "latest" ]; then
+    # Get last package, sorted descending by creation time
+    _SHA=$(
+      gcloud artifacts versions list \
+        --location=us-central1 \
+        --repository=dev-docker \
+        --project computer-vision-team \
+        --package "${IMAGE}" \
+        --sort-by ~CREATE_TIME \
+        --limit 1 \
+        --format="csv[no-heading](name)" \
+        2>/dev/null
+    )
+    get_latest_image "${IMAGE}" "${_SHA}" version
+  else
+    get_latest_image "${IMAGE}" "${VERSION_REGEX}" name
+  fi
 done
