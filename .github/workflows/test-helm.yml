@@ -7,6 +7,7 @@ on:
       - opened
       - synchronize
     paths:
+      - .github/workflows/test-helm.yml
       - helm/fiftyone-teams-app/**
       - tests/fixtures/helm/**
       - tests/integration/helm/**
