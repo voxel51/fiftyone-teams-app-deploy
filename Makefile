@@ -1,5 +1,6 @@
 SHELL := $(SHELL) -e
 ASDF := $(shell asdf where golang)
+VERSION ?= 1.7.0
 
 # Help
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))
@@ -209,3 +210,12 @@ test-integration-helm-interleaved-legacy:  ## run go test on the tests/integrati
 
 install-terratest-log-parser:  ## install terratest_log_parser
 	go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@latest
+
+get-image-versions:  ## display the latest internal image matching version string
+	./utils/get-image-versions.sh "${VERSION}"
+
+get-image-versions-dev:  ## display the latest internal image matching version string
+	./utils/get-image-versions.sh "${VERSION}" dev
+
+get-image-versions-rc:  ## display the latest internal image matching version string
+	./utils/get-image-versions.sh "${VERSION}" rc
