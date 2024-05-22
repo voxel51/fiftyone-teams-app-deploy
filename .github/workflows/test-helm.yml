@@ -1,24 +1,18 @@
 ---
-name: Tests
+name: Tests - Helm
 
 on:
   pull_request:
     types:
       - opened
       - synchronize
+    paths:
+      - helm/fiftyone-teams-app/**
+      - tests/fixtures/helm/**
+      - tests/integration/helm/**
+      - tests/unit/helm/**
 
 jobs:
-  unit-compose:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v3
-      - name: install asdf & tools
-        uses: asdf-vm/actions/install@v3.0.2
-      - name: Run unit tests
-        shell: bash
-        run: |
-          make test-unit-compose-interleaved
   unit-helm:
     runs-on: ubuntu-latest
     steps:
@@ -30,28 +24,6 @@ jobs:
         shell: bash
         run: |
           make test-unit-helm-interleaved
-  integration-compose-internal:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v3
-      - name: install asdf & tools
-        uses: asdf-vm/actions/install@v3.0.2
-      - name: Run compose integration tests for internal
-        shell: bash
-        run: |
-          make test-integration-compose-interleaved-internal
-  integration-compose-legacy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v3
-      - name: install asdf & tools
-        uses: asdf-vm/actions/install@v3.0.2
-      - name: Run compose integration tests for legacy
-        shell: bash
-        run: |
-          make test-integration-compose-interleaved-legacy
   integration-helm-internal:
     runs-on: ubuntu-latest
     steps:

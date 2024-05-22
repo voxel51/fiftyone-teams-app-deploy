@@ -1,0 +1,50 @@
+---
+name: Tests - Docker Compose
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths:
+      - docker/common-services.yaml
+      - docker/internal-auth/**
+      - docker/legacy-auth/**
+      - tests/fixtures/docker/**
+      - tests/integration/compose/**
+      - tests/unit/compose/**
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v3
+      - name: install asdf & tools
+        uses: asdf-vm/actions/install@v3.0.2
+      - name: Run unit tests
+        shell: bash
+        run: |
+          make test-unit-compose-interleaved
+  integration-internal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v3
+      - name: install asdf & tools
+        uses: asdf-vm/actions/install@v3.0.2
+      - name: Run compose integration tests for internal
+        shell: bash
+        run: |
+          make test-integration-compose-interleaved-internal
+  integration-legacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v3
+      - name: install asdf & tools
+        uses: asdf-vm/actions/install@v3.0.2
+      - name: Run compose integration tests for legacy
+        shell: bash
+        run: |
+          make test-integration-compose-interleaved-legacy
