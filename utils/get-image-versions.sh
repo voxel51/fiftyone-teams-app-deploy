@@ -54,25 +54,25 @@ get_latest_image() {
 
 # Construct regex for version accounting for the different tagging conventions
 case "${SEGMENT}" in
-rc)
-  VERSION_REGEX="${VERSION}*.${SEGMENT}*"
-  ;;
+  rc)
+    VERSION_REGEX="${VERSION}*.${SEGMENT}*"
+    ;;
 
-dev)
-  VERSION_REGEX="${VERSION}*.${SEGMENT}*"
-  ;;
+  dev)
+    VERSION_REGEX="${VERSION}*.${SEGMENT}*"
+    ;;
 
-beta)
-  VERSION_REGEX="${VERSION}*.${SEGMENT}*"
-  ;;
+  beta)
+    VERSION_REGEX="${VERSION}*.${SEGMENT}*"
+    ;;
 
-"")
-  VERSION_REGEX="${VERSION}$"
-  ;;
+  "")
+    VERSION_REGEX="${VERSION}$"
+    ;;
 
-*)
-  VERSION_REGEX="${VERSION}$"
-  ;;
+  *)
+    VERSION_REGEX="${VERSION}$"
+    ;;
 esac
 
 # Call function with package and regex pattern
