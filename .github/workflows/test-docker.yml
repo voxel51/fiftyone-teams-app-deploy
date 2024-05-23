@@ -28,6 +28,8 @@ jobs:
         run: |
           make test-unit-compose-interleaved
   integration-internal:
+    permissions:
+      id-token: 'write'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +47,8 @@ jobs:
         run: |
           make test-integration-compose-interleaved-internal
   integration-legacy:
+    permissions:
+      id-token: 'write'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
