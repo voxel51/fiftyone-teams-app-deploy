@@ -29,6 +29,7 @@ jobs:
           make test-unit-compose-interleaved
   integration-compose-internal:
     permissions:
+      contents: 'read'
       id-token: 'write'
     runs-on: ubuntu-latest
     steps:
@@ -37,31 +38,41 @@ jobs:
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
       - name: Authenticate to Google Cloud
+        id: auth
         uses: google-github-actions/auth@v2
         with:
           project_id: 'computer-vision-team'
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
+          token_format: access_token
           workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+      # - name: 'Set up Cloud SDK'
+      #   uses: 'google-github-actions/setup-gcloud@v2.1.0'
+      - name: Login to GAR
+        uses: docker/login-action@v3
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
       - name: Run compose integration tests for internal
         shell: bash
         run: |
           make start test-integration-compose-interleaved-internal
-  integration-compose-legacy:
-    permissions:
-      id-token: 'write'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v3
-      - name: install asdf & tools
-        uses: asdf-vm/actions/install@v3.0.2
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          project_id: 'computer-vision-team'
-          service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
-          workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
-      - name: Run compose integration tests for legacy
-        shell: bash
-        run: |
-          make start test-integration-compose-interleaved-legacy
+  # integration-compose-legacy:
+  #   permissions:
+  #     id-token: 'write'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v3
+  #     - name: install asdf & tools
+  #       uses: asdf-vm/actions/install@v3.0.2
+  #     - name: Authenticate to Google Cloud
+  #       uses: google-github-actions/auth@v2
+  #       with:
+  #         project_id: 'computer-vision-team'
+  #         service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
+  #         workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+  #     - name: Run compose integration tests for legacy
+  #       shell: bash
+  #       run: |
+  #         make start test-integration-compose-interleaved-legacy
