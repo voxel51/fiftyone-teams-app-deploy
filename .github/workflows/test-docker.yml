@@ -16,7 +16,7 @@ on:
       - tests/unit/compose/**
 
 jobs:
-  unit:
+  unit-compose:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           make test-unit-compose-interleaved
-  integration-internal:
+  integration-compose-internal:
     permissions:
       id-token: 'write'
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           make start test-integration-compose-interleaved-internal
-  integration-legacy:
+  integration-compose-legacy:
     permissions:
       id-token: 'write'
     runs-on: ubuntu-latest
