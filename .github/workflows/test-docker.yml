@@ -29,8 +29,8 @@ jobs:
           make test-unit-compose-interleaved
   integration-compose-internal:
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +56,7 @@ jobs:
       - name: Run compose integration tests for internal
         shell: bash
         run: |
-          make start test-integration-compose-interleaved-internal
+          make start test-integration-compose-internal
   # integration-compose-legacy:
   #   permissions:
   #     id-token: 'write'
