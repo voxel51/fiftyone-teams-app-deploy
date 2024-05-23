@@ -319,6 +319,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
+          },
+          {
+            "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
+            "value": "24"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -389,6 +393,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
+          },
+          {
+            "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
+            "value": "24"
           },
           {
             "name": "TEST_KEY",
@@ -464,6 +472,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
+          },
+          {
+            "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
+            "value": "24"
           },
           {
             "name": "TEST_KEY",

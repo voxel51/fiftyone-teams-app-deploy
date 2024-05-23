@@ -14,6 +14,7 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_SIGNED_URL_EXPIRATION: ${FIFTYONE_SIGNED_URL_EXPIRATION:-24}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
