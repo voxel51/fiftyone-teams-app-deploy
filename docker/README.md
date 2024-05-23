@@ -27,7 +27,7 @@ to appear.
 
 While Voxel51 works to address this issue, you can override the install
 instructions by setting the `FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` environment
-value for the `teams-app` deployment.  This can be accomplished by adding
+value for the `teams-app` service.  This can be accomplished by adding
 something like the following to your `compose.override.yaml`:
 
 ```yaml
