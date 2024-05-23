@@ -45,7 +45,7 @@ jobs:
       - name: Run compose integration tests for internal
         shell: bash
         run: |
-          make test-integration-compose-interleaved-internal
+          make start test-integration-compose-interleaved-internal
   integration-legacy:
     permissions:
       id-token: 'write'
@@ -64,4 +64,4 @@ jobs:
       - name: Run compose integration tests for legacy
         shell: bash
         run: |
-          make test-integration-compose-interleaved-legacy
+          make start test-integration-compose-interleaved-legacy

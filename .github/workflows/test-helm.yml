@@ -43,7 +43,7 @@ jobs:
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
-          make test-integration-helm-interleaved-internal
+          make start test-integration-helm-interleaved-internal
   integration-helm-legacy:
     permissions:
       id-token: 'write'
@@ -62,4 +62,4 @@ jobs:
       - name: Run Helm integration tests for legacy
         shell: bash
         run: |
-          make test-integration-helm-interleaved-legacy
+          make start test-integration-helm-interleaved-legacy
