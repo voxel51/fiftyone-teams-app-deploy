@@ -231,6 +231,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 			},
 		},
 		{
@@ -314,6 +315,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_CACHE_ENABLED=true",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 			},
 		},
 		{
@@ -396,6 +398,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 			},
 		},
 		{
