@@ -25,9 +25,9 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 ## Known Issue for FiftyOne Teams v1.6.0 and Above
 
 FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-introduces an abstraction layer between FiftyOne Teams and Auth0.  This
-abstraction layer makes it possible to deploy FiftyOne Teams without using Auth0
-as an Identity Service Provider.
+introduces an abstraction layer between FiftyOne Teams and Auth0.
+This abstraction layer makes it possible to deploy FiftyOne
+Teams without using Auth0 as an Identity Service Provider.
 
 However, metadata that used to be provided to FiftyOne Teams by Auth0 is no
 longer available; which has resulted in an incomplete set of instructions in the
@@ -37,10 +37,11 @@ instructions for bash.
 Specifically, you will see the word `TOKEN` where your Voxel51 PyPI token used
 to appear.
 
-While Voxel51 works to address this issue, you can override the install
-instructions by setting the `FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` environment
-value for the `teams-app` deployment.  This can be accomplished by adding
-something like the following to your `values.yaml`:
+While Voxel51 works to address this issue, you can override
+the install instructions by setting the `FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE`
+environment value for the `teams-app` deployment.
+This can be accomplished by adding something
+like the following to your `values.yaml`:
 
 ```yaml
 teamsAppSettings:
@@ -48,12 +49,12 @@ teamsAppSettings:
     FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install -U --index-url https://<your PyPI Token>@pypi.fiftyone.ai fiftyone==0.17.0
 ```
 
-If you need your PyPI token, please contact your Customer Success representative
-and they will provide it to you.
+If you need your PyPI token, please contact your Customer
+Success representative and they will provide it to you.
 
 <!-- toc -->
 
-- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [Initial Installation vs Upgrades](#initial-installation-vs-upgrades)
 - [FiftyOne Teams Features](#fiftyone-teams-features)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
@@ -86,7 +87,7 @@ We publish the following FiftyOne Teams private images to Docker Hub:
 
 For Docker Hub credentials, please contact your Voxel51 support team.
 
-## Initial Installation vs. Upgrades
+## Initial Installation vs Upgrades
 
 Upgrades are more frequent than new installations.
 The chart's default behavior supports upgrades and the `values.yaml` contains
@@ -671,9 +672,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 > **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
 > your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted
-> Web App. You should coordinate this upgrade carefully with your
-> end-users.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
 
 ---
 

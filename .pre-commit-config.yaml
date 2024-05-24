@@ -41,6 +41,12 @@ repos:
     rev: v0.36.0
     hooks:
       - id: markdownlint
+        args:
+          - --rules
+          - markdownlint-rule-max-one-sentence-per-line
+        additional_dependencies:
+          - markdownlint-rule-max-one-sentence-per-line
+        exclude: helm/local-self-signed-example/cert-manger-crds/README.md
       - id: markdownlint-fix
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.5
