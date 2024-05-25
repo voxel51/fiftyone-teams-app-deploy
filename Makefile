@@ -108,7 +108,7 @@ run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
 	skaffold run -p only-fiftyone
 
 tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
-	minikube tunnel
+	sudo minikube tunnel &> /dev/null &
 
 helm-repos:  ## add helm repos for the project
 	helm repo add bitnami https://charts.bitnami.com/bitnami
