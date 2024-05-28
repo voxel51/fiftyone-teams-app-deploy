@@ -250,7 +250,8 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 
 				// get deployment
 				deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
-				k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, 18, 5*time.Second) // 90 seconds of retries. Pods typically ready in ~51 seconds.
+				// when pulling images for the first time, it may take longer than 90s
+				k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, 72, 5*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
 
 				// get deployment match labels
 				selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
