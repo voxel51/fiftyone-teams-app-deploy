@@ -26,6 +26,8 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 
 ## Known Issue for FiftyOne Teams v1.6.0 and Above
 
+### "Install Fiftyone" Instructions Missing PyPI Token
+
 FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
 introduces an abstraction layer between FiftyOne Teams and Auth0.  This
 abstraction layer makes it possible to deploy FiftyOne Teams without using Auth0
@@ -52,6 +54,28 @@ teamsAppSettings:
 
 If you need your PyPI token, please contact your Customer Success representative
 and they will provide it to you.
+
+### Invitations Disabled for Internal Authentication Mode
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+includes both
+[`legacy` authentication mode][legacy-auth-mode]
+and
+[`internal` authentication mode][internal-auth-mode]
+
+Inviting users to join your FiftyOne Teams instance is not currently supported
+when `FIFTYONE_AUTH_MODE` is set to `internal`.
+
+### Super Admin UI Disabled for Legacy Authentication Mode
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+includes a new
+[Super Admin UI](https://docs.voxel51.com/teams/pluggable_auth.html#super-admin-ui)
+for deployment-wide authentication configurations when using
+[`internal` authentication mode][internal-auth-mode].
+
+The FiftyOne Teams Super Admin UI is disabled when `FIFTYONE_AUTH_MODE` is set
+to `legacy`.
 
 <!-- toc -->
 
@@ -127,9 +151,9 @@ Please review these notes, and the
 documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
-[`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
+[`legacy` authentication mode][legacy-auth-mode]
 and migrating to
-[`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
+[`internal` authentication mode][internal-auth-mode]
 after confirming your initial upgrade was successful.
 
 Please contact your Voxel51 customer success
@@ -633,7 +657,9 @@ A minimal example `values.yaml` may be found
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
+[internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+[legacy-auth-mode]: topher/document-install-modal-override
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
