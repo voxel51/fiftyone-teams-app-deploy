@@ -251,7 +251,32 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				// get deployment
 				deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
 				// when pulling images for the first time, it may take longer than 90s
-				k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, 72, 5*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+				errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 36, 10*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+				// errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 3, 1*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+
+				if errDeployment != nil {
+					// Get details why it failed
+					// Get k8s events
+					events := k8s.ListEvents(subT, kubectlOptions, metav1.ListOptions{})
+					logger.Log(subT, "Events:")
+					logger.Log(subT, "TYPE\tREASON\tOBJECT\tMESSAGE")
+					for _, event := range events {
+						logger.Log(subT, fmt.Sprintf("%s\t%s\t%s\t%s", event.Type, event.Reason, event.Related, event.Message))
+					}
+
+					// TODO: DRY
+					// Get k8s logs
+					selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
+					listOptions := metav1.ListOptions{LabelSelector: selectorLabelsPods}
+					pods := k8s.ListPods(subT, kubectlOptions, listOptions)
+					logger.Log(subT, "Logs:")
+					for _, pod := range pods {
+						logger.Log(subT, get_logs(subT, kubectlOptions, &pod, ""))
+					}
+
+					// Report error
+					require.NoError(subT, errDeployment)
+				}
 
 				// get deployment match labels
 				selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
