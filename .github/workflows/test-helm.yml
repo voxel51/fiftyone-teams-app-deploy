@@ -52,7 +52,7 @@ jobs:
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
-          make auth start run-cert-manager run-mongodb
+          make start run-cert-manager run-mongodb
           sudo minikube tunnel &> /dev/null &
           make test-integration-helm-internal
   integration-helm-legacy:
