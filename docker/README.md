@@ -10,6 +10,60 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
+## Known Issue for FiftyOne Teams v1.6.0 and Above
+
+### "Install Fiftyone" Instructions Missing PyPI Token
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+introduces an abstraction layer between FiftyOne Teams and Auth0.  This
+abstraction layer makes it possible to deploy FiftyOne Teams without using Auth0
+as an Identity Service Provider.
+
+However, metadata that used to be provided to FiftyOne Teams by Auth0 is no
+longer available; which has resulted in an incomplete set of instructions in the
+[Install FiftyOne](https://docs.voxel51.com/teams/installation.html#python-sdk)
+instructions for bash.
+
+Specifically, you will see the word `TOKEN` where your Voxel51 PyPI token used
+to appear.
+
+While Voxel51 works to address this issue, you can override the install
+instructions by setting the `FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` environment
+value for the `teams-app` service.  This can be accomplished by adding
+something like the following to your `compose.override.yaml`:
+
+```yaml
+teams-app:
+  environment:
+    FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install -U --index-url https://<your PyPI Token>@pypi.fiftyone.ai fiftyone==0.17.0
+```
+
+If you need your PyPI token, please contact your Customer Success representative
+and they will provide it to you.
+
+### Invitations Disabled for Internal Authentication Mode
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+includes both
+[`legacy` authentication mode][legacy-auth-mode]
+and
+[`internal` authentication mode][internal-auth-mode].
+
+Inviting users to join your FiftyOne Teams instance is not currently supported
+when `FIFTYONE_AUTH_MODE` is set to `internal`.
+
+### Super Admin UI Disabled for Legacy Authentication Mode
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+includes a new
+[Super Admin UI](https://docs.voxel51.com/teams/pluggable_auth.html#super-admin-ui)
+for deployment-wide authentication configurations.
+
+The FiftyOne Teams Super Admin UI is disabled when `FIFTYONE_AUTH_MODE` is set
+to `legacy`.
+
+## Table of Contents
+
 <!-- toc -->
 
 - [Deploying FiftyOne Teams App with Docker Compose](#deploying-fiftyone-teams-app-with-docker-compose)
@@ -115,9 +169,9 @@ Please review these notes, and the
 documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
-[`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
+[`legacy` authentication mode][legacy-auth-mode]
 and migrating to
-[`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
+[`internal` authentication mode][internal-auth-mode]
 after confirming your initial upgrade was successful.
 
 Please contact your Voxel51 customer success
@@ -703,3 +757,7 @@ for an example Nginx site configuration that forwards
 | `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                        | No                        |
 | `HTTPS_PROXY_URL`                            | The URL for your environment https proxy                                                                                                                                                                                                                                       | No                        |
 | `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
+
+<!-- Reference Links -->
+[internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
+[legacy-auth-mode]: topher/document-install-modal-override
