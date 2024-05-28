@@ -52,7 +52,8 @@ jobs:
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
-          make start auth run-cert-manager run-mongodb
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+          make start run-cert-manager run-mongodb
           sudo minikube tunnel &> /dev/null &
           make test-integration-helm-internal
   # integration-helm-legacy:
