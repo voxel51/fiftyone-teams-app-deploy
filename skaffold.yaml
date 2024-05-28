@@ -152,7 +152,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v1.7.0.dev20
+              tag: v1.7.0rc9
             service:
               liveness:
                 initialDelaySeconds: 15
