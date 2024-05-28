@@ -57,11 +57,12 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
 FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
 includes a new
 [Super Admin UI](https://docs.voxel51.com/teams/pluggable_auth.html#super-admin-ui)
-for deployment-wide authentication configurations when using
-[`internal` authentication mode][internal-auth-mode].
+for deployment-wide authentication configurations.
 
 The FiftyOne Teams Super Admin UI is disabled when `FIFTYONE_AUTH_MODE` is set
 to `legacy`.
+
+## Table of Contents
 
 <!-- toc -->
 
