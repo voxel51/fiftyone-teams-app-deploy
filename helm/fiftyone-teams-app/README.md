@@ -155,8 +155,8 @@ and migrating to
 [`internal` authentication mode][internal-auth-mode]
 after confirming your initial upgrade was successful.
 
-Please contact your Voxel51 customer success
-representative for assistance in migrating to internal mode.
+Please contact your Voxel51 customer success representative for assistance
+in migrating to internal mode.
 
 The CAS service requires changes to your `values.yaml` files.
 A brief summary of those changes include
