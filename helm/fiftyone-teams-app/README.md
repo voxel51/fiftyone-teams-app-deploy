@@ -15,12 +15,66 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 1.6.1](https://img.shields.io/badge/Version-1.6.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.1](https://img.shields.io/badge/AppVersion-v1.6.1-informational?style=flat-square)
+![Version: 1.7.0](https://img.shields.io/badge/Version-1.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.7.0](https://img.shields.io/badge/AppVersion-v1.7.0-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 <!-- markdownlint-enable line-length -->
 
 Please contact Voxel51 for more information regarding Fiftyone Teams.
+
+## Known Issue for FiftyOne Teams v1.6.0 and Above
+
+### "Install Fiftyone" Instructions Missing PyPI Token
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+introduces an abstraction layer between FiftyOne Teams and Auth0.  This
+abstraction layer makes it possible to deploy FiftyOne Teams without using Auth0
+as an Identity Service Provider.
+
+However, metadata that used to be provided to FiftyOne Teams by Auth0 is no
+longer available; which has resulted in an incomplete set of instructions in the
+[Install FiftyOne](https://docs.voxel51.com/teams/installation.html#python-sdk)
+instructions for bash.
+
+Specifically, you will see the word `TOKEN` where your Voxel51 PyPI token used
+to appear.
+
+While Voxel51 works to address this issue, you can override the install
+instructions by setting the `FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` environment
+value for the `teams-app` deployment.  This can be accomplished by adding
+something like the following to your `values.yaml`:
+
+```yaml
+teamsAppSettings:
+  env:
+    FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install -U --index-url https://<your PyPI Token>@pypi.fiftyone.ai fiftyone==0.17.0
+```
+
+If you need your PyPI token, please contact your Customer Success representative
+and they will provide it to you.
+
+### Invitations Disabled for Internal Authentication Mode
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+includes both
+[`legacy` authentication mode][legacy-auth-mode]
+and
+[`internal` authentication mode][internal-auth-mode].
+
+Inviting users to join your FiftyOne Teams instance is not currently supported
+when `FIFTYONE_AUTH_MODE` is set to `internal`.
+
+### Super Admin UI Disabled for Legacy Authentication Mode
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+includes a new
+[Super Admin UI](https://docs.voxel51.com/teams/pluggable_auth.html#super-admin-ui)
+for deployment-wide authentication configurations.
+
+The FiftyOne Teams Super Admin UI is disabled when `FIFTYONE_AUTH_MODE` is set
+to `legacy`.
+
+## Table of Contents
 
 <!-- toc -->
 
@@ -30,6 +84,9 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
+    - [Builtin Plugins Only](#builtin-plugins-only)
+    - [Shared Plugins](#shared-plugins)
+    - [Dedicated Plugins](#dedicated-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
@@ -37,7 +94,8 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
-  - [From FiftyOne Teams Version 1.1.0 and later](#from-fiftyone-teams-version-110-and-later)
+  - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
+  - [From FiftyOne Teams Version 1.6.0](#from-fiftyone-teams-version-160)
 - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
 
 <!-- tocstop -->
@@ -92,9 +150,9 @@ Please review these notes, and the
 documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
-[`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
+[`legacy` authentication mode][legacy-auth-mode]
 and migrating to
-[`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
+[`internal` authentication mode][internal-auth-mode]
 after confirming your initial upgrade was successful.
 
 Please contact your Voxel51 customer success representative for assistance
@@ -107,8 +165,8 @@ A brief summary of those changes include
   - `secret.fiftyone`
   - secret specified in `secret.name`
 
-When using path-based routing,
-update your `values.yaml` to include the route
+When using path-based routing, update your `values.yaml`
+to include the rule (add it before the `path: /` rule)
 
 ```yaml
 - path: /cas
@@ -169,47 +227,77 @@ to customize and enhance functionality.
 There are three modes for plugins
 
 1. Builtin Plugins Only
-    - No changes are required for this mode
-1. Plugins run in the `fiftyone-app` deployment
-    - To enable this mode
-        - In `values.yaml`, set the path for a Persistent Volume Claim
-          mounted to the `teams-api` and `fiftyone-app` deployments in both
-            - `appSettings.env.FIFTYONE_PLUGINS_DIR`
-            - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
-        - Mount a
-          [Persistent Volume Claim](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
-          that provides
-            - `ReadWrite` permissions to the `teams-api` deployment
-              at the `FIFTYONE_PLUGINS_DIR` path
-            - `ReadOnly` permission to the `fiftyone-app` deployment
-              at the `FIFTYONE_PLUGINS_DIR` path
-1. Plugins run in a dedicated `teams-plugins` deployment
-    - To enable this mode
-        - In `values.yaml`, set
-            - `pluginsSettings.enabled: true`
-            - The path for a Persistent Volume Claim mounted to the
-              `teams-api` and `teams-plugins` deployments in both
-                - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
-                - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
-        - Mount a
-          [Persistent Volume Claim](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
-          that provides
-            - `ReadWrite` permissions to the `teams-api` deployment
-              at the `FIFTYONE_PLUGINS_DIR` path
-            - `ReadOnly` permission to the `teams-plugins` deployment
-              at the `FIFTYONE_PLUGINS_DIR` path
-        - If you are
-          [using a proxy](#proxies),
-          add the `teams-plugins` service name to your `no_proxy` and
-          `NO_PROXY` environment variables.
+    - This is the default mode
+    - Users may only run the builtin plugins shipped with Fiftyone Teams
+    - Cannot run custom plugins
+1. Shared Plugins
+    - Users may run builtin and custom plugins
+    - Requires creating a Persistent Volume backed by NFSwith the PVCs
+      - `teams-api` (ReadWrite)
+      - `fiftyone-app` (ReadOnly)
+    - Plugins run in the existing `fiftyone-app` deployment
+      - Plugins resource consumption may starve `fiftyone-app`,
+        causing the app to be slow or crash
+1. Dedicated Plugins
+    - Users may run builtin and custom plugins
+    - Plugins run in an additional `teams-plugins` deployment
+    - Requires creating a Persistent Volume backed by NFS with the PVCs
+      - `teams-plugins` (ReadWrite)
+      - `fiftyone-app` (ReadOnly)
+    - Plugins run in a dedicated `teams-plugins` deployment
+      - Plugins resource consumption does not affect `fiftyone-app`
 
-If you build plugins that have custom dependencies, you will need to build and
-use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md)
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md).
 
-Use the FiftyOne Teams UI to deploy plugins by navigating to `https://<DEPLOY_URL>/settings/plugins`.
-Early-adopter plugins installed manually must be
-redeployed using the FiftyOne Teams UI.
+To use the FiftyOne Teams UI to deploy plugins,
+navigate to `https://<DEPLOY_URL>/settings/plugins`.
+Early-adopter plugins installed manually must
+be redeployed using the FiftyOne Teams UI.
+
+#### Builtin Plugins Only
+
+Enabled by default.
+No additional configurations are required.
+
+#### Shared Plugins
+
+Plugins run in the `fiftyone-app` deployment.
+To enable this mode
+
+- In `values.yaml`, set the path for a Persistent Volume Claim (PVC)
+  mounted to the `teams-api` and `fiftyone-app` deployments in both
+  - `appSettings.env.FIFTYONE_PLUGINS_DIR`
+  - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
+- See
+  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  - Mount a PVC that provides
+    - `ReadWrite` permissions to the `teams-api` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+    - `ReadOnly` permission to the `fiftyone-app` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+
+#### Dedicated Plugins
+
+To enable this mode
+
+- In `values.yaml`, set
+  - `pluginsSettings.enabled: true`
+  - The path for a Persistent Volume Claim mounted to the
+    `teams-api` and `teams-plugins` deployments in both
+    - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
+    - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
+- See
+  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  - Mount a Persistent Volume Claim (PVC) that provides
+    - `ReadWrite` permissions to the `teams-api` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+    - `ReadOnly` permission to the `teams-plugins` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+- If you are
+  [using a proxy](#proxies),
+  add the `teams-plugins` service name to your `no_proxy` and
+  `NO_PROXY` environment variables.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
@@ -354,11 +442,11 @@ appSettings:
 | apiSettings.securityContext | object | `{}` | Container security configuration for teams-api. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for teams-api. [Reference][annotations]. |
 | apiSettings.service.containerPort | int | `8000` | Service container port for teams-api. |
-| apiSettings.service.liveness.initialDelaySeconds | int | `45` | Number of seconds to wait before performing the liveness probe for teams-api. [Reference][probes]. |
+| apiSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-api. [Reference][probes]. |
 | apiSettings.service.name | string | `"teams-api"` | Service name. |
 | apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api. |
 | apiSettings.service.port | int | `80` | Service port for teams-api. |
-| apiSettings.service.readiness.initialDelaySeconds | int | `45` | Number of seconds to wait before performing the readiness probe for teams-api. [Reference][probes]. |
+| apiSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-api. [Reference][probes]. |
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for teams-api. [Reference][ports]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for teams-api. [Reference][service-type]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations]. |
@@ -374,6 +462,7 @@ appSettings:
 | appSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
 | appSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
 | appSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne App processes. The default value is 32 GiB. `-1` is disabled. |
+| appSettings.env.FIFTYONE_SIGNED_URL_EXPIRATION | int | `24` | Set the time-to-live for signed URLs generated by the application in hours |
 | appSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | appSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for fiftyone-app. |
 | appSettings.image.tag | string | `""` | Image tag for fiftyone-app. Defaults to the chart version. |
@@ -385,11 +474,11 @@ appSettings:
 | appSettings.securityContext | object | `{}` | Container security configuration for fiftyone-app. [Reference][container-security-context]. |
 | appSettings.service.annotations | object | `{}` | Service annotations for fiftyone-app. [Reference][annotations]. |
 | appSettings.service.containerPort | int | `5151` | Service container port for fiftyone-app. |
-| appSettings.service.liveness.initialDelaySeconds | int | `45` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
+| appSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.name | string | `"fiftyone-app"` | Service name. |
 | appSettings.service.nodePort | int | `nil` | Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app. |
 | appSettings.service.port | int | `80` | Service port. |
-| appSettings.service.readiness.initialDelaySeconds | int | `45` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
+| appSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for fiftyone-app. [Reference][service-type]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
@@ -463,11 +552,11 @@ appSettings:
 | pluginsSettings.securityContext | object | `{}` | Container security configuration for teams-plugins. [Reference][container-security-context]. |
 | pluginsSettings.service.annotations | object | `{}` | Service annotations for teams-plugins. [Reference][annotations]. |
 | pluginsSettings.service.containerPort | int | `5151` | Service container port for teams-plugins. |
-| pluginsSettings.service.liveness.initialDelaySeconds | int | `45` | Number of seconds to wait before performing the liveness probe teams-plugins. [Reference][probes]. |
+| pluginsSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.name | string | `"teams-plugins"` | Service name. |
 | pluginsSettings.service.nodePort | int | `nil` | Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins. |
 | pluginsSettings.service.port | int | `80` | Service port. |
-| pluginsSettings.service.readiness.initialDelaySeconds | int | `45` | Number of seconds to wait before performing the readiness probe for teams-plugins. [Reference][probes]. |
+| pluginsSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for teams-plugins. [Reference][service-type]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations]. |
@@ -498,7 +587,7 @@ appSettings:
 | teamsAppSettings.dnsName | string | `""` | DNS Name for the teams-app service. Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`) and teams-app deployment environment variable `AUTH0_BASE_URL`. |
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"0.16.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"0.17.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Teams API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
@@ -514,11 +603,11 @@ appSettings:
 | teamsAppSettings.serverPathPrefix | string | `"/"` | Prefix for path-based Ingress routing for teams-app. |
 | teamsAppSettings.service.annotations | object | `{}` | Service annotations for teams-app. [Reference][annotations]. |
 | teamsAppSettings.service.containerPort | int | `3000` | Service container port for teams-app. |
-| teamsAppSettings.service.liveness.initialDelaySeconds | int | `45` | Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes]. |
+| teamsAppSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.name | string | `"teams-app"` | Service name. |
 | teamsAppSettings.service.nodePort | int | `nil` | Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app. |
 | teamsAppSettings.service.port | int | `80` | Service port. |
-| teamsAppSettings.service.readiness.initialDelaySeconds | int | `45` | Number of seconds to wait before performing the readiness probe for teams-app. [Reference][probes]. |
+| teamsAppSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for teams-app. [Reference][ports]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for teams-app. [Reference][service-type]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations]. |
@@ -527,9 +616,10 @@ appSettings:
 
 ## Upgrading From Previous Versions
 
-Voxel51 assumes you are using the published
+Voxel51 assumes you use the published
 Helm Chart to deploy your FiftyOne Teams environment.
-If you are using a custom deployment mechanism, carefully review the changes in the
+If you are using a custom deployment
+mechanism, carefully review the changes in the
 [Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
 and update your deployment accordingly.
 
@@ -542,8 +632,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0 requires
-> upgrading the database and will interrupt all SDK connections.
+> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0
+> requires upgrading the database and will interrupt all SDK connections.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
@@ -558,7 +648,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -572,7 +662,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
            in the appropriate service pods
     1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
         1. This is not the default value in the Helm Chart and must be overridden
-    1. If you use path based routing, update your ingress with the rule
+    1. When using path-based routing, update your ingress with the rule
+       (add it before the `path: /` rule)
 
         ```yaml
         ingress:
@@ -583,31 +674,32 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
                 servicePort: 80
         ```
 
-1. [Upgrade to FiftyOne Teams version 1.6.1](#deploying-fiftyone-teams)
-    > **NOTE:** At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==0.16.1`
-1. Upgrade your FiftyOne SDKs to version 0.16.1
+1. [Upgrade to FiftyOne Teams v1.7.0](#deploying-fiftyone-teams)
+    > **NOTE**: At this step, FiftyOne SDK users will lose access to the
+    > FiftyOne Teams Database until they upgrade to `fiftyone==0.17.0`
+1. Upgrade your FiftyOne SDKs to version 0.17.0
     - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check if the datasets were migrated to version 0.23.8
+    - To obtain the CLI command to install the FiftyOne SDK associated
+      with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Confirm that datasets were migrated to version 0.24.0
 
     ```shell
     fiftyone migrate --info
     ```
 
-    - If not all datasets have been upgraded, upgrade all the datasets
+    - If not all datasets have been upgraded, have an admin run
 
         ```shell
         FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
         ```
 
-### From FiftyOne Teams Version 1.1.0 and later
+### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
 > your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
-> You should coordinate this upgrade carefully with your end-users.
+> This will interrupt active workflows in the FiftyOne Teams Hosted
+> Web App. You should coordinate this upgrade carefully with your
+> end-users.
 
 ---
 
@@ -620,18 +712,29 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 > documentation before completing your upgrade.
 
 1. Ensure all FiftyOne SDK users either
-    - set `FIFTYONE_DATABASE_ADMIN=false`
-    - `unset FIFTYONE_DATABASE_ADMIN`
-        - This should generally be your default
+    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
+
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=false
+      ```
+
+    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
+      (this should generally be your default)
+
+        ```shell
+        unset FIFTYONE_DATABASE_ADMIN
+        ```
+
 1. In your `values.yaml`, set the required values
-    1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
+    1. `secret.fiftyone.encryptionKey` (or your deployment's
+       equivalent)
         1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
            in the appropriate service pods
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 1.6.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.1
+1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -641,11 +744,47 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.16.1
+    > **NOTE** Any FiftyOne SDK less than 0.17.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==0.16.1` is required.
+    > Upgrading to `fiftyone==0.17.0` is required.
 
-1. Validate that all datasets are now at version 0.23.5
+1. Validate that all datasets are now at version 0.24.0
+
+    ```shell
+    fiftyone migrate --info
+    ```
+
+### From FiftyOne Teams Version 1.6.0
+
+1. Ensure all FiftyOne SDK users either
+    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
+
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=false
+      ```
+
+    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
+      (this should generally be your default)
+
+        ```shell
+        unset FIFTYONE_DATABASE_ADMIN
+        ```
+
+1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
+    - Login to the FiftyOne Teams UI
+    - To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Upgrade all the datasets
+    > **NOTE** Any FiftyOne SDK less than 0.17.0
+    > will lose connectivity at this point.
+    > Upgrading to `fiftyone==0.17.0` is required.
+
+    ```shell
+    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+    ```
+
+1. Validate that all datasets are now at version 0.24.0
 
     ```shell
     fiftyone migrate --info
@@ -695,7 +834,9 @@ A minimal example `values.yaml` may be found
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
+[internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+[legacy-auth-mode]: topher/document-install-modal-override
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/

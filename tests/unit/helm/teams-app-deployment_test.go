@@ -313,7 +313,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "0.16.1"
+            "value": "0.17.0"
           },
           {
             "name": "FIFTYONE_APP_THEME",
@@ -384,7 +384,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "0.16.1"
+            "value": "0.17.0"
           },
           {
             "name": "FIFTYONE_APP_THEME",
@@ -579,7 +579,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
             "path": "/api/hello",
             "port": "teams-app"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -707,7 +707,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
             "path": "/api/hello",
             "port": "teams-app"
           },
-          "initialDelaySeconds": 45,
+          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe

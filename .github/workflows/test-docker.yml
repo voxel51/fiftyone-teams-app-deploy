@@ -1,0 +1,85 @@
+---
+name: Tests - Docker Compose
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths:
+      - .github/workflows/test-docker.yml
+      - docker/common-services.yaml
+      - docker/internal-auth/**
+      - docker/legacy-auth/**
+      - tests/fixtures/docker/**
+      - tests/integration/compose/**
+      - tests/unit/compose/**
+
+jobs:
+  unit-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.6
+      - uses: actions/setup-python@v5.1.0
+      - name: install asdf & tools
+        uses: asdf-vm/actions/install@v3.0.2
+      - name: Run unit tests
+        shell: bash
+        run: |
+          make test-unit-compose
+  integration-compose-internal:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.6
+      - uses: actions/setup-python@v5.1.0
+      - name: install asdf & tools
+        uses: asdf-vm/actions/install@v3.0.2
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2.1.3
+        with:
+          project_id: 'computer-vision-team'
+          service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+      - name: Login to GAR
+        uses: docker/login-action@v3.1.0
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - name: Run compose integration tests for internal
+        shell: bash
+        run: |
+          make start test-integration-compose-internal
+  integration-compose-legacy:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.6
+      - uses: actions/setup-python@v5.1.0
+      - name: install asdf & tools
+        uses: asdf-vm/actions/install@v3.0.2
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2.1.3
+        with:
+          project_id: 'computer-vision-team'
+          service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+      - name: Login to GAR
+        uses: docker/login-action@v3.1.0
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - name: Run compose integration tests for legacy
+        shell: bash
+        run: |
+          make start test-integration-compose-legacy

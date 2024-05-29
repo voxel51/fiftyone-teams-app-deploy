@@ -1,0 +1,157 @@
+---
+# Copy of values from `../../../skaffold.yaml`'s `helm.releases[0].overrides`
+# used for integration tests
+apiSettings:
+  env:
+    LOGGING_LEVEL: DEBUG
+    FIFTYONE_ENV: development
+  image:
+    # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
+    pullPolicy: IfNotPresent
+    tag: v1.7.0.dev20
+  service:
+    liveness:
+      initialDelaySeconds: 15
+    readiness:
+      initialDelaySeconds: 15
+appSettings:
+  env:
+    # Only set to true during the initial installation or during a database upgrade
+    # FIFTYONE_DATABASE_ADMIN: false
+    FIFTYONE_DATABASE_ADMIN: true
+    # For local development without TLS certs, set `APP_USE_HTTPS=false` to
+    # prohibit the app from setting Redirect URL protocol to `https`.
+    # Must be set in both `appSettings.env` and `teamsAppSettings.env`.
+    # Can be true, when using cert-manager with self-signed certificates
+    # APP_USE_HTTPS: false
+  image:
+    # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+    pullPolicy: IfNotPresent
+    tag: v1.7.0.dev20
+  service:
+    liveness:
+      initialDelaySeconds: 15
+    readiness:
+      initialDelaySeconds: 15
+# TODO: Test `minikube addons configure registry-creds` or
+# When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
+# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+# imagePullSecrets:
+#   - name: regcred
+
+ingress:
+  annotations:
+    # For using the nginx-ingress controller with cert-manager self signed certificates
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+    # Configure nginx-ingress controller proxy buffers for the app
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 256k
+    # Configure nginx-ingress controller proxy buffers for the app
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+  # For using the nginx-ingress controller
+  className: nginx
+  paths:
+    - path: /_pymongo
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /health
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /graphql/v1
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /file
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /cas
+      pathType: Prefix
+      serviceName: teams-cas
+      servicePort: 80
+    # Note: the ordering matters. This root path must be last.
+    - path: /
+      pathType: Prefix
+      serviceName: teams-app
+      servicePort: 80
+  tlsEnabled: true
+secret:
+  fiftyone:
+    # In the `dev-fiftyone` Auth0 Tenant, the `local-dev` and
+    # `fiftyone-dev-api (Test Application)` applications are
+    # configured for running the app locally with https
+    auth0Domain: dev-fiftyone.us.auth0.com
+
+    # Set values for the `fiftyone-dev-api (Test Application)` application
+    apiClientId: ""
+    apiClientSecret: ""
+
+    # Set values for the `local-dev` application
+    clientId: ""
+    clientSecret: ""
+
+    # Set to the Identifier of the `fiftyone-demo` organization
+    organizationId: ""
+
+    fiftyoneDatabaseName: fiftyone-internal
+    # This password is randomly generated and is only used to initialize a local (ephemeral) MongoDB in `./skaffold-mongodb.yaml`
+    # URL encoded to overcome errors with unencoded characters
+    mongodbConnectionString: mongodb://root:3-9XjJ-gUV%3Fvp%5Ee%28WUk%3ELD%26lAjh7yEji@mongodb.fiftyone-teams.svc.cluster.local/?authSource=admin  # pragma: allowlist secret
+
+    # randomly generated value
+    cookieSecret: 5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976
+    # randomly generated value
+    encryptionKey: btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=
+
+    # randomly generated value
+    fiftyoneAuthSecret: "aGM4?s&t-n;!*U96oA#bdo,+JU)ac1T7"
+pluginsSettings:
+  image:
+    # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+    pullPolicy: IfNotPresent
+    tag: v1.7.0.dev20
+  service:
+    liveness:
+      initialDelaySeconds: 15
+    readiness:
+      initialDelaySeconds: 15
+teamsAppSettings:
+  dnsName: local.fiftyone.ai
+  # env:
+  #   # For local development without TLS certs, set `APP_USE_HTTPS=false` to
+  #   # prohibit the app from setting Redirect URL protocol to `https`.
+  #   # Must be set in both `appSettings.env` and `teamsAppSettings.env`.
+  #   # Can be true, when using cert-manager with self-signed certificates
+  #   APP_USE_HTTPS: false
+  image:
+    # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
+    # Note: the naming convention for the image `fiftyone-teams-app` differs from
+    # the other images (`fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`).
+    # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
+    # This is a byproduct of `npm` versioning versus Python PEP 440.
+    pullPolicy: IfNotPresent
+    tag: v1.7.0-dev.16
+  service:
+    liveness:
+      initialDelaySeconds: 15
+    readiness:
+      initialDelaySeconds: 15
+casSettings:
+  env:
+    DEBUG: cas:*
+    FIFTYONE_AUTH_MODE: internal
+  image:
+    # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
+    pullPolicy: IfNotPresent
+    tag: v1.7.0-dev.1
+  service:
+    liveness:
+      initialDelaySeconds: 15
+    readiness:
+      initialDelaySeconds: 15

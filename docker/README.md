@@ -10,6 +10,60 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
+## Known Issue for FiftyOne Teams v1.6.0 and Above
+
+### "Install Fiftyone" Instructions Missing PyPI Token
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+introduces an abstraction layer between FiftyOne Teams and Auth0.  This
+abstraction layer makes it possible to deploy FiftyOne Teams without using Auth0
+as an Identity Service Provider.
+
+However, metadata that used to be provided to FiftyOne Teams by Auth0 is no
+longer available; which has resulted in an incomplete set of instructions in the
+[Install FiftyOne](https://docs.voxel51.com/teams/installation.html#python-sdk)
+instructions for bash.
+
+Specifically, you will see the word `TOKEN` where your Voxel51 PyPI token used
+to appear.
+
+While Voxel51 works to address this issue, you can override the install
+instructions by setting the `FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` environment
+value for the `teams-app` service.  This can be accomplished by adding
+something like the following to your `compose.override.yaml`:
+
+```yaml
+teams-app:
+  environment:
+    FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install -U --index-url https://<your PyPI Token>@pypi.fiftyone.ai fiftyone==0.17.0
+```
+
+If you need your PyPI token, please contact your Customer Success representative
+and they will provide it to you.
+
+### Invitations Disabled for Internal Authentication Mode
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+includes both
+[`legacy` authentication mode][legacy-auth-mode]
+and
+[`internal` authentication mode][internal-auth-mode].
+
+Inviting users to join your FiftyOne Teams instance is not currently supported
+when `FIFTYONE_AUTH_MODE` is set to `internal`.
+
+### Super Admin UI Disabled for Legacy Authentication Mode
+
+FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
+includes a new
+[Super Admin UI](https://docs.voxel51.com/teams/pluggable_auth.html#super-admin-ui)
+for deployment-wide authentication configurations.
+
+The FiftyOne Teams Super Admin UI is disabled when `FIFTYONE_AUTH_MODE` is set
+to `legacy`.
+
+## Table of Contents
+
 <!-- toc -->
 
 - [Deploying FiftyOne Teams App with Docker Compose](#deploying-fiftyone-teams-app-with-docker-compose)
@@ -19,13 +73,17 @@
     - [Snapshot Archival](#snapshot-archival)
     - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
     - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
+      - [Builtin Plugins Only](#builtin-plugins-only)
+      - [Shared Plugins](#shared-plugins)
+      - [Dedicated Plugins](#dedicated-plugins)
     - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
     - [Proxies](#proxies)
     - [Text Similarity](#text-similarity)
-  - [Upgrade Process Recommendations](#upgrade-process-recommendations)
+  - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
     - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
     - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
-    - [From FiftyOne Teams Version 1.1.0 and later](#from-fiftyone-teams-version-110-and-later)
+    - [From FiftyOne Teams Version 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-version-110-and-before-version-160)
+    - [From FiftyOne Teams Version 1.6.0](#from-fiftyone-teams-version-160)
   - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
   - [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
 
@@ -55,7 +113,7 @@ When performing an initial installation, in `compose.override.yaml` set
 When performing a FiftyOne Teams upgrade, set
 `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
 See
-[Upgrade Process Recommendations](#upgrade-process-recommendations).
+[Upgrading From Previous Versions](#upgrading-from-previous-versions)
 
 The environment variable `FIFTYONE_DATABASE_ADMIN`
 controls whether the database may be migrated.
@@ -111,9 +169,9 @@ Please review these notes, and the
 documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
-[`legacy` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode)
+[`legacy` authentication mode][legacy-auth-mode]
 and migrating to
-[`internal` authentication mode](https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode)
+[`internal` authentication mode][internal-auth-mode]
 after confirming your initial upgrade was successful.
 
 Please contact your Voxel51 customer success
@@ -148,7 +206,7 @@ To upgrade from versions prior to FiftyOne Teams v1.6
 - When using path-based routing, configure a `/cas` route to value of the `CAS_BIND_PORT`
 
 > **NOTE**: See
-> [Upgrade Process Recommendations](#upgrade-process-recommendations)
+> [Upgrading From Previous Versions](#upgrading-from-previous-versions)
 
 ### Snapshot Archival
 
@@ -204,63 +262,90 @@ to customize and extend the functionality of FiftyOne Teams in your environment.
 There are three modes for plugins
 
 1. Builtin Plugins Only
-    - No changes are required for this mode
-1. Plugins run in the `fiftyone-app` deployment
-    - To enable this mode, use the file
-      [legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
-      instead of
-      [legacy-auth/compose.yaml](legacy-auth/compose.yaml)
-    - Containers need the following access to plugin storage
-      - `fiftyone-app` requires `read`
-      - `fiftyone-api` requires `read-write`
-    - Example `docker compose` command for this mode from the `legacy-auth`
-   directory
+    - This is the default mode
+    - Users may only run the builtin plugins shipped with Fiftyone Teams
+    - Cannot run custom plugins
+1. Shared Plugins
+    - Users may run builtin and custom plugins
+    - Plugins run in the existing `fiftyone-app` service
+      - Plugins resource consumption may starve `fiftyone-app`,
+        causing the app to be slow or crash
+    - Requires creating a volume mounted to the services
+      - `fiftyone-app` (read-only)
+      - `teams-api` (read-write)
+1. Dedicated Plugins
+    - Users may run builtin and custom plugins
+    - Plugins run in an additional `teams-plugins` service
+    - Plugins run in a dedicated `teams-plugins` service
+      - Plugins resource consumption does not affect `fiftyone-app`
+    - Requires creating a volume mounted to the services
+      - `teams-plugins` (read-only)
+      - `teams-api` (read-write)
 
-        ```shell
-        docker compose \
-          -f compose.plugins.yaml \
-          -f compose.override.yaml \
-          up -d
-        ```
-
-1. Plugins run in a dedicated `teams-plugins` deployment
-    - To enable this mode, use the file
-      [legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
-      instead of
-      [legacy-auth/compose.yaml](legacy-auth/compose.yaml)
-    - Containers need the following access to plugin storage
-      - `teams-plugins` requires `read`
-      - `fiftyone-api` requires `read-write`
-    - If you are
-      [using a proxy](#proxies),
-      add the `teams-plugins` service name to your `no_proxy` and `NO_PROXY`
-      environment variables.
-    - Example `docker compose` command for this mode from the `legacy-auth`
-      directory
-
-        ```shell
-        docker compose \
-          -f compose.dedicated-plugins.yaml \
-          -f compose.override.yaml \
-          up -d
-        ```
-
-Both
-[legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
-and
-[legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
-create a new Docker Volume shared between FiftyOne Teams services.
 For multi-node deployments, please implement a storage
-solution allowing the access the deployed plugins.
+solution that provides access to the deployed plugins.
 
-If you build plugins that have custom dependencies, you will need to build and
-use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md)
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md).
 
-Use the FiftyOne Teams UI to deploy plugins by navigating to
-`https://<DEPLOY_URL>/settings/plugins`.
+To use the FiftyOne Teams UI to deploy plugins,
+navigate to `https://<DEPLOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must
 be redeployed using the FiftyOne Teams UI.
+
+#### Builtin Plugins Only
+
+Enabled by default.
+No additional configurations are required.
+
+#### Shared Plugins
+
+Plugins run in the `fiftyone-app` service.
+To enable this mode, use the file
+[legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
+instead of
+[legacy-auth/compose.yaml](legacy-auth/compose.yaml).
+This compose file creates a new Docker Volume shared between FiftyOne Teams services.
+
+- Configure the services to access to the plugin volume
+  - `fiftyone-app` requires `read`
+  - `fiftyone-api` requires `read-write`
+- Example `docker compose` command for this mode from the `legacy-auth`
+directory
+
+    ```shell
+    docker compose \
+      -f compose.plugins.yaml \
+      -f compose.override.yaml \
+      up -d
+    ```
+
+#### Dedicated Plugins
+
+Plugins run in the `teams-plugins` service.
+To enable this mode, use the file
+[legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
+instead of
+[legacy-auth/compose.yaml](legacy-auth/compose.yaml).
+This compose file creates a new Docker Volume shared between FiftyOne Teams services.
+
+- Configure the services to access to the plugin volume
+  - `teams-plugins` requires `read`
+  - `fiftyone-api` requires `read-write`
+- If you are
+  [using a proxy](#proxies),
+  add the `teams-plugins` service name to your environment variables
+  - `no_proxy`
+  - `NO_PROXY`
+- Example `docker compose` command for this mode from the `legacy-auth`
+  directory
+
+    ```shell
+    docker compose \
+      -f compose.dedicated-plugins.yaml \
+      -f compose.override.yaml \
+      up --d
+    ```
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
@@ -364,24 +449,30 @@ For example, `compose.override.yaml` might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v1.6.1
+    image: voxel51/fiftyone-app-torch:v1.7.0
 ```
 
 For more information, see the docs for
 [Docker Compose Extend](https://docs.docker.com/compose/extends/).
 
-## Upgrade Process Recommendations
+## Upgrading From Previous Versions
+
+Voxel51 assumes you use the published Docker compose
+files to deploy your FiftyOne Teams environment.
+If you use custom deployment mechanisms, carefully review the changes in the
+[Docker Compose Files](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
+and update your deployment accordingly.
 
 ### From Early Adopter Versions (Versions less than 1.0)
 
 Please contact your Voxel51 Customer Success team member to coordinate this upgrade.
-To migrate to a new Auth0 Tenant, you will need to
-create a new IdP or modify your existing configuration.
+You will need to either create a new Identity Provider (IdP) or
+modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From Before FiftyOne Teams Version 1.1.0
 
-> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0 requires
-> upgrading the database and will interrupt all SDK connections.
+> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0
+> requires upgrading the database and will interrupt all SDK connections.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
@@ -396,7 +487,7 @@ create a new IdP or modify your existing configuration.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -408,16 +499,22 @@ create a new IdP or modify your existing configuration.
     - `FIFTYONE_ENCRYPTION_KEY`
     - `FIFTYONE_API_URI`
     - `FIFTYONE_AUTH_SECRET`
-1. [Upgrade to FiftyOne Teams version 1.6.1](#deploying-fiftyone-teams)
+1. Ensure your web server routes are updated to include routing
+   `/cas/*` traffic to the `teams-cas` service.
+   Example nginx configurations can be found
+   [here](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
+1. [Upgrade to FiftyOne Teams v1.7.0](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
-    - **NOTE:** FiftyOne SDK users will lose access to the
-      FiftyOne Teams Database at this step until they upgrade to `fiftyone==0.16.1`
-1. Upgrade your FiftyOne SDKs to version 0.16.1
+    > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
+    > Teams Database at this step until they upgrade to `fiftyone==0.17.0`
+
+1. Upgrade your FiftyOne SDKs to version 0.17.0
     - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check if datasets have been migrated to version 0.23.8.
+    - To obtain the CLI command to install the FiftyOne SDK associated
+      with your FiftyOne Teams version, navigate to
+      `Account > Install FiftyOne`
+1. Confirm that datasets have been migrated to version 0.24.0
 
     ```shell
     fiftyone migrate --info
@@ -429,10 +526,11 @@ create a new IdP or modify your existing configuration.
       FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
       ```
 
-### From FiftyOne Teams Version 1.1.0 and later
+### From FiftyOne Teams Version 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading from versions of FiftyOne Teams v1.1.0 and later requires
-> upgrading the database and will interrupt all SDK connections.
+> **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
+> your users to log in after the upgrade is complete.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
@@ -444,13 +542,6 @@ create a new IdP or modify your existing configuration.
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
-
----
-
-> **NOTE**: Upgrading to FiftyOne Teams v1.6.1 _requires_
-> your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
-> you should coordinate this upgrade carefully with your end-users.
 
 1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
    directory
@@ -465,17 +556,63 @@ create a new IdP or modify your existing configuration.
     - `CAS_DEBUG`
     - `CAS_DEFAULT_USER_ROLE`
 
-    > **Note**: For the `CAS_*` variables, consider using
+    > **NOTE**: For the `CAS_*` variables, consider using
     > the seed values from the `.env.template` file.
     > See
     > [Central Authentication Service](#central-authentication-service)
 
 1. Ensure all FiftyOne SDK users either
-    - Set `FIFTYONE_DATABASE_ADMIN=false`
-    - `unset FIFTYONE_DATABASE_ADMIN`
-        - This should generally be your default
-1. [Upgrade to FiftyOne Teams version 1.6.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.16.1
+    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
+
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=false
+      ```
+
+    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
+      (this should generally be your default)
+
+        ```shell
+        unset FIFTYONE_DATABASE_ADMIN
+        ```
+
+1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
+    - Login to the FiftyOne Teams UI
+    - To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Upgrade all the datasets
+    > **NOTE** Any FiftyOne SDK less than 0.17.0
+    > will lose connectivity at this point.
+    > Upgrading to `fiftyone==0.17.0` is required.
+
+    ```shell
+    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+    ```
+
+1. To ensure that all datasets are now at version 0.24.0, run
+
+    ```shell
+    fiftyone migrate --info
+    ```
+
+### From FiftyOne Teams Version 1.6.0
+
+1. Ensure all FiftyOne SDK users either
+    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
+
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=false
+      ```
+
+    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
+      (this should generally be your default)
+
+        ```shell
+        unset FIFTYONE_DATABASE_ADMIN
+        ```
+
+1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -485,16 +622,14 @@ create a new IdP or modify your existing configuration.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.16.1 will lose database connectivity
-      at this point. Upgrading to `fiftyone==0.16.1` is required
+    - **NOTE** Any FiftyOne SDK less than 0.17.0 will lose database connectivity
+      at this point. Upgrading to `fiftyone==0.17.0` is required
 
-1. To ensure that all datasets are now at version 0.23.8, run
+1. To ensure that all datasets are now at version 0.24.0, run
 
     ```shell
     fiftyone migrate --info
     ```
-
----
 
 ## Deploying FiftyOne Teams
 
@@ -558,8 +693,11 @@ to route traffic
 - From the path-based route `/cas` to port `3030`
   on the host running the FiftyOne Teams CAS
 
+  > **NOTE**: the `/cas` route must appear before the `/` route or
+  > an infinite redirect loop will occur.
+
 See
-[./example-nginx-site.conf](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf)
+[./example-nginx-site.conf](./example-nginx-site.conf)
 for an example Nginx site configuration that forwards
 
 - http traffic to https
@@ -571,7 +709,7 @@ for an example Nginx site configuration that forwards
 ## FiftyOne Teams Environment Variables
 
 | Variable                                     | Purpose                                                                                                                                                                                                                                                                        | Required                  |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- |
+|----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
 | `API_BIND_ADDRESS`                           | The host address that `fiftyone-teams-api` should bind to; `127.0.0.1` is appropriate for this in most cases                                                                                                                                                                   | Yes                       |
 | `API_BIND_PORT`                              | The host port that `fiftyone-teams-api` should bind to; the default is `8000`                                                                                                                                                                                                  | Yes                       |
 | `API_LOGGING_LEVEL`                          | Logging Level for `teams-api` service                                                                                                                                                                                                                                          | Yes                       |
@@ -609,6 +747,7 @@ for an example Nginx site configuration that forwards
 | `FIFTYONE_ENCRYPTION_KEY`                    | Used to encrypt storage credentials in MongoDB                                                                                                                                                                                                                                 | Yes                       |
 | `FIFTYONE_ENV`                               | GraphQL verbosity for the `fiftyone-teams-api` service; `production` will not log every GraphQL query, any other value will                                                                                                                                                    | No                        |
 | `FIFTYONE_PLUGINS_DIR`                       | Persistent directory inside the containers for plugins to be mounted to. `teams-api` must have write access to this directory, all plugin nodes must have read access to this directory.                                                                                       | No                        |
+| `FIFTYONE_SIGNED_URL_EXPIRATION`             | Set the time-to-live for signed URLs generated by the application in hours. Set in the `fiftyone-app` service.                                                                                                                                                                      | 24                          |
 | `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`            | Full path to network-mounted file system or a cloud storage path to use for snapshot archive storage. The default `None` means archival is disabled.                                                                                                                           | No                        |
 | `FIFTYONE_SNAPSHOTS_MAX_IN_DB`               | The max total number of Snapshots allowed at once. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                   | No                        |
 | `FIFTYONE_SNAPSHOTS_MAX_PER_DATASET`         | The max number of Snapshots allowed per dataset. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                     | No                        |
@@ -618,3 +757,7 @@ for an example Nginx site configuration that forwards
 | `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                        | No                        |
 | `HTTPS_PROXY_URL`                            | The URL for your environment https proxy                                                                                                                                                                                                                                       | No                        |
 | `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
+
+<!-- Reference Links -->
+[internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
+[legacy-auth-mode]: topher/document-install-modal-override

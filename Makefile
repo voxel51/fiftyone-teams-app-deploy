@@ -1,5 +1,6 @@
 SHELL := $(SHELL) -e
 ASDF := $(shell asdf where golang)
+VERSION ?= 1.7.0
 
 # Help
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))
@@ -92,8 +93,22 @@ port-forward-api:  ## port forward to service `teams-api` on the host port 8000
 port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
 
+run: helm-repos  ## run skaffold run
+	skaffold run
+
+run-cert-manager: helm-repos  ## run skaffold run
+	skaffold run \
+	  --filename skaffold-cert-manager.yaml
+
+run-mongodb: helm-repos  ## run skaffold run
+	skaffold run \
+	  --filename skaffold-mongodb.yaml
+
+run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
+	skaffold run -p only-fiftyone
+
 tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
-	minikube tunnel
+	sudo minikube tunnel &> /dev/null &
 
 helm-repos:  ## add helm repos for the project
 	helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -151,25 +166,56 @@ test-integration-compose: test-integration-compose-internal test-integration-com
 
 test-integration-compose-internal: dependencies-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode
 	@cd tests/integration/compose; \
-	go test -count=1 -timeout=10m -v -tags integrationComposeInternalAuth
+	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth
 
 test-integration-compose-legacy: dependencies-integration-compose ## run go test on the tests/integration/compose directory for legacy auth mode
 	@cd tests/integration/compose; \
-	go test -count=1 -timeout=10m -v -tags integrationComposeLegacyAuth
+	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth
 
 test-integration-compose-interleaved:  test-integration-compose-interleaved-internal test-integration-compose-interleaved-legacy  ## run go test on the tests/integration/compose directory and run the terratest_log_parser for reports
 
 test-integration-compose-interleaved-internal: install-terratest-log-parser dependencies-integration-compose clean-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode and run the terratest_log_parser for reports
 	@cd tests/integration/compose; \
 	rm -rf test_output_internal/*; \
-	go test -count=1 -timeout=10m -v -tags integrationComposeInternalAuth | tee test_output_internal.log; \
+	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth | tee test_output_internal.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
 
 test-integration-compose-interleaved-legacy: install-terratest-log-parser dependencies-integration-compose clean-integration-compose ## run go test on the tests/integration/compose directory for legacy auth mode and run the terratest_log_parser for reports
 	@cd tests/integration/compose; \
 	rm -rf test_output_legacy/*; \
-	go test -count=1 -timeout=10m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \
+	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
+
+test-integration-helm: test-integration-helm-internal test-integration-helm-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
+
+test-integration-helm-internal:  ## run go test on the tests/integration/helm directory for internal auth mode
+	@cd tests/integration/helm; \
+	go test -count=1 -timeout=15m -v -tags integrationHelmInternalAuth
+
+test-integration-helm-legacy:  ## run go test on the tests/integration/helm directory for legacy auth mode
+	@cd tests/integration/helm; \
+	go test -count=1 -timeout=15m -v -tags integrationHelmLegacyAuth
+
+test-integration-helm-interleaved-internal:  ## run go test on the tests/integration/helm directory for internal auth mode
+	@cd tests/integration/helm; \
+	rm -rf test_output_internal/*; \
+	go test -count=1 -timeout=15m -v -tags integrationHelmInternalAuth | tee test_output_internal.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
+
+test-integration-helm-interleaved-legacy:  ## run go test on the tests/integration/helm directory for legacy auth mode
+	@cd tests/integration/helm; \
+	rm -rf test_output_legacy/*; \
+	go test -count=1 -timeout=15m -v -tags integrationHelmLegacyAuth | tee test_output_legacy.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
 
 install-terratest-log-parser:  ## install terratest_log_parser
 	go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@latest
+
+get-image-versions:  ## display the latest internal image matching version string
+	./utils/get-image-versions.sh "${VERSION}"
+
+get-image-versions-dev:  ## display the latest internal image matching version string
+	./utils/get-image-versions.sh "${VERSION}" dev
+
+get-image-versions-rc:  ## display the latest internal image matching version string
+	./utils/get-image-versions.sh "${VERSION}" rc
