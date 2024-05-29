@@ -44,33 +44,9 @@ pre-commit:  ## Run pre-commit against all files
 	@pre-commit run -a
 
 start:  ## Run minikube with ingress and gcp-auth
-	# to persist mongodb data, we may want to start minikube with a volume mount
-	# minikube start --mount=true \
-	#   --mount-string=/var/tmp/mongodb_data:/tmp/hostpath-provisioner/fiftyone-teams/mongodb
 	minikube start
 	minikube addons enable ingress
-
-	# Requires setting up GCP credentials (application default credentials)
-	# for the GCP project `computer-vision-team`.
-	# Then run
-	#
-	# ```shell
-	# gcloud auth application-default login
-	# ```
-	#
 	minikube addons enable gcp-auth
-
-	# registery-creds is an alternative methods for accessing private repositories.
-	# If used, needs to be reconfired every time minikube is deleted.
-	# minikube addons configure registry-creds
-
-	# create the regcred secret to allow pulling images from dockerhub
-	# kubectl create namespace fiftyone-teams --context minikube
-	# kubectl --namespace fiftyone-teams \
-	#   --context minikube \
-	#   create secret generic regcred \
-	#   --from-file=.dockerconfigjson=/var/tmp/voxel51-docker.json \
-	#   --type kubernetes.io/dockerconfigjson
 
 stop:  ## Stop minikube
 	minikube stop
