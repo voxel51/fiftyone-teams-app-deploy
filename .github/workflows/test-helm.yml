@@ -55,11 +55,8 @@ jobs:
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
-          echo "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}"
-          echo "GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}"
-          gcloud artifacts docker images list \
-            us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api \
-            --limit=5
+          make start
+          make test-integration-helm-internal
   # integration-helm-legacy:
   #   permissions:
   #     contents: read
