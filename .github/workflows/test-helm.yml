@@ -36,23 +36,25 @@ jobs:
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
       - name: Authenticate to Google Cloud
-        id: auth
+        # id: auth
         uses: google-github-actions/auth@v2.1.3
         with:
           project_id: 'computer-vision-team'
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
-          token_format: access_token
+          # token_format: access_token
           workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
-      - name: Login to GAR
-        uses: docker/login-action@v3.1.0
-        with:
-          registry: us-central1-docker.pkg.dev
-          username: oauth2accesstoken
-          password: ${{ steps.auth.outputs.access_token }}
+      # - name: Login to GAR
+      #   uses: docker/login-action@v3.1.0
+      #   with:
+      #     registry: us-central1-docker.pkg.dev
+      #     username: oauth2accesstoken
+      #     password: ${{ steps.auth.outputs.access_token }}
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
-          gcloud auth configure-docker us-central1-docker.pkg.dev
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}"
+          echo "GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}"
+          echo 'List Artifacts (validate permissions)'
           make start run-cert-manager run-mongodb
           sudo minikube tunnel &> /dev/null &
           make test-integration-helm-internal

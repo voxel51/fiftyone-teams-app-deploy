@@ -251,8 +251,9 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				// get deployment
 				deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
 				// when pulling images for the first time, it may take longer than 90s
-				errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 36, 10*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
-				// errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 3, 1*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+				// errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 36, 10*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+				// fail fast during auth testing
+				errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 3, 10*time.Second) // 30 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
 
 				if errDeployment != nil {
 					// Get details why it failed
