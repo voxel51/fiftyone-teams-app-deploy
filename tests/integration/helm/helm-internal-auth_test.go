@@ -257,6 +257,15 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 
 				if errDeployment != nil {
 					// Get details why it failed
+					// Get k8s logs from gcp-auth
+					kubectlOptionsGcpAuth := k8s.NewKubectlOptions(s.context, "", "gcp-auth")
+					podsGcpAuth := k8s.ListPods(subT, kubectlOptionsGcpAuth, metav1.ListOptions{LabelSelector: "app=gcp-auth"})
+					logger.Log(subT, "Logs - GCP Auth:")
+					for _, pod := range podsGcpAuth {
+						logger.Log(subT, get_logs(subT, kubectlOptionsGcpAuth, &pod, ""))
+					}
+					logger.Log(subT, "")
+
 					// Get k8s events
 					events := k8s.ListEvents(subT, kubectlOptions, metav1.ListOptions{})
 					logger.Log(subT, "Events:")
@@ -266,7 +275,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					}
 
 					// TODO: DRY
-					// Get k8s logs
+					// Get k8s logs from pod
 					selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
 					listOptions := metav1.ListOptions{LabelSelector: selectorLabelsPods}
 					pods := k8s.ListPods(subT, kubectlOptions, listOptions)

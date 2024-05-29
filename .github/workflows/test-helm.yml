@@ -54,7 +54,6 @@ jobs:
         run: |
           echo "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}"
           echo "GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}"
-          echo 'List Artifacts (validate permissions)'
           make start run-cert-manager run-mongodb
           sudo minikube tunnel &> /dev/null &
           make test-integration-helm-internal

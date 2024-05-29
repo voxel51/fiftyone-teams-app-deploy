@@ -44,9 +44,9 @@ pre-commit:  ## Run pre-commit against all files
 	@pre-commit run -a
 
 start:  ## Run minikube with ingress and gcp-auth
-	minikube start
-	minikube addons enable ingress
+	minikube start --wait=all
 	minikube addons enable gcp-auth
+	minikube addons enable ingress
 
 stop:  ## Stop minikube
 	minikube stop
