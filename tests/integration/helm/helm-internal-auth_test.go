@@ -269,8 +269,8 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 
 					// Get k8s secret from default namespace
 					logger.Log(subT, "Secret in default namespace:")
-					secret := k8s.GetSecret(subT, k8s.NewKubectlOptions(s.context, "", "default"), "gcp-auth")
-					logger.Log(subT, fmt.Sprintf("%s\t%s", secret.Type, secret.ObjectMeta.CreationTimestamp))
+					secretDef := k8s.GetSecret(subT, k8s.NewKubectlOptions(s.context, "", "default"), "gcp-auth")
+					logger.Log(subT, fmt.Sprintf("%s\t%s", secretDef.Type, secretDef.ObjectMeta.CreationTimestamp))
 
 					// Get k8s events
 					events := k8s.ListEvents(subT, kubectlOptions, metav1.ListOptions{})
