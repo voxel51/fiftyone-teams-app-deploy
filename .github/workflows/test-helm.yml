@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: |
           echo "add scope to file"
-          sed -i -e 's/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
+          sed -i -e 's/^  },/  },\\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
           echo "check scope was added to file"
           grep scope "${GOOGLE_APPLICATION_CREDENTIALS}"
       - name: Run Helm integration tests for internal
