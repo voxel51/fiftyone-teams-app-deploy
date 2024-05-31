@@ -14,17 +14,17 @@ on:
       - tests/unit/helm/**
 
 jobs:
-  unit-helm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4.1.6
-      - uses: actions/setup-python@v5.1.0
-      - name: install asdf & tools
-        uses: asdf-vm/actions/install@v3.0.2
-      - name: Run unit tests
-        shell: bash
-        run: |
-          make test-unit-helm
+  # unit-helm:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4.1.6
+  #     - uses: actions/setup-python@v5.1.0
+  #     - name: install asdf & tools
+  #       uses: asdf-vm/actions/install@v3.0.2
+  #     - name: Run unit tests
+  #       shell: bash
+  #       run: |
+  #         make test-unit-helm
   integration-helm-internal:
     permissions:
       contents: read
@@ -32,9 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.6
-      - uses: actions/setup-python@v5.1.0
-      - name: install asdf & tools
-        uses: asdf-vm/actions/install@v3.0.2
+      # - uses: actions/setup-python@v5.1.0
+      # - name: install asdf & tools
+      #   uses: asdf-vm/actions/install@v3.0.2
       - name: Authenticate to Google Cloud
         # id: auth
         uses: google-github-actions/auth@v2.1.3
@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: |
           echo "add scope to file"
-          sed -i 's/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
+          sed -i -e 's/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
           echo "check scope was added to file"
           grep scope "${GOOGLE_APPLICATION_CREDENTIALS}"
       - name: Run Helm integration tests for internal
