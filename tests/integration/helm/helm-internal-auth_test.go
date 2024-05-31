@@ -267,6 +267,11 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					}
 					logger.Log(subT, "")
 
+					// Get k8s secret from gcp-auth namespace
+					logger.Log(subT, "Secret in gcp-auth namespace:")
+					secret := k8s.GetSecret(subT, kubectlOptionsGcpAuth, "gcp-auth")
+					logger.Log(subT, fmt.Sprintf("%s\t%s", secret.Type, secret.ObjectMeta.CreationTimestamp))
+
 					// Get k8s events
 					events := k8s.ListEvents(subT, kubectlOptions, metav1.ListOptions{})
 					logger.Log(subT, "Events:")
