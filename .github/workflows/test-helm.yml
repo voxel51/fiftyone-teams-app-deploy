@@ -63,11 +63,11 @@ jobs:
           docker pull us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api:v1.7.0
           docker pull us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:v1.7.0
           docker pull us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas:v1.7.0
-          minikube cache add us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app:v1.7.0
-          minikube cache add us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api:v1.7.0
-          minikube cache add us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:v1.7.0
-          minikube cache add us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas:v1.7.0
           make start
+          minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app:v1.7.0
+          minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api:v1.7.0
+          minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:v1.7.0
+          minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas:v1.7.0
           make test-integration-helm-internal
   # integration-helm-legacy:
   #   permissions:
