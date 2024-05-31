@@ -59,6 +59,7 @@ jobs:
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
+          set -x
           docker pull us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app:v1.7.0
           docker pull us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api:v1.7.0
           docker pull us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:v1.7.0
@@ -69,6 +70,8 @@ jobs:
           minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:v1.7.0
           minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas:v1.7.0
           minikube image ls
+          make start run-cert-manager run-mongodb
+          sudo minikube tunnel &> /dev/null &
           make test-integration-helm-internal
   # integration-helm-legacy:
   #   permissions:
