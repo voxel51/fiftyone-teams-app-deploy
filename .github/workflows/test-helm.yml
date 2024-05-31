@@ -43,8 +43,8 @@ jobs:
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
           # token_format: 'access_token'
           workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v2.1.0
+      # - name: Set up gcloud
+      #   uses: google-github-actions/setup-gcloud@v2.1.0
       # - name: Login to GAR
       #   uses: docker/login-action@v3.1.0
       #   with:
@@ -54,7 +54,7 @@ jobs:
       - name: Add scope to GOOGLE_APPLICATION_CREDENTIALS
         shell: bash
         run: |
-          sed -i '' 's/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "$GOOGLE_APPLICATION_CREDENTIALS"
+          sed -i "" "s/^  },/  },\n  \"scope\": \"https:\/\/www.googleapis.com\/auth\/cloud-platform\",/" "${GOOGLE_APPLICATION_CREDENTIALS}"
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
