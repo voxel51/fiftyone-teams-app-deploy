@@ -41,7 +41,7 @@ jobs:
         with:
           project_id: 'computer-vision-team'
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
-          # token_format: access_token
+          token_format: access_token
           workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2.1.0
@@ -54,7 +54,6 @@ jobs:
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
-          cat "${GOOGLE_APPLICATION_CREDENTIALS}"
           make start
           make test-integration-helm-internal
   # integration-helm-legacy:
