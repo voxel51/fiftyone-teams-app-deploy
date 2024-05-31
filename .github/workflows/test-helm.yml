@@ -54,7 +54,7 @@ jobs:
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
-          sed -i '' 's/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
+          echo sed -i '' 's/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
           make start
           make test-integration-helm-internal
   # integration-helm-legacy:
