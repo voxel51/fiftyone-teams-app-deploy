@@ -51,10 +51,13 @@ jobs:
       #     registry: us-central1-docker.pkg.dev
       #     username: oauth2accesstoken
       #     password: ${{ steps.auth.outputs.access_token }}
+      - name: Add scope to GOOGLE_APPLICATION_CREDENTIALS
+        shell: bash
+        run: |
+          sed -i '' 's/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
-          sed -i \'\' \'s/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/\' "${GOOGLE_APPLICATION_CREDENTIALS}"
           make start
           make test-integration-helm-internal
   # integration-helm-legacy:
