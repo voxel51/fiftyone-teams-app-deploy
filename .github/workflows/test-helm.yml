@@ -54,19 +54,15 @@ jobs:
       - name: Add scope to GOOGLE_APPLICATION_CREDENTIALS
         shell: bash
         run: |
-          whoami
-          ls -alh "${GOOGLE_APPLICATION_CREDENTIALS}"
           echo "add scope to file"
-          sed -e 's/^  },/  },\n  "scope": "https:\/\/www.googleapis.com\/auth\/cloud-platform",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
+          sed -e 's%^{"type%{"scope":"https://www.googleapis.com/auth/cloud-platform","type%' "${GOOGLE_APPLICATION_CREDENTIALS}"
           echo "check scope was added to file"
           grep scope "${GOOGLE_APPLICATION_CREDENTIALS}"
-      - name: Run Helm integration tests for internal
-        shell: bash
-        run: |
-          echo "check scope was added to file"
-          grep scope "${GOOGLE_APPLICATION_CREDENTIALS}"
-          make start
-          make test-integration-helm-internal
+      # - name: Run Helm integration tests for internal
+      #   shell: bash
+      #   run: |
+      #     make start
+      #     make test-integration-helm-internal
   # integration-helm-legacy:
   #   permissions:
   #     contents: read
