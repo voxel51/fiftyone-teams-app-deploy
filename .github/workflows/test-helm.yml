@@ -68,6 +68,7 @@ jobs:
           minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api:v1.7.0
           minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:v1.7.0
           minikube image load us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas:v1.7.0
+          minkikube image ls
           make test-integration-helm-internal
   # integration-helm-legacy:
   #   permissions:
