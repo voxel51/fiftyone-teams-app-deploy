@@ -54,6 +54,7 @@ jobs:
       - name: Add scope to GOOGLE_APPLICATION_CREDENTIALS
         shell: bash
         run: |
+          sleep 5
           echo "add scope to file"
           sed -i -e 's/^  },/  },\n  \"scope\": \"https:\/\/www.googleapis.com\/auth\/cloud-platform\",/' "${GOOGLE_APPLICATION_CREDENTIALS}"
           echo "check scope was added to file"
