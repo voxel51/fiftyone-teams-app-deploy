@@ -256,21 +256,21 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 3, 10*time.Second) // 30 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
 
 				if errDeployment != nil {
-					// // Get details why it failed
-					// kubectlOptionsGcpAuth := k8s.NewKubectlOptions(s.context, "", "gcp-auth")
+					// Get details why it failed
+					kubectlOptionsGcpAuth := k8s.NewKubectlOptions(s.context, "", "gcp-auth")
 
-					// // Get k8s logs from gcp-auth
-					// podsGcpAuth := k8s.ListPods(subT, kubectlOptionsGcpAuth, metav1.ListOptions{LabelSelector: "app=gcp-auth"})
-					// logger.Log(subT, "Logs - GCP Auth:")
-					// for _, pod := range podsGcpAuth {
-					// 	logger.Log(subT, get_logs(subT, kubectlOptionsGcpAuth, &pod, ""))
-					// }
-					// logger.Log(subT, "")
+					// Get k8s logs from gcp-auth
+					podsGcpAuth := k8s.ListPods(subT, kubectlOptionsGcpAuth, metav1.ListOptions{LabelSelector: "app=gcp-auth"})
+					logger.Log(subT, "Logs - GCP Auth:")
+					for _, pod := range podsGcpAuth {
+						logger.Log(subT, get_logs(subT, kubectlOptionsGcpAuth, &pod, ""))
+					}
+					logger.Log(subT, "")
 
 					// // Get k8s secret from default namespace
-					// logger.Log(subT, "Secret in default namespace:")
-					// secretDef := k8s.GetSecret(subT, k8s.NewKubectlOptions(s.context, "", "default"), "gcp-auth")
-					// logger.Log(subT, fmt.Sprintf("%s\t%s", secretDef.Type, secretDef.ObjectMeta.CreationTimestamp))
+					logger.Log(subT, "Secret in gcp-auth namespace:")
+					secretDef := k8s.GetSecret(subT, k8s.NewKubectlOptions(s.context, "", "gcp-auth"), "gcp-auth-certs")
+					logger.Log(subT, fmt.Sprintf("%s\t%s", secretDef.Type, secretDef.ObjectMeta.CreationTimestamp))
 
 					// Get k8s events
 					events := k8s.ListEvents(subT, kubectlOptions, metav1.ListOptions{})
@@ -280,10 +280,10 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 						logger.Log(subT, fmt.Sprintf("%s\t%s\t%s\t%s", event.Type, event.Reason, event.Related, event.Message))
 					}
 
-					// // Get k8s secret
-					// logger.Log(subT, "Secret in ephemeral namespace:")
-					// secret := k8s.GetSecret(subT, kubectlOptions, "gcp-auth")
-					// logger.Log(subT, fmt.Sprintf("%s\t%s", secret.Type, secret.ObjectMeta.CreationTimestamp))
+					// Get k8s secret
+					logger.Log(subT, "Secret in ephemeral namespace:")
+					secret := k8s.GetSecret(subT, kubectlOptions, "gcp-auth")
+					logger.Log(subT, fmt.Sprintf("%s\t%s", secret.Type, secret.ObjectMeta.CreationTimestamp))
 
 					// TODO: DRY
 					// Get k8s logs from pod
