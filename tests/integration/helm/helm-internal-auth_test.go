@@ -231,9 +231,11 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				k8s.KubectlApplyFromString(subT, kubectlOptions, persistentVolumeClaimYaml)
 			}
 
-			// Wait for gcp-auth secret to be created in the namespace
-			logger.Log(subT, fmt.Sprintf("Wait for secret `gcp-auth` to be created in namespace `%s`", kubectlOptions.Namespace))
-			k8s.WaitUntilSecretAvailable(subT, kubectlOptions, "gcp-auth", 10, 10*time.Second)
+			// // Wait for gcp-auth secret to be created in the namespace
+			// in GHA, the secrets are not created within the timeout/retry period.
+			// Locally, they are (within 20 seconds).
+			// logger.Log(subT, fmt.Sprintf("Wait for secret `gcp-auth` to be created in namespace `%s`", kubectlOptions.Namespace))
+			// k8s.WaitUntilSecretAvailable(subT, kubectlOptions, "gcp-auth", 10, 10*time.Second)
 
 			helmOptions := &helm.Options{
 				KubectlOptions: kubectlOptions,
@@ -255,9 +257,9 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				// get deployment
 				deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
 				// when pulling images for the first time, it may take longer than 90s
-				errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 36, 10*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+				// errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 36, 10*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
 				// fail fast during auth testing to show if error in pulling the image from GAR
-				// errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 3, 10*time.Second) // 30 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+				errDeployment := k8s.WaitUntilDeploymentAvailableE(subT, kubectlOptions, deployment.Name, 3, 10*time.Second) // 30 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
 
 				if errDeployment != nil {
 					// Get details why it failed

@@ -54,10 +54,13 @@ jobs:
       #     username: oauth2accesstoken
       #     password: ${{ steps.auth.outputs.access_token }}
       # With the next step, error still occurred.
-      # - name: Add scope to GOOGLE_APPLICATION_CREDENTIALS
-      #   shell: bash
-      #   run: |
-      #     sed -i -e 's%^{"type%{"scope":"https://www.googleapis.com/auth/cloud-platform","type%' "${GOOGLE_APPLICATION_CREDENTIALS}"
+      - name: List Container images in GAR
+        shell: bash
+        run: |
+          set -x
+          gcloud artifacts docker images list \
+            us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api \
+            --limit=5
       - name: Run Helm integration tests for internal
         shell: bash
         run: |
