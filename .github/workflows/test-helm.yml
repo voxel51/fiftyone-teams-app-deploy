@@ -45,8 +45,8 @@ jobs:
           # token_format: 'access_token'
           # workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
           workload_identity_provider: ${{ secrets.GOOGLE_WIP_GITHUB }}
-      # - name: Set up gcloud
-      #   uses: google-github-actions/setup-gcloud@v2.1.0
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2.1.0
       # - name: Login to GAR
       #   uses: docker/login-action@v3.1.0
       #   with:
