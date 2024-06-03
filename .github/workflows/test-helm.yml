@@ -67,7 +67,7 @@ jobs:
           set -x
           make start run-cert-manager run-mongodb
           sudo minikube tunnel &> /dev/null &
-          make test-integration-helm-internal
+          make test-integration-helm-internal || minikube logs
   # integration-helm-legacy:
   #   permissions:
   #     contents: read
