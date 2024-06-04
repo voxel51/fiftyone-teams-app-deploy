@@ -9,7 +9,7 @@ steps:
       - '-e'
       - '-c'
       - |
-        echo "$$SSH_KEY" > /root/.ssh/id_ed25519
+        echo "$${SSH_KEY}" > /root/.ssh/id_ed25519
         chmod 400 /root/.ssh/id_ed25519
 
         git clone --depth 1 -b "${BRANCH_NAME}" git@github.com:voxel51/fiftyone-teams-app-deploy.git teams-deploy
@@ -30,7 +30,7 @@ steps:
       - |
         # install asdf
         git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
-        . "$HOME/.asdf/asdf.sh"
+        . "$${HOME}/.asdf/asdf.sh"
 
         # install asdf managed tools
         make asdf
