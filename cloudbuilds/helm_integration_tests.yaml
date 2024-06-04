@@ -23,7 +23,8 @@ steps:
 
   - id: 'asdf'
     # install asdf and install asdf managed tools
-    name: 'gcr.io/computer-vision-team/cloud-build-image'
+    # name: 'gcr.io/computer-vision-team/cloud-build-image'
+    name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-o'
@@ -39,6 +40,30 @@ steps:
         # install asdf managed tools
         make asdf
     timeout: 600s  # 10 minutes
+
+  - id: build-container-image
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        # build docker container containing curl and minikube
+        docker build -t minikube-kic .
+  - id: docker-run-minikube
+    name: gcr.io/cloud-builders/docker
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        # run minikube docker container
+        docker run --detach --tty --privileged --name minikube minikube-kic:latest
+  - id: docker-exec-minikube-start
+    name: gcr.io/cloud-builders/docker
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        docker exec minikube /bin/bash -c "minikube start --force && kubectl get pods -A"
 
   - id: 'start-minikube-setup-and-test'
     # start minikube (with addons), install cert-manager and mongodb, start tunnel, run test
