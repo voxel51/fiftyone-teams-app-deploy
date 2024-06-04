@@ -57,6 +57,7 @@ steps:
         # install docker
         curl -fsSL https://get.docker.com -o get-docker.sh
         sh ./get-docker.sh
+        dockerd-rootless-setuptool.sh install
 
         # start minikube, install cert manager and mongodb
         make start run-cert-manager run-mongodb
