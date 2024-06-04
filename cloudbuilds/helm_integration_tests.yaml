@@ -57,10 +57,14 @@ steps:
         # install docker
         curl -fsSL https://get.docker.com -o get-docker.sh
         sh ./get-docker.sh
-        dockerd-rootless-setuptool.sh install
 
-        # start minikube, install cert manager and mongodb
-        make start run-cert-manager run-mongodb
+        # start minikube
+        minikube start --wait=all --force
+        minikube addons enable gcp-auth
+        minikube addons enable ingress
+
+        # install cert manager and mongodb
+        make run-cert-manager run-mongodb
 
         # start minikube tunnel with sudo for protected ports and background to allow for test run
         sudo minikube tunnel &> /dev/null &
