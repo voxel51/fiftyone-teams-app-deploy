@@ -1,0 +1,66 @@
+---
+steps:
+  - id: 'clone-repo-teams-app-deploy'
+    name: 'gcr.io/computer-vision-team/cloud-build-image'
+    entrypoint: 'bash'
+    args:
+      - '-o'
+      - 'pipefail'
+      - '-e'
+      - '-c'
+      - |
+        echo "$$SSH_KEY" > /root/.ssh/id_ed25519
+        chmod 400 /root/.ssh/id_ed25519
+
+        git clone --depth 1 -b "${BRANCH_NAME}" git@github.com:voxel51/fiftyone-teams-app-deploy.git teams-deploy
+    secretEnv:
+      - 'SSH_KEY'
+    timeout: 300s  # 5 minutes
+
+  - id: 'asdf'
+    # install asdf and install asdf managed tools
+    name: 'gcr.io/computer-vision-team/cloud-build-image'
+    entrypoint: 'bash'
+    args:
+      - '-o'
+      - 'pipefail'
+      - '-e'
+      - '-x'
+      - '-c'
+      - |
+        # install asdf
+        git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
+        . "$HOME/.asdf/asdf.sh"
+
+        # install asdf managed tools
+        make asdf
+    timeout: 600s  # 10 minutes
+
+  - id: 'start-minikube-setup-and-test'
+    # start minikube (with addons), install cert-manager and mongodb, start tunnel, run test
+    name: 'gcr.io/computer-vision-team/cloud-build-image'
+    entrypoint: 'bash'
+    args:
+      - '-o'
+      - 'pipefail'
+      - '-e'
+      - '-x'
+      - '-c'
+      - |
+        # start minikube, install cert manager and mongodb
+        make start run-cert-manager run-mongodb
+
+        # start minikube tunnel with sudo for protected ports and background to allow for test run
+        sudo minikube tunnel &> /dev/null &
+
+        # run tests
+        make test-integration-helm-internal || minikube logs && exit 1
+    timeout: 1800s  # 30 minutes
+availableSecrets:
+  secretManager:
+    - versionName: projects/computer-vision-team/secrets/voxelbot-ssh-key/versions/latest
+      env: 'SSH_KEY'
+timeout: 2700s  # 45 minutes
+options:
+  # machineType: 'E2_HIGHCPU_32'
+  logging: CLOUD_LOGGING_ONLY
