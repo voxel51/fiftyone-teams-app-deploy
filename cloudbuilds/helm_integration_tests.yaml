@@ -42,7 +42,8 @@ steps:
 
   - id: 'start-minikube-setup-and-test'
     # start minikube (with addons), install cert-manager and mongodb, start tunnel, run test
-    name: 'gcr.io/computer-vision-team/cloud-build-image'
+    # name: 'gcr.io/computer-vision-team/cloud-build-image'
+    name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-o'
@@ -55,8 +56,8 @@ steps:
         . "$${HOME}/.asdf/asdf.sh"
 
         # install docker
-        curl -fsSL https://get.docker.com -o get-docker.sh
-        sh ./get-docker.sh
+        # curl -fsSL https://get.docker.com -o get-docker.sh
+        # sh ./get-docker.sh
 
         # start minikube
         minikube start --force --alsologtostderr -v=4
