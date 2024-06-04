@@ -47,6 +47,9 @@ steps:
       - '-x'
       - '-c'
       - |
+        # source asdf
+        . "$${HOME}/.asdf/asdf.sh"
+
         # start minikube, install cert manager and mongodb
         make start run-cert-manager run-mongodb
 
