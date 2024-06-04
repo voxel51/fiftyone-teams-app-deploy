@@ -46,8 +46,7 @@ jobs:
           gcloud builds submit \
             --project=computer-vision-team \
             --config=cloudbuilds/helm_integration_tests.yaml \
-            --suppress-logs \
-            --substitutions=BRANCH_NAME="${{ github.base_ref }}"
+            --suppress-logs
   # integration-helm-internal:
   #   permissions:
   #     contents: read
