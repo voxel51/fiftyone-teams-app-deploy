@@ -12,7 +12,11 @@ steps:
         echo "$${SSH_KEY}" > /root/.ssh/id_ed25519
         chmod 400 /root/.ssh/id_ed25519
 
-        git clone --depth 1 -b "${BRANCH_NAME}" git@github.com:voxel51/fiftyone-teams-app-deploy.git teams-deploy
+        git clone \
+          --depth 1 \
+          --branch "${BRANCH_NAME}" \
+          git@github.com:voxel51/fiftyone-teams-app-deploy.git \
+          teams-deploy
     secretEnv:
       - 'SSH_KEY'
     timeout: 300s  # 5 minutes
@@ -49,6 +53,10 @@ steps:
       - |
         # source asdf
         . "$${HOME}/.asdf/asdf.sh"
+
+        # install docker
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sudo sh ./get-docker.sh --dry-run
 
         # start minikube, install cert manager and mongodb
         make start run-cert-manager run-mongodb
