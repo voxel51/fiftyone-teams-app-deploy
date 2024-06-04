@@ -59,7 +59,7 @@ steps:
         sh ./get-docker.sh
 
         # start minikube
-        minikube start --force
+        minikube start --force --alsologtostderr -v=4
         minikube addons enable gcp-auth
         minikube addons enable ingress
 
