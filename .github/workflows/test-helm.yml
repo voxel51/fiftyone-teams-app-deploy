@@ -47,7 +47,7 @@ jobs:
             --project=computer-vision-team \
             --config=cloudbuilds/helm_integration_tests.yaml \
             --suppress-logs \
-            --substitutions=BRANCH_NAME="${{ github.ref_name }}"
+            --substitutions=BRANCH_NAME="${{ github.base_ref }}"
   # integration-helm-internal:
   #   permissions:
   #     contents: read
