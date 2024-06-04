@@ -1,25 +1,25 @@
 ---
 steps:
-  - id: 'clone-repo-teams-app-deploy'
-    name: 'gcr.io/computer-vision-team/cloud-build-image'
-    entrypoint: 'bash'
-    args:
-      - '-o'
-      - 'pipefail'
-      - '-e'
-      - '-c'
-      - |
-        echo "$${SSH_KEY}" > /root/.ssh/id_ed25519
-        chmod 400 /root/.ssh/id_ed25519
+  # - id: 'clone-repo-teams-app-deploy'
+  #   name: 'gcr.io/computer-vision-team/cloud-build-image'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-o'
+  #     - 'pipefail'
+  #     - '-e'
+  #     - '-c'
+  #     - |
+  #       echo "$${SSH_KEY}" > /root/.ssh/id_ed25519
+  #       chmod 400 /root/.ssh/id_ed25519
 
-        git clone \
-          --depth 1 \
-          --branch "${BRANCH_NAME}" \
-          git@github.com:voxel51/fiftyone-teams-app-deploy.git \
-          teams-deploy
-    secretEnv:
-      - 'SSH_KEY'
-    timeout: 300s  # 5 minutes
+  #       git clone \
+  #         --depth 1 \
+  #         --branch "${BRANCH_NAME}" \
+  #         git@github.com:voxel51/fiftyone-teams-app-deploy.git \
+  #         teams-deploy
+  #   secretEnv:
+  #     - 'SSH_KEY'
+  #   timeout: 300s  # 5 minutes
 
   - id: 'asdf'
     # install asdf and install asdf managed tools
@@ -59,7 +59,7 @@ steps:
         sh ./get-docker.sh
 
         # start minikube
-        minikube start --wait=all --force
+        minikube start --force
         minikube addons enable gcp-auth
         minikube addons enable ingress
 
@@ -72,10 +72,10 @@ steps:
         # run tests
         make test-integration-helm-internal || minikube logs && exit 1
     timeout: 1800s  # 30 minutes
-availableSecrets:
-  secretManager:
-    - versionName: projects/computer-vision-team/secrets/voxelbot-ssh-key/versions/latest
-      env: 'SSH_KEY'
+# availableSecrets:
+#   secretManager:
+#     - versionName: projects/computer-vision-team/secrets/voxelbot-ssh-key/versions/latest
+#       env: 'SSH_KEY'
 timeout: 2700s  # 45 minutes
 options:
   # machineType: 'E2_HIGHCPU_32'
