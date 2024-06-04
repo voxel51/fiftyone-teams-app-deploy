@@ -41,30 +41,6 @@ steps:
         make asdf
     timeout: 600s  # 10 minutes
 
-  - id: build-container-image
-    name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-        # build docker container containing curl and minikube
-        docker build -t minikube-kic .
-  - id: docker-run-minikube
-    name: gcr.io/cloud-builders/docker
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-        # run minikube docker container
-        docker run --detach --tty --privileged --name minikube minikube-kic:latest
-  - id: docker-exec-minikube-start
-    name: gcr.io/cloud-builders/docker
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-        docker exec minikube /bin/bash -c "minikube start --force && kubectl get pods -A"
-
   - id: 'start-minikube-setup-and-test'
     # start minikube (with addons), install cert-manager and mongodb, start tunnel, run test
     # name: 'gcr.io/computer-vision-team/cloud-build-image'
@@ -85,7 +61,7 @@ steps:
         # sh ./get-docker.sh
 
         # start minikube
-        minikube start --force --alsologtostderr -v=4
+        minikube start --alsologtostderr -v=4
         minikube addons enable gcp-auth
         minikube addons enable ingress
 
