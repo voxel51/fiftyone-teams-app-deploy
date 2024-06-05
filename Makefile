@@ -79,10 +79,10 @@ delete:  ## Delete minikube
 	minikube delete
 
 dev: helm-repos  ## run skaffold dev
-	skaffold dev
+	skaffold dev --kube-context minikube
 
 dev-keep: helm-repos  ## run skaffold dev with keep-runining-on-failure
-	skaffold dev --keep-running-on-failure
+	skaffold dev --keep-running-on-failure --kube-context minikube
 
 port-forward-app:  ## port forward the service `teams-app` on the host port 3000
 	kubectl port-forward --namespace fiftyone-teams svc/teams-app 3000:80 --context minikube
@@ -94,18 +94,21 @@ port-forward-mongo:  ## port forward to service `mongodb` on the host port 27017
 	kubectl port-forward --namespace fiftyone-teams svc/mongodb 27017:27017 --context minikube
 
 run: helm-repos  ## run skaffold run
-	skaffold run
+	skaffold run --kube-context minikube
 
 run-cert-manager: helm-repos  ## run skaffold run
 	skaffold run \
-	  --filename skaffold-cert-manager.yaml
+	  --filename skaffold-cert-manager.yaml \
+	  --kube-context minikube
 
 run-mongodb: helm-repos  ## run skaffold run
 	skaffold run \
-	  --filename skaffold-mongodb.yaml
+	  --filename skaffold-mongodb.yaml \
+	  --kube-context minikube
 
 run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
-	skaffold run -p only-fiftyone
+	skaffold run -p only-fiftyone \
+	  --kube-context minikube
 
 tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
 	sudo minikube tunnel &> /dev/null &
