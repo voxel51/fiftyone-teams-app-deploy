@@ -836,7 +836,7 @@ A minimal example `values.yaml` may be found
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-[legacy-auth-mode]: topher/document-install-modal-override
+[legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/

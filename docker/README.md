@@ -760,4 +760,4 @@ for an example Nginx site configuration that forwards
 
 <!-- Reference Links -->
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
-[legacy-auth-mode]: topher/document-install-modal-override
+[legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
