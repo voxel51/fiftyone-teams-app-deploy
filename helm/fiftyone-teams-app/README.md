@@ -22,7 +22,7 @@ FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://g
 
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
-## Known Issue for FiftyOne Teams v1.6.0 and Above
+## Known Issues for FiftyOne Teams v1.6.0 and Above
 
 ### "Install Fiftyone" Instructions Missing PyPI Token
 

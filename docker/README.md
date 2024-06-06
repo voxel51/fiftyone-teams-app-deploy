@@ -10,7 +10,7 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
-## Known Issue for FiftyOne Teams v1.6.0 and Above
+## Known Issues for FiftyOne Teams v1.6.0 and Above
 
 ### "Install Fiftyone" Instructions Missing PyPI Token
 
