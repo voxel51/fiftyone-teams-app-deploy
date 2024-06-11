@@ -36,7 +36,7 @@ deploy:
     releases:
       - name: fiftyone-teams
         chartPath: helm/fiftyone-teams-app
-        version: 1.7.0
+        version: 1.7.1
         createNamespace: true
         namespace: fiftyone-teams
         overrides:
@@ -48,12 +48,8 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
               pullPolicy: IfNotPresent
-              tag: v1.7.0rc9
-            service:
-              liveness:
-                initialDelaySeconds: 15
-              readiness:
-                initialDelaySeconds: 15
+              tag: v1.7.1rc5
+
           appSettings:
             env:
               # Only set to true during the initial installation or during a database upgrade
@@ -68,12 +64,8 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v1.7.0rc9
-            service:
-              liveness:
-                initialDelaySeconds: 15
-              readiness:
-                initialDelaySeconds: 15
+              tag: v1.7.1rc5
+
           # TODO: Test `minikube addons configure registry-creds` or
           # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
           # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -152,12 +144,8 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v1.7.0rc9
-            service:
-              liveness:
-                initialDelaySeconds: 15
-              readiness:
-                initialDelaySeconds: 15
+              tag: v1.7.1rc5
+
           teamsAppSettings:
             dnsName: local.fiftyone.ai
             # env:
@@ -174,12 +162,8 @@ deploy:
               # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
               # This is a byproduct of `npm` versioning versus Python PEP 440.
               pullPolicy: IfNotPresent
-              tag: v1.7.0-rc.8
-            service:
-              liveness:
-                initialDelaySeconds: 15
-              readiness:
-                initialDelaySeconds: 15
+              tag: v1.7.1-rc.4
+
           casSettings:
             env:
               DEBUG: cas:*
@@ -187,10 +171,6 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
               pullPolicy: IfNotPresent
-              tag: v1.7.0-rc.8
-            service:
-              liveness:
-                initialDelaySeconds: 15
-              readiness:
-                initialDelaySeconds: 15
+              tag: v1.7.1-rc.4
+
   kubeContext: minikube

@@ -24,7 +24,7 @@
 
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
-## Known Issue for FiftyOne Teams v1.6.0 and Above
+## Known Issues for FiftyOne Teams v1.6.0 and Above
 
 ### "Install Fiftyone" Instructions Missing PyPI Token
 
@@ -49,7 +49,7 @@ something like the following to your `values.yaml`:
 ```yaml
 teamsAppSettings:
   env:
-    FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install -U --index-url https://<your PyPI Token>@pypi.fiftyone.ai fiftyone==0.17.0
+    FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install -U --index-url https://<your PyPI Token>@pypi.fiftyone.ai fiftyone==0.17.1
 ```
 
 If you need your PyPI token, please contact your Customer Success representative
@@ -472,7 +472,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.7.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -498,10 +498,10 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
                 servicePort: 80
         ```
 
-1. [Upgrade to FiftyOne Teams v1.7.0](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams v1.7.1](#deploying-fiftyone-teams)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==0.17.0`
-1. Upgrade your FiftyOne SDKs to version 0.17.0
+    > FiftyOne Teams Database until they upgrade to `fiftyone==0.17.1`
+1. Upgrade your FiftyOne SDKs to version 0.17.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -519,7 +519,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.7.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v1.7.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -557,8 +557,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
+1. [Upgrade to FiftyOne Teams version 1.7.1](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -568,9 +568,9 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.17.0
+    > **NOTE** Any FiftyOne SDK less than 0.17.1
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==0.17.0` is required.
+    > Upgrading to `fiftyone==0.17.1` is required.
 
 1. Validate that all datasets are now at version 0.24.0
 
@@ -594,15 +594,15 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Teams version 1.7.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.0
+1. [Upgrade to FiftyOne Teams version 1.7.1](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 0.17.0
+    > **NOTE** Any FiftyOne SDK less than 0.17.1
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==0.17.0` is required.
+    > Upgrading to `fiftyone==0.17.1` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -660,7 +660,7 @@ A minimal example `values.yaml` may be found
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-[legacy-auth-mode]: topher/document-install-modal-override
+[legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
