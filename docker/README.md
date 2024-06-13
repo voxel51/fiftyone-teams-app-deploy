@@ -621,6 +621,7 @@ modify your existing configuration to migrate to a new Auth0 Tenant.
     ```shell
     fiftyone migrate --info
     ```
+
 1. If desired, have an admin run this to upgrade all datasets to compatibility version 0.24.0
 
     ```shell
@@ -629,7 +630,6 @@ modify your existing configuration to migrate to a new Auth0 Tenant.
 
     - **NOTE** Any FiftyOne SDK less than 0.17.0 will lose database connectivity
       at this point.
-
 
 ## Deploying FiftyOne Teams
 
