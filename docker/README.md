@@ -622,8 +622,8 @@ modify your existing configuration to migrate to a new Auth0 Tenant.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.17.1 will lose database connectivity
-      at this point. Upgrading to `fiftyone==0.17.1` is required
+    - **NOTE** Any FiftyOne SDK less than 0.17.0 will lose database connectivity
+      at this point.
 
 1. To ensure that all datasets are now at version 0.24.0, run
 
