@@ -771,24 +771,26 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         ```
 
 1. [Upgrade to FiftyOne Teams version 1.7.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.1
+1. (Recommended to [stay up to date](https://docs.voxel51.com/release-notes.html#fiftyone-teams-1-7-1))
+   Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 0.17.1
-    > will lose connectivity at this point.
-    > Upgrading to `fiftyone==0.17.1` is required.
+1. Check your database and dataset compatibility versions:
+
+    ```shell
+    fiftyone migrate --info
+    ```
+
+1. (Optional, Recommended) If your database is listed with a version prior to 0.24.0,
+   have an admin run this to upgrade all datasets to compatibility version 0.24.0
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. Validate that all datasets are now at version 0.24.0
-
-    ```shell
-    fiftyone migrate --info
-    ```
+    - **NOTE** Any FiftyOne SDK less than 0.17.0 will lose database connectivity
+      at this point.
 
 ## Deploying FiftyOne Teams
 
