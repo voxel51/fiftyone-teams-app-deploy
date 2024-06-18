@@ -241,7 +241,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=true",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -261,7 +261,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=0.17.1",
@@ -298,7 +298,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			},
 		},
 		{
-			"ffEnableInvitationsFiftyoneApp",
+			"ffDisableInvitationsFiftyoneApp",
 			"fiftyone-app",
 			[]string{legacyAuthComposeFile},
 			append(s.dotEnvFiles, legacyAuthEnvFixtureFilePath),
@@ -318,13 +318,13 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			},
 		},
 		{
-			"ffEnableInvitationsTeamsApi",
+			"ffDisableInvitationsTeamsApi",
 			"teams-api",
 			[]string{legacyAuthComposeFile},
 			append(s.dotEnvFiles, legacyAuthEnvFixtureFilePath),
 			[]string{
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=true",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -337,14 +337,14 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			},
 		},
 		{
-			"ffEnableInvitationsTeamsApp",
+			"ffDisableInvitationsTeamsApp",
 			"teams-app",
 			[]string{legacyAuthComposeFile},
 			append(s.dotEnvFiles, legacyAuthEnvFixtureFilePath),
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=true",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=0.17.1",
@@ -357,7 +357,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			},
 		},
 		{
-			"ffEnableInvitationsTeamsCas",
+			"ffDisableInvitationsTeamsCas",
 			"teams-cas",
 			[]string{legacyAuthComposeFile},
 			append(s.dotEnvFiles, legacyAuthEnvFixtureFilePath),
@@ -409,7 +409,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=true",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -430,7 +430,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=0.17.1",
@@ -493,7 +493,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=true",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -514,7 +514,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
+				"FEATURE_FLAG_ENABLE_INVITATIONS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=0.17.1",
