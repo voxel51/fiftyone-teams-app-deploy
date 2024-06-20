@@ -24,6 +24,8 @@ services:
       - plugins-vol:/opt/plugins
 
   teams-app:
+    environment:
+      FEATURE_FLAG_ENABLE_INVITATIONS: false
     extends:
       file: ../common-services.yaml
       service: teams-app-common
