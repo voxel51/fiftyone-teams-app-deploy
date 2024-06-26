@@ -545,9 +545,6 @@ teamsAppSettings:
     requests: {}
     #   cpu: 500m
     #   memory: 1Gi
-  # TODO: add `serverPathPrefix` to `./templates/_helpers.tpl`. [AS-74]
-  # -- Prefix for path-based Ingress routing for teams-app.
-  serverPathPrefix: /
   service:
     # -- Service annotations for teams-app. [Reference][annotations].
     annotations: {}
