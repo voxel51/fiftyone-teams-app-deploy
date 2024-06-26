@@ -600,7 +600,6 @@ appSettings:
 | teamsAppSettings.replicaCount | int | `2` | Number of pods in the teams-app deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-app. [Reference][resources]. |
 | teamsAppSettings.securityContext | object | `{}` | Container security configuration for teams-app. [Reference][container-security-context]. |
-| teamsAppSettings.serverPathPrefix | string | `"/"` | Prefix for path-based Ingress routing for teams-app. |
 | teamsAppSettings.service.annotations | object | `{}` | Service annotations for teams-app. [Reference][annotations]. |
 | teamsAppSettings.service.containerPort | int | `3000` | Service container port for teams-app. |
 | teamsAppSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes]. |
