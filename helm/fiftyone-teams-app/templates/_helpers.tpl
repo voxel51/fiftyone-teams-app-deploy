@@ -282,6 +282,8 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
+- name: LICENSE_KEY_FILE_PATHS
+  value: "/opt/fiftyone/license"
 - name: NEXTAUTH_URL
   value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
 {{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}

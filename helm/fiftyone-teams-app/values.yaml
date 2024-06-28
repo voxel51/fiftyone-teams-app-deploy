@@ -277,6 +277,9 @@ casSettings:
   # -- Volumes for teams-cas. [Reference][volumes].
   volumes: []
 
+# -- Secret name for FiftyOne license
+fiftyoneLicenseSecret: fiftyonelicense
+
 # -- Container image registry keys. [Reference][image-pull-secrets].
 imagePullSecrets: []
 
