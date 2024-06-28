@@ -52,10 +52,13 @@ spec:
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.casSettings.resources | nindent 12 }}
-          {{- with .Values.casSettings.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            - name: fiftyonelicensefile
+              mountPath: /opt/fiftyone
+              readOnly: true
+              {{- with .Values.casSettings.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+              {{- end }}
       {{- with .Values.casSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -68,7 +71,13 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.casSettings.volumes }}
       volumes:
+        - name: fiftyonelicensefile
+          secret:
+            secretName: {{ .Values.fiftyoneLicenseSecret }}
+            items:
+              - key: license
+                path: license
+        {{- with .Values.casSettings.volumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
