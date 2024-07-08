@@ -286,6 +286,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 			},
 		},
@@ -365,6 +366,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 			},
 		},
@@ -443,6 +445,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 			},
 		},
@@ -721,7 +724,15 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			"teams-cas",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			nil,
+			[]types.ServiceVolumeConfig{
+				{
+					Type: "bind",
+					Source: "/opt/fiftyone/license",
+					Target: "/opt/fiftyone/license",
+					ReadOnly: true,
+					Consistency: "",
+				},
+			},
 		},
 		{
 			"pluginsFiftyoneApp",
@@ -765,7 +776,15 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			"teams-cas",
 			[]string{internalAuthComposePluginsFile},
 			s.dotEnvFiles,
-			nil,
+			[]types.ServiceVolumeConfig{
+				{
+					Type: "bind",
+					Source: "/opt/fiftyone/license",
+					Target: "/opt/fiftyone/license",
+					ReadOnly: true,
+					Consistency: "",
+				},
+			},
 		},
 		{
 			"dedicatedPluginsFiftyoneApp",
@@ -802,7 +821,15 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			"teams-cas",
 			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
-			nil,
+			[]types.ServiceVolumeConfig{
+				{
+					Type: "bind",
+					Source: "/opt/fiftyone/license",
+					Target: "/opt/fiftyone/license",
+					ReadOnly: true,
+					Consistency: "",
+				},
+			},
 		},
 		{
 			"dedicatedPluginsTeamsPlugins",
