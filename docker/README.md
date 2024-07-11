@@ -286,7 +286,7 @@ For multi-node deployments, please implement a storage
 solution that provides access to the deployed plugins.
 
 To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md).
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 To use the FiftyOne Teams UI to deploy plugins,
 navigate to `https://<DEPLOY_URL>/settings/plugins`.
