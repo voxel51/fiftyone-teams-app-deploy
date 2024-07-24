@@ -189,6 +189,9 @@ A brief summary of those changes include
   - `CAS_DEBUG`
   - `CAS_DEFAULT_USER_ROLE`
 
+> **NOTE**: When multiple deployments use the same database instance,
+> set `CAS_DATABASE_NAME` to a unique value for each deployment.
+
 Please review these changes in the
 [legacy-auth/env.template](legacy-auth/env.template)
 and in the appropriate `legacy-auth/compose*` files.

@@ -486,7 +486,7 @@ appSettings:
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
 | casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
-| casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database |
+| casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
