@@ -726,10 +726,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
 				{
-					Type: "bind",
-					Source: "/opt/fiftyone/license",
-					Target: "/opt/fiftyone/license",
-					ReadOnly: true,
+					Type:        "bind",
+					Source:      "/opt/fiftyone/license",
+					Target:      "/opt/fiftyone/license",
+					ReadOnly:    true,
 					Consistency: "",
 				},
 			},
@@ -778,10 +778,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
 				{
-					Type: "bind",
-					Source: "/opt/fiftyone/license",
-					Target: "/opt/fiftyone/license",
-					ReadOnly: true,
+					Type:        "bind",
+					Source:      "/opt/fiftyone/license",
+					Target:      "/opt/fiftyone/license",
+					ReadOnly:    true,
 					Consistency: "",
 				},
 			},
@@ -823,10 +823,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
 				{
-					Type: "bind",
-					Source: "/opt/fiftyone/license",
-					Target: "/opt/fiftyone/license",
-					ReadOnly: true,
+					Type:        "bind",
+					Source:      "/opt/fiftyone/license",
+					Target:      "/opt/fiftyone/license",
+					ReadOnly:    true,
 					Consistency: "",
 				},
 			},

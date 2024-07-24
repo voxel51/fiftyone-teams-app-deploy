@@ -1088,7 +1088,7 @@ func (s *deploymentCasTemplateTest) TestContainerVolumeMounts() {
           {
             "name": "fiftyonelicensefile",
             "mountPath": "/opt/fiftyone",
-            "readOnly": "true"
+            "readOnly": true
           }
         ]`
 				var expectedVolumeMounts []corev1.VolumeMount
@@ -1108,7 +1108,7 @@ func (s *deploymentCasTemplateTest) TestContainerVolumeMounts() {
           {
             "name": "fiftyonelicensefile",
             "mountPath": "/opt/fiftyone",
-            "readOnly": "true"
+            "readOnly": true
           },
           {
             "mountPath": "/test-data-volume",
@@ -1132,9 +1132,9 @@ func (s *deploymentCasTemplateTest) TestContainerVolumeMounts() {
 			func(volumeMounts []corev1.VolumeMount) {
 				expectedJSON := `[
           {
-            "name": "fiftyonelicense",
+            "name": "fiftyonelicensefile",
             "mountPath": "/opt/fiftyone",
-            "readOnly": "true"
+            "readOnly": true
           },
           {
             "mountPath": "/test-data-volume1",
@@ -1639,7 +1639,7 @@ func (s *deploymentCasTemplateTest) TestVolumes() {
 		{
 			"overrideVolumesMultiple",
 			map[string]string{
-				"fiftyoneLicenseSecret":                                  "fiftyone-license",
+				"fiftyoneLicenseSecret":                                  "fiftyone-license", // pragma: allowlist secret
 				"casSettings.volumes[0].name":                            "test-volume1",
 				"casSettings.volumes[0].hostPath.path":                   "/test-volume1",
 				"casSettings.volumes[1].name":                            "pvc1",
