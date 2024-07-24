@@ -193,7 +193,9 @@ casSettings:
   enable_invitations: true
   # Environment Variables are passed to the teams-cas containers
   env:
-    # -- Provide the name for the CAS database
+    # -- Provide the name for the CAS database.
+    # When multiple deployments use the same database instance,
+    # set `CAS_DATABASE_NAME` to a unique value for each deployment.
     CAS_DATABASE_NAME: cas
     # -- Set the default user role for new users
     # One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN`

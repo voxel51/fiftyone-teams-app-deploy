@@ -365,7 +365,6 @@ To configure this, set the following environment variables on
 1. The deployments based on the `fiftyone-teams-app` (`teamsAppSettings.env`) or
    `fiftyone-teams-cas` (`casSettings.env`) images
 
-
     ```yaml
     GLOBAL_AGENT_HTTP_PROXY: http://proxy.yourcompany.tld:3128
     GLOBAL_AGENT_HTTPS_PROXY: https://proxy.yourconpay.tld:3128
@@ -382,7 +381,6 @@ To configure this, set the following environment variables on
     > **NOTE**: If you have overridden your service names with `*.service.name`
     > you will need to include the override service names in your
     > `GLOBAL_AGENT_NO_PROXY` configuration instead
-
 
 The `NO_PROXY`, `no_proxy`, and `GLOBAL_AGENT_NO_PROXY` values must include the
 Kubernetes service names that may communicate without going through a proxy
