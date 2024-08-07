@@ -295,64 +295,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             "value": "https:///cas/api/auth"
           },
           {
-            "name": "AUTH0_AUTH_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_AUTH_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_DOMAIN",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "auth0Domain"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ISSUER_BASE_URL",
-            "value": "https://$(AUTH0_DOMAIN)"
-          },
-          {
-            "name": "AUTH0_MGMT_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "apiClientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_MGMT_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "apiClientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ORGANIZATION",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "organizationId"
-              }
-            }
-          },
-          {
             "name": "TEAMS_API_DATABASE_NAME",
             "valueFrom": {
               "secretKeyRef": {
@@ -433,64 +375,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "NEXTAUTH_URL",
             "value": "https:///cas/api/auth"
-          },
-          {
-            "name": "AUTH0_AUTH_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_AUTH_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_DOMAIN",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "auth0Domain"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ISSUER_BASE_URL",
-            "value": "https://$(AUTH0_DOMAIN)"
-          },
-          {
-            "name": "AUTH0_MGMT_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "apiClientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_MGMT_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "apiClientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ORGANIZATION",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "organizationId"
-              }
-            }
           },
           {
             "name": "TEAMS_API_DATABASE_NAME",

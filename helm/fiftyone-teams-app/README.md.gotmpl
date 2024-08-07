@@ -24,36 +24,26 @@
 
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
-## Known Issues for FiftyOne Teams v1.6.0 and Above
+## FiftyOne Teams v2.0+ Requires a License File
 
-### "Install Fiftyone" Instructions Missing PyPI Token
+FiftyOne Teams v2.0 introduces a new requirement for a license file.  This
+license file should be obtained from your Customer Success Team before
+upgrading to FiftyOne Teams 2.0 or beyond.
 
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-introduces an abstraction layer between FiftyOne Teams and Auth0.  This
-abstraction layer makes it possible to deploy FiftyOne Teams without using Auth0
-as an Identity Service Provider.
+The license file now contains all of the Auth0 configuration that was
+previously provided through kubernetes secrets; you may remove those secrets
+from your `values.yaml` and from any secrets created outside of the Voxel51
+install process.
 
-However, metadata that used to be provided to FiftyOne Teams by Auth0 is no
-longer available; which has resulted in an incomplete set of instructions in the
-[Install FiftyOne](https://docs.voxel51.com/teams/installation.html#python-sdk)
-instructions for bash.
+Use the license file provided by the Voxel51 Customer Success Team to create
+a new license file secret:
 
-Specifically, you will see the word `TOKEN` where your Voxel51 PyPI token used
-to appear.
-
-While Voxel51 works to address this issue, you can override the install
-instructions by setting the `FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` environment
-value for the `teams-app` deployment.  This can be accomplished by adding
-something like the following to your `values.yaml`:
-
-```yaml
-teamsAppSettings:
-  env:
-    FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install -U --index-url https://<your PyPI Token>@pypi.fiftyone.ai fiftyone==0.17.1
+```shell
+   kubectl --namespace your-namepace create secret generic fiftyonelicense \
+     --from-file=license=./your-license-file
 ```
 
-If you need your PyPI token, please contact your Customer Success representative
-and they will provide it to you.
+## Known Issues for FiftyOne Teams v1.6.0 and Above
 
 ### Invitations Disabled for Internal Authentication Mode
 
@@ -65,16 +55,6 @@ and
 
 Inviting users to join your FiftyOne Teams instance is not currently supported
 when `FIFTYONE_AUTH_MODE` is set to `internal`.
-
-### Super Admin UI Disabled for Legacy Authentication Mode
-
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-includes a new
-[Super Admin UI](https://docs.voxel51.com/teams/pluggable_auth.html#super-admin-ui)
-for deployment-wide authentication configurations.
-
-The FiftyOne Teams Super Admin UI is disabled when `FIFTYONE_AUTH_MODE` is set
-to `legacy`.
 
 ## Table of Contents
 
@@ -97,7 +77,7 @@ to `legacy`.
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
   - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
-  - [From FiftyOne Teams Version 1.6.0](#from-fiftyone-teams-version-160)
+  - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
 - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
 
 <!-- tocstop -->
@@ -470,10 +450,23 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.7.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
+
+---
+
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> 2.0 or beyond.
+>
+> The license file now contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets; you may remove those secrets
+> from your `values.yaml` and from any secrets created outside of the Voxel51
+> install process.
+
+---
 
 1. In your `values.yaml`, set the required values
     1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
@@ -496,28 +489,36 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
                 servicePort: 80
         ```
 
-1. [Upgrade to FiftyOne Teams v1.7.1](#deploying-fiftyone-teams)
+1. Use the license file provided by the Voxel51 Customer Success Team to create
+   a new kubernetes secret:
+
+    ```shell
+        kubectl --namespace your-namepace create secret generic fiftyonelicense \
+          --from-file=license=./your-license-file
+    ```
+
+1. [Upgrade to FiftyOne Teams v2.0.0](#deploying-fiftyone-teams)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==0.17.1`
-1. Upgrade your FiftyOne SDKs to version 0.17.1
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.0.0`
+1. Upgrade your FiftyOne SDKs to version 2.0.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Confirm that datasets were migrated to version 0.24.0
+1. Upgrade all the datasets
+
+    ```shell
+    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+    ```
+
+1. Validate that all datasets are now at version 0.25.0
 
     ```shell
     fiftyone migrate --info
     ```
 
-    - If not all datasets have been upgraded, have an admin run
-
-        ```shell
-        FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-        ```
-
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.7.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -533,6 +534,19 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
 
+---
+
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> 2.0 or beyond.
+>
+> The license file now contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets; you may remove those secrets
+> from your `values.yaml` and from any secrets created outside of the Voxel51
+> install process.
+
+---
+
 1. Ensure all FiftyOne SDK users either
     - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
 
@@ -546,6 +560,14 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         ```shell
         unset FIFTYONE_DATABASE_ADMIN
         ```
+
+1. Use the license file provided by the Voxel51 Customer Success Team to create
+   a new kubernetes secret:
+
+    ```shell
+        kubectl --namespace your-namepace create secret generic fiftyonelicense \
+          --from-file=license=./your-license-file
+    ```
 
 1. In your `values.yaml`, set the required values
     1. `secret.fiftyone.encryptionKey` (or your deployment's
@@ -555,28 +577,40 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 1.7.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.1
+1. [Upgrade to FiftyOne Teams version 2.0.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.0.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
+    > **NOTE** Any FiftyOne SDK less than 2.0.0 will lose connectivity after
+    > this point.
+    > Upgrading all SDKs to `fiftyone==2.0.0` is recommended before migrating
+        > your database.
+
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.17.1
-    > will lose connectivity at this point.
-    > Upgrading to `fiftyone==0.17.1` is required.
-
-1. Validate that all datasets are now at version 0.24.0
+1. Validate that all datasets are now at version 0.25.0
 
     ```shell
     fiftyone migrate --info
     ```
 
-### From FiftyOne Teams Version 1.6.0
+### From FiftyOne Teams Versions 1.6.0 to 1.7.1
+
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> 2.0 or beyond.
+>
+> The license file now contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets; you may remove those secrets
+> from your `values.yaml` and from any secrets created outside of the Voxel51
+> install process.
+
+---
 
 1. Ensure all FiftyOne SDK users either
     - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
@@ -592,27 +626,35 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Teams version 1.7.1](#deploying-fiftyone-teams)
-1. (Recommended to [stay up to date](https://docs.voxel51.com/release-notes.html#fiftyone-teams-1-7-1))
-   Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.1
+1. Use the license file provided by the Voxel51 Customer Success Team to create
+   a new kubernetes secret:
+
+    ```shell
+        kubectl --namespace your-namepace create secret generic fiftyonelicense \
+          --from-file=license=./your-license-file
+    ```
+
+1. [Upgrade to FiftyOne Teams version 2.0.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.0.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check your database and dataset compatibility versions:
+1. Upgrade all the datasets
 
-    ```shell
-    fiftyone migrate --info
-    ```
-
-1. (Optional, Recommended) If your database is listed with a version prior to 0.24.0,
-   have an admin run this to upgrade all datasets to compatibility version 0.24.0
+    > **NOTE** Any FiftyOne SDK less than 2.0.0 will lose connectivity after
+    > this point.
+    > Upgrading all SDKs to `fiftyone==2.0.0` is recommended before migrating
+        > your database.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.17.0 will lose database connectivity
-      at this point.
+1. Validate that all datasets are now at version 0.25.0
+
+    ```shell
+    fiftyone migrate --info
+    ```
 
 ## Deploying FiftyOne Teams
 

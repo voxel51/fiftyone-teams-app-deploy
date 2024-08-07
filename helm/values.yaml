@@ -22,15 +22,6 @@ fiftyoneLicenseSecret: fiftyonelicense
 
 secret:
   fiftyone:
-    # Voxel51 provides you these secrets.
-    # They should be omitted when `casSettings.env.FIFTYONE_AUTH_MODE` is set to `internal`
-    apiClientId:
-    apiClientSecret:
-    auth0Domain:
-    clientId:
-    clientSecret:
-    organizationId:
-
     # These secrets come from your MongoDB implementation
     fiftyoneDatabaseName: fiftyone
     mongodbConnectionString: mongodb://username:password@somehostname/?authSource=admin

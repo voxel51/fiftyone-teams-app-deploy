@@ -287,38 +287,6 @@ Create a merged list of environment variables for fiftyone-teams-cas
 - name: NEXTAUTH_URL
   value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
 {{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
-- name: AUTH0_AUTH_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientId
-- name: AUTH0_AUTH_CLIENT_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: clientSecret
-- name: AUTH0_DOMAIN
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: auth0Domain
-- name: AUTH0_ISSUER_BASE_URL
-  value: "https://$(AUTH0_DOMAIN)"
-- name: AUTH0_MGMT_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: apiClientId
-- name: AUTH0_MGMT_CLIENT_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: apiClientSecret
-- name: AUTH0_ORGANIZATION
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: organizationId
 - name: TEAMS_API_DATABASE_NAME
   valueFrom:
     secretKeyRef:
