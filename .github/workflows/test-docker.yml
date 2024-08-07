@@ -61,7 +61,7 @@ jobs:
       - name: Run compose integration tests for internal
         shell: bash
         run: |
-          make start test-integration-compose-internal
+          make test-integration-compose-internal
   integration-compose-legacy:
     permissions:
       contents: read
@@ -96,4 +96,4 @@ jobs:
       - name: Run compose integration tests for legacy
         shell: bash
         run: |
-          make start test-integration-compose-legacy
+          make test-integration-compose-legacy
