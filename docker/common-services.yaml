@@ -98,7 +98,7 @@ services:
       CAS_MONGODB_URI: ${CAS_MONGO_DB_URI:-$FIFTYONE_DATABASE_URI}
       DEBUG: ${CAS_DEBUG:-cas:*,-cas:*:debug}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
-      LICENSE_KEY_FILE_PATHS: /opt/fiftyone/license
+      LICENSE_KEY_FILE_PATH: /opt/fiftyone/license
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your

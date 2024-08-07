@@ -51,6 +51,13 @@ jobs:
           registry: us-central1-docker.pkg.dev
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
+      - name: Create Local License From Secret
+        uses: mobiledevops/secret-to-file-action@v1
+        with:
+          base64-encoded-secret: ${{ secrets.FO_INTERNAL_LICENSE }}
+          filename: 'internal-license.key'
+          is-executable: false
+          working-directory: './docker'
       - name: Run compose integration tests for internal
         shell: bash
         run: |
@@ -79,6 +86,13 @@ jobs:
           registry: us-central1-docker.pkg.dev
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
+      - name: Create Local License From Secret
+        uses: mobiledevops/secret-to-file-action@v1
+        with:
+          base64-encoded-secret: ${{ secrets.FO_INTERNAL_LICENSE }}
+          filename: 'legacy-license.key'
+          is-executable: false
+          working-directory: './docker'
       - name: Run compose integration tests for legacy
         shell: bash
         run: |

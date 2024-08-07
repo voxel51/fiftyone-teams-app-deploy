@@ -75,22 +75,6 @@ ingress:
   tlsEnabled: true
 secret:
   fiftyone:
-    # In the `dev-fiftyone` Auth0 Tenant, the `local-dev` and
-    # `fiftyone-dev-api (Test Application)` applications are
-    # configured for running the app locally with https
-    auth0Domain: dev-fiftyone.us.auth0.com
-
-    # Set values for the `fiftyone-dev-api (Test Application)` application
-    apiClientId: ""
-    apiClientSecret: ""
-
-    # Set values for the `local-dev` application
-    clientId: ""
-    clientSecret: ""
-
-    # Set to the Identifier of the `fiftyone-demo` organization
-    organizationId: ""
-
     fiftyoneDatabaseName: fiftyone-internal
     # This password is randomly generated and is only used to initialize a local (ephemeral) MongoDB in `./skaffold-mongodb.yaml`
     # URL encoded to overcome errors with unencoded characters

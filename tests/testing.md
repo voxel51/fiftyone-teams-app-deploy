@@ -121,6 +121,11 @@ See
 ### Running Docker Compose Integration Tests
 
 1. Have Docker desktop running
+1. Copy the 'Voxel51 GitHub Legacy' license file to `docker/legacy-license.key`
+  * gs://voxel51-test/licenses/299a423b/1/license.key
+1. Copy the 'Voxel51 GitHub Internal' license file to
+   `docker/internal-license.key`
+  * gs://voxel51-test/licenses/299a423b/1/license.key
 1. tests/integration/compose/docker-compose-legacy-auth_test.goRun tests
 
     ```shell
@@ -150,6 +155,16 @@ See
 
     > **NOTE**: This command will prompt for sudo permission
     > on systems where 80 and 443 are privileged ports
+
+1. Copy the 'Voxel51 GitHub Internal' license file and convert it to a
+   kubernetes secret
+
+   ```
+   gcloud storage cp gs://voxel51-test/licenses/299a423b/1/license.key \
+     internal-license.key
+   kubectl --namespace your-namepace create secret generic fiftyonelicense \
+     --from-file=license=./internal-license.key
+   ````
 
 1. Run tests
 

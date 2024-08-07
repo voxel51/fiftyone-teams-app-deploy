@@ -612,6 +612,13 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
+> **NOTE**: If you had previously set
+> `teamsAppSettings.env.FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` to include your
+> Voxel51 private PyPI token, you can remove it from your configuration. The
+> Voxel51 private PyPI token is now loaded correctly from your license file.
+
+---
+
 1. Ensure all FiftyOne SDK users either
     - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
 

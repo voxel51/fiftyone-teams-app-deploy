@@ -109,7 +109,7 @@ These instructions assume you have
       please update the command line accordingly.
 - Your license file from the Voxel51 Customer Success Team
   - If you have not received this information, please contact your
-    [Voxel51 Support Team](mailto:support@voxel51.com).
+    Voxel51 Support Team via your agreed-upon mechanism (Slack, email, etc.)
 
 #### Download the Example Configuration Files
 
