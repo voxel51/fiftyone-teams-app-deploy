@@ -130,7 +130,7 @@ See
 
 * gs://voxel51-test/licenses/299a423b/1/license.key
 
-1. tests/integration/compose/docker-compose-legacy-auth_test.goRun tests
+1. Run tests
 
     ```shell
     make auth test-integration-compose
