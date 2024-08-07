@@ -131,6 +131,7 @@ See
    [Voxel51 License Management](https://computer-vision-team.uc.r.appspot.com/)
    UI
 1. Run tests
+
     ```shell
     make auth test-integration-compose
     ```

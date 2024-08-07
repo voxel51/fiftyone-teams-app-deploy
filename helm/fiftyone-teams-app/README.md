@@ -37,9 +37,8 @@ Use the license file provided by the Voxel51 Customer Success Team to create
 a new license file secret:
 
 ```shell
-   kubectl --namespace your-namepace create secret generic fiftyonelicense \
-     --from-file=license=./your-license-file
-```
+kubectl --namespace your-namepace create secret generic fiftyonelicense \
+  --from-file=license=./your-license-file
 
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
 
@@ -665,8 +664,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-        kubectl --namespace your-namepace create secret generic fiftyonelicense \
-          --from-file=license=./your-license-file
+    kubectl --namespace your-namepace create secret generic fiftyonelicense \
+      --from-file=license=./your-license-file
     ```
 
 1. [Upgrade to FiftyOne Teams v2.0.0](#deploying-fiftyone-teams)
@@ -737,8 +736,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-        kubectl --namespace your-namepace create secret generic fiftyonelicense \
-          --from-file=license=./your-license-file
+    kubectl --namespace your-namepace create secret generic fiftyonelicense \
+      --from-file=license=./your-license-file
     ```
 
 1. In your `values.yaml`, set the required values
@@ -809,8 +808,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-        kubectl --namespace your-namepace create secret generic fiftyonelicense \
-          --from-file=license=./your-license-file
+    kubectl --namespace your-namepace create secret generic fiftyonelicense \
+      --from-file=license=./your-license-file
     ```
 
 1. [Upgrade to FiftyOne Teams version 2.0.0](#deploying-fiftyone-teams)
