@@ -89,7 +89,7 @@ jobs:
       - name: Create Local License From Secret
         uses: mobiledevops/secret-to-file-action@v1
         with:
-          base64-encoded-secret: ${{ secrets.FO_INTERNAL_LICENSE }}
+          base64-encoded-secret: ${{ secrets.FO_LEGACY_LICENSE }}
           filename: 'legacy-license.key'
           is-executable: false
           working-directory: './docker'
