@@ -122,10 +122,14 @@ See
 
 1. Have Docker desktop running
 1. Copy the 'Voxel51 GitHub Legacy' license file to `docker/legacy-license.key`
-  * gs://voxel51-test/licenses/299a423b/1/license.key
+
+* gs://voxel51-test/licenses/299a423b/1/license.key
+
 1. Copy the 'Voxel51 GitHub Internal' license file to
    `docker/internal-license.key`
-  * gs://voxel51-test/licenses/299a423b/1/license.key
+
+* gs://voxel51-test/licenses/299a423b/1/license.key
+
 1. tests/integration/compose/docker-compose-legacy-auth_test.goRun tests
 
     ```shell
@@ -159,12 +163,12 @@ See
 1. Copy the 'Voxel51 GitHub Internal' license file and convert it to a
    kubernetes secret
 
-   ```
+   ```shell
    gcloud storage cp gs://voxel51-test/licenses/299a423b/1/license.key \
      internal-license.key
    kubectl --namespace your-namepace create secret generic fiftyonelicense \
      --from-file=license=./internal-license.key
-   ````
+   ```
 
 1. Run tests
 
