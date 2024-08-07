@@ -122,16 +122,15 @@ See
 
 1. Have Docker desktop running
 1. Copy the 'Voxel51 GitHub Legacy' license file to `docker/legacy-license.key`
-
-* gs://voxel51-test/licenses/299a423b/1/license.key
-
+   You can retrieve this from the
+   [Voxel51 License Management](https://computer-vision-team.uc.r.appspot.com/)
+   UI
 1. Copy the 'Voxel51 GitHub Internal' license file to
    `docker/internal-license.key`
-
-* gs://voxel51-test/licenses/299a423b/1/license.key
-
+   You can retrieve this from the
+   [Voxel51 License Management](https://computer-vision-team.uc.r.appspot.com/)
+   UI
 1. Run tests
-
     ```shell
     make auth test-integration-compose
     ```
