@@ -17,7 +17,7 @@ license file should be obtained from your Customer Success Team before
 upgrading to FiftyOne Teams 2.0 or beyond.
 
 The license file now contains all of the Auth0 configuration that was
-previously provided through kubernetes secrets; you may remove those secrets
+previously provided through environment variables; you may remove those secrets
 from your `.env` and from any secrets created outside of the Voxel51
 install process.
 
