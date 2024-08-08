@@ -287,7 +287,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "LICENSE_KEY_FILE_PATH",
+            "name": "LICENSE_KEY_FILE_PATHS",
             "value": "/opt/fiftyone/license"
           },
           {
@@ -369,7 +369,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "LICENSE_KEY_FILE_PATH",
+            "name": "LICENSE_KEY_FILE_PATHS",
             "value": "/opt/fiftyone/license"
           },
           {
@@ -456,7 +456,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "LICENSE_KEY_FILE_PATH",
+            "name": "LICENSE_KEY_FILE_PATHS",
             "value": "/opt/fiftyone/license"
           },
           {
