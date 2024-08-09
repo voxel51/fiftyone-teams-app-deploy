@@ -137,6 +137,16 @@ clean-unit-helm:  ## delete helm unit test output and reports
 	rm -rf tests/unit/helm/test_output || true
 	rm tests/unit/helm/test_output.log || true
 
+copy-license-file-docker:
+	gcloud storage cp gs://voxel51-test/licenses/299a423b/1/license.key ./docker/legacy-license.key
+	gcloud storage cp gs://voxel51-test/licenses/299a423b/1/license.key ./docker/internal-license.key
+
+copy-license-file-helm:
+	gcloud storage cp gs://voxel51-test/licenses/299a423b/1/license.key tests/fixtures/helm/internal-license.key
+
+dependencies-integration-compose:  ## create a (temporary) directory for mongodb container
+	mkdir -p /tmp/mongodb
+
 login:  ## Docker login to Google Artifact Registry (for accessing internal gcr.io container images)
 	gcloud auth print-access-token | \
 	  docker login -u oauth2accesstoken \
