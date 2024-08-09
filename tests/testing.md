@@ -121,15 +121,12 @@ See
 ### Running Docker Compose Integration Tests
 
 1. Have Docker desktop running
-1. Copy the 'Voxel51 GitHub Legacy' license file to `docker/legacy-license.key`
-   You can retrieve this from the
-   [Voxel51 License Management](https://computer-vision-team.uc.r.appspot.com/)
-   UI
-1. Copy the 'Voxel51 GitHub Internal' license file to
-   `docker/internal-license.key`
-   You can retrieve this from the
-   [Voxel51 License Management](https://computer-vision-team.uc.r.appspot.com/)
-   UI
+1. Copy License files from Google Cloud Storage
+
+    ```shell
+    make copy-license-file-docker
+    ```
+
 1. Run tests
 
     ```shell
@@ -154,20 +151,18 @@ See
    (to expose the services within minikube outside of minikube)
 
     ```shell
-    make tunnel
+    sudo make tunnel
     ```
 
     > **NOTE**: This command will prompt for sudo permission
     > on systems where 80 and 443 are privileged ports
 
-1. Copy the 'Voxel51 GitHub Internal' license file and convert it to a
-   kubernetes secret
+1. Copy the 'Voxel51 GitHub Internal' license file for use by
+   integration tests that convert it to a kubernetes secret
+   in each ephemeral namespace created for each test case.
 
    ```shell
-   gcloud storage cp gs://voxel51-test/licenses/299a423b/1/license.key \
-     internal-license.key
-   kubectl --namespace your-namepace create secret generic fiftyonelicense \
-     --from-file=license=./internal-license.key
+   make copy-license-file-helm
    ```
 
 1. Run tests

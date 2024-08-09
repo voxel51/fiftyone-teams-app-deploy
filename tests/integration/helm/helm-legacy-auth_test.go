@@ -231,6 +231,11 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				k8s.KubectlApplyFromString(subT, kubectlOptions, persistentVolumeClaimYaml)
 			}
 
+			// create licensefile secret
+			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFile)
+			defer k8s.KubectlDeleteFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
+			k8s.KubectlApplyFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
+
 			helmOptions := &helm.Options{
 				KubectlOptions: kubectlOptions,
 				SetValues:      testCase.values,
@@ -250,8 +255,20 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 
 				// get deployment
 				deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
+
+				waitTime := 5 * time.Second
+				retries := 72
+
+				// `teams-api` pod does not start successfully on the first attempt.
+				// extend the timeout to allow for it to be recreated and successfully start
+				if expected.name == "teams-api" {
+					waitTime = 60 * time.Second
+					retries = 6
+				}
+
 				// when pulling images for the first time, it may take longer than 90s
-				k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, 72, 5*time.Second) // 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+				// 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+				k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, retries, waitTime)
 
 				// get deployment match labels
 				selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
