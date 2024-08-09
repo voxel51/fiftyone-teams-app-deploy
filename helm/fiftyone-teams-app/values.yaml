@@ -278,7 +278,8 @@ casSettings:
   volumes: []
 
 # -- Secret name for FiftyOne license
-fiftyoneLicenseSecret: fiftyonelicense
+fiftyoneLicenseSecrets:
+  - fiftyone-license
 
 # -- Container image registry keys. [Reference][image-pull-secrets].
 imagePullSecrets: []

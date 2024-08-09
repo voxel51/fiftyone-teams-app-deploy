@@ -266,6 +266,20 @@ Create a merged list of environment variables for fiftyone-app
 {{- end -}}
 
 {{/*
+Create a string that contains all license files to be created in the
+`teams-cas` deployment
+*/}}
+{{- define "teams-cas.license-key-file-paths" }}
+{{- $licensePaths := "" }}
+{{- range $i, $name := .Values.fiftyoneLicenseSecrets }}
+{{- if $i }}
+{{- $licensePaths = print $licensePaths "," }}
+{{- end }}
+{{- $licensePaths = print "/opt/fiftyone/licenses/" $name }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create a merged list of environment variables for fiftyone-teams-cas
 */}}
 {{- define "teams-cas.env-vars-list" -}}
@@ -283,7 +297,7 @@ Create a merged list of environment variables for fiftyone-teams-cas
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
 - name: LICENSE_KEY_FILE_PATHS
-  value: "/opt/fiftyone/license"
+  value: {{ include "teams-cas.license-key-file-paths" . | quote }}
 - name: NEXTAUTH_URL
   value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
 {{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
