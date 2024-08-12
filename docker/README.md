@@ -506,7 +506,6 @@ existing configuration to migrate to a new Auth0 Tenant.
    license file to the `LOCAL_LICENSE_FILE_DIR` directory on your FiftyOne
    Teams docker compose host.
 
-
    ```shell
    . .env
    mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
