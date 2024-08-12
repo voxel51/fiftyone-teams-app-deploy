@@ -37,8 +37,9 @@ Use the license file provided by the Voxel51 Customer Success Team to create
 a new license file secret:
 
 ```shell
-kubectl --namespace your-namepace create secret generic fiftyonelicense \
+kubectl --namespace your-namepace create secret generic fiftyone-license \
   --from-file=license=./your-license-file
+```
 
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
 
@@ -491,7 +492,7 @@ appSettings:
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
-| fiftyoneLicenseSecret | string | `"fiftyonelicense"` | Secret name for FiftyOne license |
+| fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Teams Licenses (one per org) |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
@@ -664,7 +665,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace create secret generic fiftyonelicense \
+    kubectl --namespace your-namepace create secret generic fiftyone-license \
       --from-file=license=./your-license-file
     ```
 
@@ -736,7 +737,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace create secret generic fiftyonelicense \
+    kubectl --namespace your-namepace create secret generic fiftyone-license \
       --from-file=license=./your-license-file
     ```
 
@@ -808,7 +809,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace create secret generic fiftyonelicense \
+    kubectl --namespace your-namepace create secret generic fiftyone-license \
       --from-file=license=./your-license-file
     ```
 

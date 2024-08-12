@@ -53,9 +53,11 @@ spec:
           resources:
             {{- toYaml .Values.casSettings.resources | nindent 12 }}
           volumeMounts:
-            - name: fiftyonelicensefile
-              mountPath: /opt/fiftyone
+            {{- range $name := .Values.fiftyoneLicenseSecrets }}
+            - name: {{ print $name }}
+              mountPath: /opt/fiftyone/licenses
               readOnly: true
+            {{- end }}
               {{- with .Values.casSettings.volumeMounts }}
               {{- toYaml . | nindent 12 }}
               {{- end }}
@@ -72,12 +74,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: fiftyonelicensefile
+        {{- range $name := .Values.fiftyoneLicenseSecrets }}
+        - name: {{ print $name }}
           secret:
-            secretName: {{ .Values.fiftyoneLicenseSecret }}
+            secretName: {{ print $name }}
             items:
               - key: license
-                path: license
+                path: {{ print $name }}
+        {{- end }}
         {{- with .Values.casSettings.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

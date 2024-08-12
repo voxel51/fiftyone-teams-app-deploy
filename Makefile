@@ -137,9 +137,6 @@ clean-unit-helm:  ## delete helm unit test output and reports
 	rm -rf tests/unit/helm/test_output || true
 	rm tests/unit/helm/test_output.log || true
 
-dependencies-integration-compose:  ## create a (temporary) directory for mongodb container
-	mkdir -p /tmp/mongodb
-
 login:  ## Docker login to Google Artifact Registry (for accessing internal gcr.io container images)
 	gcloud auth print-access-token | \
 	  docker login -u oauth2accesstoken \
@@ -167,11 +164,11 @@ test-unit-helm-interleaved: install-terratest-log-parser  ## run go test on the 
 
 test-integration-compose: test-integration-compose-internal test-integration-compose-legacy ## run go test on the tests/integration/compose directory for both internal and legacy auth modes
 
-test-integration-compose-internal: dependencies-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode
+test-integration-compose-internal: ## run go test on the tests/integration/compose directory for internal auth mode
 	@cd tests/integration/compose; \
 	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth
 
-test-integration-compose-legacy: dependencies-integration-compose ## run go test on the tests/integration/compose directory for legacy auth mode
+test-integration-compose-legacy: ## run go test on the tests/integration/compose directory for legacy auth mode
 	@cd tests/integration/compose; \
 	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth
 

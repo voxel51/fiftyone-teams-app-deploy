@@ -285,7 +285,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"CAS_URL=https://example.fiftyone.ai",
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
-				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
 				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -362,7 +362,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"CAS_URL=https://example.fiftyone.ai",
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
-				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
 				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -442,7 +442,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"CAS_URL=https://example.fiftyone.ai",
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
-				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
 				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -521,7 +521,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"CAS_URL=https://example.fiftyone.ai",
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
-				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
 				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -810,8 +810,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "/opt/fiftyone/license",
-					Target:      "/opt/fiftyone/license",
+					Source:      "/some/directory/with/licenses/",
+					Target:      "/opt/fiftyone/licenses",
 					ReadOnly:    true,
 					Consistency: "",
 				},
@@ -862,8 +862,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "/opt/fiftyone/license",
-					Target:      "/opt/fiftyone/license",
+					Source:      "/some/directory/with/licenses/",
+					Target:      "/opt/fiftyone/licenses",
 					ReadOnly:    true,
 					Consistency: "",
 				},
@@ -907,8 +907,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "/opt/fiftyone/license",
-					Target:      "/opt/fiftyone/license",
+					Source:      "/some/directory/with/licenses/",
+					Target:      "/opt/fiftyone/licenses",
 					ReadOnly:    true,
 					Consistency: "",
 				},

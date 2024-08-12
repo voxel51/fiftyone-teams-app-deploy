@@ -286,7 +286,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
-				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 			},
 		},
@@ -366,7 +366,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
-				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 			},
 		},
@@ -445,7 +445,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
-				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/license",
+				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 			},
 		},
@@ -727,8 +727,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "/opt/fiftyone/license",
-					Target:      "/opt/fiftyone/license",
+					Source:      "/some/directory/with/licenses/",
+					Target:      "/opt/fiftyone/licenses",
 					ReadOnly:    true,
 					Consistency: "",
 				},
@@ -779,8 +779,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "/opt/fiftyone/license",
-					Target:      "/opt/fiftyone/license",
+					Source:      "/some/directory/with/licenses/",
+					Target:      "/opt/fiftyone/licenses",
 					ReadOnly:    true,
 					Consistency: "",
 				},
@@ -824,8 +824,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "/opt/fiftyone/license",
-					Target:      "/opt/fiftyone/license",
+					Source:      "/some/directory/with/licenses/",
+					Target:      "/opt/fiftyone/licenses",
 					ReadOnly:    true,
 					Consistency: "",
 				},
