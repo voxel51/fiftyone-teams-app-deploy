@@ -20,6 +20,6 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
       - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
     volumes:
-      - type: bind
-        source: ${MONGODB_DIR}
-        target: /data/db
+      - mongodbvol:/data/db
+volumes:
+  mongodbvol:

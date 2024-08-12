@@ -275,8 +275,9 @@ Create a string that contains all license files to be created in the
 {{- if $i }}
 {{- $licensePaths = print $licensePaths "," }}
 {{- end }}
-{{- $licensePaths = print "/opt/fiftyone/licenses/" $name }}
+{{- $licensePaths = print $licensePaths "/opt/fiftyone/licenses/" $name }}
 {{- end }}
+{{- print $licensePaths }}
 {{- end }}
 
 {{/*

@@ -249,6 +249,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 			argsUp = append(argsUp, "up", "--detach")
 			argsDown = append(argsDown, args...)
 			argsDown = append(argsDown, "down", "--remove-orphans", "--timeout", "2")
+			argsDown = append(argsDown, "--volumes")
 
 			// Config
 			docker.RunDockerCompose(

@@ -21,12 +21,15 @@ previously provided through environment variables; you may remove those secrets
 from your `.env` and from any secrets created outside of the Voxel51
 install process.
 
-Copy the license file to your FiftyOne Teams docker compose host and set the
-`LOCAL_LICENSE_FILE_PATH` value in your `.env` to point at the license file.
+Set the `LOCAL_LICENSE_FILE_DIR` value in your .env file and copy the license
+file to the `LOCAL_LICENSE_FILE_DIR` directory on your FiftyOne Teams docker
+compose host.
 e.g.:
 
 ```shell
-LOCAL_LICENSE_FILE_PATH=/opt/fiftyone/license.key
+. .env
+mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
+mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 ```
 
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
@@ -499,9 +502,17 @@ existing configuration to migrate to a new Auth0 Tenant.
     - `FIFTYONE_ENCRYPTION_KEY`
     - `FIFTYONE_API_URI`
     - `FIFTYONE_AUTH_SECRET`
-1. Copy the license file to your FiftyOne Teams docker compose host and set the
-   `LOCAL_LICENSE_FILE_PATH` value in your `.env` to point at the license file.
-    e.g.: `LOCAL_LICENSE_FILE_PATH=/opt/fiftyone/license.key`
+1. Set the `LOCAL_LICENSE_FILE_DIR` value in your .env file and copy the
+   license file to the `LOCAL_LICENSE_FILE_DIR` directory on your FiftyOne
+   Teams docker compose host.
+
+
+   ```shell
+   . .env
+   mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
+   mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
+   ```
+
 1. Ensure your web server routes are updated to include routing
    `/cas/*` traffic to the `teams-cas` service.
    Example nginx configurations can be found
@@ -577,9 +588,16 @@ existing configuration to migrate to a new Auth0 Tenant.
     > the seed values from the `.env.template` file.
     > See
     > [Central Authentication Service](#central-authentication-service)
-1. Copy the license file to your FiftyOne Teams docker compose host and set the
-   `LOCAL_LICENSE_FILE_PATH` value in your `.env` to point at the license file.
-    e.g.: `LOCAL_LICENSE_FILE_PATH=/opt/fiftyone/license.key`
+1. Set the `LOCAL_LICENSE_FILE_DIR` value in your .env file and copy the
+   license file to the `LOCAL_LICENSE_FILE_DIR` directory on your FiftyOne
+   Teams docker compose host.
+
+   ```shell
+   . .env
+   mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
+   mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
+   ```
+
 1. Ensure all FiftyOne SDK users either
     - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
 
@@ -641,9 +659,16 @@ existing configuration to migrate to a new Auth0 Tenant.
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. Copy the license file to your FiftyOne Teams docker compose host and set the
-   `LOCAL_LICENSE_FILE_PATH` value in your `.env` to point at the license file.
-    e.g.: `LOCAL_LICENSE_FILE_PATH=/opt/fiftyone/license.key`
+1. Set the `LOCAL_LICENSE_FILE_DIR` value in your .env file and copy the
+   license file to the `LOCAL_LICENSE_FILE_DIR` directory on your FiftyOne
+   Teams docker compose host.
+
+   ```shell
+   . .env
+   mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
+   mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
+   ```
+
 1. [Upgrade to FiftyOne Teams version 2.0.0](#deploying-fiftyone-teams)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.0.0
     - Login to the FiftyOne Teams UI
@@ -772,7 +797,7 @@ for the FiftyOne Teams API service.
 | `GRAPHQL_DEFAULT_LIMIT`                      | Default GraphQL limit for results                                                                                                                                                                                                                                              | No                        |
 | `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                        | No                        |
 | `HTTPS_PROXY_URL`                            | The URL for your environment https proxy                                                                                                                                                                                                                                       | No                        |
-| `LOCAL_LICENSE_FILE_PATH`                    | Location of the FiftyOne Teams license file on the local server.                                                                                                                                                                                                               | Yes                          |
+| `LOCAL_LICENSE_FILE_DIR`                    | Location of the directory that contains the FiftyOne Teams license file on the local server.                                                                                                                                                                                                               | Yes                          |
 | `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
 
 <!-- Reference Links -->

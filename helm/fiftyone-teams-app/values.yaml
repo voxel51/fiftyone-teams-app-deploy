@@ -277,7 +277,7 @@ casSettings:
   # -- Volumes for teams-cas. [Reference][volumes].
   volumes: []
 
-# -- Secret name for FiftyOne license
+# -- List of secrets for FiftyOne Teams Licenses (one per org)
 fiftyoneLicenseSecrets:
   - fiftyone-license
 
