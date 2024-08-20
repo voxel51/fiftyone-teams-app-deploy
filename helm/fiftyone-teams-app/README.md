@@ -15,43 +15,33 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 1.7.1](https://img.shields.io/badge/Version-1.7.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.7.1](https://img.shields.io/badge/AppVersion-v1.7.1-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.0.0](https://img.shields.io/badge/AppVersion-v2.0.0-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 <!-- markdownlint-enable line-length -->
 
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
-## Known Issues for FiftyOne Teams v1.6.0 and Above
+## FiftyOne Teams v2.0+ Requires a License File
 
-### "Install Fiftyone" Instructions Missing PyPI Token
+FiftyOne Teams v2.0 introduces a new requirement for a license file.  This
+license file should be obtained from your Customer Success Team before
+upgrading to FiftyOne Teams 2.0 or beyond.
 
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-introduces an abstraction layer between FiftyOne Teams and Auth0.  This
-abstraction layer makes it possible to deploy FiftyOne Teams without using Auth0
-as an Identity Service Provider.
+The license file now contains all of the Auth0 configuration that was
+previously provided through kubernetes secrets; you may remove those secrets
+from your `values.yaml` and from any secrets created outside of the Voxel51
+install process.
 
-However, metadata that used to be provided to FiftyOne Teams by Auth0 is no
-longer available; which has resulted in an incomplete set of instructions in the
-[Install FiftyOne](https://docs.voxel51.com/teams/installation.html#python-sdk)
-instructions for bash.
+Use the license file provided by the Voxel51 Customer Success Team to create
+a new license file secret:
 
-Specifically, you will see the word `TOKEN` where your Voxel51 PyPI token used
-to appear.
-
-While Voxel51 works to address this issue, you can override the install
-instructions by setting the `FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` environment
-value for the `teams-app` deployment.  This can be accomplished by adding
-something like the following to your `values.yaml`:
-
-```yaml
-teamsAppSettings:
-  env:
-    FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install -U --index-url https://<your PyPI Token>@pypi.fiftyone.ai fiftyone==0.17.1
+```shell
+kubectl --namespace your-namepace create secret generic fiftyone-license \
+  --from-file=license=./your-license-file
 ```
 
-If you need your PyPI token, please contact your Customer Success representative
-and they will provide it to you.
+## Known Issues for FiftyOne Teams v1.6.0 and Above
 
 ### Invitations Disabled for Internal Authentication Mode
 
@@ -63,16 +53,6 @@ and
 
 Inviting users to join your FiftyOne Teams instance is not currently supported
 when `FIFTYONE_AUTH_MODE` is set to `internal`.
-
-### Super Admin UI Disabled for Legacy Authentication Mode
-
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-includes a new
-[Super Admin UI](https://docs.voxel51.com/teams/pluggable_auth.html#super-admin-ui)
-for deployment-wide authentication configurations.
-
-The FiftyOne Teams Super Admin UI is disabled when `FIFTYONE_AUTH_MODE` is set
-to `legacy`.
 
 ## Table of Contents
 
@@ -95,7 +75,7 @@ to `legacy`.
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
   - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
-  - [From FiftyOne Teams Version 1.6.0](#from-fiftyone-teams-version-160)
+  - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
 - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
 
 <!-- tocstop -->
@@ -248,7 +228,7 @@ There are three modes for plugins
       - Plugins resource consumption does not affect `fiftyone-app`
 
 To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app/blob/main/docs/custom-plugins.md).
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 To use the FiftyOne Teams UI to deploy plugins,
 navigate to `https://<DEPLOY_URL>/settings/plugins`.
@@ -486,7 +466,7 @@ appSettings:
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
 | casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
-| casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database |
+| casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
@@ -512,6 +492,7 @@ appSettings:
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
+| fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Teams Licenses (one per org) |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
@@ -563,17 +544,11 @@ appSettings:
 | pluginsSettings.volumeMounts | list | `[]` | Volume mounts for teams-plugins pods. [Reference][volumes]. |
 | pluginsSettings.volumes | list | `[]` | Volumes for teams-plugins. [Reference][volumes]. |
 | secret.create | bool | `true` | Controls whether to create the secret named `secret.name`. |
-| secret.fiftyone.apiClientId | string | `""` | Voxel51-provided Auth0 API Client ID. |
-| secret.fiftyone.apiClientSecret | string | `""` | Voxel51-provided Auth0 API Client Secret. |
-| secret.fiftyone.auth0Domain | string | `""` | Voxel51-provided Auth0 Domain. |
-| secret.fiftyone.clientId | string | `""` | Voxel51-provided Auth0 Client ID. |
-| secret.fiftyone.clientSecret | string | `""` | Voxel51-provided Auth0 Client Secret. |
 | secret.fiftyone.cookieSecret | string | `""` | A randomly generated string for cookie encryption. To generate, run `openssl rand -hex 32`. |
 | secret.fiftyone.encryptionKey | string | `""` | Encryption key for storage credentials. [Reference][fiftyone-encryption-key]. |
 | secret.fiftyone.fiftyoneAuthSecret | string | `""` | A randomly generated string for CAS Authentication. This can be any string you care to use generated by any mechanism you   prefer. This is used for inter-service authentication and for the SuperUser to  authenticate at the CAS UI to configure the Central Authentication Service. |
 | secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Teams. |
 | secret.fiftyone.mongodbConnectionString | string | `""` | MongoDB Connection String. [Reference][mongodb-connection-string]. |
-| secret.fiftyone.organizationId | string | `""` | Voxel51-provided Auth0 Organization ID. |
 | secret.name | string | `"fiftyone-teams-secrets"` | Name of the secret (existing or to be created) in the namespace `namespace.name`. |
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
 | serviceAccount.create | bool | `true` | Controls whether to create the service account named `serviceAccount.name`. |
@@ -584,10 +559,10 @@ appSettings:
 | teamsAppSettings.autoscaling.minReplicas | int | `2` | Minimum Replicas for horizontal autoscaling for teams-app. |
 | teamsAppSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for teams-app. |
 | teamsAppSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for teams-app. |
-| teamsAppSettings.dnsName | string | `""` | DNS Name for the teams-app service. Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`) and teams-app deployment environment variable `AUTH0_BASE_URL`. |
+| teamsAppSettings.dnsName | string | `""` | DNS Name for the teams-app service. Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`) |
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"0.17.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.0.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Teams API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
@@ -600,7 +575,6 @@ appSettings:
 | teamsAppSettings.replicaCount | int | `2` | Number of pods in the teams-app deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-app. [Reference][resources]. |
 | teamsAppSettings.securityContext | object | `{}` | Container security configuration for teams-app. [Reference][container-security-context]. |
-| teamsAppSettings.serverPathPrefix | string | `"/"` | Prefix for path-based Ingress routing for teams-app. |
 | teamsAppSettings.service.annotations | object | `{}` | Service annotations for teams-app. [Reference][annotations]. |
 | teamsAppSettings.service.containerPort | int | `3000` | Service container port for teams-app. |
 | teamsAppSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes]. |
@@ -648,10 +622,23 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.7.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
+
+---
+
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> 2.0 or beyond.
+>
+> The license file now contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets; you may remove those secrets
+> from your `values.yaml` and from any secrets created outside of the Voxel51
+> install process.
+
+---
 
 1. In your `values.yaml`, set the required values
     1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
@@ -674,28 +661,36 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
                 servicePort: 80
         ```
 
-1. [Upgrade to FiftyOne Teams v1.7.1](#deploying-fiftyone-teams)
+1. Use the license file provided by the Voxel51 Customer Success Team to create
+   a new kubernetes secret:
+
+    ```shell
+    kubectl --namespace your-namepace create secret generic fiftyone-license \
+      --from-file=license=./your-license-file
+    ```
+
+1. [Upgrade to FiftyOne Teams v2.0.0](#deploying-fiftyone-teams)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==0.17.1`
-1. Upgrade your FiftyOne SDKs to version 0.17.1
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.0.0`
+1. Upgrade your FiftyOne SDKs to version 2.0.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Confirm that datasets were migrated to version 0.24.0
+1. Upgrade all the datasets
+
+    ```shell
+    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+    ```
+
+1. Validate that all datasets are now at version 0.25.0
 
     ```shell
     fiftyone migrate --info
     ```
 
-    - If not all datasets have been upgraded, have an admin run
-
-        ```shell
-        FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-        ```
-
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v1.7.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -711,6 +706,19 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
 
+---
+
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> 2.0 or beyond.
+>
+> The license file now contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets; you may remove those secrets
+> from your `values.yaml` and from any secrets created outside of the Voxel51
+> install process.
+
+---
+
 1. Ensure all FiftyOne SDK users either
     - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
 
@@ -724,6 +732,14 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         ```shell
         unset FIFTYONE_DATABASE_ADMIN
         ```
+
+1. Use the license file provided by the Voxel51 Customer Success Team to create
+   a new kubernetes secret:
+
+    ```shell
+    kubectl --namespace your-namepace create secret generic fiftyone-license \
+      --from-file=license=./your-license-file
+    ```
 
 1. In your `values.yaml`, set the required values
     1. `secret.fiftyone.encryptionKey` (or your deployment's
@@ -733,28 +749,47 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 1.7.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.1
+1. [Upgrade to FiftyOne Teams version 2.0.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.0.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
+    > **NOTE** Any FiftyOne SDK less than 2.0.0 will lose connectivity after
+    > this point.
+    > Upgrading all SDKs to `fiftyone==2.0.0` is recommended before migrating
+        > your database.
+
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    > **NOTE** Any FiftyOne SDK less than 0.17.1
-    > will lose connectivity at this point.
-    > Upgrading to `fiftyone==0.17.1` is required.
-
-1. Validate that all datasets are now at version 0.24.0
+1. Validate that all datasets are now at version 0.25.0
 
     ```shell
     fiftyone migrate --info
     ```
 
-### From FiftyOne Teams Version 1.6.0
+### From FiftyOne Teams Versions 1.6.0 to 1.7.1
+
+> **NOTE**: Upgrading to FiftyOne Teams v2.0.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> 2.0 or beyond.
+>
+> The license file now contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets; you may remove those secrets
+> from your `values.yaml` and from any secrets created outside of the Voxel51
+> install process.
+
+---
+
+> **NOTE**: If you had previously set
+> `teamsAppSettings.env.FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` to include your
+> Voxel51 private PyPI token, you can remove it from your configuration. The
+> Voxel51 private PyPI token is now loaded correctly from your license file.
+
+---
 
 1. Ensure all FiftyOne SDK users either
     - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
@@ -770,27 +805,35 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Teams version 1.7.1](#deploying-fiftyone-teams)
-1. (Recommended to [stay up to date](https://docs.voxel51.com/release-notes.html#fiftyone-teams-1-7-1))
-   Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 0.17.1
+1. Use the license file provided by the Voxel51 Customer Success Team to create
+   a new kubernetes secret:
+
+    ```shell
+    kubectl --namespace your-namepace create secret generic fiftyone-license \
+      --from-file=license=./your-license-file
+    ```
+
+1. [Upgrade to FiftyOne Teams version 2.0.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.0.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Check your database and dataset compatibility versions:
+1. Upgrade all the datasets
 
-    ```shell
-    fiftyone migrate --info
-    ```
-
-1. (Optional, Recommended) If your database is listed with a version prior to 0.24.0,
-   have an admin run this to upgrade all datasets to compatibility version 0.24.0
+    > **NOTE** Any FiftyOne SDK less than 2.0.0 will lose connectivity after
+    > this point.
+    > Upgrading all SDKs to `fiftyone==2.0.0` is recommended before migrating
+        > your database.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-    - **NOTE** Any FiftyOne SDK less than 0.17.0 will lose database connectivity
-      at this point.
+1. Validate that all datasets are now at version 0.25.0
+
+    ```shell
+    fiftyone migrate --info
+    ```
 
 ## Deploying FiftyOne Teams
 

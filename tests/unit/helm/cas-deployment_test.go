@@ -287,66 +287,12 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "LICENSE_KEY_FILE_PATHS",
+            "value": "/opt/fiftyone/licenses/fiftyone-license"
+          },
+          {
             "name": "NEXTAUTH_URL",
             "value": "https:///cas/api/auth"
-          },
-          {
-            "name": "AUTH0_AUTH_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_AUTH_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_DOMAIN",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "auth0Domain"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ISSUER_BASE_URL",
-            "value": "https://$(AUTH0_DOMAIN)"
-          },
-          {
-            "name": "AUTH0_MGMT_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "apiClientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_MGMT_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "apiClientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ORGANIZATION",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "organizationId"
-              }
-            }
           },
           {
             "name": "TEAMS_API_DATABASE_NAME",
@@ -423,66 +369,12 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "LICENSE_KEY_FILE_PATHS",
+            "value": "/opt/fiftyone/licenses/fiftyone-license"
+          },
+          {
             "name": "NEXTAUTH_URL",
             "value": "https:///cas/api/auth"
-          },
-          {
-            "name": "AUTH0_AUTH_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_AUTH_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "clientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_DOMAIN",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "auth0Domain"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ISSUER_BASE_URL",
-            "value": "https://$(AUTH0_DOMAIN)"
-          },
-          {
-            "name": "AUTH0_MGMT_CLIENT_ID",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "apiClientId"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_MGMT_CLIENT_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "apiClientSecret"
-              }
-            }
-          },
-          {
-            "name": "AUTH0_ORGANIZATION",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "organizationId"
-              }
-            }
           },
           {
             "name": "TEAMS_API_DATABASE_NAME",
@@ -564,6 +456,10 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "LICENSE_KEY_FILE_PATHS",
+            "value": "/opt/fiftyone/licenses/fiftyone-license"
+          },
+          {
             "name": "NEXTAUTH_URL",
             "value": "https:///cas/api/auth"
           },
@@ -590,6 +486,89 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          }
+        ]`
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"multipleLicenses",
+			map[string]string{
+				"fiftyoneLicenseSecrets[0]": "fiftyonelicense",
+				"fiftyoneLicenseSecrets[1]": "another-fiftyone-license",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := `[
+          {
+            "name": "CAS_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "CAS_URL",
+            "value": "https://"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "LICENSE_KEY_FILE_PATHS",
+            "value": "/opt/fiftyone/licenses/fiftyonelicense,/opt/fiftyone/licenses/another-fiftyone-license"
+          },
+          {
+            "name": "NEXTAUTH_URL",
+            "value": "https:///cas/api/auth"
+          },
+          {
+            "name": "TEAMS_API_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "TEAMS_API_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "CAS_DATABASE_NAME",
+            "value": "cas"
+          },
+          {
+            "name": "CAS_DEFAULT_USER_ROLE",
+            "value": "GUEST"
+          },
+          {
+            "name": "CAS_MONGODB_URI_KEY",
+            "value": "mongodbConnectionString"
+          },
+          {
+            "name": "DEBUG",
+            "value": "cas:*,-cas:*:debug"
+          },
+          {
+            "name": "FIFTYONE_AUTH_MODE",
+            "value": "legacy"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -1072,7 +1051,17 @@ func (s *deploymentCasTemplateTest) TestContainerVolumeMounts() {
 			"defaultValues",
 			nil,
 			func(volumeMounts []corev1.VolumeMount) {
-				s.Nil(volumeMounts, "VolumeMounts should be nil")
+				expectedJSON := `[
+          {
+            "name": "fiftyone-license",
+            "mountPath": "/opt/fiftyone/licenses",
+            "readOnly": true
+          }
+        ]`
+				var expectedVolumeMounts []corev1.VolumeMount
+				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+				s.NoError(err)
+				s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
 			},
 		},
 		{
@@ -1083,6 +1072,11 @@ func (s *deploymentCasTemplateTest) TestContainerVolumeMounts() {
 			},
 			func(volumeMounts []corev1.VolumeMount) {
 				expectedJSON := `[
+          {
+            "name": "fiftyone-license",
+            "mountPath": "/opt/fiftyone/licenses",
+            "readOnly": true
+          },
           {
             "mountPath": "/test-data-volume",
             "name": "test-volume"
@@ -1105,12 +1099,42 @@ func (s *deploymentCasTemplateTest) TestContainerVolumeMounts() {
 			func(volumeMounts []corev1.VolumeMount) {
 				expectedJSON := `[
           {
+            "name": "fiftyone-license",
+            "mountPath": "/opt/fiftyone/licenses",
+            "readOnly": true
+          },
+          {
             "mountPath": "/test-data-volume1",
             "name": "test-volume1"
           },
           {
             "mountPath": "/test-data-volume2",
             "name": "test-volume2"
+          }
+        ]`
+				var expectedVolumeMounts []corev1.VolumeMount
+				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+				s.NoError(err)
+				s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
+			},
+		},
+		{
+			"multipleLicenseFiles",
+			map[string]string{
+				"fiftyoneLicenseSecrets[0]": "fiftyonelicense",
+				"fiftyoneLicenseSecrets[1]": "another-fiftyone-license",
+			},
+			func(volumeMounts []corev1.VolumeMount) {
+				expectedJSON := `[
+          {
+            "name": "fiftyonelicense",
+            "mountPath": "/opt/fiftyone/licenses",
+            "readOnly": true
+          },
+          {
+            "name": "another-fiftyone-license",
+            "mountPath": "/opt/fiftyone/licenses",
+            "readOnly": true
           }
         ]`
 				var expectedVolumeMounts []corev1.VolumeMount
@@ -1550,7 +1574,25 @@ func (s *deploymentCasTemplateTest) TestVolumes() {
 			"defaultValues",
 			nil,
 			func(volumes []corev1.Volume) {
-				s.Nil(volumes, "Volumes should be nil")
+				expectedJSON := `[
+          {
+            "name": "fiftyone-license",
+            "secret": {
+              "secretName": "fiftyone-license",
+              "items": [
+                {
+                  "key": "license",
+                  "path": "fiftyone-license"
+                }
+              ]
+            }
+          }
+        ]`
+				var expectedVolumes []corev1.Volume
+				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+				s.NoError(err)
+				s.Equal(expectedVolumes, volumes, "Volumes should be equal")
+
 			},
 		},
 		{
@@ -1561,6 +1603,18 @@ func (s *deploymentCasTemplateTest) TestVolumes() {
 			},
 			func(volumes []corev1.Volume) {
 				expectedJSON := `[
+          {
+            "name": "fiftyone-license",
+            "secret": {
+              "secretName": "fiftyone-license",
+              "items": [
+                {
+                  "key": "license",
+                  "path": "fiftyone-license"
+                }
+              ]
+            }
+          },
           {
             "name": "test-volume",
             "hostPath": {
@@ -1577,6 +1631,7 @@ func (s *deploymentCasTemplateTest) TestVolumes() {
 		{
 			"overrideVolumesMultiple",
 			map[string]string{
+				"fiftyoneLicenseSecret":                                  "fiftyone-license", // pragma: allowlist secret
 				"casSettings.volumes[0].name":                            "test-volume1",
 				"casSettings.volumes[0].hostPath.path":                   "/test-volume1",
 				"casSettings.volumes[1].name":                            "pvc1",
@@ -1584,6 +1639,18 @@ func (s *deploymentCasTemplateTest) TestVolumes() {
 			},
 			func(volumes []corev1.Volume) {
 				expectedJSON := `[
+          {
+            "name": "fiftyone-license",
+            "secret": {
+              "secretName": "fiftyone-license",
+              "items": [
+                {
+                  "key": "license",
+                  "path": "fiftyone-license"
+                }
+              ]
+            }
+          },
           {
             "name": "test-volume1",
             "hostPath": {

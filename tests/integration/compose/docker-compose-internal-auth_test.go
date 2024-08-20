@@ -90,7 +90,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-api",
 					url:              "http://127.0.0.1:8000/health",
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
@@ -127,7 +127,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-api",
 					url:              "http://127.0.0.1:8000/health",
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
@@ -164,7 +164,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-api",
 					url:              "http://127.0.0.1:8000/health",
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
@@ -249,6 +249,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 			argsUp = append(argsUp, "up", "--detach")
 			argsDown = append(argsDown, args...)
 			argsDown = append(argsDown, "down", "--remove-orphans", "--timeout", "2")
+			argsDown = append(argsDown, "--volumes")
 
 			// Config
 			docker.RunDockerCompose(

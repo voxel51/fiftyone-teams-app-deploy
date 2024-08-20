@@ -10,17 +10,19 @@
 # imagePullSecrets:
 #   - name: regcred
 
+# # Voxel51 provided you with a license file.  You can use the following command
+# # to create a fiftyoneLicenseSecret:
+# #
+# # ```shell
+# #  kubectl --namespace your-namepace create secret generic fiftyone-license \
+# #    --from-file=license=./your-license-file
+# # ```
+# # Then set the name(s) of your license file secret(s) here (one per org):
+fiftyoneLicenseSecrets:
+  - fiftyone-license
+
 secret:
   fiftyone:
-    # Voxel51 provides you these secrets.
-    # They should be omitted when `casSettings.env.FIFTYONE_AUTH_MODE` is set to `internal`
-    apiClientId:
-    apiClientSecret:
-    auth0Domain:
-    clientId:
-    clientSecret:
-    organizationId:
-
     # These secrets come from your MongoDB implementation
     fiftyoneDatabaseName: fiftyone
     mongodbConnectionString: mongodb://username:password@somehostname/?authSource=admin
@@ -66,12 +68,12 @@ secret:
 #     FIFTYONE_PLUGINS_DIR: /opt/plugins
 #     # Set FIFTYONE_TEAMS_VERSION_OVERRIDE to override the `Install FiftyOne`
 #     # bash command in the `Settings > Install FiftyOne` modal
-#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==0.17.1
+#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.0.0
 
 
 appSettings:
   env:
-    # FIFTYONE_DATABASE_ADMIN is set to `false` by default for v1.7.1
+    # FIFTYONE_DATABASE_ADMIN is set to `false` by default for v2.0.0
     # If you are performing a new install or an upgrade from v1.0 or earlier you may want to set
     # this value to `true`.
     # Please see https://helm.fiftyone.ai/#initial-installation-vs-upgrades for details

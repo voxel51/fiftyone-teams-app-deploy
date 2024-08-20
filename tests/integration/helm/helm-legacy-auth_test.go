@@ -65,7 +65,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-api",
 					url:              "https://local.fiftyone.ai/health",
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
@@ -113,7 +113,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-api",
 					url:              "https://local.fiftyone.ai/health",
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
@@ -162,7 +162,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-api",
 					url:              "https://local.fiftyone.ai/health",
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},

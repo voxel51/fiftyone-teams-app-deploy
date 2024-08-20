@@ -107,9 +107,9 @@ These instructions assume you have
   - Have `voxel51-docker.json` file in the current directory
     - If `voxel51-docker.json` is not in the current directory,
       please update the command line accordingly.
-- Auth0 configuration information from Voxel51.
+- Your license file from the Voxel51 Customer Success Team
   - If you have not received this information, please contact your
-    [Voxel51 Support Team](mailto:support@voxel51.com).
+    Voxel51 Support Team via your agreed-upon mechanism (Slack, email, etc.)
 
 #### Download the Example Configuration Files
 
