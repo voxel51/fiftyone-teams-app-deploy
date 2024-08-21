@@ -231,8 +231,8 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				k8s.KubectlApplyFromString(subT, kubectlOptions, persistentVolumeClaimYaml)
 			}
 
-			// create licensefile secret
-			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFile)
+			// create license-file secret
+			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFileLegacy)
 			defer k8s.KubectlDeleteFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 			k8s.KubectlApplyFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 

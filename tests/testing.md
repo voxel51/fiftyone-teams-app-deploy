@@ -121,11 +121,6 @@ See
 ### Running Docker Compose Integration Tests
 
 1. Have Docker desktop running
-1. Copy License files from Google Cloud Storage
-
-    ```shell
-    make copy-license-file-docker
-    ```
 
 1. Run tests
 
@@ -156,14 +151,6 @@ See
 
     > **NOTE**: This command will prompt for sudo permission
     > on systems where 80 and 443 are privileged ports
-
-1. Copy the 'Voxel51 GitHub Internal' license file for use by
-   integration tests that convert it to a kubernetes secret
-   in each ephemeral namespace created for each test case.
-
-   ```shell
-   make copy-license-file-helm
-   ```
 
 1. Run tests
 

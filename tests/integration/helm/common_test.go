@@ -19,9 +19,10 @@ import (
 )
 
 const (
-	chartPath         = "../../../helm/fiftyone-teams-app/"
-	integrationValues = "../../fixtures/helm/integration_values.yaml"
-	licenseFile       = "../../fixtures/helm/internal-license.key"
+	chartPath           = "../../../helm/fiftyone-teams-app/"
+	integrationValues   = "../../fixtures/helm/integration_values.yaml"
+	licenseFileInternal = "../../fixtures/helm/internal-license.key"
+	licenseFileLegacy   = "../../fixtures/helm/legacy-license.key"
 	// for minikube, where node count is 1, we don't need ReadWriteMany and NFS
 	persistentVolumeYaml = `---
     apiVersion: v1
