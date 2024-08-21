@@ -58,7 +58,7 @@ const (
     apiVersion: v1
     kind: Secret
     metadata:
-      name: fiftyonelicense
+      name: fiftyone-license
     type: Opaque
     data:
       license: `
