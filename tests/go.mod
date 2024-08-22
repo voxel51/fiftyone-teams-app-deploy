@@ -1,6 +1,6 @@
 module github.com/voxel51/fiftyone-teams-app-deploy
 
-go 1.21.6
+go 1.22.3
 
 require (
 	github.com/compose-spec/compose-go/v2 v2.0.2
