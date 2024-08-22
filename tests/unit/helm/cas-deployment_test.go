@@ -497,7 +497,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 		{
 			"multipleLicenses",
 			map[string]string{
-				"fiftyoneLicenseSecrets[0]": "fiftyone-license",
+				"fiftyoneLicenseSecrets[0]": "fiftyonelicense",
 				"fiftyoneLicenseSecrets[1]": "another-fiftyone-license",
 			},
 			func(envVars []corev1.EnvVar) {
@@ -526,7 +526,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           },
           {
             "name": "LICENSE_KEY_FILE_PATHS",
-            "value": "/opt/fiftyone/licenses/fiftyone-license,/opt/fiftyone/licenses/another-fiftyone-license"
+            "value": "/opt/fiftyone/licenses/fiftyonelicense,/opt/fiftyone/licenses/another-fiftyone-license"
           },
           {
             "name": "NEXTAUTH_URL",
