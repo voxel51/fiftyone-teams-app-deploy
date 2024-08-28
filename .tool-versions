@@ -5,6 +5,7 @@ helm-docs 1.13.1
 kubectl 1.30.1
 minikube 1.33.1
 pre-commit 3.7.1
+python 3.10.14
 shellcheck 0.10.0
 shfmt 3.8.0
 skaffold 2.12.0
