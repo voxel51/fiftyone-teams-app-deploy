@@ -302,7 +302,7 @@ GCP project `computer-vision-team`, configure minikube and skaffold
     - `pluginsSettings`
     - `teamsAppSettings`
 
-   For example for the version `2.0.0` at `dev7`.
+   For example for the version `2.0.0` at the latest `rc`s.
 
     ```yaml
     apiSettings:

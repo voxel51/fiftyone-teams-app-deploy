@@ -149,32 +149,32 @@ clean-unit-helm:  ## delete helm unit test output and reports
 
 copy-license-files-docker:  ## copy local developer license files used during docker compose integration tests
 	gcloud storage cp \
-	  gs://voxel51-test/licenses/299a423b/1/license.key \
-	  ./docker/legacy-license.key \
+	  gs://voxel51-licenses-dev/licenses/org_juxHKWTkD9xAY0VO/1/license.key \
+	  ./docker/internal-license.key \
 	  --project computer-vision-team
 	gcloud storage cp \
-	  gs://voxel51-test/licenses/299a423b/1/license.key \
-	  ./docker/internal-license.key \
+	  gs://voxel51-licenses-dev/licenses/org_juxHKWTkD9xAY0VO/1/license.key \
+	  ./docker/legacy-license.key \
 	  --project computer-vision-team
 
 copy-license-files-helm:  ## copy local developer license files used during helm integration tests
 	gcloud storage cp \
-	  gs://voxel51-test/licenses/299a423b/1/license.key \
-	  tests/fixtures/helm/legacy-license.key
+	  gs://voxel51-licenses-dev/licenses/org_ETn2K6DxWWd4cBwS/1/license.key \
+	  tests/fixtures/helm/internal-license.key
 	  --project computer-vision-team
 	gcloud storage cp \
-	  gs://voxel51-test/licenses/299a423b/1/license.key \
-	  tests/fixtures/helm/internal-license.key
+	  gs://voxel51-licenses-dev/licenses/org_ETn2K6DxWWd4cBwS/1/license.key \
+	  tests/fixtures/helm/legacy-license.key
 	  --project computer-vision-team
 
 copy-license-files-skaffold:  ## copy local developer license files used during helm integration tests
 	gcloud storage cp \
-	  gs://voxel51-licenses-dev/licenses/org_ETn2K6DxWWd4cBwS/1/license.key \
-	  legacy-license.key \
-	  --project computer-vision-team
-	gcloud storage cp \
 	  gs://voxel51-licenses-dev/licenses/org_juxHKWTkD9xAY0VO/1/license.key \
 	  internal-license.key \
+	  --project computer-vision-team
+	gcloud storage cp \
+	  gs://voxel51-licenses-dev/licenses/org_ETn2K6DxWWd4cBwS/1/license.key \
+	  legacy-license.key \
 	  --project computer-vision-team
 
 login:  ## Docker login to Google Artifact Registry (for accessing internal gcr.io container images)
