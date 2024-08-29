@@ -13,6 +13,9 @@ requires:
   - configs:
       - cert-manager
     path: skaffold-cert-manager.yaml
+  - configs:
+      - legacy-license
+    path: skaffold-secret-license-file.yaml
 
 # Profiles allow us to easily control which resources are created when we run skaffold.
 # Cannot combine `--profile no-mongodb,no-cert-manager`.
@@ -29,7 +32,9 @@ profiles:
   - name: only-fiftyone
     patches:
       - op: remove
-        path: /requires
+        path: /requires/1
+      - op: remove
+        path: /requires/0
 
 deploy:
   helm:
@@ -40,6 +45,7 @@ deploy:
         createNamespace: true
         namespace: fiftyone-teams
         overrides:
+          # FiftyOne Teams API (teams-api)
           apiSettings:
             env:
               LOGGING_LEVEL: DEBUG
@@ -48,8 +54,9 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
               pullPolicy: IfNotPresent
-              tag: v2.0.1rc1
+              tag: v2.0.0rc17  # TODO: change to v2.0.1rc1 prior to the release of 2.0.1
 
+          # FiftyOne App (fiftyone-app) configurations
           appSettings:
             env:
               # Only set to true during the initial installation or during a database upgrade
@@ -64,7 +71,17 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v2.0.1rc1
+              tag: v2.0.0rc17  # TODO: change to v2.0.1rc1 prior to the release of 2.0.1
+
+          # Central Authentication Service (teams-cas) configurations
+          casSettings:
+            env:
+              DEBUG: cas:*
+            image:
+              # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+              repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
+              pullPolicy: IfNotPresent
+              tag: v2.0.0-rc.16  # TODO: change to v2.0.1rc1 prior to the release of 2.0.1
 
           # TODO: Test `minikube addons configure registry-creds` or
           # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
@@ -111,22 +128,6 @@ deploy:
             tlsEnabled: true
           secret:
             fiftyone:
-              # In the `dev-fiftyone` Auth0 Tenant, the `local-dev` and
-              # `fiftyone-dev-api (Test Application)` applications are
-              # configured for running the app locally with https
-              auth0Domain: "dev-fiftyone.us.auth0.com"
-
-              # Set values for the `fiftyone-dev-api (Test Application)` application
-              apiClientId: ""
-              apiClientSecret: ""
-
-              # Set values for the `local-dev` application
-              clientId: ""
-              clientSecret: ""
-
-              # Set to the Identifier of the `fiftyone-demo` organization
-              organizationId: ""
-
               fiftyoneDatabaseName: fiftyone-internal
               # This password is randomly generated and is only used to initialize a local (ephemeral) MongoDB in `./skaffold-mongodb.yaml`
               # URL encoded to overcome errors with unencoded characters
@@ -139,13 +140,16 @@ deploy:
 
               # randomly generated value
               fiftyoneAuthSecret: "aGM4?s&t-n;!*U96oA#bdo,+JU)ac1T7"
+
+          # FiftyOne Teams Plugins (teams-plugins) configurations. [Reference][fiftyone-plugins].
           pluginsSettings:
             image:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v2.0.1rc1
+              tag: v2.0.0rc17  # TODO: change to v2.0.1rc1 prior to the release of 2.0.1
 
+          # FiftyOne Teams App (teams-app) configurations
           teamsAppSettings:
             dnsName: local.fiftyone.ai
             # env:
@@ -162,15 +166,6 @@ deploy:
               # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
               # This is a byproduct of `npm` versioning versus Python PEP 440.
               pullPolicy: IfNotPresent
-              tag: v2.0.1-rc.0
-
-          casSettings:
-            env:
-              DEBUG: cas:*
-            image:
-              # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
-              repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
-              pullPolicy: IfNotPresent
-              tag: v2.0.1-rc.0
+              tag: v2.0.0-rc.16  # TODO: change to v2.0.1rc1 prior to the release of 2.0.1
 
   kubeContext: minikube
