@@ -37,8 +37,8 @@ Use the license file provided by the Voxel51 Customer Success Team to create
 a new license file secret:
 
 ```shell
-kubectl --namespace your-namepace create secret generic fiftyone-license \
-  --from-file=license=./your-license-file
+kubectl --namespace your-namepace-here create secret generic fiftyone-license \
+--from-file=license=./your-license-file
 ```
 
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
@@ -666,8 +666,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace create secret generic fiftyone-license \
-      --from-file=license=./your-license-file
+    kubectl --namespace your-namepace-here create secret generic \
+        fiftyone-license --from-file=license=./your-license-file
     ```
 
 1. [Upgrade to FiftyOne Teams v2.0.1](#deploying-fiftyone-teams)
@@ -738,8 +738,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace create secret generic fiftyone-license \
-      --from-file=license=./your-license-file
+    kubectl --namespace your-namepace-here create secret generic \
+        fiftyone-license --from-file=license=./your-license-file
     ```
 
 1. In your `values.yaml`, set the required values
@@ -810,8 +810,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace create secret generic fiftyone-license \
-      --from-file=license=./your-license-file
+    kubectl --namespace your-namepace-here create secret generic \
+        fiftyone-license --from-file=license=./your-license-file
     ```
 
 1. [Upgrade to FiftyOne Teams version 2.0.1](#deploying-fiftyone-teams)
@@ -866,6 +866,14 @@ A minimal example `values.yaml` may be found
 1. Edit the `values.yaml` file
 1. Deploy FiftyOne Teams with `helm install`
     1. For a new installation
+        1. Create a new namespace and set the current namespace for your kubectl
+           context
+
+           ```shell
+           kubectl create namespace your-namespace-here
+           kubectl config set-context --current --namespace your-namespace-here
+           ```
+
         1. If you are using the Voxel51 DockerHub registry to install your
            container images, use the Voxel51-provided DockerHub credentials to
            create an Image Pull Secret, and uncomment the `imagePullSecrets`
@@ -881,7 +889,7 @@ A minimal example `values.yaml` may be found
            Secret
 
            ```shell
-           kubectl --namespace your-namepace create secret generic \
+           kubectl --namespace your-namepace-here create secret generic \
            fiftyone-license --from-file=license=./your-license-file
            ```
 
@@ -898,6 +906,13 @@ A minimal example `values.yaml` may be found
 
         1. Make sure you have followed the appropriate directions for
            [Upgrading From Previous Versions](#upgrading-from-previous-versions)
+
+        1. Update your kubectl configuration to set your current namespace for
+           your kubectl context
+
+           ```shell
+           kubectl config set-context --current --namespace your-namespace-here
+           ```
 
         1. Update your Voxel51 Helm repository and upgrade your FiftyOne Teams
            deployment
