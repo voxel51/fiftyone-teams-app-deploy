@@ -14,8 +14,8 @@ requires:
       - cert-manager
     path: skaffold-cert-manager.yaml
   - configs:
-      - legacy-license
-    path: skaffold-secret-license-file.yaml
+      - license
+    path: skaffold-voxel51-license.yaml
 
 # Profiles allow us to easily control which resources are created when we run skaffold.
 # Cannot combine `--profile no-mongodb,no-cert-manager`.
