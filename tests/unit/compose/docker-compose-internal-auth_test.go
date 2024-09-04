@@ -288,6 +288,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
+				"TEAMS_API_DATABASE_NAME=fiftyone",
+				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 			},
 		},
 		{
@@ -368,6 +370,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
+				"TEAMS_API_DATABASE_NAME=fiftyone",
+				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 			},
 		},
 		{
@@ -447,6 +451,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
+				"TEAMS_API_DATABASE_NAME=fiftyone",
+				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 			},
 		},
 		{

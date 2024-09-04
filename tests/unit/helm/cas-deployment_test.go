@@ -464,6 +464,24 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             "value": "https:///cas/api/auth"
           },
           {
+            "name": "TEAMS_API_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "TEAMS_API_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
             "name": "CAS_DATABASE_NAME",
             "value": "cas"
           },
