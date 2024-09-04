@@ -1,0 +1,13 @@
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
+  name: license
+
+manifests:
+  rawYaml:
+    - secret-license.yaml
+deploy:
+  kubectl:
+    defaultNamespace: fiftyone-teams
+  kubeContext: minikube
