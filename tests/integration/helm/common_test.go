@@ -6,7 +6,9 @@ package integration
 import (
 	"crypto/tls"
 
+	"encoding/base64"
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -17,8 +19,10 @@ import (
 )
 
 const (
-	chartPath         = "../../../helm/fiftyone-teams-app/"
-	integrationValues = "../../fixtures/helm/integration_values.yaml"
+	chartPath           = "../../../helm/fiftyone-teams-app/"
+	integrationValues   = "../../fixtures/helm/integration_values.yaml"
+	licenseFileInternal = "../../fixtures/helm/internal-license.key"
+	licenseFileLegacy   = "../../fixtures/helm/legacy-license.key"
 	// for minikube, where node count is 1, we don't need ReadWriteMany and NFS
 	persistentVolumeYaml = `---
     apiVersion: v1
@@ -48,6 +52,16 @@ const (
         requests:
           storage: 100Mi
 `
+
+	// License File Secret
+	licenseFileSecretTemplateYaml = `---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: fiftyone-license
+    type: Opaque
+    data:
+      license: `
 )
 
 type serviceValidations struct {
@@ -88,4 +102,13 @@ func makeLabels(labels map[string]string) string {
 		out = append(out, fmt.Sprintf("%s=%s", key, value))
 	}
 	return strings.Join(out, ",")
+}
+
+func getBase64EncodedStringOfFile(filePath string) string {
+	b, err := os.ReadFile(filePath)
+	if err != nil {
+		fmt.Print(err)
+	}
+	sEnc := base64.StdEncoding.EncodeToString(b)
+	return sEnc
 }

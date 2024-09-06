@@ -301,7 +301,6 @@ Create a merged list of environment variables for fiftyone-teams-cas
   value: {{ include "teams-cas.license-key-file-paths" . | quote }}
 - name: NEXTAUTH_URL
   value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
-{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "legacy" }}
 - name: TEAMS_API_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -312,7 +311,6 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
-{{- end }}
 {{- range $key, $val := .Values.casSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

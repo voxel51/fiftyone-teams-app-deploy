@@ -1,6 +1,6 @@
 SHELL := $(SHELL) -e
 ASDF := $(shell asdf where golang)
-VERSION ?= 2.0.0
+VERSION ?= 2.0.1
 
 # Help
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))
@@ -110,6 +110,16 @@ run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
 	skaffold run -p only-fiftyone \
 	  --kube-context minikube
 
+license-secret-internal: copy-license-files-skaffold
+	@cp secret-license.template.yaml secret-license.yaml
+	$(eval LICENSE_INTERNAL := $(shell cat internal-license.key | base64))
+	@sed -i "" -e "s/\"\"/${LICENSE_INTERNAL}/" secret-license.yaml
+
+license-secret-legacy: copy-license-files-skaffold
+	@cp secret-license.template.yaml secret-license.yaml
+	$(eval LICENSE_LEGACY := $(shell cat legacy-license.key | base64))
+	@sed -i "" -e "s/\"\"/${LICENSE_LEGACY}/" secret-license.yaml
+
 tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
 	sudo minikube tunnel &> /dev/null &
 
@@ -136,6 +146,36 @@ clean-unit-compose:  ## delete docker compose unit test output and reports
 clean-unit-helm:  ## delete helm unit test output and reports
 	rm -rf tests/unit/helm/test_output || true
 	rm tests/unit/helm/test_output.log || true
+
+copy-license-files-docker:  ## copy local developer license files used during docker compose integration tests
+	gcloud storage cp \
+	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
+	  ./docker/internal-license.key \
+	  --project computer-vision-team
+	gcloud storage cp \
+	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
+	  ./docker/legacy-license.key \
+	  --project computer-vision-team
+
+copy-license-files-helm:  ## copy local developer license files used during helm integration tests
+	gcloud storage cp \
+	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
+	  tests/fixtures/helm/internal-license.key
+	  --project computer-vision-team
+	gcloud storage cp \
+	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
+	  tests/fixtures/helm/legacy-license.key
+	  --project computer-vision-team
+
+copy-license-files-skaffold:  ## copy local developer license files used during helm integration tests
+	gcloud storage cp \
+	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
+	  internal-license.key \
+	  --project computer-vision-team
+	gcloud storage cp \
+	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
+	  legacy-license.key \
+	  --project computer-vision-team
 
 login:  ## Docker login to Google Artifact Registry (for accessing internal gcr.io container images)
 	gcloud auth print-access-token | \
@@ -164,23 +204,23 @@ test-unit-helm-interleaved: install-terratest-log-parser  ## run go test on the 
 
 test-integration-compose: test-integration-compose-internal test-integration-compose-legacy ## run go test on the tests/integration/compose directory for both internal and legacy auth modes
 
-test-integration-compose-internal: ## run go test on the tests/integration/compose directory for internal auth mode
+test-integration-compose-internal: copy-license-files-docker ## run go test on the tests/integration/compose directory for internal auth mode
 	@cd tests/integration/compose; \
 	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth
 
-test-integration-compose-legacy: ## run go test on the tests/integration/compose directory for legacy auth mode
+test-integration-compose-legacy: copy-license-files-docker ## run go test on the tests/integration/compose directory for legacy auth mode
 	@cd tests/integration/compose; \
 	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth
 
 test-integration-compose-interleaved:  test-integration-compose-interleaved-internal test-integration-compose-interleaved-legacy  ## run go test on the tests/integration/compose directory and run the terratest_log_parser for reports
 
-test-integration-compose-interleaved-internal: install-terratest-log-parser dependencies-integration-compose clean-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode and run the terratest_log_parser for reports
+test-integration-compose-interleaved-internal: install-terratest-log-parser copy-license-files-docker clean-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode and run the terratest_log_parser for reports
 	@cd tests/integration/compose; \
 	rm -rf test_output_internal/*; \
 	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth | tee test_output_internal.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
 
-test-integration-compose-interleaved-legacy: install-terratest-log-parser dependencies-integration-compose clean-integration-compose ## run go test on the tests/integration/compose directory for legacy auth mode and run the terratest_log_parser for reports
+test-integration-compose-interleaved-legacy: install-terratest-log-parser copy-license-files-docker clean-integration-compose ## run go test on the tests/integration/compose directory for legacy auth mode and run the terratest_log_parser for reports
 	@cd tests/integration/compose; \
 	rm -rf test_output_legacy/*; \
 	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \

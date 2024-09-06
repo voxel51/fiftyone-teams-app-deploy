@@ -52,9 +52,11 @@
     make start
     ```
 
-1. Set skaffold secrets.
-   See
-   [skaffold](#skaffold)
+1. Download dev license file
+
+   ```shell
+   make license-secret-legacy
+   ```
 
 1. Run skaffold
 
@@ -157,13 +159,6 @@ generated using the pre-commit hooks for
 
     - Install
       [Docker](https://www.docker.com/products/docker-desktop/)
-      at version `4.26.1` until we build and publish arm64 container images
-        - Version `4.27.1` causes the container error
-
-            ```txt
-            $ kubectl logs fiftyone-app-76b697dc68-5t26r
-            exec /bin/sh: exec format error
-            ```
 
 1. Add the helm repos
 
@@ -185,35 +180,22 @@ minikube start
 
 We use
 [Skaffold](https://skaffold.dev/)
-to deploy our application to the minikube cluster with
+to deploy our application to the local minikube cluster with
 Helm and overrides (`values.yaml`).
 
-In `skaffold.yaml`, set the fiftyone Auth0 secrets:
+The license file contains the secrets.
+Copy the license file for our local dev organization.
 
-```yaml
-deploy:
-  helm:
-    releases:
-      - name: fiftyone-teams
-        overrides:
-          secret:
-            fiftyone:
-              # In the `dev-fiftyone` Auth0 Tenant, the `local-dev` and
-              # `fiftyone-dev-api (Test Application)` applications are
-              # configured for running the app locally with https
-              auth0Domain: "dev-fiftyone.us.auth0.com"
+For legacy CAS mode
 
-              # # Set values for the `fiftyone-dev-api (Test Application)` application
-              apiClientId: ""
-              apiClientSecret: ""
+```shell
+make license-secret-legacy
+```
 
-              # Set values for the `local-dev` application
-              clientId: ""
-              clientSecret: ""
+For internal CAS mode
 
-              # Set to the Identifier of the `fiftyone-demo` organization
-              organizationId: ""
-
+```shell
+make license-secret-internal
 ```
 
 When debugging, it may be helpful to start minikube with the flag
@@ -239,6 +221,7 @@ By default, Skaffold will Helm install
   - CRDs
   - self-singed ClusterIssuer
   - cert-manager from chart defaults
+- FiftyOne Teams License
 - FiftyOne Teams
 
 #### profiles
@@ -315,24 +298,29 @@ GCP project `computer-vision-team`, configure minikube and skaffold
 
     - `apiSettings`
     - `appSettings`
+    - `casSettings`
     - `pluginsSettings`
     - `teamsAppSettings`
 
-   For example for the version `1.6.0` at `dev7`.
+   For example for the version `2.0.0` at the latest `rc`s.
 
     ```yaml
     apiSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
-        tag: v1.6.0.dev7
+        tag: v2.0.0rc17
     appSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-        tag: v1.6.0.dev7
+        tag: v2.0.0rc17
+    casSettings:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
+        tag: v2.0.0-rc.16
     pluginsSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-        tag: v1.6.0.dev7
+        tag: v2.0.0rc17
     teamsAppSettings:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app
@@ -340,7 +328,7 @@ GCP project `computer-vision-team`, configure minikube and skaffold
         # the other images (`fiftyone-app`, `fiftyone-app` and `fiftyone-teams-api`).
         # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
         # This is a byproduct of `npm` versioning versus Python PEP 440.
-        tag: v1.6.0-dev.7
+        tag: v2.0.0-rc.16
     ```
 
     > _Note:_ To see the available tags for each image, see

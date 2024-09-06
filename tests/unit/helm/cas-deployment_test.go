@@ -464,6 +464,24 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             "value": "https:///cas/api/auth"
           },
           {
+            "name": "TEAMS_API_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "TEAMS_API_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
             "name": "CAS_DATABASE_NAME",
             "value": "cas"
           },
@@ -1121,13 +1139,13 @@ func (s *deploymentCasTemplateTest) TestContainerVolumeMounts() {
 		{
 			"multipleLicenseFiles",
 			map[string]string{
-				"fiftyoneLicenseSecrets[0]": "fiftyonelicense",
+				"fiftyoneLicenseSecrets[0]": "fiftyone-license",
 				"fiftyoneLicenseSecrets[1]": "another-fiftyone-license",
 			},
 			func(volumeMounts []corev1.VolumeMount) {
 				expectedJSON := `[
           {
-            "name": "fiftyonelicense",
+            "name": "fiftyone-license",
             "mountPath": "/opt/fiftyone/licenses",
             "readOnly": true
           },
