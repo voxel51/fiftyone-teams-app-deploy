@@ -149,31 +149,31 @@ clean-unit-helm:  ## delete helm unit test output and reports
 
 copy-license-files-docker:  ## copy local developer license files used during docker compose integration tests
 	gcloud storage cp \
-	  gs://voxel51-licenses-dev/licenses/***REMOVED***/1/license.key \
+	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
 	  ./docker/internal-license.key \
 	  --project computer-vision-team
 	gcloud storage cp \
-	  gs://voxel51-licenses-dev/licenses/org_ETn2K6DxWWd4cBwS/1/license.key \
+	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
 	  ./docker/legacy-license.key \
 	  --project computer-vision-team
 
 copy-license-files-helm:  ## copy local developer license files used during helm integration tests
 	gcloud storage cp \
-	  gs://voxel51-licenses-dev/licenses/***REMOVED***/1/license.key \
+	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
 	  tests/fixtures/helm/internal-license.key
 	  --project computer-vision-team
 	gcloud storage cp \
-	  gs://voxel51-licenses-dev/licenses/org_ETn2K6DxWWd4cBwS/1/license.key \
+	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
 	  tests/fixtures/helm/legacy-license.key
 	  --project computer-vision-team
 
 copy-license-files-skaffold:  ## copy local developer license files used during helm integration tests
 	gcloud storage cp \
-	  gs://voxel51-licenses-dev/licenses/***REMOVED***/1/license.key \
+	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
 	  internal-license.key \
 	  --project computer-vision-team
 	gcloud storage cp \
-	  gs://voxel51-licenses-dev/licenses/org_ETn2K6DxWWd4cBwS/1/license.key \
+	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
 	  legacy-license.key \
 	  --project computer-vision-team
 
