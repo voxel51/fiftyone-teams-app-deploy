@@ -1293,6 +1293,56 @@ func (s *deploymentApiTemplateTest) TestPodSecurityContext() {
 	}
 }
 
+func (s *deploymentApiTemplateTest) TestTemplateMetadataLabels() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected map[string]string
+	}{
+		{
+			"defaultValues",
+			nil,
+			map[string]string{
+				"app":                        "teams-api",
+				"app.kubernetes.io/name":     "teams-api",
+				"app.kubernetes.io/instance": "fiftyone-test",
+			},
+		},
+		{
+			"overrideSelectorMatchLabels",
+			map[string]string{
+				"apiSettings.service.name": "test-service-name",
+			},
+			map[string]string{
+				"app":                        "test-service-name",
+				"app.kubernetes.io/name":     "test-service-name",
+				"app.kubernetes.io/instance": "fiftyone-test",
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			for key, value := range testCase.expected {
+
+				foundValue := deployment.Spec.Template.ObjectMeta.Labels[key]
+				s.Equal(value, foundValue, "Template Metadata Labels should contain all set labels.")
+			}
+		})
+	}
+}
+
 func (s *deploymentApiTemplateTest) TestSelectorMatchLabels() {
 	testCases := []struct {
 		name     string
@@ -1334,14 +1384,9 @@ func (s *deploymentApiTemplateTest) TestSelectorMatchLabels() {
 			var deployment appsv1.Deployment
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-			// Selector Labels and Template Metadata Labels use the same helm template.
-			// Check both.
 			for key, value := range testCase.expected {
 
 				foundValue := deployment.Spec.Selector.MatchLabels[key]
-				s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
-
-				foundValue = deployment.Spec.Template.ObjectMeta.Labels[key]
 				s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
 			}
 		})
