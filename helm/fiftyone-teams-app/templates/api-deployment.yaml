@@ -21,6 +21,9 @@ spec:
       labels:
         app: {{ include "teams-api.name" . }}
         {{- include "fiftyone-teams-api.selectorLabels" . | nindent 8 }}
+        {{- with .Values.apiSettings.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
