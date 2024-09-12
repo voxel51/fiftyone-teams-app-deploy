@@ -505,8 +505,8 @@ teamsAppSettings:
     # [Reference][recoil-env].
     RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
     # -- Controls whether anonymous analytics are captures for the teams
-    # application. Set to true to opt-in to anonymous analytics.
-    FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: false
+    # application. Set to false to opt-out of anonymous analytics.
+    FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: true
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy].
