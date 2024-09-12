@@ -72,6 +72,7 @@ services:
       FIFTYONE_TEAMS_PROXY_URL: ${FIFTYONE_TEAMS_PROXY_URL}
       NODE_ENV: production
       RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
+      FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: ${FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED:-false}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
