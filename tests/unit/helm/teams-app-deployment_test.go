@@ -311,7 +311,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
             "value": "true"
           },
-		  {
+          {
             "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
             "value": "true"
           },
@@ -386,7 +386,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
             "value": "true"
           },
-		  {
+          {
             "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
             "value": "true"
           },
