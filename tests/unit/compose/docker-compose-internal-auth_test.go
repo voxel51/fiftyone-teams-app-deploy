@@ -271,6 +271,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_TEAMS_PROXY_URL=http://fiftyone-app:5151",
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
+				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 			},
 		},
 		{
@@ -353,6 +354,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_TEAMS_PROXY_URL=http://fiftyone-app:5151",
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
+				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 			},
 		},
 		{
@@ -434,6 +436,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151",
+				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 			},
 		},
 		{

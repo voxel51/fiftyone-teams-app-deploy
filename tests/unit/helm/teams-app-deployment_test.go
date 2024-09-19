@@ -312,6 +312,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "true"
           },
           {
+            "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
             "value": "2.0.1"
           },
@@ -380,6 +384,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
             "value": "true"
           },
           {

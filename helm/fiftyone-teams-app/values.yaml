@@ -504,6 +504,9 @@ teamsAppSettings:
     # -- Disable duplicate atom/selector key checking that generated false-positive errors.
     # [Reference][recoil-env].
     RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
+    # -- Controls whether anonymous analytics are captured for the teams
+    # application. Set to false to opt-out of anonymous analytics.
+    FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: true
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy].
