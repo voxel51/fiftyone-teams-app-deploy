@@ -1445,15 +1445,15 @@ func (s *deploymentCasTemplateTest) TestTemplateLabels() {
 		{
 			"addTemplatemetadataLabels",
 			map[string]string{
-				"apiSettings.labels.label-3": "grey",
+				"casSettings.labels.label-3": "grey",
 			},
 			map[string]string{
 				// metadata labels should not appear here
-				"app.kubernetes.io/name":     "test-service-name",
+				"app.kubernetes.io/name":     "teams-cas",
 				"app.kubernetes.io/instance": "fiftyone-test",
 			},
 			map[string]string{
-				"app.kubernetes.io/name":     "test-service-name",
+				"app.kubernetes.io/name":     "teams-cas",
 				"app.kubernetes.io/instance": "fiftyone-test",
 				"label-3":                    "grey",
 			},
