@@ -31,7 +31,7 @@ apiSettings:
     repository: voxel51/fiftyone-teams-api
     # -- Image tag for teams-api. Defaults to the chart version.
     tag: ""
-  # Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors].
   labels: {}
 
 
@@ -132,7 +132,7 @@ appSettings:
     repository: voxel51/fiftyone-app
     # -- Image tag for fiftyone-app. Defaults to the chart version.
     tag: ""
-  # Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the fiftyone-app deployment's ReplicaSet.
   # Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].
@@ -225,7 +225,7 @@ casSettings:
     repository: voxel51/fiftyone-teams-cas
     # -- Image tag for teams-cas. Defaults to the chart version.
     tag: ""
-  # Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the teams-cas deployment's ReplicaSet. [Reference][deployment].
   replicaCount: 2
@@ -383,7 +383,7 @@ pluginsSettings:
     repository: voxel51/fiftyone-app
     # -- Image tag for teams-plugins. Defaults to the chart version.
     tag: ""
-  # Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the teams-plugins deployment's ReplicaSet.
   # Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].
@@ -523,7 +523,7 @@ teamsAppSettings:
     repository: voxel51/fiftyone-teams-app
     # -- Image tag for teams-app. Defaults to the chart version.
     tag: ""
-  # Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors].
   labels: {}
   # -- Overrides the `FIFTYONE_API_URI` environment variable. When set
   # `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance
