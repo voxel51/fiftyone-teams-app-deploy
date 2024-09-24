@@ -1293,15 +1293,39 @@ func (s *deploymentApiTemplateTest) TestPodSecurityContext() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestTemplateMetadataLabels() {
+func (s *deploymentApiTemplateTest) TestTemplateLabels() {
 	testCases := []struct {
-		name     string
-		values   map[string]string
-		expected map[string]string
+		name                     string
+		values                   map[string]string
+		selectorMatchExpected    map[string]string
+		templateMetadataExpected map[string]string
 	}{
+		{
+			"addTemplateMetadataLabels",
+			map[string]string{
+				"apiSettings.labels.label-1": "blue",
+			},
+			map[string]string{
+				// metadata labels should not appear here
+				"app":                        "teams-api",
+				"app.kubernetes.io/name":     "teams-api",
+				"app.kubernetes.io/instance": "fiftyone-test",
+			},
+			map[string]string{
+				"app":                        "teams-api",
+				"app.kubernetes.io/name":     "teams-api",
+				"app.kubernetes.io/instance": "fiftyone-test",
+				"label-1":                    "blue",
+			},
+		},
 		{
 			"defaultValues",
 			nil,
+			map[string]string{
+				"app":                        "teams-api",
+				"app.kubernetes.io/name":     "teams-api",
+				"app.kubernetes.io/instance": "fiftyone-test",
+			},
 			map[string]string{
 				"app":                        "teams-api",
 				"app.kubernetes.io/name":     "teams-api",
@@ -1312,6 +1336,11 @@ func (s *deploymentApiTemplateTest) TestTemplateMetadataLabels() {
 			"overrideSelectorMatchLabels",
 			map[string]string{
 				"apiSettings.service.name": "test-service-name",
+			},
+			map[string]string{
+				"app":                        "test-service-name",
+				"app.kubernetes.io/name":     "test-service-name",
+				"app.kubernetes.io/instance": "fiftyone-test",
 			},
 			map[string]string{
 				"app":                        "test-service-name",
@@ -1334,60 +1363,16 @@ func (s *deploymentApiTemplateTest) TestTemplateMetadataLabels() {
 			var deployment appsv1.Deployment
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-			for key, value := range testCase.expected {
-
-				foundValue := deployment.Spec.Template.ObjectMeta.Labels[key]
-				s.Equal(value, foundValue, "Template Metadata Labels should contain all set labels.")
-			}
-		})
-	}
-}
-
-func (s *deploymentApiTemplateTest) TestSelectorMatchLabels() {
-	testCases := []struct {
-		name     string
-		values   map[string]string
-		expected map[string]string
-	}{
-		{
-			"defaultValues",
-			nil,
-			map[string]string{
-				"app":                        "teams-api",
-				"app.kubernetes.io/name":     "teams-api",
-				"app.kubernetes.io/instance": "fiftyone-test",
-			},
-		},
-		{
-			"overrideSelectorMatchLabels",
-			map[string]string{
-				"apiSettings.service.name": "test-service-name",
-			},
-			map[string]string{
-				"app":                        "test-service-name",
-				"app.kubernetes.io/name":     "test-service-name",
-				"app.kubernetes.io/instance": "fiftyone-test",
-			},
-		},
-	}
-
-	for _, testCase := range testCases {
-		testCase := testCase
-
-		s.Run(testCase.name, func() {
-			subT := s.T()
-			subT.Parallel()
-
-			options := &helm.Options{SetValues: testCase.values}
-			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
-
-			var deployment appsv1.Deployment
-			helm.UnmarshalK8SYaml(subT, output, &deployment)
-
-			for key, value := range testCase.expected {
+			for key, value := range testCase.selectorMatchExpected {
 
 				foundValue := deployment.Spec.Selector.MatchLabels[key]
 				s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
+			}
+
+			for key, value := range testCase.templateMetadataExpected {
+
+				foundValue := deployment.Spec.Template.ObjectMeta.Labels[key]
+				s.Equal(value, foundValue, "Template Metadata Labels should contain all set labels.")
 			}
 		})
 	}
