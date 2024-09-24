@@ -271,6 +271,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://teams-api:80"
           },
           {
+            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_API_URI",
             "value": "https://"
           },
@@ -340,6 +344,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
+          },
+          {
+            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_API_URI",

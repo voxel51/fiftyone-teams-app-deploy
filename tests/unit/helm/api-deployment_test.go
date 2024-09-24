@@ -264,6 +264,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "http://teams-cas:80/cas/api"
           },
           {
+            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_AUTH_SECRET",
             "valueFrom": {
               "secretKeyRef": {
@@ -341,6 +345,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "CAS_BASE_URL",
             "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_AUTH_SECRET",
@@ -425,6 +433,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "CAS_BASE_URL",
             "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "FEATURE_FLAG_ENABLE_INVITATIONS",
+            "value": "false"
           },
           {
             "name": "FIFTYONE_AUTH_SECRET",

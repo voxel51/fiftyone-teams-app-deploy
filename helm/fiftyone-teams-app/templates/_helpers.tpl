@@ -195,6 +195,12 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- $secretName := .Values.secret.name }}
 - name: CAS_BASE_URL
   value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name .Values.casSettings.service.port | quote }}
+- name: FEATURE_FLAG_ENABLE_INVITATIONS
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "internal" }}
+  value: "false"
+{{- else }}
+  value: "{{ .Values.casSettings.enable_invitations }}"
+{{- end }}
 - name: FIFTYONE_AUTH_SECRET
   valueFrom:
     secretKeyRef:
@@ -354,6 +360,12 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+- name: FEATURE_FLAG_ENABLE_INVITATIONS
+{{- if eq .Values.casSettings.env.FIFTYONE_AUTH_MODE "internal" }}
+  value: "false"
+{{- else }}
+  value: "{{ .Values.casSettings.enable_invitations }}"
+{{- end }}
 - name: FIFTYONE_API_URI
 {{- if .Values.teamsAppSettings.fiftyoneApiOverride }}
   value: {{ .Values.teamsAppSettings.fiftyoneApiOverride }}
