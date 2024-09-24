@@ -14,7 +14,6 @@ services:
 
   teams-api:
     environment:
-      FEATURE_FLAG_ENABLE_INVITATIONS: false
       FIFTYONE_PLUGINS_CACHE_ENABLED: true
       FIFTYONE_PLUGINS_DIR: /opt/plugins
     extends:
@@ -24,8 +23,6 @@ services:
       - plugins-vol:/opt/plugins
 
   teams-app:
-    environment:
-      FEATURE_FLAG_ENABLE_INVITATIONS: false
     extends:
       file: ../common-services.yaml
       service: teams-app-common
