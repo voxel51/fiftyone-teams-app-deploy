@@ -68,22 +68,20 @@ func (s *deploymentTeamsAppTemplateTest) TestMetadataLabels() {
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
-				"app.kubernetes.io/name":       "fiftyone-teams-app",
+				"app.kubernetes.io/name":       "teams-app",
 				"app.kubernetes.io/instance":   "fiftyone-test",
 			},
 		},
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
-				// does not affect the label `app.kubernetes.io/name` for teams-app.
 				"teamsAppSettings.service.name": "test-service-name",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
-				"app.kubernetes.io/name":       "fiftyone-teams-app",
+				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
 			},
 		},
@@ -1200,29 +1198,51 @@ func (s *deploymentTeamsAppTemplateTest) TestPodSecurityContext() {
 	}
 }
 
-func (s *deploymentTeamsAppTemplateTest) TestSelectorMatchLabels() {
+func (s *deploymentTeamsAppTemplateTest) TestTemplateLabels() {
 	testCases := []struct {
-		name     string
-		values   map[string]string
-		expected map[string]string
+		name                     string
+		values                   map[string]string
+		selectorMatchExpected    map[string]string
+		templateMetadataExpected map[string]string
 	}{
+		{
+			"addTemplateMetadataLabels",
+			map[string]string{
+				"teamsAppSettings.labels.someLabel": "orange",
+			},
+			map[string]string{
+				"app.kubernetes.io/name":     "teams-app",
+				"app.kubernetes.io/instance": "fiftyone-test",
+			},
+			map[string]string{
+				"app.kubernetes.io/name":     "teams-app",
+				"app.kubernetes.io/instance": "fiftyone-test",
+				"someLabel":                  "orange",
+			},
+		},
 		{
 			"defaultValues",
 			nil,
 			map[string]string{
-				"app.kubernetes.io/name":     "fiftyone-teams-app",
+				"app.kubernetes.io/name":     "teams-app",
+				"app.kubernetes.io/instance": "fiftyone-test",
+			},
+			map[string]string{
+				"app.kubernetes.io/name":     "teams-app",
 				"app.kubernetes.io/instance": "fiftyone-test",
 			},
 		},
 		{
 			"overrideSelectorMatchLabels",
 			map[string]string{
-				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
-				// does not affect the label `app.kubernetes.io/name` for teams-app.
 				"teamsAppSettings.service.name": "test-service-name",
 			},
 			map[string]string{
-				"app.kubernetes.io/name":     "fiftyone-teams-app",
+				"app.kubernetes.io/name":     "test-service-name",
+				"app.kubernetes.io/instance": "fiftyone-test",
+			},
+			map[string]string{
+				"app.kubernetes.io/name":     "test-service-name",
 				"app.kubernetes.io/instance": "fiftyone-test",
 			},
 		},
@@ -1241,15 +1261,16 @@ func (s *deploymentTeamsAppTemplateTest) TestSelectorMatchLabels() {
 			var deployment appsv1.Deployment
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-			// Selector Labels and Template Metadata Labels use the same helm template.
-			// Check both.
-			for key, value := range testCase.expected {
+			for key, value := range testCase.selectorMatchExpected {
 
 				foundValue := deployment.Spec.Selector.MatchLabels[key]
 				s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
+			}
 
-				foundValue = deployment.Spec.Template.ObjectMeta.Labels[key]
-				s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
+			for key, value := range testCase.templateMetadataExpected {
+
+				foundValue := deployment.Spec.Template.ObjectMeta.Labels[key]
+				s.Equal(value, foundValue, "Template Metadata Labels should contain all set labels.")
 			}
 		})
 	}

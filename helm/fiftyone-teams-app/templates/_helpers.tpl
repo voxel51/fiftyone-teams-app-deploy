@@ -165,7 +165,7 @@ Plugins Combined labels
 Teams APP Selector labels
 */}}
 {{- define "fiftyone-teams-app.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "fiftyone-teams-app.name" . }}
+app.kubernetes.io/name: {{ include "teams-app.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 

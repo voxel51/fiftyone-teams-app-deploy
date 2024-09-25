@@ -1703,21 +1703,43 @@ func (s *deploymentPluginsTemplateTest) TestPodSecurityContext() {
 	}
 }
 
-func (s *deploymentPluginsTemplateTest) TestSelectorMatchLabels() {
+func (s *deploymentPluginsTemplateTest) TestTemplateLabels() {
 	testCases := []struct {
-		name     string
-		values   map[string]string
-		expected map[string]string
+		name                     string
+		values                   map[string]string
+		selectorMatchExpected    map[string]string
+		templateMetadataExpected map[string]string
 	}{
 		{
 			"defaultValues",
 			nil,
 			nil,
+			nil,
+		},
+		{
+			"addTemplateMetadataLabels",
+			map[string]string{
+				"pluginsSettings.enabled":        "true",
+				"pluginsSettings.labels.myLabel": "unruly",
+			},
+			map[string]string{
+				"app.kubernetes.io/name":     "teams-plugins",
+				"app.kubernetes.io/instance": "fiftyone-test",
+			},
+			map[string]string{
+				"app.kubernetes.io/name":     "teams-plugins",
+				"app.kubernetes.io/instance": "fiftyone-test",
+				"myLabel":                    "unruly",
+			},
 		},
 		{
 			"defaultValuesPluginsEnabled",
 			map[string]string{
 				"pluginsSettings.enabled": "true",
+			},
+			map[string]string{
+				"app.kubernetes.io/name":     "teams-plugins",
+				"app.kubernetes.io/instance": "fiftyone-test",
 			},
 			map[string]string{
 				"app.kubernetes.io/name":     "teams-plugins",
@@ -1729,6 +1751,10 @@ func (s *deploymentPluginsTemplateTest) TestSelectorMatchLabels() {
 			map[string]string{
 				"pluginsSettings.enabled":      "true",
 				"pluginsSettings.service.name": "test-service-name",
+			},
+			map[string]string{
+				"app.kubernetes.io/name":     "test-service-name",
+				"app.kubernetes.io/instance": "fiftyone-test",
 			},
 			map[string]string{
 				"app.kubernetes.io/name":     "test-service-name",
@@ -1762,15 +1788,16 @@ func (s *deploymentPluginsTemplateTest) TestSelectorMatchLabels() {
 				var deployment appsv1.Deployment
 				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-				// Selector Labels and Template Metadata Labels use the same helm template.
-				// Check both.
-				for key, value := range testCase.expected {
+				for key, value := range testCase.selectorMatchExpected {
 
 					foundValue := deployment.Spec.Selector.MatchLabels[key]
 					s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
+				}
 
-					foundValue = deployment.Spec.Template.ObjectMeta.Labels[key]
-					s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
+				for key, value := range testCase.templateMetadataExpected {
+
+					foundValue := deployment.Spec.Template.ObjectMeta.Labels[key]
+					s.Equal(value, foundValue, "Template Metadata Labels should contain all set labels.")
 				}
 			}
 		})
