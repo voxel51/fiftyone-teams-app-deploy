@@ -241,7 +241,6 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -261,7 +260,6 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.1.0",
@@ -322,7 +320,6 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -344,7 +341,6 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.1.0",
@@ -403,7 +399,6 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
@@ -425,7 +420,6 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{
 				"API_URL=http://teams-api:8000",
 				"APP_USE_HTTPS=true",
-				"FEATURE_FLAG_ENABLE_INVITATIONS=false",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
 				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.1.0",
