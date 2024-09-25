@@ -20,6 +20,9 @@ spec:
       {{- end }}
       labels:
         {{- include "fiftyone-app.selectorLabels" . | nindent 8 }}
+        {{- with .Values.appSettings.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

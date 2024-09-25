@@ -20,6 +20,9 @@ spec:
       {{- end }}
       labels:
         {{- include "fiftyone-teams-app.selectorLabels" . | nindent 8 }}
+        {{- with .Values.teamsAppSettings.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

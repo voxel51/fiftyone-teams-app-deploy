@@ -21,6 +21,9 @@ spec:
       {{- end }}
       labels:
         {{- include "teams-plugins.selectorLabels" . | nindent 8 }}
+        {{- with .Values.pluginsSettings.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
