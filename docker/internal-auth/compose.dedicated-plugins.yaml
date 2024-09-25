@@ -9,7 +9,6 @@ services:
 
   teams-api:
     environment:
-      FEATURE_FLAG_ENABLE_INVITATIONS: false
       FIFTYONE_PLUGINS_CACHE_ENABLED: true
       FIFTYONE_PLUGINS_DIR: /opt/plugins
     extends:
@@ -20,7 +19,6 @@ services:
 
   teams-app:
     environment:
-      FEATURE_FLAG_ENABLE_INVITATIONS: false
       FIFTYONE_TEAMS_PLUGIN_URL: ${FIFTYONE_TEAMS_PLUGIN_URL}
     extends:
       file: ../common-services.yaml
