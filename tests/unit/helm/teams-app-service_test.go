@@ -391,8 +391,6 @@ func (s *serviceTeamsAppTemplateTest) TestSelectorLabels() {
 		{
 			"overrideSelectorLabels",
 			map[string]string{
-				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
-				// does not affect the label `app.kubernetes.io/name` for teams-app.
 				"teamsAppSettings.service.name": "test-service-name",
 			},
 			map[string]string{
