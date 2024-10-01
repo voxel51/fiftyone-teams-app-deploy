@@ -40,15 +40,15 @@ For teams that have smaller
 databases (say, less than 100GB on disk), it may be simplest to
 perform a full database migration all at once:
 
-1. Increase the storage capacity of your MongoDB by 50% to buffer
+1. Make sure that all users/runners have upgraded their SDKs before
+performing the migration!
+2. Increase the storage capacity of your MongoDB by 50% to buffer
 against a transient spike in disk usage during migration.
-2. Schedule/perform the migration during a time of low
+3. Schedule/perform the migration during a time of low
 utilization. During migration, CPU and memory utilization will also
 spike which will adversely affect user operations.
-3. Budget a significant amount of time, say up to 2 hours, for the migration.
-4. Utilize the `fiftyone migrate –all` command (Option 2 below)
-5. Make sure that all users/runners have upgraded their SDKs before
-performing the migration!
+4. Budget a significant amount of time, say up to 2 hours, for the migration.
+5. Utilize the `fiftyone migrate –all` command (Option 2 below)
 
 ***Path B: Migrate datasets on-demand***
 
@@ -59,10 +59,11 @@ command. This option may be useful for instance to test out the
 migration to get a sense of the running time and increased MongoDB
 storage requirements for your typical datasets.
 
-1. Increase the storage capacity of your MongoDB to account for the
+1. Make sure that all users/runners have upgraded their SDKs!
+2. Increase the storage capacity of your MongoDB to account for the
 increased disk usage of your Datasets. Monitor this usage over time as
 datasets are migrated.
-2. Follow Option 1 or Option 3 below:
+3. Follow Option 1 or Option 3 below:
     * Option 1: Datasets are migrated when loaded in the SDK. Note,
 larger datasets could take a significant time (many minutes) to
 migrate at load-time.
