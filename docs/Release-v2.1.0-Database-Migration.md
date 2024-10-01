@@ -68,7 +68,8 @@ datasets are migrated.
 larger datasets could take a significant time (many minutes) to
 migrate at load-time.
     * Option 3: Specific datasets are explicitly
-migrated via the FiftyOne CLI.  3. After a time, you can always decide
+migrated via the FiftyOne CLI.
+4. After a time, you can always decide
 to finish the migration in bulk as in Path A.
 
 ## How do I perform the migration?
