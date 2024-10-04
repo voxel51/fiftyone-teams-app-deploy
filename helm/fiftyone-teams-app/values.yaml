@@ -1,6 +1,18 @@
 ---
 # FiftyOne Teams API (teams-api)
 apiSettings:
+  autoscaling:
+    # -- Controls horizontal pod autoscaling for fiftyone-app. [Reference][autoscaling].
+    enabled: false
+    # -- Maximum replicas for horizontal pod autoscaling for fiftyone-app.
+    maxReplicas: 20
+    # -- Minimum Replicas for horizontal pod autoscaling for fiftyone-app.
+    minReplicas: 2
+    # -- Percent CPU utilization for autoscaling for fiftyone-app.
+    targetCPUUtilizationPercentage: 80
+    # -- Percent memory utilization for autoscaling for fiftyone-app.
+    targetMemoryUtilizationPercentage: 80
+
   # -- Controls whether teams-api is added to the chart's ingress.
   # When an empty string, a rule for teams-api is not added to the chart managed ingress.
   # When not an empty string, becomes the value to the `host` in the ingress' rule and
@@ -33,6 +45,10 @@ apiSettings:
     tag: ""
   # -- Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors].
   labels: {}
+  # -- Number of pods in the teams-api deployment's ReplicaSet. [Reference][deployment].
+  # If you increase this beyond 1 you will need a ReadWriteMany directory for API Caching
+  # TODO: Provide Documentation for API Scaling
+  replicaCount: 1
 
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little

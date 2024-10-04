@@ -197,6 +197,13 @@ func (s *deploymentApiTemplateTest) TestReplicas() {
 			nil,
 			1,
 		},
+		{
+			"overrideReplicaCount",
+			map[string]string{
+				"apiSettings.replicaCount": "3",
+			},
+			3,
+		},
 	}
 
 	for _, testCase := range testCases {
