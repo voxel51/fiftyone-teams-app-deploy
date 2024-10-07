@@ -68,12 +68,12 @@ secret:
 #     FIFTYONE_PLUGINS_DIR: /opt/plugins
 #     # Set FIFTYONE_TEAMS_VERSION_OVERRIDE to override the `Install FiftyOne`
 #     # bash command in the `Settings > Install FiftyOne` modal
-#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.1.0
+#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.1.1
 
 
 appSettings:
   env:
-    # FIFTYONE_DATABASE_ADMIN is set to `false` by default for v2.1.0
+    # FIFTYONE_DATABASE_ADMIN is set to `false` by default for v2.1.1
     # If you are performing a new install or an upgrade from v1.0 or earlier you may want to set
     # this value to `true`.
     # Please see https://helm.fiftyone.ai/#initial-installation-vs-upgrades for details

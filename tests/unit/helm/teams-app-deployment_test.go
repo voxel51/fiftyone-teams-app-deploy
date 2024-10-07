@@ -313,7 +313,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "2.1.0"
+            "value": "2.1.1"
           },
           {
             "name": "FIFTYONE_APP_THEME",
@@ -384,7 +384,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "2.1.0"
+            "value": "2.1.1"
           },
           {
             "name": "FIFTYONE_APP_THEME",
