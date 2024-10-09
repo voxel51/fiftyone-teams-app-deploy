@@ -341,7 +341,8 @@ services.
 
 If you would like to execute
 [delegated operations](https://docs.voxel51.com/teams/teams_plugins.html?highlight=delegated#teams-delegated-operations)
-without the need to setup your own orchestrator, such as Airflow, you can launch worker
+without the need to setup your own orchestrator, such as Airflow,
+you can launch worker
 containers using [legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
 in conjunction with any of the plugin configurations above.
 
