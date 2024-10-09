@@ -38,5 +38,10 @@ services:
     volumes:
       - plugins-vol:/opt/plugins:ro
 
+  teams-delegated-operator-worker:
+    extends:
+      file: ../common-services.yaml
+      service: teams-delegated-operator-worker-common
+
 volumes:
   plugins-vol:
