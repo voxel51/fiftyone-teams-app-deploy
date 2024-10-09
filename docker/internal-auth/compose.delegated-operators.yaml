@@ -2,10 +2,10 @@
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 services:
-  teams-delegated-operator-worker:
+  teams-do:
     extends:
       file: ../common-services.yaml
-      service: teams-delegated-operator-worker-common
+      service: teams-do-worker-common
 
 volumes:
   plugins-vol:

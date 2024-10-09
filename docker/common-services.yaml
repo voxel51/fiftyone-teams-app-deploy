@@ -152,7 +152,7 @@ services:
       # no_proxy: ${NO_PROXY_LIST}
     restart: always
 
-  teams-delegated-operator-worker-common:
+  teams-do-common:
     image: voxel51/fiftyone-app:v2.1.0
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-0}
