@@ -160,7 +160,7 @@ services:
       /bin/sh -c "fiftyone delegated launch -t remote"
     environment:
       API_URL: ${API_URL}
-      FIFTYONE_API_KEY: ${FIFTYONE_API_KEY}
+      FIFTYONE_API_KEY: ${FIFTYONE_API_KEY:-none}
       FIFTYONE_DATABASE_ADMIN: false
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
