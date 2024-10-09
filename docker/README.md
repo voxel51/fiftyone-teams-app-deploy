@@ -59,6 +59,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
       - [Builtin Plugins Only](#builtin-plugins-only)
       - [Shared Plugins](#shared-plugins)
       - [Dedicated Plugins](#dedicated-plugins)
+      - [Delegated Operators](#delegated-operators)
     - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
     - [Proxies](#proxies)
     - [Text Similarity](#text-similarity)
@@ -338,10 +339,10 @@ services.
 
 #### Delegated Operators
 
-If you would like to execute 
+If you would like to execute
 [delegated operations](https://docs.voxel51.com/teams/teams_plugins.html?highlight=delegated#teams-delegated-operations) 
 without the need to setup your own orchestrator, such as Airflow, you can launch worker
-containers using [legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml) 
+containers using [legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
 in conjunction with any of the plugin configurations above.
 
 - Example `docker compose` command for this mode from the `legacy-auth`
