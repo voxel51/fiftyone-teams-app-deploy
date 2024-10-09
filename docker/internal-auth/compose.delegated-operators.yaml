@@ -5,7 +5,7 @@ services:
   teams-do:
     extends:
       file: ../common-services.yaml
-      service: teams-do-worker-common
+      service: teams-do-common
 
 volumes:
   plugins-vol:
