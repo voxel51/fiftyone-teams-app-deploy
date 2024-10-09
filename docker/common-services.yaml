@@ -156,6 +156,8 @@ services:
     image: voxel51/fiftyone-app:v2.1.0
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-0}
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote"
     environment:
       API_URL: ${API_URL}
       FIFTYONE_API_KEY: ${FIFTYONE_API_KEY}
@@ -168,3 +170,5 @@ services:
       FIFTYONE_PLUGINS_CACHE_ENABLED: true
       FIFTYONE_PLUGINS_DIR: /opt/plugins
     restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro

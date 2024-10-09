@@ -37,13 +37,9 @@ services:
       service: teams-cas-common
 
   teams-delegated-operator-worker:
-    command: >
-      /bin/sh -c "fiftyone delegated launch -t remote"
     extends:
       file: ../common-services.yaml
       service: teams-delegated-operator-worker-common
-    volumes:
-      - plugins-vol:/opt/plugins:ro
 
 volumes:
   plugins-vol:
