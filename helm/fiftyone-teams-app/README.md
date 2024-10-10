@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.1.0](https://img.shields.io/badge/AppVersion-v2.1.0-informational?style=flat-square)
+![Version: 2.1.1](https://img.shields.io/badge/Version-2.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.1.1](https://img.shields.io/badge/AppVersion-v2.1.1-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 <!-- markdownlint-enable line-length -->
@@ -174,7 +174,7 @@ Supported locations are network mounted filesystems and cloud storage folders.
   - Mount a Persistent Volume Claim with `ReadWrite` permissions to
     the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path.
     For an example, see
-    [Plugins Storage](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md).
+    [Plugins Storage][plugins-storage].
 - Cloud storage folder
   - In `values.yaml`, set the cloud storage path (for example
     `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
@@ -251,7 +251,7 @@ To enable this mode
   - `appSettings.env.FIFTYONE_PLUGINS_DIR`
   - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  [Adding Shared Storage for FiftyOne Teams Plugins][plugins-storage]
   - Mount a PVC that provides
     - `ReadWrite` permissions to the `teams-api` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
@@ -269,7 +269,7 @@ To enable this mode
     - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
     - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  [Adding Shared Storage for FiftyOne Teams Plugins][plugins-storage]
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-api` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
@@ -568,7 +568,7 @@ appSettings:
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics. |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.1.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.1.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Teams API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
@@ -629,14 +629,14 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -676,10 +676,10 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams v2.1.0](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams v2.1.1](#deploying-fiftyone-teams)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.1.0`
-1. Upgrade your FiftyOne SDKs to version 2.1.0
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.1.1`
+1. Upgrade your FiftyOne SDKs to version 2.1.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -697,7 +697,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -715,7 +715,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -756,16 +756,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.1.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.0
+1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.0 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.1.1 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.0` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.1.1` is recommended before migrating
         > your database.
 
     ```shell
@@ -780,7 +780,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -820,16 +820,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.0
+1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.1
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.0 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.1.1 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.0` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.1.1` is recommended before migrating
         > your database.
 
     ```shell
@@ -844,9 +844,9 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.1.0](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.1.0, but it is not required
+   version 2.1.1, but it is not required
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -946,6 +946,8 @@ A minimal example `values.yaml` may be found
 [autoscaling]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 [container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
 [image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
@@ -954,19 +956,15 @@ A minimal example `values.yaml` may be found
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
+[mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+[plugins-storage]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+[recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
 [resources]: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 [security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 [service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-
-[mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
-
-[recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
-
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
-[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
