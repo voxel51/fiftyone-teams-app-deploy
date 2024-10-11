@@ -281,6 +281,68 @@ casSettings:
   volumeMounts: []
   # -- Volumes for teams-cas. [Reference][volumes].
   volumes: []
+# FiftyOne Teams Plugins (teams-plugins) configurations. [Reference][fiftyone-plugins].
+
+delegatedOperatorExecutorSettings:
+  # Environment Variables are passed to the delegated-operator-executor containers.
+  env:
+    # -- Set the media cache size (in bytes) for the local FiftyOne Plugins processes.
+    # The default value is 32 GiB.
+    # `-1` is disabled.
+    FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+    # TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`
+    # -- Whether the SDK is running in an internal service context.
+    # When running in FiftyOne Teams, set to `true`.
+    FIFTYONE_INTERNAL_SERVICE: true
+  image:
+    # -- Instruct when the kubelet should pull (download) the specified image.
+    # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
+    pullPolicy: Always
+    # -- Container image for delegated-operator-executor.
+    repository: voxel51/fiftyone-app
+    # -- Image tag for delegated-operator-executor. Defaults to the chart version.
+    tag: ""
+  # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
+  labels: {}
+  # -- Number of pods in the delegated-operator-executor deployment's ReplicaSet.
+  # This should not exceed the value set in the deployment's license file for
+  #  max concurrent delegated operators.
+  # Set to 0 by default, meaning delegated operations will not be executed
+  #  without an external executor system.
+  replicaCount: 0
+
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # -- Container resource requests and limits for delegated-operator-executor. [Reference][resources].
+  resources:
+    limits: {}
+    #   cpu: 2
+    #   memory: 6Gi
+    requests: {}
+    #   cpu: 500m
+    #   memory: 1Gi
+
+  # -- Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity].
+  affinity: {}
+  # -- Deployment name
+  name: "teams-do"
+  # -- nodeSelector for delegated-operator-executor. [Reference][node-selector].
+  nodeSelector: {}
+  # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
+  podAnnotations: {}
+  # -- Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context].
+  podSecurityContext: {}
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
+  # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
+  securityContext: {}
+  # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
+  tolerations: []
+  # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
+  volumeMounts: []
+  # -- Volumes for delegated-operator-executor. [Reference][volumes].
+  volumes: []
 
 # -- List of secrets for FiftyOne Teams Licenses (one per org)
 fiftyoneLicenseSecrets:
@@ -463,6 +525,10 @@ secret:
     # This is used for inter-service authentication and for the SuperUser to
     #  authenticate at the CAS UI to configure the Central Authentication Service.
     fiftyoneAuthSecret: ""
+    # -- An admin API key to use for running delegated operations, like a service account.
+    # <https://docs.voxel51.com/teams/api_connection.html#generating-an-api-key>
+    # This key is only required if `.Values.delegatedOperatorExecutorSettings.replicaCount` is nonzero.
+    delegatedOperatorApiKey: ""
 
 serviceAccount:
   # -- Service Account annotations. [Reference][annotations].
