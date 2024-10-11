@@ -286,7 +286,8 @@ casSettings:
 delegatedOperatorExecutorSettings:
   # Environment Variables are passed to the delegated-operator-executor containers.
   env:
-    # -- Set the media cache size (in bytes) for the local FiftyOne Plugins processes.
+    # -- Set the media cache size (in bytes) for the local FiftyOne Delegated
+    # Operator Executor processes.
     # The default value is 32 GiB.
     # `-1` is disabled.
     FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
