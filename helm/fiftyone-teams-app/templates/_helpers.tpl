@@ -30,7 +30,7 @@ Create a default name for the delegated operator executor service
 {{- if .Values.delegatedOperatorExecutorSettings.name }}
 {{- .Values.delegatedOperatorExecutorSettings.name | trunc 63 | trimSuffix "-" }}
 {{- else }}
-"delegated-operator-executor"
+"teams-do"
 {{- end }}
 {{- end }}
 
