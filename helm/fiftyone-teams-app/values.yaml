@@ -281,8 +281,8 @@ casSettings:
   volumeMounts: []
   # -- Volumes for teams-cas. [Reference][volumes].
   volumes: []
-# FiftyOne Teams Plugins (teams-plugins) configurations. [Reference][fiftyone-plugins].
 
+# FiftyOne Teams Delegated Operator Executor (teams-do) configurations.
 delegatedOperatorExecutorSettings:
   # Environment Variables are passed to the delegated-operator-executor containers.
   env:
