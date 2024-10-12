@@ -1,0 +1,4 @@
+services:
+  teams-do:
+    depends_on: [mongodb]
+    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:${FIFTYONE_APP_VERSION}
