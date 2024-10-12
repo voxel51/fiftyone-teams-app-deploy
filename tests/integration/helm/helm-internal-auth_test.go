@@ -96,18 +96,25 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 		{
 			"sharedPlugins", // plugins run in fiftyone-app deployment
 			map[string]string{
-				"casSettings.env.FIFTYONE_AUTH_MODE":                     "internal",
-				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
-				"apiSettings.volumes[0].name":                            "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
-				"apiSettings.volumeMounts[0].name":                       "plugins-vol",
-				"apiSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
-				"appSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
-				"appSettings.volumes[0].name":                            "plugins-vol-ro",
-				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
-				"appSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
-				"appSettings.volumeMounts[0].name":                       "plugins-vol-ro",
-				"appSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                           "internal",
+				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
+				"apiSettings.volumes[0].name":                                                  "plugins-vol",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                       "pv0001claim",
+				"apiSettings.volumeMounts[0].name":                                             "plugins-vol",
+				"apiSettings.volumeMounts[0].mountPath":                                        "/opt/plugins",
+				"appSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
+				"appSettings.volumes[0].name":                                                  "plugins-vol-ro",
+				"appSettings.volumes[0].persistentVolumeClaim.claimName":                       "pv0001claim",
+				"appSettings.volumes[0].persistentVolumeClaim.readOnly":                        "true",
+				"appSettings.volumeMounts[0].name":                                             "plugins-vol-ro",
+				"appSettings.volumeMounts[0].mountPath":                                        "/opt/plugins",
+				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
+				"delegatedOperatorExecutorSettings.volumes[0].name":                            "plugins-vol-ro",
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
+				"delegatedOperatorExecutorSettings.volumeMounts[0].name":                       "plugins-vol-ro",
+				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
+				"delegatedOperatorExecutorSettings.replicaCount":                               "1",
 			},
 			[]serviceValidations{
 				{
@@ -139,24 +146,38 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					httpResponseCode: 200,
 					log:              "[INFO] Running on http://0.0.0.0:5151",
 				},
+				{
+					name:             "teams-do",
+					url:              "",
+					responsePayload:  "",
+					httpResponseCode: 0,
+					log:              "[INFO] Executor started",
+				},
 			},
 		},
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
-				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                       "/opt/plugins",
-				"apiSettings.volumes[0].name":                                "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pv0001claim",
-				"apiSettings.volumeMounts[0].name":                           "plugins-vol",
-				"apiSettings.volumeMounts[0].mountPath":                      "/opt/plugins",
-				"casSettings.env.FIFTYONE_AUTH_MODE":                         "internal",
-				"pluginsSettings.enabled":                                    "true",
-				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
-				"pluginsSettings.volumes[0].name":                            "plugins-vol-ro",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
-				"pluginsSettings.volumeMounts[0].name":                       "plugins-vol-ro",
-				"pluginsSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
+				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
+				"apiSettings.volumes[0].name":                                                  "plugins-vol",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                       "pv0001claim",
+				"apiSettings.volumeMounts[0].name":                                             "plugins-vol",
+				"apiSettings.volumeMounts[0].mountPath":                                        "/opt/plugins",
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                           "internal",
+				"pluginsSettings.enabled":                                                      "true",
+				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                                     "/opt/plugins",
+				"pluginsSettings.volumes[0].name":                                              "plugins-vol-ro",
+				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName":                   "pv0001claim",
+				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":                    "true",
+				"pluginsSettings.volumeMounts[0].name":                                         "plugins-vol-ro",
+				"pluginsSettings.volumeMounts[0].mountPath":                                    "/opt/plugins",
+				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
+				"delegatedOperatorExecutorSettings.volumes[0].name":                            "plugins-vol-ro",
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
+				"delegatedOperatorExecutorSettings.volumeMounts[0].name":                       "plugins-vol-ro",
+				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
+				"delegatedOperatorExecutorSettings.replicaCount":                               "1",
 			},
 			[]serviceValidations{
 				{
@@ -194,6 +215,13 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					responsePayload:  "",
 					httpResponseCode: 0,
 					log:              "[INFO] Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
+				},
+				{
+					name:             "teams-do",
+					url:              "",
+					responsePayload:  "",
+					httpResponseCode: 0,
+					log:              "[INFO] Executor started",
 				},
 			},
 		},
@@ -290,7 +318,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
 
 				// Validate endpoint response
-				// Skip fiftyone-app and teams-plugins because they do not have callable endpoints that return a response payload.
+				// Skip fiftyone-app, teams-plugins, and teams-do because they do not have callable endpoints that return a response payload.
 				if expected.url != "" {
 					// Validate url endpoint response is expected
 					validate_endpoint(subT, expected.url, expected.responsePayload, expected.httpResponseCode)
