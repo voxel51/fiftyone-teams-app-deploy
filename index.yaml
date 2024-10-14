@@ -2,6 +2,18 @@ apiVersion: v1
 entries:
   fiftyone-teams-app:
   - apiVersion: v2
+    appVersion: v2.1.1
+    created: "2024-10-14T13:53:46.428510973Z"
+    description: FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone)
+      project.
+    digest: 2e6ec8a9f8a36b2351f99c32d426716a3f0797d7f261fc4ac62ede27b936daa9
+    icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
+    name: fiftyone-teams-app
+    type: application
+    urls:
+    - https://github.com/voxel51/fiftyone-teams-app-deploy/releases/download/fiftyone-teams-app-2.1.1/fiftyone-teams-app-2.1.1.tgz
+    version: 2.1.1
+  - apiVersion: v2
     appVersion: v2.1.0
     created: "2024-10-01T02:54:55.259237705Z"
     description: FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone)
@@ -543,4 +555,4 @@ entries:
     urls:
     - https://github.com/voxel51/fiftyone-teams-app-deploy/releases/download/fiftyone-teams-app-0.1.7/fiftyone-teams-app-0.1.7.tgz
     version: 0.1.7
-generated: "2024-10-01T02:54:55.259588222Z"
+generated: "2024-10-14T13:53:46.428910118Z"
