@@ -54,7 +54,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
               pullPolicy: IfNotPresent
-              tag: v2.1.1rc2  # TODO: change to v2.1.0rc1 prior to the release of 2.0.1
+              tag: v2.1.0rc15
 
           # FiftyOne App (fiftyone-app) configurations
           appSettings:
@@ -71,7 +71,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v2.1.1rc2  # TODO: change to v2.1.0rc1 prior to the release of 2.0.1
+              tag: v2.1.0rc15
 
           # Central Authentication Service (teams-cas) configurations
           casSettings:
@@ -81,7 +81,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
               pullPolicy: IfNotPresent
-              tag: v2.1.1-rc.1  # TODO: change to v2.1.0rc1 prior to the release of 2.0.1
+              tag: v2.1.0rc15
 
           # TODO: Test `minikube addons configure registry-creds` or
           # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
@@ -147,7 +147,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v2.0.0rc17  # TODO: change to v2.1.0rc1 prior to the release of 2.0.1
+              tag: v2.1.0rc15
 
           # FiftyOne Teams App (teams-app) configurations
           teamsAppSettings:
@@ -166,6 +166,6 @@ deploy:
               # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
               # This is a byproduct of `npm` versioning versus Python PEP 440.
               pullPolicy: IfNotPresent
-              tag: v2.1.1-rc.1  # TODO: change to v2.1.0rc1 prior to the release of 2.0.1
+              tag: v2.1.0rc15
 
   kubeContext: minikube
