@@ -34,8 +34,7 @@ auth:
 
 hooks:  ## Install git hooks (pre-commit)
 	@pre-commit install
-	# disabled until we adopt conventional-commits
-	# @pre-commit install --hook-type commit-msg
+	@pre-commit install --hook-type commit-msg
 
 	# Install environments for all available hooks now (rather than when they are first executed)
 	@pre-commit install --install-hooks
