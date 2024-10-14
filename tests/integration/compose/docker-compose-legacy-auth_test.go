@@ -248,7 +248,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "[INFO] Executor started",
+					log:              "Executor started",
 				},
 			},
 		},
