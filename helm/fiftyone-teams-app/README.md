@@ -968,4 +968,3 @@ A minimal example `values.yaml` may be found
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-[workload-identity]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/gke-workload-identity.md
