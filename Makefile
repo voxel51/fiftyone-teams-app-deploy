@@ -107,7 +107,7 @@ run-mongodb: helm-repos  ## run skaffold run
 	  --kube-context minikube
 
 run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
-	skaffold run -p only-fiftyone \
+	skaffold run --profile only-fiftyone \
 	  --kube-context minikube
 
 license-secret-internal: copy-license-files-skaffold
@@ -228,21 +228,21 @@ test-integration-compose-interleaved-legacy: install-terratest-log-parser copy-l
 
 test-integration-helm: test-integration-helm-internal test-integration-helm-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
 
-test-integration-helm-internal:  ## run go test on the tests/integration/helm directory for internal auth mode
+test-integration-helm-internal: copy-license-files-helm  ## run go test on the tests/integration/helm directory for internal auth mode
 	@cd tests/integration/helm; \
 	go test -count=1 -timeout=15m -v -tags integrationHelmInternalAuth
 
-test-integration-helm-legacy:  ## run go test on the tests/integration/helm directory for legacy auth mode
+test-integration-helm-legacy: copy-license-files-helm  ## run go test on the tests/integration/helm directory for legacy auth mode
 	@cd tests/integration/helm; \
 	go test -count=1 -timeout=15m -v -tags integrationHelmLegacyAuth
 
-test-integration-helm-interleaved-internal:  ## run go test on the tests/integration/helm directory for internal auth mode
+test-integration-helm-interleaved-internal: copy-license-files-helm  ## run go test on the tests/integration/helm directory for internal auth mode
 	@cd tests/integration/helm; \
 	rm -rf test_output_internal/*; \
 	go test -count=1 -timeout=15m -v -tags integrationHelmInternalAuth | tee test_output_internal.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
 
-test-integration-helm-interleaved-legacy:  ## run go test on the tests/integration/helm directory for legacy auth mode
+test-integration-helm-interleaved-legacy: copy-license-files-helm  ## run go test on the tests/integration/helm directory for legacy auth mode
 	@cd tests/integration/helm; \
 	rm -rf test_output_legacy/*; \
 	go test -count=1 -timeout=15m -v -tags integrationHelmLegacyAuth | tee test_output_legacy.log; \
