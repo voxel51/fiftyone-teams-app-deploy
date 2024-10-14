@@ -78,6 +78,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
   - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
   - [From FiftyOne Teams Version 2.0.0](#from-fiftyone-teams-version-200)
 - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
+  - [Deploying On GKE](#deploying-on-gke)
 
 <!-- tocstop -->
 
@@ -940,7 +941,32 @@ A minimal example `values.yaml` may be found
         > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
         > ```
 
+### Deploying On GKE
+
+Voxel51 FiftyOne Teams supports
+[Workload Identity Federation for GKE][about-wif]
+when installing via Helm into Google Kubernetes Engine (GKE).
+Workload Identity is achieved using service account annotations
+that can be defined in the `values.yaml` file when installing
+or upgrading the application.
+
+Please follow the steps
+[outlined by Google][howto-wif]
+to allow your cluster to utilize workload identity federation and to
+create a service account with the required IAM permissions.
+
+Once the cluster and service account are configured, you can permit your
+workloads to utilize the GCP service account via service account annotations
+defined in the `values.yaml` file:
+
+```yaml
+serviceAccount:
+  annotations:
+    iam.gke.io/gcp-service-account: <GSA_NAME>@<GSA_PROJECT>.iam.gserviceaccount.com
+```
+
 <!-- Reference Links -->
+[about-wif]: https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity
 [affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 [annotations]: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 [autoscaling]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
@@ -948,6 +974,7 @@ A minimal example `values.yaml` may be found
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 [fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
 [fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
+[howto-wif]: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
 [image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
