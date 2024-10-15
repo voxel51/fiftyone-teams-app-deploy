@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.1
       - uses: actions/setup-python@v5.2.0
+      - name: Temporary SQLite/LZMA - Install missing libraries
+        run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
       - uses: pre-commit/action@v3.0.1
