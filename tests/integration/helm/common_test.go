@@ -112,3 +112,16 @@ func getBase64EncodedStringOfFile(filePath string) string {
 	sEnc := base64.StdEncoding.EncodeToString(b)
 	return sEnc
 }
+
+func defineKubeCtx() string {
+	kubeCtx := "minikube"
+	requiredSubstring := "voxel51-ephemeral-test" // enforce it goes to ephemeral env
+	if kc := os.Getenv("INTEGRATION_TEST_KUBECONTEXT"); kc != "" {
+		if strings.Contains(kubeCtx, requiredSubstring) {
+			kubeCtx = kc
+		} else {
+			fmt.Printf("The string '%s' does not contain the required context slug. Defaulting to minikube.\n", kc)
+		}
+	}
+	return kubeCtx
+}

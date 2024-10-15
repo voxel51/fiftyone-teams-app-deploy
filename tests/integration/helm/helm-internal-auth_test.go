@@ -36,14 +36,15 @@ func TestHelmInternalAuth(t *testing.T) {
 
 	helmChartPath, err := filepath.Abs(chartPath)
 	require.NoError(t, err)
-
+	
+	kubeCtx := defineKubeCtx()
 	integrationValuesPath, err := filepath.Abs(integrationValues)
 
 	suite.Run(t, &internalAuthHelmTest{
 		Suite:     suite.Suite{},
 		chartPath: helmChartPath,
 		namespace: "fiftyone-" + strings.ToLower(random.UniqueId()),
-		context:   "minikube", // hardcoding to minikube k8s cluster context avoid accessing another k8s cluster
+		context:   kubeCtx,
 		valuesFiles: []string{
 			integrationValuesPath, // Copy of values from `skaffold.yaml`'s `helm.releases[0].overrides`
 		},
