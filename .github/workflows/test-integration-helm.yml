@@ -38,4 +38,5 @@ jobs:
         shell: bash
         run: |
           gcloud components install gke-gcloud-auth-plugin --quiet
+          make helm-repos
           make test-integration-helm-ci
