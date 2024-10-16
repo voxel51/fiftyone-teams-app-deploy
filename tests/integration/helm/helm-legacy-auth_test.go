@@ -102,12 +102,12 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"casSettings.env.CAS_DATABASE_NAME":                      "cas-leg-sp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"apiSettings.volumes[0].name":                            "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + suffix,
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-leg-sp-" + suffix,
 				"apiSettings.volumeMounts[0].name":                       "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
 				"appSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"appSettings.volumes[0].name":                            "plugins-vol-ro",
-				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + suffix,
+				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-leg-sp-" + suffix,
 				"appSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"appSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -150,7 +150,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"secret.fiftyone.fiftyoneDatabaseName":                       "fiftyone-leg-dp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                       "/opt/plugins",
 				"apiSettings.volumes[0].name":                                "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pvc-" + suffix,
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pv-fiftyone-leg-dp-" + suffix,
 				"apiSettings.volumeMounts[0].name":                           "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                      "/opt/plugins",
 				"casSettings.env.FIFTYONE_AUTH_MODE":                         "legacy",
@@ -158,7 +158,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"pluginsSettings.enabled":                                    "true",
 				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"pluginsSettings.volumes[0].name":                            "plugins-vol-ro",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + suffix,
+				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pv-fiftyone-leg-dp-" + suffix,
 				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"pluginsSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"pluginsSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -242,7 +242,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				}
 
 				pv := PersistentVolume{
-					Name:             "pv-" + suffix,
+					Name:             testCase.values["apiSettings.volumes[0].persistentVolumeClaim.claimName"],
 					AccessModes:      []string{"ReadWriteOnce", "ReadOnlyMany"},
 					Capacity:         pvCapacity,
 					StorageClassName: pvStorageClassName,
@@ -251,7 +251,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				}
 
 				pvc := PersistentVolumeClaim{
-					Name:             "pvc-" + suffix,
+					Name:             testCase.values["apiSettings.volumes[0].persistentVolumeClaim.claimName"],
 					AccessModes:      []string{"ReadWriteOnce", "ReadOnlyMany"},
 					Capacity:         pv.Capacity,
 					VolumeName:       pv.Name,
