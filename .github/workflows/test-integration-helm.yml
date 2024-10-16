@@ -1,5 +1,5 @@
 ---
-name: Tests - Helm
+name: Tests - Integration Helm
 
 on:
   pull_request:
