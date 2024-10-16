@@ -169,7 +169,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				},
 				{
 					name:             "teams-app",
-					url:              "", //"https://local.fiftyone.ai/api/hello",
+					url:              "", // "https://local.fiftyone.ai/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
