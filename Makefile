@@ -160,11 +160,11 @@ copy-license-files-docker:  ## copy local developer license files used during do
 copy-license-files-helm:  ## copy local developer license files used during helm integration tests
 	gcloud storage cp \
 	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
-	  tests/fixtures/helm/internal-license.key
+	  tests/fixtures/helm/internal-license.key \
 	  --project computer-vision-team
 	gcloud storage cp \
 	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
-	  tests/fixtures/helm/legacy-license.key
+	  tests/fixtures/helm/legacy-license.key \
 	  --project computer-vision-team
 
 copy-license-files-skaffold:  ## copy local developer license files used during helm integration tests
@@ -225,6 +225,21 @@ test-integration-compose-interleaved-legacy: install-terratest-log-parser copy-l
 	rm -rf test_output_legacy/*; \
 	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
+
+test-integration-helm-ci:
+	@CLST=$(shell gcloud container clusters list --filter="name : voxel51-ephemeral-test-*" --format="get(name)"); \
+	INTEGRATION_TEST_KUBECONTEXT=gke_computer-vision-team_us-east4_$$CLST; \
+	gcloud container clusters get-credentials \
+		$$CLST \
+		--region=us-east4 \
+		--project=computer-vision-team; \
+	skaffold run \
+		--filename=skaffold-mongodb.yaml \
+		--kube-context=$$INTEGRATION_TEST_KUBECONTEXT; \
+	INTEGRATION_TEST_KUBECONTEXT=$$INTEGRATION_TEST_KUBECONTEXT make test-integration-helm-internal; \
+	skaffold delete \
+		--filename=skaffold-mongodb.yaml \
+		--kube-context=$$INTEGRATION_TEST_KUBECONTEXT
 
 test-integration-helm: test-integration-helm-internal test-integration-helm-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
 

@@ -6,11 +6,14 @@ package integration
 import (
 	"crypto/tls"
 
+	"bytes"
 	"encoding/base64"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
@@ -18,41 +21,76 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+type NFSConfig struct {
+	Server string
+	Path   string
+}
+
+type PersistentVolume struct {
+	Name             string
+	AccessModes      []string
+	Capacity         string
+	StorageClassName string
+	HostPath         string
+	NFS              *NFSConfig // Pointer to allow for nil checking
+}
+
+type PersistentVolumeClaim struct {
+	Name             string
+	AccessModes      []string
+	Capacity         string
+	HostPath         string
+	StorageClassName string
+	VolumeName       string
+}
+
 const (
 	chartPath           = "../../../helm/fiftyone-teams-app/"
 	integrationValues   = "../../fixtures/helm/integration_values.yaml"
 	licenseFileInternal = "../../fixtures/helm/internal-license.key"
 	licenseFileLegacy   = "../../fixtures/helm/legacy-license.key"
 	// for minikube, where node count is 1, we don't need ReadWriteMany and NFS
-	persistentVolumeYaml = `---
-    apiVersion: v1
-    kind: PersistentVolume
-    metadata:
-      name: pv0001
-    spec:
-      accessModes:
+	persistentVolumeYamlTpl = `---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: {{ .Name }}
+spec:
+    accessModes:
         - ReadWriteOnce
         - ReadOnlyMany
-      capacity:
-        storage: 100Mi
-      hostPath:
-        path: /data/pv0001/
+    capacity:
+        storage: {{ .Capacity }}
+    {{- if .HostPath }}
+    hostPath:
+        path: {{ .HostPath }}
+    {{- else if .NFS }}
+    nfs:
+        server: {{ .NFS.Server }}
+        path: {{ .NFS.Path }}
+    {{- end }}
+    storageClassName: {{ .StorageClassName }}
 `
 	// for minikube, where node count is 1, we don't need ReadWriteMany and NFS
-	persistentVolumeClaimYaml = `---
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: pv0001claim
-    spec:
-      accessModes:
+	persistentVolumeClaimYamlTpl = `---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: {{ .Name }}
+spec:
+    accessModes:
         - ReadWriteOnce
         - ReadOnlyMany
-      resources:
+    storageClassName: {{ .StorageClassName }}
+    volumeName: {{ .VolumeName }}
+    resources:
         requests:
-          storage: 100Mi
+            storage: {{ .Capacity }}
 `
-
+	nfsExportPath      = "/ephemeral-integration-tests/plugins"
+	nfsExportServer    = "nfs-server.us-east5-a.c.computer-vision-team.internal"
+	pvCapacity         = "100Mi"
+	pvStorageClassName = "\"\""
 	// License File Secret
 	licenseFileSecretTemplateYaml = `---
     apiVersion: v1
@@ -62,6 +100,10 @@ const (
     type: Opaque
     data:
       license: `
+)
+
+var (
+	pvSuffix = generateRandomString(6)
 )
 
 type serviceValidations struct {
@@ -117,11 +159,47 @@ func defineKubeCtx() string {
 	kubeCtx := "minikube"
 	requiredSubstring := "voxel51-ephemeral-test" // enforce it goes to ephemeral env
 	if kc := os.Getenv("INTEGRATION_TEST_KUBECONTEXT"); kc != "" {
-		if strings.Contains(kubeCtx, requiredSubstring) {
+		if strings.Contains(kc, requiredSubstring) {
 			kubeCtx = kc
 		} else {
 			fmt.Printf("The string '%s' does not contain the required context slug. Defaulting to minikube.\n", kc)
 		}
 	}
 	return kubeCtx
+}
+
+func renderTemplate(templateString string, data interface{}) (string, error) {
+	tmpl, err := template.New("resource").Parse(templateString)
+	if err != nil {
+		return "", err
+	}
+
+	var buffer bytes.Buffer
+	if err := tmpl.Execute(&buffer, data); err != nil {
+		return "", err
+	}
+
+	return buffer.String(), nil
+}
+
+func pvToYaml(pv PersistentVolume) (string, error) {
+	return renderTemplate(persistentVolumeYamlTpl, pv)
+}
+
+func pvcToYaml(pvc PersistentVolumeClaim) (string, error) {
+	return renderTemplate(persistentVolumeClaimYamlTpl, pvc)
+}
+
+func generateRandomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyz"
+
+	// Seed the random number generator
+	rand.Seed(time.Now().UnixNano())
+
+	// Create a byte slice to store the random characters
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(b)
 }
