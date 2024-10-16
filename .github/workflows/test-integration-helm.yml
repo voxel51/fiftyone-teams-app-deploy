@@ -37,4 +37,5 @@ jobs:
       - name: Run unit tests
         shell: bash
         run: |
+          gcloud components install gke-gcloud-auth-plugin --quiet
           make test-integration-helm-ci
