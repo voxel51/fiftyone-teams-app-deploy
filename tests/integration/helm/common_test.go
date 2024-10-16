@@ -208,7 +208,7 @@ func enforceReady(subT *testing.T, kubectlOptions *k8s.KubectlOptions, vals []se
 	// Pods might have to connect to each other. So, we should
 	// wait for all pods to be ready before doing any log checks.
 	waitTime := 5 * time.Second
-	retries := 72
+	retries := 96
 	for _, expected := range vals {
 		deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
 		// when pulling images for the first time, it may take longer than 90s
