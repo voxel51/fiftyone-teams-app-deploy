@@ -52,17 +52,11 @@
     make start
     ```
 
-1. Download dev license file (legacy or internal)
+1. Download dev license file
 
-    ```shell
-    make license-secret-legacy
-    ```
-
-    or
-
-    ```shell
-    make license-secret-internal
-    ```
+   ```shell
+   make license-secret-legacy
+   ```
 
 1. Run skaffold
 
@@ -70,33 +64,11 @@
     make dev-keep
     ```
 
-    Cancelling this process will destroy the cert-manager and mongodb deployments.
-    Alternatively, they can be started with
-
-    ```shell
-    make run-cert-manager run-mongodb
-    ```
-
-    and then run this to manage the fiftyone-teams deployment resources
-
-    ```shell
-    skaffold dev \
-      --profile only-fiftyone \
-      --keep-running-on-failure \
-      --kube-context minikube
-    ```
-
-    Cancelling this process will destroy only the fiftyone-teams deployment
-    resources (leaving the cert-manager and mongodb resources).
-
 1. In another terminal, run minikube tunnel (and provide your password when prompted)
 
     ```shell
-    sudo minikube tunnel
+    minikube tunnel
     ```
-
-    > **NOTE**: This command will prompt for sudo permission
-    > on systems where 80 and 443 are privileged ports
 
 1. Navigate to
    [https://local.fiftyone.ai](https://local.fiftyone.ai)
