@@ -236,7 +236,7 @@ test-integration-helm-ci:
 	skaffold run \
 		--filename=skaffold-mongodb.yaml \
 		--kube-context=$$INTEGRATION_TEST_KUBECONTEXT; \
-	INTEGRATION_TEST_KUBECONTEXT=$$INTEGRATION_TEST_KUBECONTEXT make test-integration-helm-internal; \
+	INTEGRATION_TEST_KUBECONTEXT=$$INTEGRATION_TEST_KUBECONTEXT make test-integration-helm; \
 	skaffold delete \
 		--filename=skaffold-mongodb.yaml \
 		--kube-context=$$INTEGRATION_TEST_KUBECONTEXT

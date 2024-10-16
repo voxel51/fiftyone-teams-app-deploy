@@ -1,0 +1,13 @@
+extraEnvVars:
+  - name: MONGO_INITDB_ROOT_USERNAME
+    value: root
+  - name: MONGO_INITDB_ROOT_PASSWORD
+    value: 3-9XjJ-gUV?vp^e(WUk>LD&lAjh7yEji
+image:
+  pullPolicy: IfNotPresent
+  repository: mongo
+  tag: 6.0.12-jammy
+persistence:
+  mountPath: /data/db
+volumePermissions:
+  enabled: true
