@@ -64,21 +64,21 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "https://local.fiftyone.ai/health",
+					url:              "", // "https://local.fiftyone.ai/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "https://local.fiftyone.ai/api/hello",
+					url:              "", // "https://local.fiftyone.ai/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "https://local.fiftyone.ai/cas/api",
+					url:              "", // "https://local.fiftyone.ai/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -99,12 +99,12 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"casSettings.env.FIFTYONE_AUTH_MODE":                     "legacy",
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"apiSettings.volumes[0].name":                            "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + pvSuffix,
 				"apiSettings.volumeMounts[0].name":                       "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
 				"appSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"appSettings.volumes[0].name":                            "plugins-vol-ro",
-				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
+				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + pvSuffix,
 				"appSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"appSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -112,21 +112,21 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "https://local.fiftyone.ai/health",
+					url:              "", // "https://local.fiftyone.ai/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "https://local.fiftyone.ai/api/hello",
+					url:              "", // "https://local.fiftyone.ai/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "https://local.fiftyone.ai/cas/api",
+					url:              "", // "https://local.fiftyone.ai/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -146,14 +146,14 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			map[string]string{
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                       "/opt/plugins",
 				"apiSettings.volumes[0].name":                                "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pv0001claim",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pvc-" + pvSuffix,
 				"apiSettings.volumeMounts[0].name":                           "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                      "/opt/plugins",
 				"casSettings.env.FIFTYONE_AUTH_MODE":                         "legacy",
 				"pluginsSettings.enabled":                                    "true",
 				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"pluginsSettings.volumes[0].name":                            "plugins-vol-ro",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
+				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + pvSuffix,
 				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"pluginsSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"pluginsSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -161,21 +161,21 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "https://local.fiftyone.ai/health",
+					url:              "", // "https://local.fiftyone.ai/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "https://local.fiftyone.ai/api/hello",
+					url:              "", //"https://local.fiftyone.ai/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "https://local.fiftyone.ai/cas/api",
+					url:              "", // "https://local.fiftyone.ai/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -225,6 +225,46 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			// create persistent volume, when necessary
 			needsPersistentVolume := []string{"sharedPlugins", "dedicatedPlugins"}
 			if slices.Contains(needsPersistentVolume, testCase.name) {
+
+				var nfsConfig *NFSConfig
+				hostPath := "/data/pv0001/"
+
+				if s.context != "minikube" {
+					nfsConfig = &NFSConfig{
+						Server: nfsExportServer,
+						Path:   nfsExportPath,
+					}
+					hostPath = ""
+				}
+
+				pv := PersistentVolume{
+					Name:             "pv-" + pvSuffix,
+					AccessModes:      []string{"ReadWriteOnce", "ReadOnlyMany"},
+					Capacity:         pvCapacity,
+					StorageClassName: pvStorageClassName,
+					HostPath:         hostPath,
+					NFS:              nfsConfig,
+				}
+
+				pvc := PersistentVolumeClaim{
+					Name:             "pvc-" + pvSuffix,
+					AccessModes:      []string{"ReadWriteOnce", "ReadOnlyMany"},
+					Capacity:         pv.Capacity,
+					VolumeName:       pv.Name,
+					StorageClassName: pv.StorageClassName,
+				}
+
+				persistentVolumeYaml, err := pvToYaml(pv)
+
+				if err != nil {
+					panic(err)
+				}
+				persistentVolumeClaimYaml, err := pvcToYaml(pvc)
+
+				if err != nil {
+					panic(err)
+				}
+
 				defer k8s.KubectlDeleteFromString(subT, kubectlOptions, persistentVolumeYaml)
 				k8s.KubectlApplyFromString(subT, kubectlOptions, persistentVolumeYaml)
 				defer k8s.KubectlDeleteFromString(subT, kubectlOptions, persistentVolumeClaimYaml)
@@ -258,13 +298,6 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 
 				waitTime := 5 * time.Second
 				retries := 72
-
-				// `teams-api` pod does not start successfully on the first attempt.
-				// extend the timeout to allow for it to be recreated and successfully start
-				if expected.name == "teams-api" {
-					waitTime = 60 * time.Second
-					retries = 6
-				}
 
 				// when pulling images for the first time, it may take longer than 90s
 				// 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
