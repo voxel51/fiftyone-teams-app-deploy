@@ -14,8 +14,11 @@ on:
       - tests/unit/helm/**
 
 jobs:
-  unit-helm:
+  integration-helm:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - uses: actions/checkout@v4.2.0
       - uses: actions/setup-python@v5.2.0

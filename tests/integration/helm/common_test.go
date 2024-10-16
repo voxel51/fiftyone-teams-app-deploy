@@ -203,3 +203,19 @@ func generateRandomString(length int) string {
 	}
 	return string(b)
 }
+
+func enforceReady(subT *testing.T, kubectlOptions *k8s.KubectlOptions, vals []serviceValidations) {
+	// Pods might have to connect to each other. So, we should
+	// wait for all pods to be ready before doing any log checks.
+	waitTime := 5 * time.Second
+	retries := 72
+	for _, expected := range vals {
+		deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
+		// when pulling images for the first time, it may take longer than 90s
+		// 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+		k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, retries, waitTime)
+
+		// Validate that k8s service is ready (pods are started and in service)
+		k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
+	}
+}

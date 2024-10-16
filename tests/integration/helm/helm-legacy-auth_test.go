@@ -8,7 +8,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-	"time"
 
 	"path/filepath"
 
@@ -290,18 +289,13 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			helm.Install(subT, helmOptions, s.chartPath, releaseName)
 
 			// Validate system health
+			enforceReady(subT, kubectlOptions, testCase.expected)
+
 			for _, expected := range testCase.expected {
 				logger.Log(subT, fmt.Sprintf("Validating service %s...", expected.name))
 
 				// get deployment
 				deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
-
-				waitTime := 5 * time.Second
-				retries := 72
-
-				// when pulling images for the first time, it may take longer than 90s
-				// 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
-				k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, retries, waitTime)
 
 				// get deployment match labels
 				selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
@@ -318,9 +312,6 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 						fmt.Sprintf("%s - %s - log should contain matching entry", testCase.name, expected.name),
 					)
 				}
-
-				// Validate that k8s service is ready (pods are started and in service)
-				k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
 
 				// Validate endpoint response
 				// Skip fiftyone-app and teams-plugins because they do not have callable endpoints that return a response payload.
