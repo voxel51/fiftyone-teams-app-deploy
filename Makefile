@@ -49,6 +49,7 @@ start:  ## Run minikube with ingress and gcp-auth
 	#   --mount-string=/var/tmp/mongodb_data:/tmp/hostpath-provisioner/fiftyone-teams/mongodb
 	minikube start
 	minikube addons enable ingress
+	minikube addons enable metrics-server
 
 	# Requires setting up GCP credentials (application default credentials)
 	# for the GCP project `computer-vision-team`.

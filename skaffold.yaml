@@ -55,6 +55,13 @@ deploy:
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
               pullPolicy: IfNotPresent
               tag: v2.1.1
+            resources:
+              limits:
+                cpu: 1.0
+                memory: 1.0Gi
+              requests:
+                cpu: 1.0
+                memory: 1.0Gi
 
           # FiftyOne App (fiftyone-app) configurations
           appSettings:
@@ -72,6 +79,14 @@ deploy:
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
               tag: v2.1.1
+            replicaCount: 1
+            resources:
+              limits:
+                cpu: 0.5
+                memory: 512Mi
+              requests:
+                cpu: 0.5
+                memory: 512Mi
 
           # Central Authentication Service (teams-cas) configurations
           casSettings:
@@ -82,6 +97,28 @@ deploy:
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
               pullPolicy: IfNotPresent
               tag: v2.1.1
+            resources:
+              limits:
+                cpu: 500m
+                memory: 256Mi
+              requests:
+                cpu: 500m
+                memory: 256Mi
+            replicaCount: 1
+
+          delegatedOperatorExecutorSettings:
+            image:
+              repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+              pullPolicy: IfNotPresent
+              tag: v2.2.0.dev14  ## Using a temporarily pre-release tag here until v2.2.0 exists with the delegated operator
+            resources:
+              limits:
+                cpu: 500m
+                memory: 512Mi
+              requests:
+                cpu: 500m
+                memory: 512Mi
+            replicaCount: 0
 
           # TODO: Test `minikube addons configure registry-creds` or
           # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
@@ -148,6 +185,14 @@ deploy:
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
               tag: v2.1.1
+            replicaCount: 1
+            resources:
+              limits:
+                cpu: 500m
+                memory: 512Mi
+              requests:
+                cpu: 500m
+                memory: 512Mi
 
           # FiftyOne Teams App (teams-app) configurations
           teamsAppSettings:
@@ -167,5 +212,13 @@ deploy:
               # This is a byproduct of `npm` versioning versus Python PEP 440.
               pullPolicy: IfNotPresent
               tag: v2.1.1
+            replicaCount: 1
+            resources:
+              limits:
+                cpu: 500m
+                memory: 512Mi
+              requests:
+                cpu: 500m
+                memory: 512Mi
 
   kubeContext: minikube
