@@ -219,3 +219,39 @@ func enforceReady(subT *testing.T, kubectlOptions *k8s.KubectlOptions, vals []se
 		k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
 	}
 }
+
+func checkPodLogsWithRetries(subT *testing.T, kubectlOptions *k8s.KubectlOptions, pods []corev1.Pod, tc string, svc string, expected string) {
+	// The pods report they're ready before the final log that we sometimes
+	// test. The root issue is that pods report ready before they truly are.
+	// Once that is fixed, this test becomes redundant and isn't required.
+	maxRetries := 3
+	retryDelay := 2 * time.Second
+
+	for _, pod := range pods {
+		var log string
+
+		for i := 0; i < maxRetries; i++ {
+			log = get_logs(subT, kubectlOptions, &pod, "")
+			if contains(log, expected) {
+				// Log entry found, proceed to next pod
+				break
+			}
+
+			// Log entry not found, wait before retrying
+			if i < maxRetries-1 {
+				time.Sleep(retryDelay)
+			}
+		}
+
+		// Final assertion
+		subT.Run(fmt.Sprintf("%s - %s", tc, svc), func(t *testing.T) {
+			if !contains(log, expected) {
+				t.Errorf("%s - %s - log should contain matching entry", tc, svc)
+			}
+		})
+	}
+}
+
+func contains(s, substr string) bool {
+	return strings.Contains(s, substr)
+}

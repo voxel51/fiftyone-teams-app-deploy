@@ -311,13 +311,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				pods := k8s.ListPods(subT, kubectlOptions, listOptions)
 
 				// Validate log output is expected
-				for _, pod := range pods {
-					s.Contains(
-						get_logs(subT, kubectlOptions, &pod, ""),
-						expected.log,
-						fmt.Sprintf("%s - %s - log should contain matching entry", testCase.name, expected.name),
-					)
-				}
+				checkPodLogsWithRetries(subT, kubectlOptions, pods, testCase.name, expected.name, expected.log)
 
 				// Validate endpoint response
 				// Skip fiftyone-app and teams-plugins because they do not have callable endpoints that return a response payload.
