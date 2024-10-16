@@ -103,7 +103,7 @@ spec:
 )
 
 var (
-	pvSuffix = generateRandomString(6)
+	suffix = generateRandomString(6)
 )
 
 type serviceValidations struct {

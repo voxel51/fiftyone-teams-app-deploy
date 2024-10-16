@@ -58,7 +58,9 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"builtinPlugins",
 			map[string]string{
-				"casSettings.env.FIFTYONE_AUTH_MODE": "legacy",
+				"secret.fiftyone.fiftyoneDatabaseName": "fiftyone-leg-bp-" + suffix,
+				"casSettings.env.FIFTYONE_AUTH_MODE":   "legacy",
+				"casSettings.env.CAS_DATABASE_NAME":    "cas-leg-bp-" + suffix,
 			},
 			[]serviceValidations{
 				{
@@ -95,15 +97,17 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"sharedPlugins", // plugins run in fiftyone-app deployment
 			map[string]string{
+				"secret.fiftyone.fiftyoneDatabaseName":                   "fiftyone-leg-sp-" + suffix,
 				"casSettings.env.FIFTYONE_AUTH_MODE":                     "legacy",
+				"casSettings.env.CAS_DATABASE_NAME":                      "cas-leg-sp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"apiSettings.volumes[0].name":                            "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + pvSuffix,
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + suffix,
 				"apiSettings.volumeMounts[0].name":                       "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
 				"appSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"appSettings.volumes[0].name":                            "plugins-vol-ro",
-				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + pvSuffix,
+				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + suffix,
 				"appSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"appSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -143,16 +147,18 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
+				"secret.fiftyone.fiftyoneDatabaseName":                       "fiftyone-leg-dp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                       "/opt/plugins",
 				"apiSettings.volumes[0].name":                                "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pvc-" + pvSuffix,
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pvc-" + suffix,
 				"apiSettings.volumeMounts[0].name":                           "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                      "/opt/plugins",
 				"casSettings.env.FIFTYONE_AUTH_MODE":                         "legacy",
+				"casSettings.env.CAS_DATABASE_NAME":                          "cas-leg-dp-" + suffix,
 				"pluginsSettings.enabled":                                    "true",
 				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"pluginsSettings.volumes[0].name":                            "plugins-vol-ro",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + pvSuffix,
+				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-" + suffix,
 				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"pluginsSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"pluginsSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -203,8 +209,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 
 		s.Run(testCase.name, func() {
 			subT := s.T()
-			// Disabling parallelization until we configure discrete databases
-			// subT.Parallel()
+			subT.Parallel()
 
 			// Create namespace name for the test case
 			namespace := fmt.Sprintf(
@@ -237,7 +242,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				}
 
 				pv := PersistentVolume{
-					Name:             "pv-" + pvSuffix,
+					Name:             "pv-" + suffix,
 					AccessModes:      []string{"ReadWriteOnce", "ReadOnlyMany"},
 					Capacity:         pvCapacity,
 					StorageClassName: pvStorageClassName,
@@ -246,7 +251,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				}
 
 				pvc := PersistentVolumeClaim{
-					Name:             "pvc-" + pvSuffix,
+					Name:             "pvc-" + suffix,
 					AccessModes:      []string{"ReadWriteOnce", "ReadOnlyMany"},
 					Capacity:         pv.Capacity,
 					VolumeName:       pv.Name,
