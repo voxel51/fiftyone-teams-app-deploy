@@ -5,8 +5,8 @@ package integration
 
 import (
 	"crypto/tls"
-
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -15,7 +15,11 @@ import (
 
 	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
 	"github.com/gruntwork-io/terratest/modules/k8s"
+	"github.com/gruntwork-io/terratest/modules/logger"
+	"github.com/gruntwork-io/terratest/modules/retry"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -111,4 +115,34 @@ func getBase64EncodedStringOfFile(filePath string) string {
 	}
 	sEnc := base64.StdEncoding.EncodeToString(b)
 	return sEnc
+}
+
+func waitForTeamsApi(t *testing.T, kubectlOptions *k8s.KubectlOptions, maxRetries int, sleepBetweenRetries time.Duration, deployment *appsv1.Deployment, expected serviceValidations) error {
+	statusMsg := fmt.Sprint("Wait for teams-api to start successfully.")
+	message, err := retry.DoWithRetryE(
+		t,
+		statusMsg,
+		maxRetries,
+		sleepBetweenRetries,
+		func() (string, error) {
+			k8s.WaitUntilDeploymentAvailable(t, kubectlOptions, deployment.Name, maxRetries, sleepBetweenRetries)
+			selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
+			listOptions := metav1.ListOptions{LabelSelector: selectorLabelsPods}
+			pods := k8s.ListPods(t, kubectlOptions, listOptions)
+			started := false
+			for _, pod := range pods {
+				started = strings.Contains(get_logs(t, kubectlOptions, &pod, ""), expected.log)
+			}
+			if !started {
+				return "", errors.New("team-api not available")
+			}
+			return "teams-api is now available", nil
+		},
+	)
+	if err != nil {
+		logger.Logf(t, "Timedout waiting for Pod to be provisioned: %s", err)
+		return err
+	}
+	logger.Logf(t, message)
+	return nil
 }
