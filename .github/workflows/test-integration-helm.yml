@@ -34,7 +34,7 @@ jobs:
           workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
-      - name: Run unit tests
+      - name: Run integration tests
         shell: bash
         run: |
           gcloud components install gke-gcloud-auth-plugin --quiet

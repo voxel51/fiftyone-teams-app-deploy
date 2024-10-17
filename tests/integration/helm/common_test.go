@@ -246,7 +246,7 @@ func checkPodLogsWithRetries(subT *testing.T, kubectlOptions *k8s.KubectlOptions
 		// Final assertion
 		subT.Run(fmt.Sprintf("%s - %s", tc, svc), func(t *testing.T) {
 			if !contains(log, expected) {
-				t.Errorf("%s - %s - log should contain matching entry", tc, svc)
+				t.Errorf("[ERROR]: %s - %s - log should contain matching entry:\n\t%s", tc, svc, expected)
 			}
 		})
 	}
