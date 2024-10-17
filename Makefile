@@ -225,7 +225,7 @@ test-integration-compose-interleaved-legacy: install-terratest-log-parser copy-l
 	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
 
-test-integration-helm-ci:
+test-integration-helm-ci: ## set context, install mongodb, and ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
 	@CLST=$(shell gcloud container clusters list --filter="name : voxel51-ephemeral-test-*" --format="get(name)"); \
 	INTEGRATION_TEST_KUBECONTEXT=gke_computer-vision-team_us-east4_$$CLST; \
 	gcloud container clusters get-credentials \
