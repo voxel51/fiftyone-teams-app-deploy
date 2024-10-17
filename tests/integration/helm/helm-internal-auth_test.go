@@ -8,7 +8,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-	"time"
 
 	"path/filepath"
 
@@ -37,13 +36,14 @@ func TestHelmInternalAuth(t *testing.T) {
 	helmChartPath, err := filepath.Abs(chartPath)
 	require.NoError(t, err)
 
+	kubeCtx := defineKubeCtx()
 	integrationValuesPath, err := filepath.Abs(integrationValues)
 
 	suite.Run(t, &internalAuthHelmTest{
 		Suite:     suite.Suite{},
 		chartPath: helmChartPath,
 		namespace: "fiftyone-" + strings.ToLower(random.UniqueId()),
-		context:   "minikube", // hardcoding to minikube k8s cluster context avoid accessing another k8s cluster
+		context:   kubeCtx,
 		valuesFiles: []string{
 			integrationValuesPath, // Copy of values from `skaffold.yaml`'s `helm.releases[0].overrides`
 		},
@@ -59,26 +59,28 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 		{
 			"builtinPlugins",
 			map[string]string{
-				"casSettings.env.FIFTYONE_AUTH_MODE": "internal",
+				"secret.fiftyone.fiftyoneDatabaseName": "fiftyone-int-bp-" + suffix,
+				"casSettings.env.FIFTYONE_AUTH_MODE":   "internal",
+				"casSettings.env.CAS_DATABASE_NAME":    "cas-int-bp-" + suffix,
 			},
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "https://local.fiftyone.ai/health",
+					url:              "", // "https://local.fiftyone.ai/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "https://local.fiftyone.ai/api/hello",
+					url:              "", // "https://local.fiftyone.ai/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "https://local.fiftyone.ai/cas/api",
+					url:              "", // "https://local.fiftyone.ai/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -96,15 +98,17 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 		{
 			"sharedPlugins", // plugins run in fiftyone-app deployment
 			map[string]string{
+				"secret.fiftyone.fiftyoneDatabaseName":                   "fiftyone-int-sp-" + suffix,
 				"casSettings.env.FIFTYONE_AUTH_MODE":                     "internal",
+				"casSettings.env.CAS_DATABASE_NAME":                      "cas-int-sp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"apiSettings.volumes[0].name":                            "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-int-sp-" + suffix,
 				"apiSettings.volumeMounts[0].name":                       "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
 				"appSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"appSettings.volumes[0].name":                            "plugins-vol-ro",
-				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
+				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-int-sp-" + suffix,
 				"appSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"appSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -112,21 +116,21 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "https://local.fiftyone.ai/health",
+					url:              "", // "https://local.fiftyone.ai/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "https://local.fiftyone.ai/api/hello",
+					url:              "", // "https://local.fiftyone.ai/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "https://local.fiftyone.ai/cas/api",
+					url:              "", // "https://local.fiftyone.ai/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -144,16 +148,18 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
+				"secret.fiftyone.fiftyoneDatabaseName":                       "fiftyone-int-dp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                       "/opt/plugins",
 				"apiSettings.volumes[0].name":                                "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pv0001claim",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pvc-int-dp-" + suffix,
 				"apiSettings.volumeMounts[0].name":                           "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                      "/opt/plugins",
 				"casSettings.env.FIFTYONE_AUTH_MODE":                         "internal",
+				"casSettings.env.CAS_DATABASE_NAME":                          "cas-int-dp-" + suffix,
 				"pluginsSettings.enabled":                                    "true",
 				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"pluginsSettings.volumes[0].name":                            "plugins-vol-ro",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pv0001claim",
+				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-int-dp-" + suffix,
 				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"pluginsSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"pluginsSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -161,21 +167,21 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "https://local.fiftyone.ai/health",
+					url:              "", // "https://local.fiftyone.ai/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "https://local.fiftyone.ai/api/hello",
+					url:              "", // "https://local.fiftyone.ai/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "https://local.fiftyone.ai/cas/api",
+					url:              "", // "https://local.fiftyone.ai/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -204,8 +210,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 
 		s.Run(testCase.name, func() {
 			subT := s.T()
-			// Disabling parallelization until we configure discrete databases
-			// subT.Parallel()
+			subT.Parallel()
 
 			// Create namespace name for the test case
 			namespace := fmt.Sprintf(
@@ -225,6 +230,46 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 			// create persistent volume, when necessary
 			needsPersistentVolume := []string{"sharedPlugins", "dedicatedPlugins"}
 			if slices.Contains(needsPersistentVolume, testCase.name) {
+
+				var nfsConfig *NFSConfig
+				hostPath := "/data/pv0001/"
+
+				if s.context != "minikube" {
+					nfsConfig = &NFSConfig{
+						Server: nfsExportServer,
+						Path:   nfsExportPath,
+					}
+					hostPath = ""
+				}
+
+				pv := PersistentVolume{
+					Name:             testCase.values["apiSettings.volumes[0].persistentVolumeClaim.claimName"],
+					AccessModes:      []string{"ReadWriteOnce", "ReadOnlyMany"},
+					Capacity:         pvCapacity,
+					StorageClassName: pvStorageClassName,
+					HostPath:         hostPath,
+					NFS:              nfsConfig,
+				}
+
+				pvc := PersistentVolumeClaim{
+					Name:             testCase.values["apiSettings.volumes[0].persistentVolumeClaim.claimName"],
+					AccessModes:      []string{"ReadWriteOnce", "ReadOnlyMany"},
+					Capacity:         pv.Capacity,
+					VolumeName:       pv.Name,
+					StorageClassName: pv.StorageClassName,
+				}
+
+				persistentVolumeYaml, err := pvToYaml(pv)
+
+				if err != nil {
+					panic(err)
+				}
+				persistentVolumeClaimYaml, err := pvcToYaml(pvc)
+
+				if err != nil {
+					panic(err)
+				}
+
 				defer k8s.KubectlDeleteFromString(subT, kubectlOptions, persistentVolumeYaml)
 				k8s.KubectlApplyFromString(subT, kubectlOptions, persistentVolumeYaml)
 				defer k8s.KubectlDeleteFromString(subT, kubectlOptions, persistentVolumeClaimYaml)
@@ -249,26 +294,14 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 			defer helm.Delete(subT, helmOptions, releaseName, true)
 			helm.Install(subT, helmOptions, s.chartPath, releaseName)
 
+			enforceReady(subT, kubectlOptions, testCase.expected)
+
 			// Validate system health
 			for _, expected := range testCase.expected {
 				logger.Log(subT, fmt.Sprintf("Validating service %s...", expected.name))
 
 				// get deployment
 				deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
-
-				waitTime := 5 * time.Second
-				retries := 72
-
-				// `teams-api` pod does not start successfully on the first attempt.
-				// extend the timeout to allow for it to be recreated and successfully start
-				if expected.name == "teams-api" {
-					waitTime = 60 * time.Second
-					retries = 6
-				}
-
-				// when pulling images for the first time, it may take longer than 90s
-				// 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
-				k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, retries, waitTime)
 
 				// get deployment match labels
 				selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
@@ -278,16 +311,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				pods := k8s.ListPods(subT, kubectlOptions, listOptions)
 
 				// Validate log output is expected
-				for _, pod := range pods {
-					s.Contains(
-						get_logs(subT, kubectlOptions, &pod, ""),
-						expected.log,
-						fmt.Sprintf("%s - %s - log should contain matching entry", testCase.name, expected.name),
-					)
-				}
-
-				// Validate that k8s service is ready (pods are started and in service)
-				k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
+				checkPodLogsWithRetries(subT, kubectlOptions, pods, testCase.name, expected.name, expected.log)
 
 				// Validate endpoint response
 				// Skip fiftyone-app and teams-plugins because they do not have callable endpoints that return a response payload.

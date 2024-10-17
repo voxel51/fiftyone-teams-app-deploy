@@ -1,0 +1,42 @@
+---
+name: Tests - Integration Helm
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths:
+      - .github/workflows/test-integration-helm.yml
+      - helm/fiftyone-teams-app/**
+      - tests/fixtures/helm/**
+      - tests/integration/helm/**
+      - tests/unit/helm/**
+
+jobs:
+  integration-helm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v4.2.0
+      - uses: actions/setup-python@v5.2.0
+      - name: Temporary SQLite/LZMA - Install missing libraries
+        run: sudo apt install -y libsqlite3-dev libbz2-dev
+      - name: install asdf & tools
+        uses: asdf-vm/actions/install@v3.0.2
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: 'computer-vision-team'
+          service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
+          workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+      - name: Set Up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Run integration tests
+        shell: bash
+        run: |
+          gcloud components install gke-gcloud-auth-plugin --quiet
+          make helm-repos
+          make test-integration-helm-ci
