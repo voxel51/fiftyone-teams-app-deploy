@@ -59,9 +59,9 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 		{
 			"builtinPlugins",
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName": "fiftyone-int-bp-" + suffix,
 				"casSettings.env.FIFTYONE_AUTH_MODE":   "internal",
 				"casSettings.env.CAS_DATABASE_NAME":    "cas-int-bp-" + suffix,
+				"secret.fiftyone.fiftyoneDatabaseName": "fiftyone-int-bp-" + suffix,
 			},
 			[]serviceValidations{
 				// ordering first, because teams-api startup connects to teams-cas
@@ -106,9 +106,6 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 		{
 			"sharedPlugins", // plugins run in fiftyone-app deployment
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-int-sp-" + suffix,
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                           "internal",
-				"casSettings.env.CAS_DATABASE_NAME":                                            "cas-int-sp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
 				"apiSettings.volumes[0].name":                                                  "plugins-vol",
 				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                       "pvc-int-sp-" + suffix,
@@ -120,6 +117,8 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"appSettings.volumes[0].persistentVolumeClaim.readOnly":                        "true",
 				"appSettings.volumeMounts[0].name":                                             "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                                        "/opt/plugins",
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                           "internal",
+				"casSettings.env.CAS_DATABASE_NAME":                                            "cas-int-sp-" + suffix,
 				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"delegatedOperatorExecutorSettings.replicaCount":                               "1",
 				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -127,6 +126,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"delegatedOperatorExecutorSettings.volumes[0].name":                            "plugins-vol-ro",
 				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-int-sp-" + suffix,
 				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
+				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-int-sp-" + suffix,
 			},
 			/* Why the ternary? This is a first iteration against a live kube
 			 * cluster. We don't have things like wildcard certificates,
@@ -187,7 +187,6 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-int-dp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
 				"apiSettings.volumes[0].name":                                                  "plugins-vol",
 				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                       "pvc-int-dp-" + suffix,
@@ -209,6 +208,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":                    "true",
 				"pluginsSettings.volumeMounts[0].name":                                         "plugins-vol-ro",
 				"pluginsSettings.volumeMounts[0].mountPath":                                    "/opt/plugins",
+				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-int-dp-" + suffix,
 			},
 			[]serviceValidations{
 				// ordering teams-cas first, because teams-api startup connects to teams-cas

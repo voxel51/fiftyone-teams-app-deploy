@@ -58,9 +58,9 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"builtinPlugins",
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName": "fiftyone-leg-bp-" + suffix,
 				"casSettings.env.FIFTYONE_AUTH_MODE":   "legacy",
 				"casSettings.env.CAS_DATABASE_NAME":    "cas-leg-bp-" + suffix,
+				"secret.fiftyone.fiftyoneDatabaseName": "fiftyone-leg-bp-" + suffix,
 			},
 			/* Why the ternary? This is a first iteration against a live kube
 			 * cluster. We don't have things like wildcard certificates,
@@ -113,9 +113,6 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"sharedPlugins", // plugins run in fiftyone-app deployment
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-leg-sp-" + suffix,
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                           "legacy",
-				"casSettings.env.CAS_DATABASE_NAME":                                            "cas-leg-sp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
 				"apiSettings.volumes[0].name":                                                  "plugins-vol",
 				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                       "pvc-leg-sp-" + suffix,
@@ -127,6 +124,8 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"appSettings.volumes[0].persistentVolumeClaim.readOnly":                        "true",
 				"appSettings.volumeMounts[0].name":                                             "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                                        "/opt/plugins",
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                           "legacy",
+				"casSettings.env.CAS_DATABASE_NAME":                                            "cas-leg-sp-" + suffix,
 				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
 				"delegatedOperatorExecutorSettings.replicaCount":                               "1",
 				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
@@ -134,6 +133,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"delegatedOperatorExecutorSettings.volumes[0].name":                            "plugins-vol-ro",
 				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-leg-sp-" + suffix,
 				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
+				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-leg-sp-" + suffix,
 			},
 			[]serviceValidations{
 				{
@@ -177,7 +177,6 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-leg-dp-" + suffix,
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
 				"apiSettings.volumes[0].name":                                                  "plugins-vol",
 				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                       "pv-fiftyone-leg-dp-" + suffix,
@@ -199,6 +198,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":                    "true",
 				"pluginsSettings.volumeMounts[0].name":                                         "plugins-vol-ro",
 				"pluginsSettings.volumeMounts[0].mountPath":                                    "/opt/plugins",
+				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-leg-dp-" + suffix,
 			},
 			[]serviceValidations{
 				{
