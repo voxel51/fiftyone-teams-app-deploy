@@ -113,6 +113,15 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"appSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
 			},
+			/* Why the ternary? This is a first iteration against a live kube
+			 * cluster. We don't have things like wildcard certificates,
+			 * external DNS, etc. deployed in the ephemeral clusters.
+			 * To avoid making our tests run TOO long, we will omit the
+			 * URL checks until we come up with a good solution to those
+			 * issues. If we're running on minikube, it is safe to assume
+			 * that we have used skaffold to deploy things like certificates
+			 * that we can use for DNS, so we will still use those URL checks.
+			 */
 			[]serviceValidations{
 				{
 					name:             "teams-api",
