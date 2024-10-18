@@ -5,12 +5,16 @@ package integration
 
 import (
 	"crypto/tls"
+
+	"bytes"
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
@@ -22,41 +26,76 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type NFSConfig struct {
+	Server string
+	Path   string
+}
+
+type PersistentVolume struct {
+	Name             string
+	AccessModes      []string
+	Capacity         string
+	StorageClassName string
+	HostPath         string
+	NFS              *NFSConfig // Pointer to allow for nil checking
+}
+
+type PersistentVolumeClaim struct {
+	Name             string
+	AccessModes      []string
+	Capacity         string
+	HostPath         string
+	StorageClassName string
+	VolumeName       string
+}
+
 const (
 	chartPath           = "../../../helm/fiftyone-teams-app/"
 	integrationValues   = "../../fixtures/helm/integration_values.yaml"
 	licenseFileInternal = "../../fixtures/helm/internal-license.key"
 	licenseFileLegacy   = "../../fixtures/helm/legacy-license.key"
 	// for minikube, where node count is 1, we don't need ReadWriteMany and NFS
-	persistentVolumeYaml = `---
-    apiVersion: v1
-    kind: PersistentVolume
-    metadata:
-      name: pv0001
-    spec:
-      accessModes:
+	persistentVolumeYamlTpl = `---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: {{ .Name }}
+spec:
+    accessModes:
         - ReadWriteOnce
         - ReadOnlyMany
-      capacity:
-        storage: 100Mi
-      hostPath:
-        path: /data/pv0001/
+    capacity:
+        storage: {{ .Capacity }}
+    {{- if .HostPath }}
+    hostPath:
+        path: {{ .HostPath }}
+    {{- else if .NFS }}
+    nfs:
+        server: {{ .NFS.Server }}
+        path: {{ .NFS.Path }}
+    {{- end }}
+    storageClassName: {{ .StorageClassName }}
 `
 	// for minikube, where node count is 1, we don't need ReadWriteMany and NFS
-	persistentVolumeClaimYaml = `---
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: pv0001claim
-    spec:
-      accessModes:
+	persistentVolumeClaimYamlTpl = `---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: {{ .Name }}
+spec:
+    accessModes:
         - ReadWriteOnce
         - ReadOnlyMany
-      resources:
+    storageClassName: {{ .StorageClassName }}
+    volumeName: {{ .VolumeName }}
+    resources:
         requests:
-          storage: 100Mi
+            storage: {{ .Capacity }}
 `
-
+	nfsExportPath      = "/ephemeral-integration-tests/plugins"
+	nfsExportServer    = "nfs-server.us-east5-a.c.computer-vision-team.internal"
+	pvCapacity         = "100Mi"
+	pvStorageClassName = "\"\""
 	// License File Secret
 	licenseFileSecretTemplateYaml = `---
     apiVersion: v1
@@ -66,6 +105,10 @@ const (
     type: Opaque
     data:
       license: `
+)
+
+var (
+	suffix = generateRandomString(6)
 )
 
 type serviceValidations struct {
@@ -117,32 +160,106 @@ func getBase64EncodedStringOfFile(filePath string) string {
 	return sEnc
 }
 
-func waitForTeamsApi(t *testing.T, kubectlOptions *k8s.KubectlOptions, maxRetries int, sleepBetweenRetries time.Duration, deployment *appsv1.Deployment, expected serviceValidations) error {
-	statusMsg := fmt.Sprint("Wait for teams-api to start successfully.")
-	message, err := retry.DoWithRetryE(
-		t,
-		statusMsg,
-		maxRetries,
-		sleepBetweenRetries,
-		func() (string, error) {
-			k8s.WaitUntilDeploymentAvailable(t, kubectlOptions, deployment.Name, maxRetries, sleepBetweenRetries)
-			selectorLabelsPods := makeLabels(deployment.Spec.Selector.MatchLabels)
-			listOptions := metav1.ListOptions{LabelSelector: selectorLabelsPods}
-			pods := k8s.ListPods(t, kubectlOptions, listOptions)
-			started := false
-			for _, pod := range pods {
-				started = strings.Contains(get_logs(t, kubectlOptions, &pod, ""), expected.log)
-			}
-			if !started {
-				return "", errors.New("team-api not available")
-			}
-			return "teams-api is now available", nil
-		},
-	)
-	if err != nil {
-		logger.Logf(t, "Timedout waiting for Pod to be provisioned: %s", err)
-		return err
+func defineKubeCtx() string {
+	kubeCtx := "minikube"
+	requiredSubstring := "voxel51-ephemeral-test" // enforce it goes to ephemeral env
+	if kc := os.Getenv("INTEGRATION_TEST_KUBECONTEXT"); kc != "" {
+		if strings.Contains(kc, requiredSubstring) {
+			kubeCtx = kc
+		} else {
+			fmt.Printf("The string '%s' does not contain the required context slug. Defaulting to minikube.\n", kc)
+		}
 	}
-	logger.Logf(t, message)
-	return nil
+	return kubeCtx
+}
+
+func renderTemplate(templateString string, data interface{}) (string, error) {
+	tmpl, err := template.New("resource").Parse(templateString)
+	if err != nil {
+		return "", err
+	}
+
+	var buffer bytes.Buffer
+	if err := tmpl.Execute(&buffer, data); err != nil {
+		return "", err
+	}
+
+	return buffer.String(), nil
+}
+
+func pvToYaml(pv PersistentVolume) (string, error) {
+	return renderTemplate(persistentVolumeYamlTpl, pv)
+}
+
+func pvcToYaml(pvc PersistentVolumeClaim) (string, error) {
+	return renderTemplate(persistentVolumeClaimYamlTpl, pvc)
+}
+
+func generateRandomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyz"
+
+	// Seed the random number generator
+	rand.Seed(time.Now().UnixNano())
+
+	// Create a byte slice to store the random characters
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(b)
+}
+
+func enforceReady(subT *testing.T, kubectlOptions *k8s.KubectlOptions, vals []serviceValidations) {
+	// Pods might have to connect to each other. So, we should
+	// wait for all pods to be ready before doing any log checks.
+	waitTime := 5 * time.Second
+	retries := 96
+	for _, expected := range vals {
+		deployment := k8s.GetDeployment(subT, kubectlOptions, expected.name)
+		// when pulling images for the first time, it may take longer than 90s
+		// 360 seconds of retries. Pods typically ready in ~51 seconds if the image is already pulled.
+		k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, retries, waitTime)
+
+		// Validate that k8s service is ready (pods are started and in service)
+		k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
+	}
+}
+
+func checkPodLogsWithRetries(subT *testing.T, kubectlOptions *k8s.KubectlOptions, pods []corev1.Pod, tc string, svc string, expected string) {
+	// The pods report they're ready before the final log that we sometimes
+	// test. The root issue is that pods report ready before they truly are.
+	// Once that is fixed, this test becomes redundant and isn't required.
+	maxRetries := 3
+	retryDelay := 2 * time.Second
+
+	for _, pod := range pods {
+		var log string
+
+		for i := 0; i < maxRetries; i++ {
+			log = get_logs(subT, kubectlOptions, &pod, "")
+			if strings.Contains(log, expected) {
+				// Log entry found, proceed to next pod
+				break
+			}
+
+			// Log entry not found, wait before retrying
+			if i < maxRetries-1 {
+				time.Sleep(retryDelay)
+			}
+		}
+
+		// Final assertion
+		subT.Run(fmt.Sprintf("%s - %s", tc, svc), func(t *testing.T) {
+			if !strings.Contains(log, expected) {
+				t.Errorf("[ERROR]: %s - %s - log should contain matching entry:\n\t%s", tc, svc, expected)
+			}
+		})
+	}
+}
+
+func ternary(condition bool, a string, b string) string {
+	if condition {
+		return a
+	}
+	return b
 }
