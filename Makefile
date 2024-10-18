@@ -234,8 +234,8 @@ test-integration-helm-ci: ## set context, install mongodb, and ## run go test on
 		--project=computer-vision-team; \
 	skaffold run \
 		--filename=skaffold-mongodb.yaml \
-		--kube-context=$$INTEGRATION_TEST_KUBECONTEXT; \
-	INTEGRATION_TEST_KUBECONTEXT=$$INTEGRATION_TEST_KUBECONTEXT GOMAXPROCS=2 make test-integration-helm
+		--kube-context=$${INTEGRATION_TEST_KUBECONTEXT}; \
+	INTEGRATION_TEST_KUBECONTEXT=$${INTEGRATION_TEST_KUBECONTEXT} GOMAXPROCS=2 make test-integration-helm
 
 test-integration-helm: test-integration-helm-internal test-integration-helm-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
 
