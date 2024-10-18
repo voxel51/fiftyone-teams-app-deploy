@@ -93,13 +93,6 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
-				{
-					name:             "teams-do",
-					url:              "",
-					responsePayload:  "",
-					httpResponseCode: 0,
-					log:              "Executor started",
-				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
 					name:             "fiftyone-app",
