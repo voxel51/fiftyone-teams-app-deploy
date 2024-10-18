@@ -239,6 +239,8 @@ test-integration-helm-ci: ## set context, install mongodb, and ## run go test on
 
 test-integration-helm: test-integration-helm-internal test-integration-helm-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
 
+test-integration-helm-interleaved: test-integration-helm-interleaved-internal test-integration-helm-interleaved-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
+
 test-integration-helm-internal: copy-license-files-helm  ## run go test on the tests/integration/helm directory for internal auth mode
 	@cd tests/integration/helm; \
 	go test -count=1 -timeout=15m -v -tags integrationHelmInternalAuth
