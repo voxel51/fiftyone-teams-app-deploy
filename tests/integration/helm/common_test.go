@@ -232,7 +232,7 @@ func checkPodLogsWithRetries(subT *testing.T, kubectlOptions *k8s.KubectlOptions
 
 		for i := 0; i < maxRetries; i++ {
 			log = get_logs(subT, kubectlOptions, &pod, "")
-			if strings.Contains(s, substr)(log, expected) {
+			if strings.Contains(log, expected) {
 				// Log entry found, proceed to next pod
 				break
 			}
@@ -245,9 +245,16 @@ func checkPodLogsWithRetries(subT *testing.T, kubectlOptions *k8s.KubectlOptions
 
 		// Final assertion
 		subT.Run(fmt.Sprintf("%s - %s", tc, svc), func(t *testing.T) {
-			if !strings.Contains(s, substr)(log, expected) {
+			if !strings.Contains(log, expected) {
 				t.Errorf("[ERROR]: %s - %s - log should contain matching entry:\n\t%s", tc, svc, expected)
 			}
 		})
 	}
+}
+
+func ternary(condition bool, a string, b string) string {
+	if condition {
+		return a
+	}
+	return b
 }

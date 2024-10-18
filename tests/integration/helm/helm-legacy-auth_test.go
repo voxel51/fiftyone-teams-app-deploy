@@ -65,21 +65,21 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "", // "https://local.fiftyone.ai/health",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "", // "https://local.fiftyone.ai/api/hello",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "", // "https://local.fiftyone.ai/cas/api",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -115,21 +115,21 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "", // "https://local.fiftyone.ai/health",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "", // "https://local.fiftyone.ai/api/hello",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "", // "https://local.fiftyone.ai/cas/api",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -166,21 +166,21 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			[]serviceValidations{
 				{
 					name:             "teams-api",
-					url:              "", // "https://local.fiftyone.ai/health",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
 					log:              "[INFO] Starting worker",
 				},
 				{
 					name:             "teams-app",
-					url:              "", //"https://local.fiftyone.ai/api/hello",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
 				},
 				{
 					name:             "teams-cas",
-					url:              "", // "https://local.fiftyone.ai/cas/api",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
