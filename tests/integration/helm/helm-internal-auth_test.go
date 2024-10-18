@@ -67,7 +67,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				// ordering first, because teams-api startup connects to teams-cas
 				{
 					name:             "teams-cas",
-					url:              "https://local.fiftyone.ai/cas/api",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
@@ -134,7 +134,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				// ordering teams-cas first, because teams-api startup connects to teams-cas
 				{
 					name:             "teams-cas",
-					url:              "https://local.fiftyone.ai/cas/api",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
