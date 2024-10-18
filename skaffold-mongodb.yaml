@@ -5,6 +5,7 @@ metadata:
   name: mongodb
 
 deploy:
+  statusCheckDeadlineSeconds: 540
   helm:
     releases:
       - name: mongodb
