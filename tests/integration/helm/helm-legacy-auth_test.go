@@ -182,7 +182,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
 				"delegatedOperatorExecutorSettings.volumeMounts[0].name":                       "plugins-vol-ro",
 				"delegatedOperatorExecutorSettings.volumes[0].name":                            "plugins-vol-ro",
-				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName": "cas-leg-dp-" + suffix,
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName": "pv-fiftyone-leg-dp-" + suffix,
 				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
 				"pluginsSettings.enabled":                                                      "true",
 				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                                     "/opt/plugins",
