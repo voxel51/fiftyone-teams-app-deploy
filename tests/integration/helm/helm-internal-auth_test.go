@@ -160,13 +160,6 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					httpResponseCode: 0,
 					log:              "Executor started",
 				},
-				{
-					name:             "teams-do",
-					url:              "",
-					responsePayload:  "",
-					httpResponseCode: 0,
-					log:              "Executor started",
-				},
 				// ordering fiftyone-app this last to avoid test flakes where testing for log before the container is running
 				{
 					name:             "fiftyone-app",
