@@ -229,7 +229,7 @@ test-integration-helm-ci: ## set context, install mongodb, and ## run go test on
 	@CLST=$(shell gcloud container clusters list --filter="name : voxel51-ephemeral-test-*" --format="get(name)"); \
 	INTEGRATION_TEST_KUBECONTEXT=gke_computer-vision-team_us-east4_$$CLST; \
 	gcloud container clusters get-credentials \
-		$$CLST \
+		$${CLST} \
 		--region=us-east4 \
 		--project=computer-vision-team; \
 	skaffold run \
