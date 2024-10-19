@@ -93,10 +93,10 @@ jobs:
           script: |
             const result = await github.rest.actions.createWorkflowDispatch({
               owner: "${{ github.repository_owner }}",
-              repo: 'helm-charts-internal',
-              workflow_id: 'pre-release-internal-env.yml',
-              ref: 'main',
+              repo: "helm-charts-internal",
+              workflow_id: "pre-release-internal-env.yml",
+              ref: "main",
               inputs: {
-                fiftyone-teams-app-deploy-version: "${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
+                "fiftyone-teams-app-deploy-version": "${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
               }
             })
