@@ -89,7 +89,7 @@ jobs:
       - name: Trigger Internal Chart Build
         uses: actions/github-script@v6
         with:
-          github-token: ${{ github.token }}
+          github-token: ${{ secrets.FIFTYONE_GITHUB_TOKEN }}
           script: |
             const result = await github.rest.actions.createWorkflowDispatch({
               owner: "${{ github.repository_owner }}",
