@@ -85,3 +85,18 @@ jobs:
           helm package "${{ env.HELM_CHART_NAME }}"
           helm push "${{ env.HELM_CHART_NAME }}-${{ env.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}.tgz" oci://${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.GCP_HELM_REGISTRY }}/
         working-directory: "helm"
+
+      - name: Trigger Internal Chart Build
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const result = await github.rest.actions.createWorkflowDispatch({
+              owner: "${{ github.repository_owner }}",
+              repo: 'helm-charts-internal',
+              workflow_id: 'pre-release-internal-env.yml',
+              ref: 'main',
+              inputs: {
+                fiftyone-teams-app-deploy-version: "${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
+              }
+            })
