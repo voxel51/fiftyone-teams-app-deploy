@@ -19,7 +19,7 @@ jobs:
       GCP_LOCATION: us-central1
       GCP_PROJECT: computer-vision-team
       GCP_SERVICE_ACCOUNT: github@computer-vision-team.iam.gserviceaccount.com
-      HELM_CHART_NAME: fiftyone-teams-app-deploy
+      HELM_CHART_NAME: fiftyone-teams-app
     runs-on: ubuntu-latest
 
     outputs:
