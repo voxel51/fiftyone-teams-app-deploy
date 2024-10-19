@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-      
+
       - name: Set Helm Chart Version
         id: find-versions
         run: |
@@ -42,7 +42,7 @@ jobs:
           # Don't push anything for release, just let the operator
           # handle that by updating Chart.yaml
           if [[ ! "${GITHUB_BRANCH}" == "release/"* ]]; then
-            version="${version}-sha-${GITHUB_SHA::7}"            
+            version="${version}-sha-${GITHUB_SHA::7}"
           fi
 
           echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_ENV}"
