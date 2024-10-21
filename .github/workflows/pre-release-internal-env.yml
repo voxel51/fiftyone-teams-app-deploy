@@ -41,9 +41,9 @@ jobs:
         id: find-versions
         run: |
           version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
-          # Don't push anything for release, just let the operator
-          # handle that by updating Chart.yaml
-          if [[ ! "${GITHUB_BRANCH}" == "release/"* ]]; then
+          if [[ "${GITHUB_BRANCH}" == "release/"* ]]; then
+            version="${version}-rc-${GITHUB_SHA::7}"
+          else
             version="${version}-sha-${GITHUB_SHA::7}"
           fi
 
