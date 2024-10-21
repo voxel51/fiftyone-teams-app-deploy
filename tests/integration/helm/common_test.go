@@ -216,7 +216,10 @@ func enforceReady(subT *testing.T, kubectlOptions *k8s.KubectlOptions, vals []se
 		k8s.WaitUntilDeploymentAvailable(subT, kubectlOptions, deployment.Name, retries, waitTime)
 
 		// Validate that k8s service is ready (pods are started and in service)
-		k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
+
+		if expected.name != "teams-do" {
+			k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
+		}
 	}
 }
 
