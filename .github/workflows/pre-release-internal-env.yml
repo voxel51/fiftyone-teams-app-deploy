@@ -93,7 +93,7 @@ jobs:
             const result = await github.rest.actions.createWorkflowDispatch({
               owner: "${{ github.repository_owner }}",
               repo: "${{ secrets.CROSS_REPOSITORY_REPOSITORY }}",
-              workflow_id: "${{ secrets.CROSS_REPOSITORY_WORKFLOW }}"
+              workflow_id: "${{ secrets.CROSS_REPOSITORY_WORKFLOW }}",
               ref: "main",
               inputs: {
                 "fiftyone-teams-app-deploy-version": "${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
