@@ -153,7 +153,7 @@ services:
     restart: always
 
   teams-do-common:
-    image: voxel51/fiftyone-app:v2.1.0
+    image: voxel51/fiftyone-app:v2.2.0
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-0}
     command: >
