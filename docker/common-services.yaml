@@ -155,7 +155,7 @@ services:
   teams-do-common:
     image: voxel51/fiftyone-app:v2.2.0
     deploy:
-      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-0}
+      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
     command: >
       /bin/sh -c "fiftyone delegated launch -t remote"
     environment:
