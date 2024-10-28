@@ -19,7 +19,7 @@ jobs:
   unit-compose:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.2
       - uses: actions/setup-python@v5.2.0
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
@@ -33,7 +33,7 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.2
       - uses: actions/setup-python@v5.2.0
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
@@ -68,7 +68,7 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.2
       - uses: actions/setup-python@v5.2.0
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
