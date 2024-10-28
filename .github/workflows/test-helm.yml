@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.0
-      - uses: actions/setup-python@v5.2.0
+      - uses: actions/setup-python@v5.3.0
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
       - name: Run unit tests
