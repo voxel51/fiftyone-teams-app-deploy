@@ -69,7 +69,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestMetadataLabels() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -82,8 +82,8 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
-				"delegatedOperatorExecutorSettings.name":         "test-service-name",
+				"delegatedOperatorExecutorSettings.enabled": "true",
+				"delegatedOperatorExecutorSettings.name":    "test-service-name",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -141,15 +141,15 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestMetadataName() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			"teams-do",
 		},
 		{
 			"overrideMetadataName",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
-				"delegatedOperatorExecutorSettings.name":         "test-service-name",
+				"delegatedOperatorExecutorSettings.enabled": "true",
+				"delegatedOperatorExecutorSettings.name":    "test-service-name",
 			},
 			"test-service-name",
 		},
@@ -199,14 +199,14 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestMetadataNamespace(
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			"fiftyone-teams",
 		},
 		{
 			"overrideNamespaceName",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 				"namespace.name": "test-namespace-name",
 			},
 			"test-namespace-name",
@@ -257,6 +257,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestReplicas() {
 		{
 			"overrideReplicaCount",
 			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled":      "true",
 				"delegatedOperatorExecutorSettings.replicaCount": "3",
 			},
 			3,
@@ -305,7 +306,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerCount() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			1,
 		},
@@ -360,7 +361,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
@@ -426,7 +427,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
 		{
 			"overrideEnv",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled":      "true",
 				"delegatedOperatorExecutorSettings.env.TEST_KEY": "TEST_VALUE",
 			},
 			func(envVars []corev1.EnvVar) {
@@ -550,22 +551,22 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerImage() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			fmt.Sprintf("voxel51/fiftyone-app:%s", chartAppVersion),
 		},
 		{
 			"overrideImageTag",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
-				"delegatedOperatorExecutorSettings.image.tag":    "testTag",
+				"delegatedOperatorExecutorSettings.enabled":   "true",
+				"delegatedOperatorExecutorSettings.image.tag": "testTag",
 			},
 			"voxel51/fiftyone-app:testTag",
 		},
 		{
 			"overrideImageRepository",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":     "1",
+				"delegatedOperatorExecutorSettings.enabled":          "true",
 				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-app",
 			},
 			fmt.Sprintf("ghcr.io/fiftyone-app:%s", chartAppVersion),
@@ -573,7 +574,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerImage() {
 		{
 			"overrideImageVersionAndRepository",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":     "1",
+				"delegatedOperatorExecutorSettings.enabled":          "true",
 				"delegatedOperatorExecutorSettings.image.tag":        "testTag",
 				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-app",
 			},
@@ -626,14 +627,14 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerImagePull
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			"Always",
 		},
 		{
 			"overrideImagePullPolicy",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":     "1",
+				"delegatedOperatorExecutorSettings.enabled":          "true",
 				"delegatedOperatorExecutorSettings.image.pullPolicy": "IfNotPresent",
 			},
 			"IfNotPresent",
@@ -685,15 +686,15 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerName() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			"teams-do",
 		},
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
-				"delegatedOperatorExecutorSettings.name":         "test-service-account",
+				"delegatedOperatorExecutorSettings.enabled": "true",
+				"delegatedOperatorExecutorSettings.name":    "test-service-account",
 			},
 			"test-service-account",
 		},
@@ -746,7 +747,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerResourceR
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			func(resourceRequirements corev1.ResourceRequirements) {
 				s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
@@ -757,7 +758,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerResourceR
 		{
 			"overrideResources",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":              "1",
+				"delegatedOperatorExecutorSettings.enabled":                   "true",
 				"delegatedOperatorExecutorSettings.resources.limits.cpu":      "1",
 				"delegatedOperatorExecutorSettings.resources.limits.memory":   "1Gi",
 				"delegatedOperatorExecutorSettings.resources.requests.cpu":    "500m",
@@ -827,7 +828,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerSecurityC
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			func(securityContext *corev1.SecurityContext) {
 				s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
@@ -846,7 +847,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerSecurityC
 		{
 			"overrideSecurityContext",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":               "1",
+				"delegatedOperatorExecutorSettings.enabled":                    "true",
 				"delegatedOperatorExecutorSettings.securityContext.runAsGroup": "3000",
 				"delegatedOperatorExecutorSettings.securityContext.runAsUser":  "1000",
 			},
@@ -904,7 +905,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerVolumeMou
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			func(volumeMounts []corev1.VolumeMount) {
 				s.Nil(volumeMounts, "VolumeMounts should be nil")
@@ -913,7 +914,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerVolumeMou
 		{
 			"overrideVolumeMountsSingle",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":              "1",
+				"delegatedOperatorExecutorSettings.enabled":                   "true",
 				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath": "/test-data-volume",
 				"delegatedOperatorExecutorSettings.volumeMounts[0].name":      "test-volume",
 			},
@@ -933,7 +934,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerVolumeMou
 		{
 			"overrideVolumeMountsMultiple",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":              "1",
+				"delegatedOperatorExecutorSettings.enabled":                   "true",
 				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath": "/test-data-volume1",
 				"delegatedOperatorExecutorSettings.volumeMounts[0].name":      "test-volume1",
 				"delegatedOperatorExecutorSettings.volumeMounts[1].mountPath": "/test-data-volume2",
@@ -1006,7 +1007,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestAffinity() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			func(affinity *corev1.Affinity) {
 				s.Nil(affinity, "should be nil")
@@ -1015,7 +1016,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestAffinity() {
 		{
 			"overrideAffinity",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 				"delegatedOperatorExecutorSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "disktype",
 				"delegatedOperatorExecutorSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":  "In",
 				"delegatedOperatorExecutorSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]": "ssd",
@@ -1094,15 +1095,15 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestImagePullSecrets()
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			"",
 		},
 		{
 			"overrideImagePullSecrets",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
-				"imagePullSecrets[0].name":                       "test-pull-secret",
+				"delegatedOperatorExecutorSettings.enabled": "true",
+				"imagePullSecrets[0].name":                  "test-pull-secret",
 			},
 			"test-pull-secret",
 		},
@@ -1157,14 +1158,14 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestNodeSelector() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			nil,
 		},
 		{
 			"overrideNodeSelector",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":          "1",
+				"delegatedOperatorExecutorSettings.enabled":               "true",
 				"delegatedOperatorExecutorSettings.nodeSelector.disktype": "ssd",
 			},
 			map[string]string{
@@ -1221,14 +1222,14 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestPodAnnotations() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			nil,
 		},
 		{
 			"overridePodAnnotations",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":                "1",
+				"delegatedOperatorExecutorSettings.enabled":                     "true",
 				"delegatedOperatorExecutorSettings.podAnnotations.annotation-1": "annotation-1-value",
 			},
 			map[string]string{
@@ -1291,7 +1292,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestPodSecurityContext
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			func(podSecurityContext *corev1.PodSecurityContext) {
 				s.Nil(podSecurityContext.FSGroup, "should be nil")
@@ -1309,7 +1310,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestPodSecurityContext
 		{
 			"overridePodSecurityContext",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":                  "1",
+				"delegatedOperatorExecutorSettings.enabled":                       "true",
 				"delegatedOperatorExecutorSettings.podSecurityContext.fsGroup":    "2000",
 				"delegatedOperatorExecutorSettings.podSecurityContext.runAsGroup": "3000",
 				"delegatedOperatorExecutorSettings.podSecurityContext.runAsUser":  "1000",
@@ -1369,7 +1370,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestTemplateLabels() {
 		{
 			"addTemplateMetadataLabels",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":   "1",
+				"delegatedOperatorExecutorSettings.enabled":        "true",
 				"delegatedOperatorExecutorSettings.labels.myLabel": "unruly",
 			},
 			map[string]string{
@@ -1385,7 +1386,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestTemplateLabels() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			map[string]string{
 				"app.kubernetes.io/name":     "teams-do",
@@ -1399,8 +1400,8 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestTemplateLabels() {
 		{
 			"overrideSelectorMatchLabels",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
-				"delegatedOperatorExecutorSettings.name":         "test-service-name",
+				"delegatedOperatorExecutorSettings.enabled": "true",
+				"delegatedOperatorExecutorSettings.name":    "test-service-name",
 			},
 			map[string]string{
 				"app.kubernetes.io/name":     "test-service-name",
@@ -1468,15 +1469,15 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestServiceAccountName
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			"fiftyone-teams",
 		},
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
-				"serviceAccount.name":                            "test-service-account",
+				"delegatedOperatorExecutorSettings.enabled": "true",
+				"serviceAccount.name":                       "test-service-account",
 			},
 			"test-service-account",
 		},
@@ -1528,7 +1529,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestTolerations() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			func(tolerations []corev1.Toleration) {
 				s.Nil(tolerations, "should be nil")
@@ -1537,7 +1538,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestTolerations() {
 		{
 			"overrideTolerations",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":            "1",
+				"delegatedOperatorExecutorSettings.enabled":                 "true",
 				"delegatedOperatorExecutorSettings.tolerations[0].key":      "example-key",
 				"delegatedOperatorExecutorSettings.tolerations[0].operator": "Exists",
 				"delegatedOperatorExecutorSettings.tolerations[0].effect":   "NoSchedule",
@@ -1607,7 +1608,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestVolumes() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount": "1",
+				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
 			func(volumes []corev1.Volume) {
 				s.Nil(volumes, "Volumes should be nil")
@@ -1616,7 +1617,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestVolumes() {
 		{
 			"overrideVolumesSingle",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":             "1",
+				"delegatedOperatorExecutorSettings.enabled":                  "true",
 				"delegatedOperatorExecutorSettings.volumes[0].name":          "test-volume",
 				"delegatedOperatorExecutorSettings.volumes[0].hostPath.path": "/test-volume",
 			},
@@ -1638,7 +1639,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestVolumes() {
 		{
 			"overrideVolumesMultiple",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.replicaCount":                               "1",
+				"delegatedOperatorExecutorSettings.enabled":                                    "true",
 				"delegatedOperatorExecutorSettings.volumes[0].name":                            "test-volume1",
 				"delegatedOperatorExecutorSettings.volumes[0].hostPath.path":                   "/test-volume1",
 				"delegatedOperatorExecutorSettings.volumes[1].name":                            "pvc1",

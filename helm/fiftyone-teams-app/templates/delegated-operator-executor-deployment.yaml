@@ -1,4 +1,4 @@
-{{- if gt (int .Values.delegatedOperatorExecutorSettings.replicaCount) 0 }}
+{{- if .Values.delegatedOperatorExecutorSettings.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
