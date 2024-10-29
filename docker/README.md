@@ -521,9 +521,9 @@ existing configuration to migrate to a new Auth0 Tenant.
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
-    > Teams Database at this step until they upgrade to `fiftyone==2.1.1`
+    > Teams Database at this step until they upgrade to `fiftyone==2.1.2`
 
-1. Upgrade your FiftyOne SDKs to version 2.1.1
+1. Upgrade your FiftyOne SDKs to version 2.1.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to
@@ -612,15 +612,15 @@ existing configuration to migrate to a new Auth0 Tenant.
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.1
+1. [Upgrade to FiftyOne Teams version 2.1.2](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.1.1
+    > **NOTE** Any FiftyOne SDK less than 2.1.2
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.1.1` is required.
+    > Upgrading to `fiftyone==2.1.2` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -669,15 +669,15 @@ existing configuration to migrate to a new Auth0 Tenant.
    mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
    ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.1
+1. [Upgrade to FiftyOne Teams version 2.1.2](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.1.1
+    > **NOTE** Any FiftyOne SDK less than 2.1.2
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.1.1` is required.
+    > Upgrading to `fiftyone==2.1.2` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -691,9 +691,9 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 2.1.2](#deploying-fiftyone-teams)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.1.1, but it is not required
+   version 2.1.2, but it is not required
    - Login to the FiftyOne Teams UI
    - To obtain the CLI command to install the FiftyOne SDK associated with
      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
