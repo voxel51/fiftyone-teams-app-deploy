@@ -70,6 +70,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
+- [Requirements](#requirements)
 - [Values](#values)
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
@@ -403,6 +404,10 @@ appSettings:
   image:
     repository: voxel51/fiftyone-app-torch
 ```
+
+## Requirements
+
+Kubernetes: `>=1.18.0-0 || >=1.18.0`
 
 ## Values
 
