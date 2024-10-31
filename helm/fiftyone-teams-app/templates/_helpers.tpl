@@ -163,9 +163,13 @@ Plugins Combined labels
 
 {{/*
 Teams APP Selector labels
+
+NOTE: Selector labels are immutable.
+We will keep app.kubernetes.io/name
+as fiftyone-teams-app.name and not teams-app.name.
 */}}
 {{- define "teams-app.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "teams-app.name" . }}
+app.kubernetes.io/name: {{ include "fiftyone-teams-app.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
