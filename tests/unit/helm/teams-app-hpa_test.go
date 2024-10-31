@@ -73,7 +73,7 @@ func (s *horizontalPodAutoscalerTeamsAppTemplateTest) TestMetadataLabels() {
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
-				"app.kubernetes.io/name":       "fiftyone-teams-app",
+				"app.kubernetes.io/name":       "teams-app",
 				"app.kubernetes.io/instance":   "fiftyone-test",
 			},
 		},
@@ -81,15 +81,13 @@ func (s *horizontalPodAutoscalerTeamsAppTemplateTest) TestMetadataLabels() {
 			"overrideMetadataLabels",
 			map[string]string{
 				"teamsAppSettings.autoscaling.enabled": "true",
-				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
-				// does not affect the label `app.kubernetes.io/name` for teams-app.
-				"teamsAppSettings.service.name": "test-service-name",
+				"teamsAppSettings.service.name":        "test-service-name",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
-				"app.kubernetes.io/name":       "fiftyone-teams-app",
+				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
 			},
 		},

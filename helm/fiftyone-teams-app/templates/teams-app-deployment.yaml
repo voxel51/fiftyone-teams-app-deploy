@@ -4,14 +4,14 @@ metadata:
   name: {{ include "teams-app.name" . }}
   namespace: {{ .Values.namespace.name }}
   labels:
-    {{- include "fiftyone-teams-app.labels" . | nindent 4 }}
+    {{- include "teams-app.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.teamsAppSettings.autoscaling.enabled }}
   replicas: {{ .Values.teamsAppSettings.replicaCount | default 2 }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "fiftyone-teams-app.selectorLabels" . | nindent 6 }}
+      {{- include "teams-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.teamsAppSettings.podAnnotations }}
@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "fiftyone-teams-app.selectorLabels" . | nindent 8 }}
+        {{- include "teams-app.selectorLabels" . | nindent 8 }}
         {{- with .Values.teamsAppSettings.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
