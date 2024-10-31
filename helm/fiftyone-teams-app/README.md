@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.1.1](https://img.shields.io/badge/Version-2.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.1.1](https://img.shields.io/badge/AppVersion-v2.1.1-informational?style=flat-square)
+![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.1.2](https://img.shields.io/badge/AppVersion-v2.1.2-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 <!-- markdownlint-enable line-length -->
@@ -568,7 +568,7 @@ appSettings:
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics. |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.1.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.1.2"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Teams API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
@@ -629,14 +629,14 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.2 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.2 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -676,10 +676,10 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams v2.1.1](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams v2.1.2](#deploying-fiftyone-teams)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.1.1`
-1. Upgrade your FiftyOne SDKs to version 2.1.1
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.1.2`
+1. Upgrade your FiftyOne SDKs to version 2.1.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -697,7 +697,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.2 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -715,7 +715,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.2 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -756,16 +756,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.1
+1. [Upgrade to FiftyOne Teams version 2.1.2](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.1 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.1.2 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.1` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.1.2` is recommended before migrating
         > your database.
 
     ```shell
@@ -780,7 +780,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.1.2 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -820,16 +820,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.1
+1. [Upgrade to FiftyOne Teams version 2.1.2](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.2
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.1 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.1.2 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.1` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.1.2` is recommended before migrating
         > your database.
 
     ```shell
@@ -844,9 +844,9 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.1.1](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 2.1.2](#deploying-fiftyone-teams)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.1.1, but it is not required
+   version 2.1.2, but it is not required
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
