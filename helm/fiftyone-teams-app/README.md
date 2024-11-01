@@ -407,7 +407,7 @@ appSettings:
 
 ## Requirements
 
-Kubernetes: `>=1.18.0-0 || >=1.18.0`
+Kubernetes: `>=1.18-0`
 
 ## Values
 
