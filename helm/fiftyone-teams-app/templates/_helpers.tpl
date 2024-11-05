@@ -163,8 +163,12 @@ Plugins Combined labels
 
 {{/*
 Teams APP Selector labels
+
+NOTE: Selector labels are immutable.
+We will keep app.kubernetes.io/name
+as fiftyone-teams-app.name and not teams-app.name.
 */}}
-{{- define "fiftyone-teams-app.selectorLabels" -}}
+{{- define "teams-app.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "fiftyone-teams-app.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
@@ -172,9 +176,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Teams APP Combined labels
 */}}
-{{- define "fiftyone-teams-app.labels" -}}
+{{- define "teams-app.labels" -}}
 {{ include "fiftyone-teams-app.commonLabels" . }}
-{{ include "fiftyone-teams-app.selectorLabels" . }}
+{{ include "teams-app.selectorLabels" . }}
 {{- end }}
 
 {{/*
@@ -185,6 +189,27 @@ Create the name of the service account to use
 {{- default (include "fiftyone-teams-app.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Service Account labels
+*/}}
+{{- define "fiftyone-teams-app.serviceAccountLabels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+app.kubernetes.io/name: {{ default (include "fiftyone-teams-app.fullname" .) .Values.serviceAccount.name }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Ingress labels
+*/}}
+{{- define "fiftyone-teams-app.ingressLabels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+app.kubernetes.io/name: {{ include "fiftyone-teams-app.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.ingress.labels }}
+{{ toYaml . }}
 {{- end }}
 {{- end }}
 

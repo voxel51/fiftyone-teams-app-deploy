@@ -8,7 +8,7 @@ metadata:
   name: {{ include "teams-app.name" . }}
   namespace: {{ .Values.namespace.name }}
   labels:
-    {{- include "fiftyone-teams-app.labels" . | nindent 4 }}
+    {{- include "teams-app.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.teamsAppSettings.service.type }}
   ports:
@@ -20,4 +20,4 @@ spec:
       nodePort: {{ .Values.teamsAppSettings.service.nodePort }}
       {{- end }}
   selector:
-    {{- include "fiftyone-teams-app.selectorLabels" . | nindent 4 }}
+    {{- include "teams-app.selectorLabels" . | nindent 4 }}

@@ -241,22 +241,20 @@ func (s *serviceAccountTemplateTest) TestMetadataLabels() {
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
-				"app.kubernetes.io/name":       "fiftyone-teams-app",
+				"app.kubernetes.io/name":       "fiftyone-teams",
 				"app.kubernetes.io/instance":   "fiftyone-test",
 			},
 		},
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
-				// does not affect the label `app.kubernetes.io/name` for the serviceAccount.
-				"appSettings.service.name": "test-service-name",
+				"serviceAccount.name": "test-service-account-name",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
-				"app.kubernetes.io/name":       "fiftyone-teams-app",
+				"app.kubernetes.io/name":       "test-service-account-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
 			},
 		},

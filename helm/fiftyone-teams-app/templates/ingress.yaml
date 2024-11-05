@@ -15,10 +15,7 @@ metadata:
   name: {{ $fullName }}
   namespace: {{ .Values.namespace.name }}
   labels:
-    {{- include "fiftyone-teams-app.labels" . | nindent 4 }}
-    {{- with .Values.ingress.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    {{- include "fiftyone-teams-app.ingressLabels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
