@@ -41,7 +41,7 @@ jobs:
         uses: asdf-vm/actions/install@v3.0.2
       - name: Authenticate to Google Cloud
         id: auth
-        uses: google-github-actions/auth@v2.1.6
+        uses: google-github-actions/auth@v2.1.7
         with:
           project_id: 'computer-vision-team'
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
@@ -78,7 +78,7 @@ jobs:
         uses: asdf-vm/actions/install@v3.0.2
       - name: Authenticate to Google Cloud
         id: auth
-        uses: google-github-actions/auth@v2.1.6
+        uses: google-github-actions/auth@v2.1.7
         with:
           project_id: 'computer-vision-team'
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
