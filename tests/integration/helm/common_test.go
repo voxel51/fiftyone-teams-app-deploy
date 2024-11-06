@@ -1,5 +1,5 @@
-//go:build docker || helm || integration || integrationHelmInternalAuth || integrationHelmLegacyAuth
-// +build docker helm integration integrationHelmInternalAuth integrationHelmLegacyAuth
+//go:build docker || helm || integration || integrationHelmInternalAuth || integrationHelmLegacyAuth || integrationHelmTopology
+// +build docker helm integration integrationHelmInternalAuth integrationHelmLegacyAuth integrationHelmTopology
 
 package integration
 
