@@ -845,7 +845,6 @@ func (s *deploymentPluginsTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "teams-plugins"
           },
-          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -855,18 +854,16 @@ func (s *deploymentPluginsTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessInitialDelaySecondsAndShortName",
+			"overrideServiceLivenessAndShortName",
 			map[string]string{
-				"pluginsSettings.enabled":                              "true",
-				"pluginsSettings.service.liveness.initialDelaySeconds": "30",
-				"pluginsSettings.service.shortname":                    "test-service-shortname",
+				"pluginsSettings.enabled":           "true",
+				"pluginsSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "tcpSocket": {
             "port": "test-service-shortname"
           },
-          "initialDelaySeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1017,7 +1014,6 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "teams-plugins"
           },
-          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1027,18 +1023,16 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessInitialDelaySecondsAndShortName",
+			"overrideServiceReadinessAndShortName",
 			map[string]string{
-				"pluginsSettings.enabled":                               "true",
-				"pluginsSettings.service.readiness.initialDelaySeconds": "30",
-				"pluginsSettings.service.shortname":                     "test-service-shortname",
+				"pluginsSettings.enabled":           "true",
+				"pluginsSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "tcpSocket": {
             "port": "test-service-shortname"
           },
-          "initialDelaySeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1075,6 +1069,95 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
 				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 				testCase.expected(deployment.Spec.Template.Spec.Containers[0].ReadinessProbe)
+			}
+		})
+	}
+}
+
+func (s *deploymentPluginsTemplateTest) TestContainerStartupProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(probe *corev1.Probe) {
+				s.Empty(probe, "Startup Probes should not be set")
+			},
+		},
+		{
+			"defaultValuesPluginsEnabled",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "teams-plugins"
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 5,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			map[string]string{
+				"pluginsSettings.enabled":                          "true",
+				"pluginsSettings.service.shortname":                "test-service-shortname",
+				"pluginsSettings.service.startup.failureThreshold": "10",
+				"pluginsSettings.service.startup.periodSeconds":    "10",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "test-service-shortname"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				var deployment appsv1.Deployment
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				testCase.expected(deployment.Spec.Template.Spec.Containers[0].StartupProbe)
 			}
 		})
 	}
