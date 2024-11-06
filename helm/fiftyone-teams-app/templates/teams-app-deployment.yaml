@@ -47,14 +47,19 @@ spec:
             httpGet:
               path: /api/hello
               port: {{ .Values.teamsAppSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.teamsAppSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /api/hello
               port: {{ .Values.teamsAppSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.teamsAppSettings.service.readiness.initialDelaySeconds }}
             timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /api/hello
+              port: {{ .Values.teamsAppSettings.service.shortname }}
+            timeoutSeconds: 5
+            failureThreshold: {{ .Values.teamsAppSettings.service.startup.failureThreshold }}
+            periodSeconds: {{ .Values.teamsAppSettings.service.startup.periodSeconds }}
           resources:
             {{- toYaml .Values.teamsAppSettings.resources | nindent 12 }}
           {{- with .Values.teamsAppSettings.volumeMounts }}

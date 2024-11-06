@@ -51,21 +51,21 @@ apiSettings:
     annotations: {}
     # -- Service container port for teams-api.
     containerPort: 8000
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe for teams-api. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: teams-api
     # -- (int) Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api.
     nodePort:
     # -- Service port for teams-api.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for teams-api. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for teams-api. [Reference][ports].
     shortname: teams-api
+    startup:
+      # -- Number of times to retry the startup probe for the teams-api. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for teams-api. [Reference][probes].
+      periodSeconds: 5
     # -- Service type for teams-api. [Reference][service-type].
     type: ClusterIP
 
@@ -154,21 +154,21 @@ appSettings:
     annotations: {}
     # -- Service container port for fiftyone-app.
     containerPort: 5151
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: fiftyone-app
     # -- (int) Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app.
     nodePort:
     # -- Service port.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports].
     shortname: fiftyone-app
+    startup:
+      # -- Number of times to retry the startup probe for the fiftyone-app. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes].
+      periodSeconds: 5
     # -- Service type for fiftyone-app. [Reference][service-type].
     type: ClusterIP
 
@@ -246,21 +246,21 @@ casSettings:
     annotations: {}
     # -- Service container port for teams-cas.
     containerPort: 3000
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: teams-cas
     # -- (int) Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas.
     nodePort:
     # -- Service port.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for teams-cas. [Reference][ports].
     shortname: teams-cas
+    startup:
+      # -- Number of times to retry the startup probe for the teams-cas. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes].
+      periodSeconds: 5
     # -- Service type for teams-cas. [Reference][service-type].
     type: ClusterIP
 
@@ -405,21 +405,21 @@ pluginsSettings:
     annotations: {}
     # -- Service container port for teams-plugins.
     containerPort: 5151
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe teams-plugins. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: teams-plugins
     # -- (int) Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins.
     nodePort:
     # -- Service port.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for teams-plugins. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports].
     shortname: teams-plugins
+    startup:
+      # -- Number of times to retry the startup probe for the teams-plugins. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes].
+      periodSeconds: 5
     # -- Service type for teams-plugins. [Reference][service-type].
     type: ClusterIP
 
@@ -552,21 +552,21 @@ teamsAppSettings:
     annotations: {}
     # -- Service container port for teams-app.
     containerPort: 3000
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: teams-app
     # -- (int) Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app.
     nodePort:
     # -- Service port.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for teams-app. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for teams-app. [Reference][ports].
     shortname: teams-app
+    startup:
+      # -- Number of times to retry the startup probe for the teams-app. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for teams-app. [Reference][probes].
+      periodSeconds: 5
     # -- Service type for teams-app. [Reference][service-type].
     type: ClusterIP
 

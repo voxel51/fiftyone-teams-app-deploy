@@ -46,13 +46,17 @@ spec:
           livenessProbe:
             tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.appSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
             tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.appSettings.service.readiness.initialDelaySeconds }}
             timeoutSeconds: 5
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.appSettings.service.shortname }}
+            timeoutSeconds: 5
+            failureThreshold: {{ .Values.appSettings.service.startup.failureThreshold }}
+            periodSeconds: {{ .Values.appSettings.service.startup.periodSeconds }}
           resources:
             {{- toYaml .Values.appSettings.resources | nindent 12 }}
           {{- with .Values.appSettings.volumeMounts }}
