@@ -69,7 +69,7 @@ spec:
           {{- end }}
       {{- if .Values.apiSettings.topologySpreadConstraints }}
       topologySpreadConstraints:
-        {{- include "fiftyone-teams-api.topologySpreadConstraints" . | nindent 8 }}
+        {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.apiSettings.topologySpreadConstraints "selectorLabels" "fiftyone-teams-api.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
       {{- with .Values.apiSettings.nodeSelector }}
       nodeSelector:

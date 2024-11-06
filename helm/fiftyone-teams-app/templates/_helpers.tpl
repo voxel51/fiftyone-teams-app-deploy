@@ -214,20 +214,34 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Teams API Topology Constraints
+Common Topology Constraints
 */}}
-{{- define "fiftyone-teams-api.topologySpreadConstraints" -}}
-{{- range $constraint := .Values.apiSettings.topologySpreadConstraints -}}
+{{- define "fiftyone-teams-app.commonTopologySpreadConstraints" -}}
+{{- range $constraint := .constraints -}}
 - maxSkew: {{ $constraint.maxSkew }}
-  minDomains: ""
+  {{- if $constraint.minDomains }}
+  minDomains: {{ $constraint.minDomains }}
+  {{- end }}
   topologyKey: {{ $constraint.topologyKey }}
   whenUnsatisfiable: {{ $constraint.whenUnsatisfiable }}
+  {{- if $constraint.labelSelector }}
+  labelSelector:
+    {{- $constraint.labelSelector | toYaml | nindent 4 }}
+  {{- else }}
   labelSelector:
     matchLabels:
-      {{- include "fiftyone-teams-api.selectorLabels" $ | nindent 6 }}
-  matchLabelKeys: []
-  nodeAffinityPolicy: ""
-  nodeTaintsPolicy: ""
+      {{- include $.selectorLabels $.context | nindent 6 }}
+  {{- end }}
+  {{- if $constraint.matchLabelKeys }}
+  matchLabelKeys:
+    {{- $constraint.matchLabelKeys | nindent 4 }}
+  {{- end }}
+  {{- if $constraint.nodeAffinityPolicy }}
+  nodeAffinityPolicy: {{ $constraint.nodeAffinityPolicy }}
+  {{- end }}
+  {{- if $constraint.nodeTaintsPolicy }}
+  nodeTaintsPolicy: {{ $constraint.nodeTaintsPolicy }}
+  {{- end }}
 {{- end -}}
 {{- end }}
 

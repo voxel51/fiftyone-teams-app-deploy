@@ -438,7 +438,7 @@ Kubernetes: `>=1.18-0`
 | apiSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-api. [Reference][probes]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for teams-api. [Reference][service-type]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations]. |
-| apiSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. [Reference][topology-spread-constraints].   - topologyKey: topology.kubernetes.io/zone     maxSkew: 1     whenUnsatisfiable: DoNotSchedule |
+| apiSettings.topologySpreadConstraints | list | `[]` | Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints]. Example Below: - topologyKey: topology.kubernetes.io/zone   maxSkew: 1   whenUnsatisfiable: DoNotSchedule   nodeAffinityPolicy: "Honor"   nodeTaintsPolicy: "Honor"   minDomains: 1 |
 | apiSettings.volumeMounts | list | `[]` | Volume mounts for teams-api. [Reference][volumes]. |
 | apiSettings.volumes | list | `[]` | Volumes for teams-api. [Reference][volumes]. |
 | appSettings.affinity | object | `{}` | Affinity and anti-affinity for fiftyone-app. [Reference][affinity]. |
