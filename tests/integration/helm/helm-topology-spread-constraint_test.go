@@ -154,7 +154,7 @@ func (s *topologyAuthHelmTest) TestHelmInstall() {
 			k8s.CreateNamespace(subT, kubectlOptions, namespace)
 
 			// create persistent volume, when necessary
-			needsPersistentVolume := []string{"sharedPlugins", "dedicatedPlugins"}
+			needsPersistentVolume := []string{"dedicatedPluginsTopologyConstraints"}
 			if slices.Contains(needsPersistentVolume, testCase.name) {
 
 				var nfsConfig *NFSConfig
