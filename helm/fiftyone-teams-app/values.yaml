@@ -84,13 +84,6 @@ apiSettings:
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
-  # Example Below:
-  # - topologyKey: topology.kubernetes.io/zone
-  #   maxSkew: 1
-  #   whenUnsatisfiable: DoNotSchedule
-  #   nodeAffinityPolicy: "Honor"
-  #   nodeTaintsPolicy: "Honor"
-  #   minDomains: 1
   topologySpreadConstraints: []
   # -- Volume mounts for teams-api. [Reference][volumes].
   volumeMounts: []
@@ -197,13 +190,6 @@ appSettings:
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
-  # Example Below:
-  # - topologyKey: topology.kubernetes.io/zone
-  #   maxSkew: 1
-  #   whenUnsatisfiable: DoNotSchedule
-  #   nodeAffinityPolicy: "Honor"
-  #   nodeTaintsPolicy: "Honor"
-  #   minDomains: 1
   topologySpreadConstraints: []
   # -- Volume mounts for fiftyone-app. [Reference][volumes].
   volumeMounts: []
@@ -299,13 +285,6 @@ casSettings:
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
-  # Example Below:
-  # - topologyKey: topology.kubernetes.io/zone
-  #   maxSkew: 1
-  #   whenUnsatisfiable: DoNotSchedule
-  #   nodeAffinityPolicy: "Honor"
-  #   nodeTaintsPolicy: "Honor"
-  #   minDomains: 1
   topologySpreadConstraints: []
   # -- Volume mounts for teams-cas. [Reference][volumes].
   volumeMounts: []
@@ -468,13 +447,6 @@ pluginsSettings:
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
-  # Example Below:
-  # - topologyKey: topology.kubernetes.io/zone
-  #   maxSkew: 1
-  #   whenUnsatisfiable: DoNotSchedule
-  #   nodeAffinityPolicy: "Honor"
-  #   nodeTaintsPolicy: "Honor"
-  #   minDomains: 1
   topologySpreadConstraints: []
   # -- Volume mounts for teams-plugins pods. [Reference][volumes].
   volumeMounts: []
@@ -625,13 +597,6 @@ teamsAppSettings:
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
-  # Example Below:
-  # - topologyKey: topology.kubernetes.io/zone
-  #   maxSkew: 1
-  #   whenUnsatisfiable: DoNotSchedule
-  #   nodeAffinityPolicy: "Honor"
-  #   nodeTaintsPolicy: "Honor"
-  #   minDomains: 1
   topologySpreadConstraints: []
   # -- Volume mounts for teams-app pods. [Reference][volumes].
   volumeMounts: []
