@@ -472,6 +472,7 @@ Kubernetes: `>=1.18-0`
 | appSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for fiftyone-app. [Reference][service-type]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| appSettings.topologySpreadConstraints | list | `[]` | Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints]. Example Below: - topologyKey: topology.kubernetes.io/zone   maxSkew: 1   whenUnsatisfiable: DoNotSchedule   nodeAffinityPolicy: "Honor"   nodeTaintsPolicy: "Honor"   minDomains: 1 |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
@@ -501,6 +502,7 @@ Kubernetes: `>=1.18-0`
 | casSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes]. |
 | casSettings.service.type | string | `"ClusterIP"` | Service type for teams-cas. [Reference][service-type]. |
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
+| casSettings.topologySpreadConstraints | list | `[]` | Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints]. Example Below: - topologyKey: topology.kubernetes.io/zone   maxSkew: 1   whenUnsatisfiable: DoNotSchedule   nodeAffinityPolicy: "Honor"   nodeTaintsPolicy: "Honor"   minDomains: 1 |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Teams Licenses (one per org) |
@@ -553,6 +555,7 @@ Kubernetes: `>=1.18-0`
 | pluginsSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for teams-plugins. [Reference][service-type]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations]. |
+| pluginsSettings.topologySpreadConstraints | list | `[]` | Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints]. Example Below: - topologyKey: topology.kubernetes.io/zone   maxSkew: 1   whenUnsatisfiable: DoNotSchedule   nodeAffinityPolicy: "Honor"   nodeTaintsPolicy: "Honor"   minDomains: 1 |
 | pluginsSettings.volumeMounts | list | `[]` | Volume mounts for teams-plugins pods. [Reference][volumes]. |
 | pluginsSettings.volumes | list | `[]` | Volumes for teams-plugins. [Reference][volumes]. |
 | secret.create | bool | `true` | Controls whether to create the secret named `secret.name`. |
@@ -599,6 +602,7 @@ Kubernetes: `>=1.18-0`
 | teamsAppSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for teams-app. [Reference][service-type]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| teamsAppSettings.topologySpreadConstraints | list | `[]` | Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints]. Example Below: - topologyKey: topology.kubernetes.io/zone   maxSkew: 1   whenUnsatisfiable: DoNotSchedule   nodeAffinityPolicy: "Honor"   nodeTaintsPolicy: "Honor"   minDomains: 1 |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for teams-app pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for teams-app pods. [Reference][volumes]. |
 

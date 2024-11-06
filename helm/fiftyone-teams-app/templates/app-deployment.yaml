@@ -75,6 +75,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.appSettings.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.appSettings.topologySpreadConstraints "selectorLabels" "fiftyone-teams-app.selectorLabels" "context" $) | nindent 8 }}
+      {{- end }}
       {{- with .Values.appSettings.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

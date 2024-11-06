@@ -195,6 +195,16 @@ appSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Example Below:
+  # - topologyKey: topology.kubernetes.io/zone
+  #   maxSkew: 1
+  #   whenUnsatisfiable: DoNotSchedule
+  #   nodeAffinityPolicy: "Honor"
+  #   nodeTaintsPolicy: "Honor"
+  #   minDomains: 1
+  topologySpreadConstraints: []
   # -- Volume mounts for fiftyone-app. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for fiftyone-app. [Reference][volumes].
@@ -287,6 +297,16 @@ casSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Example Below:
+  # - topologyKey: topology.kubernetes.io/zone
+  #   maxSkew: 1
+  #   whenUnsatisfiable: DoNotSchedule
+  #   nodeAffinityPolicy: "Honor"
+  #   nodeTaintsPolicy: "Honor"
+  #   minDomains: 1
+  topologySpreadConstraints: []
   # -- Volume mounts for teams-cas. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for teams-cas. [Reference][volumes].
@@ -446,6 +466,16 @@ pluginsSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Example Below:
+  # - topologyKey: topology.kubernetes.io/zone
+  #   maxSkew: 1
+  #   whenUnsatisfiable: DoNotSchedule
+  #   nodeAffinityPolicy: "Honor"
+  #   nodeTaintsPolicy: "Honor"
+  #   minDomains: 1
+  topologySpreadConstraints: []
   # -- Volume mounts for teams-plugins pods. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for teams-plugins. [Reference][volumes].
@@ -593,6 +623,16 @@ teamsAppSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Example Below:
+  # - topologyKey: topology.kubernetes.io/zone
+  #   maxSkew: 1
+  #   whenUnsatisfiable: DoNotSchedule
+  #   nodeAffinityPolicy: "Honor"
+  #   nodeTaintsPolicy: "Honor"
+  #   minDomains: 1
+  topologySpreadConstraints: []
   # -- Volume mounts for teams-app pods. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for teams-app pods. [Reference][volumes].
