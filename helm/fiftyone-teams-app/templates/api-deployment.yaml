@@ -62,6 +62,10 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      {{- if .Values.apiSettings.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- include "fiftyone-teams-api.topologySpreadConstraints" . | nindent 8 }}
+      {{- end }}
       {{- with .Values.apiSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

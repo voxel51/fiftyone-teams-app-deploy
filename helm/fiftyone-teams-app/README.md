@@ -438,6 +438,7 @@ Kubernetes: `>=1.18-0`
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for teams-api. [Reference][ports]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for teams-api. [Reference][service-type]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations]. |
+| apiSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. [Reference][topology-spread-constraints].   - topologyKey: topology.kubernetes.io/zone     maxSkew: 1     whenUnsatisfiable: DoNotSchedule |
 | apiSettings.volumeMounts | list | `[]` | Volume mounts for teams-api. [Reference][volumes]. |
 | apiSettings.volumes | list | `[]` | Volumes for teams-api. [Reference][volumes]. |
 | appSettings.affinity | object | `{}` | Affinity and anti-affinity for fiftyone-app. [Reference][affinity]. |
@@ -994,6 +995,7 @@ serviceAccount:
 [service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+[topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
 
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/

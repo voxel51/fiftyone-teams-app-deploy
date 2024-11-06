@@ -82,6 +82,11 @@ apiSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint. [Reference][topology-spread-constraints].
+  #   - topologyKey: topology.kubernetes.io/zone
+  #     maxSkew: 1
+  #     whenUnsatisfiable: DoNotSchedule
+  topologySpreadConstraints: []
   # -- Volume mounts for teams-api. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for teams-api. [Reference][volumes].

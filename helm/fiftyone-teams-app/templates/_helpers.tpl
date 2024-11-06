@@ -214,6 +214,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Teams API Topology Constraints
+*/}}
+{{- define "fiftyone-teams-api.topologySpreadConstraints" -}}
+{{- range $constraint := .Values.apiSettings.topologySpreadConstraints -}}
+- maxSkew: {{ $constraint.maxSkew }}
+  minDomains: ""
+  topologyKey: {{ $constraint.topologyKey }}
+  whenUnsatisfiable: {{ $constraint.whenUnsatisfiable }}
+  labelSelector:
+    matchLabels:
+      {{- include "fiftyone-teams-api.selectorLabels" $ | nindent 6 }}
+  matchLabelKeys: []
+  nodeAffinityPolicy: ""
+  nodeTaintsPolicy: ""
+{{- end -}}
+{{- end }}
+
+{{/*
 Create a merged list of environment variables for fiftyone-teams-api
 */}}
 {{- define "fiftyone-teams-api.env-vars-list" -}}
