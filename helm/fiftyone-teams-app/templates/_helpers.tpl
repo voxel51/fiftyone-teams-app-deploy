@@ -330,6 +330,11 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
+- name: FIFTYONE_ENCRYPTION_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: encryptionKey
 {{- range $key, $val := .Values.casSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

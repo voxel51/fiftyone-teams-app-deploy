@@ -331,6 +331,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_AUTH_MODE",
             "value": "legacy"
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
