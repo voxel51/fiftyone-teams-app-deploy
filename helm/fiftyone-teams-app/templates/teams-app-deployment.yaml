@@ -57,9 +57,9 @@ spec:
             httpGet:
               path: /api/hello
               port: {{ .Values.teamsAppSettings.service.shortname }}
-            timeoutSeconds: 5
             failureThreshold: {{ .Values.teamsAppSettings.service.startup.failureThreshold }}
             periodSeconds: {{ .Values.teamsAppSettings.service.startup.periodSeconds }}
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.teamsAppSettings.resources | nindent 12 }}
           {{- with .Values.teamsAppSettings.volumeMounts }}

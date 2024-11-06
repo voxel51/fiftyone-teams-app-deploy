@@ -54,9 +54,9 @@ spec:
           startupProbe:
             tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
-            timeoutSeconds: 5
             failureThreshold: {{ .Values.appSettings.service.startup.failureThreshold }}
             periodSeconds: {{ .Values.appSettings.service.startup.periodSeconds }}
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.appSettings.resources | nindent 12 }}
           {{- with .Values.appSettings.volumeMounts }}

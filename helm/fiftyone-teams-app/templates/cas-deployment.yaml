@@ -55,9 +55,9 @@ spec:
             httpGet:
               path: /cas/api
               port: {{ .Values.casSettings.service.shortname }}
-            timeoutSeconds: 5
             failureThreshold: {{ .Values.casSettings.service.startup.failureThreshold }}
             periodSeconds: {{ .Values.casSettings.service.startup.periodSeconds }}
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.casSettings.resources | nindent 12 }}
           volumeMounts:

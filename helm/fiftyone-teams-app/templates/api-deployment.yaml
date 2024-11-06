@@ -58,9 +58,9 @@ spec:
             httpGet:
               path: /health/
               port: {{ .Values.apiSettings.service.shortname }}
-            timeoutSeconds: 5
             failureThreshold: {{ .Values.apiSettings.service.startup.failureThreshold }}
             periodSeconds: {{ .Values.apiSettings.service.startup.periodSeconds }}
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.apiSettings.resources | nindent 12 }}
           {{- with .Values.apiSettings.volumeMounts }}
