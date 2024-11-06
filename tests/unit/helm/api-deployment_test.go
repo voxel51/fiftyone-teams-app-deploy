@@ -217,6 +217,141 @@ func (s *deploymentApiTemplateTest) TestReplicas() {
 	}
 }
 
+func (s *deploymentApiTemplateTest) TestTopologySpreadConstraints() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(constraint []corev1.TopologySpreadConstraint)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsRequiredValues",
+			map[string]string{
+				"apiSettings.topologySpreadConstraints[0].maxSkew":           "1",
+				"apiSettings.topologySpreadConstraints[0].topologyKey":       "kubernetes.io/hostname",
+				"apiSettings.topologySpreadConstraints[0].whenUnsatisfiable": "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				eexpectedTopologySpreadConstraintJSON := `[
+					{
+					  "maxSkew": 1,
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app.kubernetes.io/name": "teams-api",
+							"app.kubernetes.io/instance": "fiftyone-test"
+						}
+					  }
+					}
+				  ]`
+				err := json.Unmarshal([]byte(eexpectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsOptionalValues",
+			map[string]string{
+				"apiSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"apiSettings.topologySpreadConstraints[0].maxSkew":            "1",
+				"apiSettings.topologySpreadConstraints[0].minDomains":         "1",
+				"apiSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
+				"apiSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
+				"apiSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"apiSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				eexpectedTopologySpreadConstraintJSON := `[
+					{
+					  "matchLabelKeys": [
+					  	"pod-template-hash"
+					  ],
+					  "maxSkew": 1,
+					  "minDomains": 1,
+					  "nodeAffinityPolicy": "Honor",
+					  "nodeTaintsPolicy": "Honor",
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app.kubernetes.io/name": "teams-api",
+							"app.kubernetes.io/instance": "fiftyone-test"
+						}
+					  }
+					}
+				  ]`
+				err := json.Unmarshal([]byte(eexpectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsSelectorLabels",
+			map[string]string{
+				"apiSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"apiSettings.topologySpreadConstraints[0].maxSkew":                       "1",
+				"apiSettings.topologySpreadConstraints[0].minDomains":                    "1",
+				"apiSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
+				"apiSettings.topologySpreadConstraints[0].nodeTaintsPolicy":              "Honor",
+				"apiSettings.topologySpreadConstraints[0].labelSelector.matchLabels.app": "foo",
+				"apiSettings.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
+				"apiSettings.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				eexpectedTopologySpreadConstraintJSON := `[
+					{
+					  "matchLabelKeys": [
+					  	"pod-template-hash"
+					  ],
+					  "maxSkew": 1,
+					  "minDomains": 1,
+					  "nodeAffinityPolicy": "Honor",
+					  "nodeTaintsPolicy": "Honor",
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app": "foo"
+						}
+					  }
+					}
+				  ]`
+				err := json.Unmarshal([]byte(eexpectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.TopologySpreadConstraints)
+		})
+	}
+}
+
 func (s *deploymentApiTemplateTest) TestContainerCount() {
 	testCases := []struct {
 		name     string

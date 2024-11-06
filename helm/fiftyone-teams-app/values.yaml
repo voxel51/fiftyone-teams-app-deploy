@@ -83,7 +83,7 @@ apiSettings:
   # -- Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
   # Example Below:
   # - topologyKey: topology.kubernetes.io/zone
   #   maxSkew: 1
@@ -196,7 +196,7 @@ appSettings:
   # -- Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
   # Example Below:
   # - topologyKey: topology.kubernetes.io/zone
   #   maxSkew: 1
@@ -298,7 +298,7 @@ casSettings:
   # -- Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
   # Example Below:
   # - topologyKey: topology.kubernetes.io/zone
   #   maxSkew: 1
@@ -467,7 +467,7 @@ pluginsSettings:
   # -- Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
   # Example Below:
   # - topologyKey: topology.kubernetes.io/zone
   #   maxSkew: 1
@@ -624,7 +624,7 @@ teamsAppSettings:
   # -- Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # -- Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the teams-api. [Reference][topology-spread-constraints].
   # Example Below:
   # - topologyKey: topology.kubernetes.io/zone
   #   maxSkew: 1
