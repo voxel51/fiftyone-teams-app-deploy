@@ -242,7 +242,7 @@ Common Topology Constraints
   {{- if $constraint.nodeTaintsPolicy }}
   nodeTaintsPolicy: {{ $constraint.nodeTaintsPolicy }}
   {{- end }}
-{{- end -}}
+{{ end }}
 {{- end }}
 
 {{/*

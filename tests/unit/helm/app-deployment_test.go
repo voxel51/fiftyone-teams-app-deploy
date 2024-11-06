@@ -273,10 +273,34 @@ func (s *deploymentAppTemplateTest) TestTopologySpreadConstraints() {
 				"appSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
 				"appSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"appSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"appSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[1].maxSkew":            "1",
+				"appSettings.topologySpreadConstraints[1].minDomains":         "1",
+				"appSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Honor",
+				"appSettings.topologySpreadConstraints[1].nodeTaintsPolicy":   "Honor",
+				"appSettings.topologySpreadConstraints[1].topologyKey":        "kubernetes.io/hostname",
+				"appSettings.topologySpreadConstraints[1].whenUnsatisfiable":  "DoNotSchedule",
 			},
 			func(constraint []corev1.TopologySpreadConstraint) {
 				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
 				eexpectedTopologySpreadConstraintJSON := `[
+					{
+					  "matchLabelKeys": [
+					  	"pod-template-hash"
+					  ],
+					  "maxSkew": 1,
+					  "minDomains": 1,
+					  "nodeAffinityPolicy": "Honor",
+					  "nodeTaintsPolicy": "Honor",
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app.kubernetes.io/name": "fiftyone-teams-app",
+							"app.kubernetes.io/instance": "fiftyone-test"
+						}
+					  }
+					},
 					{
 					  "matchLabelKeys": [
 					  	"pod-template-hash"

@@ -273,10 +273,34 @@ func (s *deploymentCasTemplateTest) TestTopologySpreadConstraints() {
 				"casSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
 				"casSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"casSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"casSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"casSettings.topologySpreadConstraints[1].maxSkew":            "1",
+				"casSettings.topologySpreadConstraints[1].minDomains":         "1",
+				"casSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Honor",
+				"casSettings.topologySpreadConstraints[1].nodeTaintsPolicy":   "Honor",
+				"casSettings.topologySpreadConstraints[1].topologyKey":        "kubernetes.io/hostname",
+				"casSettings.topologySpreadConstraints[1].whenUnsatisfiable":  "DoNotSchedule",
 			},
 			func(constraint []corev1.TopologySpreadConstraint) {
 				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
 				eexpectedTopologySpreadConstraintJSON := `[
+					{
+					  "matchLabelKeys": [
+					  	"pod-template-hash"
+					  ],
+					  "maxSkew": 1,
+					  "minDomains": 1,
+					  "nodeAffinityPolicy": "Honor",
+					  "nodeTaintsPolicy": "Honor",
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app.kubernetes.io/name": "teams-cas",
+							"app.kubernetes.io/instance": "fiftyone-test"
+						}
+					  }
+					},
 					{
 					  "matchLabelKeys": [
 					  	"pod-template-hash"
