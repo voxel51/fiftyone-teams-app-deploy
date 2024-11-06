@@ -859,8 +859,8 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "path": "/health/",
             "port": "teams-api"
           },
-		  "failureThreshold": 5,
-		  "periodSeconds": 5,
+          "failureThreshold": 5,
+          "periodSeconds": 5,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -882,8 +882,8 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "path": "/health/",
             "port": "test-service-shortname"
           },
-		  "failureThreshold": 10,
-		  "periodSeconds": 10,
+          "failureThreshold": 10,
+          "periodSeconds": 10,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
