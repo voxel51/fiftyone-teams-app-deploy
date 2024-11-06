@@ -430,12 +430,12 @@ Kubernetes: `>=1.18-0`
 | apiSettings.securityContext | object | `{}` | Container security configuration for teams-api. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for teams-api. [Reference][annotations]. |
 | apiSettings.service.containerPort | int | `8000` | Service container port for teams-api. |
-| apiSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-api. [Reference][probes]. |
 | apiSettings.service.name | string | `"teams-api"` | Service name. |
 | apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api. |
 | apiSettings.service.port | int | `80` | Service port for teams-api. |
-| apiSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-api. [Reference][probes]. |
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for teams-api. [Reference][ports]. |
+| apiSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-api. [Reference][probes]. |
+| apiSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-api. [Reference][probes]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for teams-api. [Reference][service-type]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations]. |
 | apiSettings.volumeMounts | list | `[]` | Volume mounts for teams-api. [Reference][volumes]. |
@@ -463,12 +463,12 @@ Kubernetes: `>=1.18-0`
 | appSettings.securityContext | object | `{}` | Container security configuration for fiftyone-app. [Reference][container-security-context]. |
 | appSettings.service.annotations | object | `{}` | Service annotations for fiftyone-app. [Reference][annotations]. |
 | appSettings.service.containerPort | int | `5151` | Service container port for fiftyone-app. |
-| appSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.name | string | `"fiftyone-app"` | Service name. |
 | appSettings.service.nodePort | int | `nil` | Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app. |
 | appSettings.service.port | int | `80` | Service port. |
-| appSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports]. |
+| appSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the fiftyone-app. [Reference][probes]. |
+| appSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for fiftyone-app. [Reference][service-type]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
@@ -492,12 +492,12 @@ Kubernetes: `>=1.18-0`
 | casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
 | casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
 | casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
-| casSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | casSettings.service.name | string | `"teams-cas"` | Service name. |
 | casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas. |
 | casSettings.service.port | int | `80` | Service port. |
-| casSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
 | casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for teams-cas. [Reference][ports]. |
+| casSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-cas. [Reference][probes]. |
+| casSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes]. |
 | casSettings.service.type | string | `"ClusterIP"` | Service type for teams-cas. [Reference][service-type]. |
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
@@ -544,12 +544,12 @@ Kubernetes: `>=1.18-0`
 | pluginsSettings.securityContext | object | `{}` | Container security configuration for teams-plugins. [Reference][container-security-context]. |
 | pluginsSettings.service.annotations | object | `{}` | Service annotations for teams-plugins. [Reference][annotations]. |
 | pluginsSettings.service.containerPort | int | `5151` | Service container port for teams-plugins. |
-| pluginsSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.name | string | `"teams-plugins"` | Service name. |
 | pluginsSettings.service.nodePort | int | `nil` | Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins. |
 | pluginsSettings.service.port | int | `80` | Service port. |
-| pluginsSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports]. |
+| pluginsSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-plugins. [Reference][probes]. |
+| pluginsSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for teams-plugins. [Reference][service-type]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations]. |
 | pluginsSettings.volumeMounts | list | `[]` | Volume mounts for teams-plugins pods. [Reference][volumes]. |
@@ -590,12 +590,12 @@ Kubernetes: `>=1.18-0`
 | teamsAppSettings.securityContext | object | `{}` | Container security configuration for teams-app. [Reference][container-security-context]. |
 | teamsAppSettings.service.annotations | object | `{}` | Service annotations for teams-app. [Reference][annotations]. |
 | teamsAppSettings.service.containerPort | int | `3000` | Service container port for teams-app. |
-| teamsAppSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.name | string | `"teams-app"` | Service name. |
 | teamsAppSettings.service.nodePort | int | `nil` | Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app. |
 | teamsAppSettings.service.port | int | `80` | Service port. |
-| teamsAppSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for teams-app. [Reference][ports]. |
+| teamsAppSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-app. [Reference][probes]. |
+| teamsAppSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for teams-app. [Reference][service-type]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations]. |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for teams-app pods. [Reference][volumes]. |
