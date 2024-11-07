@@ -1600,6 +1600,14 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerCount() {
 			},
 			1,
 		},
+		{
+			"overrideInitContainersEnabled",
+			map[string]string{
+				"pluginsSettings.enabled":                "true",
+				"pluginsSettings.initContainers.enabled": "false",
+			},
+			0,
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -1636,9 +1644,9 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerImage() {
 		{
 			"overrideImageRepositoryAndTag",
 			map[string]string{
-				"pluginsSettings.enabled":                   "true",
-				"pluginsSettings.initContainers.repository": "docker.io/bash",
-				"pluginsSettings.initContainers.tag":        "devel-alpine3.20",
+				"pluginsSettings.enabled":                         "true",
+				"pluginsSettings.initContainers.image.repository": "docker.io/bash",
+				"pluginsSettings.initContainers.image.tag":        "devel-alpine3.20",
 			},
 			"docker.io/bash:devel-alpine3.20",
 		},
@@ -1677,7 +1685,7 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerCommand() {
 				expectedCmd := []string{
 					"sh",
 					"-c",
-					"until nslookup teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+					"until nslookup teams-cas; do echo waiting for cas; sleep 2; done",
 				}
 				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
 			},

@@ -64,13 +64,10 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      {{- if .Values.pluginsSettings.initContainers.enabled }}
       initContainers:
-        - name: init-cas
-          image: {{ .Values.pluginsSettings.initContainers.repository }}:{{ .Values.pluginsSettings.initContainers.tag }}
-          command:
-            - 'sh'
-            - '-c'
-            - "until nslookup teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done"
+        {{- include "fiftyone-teams-app.commonInitContainers" (dict "repository" .Values.pluginsSettings.initContainers.image.repository "tag" .Values.pluginsSettings.initContainers.image.tag) | nindent 8 }}
+      {{- end }}
       {{- with .Values.pluginsSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

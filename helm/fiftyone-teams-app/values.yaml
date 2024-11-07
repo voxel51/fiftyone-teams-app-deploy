@@ -72,10 +72,13 @@ apiSettings:
   # -- Affinity and anti-affinity for teams-api. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Init container images repositories for teams-api. [Reference][init-containers].
-    repository: docker.io/busybox
-    # -- Init container images tags for teams-api. [Reference][init-containers].
-    tag: stable-glibc
+    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for teams-api. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for teams-api. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for teams-api. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for teams-api. [Reference][annotations].
@@ -183,10 +186,13 @@ appSettings:
   # -- Affinity and anti-affinity for fiftyone-app. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Init container images repositories for fiftyone-app. [Reference][init-containers].
-    repository: docker.io/busybox
-    # -- Init container images tags for fiftyone-app. [Reference][init-containers].
-    tag: stable-glibc
+    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for fiftyone-app. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for fiftyone-app. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for fiftyone-app. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for fiftyone-app. [Reference][annotations].
@@ -283,10 +289,13 @@ casSettings:
   # -- Affinity and anti-affinity for teams-cas. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Init container images repositories for teams-cas. [Reference][init-containers].
-    repository: docker.io/busybox
-    # -- Init container images tags for teams-cas. [Reference][init-containers].
-    tag: stable-glibc
+    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for teams-cas. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for teams-cas. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for teams-cas. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for teams-cas. [Reference][annotations].
@@ -450,10 +459,13 @@ pluginsSettings:
   # -- Affinity and anti-affinity for teams-plugins. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Init container images repositories for teams-plugins. [Reference][init-containers].
-    repository: docker.io/busybox
-    # -- Init container images tags for teams-plugins. [Reference][init-containers].
-    tag: stable-glibc
+    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for teams-plugins. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for teams-plugins. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for teams-plugins. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for teams-plugins pods. [Reference][annotations].
@@ -605,10 +617,13 @@ teamsAppSettings:
   # -- Affinity and anti-affinity for teams-app. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Init container images repositories for teams-app. [Reference][init-containers].
-    repository: docker.io/busybox
-    # -- Init container images tags for teams-app. [Reference][init-containers].
-    tag: stable-glibc
+    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for teams-app. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for teams-app. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for teams-app. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for teams-app pods. [Reference][annotations].
