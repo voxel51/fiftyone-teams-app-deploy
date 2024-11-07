@@ -248,7 +248,7 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 			},
 			func(constraint []corev1.TopologySpreadConstraint) {
 				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
-				eexpectedTopologySpreadConstraintJSON := `[
+				expectedTopologySpreadConstraintJSON := `[
 					{
 					  "maxSkew": 1,
 					  "topologyKey": "kubernetes.io/hostname",
@@ -261,7 +261,7 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 					  }
 					}
 				  ]`
-				err := json.Unmarshal([]byte(eexpectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
 				s.NoError(err)
 				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
 			},
@@ -277,16 +277,16 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 				"teamsAppSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"teamsAppSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
 				"teamsAppSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
-				"teamsAppSettings.topologySpreadConstraints[1].maxSkew":            "1",
-				"teamsAppSettings.topologySpreadConstraints[1].minDomains":         "1",
-				"teamsAppSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Honor",
-				"teamsAppSettings.topologySpreadConstraints[1].nodeTaintsPolicy":   "Honor",
-				"teamsAppSettings.topologySpreadConstraints[1].topologyKey":        "kubernetes.io/hostname",
-				"teamsAppSettings.topologySpreadConstraints[1].whenUnsatisfiable":  "DoNotSchedule",
+				"teamsAppSettings.topologySpreadConstraints[1].maxSkew":            "2",
+				"teamsAppSettings.topologySpreadConstraints[1].minDomains":         "2",
+				"teamsAppSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
+				"teamsAppSettings.topologySpreadConstraints[1].nodeTaintsPolicy":   "Ignore",
+				"teamsAppSettings.topologySpreadConstraints[1].topologyKey":        "kubernetes.io/region",
+				"teamsAppSettings.topologySpreadConstraints[1].whenUnsatisfiable":  "ScheduleAnyway",
 			},
 			func(constraint []corev1.TopologySpreadConstraint) {
 				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
-				eexpectedTopologySpreadConstraintJSON := `[
+				expectedTopologySpreadConstraintJSON := `[
 					{
 					  "matchLabelKeys": [
 					  	"pod-template-hash"
@@ -308,12 +308,12 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 					  "matchLabelKeys": [
 					  	"pod-template-hash"
 					  ],
-					  "maxSkew": 1,
-					  "minDomains": 1,
-					  "nodeAffinityPolicy": "Honor",
-					  "nodeTaintsPolicy": "Honor",
-					  "topologyKey": "kubernetes.io/hostname",
-					  "whenUnsatisfiable": "DoNotSchedule",
+					  "maxSkew": 2,
+					  "minDomains": 2,
+					  "nodeAffinityPolicy": "Ignore",
+					  "nodeTaintsPolicy": "Ignore",
+					  "topologyKey": "kubernetes.io/region",
+					  "whenUnsatisfiable": "ScheduleAnyway",
 					  "labelSelector": {
 					  	"matchLabels": {
 							"app.kubernetes.io/name": "fiftyone-teams-app",
@@ -322,7 +322,7 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 					  }
 					}
 				  ]`
-				err := json.Unmarshal([]byte(eexpectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
 				s.NoError(err)
 				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
 			},
@@ -341,7 +341,7 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 			},
 			func(constraint []corev1.TopologySpreadConstraint) {
 				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
-				eexpectedTopologySpreadConstraintJSON := `[
+				expectedTopologySpreadConstraintJSON := `[
 					{
 					  "matchLabelKeys": [
 					  	"pod-template-hash"
@@ -359,7 +359,7 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 					  }
 					}
 				  ]`
-				err := json.Unmarshal([]byte(eexpectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
 				s.NoError(err)
 				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
 			},
