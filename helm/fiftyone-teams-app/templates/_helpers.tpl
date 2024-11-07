@@ -316,6 +316,11 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
+- name: FIFTYONE_ENCRYPTION_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: encryptionKey
 - name: LICENSE_KEY_FILE_PATHS
   value: {{ include "teams-cas.license-key-file-paths" . | quote }}
 - name: NEXTAUTH_URL
@@ -330,11 +335,6 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
-- name: FIFTYONE_ENCRYPTION_KEY
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: encryptionKey
 {{- range $key, $val := .Values.casSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
