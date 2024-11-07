@@ -72,7 +72,7 @@ apiSettings:
   # -- Affinity and anti-affinity for teams-api. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    # -- Whether to enable init containers for teams-api. [Reference][init-containers].
     enabled: true
     image:
       # -- Init container images repositories for teams-api. [Reference][init-containers].
@@ -186,7 +186,7 @@ appSettings:
   # -- Affinity and anti-affinity for fiftyone-app. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    # -- Whether to enable init containers for fiftyone-app. [Reference][init-containers].
     enabled: true
     image:
       # -- Init container images repositories for fiftyone-app. [Reference][init-containers].
@@ -289,7 +289,7 @@ casSettings:
   # -- Affinity and anti-affinity for teams-cas. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    # -- Whether to enable init containers for teams-cas. [Reference][init-containers].
     enabled: true
     image:
       # -- Init container images repositories for teams-cas. [Reference][init-containers].
@@ -459,7 +459,7 @@ pluginsSettings:
   # -- Affinity and anti-affinity for teams-plugins. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    # -- Whether to enable init containers for teams-plugins. [Reference][init-containers].
     enabled: true
     image:
       # -- Init container images repositories for teams-plugins. [Reference][init-containers].
