@@ -254,7 +254,7 @@ Common Init Containers
   command:
     - 'sh'
     - '-c'
-    - "until nslookup {{ $.casHostname }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done"
+    - "until nslookup {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done"
 {{- end }}
 
 {{/*
