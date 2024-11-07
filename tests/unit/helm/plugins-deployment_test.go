@@ -1690,6 +1690,21 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerCommand() {
 				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
 			},
 		},
+		{
+			"overrideCasHostname",
+			map[string]string{
+				"casSettings.service.name": "test-service-name",
+				"pluginsSettings.enabled":  "true",
+			},
+			func(cmd []string) {
+				expectedCmd := []string{
+					"sh",
+					"-c",
+					"until nslookup test-service-name.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+				}
+				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
