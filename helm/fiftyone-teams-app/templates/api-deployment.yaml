@@ -67,6 +67,13 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      initContainers:
+        - name: init-cas
+          image: {{ .Values.apiSettings.initContainers.repository }}:{{ .Values.apiSettings.initContainers.tag }}
+          command:
+            - 'sh'
+            - '-c'
+            - "until nslookup teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done"
       {{- with .Values.apiSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

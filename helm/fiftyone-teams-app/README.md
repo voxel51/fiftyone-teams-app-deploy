@@ -422,6 +422,8 @@ Kubernetes: `>=1.18-0`
 | apiSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | apiSettings.image.repository | string | `"voxel51/fiftyone-teams-api"` | Container image for the teams-api. |
 | apiSettings.image.tag | string | `""` | Image tag for teams-api. Defaults to the chart version. |
+| apiSettings.initContainers.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-api. [Reference][init-containers]. |
+| apiSettings.initContainers.tag | string | `"stable-glibc"` | Init container images tags for teams-api. [Reference][init-containers]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for teams-api. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for teams-api. [Reference][annotations]. |
@@ -455,6 +457,8 @@ Kubernetes: `>=1.18-0`
 | appSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | appSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for fiftyone-app. |
 | appSettings.image.tag | string | `""` | Image tag for fiftyone-app. Defaults to the chart version. |
+| appSettings.initContainers.repository | string | `"docker.io/busybox"` | Init container images repositories for fiftyone-app. [Reference][init-containers]. |
+| appSettings.initContainers.tag | string | `"stable-glibc"` | Init container images tags for fiftyone-app. [Reference][init-containers]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for fiftyone-app. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for fiftyone-app. [Reference][annotations]. |
@@ -485,6 +489,8 @@ Kubernetes: `>=1.18-0`
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for teams-cas. |
 | casSettings.image.tag | string | `""` | Image tag for teams-cas. Defaults to the chart version. |
+| casSettings.initContainers.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-cas. [Reference][init-containers]. |
+| casSettings.initContainers.tag | string | `"stable-glibc"` | Init container images tags for teams-cas. [Reference][init-containers]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for teams-cas. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for teams-cas. [Reference][annotations]. |
@@ -538,6 +544,8 @@ Kubernetes: `>=1.18-0`
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for teams-plugins. |
 | pluginsSettings.image.tag | string | `""` | Image tag for teams-plugins. Defaults to the chart version. |
+| pluginsSettings.initContainers.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-plugins. [Reference][init-containers]. |
+| pluginsSettings.initContainers.tag | string | `"stable-glibc"` | Init container images tags for teams-plugins. [Reference][init-containers]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for teams-plugins. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for teams-plugins pods. [Reference][annotations]. |
@@ -585,6 +593,8 @@ Kubernetes: `>=1.18-0`
 | teamsAppSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy]. |
 | teamsAppSettings.image.repository | string | `"voxel51/fiftyone-teams-app"` | Container image for teams-app. |
 | teamsAppSettings.image.tag | string | `""` | Image tag for teams-app. Defaults to the chart version. |
+| teamsAppSettings.initContainers.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-app. [Reference][init-containers]. |
+| teamsAppSettings.initContainers.tag | string | `"stable-glibc"` | Init container images tags for teams-app. [Reference][init-containers]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for teams-app. [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for teams-app pods. [Reference][annotations]. |
@@ -988,6 +998,7 @@ serviceAccount:
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
+[init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode

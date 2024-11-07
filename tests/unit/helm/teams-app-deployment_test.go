@@ -1168,6 +1168,114 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerVolumeMounts() {
 	}
 }
 
+func (s *deploymentTeamsAppTemplateTest) TestInitContainerCount() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected int
+	}{
+		{
+			"defaultValues",
+			nil,
+			1,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			s.Equal(testCase.expected, len(deployment.Spec.Template.Spec.InitContainers), "Init container count should be equal.")
+		})
+	}
+}
+
+func (s *deploymentTeamsAppTemplateTest) TestInitContainerImage() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected string
+	}{
+		{
+			"defaultValues",
+			nil,
+			"docker.io/busybox:stable-glibc",
+		},
+		{
+			"overrideImageRepositoryAndTag",
+			map[string]string{
+				"teamsAppSettings.initContainers.repository": "docker.io/bash",
+				"teamsAppSettings.initContainers.tag":        "devel-alpine3.20",
+			},
+			"docker.io/bash:devel-alpine3.20",
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			s.Equal(testCase.expected, deployment.Spec.Template.Spec.InitContainers[0].Image, "Image values should be equal.")
+		})
+	}
+}
+
+func (s *deploymentTeamsAppTemplateTest) TestInitContainerCommand() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(cmd []string)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(cmd []string) {
+				expectedCmd := []string{
+					"sh",
+					"-c",
+					"until nslookup teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+				}
+				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].Command)
+		})
+	}
+}
+
 func (s *deploymentTeamsAppTemplateTest) TestAffinity() {
 	testCases := []struct {
 		name     string
