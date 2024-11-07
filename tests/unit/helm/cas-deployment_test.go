@@ -286,6 +286,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
               }
             }
           },
+		  {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
           {
             "name": "LICENSE_KEY_FILE_PATHS",
             "value": "/opt/fiftyone/licenses/fiftyone-license"
@@ -365,6 +374,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
                 "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
               }
             }
           },
@@ -456,6 +474,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
             "name": "LICENSE_KEY_FILE_PATHS",
             "value": "/opt/fiftyone/licenses/fiftyone-license"
           },
@@ -539,6 +566,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
                 "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
               }
             }
           },
