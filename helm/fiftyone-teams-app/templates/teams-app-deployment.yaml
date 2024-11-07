@@ -66,6 +66,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      {{- if .Values.teamsAppSettings.initContainers.enabled }}
+      initContainers:
+        {{-
+          include "fiftyone-teams-app.commonInitContainers"
+          (dict "repository" .Values.teamsAppSettings.initContainers.image.repository "tag" .Values.teamsAppSettings.initContainers.image.tag "casServiceName" (include "teams-cas.name" .) )
+          | nindent 8
+        }}
+      {{- end }}
       {{- with .Values.teamsAppSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

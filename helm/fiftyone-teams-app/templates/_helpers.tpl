@@ -246,6 +246,18 @@ Common Topology Constraints
 {{- end }}
 
 {{/*
+Common Init Containers
+*/}}
+{{- define "fiftyone-teams-app.commonInitContainers" -}}
+- name: init-cas
+  image: {{ $.repository }}:{{ $.tag }}
+  command:
+    - 'sh'
+    - '-c'
+    - "until nslookup {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done"
+{{- end }}
+
+{{/*
 Create a merged list of environment variables for fiftyone-teams-api
 */}}
 {{- define "fiftyone-teams-api.env-vars-list" -}}
