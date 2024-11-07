@@ -225,7 +225,7 @@ test-integration-compose-interleaved-legacy: install-terratest-log-parser copy-l
 	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
 
-test-integration-helm-ci: ## set context, install mongodb, and ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
+test-integration-helm-ci: ## set context, install mongodb, and run go test on the tests/integration/helm directory for both internal and legacy auth modes with topology constraints
 	@CLST=$(shell gcloud container clusters list --filter="name : voxel51-ephemeral-test-*" --format="get(name)"); \
 	INTEGRATION_TEST_KUBECONTEXT=gke_computer-vision-team_us-east4_$${CLST}; \
 	gcloud container clusters get-credentials \
@@ -237,13 +237,23 @@ test-integration-helm-ci: ## set context, install mongodb, and ## run go test on
 		--kube-context=$${INTEGRATION_TEST_KUBECONTEXT}; \
 	INTEGRATION_TEST_KUBECONTEXT=$${INTEGRATION_TEST_KUBECONTEXT} GOMAXPROCS=2 make test-integration-helm
 
-test-integration-helm: test-integration-helm-internal test-integration-helm-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
+test-integration-helm: test-integration-helm-internal test-integration-helm-legacy test-integration-helm-topology ## run go test on the tests/integration/helm directory for both internal and legacy auth modes with topology constraints
 
-test-integration-helm-interleaved: test-integration-helm-interleaved-internal test-integration-helm-interleaved-legacy ## run go test on the tests/integration/helm directory for both internal and legacy auth modes
+test-integration-helm-interleaved: test-integration-helm-interleaved-internal test-integration-helm-interleaved-legacy test-integration-helm-interleaved-topology ## run go test on the tests/integration/helm directory for both internal and legacy auth modes with topology constraints
+
+test-integration-helm-topology: copy-license-files-helm  ## run go test on the tests/integration/helm directory for topology constraints
+	@cd tests/integration/helm; \
+	go test -count=1 -timeout=15m -v -tags integrationHelmTopology
 
 test-integration-helm-internal: copy-license-files-helm  ## run go test on the tests/integration/helm directory for internal auth mode
 	@cd tests/integration/helm; \
 	go test -count=1 -timeout=15m -v -tags integrationHelmInternalAuth
+
+test-integration-helm-interleaved-topology: copy-license-files-helm  ## run go test on the tests/integration/helm directory for topology constraints
+	@cd tests/integration/helm; \
+	rm -rf test_output_topology/*; \
+	go test -count=1 -timeout=15m -v -tags integrationHelmTopology | tee test_output_topology.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_topology.log -outputdir test_output_topology
 
 test-integration-helm-legacy: copy-license-files-helm  ## run go test on the tests/integration/helm directory for legacy auth mode
 	@cd tests/integration/helm; \

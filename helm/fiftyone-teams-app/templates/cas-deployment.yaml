@@ -81,6 +81,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.casSettings.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.casSettings.topologySpreadConstraints "selectorLabels" "fiftyone-teams-cas.selectorLabels" "context" $) | nindent 8 }}
+      {{- end }}
       volumes:
         {{- range $name := .Values.fiftyoneLicenseSecrets }}
         - name: {{ print $name }}

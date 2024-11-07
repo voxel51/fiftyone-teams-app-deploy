@@ -438,6 +438,7 @@ Kubernetes: `>=1.18-0`
 | apiSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-api. [Reference][probes]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for teams-api. [Reference][service-type]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations]. |
+| apiSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-api deployment. [Reference][topology-spread-constraints]. |
 | apiSettings.volumeMounts | list | `[]` | Volume mounts for teams-api. [Reference][volumes]. |
 | apiSettings.volumes | list | `[]` | Volumes for teams-api. [Reference][volumes]. |
 | appSettings.affinity | object | `{}` | Affinity and anti-affinity for fiftyone-app. [Reference][affinity]. |
@@ -471,6 +472,7 @@ Kubernetes: `>=1.18-0`
 | appSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for fiftyone-app. [Reference][service-type]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| appSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the fiftyone-app deployment. [Reference][topology-spread-constraints]. |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
@@ -500,6 +502,7 @@ Kubernetes: `>=1.18-0`
 | casSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes]. |
 | casSettings.service.type | string | `"ClusterIP"` | Service type for teams-cas. [Reference][service-type]. |
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
+| casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-cas deployment. [Reference][topology-spread-constraints]. |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Teams Licenses (one per org) |
@@ -552,6 +555,7 @@ Kubernetes: `>=1.18-0`
 | pluginsSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for teams-plugins. [Reference][service-type]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations]. |
+| pluginsSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-plugins deployment. [Reference][topology-spread-constraints]. |
 | pluginsSettings.volumeMounts | list | `[]` | Volume mounts for teams-plugins pods. [Reference][volumes]. |
 | pluginsSettings.volumes | list | `[]` | Volumes for teams-plugins. [Reference][volumes]. |
 | secret.create | bool | `true` | Controls whether to create the secret named `secret.name`. |
@@ -598,6 +602,7 @@ Kubernetes: `>=1.18-0`
 | teamsAppSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for teams-app. [Reference][service-type]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-app deployment. [Reference][topology-spread-constraints]. |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for teams-app pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for teams-app pods. [Reference][volumes]. |
 
@@ -994,6 +999,7 @@ serviceAccount:
 [service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+[topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
 
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/

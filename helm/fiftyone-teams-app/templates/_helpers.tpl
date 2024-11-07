@@ -214,6 +214,38 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Common Topology Constraints
+*/}}
+{{- define "fiftyone-teams-app.commonTopologySpreadConstraints" -}}
+{{- range $constraint := .constraints -}}
+- maxSkew: {{ $constraint.maxSkew }}
+  {{- if $constraint.minDomains }}
+  minDomains: {{ $constraint.minDomains }}
+  {{- end }}
+  topologyKey: {{ $constraint.topologyKey }}
+  whenUnsatisfiable: {{ $constraint.whenUnsatisfiable }}
+  {{- if $constraint.labelSelector }}
+  labelSelector:
+    {{- $constraint.labelSelector | toYaml | nindent 4 }}
+  {{- else }}
+  labelSelector:
+    matchLabels:
+      {{- include $.selectorLabels $.context | nindent 6 }}
+  {{- end }}
+  {{- if $constraint.matchLabelKeys }}
+  matchLabelKeys:
+    {{- $constraint.matchLabelKeys | nindent 4 }}
+  {{- end }}
+  {{- if $constraint.nodeAffinityPolicy }}
+  nodeAffinityPolicy: {{ $constraint.nodeAffinityPolicy }}
+  {{- end }}
+  {{- if $constraint.nodeTaintsPolicy }}
+  nodeTaintsPolicy: {{ $constraint.nodeTaintsPolicy }}
+  {{- end }}
+{{ end }}
+{{- end }}
+
+{{/*
 Create a merged list of environment variables for fiftyone-teams-api
 */}}
 {{- define "fiftyone-teams-api.env-vars-list" -}}
