@@ -499,7 +499,6 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
-				"FIFTYONE_API_KEY=none", // pragma: allowlist secret
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
