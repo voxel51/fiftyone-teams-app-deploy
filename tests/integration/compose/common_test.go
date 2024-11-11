@@ -19,8 +19,10 @@ const (
 	// To run the containers on macOS arm64, we need to set the platform
 	darwinOverrideFile        = "../../tests/fixtures/docker/compose.override.darwin.yaml"
 	darwinOverrideFilePlugins = "../../tests/fixtures/docker/compose.override.darwin_plugins.yaml"
+	darwinOverrideFileDO      = "../../tests/fixtures/docker/compose.override.darwin_do.yaml"
 	mongodbComposeFile        = "../../tests/fixtures/docker/compose.override.mongodb.yaml"
 	mongodbComposeFilePlugins = "../../tests/fixtures/docker/compose.override.mongodb_plugins.yaml"
+	mongodbComposeFileDO      = "../../tests/fixtures/docker/compose.override.mongodb_do.yaml"
 )
 
 type serviceValidations struct {

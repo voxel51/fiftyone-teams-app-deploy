@@ -27,6 +27,7 @@ const (
 var internalAuthComposeFile = filepath.Join(dockerInternalAuthDir, "compose.yaml")
 var internalAuthComposePluginsFile = filepath.Join(dockerInternalAuthDir, "compose.plugins.yaml")
 var internalAuthComposeDedicatedPluginsFile = filepath.Join(dockerInternalAuthDir, "compose.dedicated-plugins.yaml")
+var internalAuthComposeDelegatedOperationsFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.yaml")
 var internalAuthEnvTemplateFilePath = filepath.Join(dockerInternalAuthDir, "env.template")
 
 type commonServicesInternalAuthDockerComposeTest struct {
@@ -92,6 +93,14 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 				"teams-app",
 				"teams-cas",
 				"teams-plugins",
+			},
+		},
+		{
+			"composeDelegatedOperations",
+			[]string{internalAuthComposeDelegatedOperationsFile},
+			s.dotEnvFiles,
+			[]string{
+				"teams-do",
 			},
 		},
 	}
@@ -168,6 +177,13 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
+			s.dotEnvFiles,
+			"voxel51/fiftyone-app:v2.2.0",
+		},
+		{
+			"delegatedOperationsTeamsDo",
+			"teams-do",
+			[]string{internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			"voxel51/fiftyone-app:v2.2.0",
 		},
@@ -476,6 +492,23 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 			},
 		},
+		{
+			"delegatedOperationsTeamsDo",
+			"teams-do",
+			[]string{internalAuthComposeDelegatedOperationsFile},
+			s.dotEnvFiles,
+			[]string{
+				"API_URL=http://teams-api:8000",
+				"FIFTYONE_DATABASE_ADMIN=false",
+				"FIFTYONE_DATABASE_NAME=fiftyone",
+				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
+				"FIFTYONE_INTERNAL_SERVICE=true",
+				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_PLUGINS_CACHE_ENABLED=true",
+				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -658,6 +691,13 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceRestart() {
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
+			s.dotEnvFiles,
+			types.RestartPolicyAlways,
+		},
+		{
+			"delegatedOperationsTeamsDo",
+			"teams-do",
+			[]string{internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
@@ -852,6 +892,21 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 				},
 			},
 		},
+		{
+			"delegatedOperationsTeamsDo",
+			"teams-do",
+			[]string{internalAuthComposeDelegatedOperationsFile},
+			s.dotEnvFiles,
+			[]types.ServiceVolumeConfig{
+				{
+					Type:     "volume",
+					Source:   "plugins-vol",
+					Target:   "/opt/plugins",
+					ReadOnly: true,
+					Volume:   &types.ServiceVolumeVolume{},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -912,6 +967,16 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 		{
 			"dedicatedPlugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
+			s.dotEnvFiles,
+			types.Volumes{
+				"plugins-vol": {
+					Name: "fiftyone-compose-test_plugins-vol",
+				},
+			},
+		},
+		{
+			"delegatedOperations",
+			[]string{internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			types.Volumes{
 				"plugins-vol": {

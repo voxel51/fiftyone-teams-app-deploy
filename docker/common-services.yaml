@@ -151,3 +151,23 @@ services:
       # https_proxy: ${HTTPS_PROXY_URL}
       # no_proxy: ${NO_PROXY_LIST}
     restart: always
+
+  teams-do-common:
+    image: voxel51/fiftyone-app:v2.2.0
+    deploy:
+      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: false
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_CACHE_ENABLED: true
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+    restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro
