@@ -104,6 +104,10 @@ To run plugins in a dedicated `teams-plugins` deployment, provide
 * `ReadOnly` access to the `teams-plugins` deployment
 * `ReadWrite` access to the `teams-api` deployment
 
+To run delegated operators in the builtin orchestrator, additionally provide
+
+* `ReadOnly` access to the `teams-do` deployment
+
 Add the appropriate `volumes` and `volumeMounts` configurations
 to the `apiSettings` section of your `values.yaml`
 
@@ -122,7 +126,9 @@ apiSettings:
 ```
 
 Add the `volumes` and `volumeMounts` configurations to either
-the `pluginsSettings` or `appSettings` section of your `values.yaml`
+the `pluginsSettings` or `appSettings` section of your `values.yaml`. And
+optionally the `delegatedOperatorExecutorSettings` section for the builtin
+delegated operator orchestrator.
 
 ```yaml
 # values.yaml

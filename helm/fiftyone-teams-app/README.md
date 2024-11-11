@@ -60,6 +60,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
 
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [FiftyOne Teams Features](#fiftyone-teams-features)
+  - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -123,6 +124,32 @@ When performing an upgrade, please review
 ## FiftyOne Teams Features
 
 Consider if you will require these settings for your deployment.
+
+### Builtin Delegated Operator Orchestrator
+
+FiftyOne Teams v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+instead of (or in addition to) configuring your own orchestrator such as Airflow.
+
+This option can be added to any of the 3 existing
+[plugin modes](fiftyone-teams-plugins). If you're using the builtin-operator
+only option, the Persistent Volume Claim should be omitted.
+
+To enable this mode
+
+- In `values.yaml`, set
+  - `delegatedOperatorExecutorSettings.enabled: true`
+  - The path for a Persistent Volume Claim mounted to the
+    `teams-do` deployment in
+    - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
+- See
+  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  - Mount a Persistent Volume Claim (PVC) that provides
+    - `ReadWrite` permissions to the `teams-do` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 ### Central Authentication Service
 
@@ -514,6 +541,24 @@ Kubernetes: `>=1.18-0`
 | casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-cas deployment. [Reference][topology-spread-constraints]. |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
+| delegatedOperatorExecutorSettings.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
+| delegatedOperatorExecutorSettings.enabled | bool | `false` | Controls whether to create a dedicated "teams-do" deployment. Disabled by default, meaning delegated operations will not be executed without an external executor system. |
+| delegatedOperatorExecutorSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
+| delegatedOperatorExecutorSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
+| delegatedOperatorExecutorSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
+| delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for delegated-operator-executor. |
+| delegatedOperatorExecutorSettings.image.tag | string | `""` | Image tag for delegated-operator-executor. Defaults to the chart version. |
+| delegatedOperatorExecutorSettings.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
+| delegatedOperatorExecutorSettings.name | string | `"teams-do"` | Deployment name |
+| delegatedOperatorExecutorSettings.nodeSelector | object | `{}` | nodeSelector for delegated-operator-executor. [Reference][node-selector]. |
+| delegatedOperatorExecutorSettings.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
+| delegatedOperatorExecutorSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context]. |
+| delegatedOperatorExecutorSettings.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
+| delegatedOperatorExecutorSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
+| delegatedOperatorExecutorSettings.securityContext | object | `{}` | Container security configuration for delegated-operator-executor. [Reference][container-security-context]. |
+| delegatedOperatorExecutorSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
+| delegatedOperatorExecutorSettings.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
+| delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Teams Licenses (one per org) |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |

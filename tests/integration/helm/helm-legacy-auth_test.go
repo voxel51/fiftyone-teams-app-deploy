@@ -58,9 +58,9 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"builtinPlugins",
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName": "fiftyone-leg-bp-" + suffix,
 				"casSettings.env.FIFTYONE_AUTH_MODE":   "legacy",
 				"casSettings.env.CAS_DATABASE_NAME":    "cas-leg-bp-" + suffix,
+				"secret.fiftyone.fiftyoneDatabaseName": "fiftyone-leg-bp-" + suffix,
 			},
 			/* Why the ternary? This is a first iteration against a live kube
 			 * cluster. We don't have things like wildcard certificates,
@@ -72,6 +72,13 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			 * that we can use for DNS, so we will still use those URL checks.
 			 */
 			[]serviceValidations{
+				{
+					name:             "teams-cas",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
+					responsePayload:  `{"status":"available"}`,
+					httpResponseCode: 200,
+					log:              " ✓ Ready in",
+				},
 				{
 					name:             "teams-api",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
@@ -85,13 +92,6 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
 					log:              "Listening on port 3000",
-				},
-				{
-					name:             "teams-cas",
-					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
-					httpResponseCode: 200,
-					log:              " ✓ Ready in",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -106,22 +106,37 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"sharedPlugins", // plugins run in fiftyone-app deployment
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName":                   "fiftyone-leg-sp-" + suffix,
-				"casSettings.env.FIFTYONE_AUTH_MODE":                     "legacy",
-				"casSettings.env.CAS_DATABASE_NAME":                      "cas-leg-sp-" + suffix,
-				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
-				"apiSettings.volumes[0].name":                            "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-leg-sp-" + suffix,
-				"apiSettings.volumeMounts[0].name":                       "plugins-vol",
-				"apiSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
-				"appSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
-				"appSettings.volumes[0].name":                            "plugins-vol-ro",
-				"appSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-leg-sp-" + suffix,
-				"appSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
-				"appSettings.volumeMounts[0].name":                       "plugins-vol-ro",
-				"appSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
+				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
+				"apiSettings.volumes[0].name":                                                  "plugins-vol",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                       "pvc-leg-sp-" + suffix,
+				"apiSettings.volumeMounts[0].name":                                             "plugins-vol",
+				"apiSettings.volumeMounts[0].mountPath":                                        "/opt/plugins",
+				"appSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
+				"appSettings.volumes[0].name":                                                  "plugins-vol-ro",
+				"appSettings.volumes[0].persistentVolumeClaim.claimName":                       "pvc-leg-sp-" + suffix,
+				"appSettings.volumes[0].persistentVolumeClaim.readOnly":                        "true",
+				"appSettings.volumeMounts[0].name":                                             "plugins-vol-ro",
+				"appSettings.volumeMounts[0].mountPath":                                        "/opt/plugins",
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                           "legacy",
+				"casSettings.env.CAS_DATABASE_NAME":                                            "cas-leg-sp-" + suffix,
+				"delegatedOperatorExecutorSettings.enabled":                                    "true",
+				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
+				"delegatedOperatorExecutorSettings.replicaCount":                               "1",
+				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
+				"delegatedOperatorExecutorSettings.volumeMounts[0].name":                       "plugins-vol-ro",
+				"delegatedOperatorExecutorSettings.volumes[0].name":                            "plugins-vol-ro",
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName": "pvc-leg-sp-" + suffix,
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
+				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-leg-sp-" + suffix,
 			},
 			[]serviceValidations{
+				{
+					name:             "teams-cas",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
+					responsePayload:  `{"status":"available"}`,
+					httpResponseCode: 200,
+					log:              " ✓ Ready in",
+				},
 				{
 					name:             "teams-api",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
@@ -137,11 +152,11 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 					log:              "Listening on port 3000",
 				},
 				{
-					name:             "teams-cas",
-					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
-					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					name:             "teams-do",
+					url:              "",
+					responsePayload:  "",
+					httpResponseCode: 0,
+					log:              "Executor started",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -156,23 +171,38 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
-				"secret.fiftyone.fiftyoneDatabaseName":                       "fiftyone-leg-dp-" + suffix,
-				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                       "/opt/plugins",
-				"apiSettings.volumes[0].name":                                "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":     "pv-fiftyone-leg-dp-" + suffix,
-				"apiSettings.volumeMounts[0].name":                           "plugins-vol",
-				"apiSettings.volumeMounts[0].mountPath":                      "/opt/plugins",
-				"casSettings.env.FIFTYONE_AUTH_MODE":                         "legacy",
-				"casSettings.env.CAS_DATABASE_NAME":                          "cas-leg-dp-" + suffix,
-				"pluginsSettings.enabled":                                    "true",
-				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
-				"pluginsSettings.volumes[0].name":                            "plugins-vol-ro",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName": "pv-fiftyone-leg-dp-" + suffix,
-				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
-				"pluginsSettings.volumeMounts[0].name":                       "plugins-vol-ro",
-				"pluginsSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
+				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                         "/opt/plugins",
+				"apiSettings.volumes[0].name":                                                  "plugins-vol",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                       "pv-fiftyone-leg-dp-" + suffix,
+				"apiSettings.volumeMounts[0].name":                                             "plugins-vol",
+				"apiSettings.volumeMounts[0].mountPath":                                        "/opt/plugins",
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                           "legacy",
+				"casSettings.env.CAS_DATABASE_NAME":                                            "cas-leg-dp-" + suffix,
+				"delegatedOperatorExecutorSettings.enabled":                                    "true",
+				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                   "/opt/plugins",
+				"delegatedOperatorExecutorSettings.replicaCount":                               "1",
+				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                  "/opt/plugins",
+				"delegatedOperatorExecutorSettings.volumeMounts[0].name":                       "plugins-vol-ro",
+				"delegatedOperatorExecutorSettings.volumes[0].name":                            "plugins-vol-ro",
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName": "pv-fiftyone-leg-dp-" + suffix,
+				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":  "true",
+				"pluginsSettings.enabled":                                                      "true",
+				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                                     "/opt/plugins",
+				"pluginsSettings.volumes[0].name":                                              "plugins-vol-ro",
+				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName":                   "pv-fiftyone-leg-dp-" + suffix,
+				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":                    "true",
+				"pluginsSettings.volumeMounts[0].name":                                         "plugins-vol-ro",
+				"pluginsSettings.volumeMounts[0].mountPath":                                    "/opt/plugins",
+				"secret.fiftyone.fiftyoneDatabaseName":                                         "fiftyone-leg-dp-" + suffix,
 			},
 			[]serviceValidations{
+				{
+					name:             "teams-cas",
+					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
+					responsePayload:  `{"status":"available"}`,
+					httpResponseCode: 200,
+					log:              " ✓ Ready in",
+				},
 				{
 					name:             "teams-api",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
@@ -188,11 +218,18 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 					log:              "Listening on port 3000",
 				},
 				{
-					name:             "teams-cas",
-					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
-					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					name:             "teams-plugins",
+					url:              "",
+					responsePayload:  "",
+					httpResponseCode: 0,
+					log:              "[INFO] Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
+				},
+				{
+					name:             "teams-do",
+					url:              "",
+					responsePayload:  "",
+					httpResponseCode: 0,
+					log:              "Executor started",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -201,13 +238,6 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 					responsePayload:  "",
 					httpResponseCode: 200,
 					log:              "[INFO] Running on http://0.0.0.0:5151",
-				},
-				{
-					name:             "teams-plugins",
-					url:              "",
-					responsePayload:  "",
-					httpResponseCode: 0,
-					log:              "[INFO] Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
 				},
 			},
 		},
@@ -322,7 +352,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				checkPodLogsWithRetries(subT, kubectlOptions, pods, testCase.name, expected.name, expected.log)
 
 				// Validate endpoint response
-				// Skip fiftyone-app and teams-plugins because they do not have callable endpoints that return a response payload.
+				// Skip fiftyone-app, teams-plugins, amd teams-do because they do not have callable endpoints that return a response payload.
 				if expected.url != "" {
 					// Validate url endpoint response is expected
 					validate_endpoint(subT, expected.url, expected.responsePayload, expected.httpResponseCode)

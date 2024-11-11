@@ -82,6 +82,16 @@ pluginsSettings:
     repository: your-internal-registry/fiftyone-app-internal
 ```
 
+If you are using the builtin delegated operation orchestrator, you should
+configure it to use the custom plugins image also, by adding it to your
+`values.yaml` like
+
+```yaml
+delegatedOperatorExecutorSettings:
+  image:
+    repository: your-internal-registry/fiftyone-app-internal
+```
+
 Assuming you tagged your custom container with the same version
 number as the FiftyOne Teams release, the Helm chart will
 automatically use the chart version to pull your image.
