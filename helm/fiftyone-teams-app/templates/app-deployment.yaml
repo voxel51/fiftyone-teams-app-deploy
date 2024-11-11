@@ -46,12 +46,16 @@ spec:
           livenessProbe:
             tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.appSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
             tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.appSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.appSettings.service.shortname }}
+            failureThreshold: {{ .Values.appSettings.service.startup.failureThreshold }}
+            periodSeconds: {{ .Values.appSettings.service.startup.periodSeconds }}
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.appSettings.resources | nindent 12 }}
@@ -59,6 +63,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      {{- if .Values.appSettings.initContainers.enabled }}
+      initContainers:
+        {{-
+          include "fiftyone-teams-app.commonInitContainers"
+          (dict "repository" .Values.appSettings.initContainers.image.repository "tag" .Values.appSettings.initContainers.image.tag "casServiceName" (include "teams-cas.name" .) )
+          | nindent 8
+        }}
+      {{- end }}
       {{- with .Values.appSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -70,6 +82,10 @@ spec:
       {{- with .Values.appSettings.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.appSettings.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.appSettings.topologySpreadConstraints "selectorLabels" "teams-app.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
       {{- with .Values.appSettings.volumes }}
       volumes:

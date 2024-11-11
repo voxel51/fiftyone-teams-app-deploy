@@ -77,6 +77,7 @@ func (s *deploymentTeamsAppTemplateTest) TestMetadataLabels() {
 			map[string]string{
 				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
 				// does not affect the label `app.kubernetes.io/name` for teams-app.
+				// See note in _helpers.tpl.
 				"teamsAppSettings.service.name": "test-service-name",
 			},
 			map[string]string{
@@ -220,6 +221,165 @@ func (s *deploymentTeamsAppTemplateTest) TestReplicas() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			s.Equal(testCase.expected, *deployment.Spec.Replicas, "Replica count should be equal.")
+		})
+	}
+}
+
+func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(constraint []corev1.TopologySpreadConstraint)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsRequiredValues",
+			map[string]string{
+				"teamsAppSettings.topologySpreadConstraints[0].maxSkew":           "1",
+				"teamsAppSettings.topologySpreadConstraints[0].topologyKey":       "kubernetes.io/hostname",
+				"teamsAppSettings.topologySpreadConstraints[0].whenUnsatisfiable": "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+					{
+					  "maxSkew": 1,
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app.kubernetes.io/name": "fiftyone-teams-app",
+							"app.kubernetes.io/instance": "fiftyone-test"
+						}
+					  }
+					}
+				  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsOptionalValues",
+			map[string]string{
+				"teamsAppSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"teamsAppSettings.topologySpreadConstraints[0].maxSkew":            "1",
+				"teamsAppSettings.topologySpreadConstraints[0].minDomains":         "1",
+				"teamsAppSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
+				"teamsAppSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
+				"teamsAppSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"teamsAppSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"teamsAppSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"teamsAppSettings.topologySpreadConstraints[1].maxSkew":            "2",
+				"teamsAppSettings.topologySpreadConstraints[1].minDomains":         "2",
+				"teamsAppSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
+				"teamsAppSettings.topologySpreadConstraints[1].nodeTaintsPolicy":   "Ignore",
+				"teamsAppSettings.topologySpreadConstraints[1].topologyKey":        "kubernetes.io/region",
+				"teamsAppSettings.topologySpreadConstraints[1].whenUnsatisfiable":  "ScheduleAnyway",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+					{
+					  "matchLabelKeys": [
+					  	"pod-template-hash"
+					  ],
+					  "maxSkew": 1,
+					  "minDomains": 1,
+					  "nodeAffinityPolicy": "Honor",
+					  "nodeTaintsPolicy": "Honor",
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app.kubernetes.io/name": "fiftyone-teams-app",
+							"app.kubernetes.io/instance": "fiftyone-test"
+						}
+					  }
+					},
+					{
+					  "matchLabelKeys": [
+					  	"pod-template-hash"
+					  ],
+					  "maxSkew": 2,
+					  "minDomains": 2,
+					  "nodeAffinityPolicy": "Ignore",
+					  "nodeTaintsPolicy": "Ignore",
+					  "topologyKey": "kubernetes.io/region",
+					  "whenUnsatisfiable": "ScheduleAnyway",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app.kubernetes.io/name": "fiftyone-teams-app",
+							"app.kubernetes.io/instance": "fiftyone-test"
+						}
+					  }
+					}
+				  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsSelectorLabels",
+			map[string]string{
+				"teamsAppSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"teamsAppSettings.topologySpreadConstraints[0].maxSkew":                       "1",
+				"teamsAppSettings.topologySpreadConstraints[0].minDomains":                    "1",
+				"teamsAppSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
+				"teamsAppSettings.topologySpreadConstraints[0].nodeTaintsPolicy":              "Honor",
+				"teamsAppSettings.topologySpreadConstraints[0].labelSelector.matchLabels.app": "foo",
+				"teamsAppSettings.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
+				"teamsAppSettings.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+					{
+					  "matchLabelKeys": [
+					  	"pod-template-hash"
+					  ],
+					  "maxSkew": 1,
+					  "minDomains": 1,
+					  "nodeAffinityPolicy": "Honor",
+					  "nodeTaintsPolicy": "Honor",
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app": "foo"
+						}
+					  }
+					}
+				  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.TopologySpreadConstraints)
 		})
 	}
 }
@@ -579,7 +739,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
             "path": "/api/hello",
             "port": "teams-app"
           },
-          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -589,10 +748,9 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessInitialDelaySecondsAndShortName",
+			"overrideServiceLivenessShortName",
 			map[string]string{
-				"teamsAppSettings.service.liveness.initialDelaySeconds": "30",
-				"teamsAppSettings.service.shortname":                    "test-service-shortname",
+				"teamsAppSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -600,7 +758,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
             "path": "/api/hello",
             "port": "test-service-shortname"
           },
-          "initialDelaySeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -707,7 +864,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
             "path": "/api/hello",
             "port": "teams-app"
           },
-          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -717,10 +873,9 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessInitialDelaySecondsAndShortName",
+			"overrideServiceReadinessShortName",
 			map[string]string{
-				"teamsAppSettings.service.readiness.initialDelaySeconds": "30",
-				"teamsAppSettings.service.shortname":                     "test-service-shortname",
+				"teamsAppSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -728,7 +883,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
             "path": "/api/hello",
             "port": "test-service-shortname"
           },
-          "initialDelaySeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -753,6 +907,74 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Template.Spec.Containers[0].ReadinessProbe)
+		})
+	}
+}
+
+func (s *deploymentTeamsAppTemplateTest) TestContainerStartupProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/api/hello",
+            "port": "teams-app"
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 5,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			map[string]string{
+				"teamsAppSettings.service.shortname":                "test-service-shortname",
+				"teamsAppSettings.service.startup.failureThreshold": "10",
+				"teamsAppSettings.service.startup.periodSeconds":    "10",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/api/hello",
+            "port": "test-service-shortname"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.Containers[0].StartupProbe)
 		})
 	}
 }
@@ -942,6 +1164,135 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerVolumeMounts() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Template.Spec.Containers[0].VolumeMounts)
+		})
+	}
+}
+
+func (s *deploymentTeamsAppTemplateTest) TestInitContainerCount() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected int
+	}{
+		{
+			"defaultValues",
+			nil,
+			1,
+		},
+		{
+			"overrideInitContainersEnabled",
+			map[string]string{
+				"teamsAppSettings.initContainers.enabled": "false",
+			},
+			0,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			s.Equal(testCase.expected, len(deployment.Spec.Template.Spec.InitContainers), "Init container count should be equal.")
+		})
+	}
+}
+
+func (s *deploymentTeamsAppTemplateTest) TestInitContainerImage() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected string
+	}{
+		{
+			"defaultValues",
+			nil,
+			"docker.io/busybox:stable-glibc",
+		},
+		{
+			"overrideImageRepositoryAndTag",
+			map[string]string{
+				"teamsAppSettings.initContainers.image.repository": "docker.io/bash",
+				"teamsAppSettings.initContainers.image.tag":        "devel-alpine3.20",
+			},
+			"docker.io/bash:devel-alpine3.20",
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			s.Equal(testCase.expected, deployment.Spec.Template.Spec.InitContainers[0].Image, "Image values should be equal.")
+		})
+	}
+}
+
+func (s *deploymentTeamsAppTemplateTest) TestInitContainerCommand() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(cmd []string)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(cmd []string) {
+				expectedCmd := []string{
+					"sh",
+					"-c",
+					"until nslookup teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+				}
+				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
+			},
+		},
+		{
+			"overrideCasHostname",
+			map[string]string{
+				"casSettings.service.name": "test-service-name",
+			},
+			func(cmd []string) {
+				expectedCmd := []string{
+					"sh",
+					"-c",
+					"until nslookup test-service-name.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+				}
+				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].Command)
 		})
 	}
 }
@@ -1239,6 +1590,7 @@ func (s *deploymentTeamsAppTemplateTest) TestTemplateLabels() {
 			map[string]string{
 				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
 				// does not affect the label `app.kubernetes.io/name` for teams-app.
+				// See note in _helpers.tpl.
 				"teamsAppSettings.service.name": "test-service-name",
 			},
 			map[string]string{

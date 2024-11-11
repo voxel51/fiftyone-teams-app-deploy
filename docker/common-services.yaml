@@ -100,6 +100,7 @@ services:
       LICENSE_KEY_FILE_PATHS: ${LICENSE_KEY_FILE_PATHS:-/opt/fiftyone/licenses/license}
       TEAMS_API_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       TEAMS_API_MONGODB_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your

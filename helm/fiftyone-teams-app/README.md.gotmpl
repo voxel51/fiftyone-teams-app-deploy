@@ -72,6 +72,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
+- [Requirements](#requirements)
 - [Values](#values)
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
@@ -412,7 +413,9 @@ appSettings:
 
 {{ template "chart.sourcesSection" . }}
 
-{{ template "chart.requirementsSection" . }}
+## Requirements
+
+{{ template "chart.kubeVersionLine" . }}
 
 ## Values
 
@@ -800,6 +803,7 @@ serviceAccount:
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
+[init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
@@ -811,6 +815,7 @@ serviceAccount:
 [service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+[topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
 
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/

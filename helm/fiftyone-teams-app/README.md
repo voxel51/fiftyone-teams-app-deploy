@@ -70,6 +70,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
+- [Requirements](#requirements)
 - [Values](#values)
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
@@ -404,6 +405,10 @@ appSettings:
     repository: voxel51/fiftyone-app-torch
 ```
 
+## Requirements
+
+Kubernetes: `>=1.18-0`
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -417,6 +422,9 @@ appSettings:
 | apiSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | apiSettings.image.repository | string | `"voxel51/fiftyone-teams-api"` | Container image for the teams-api. |
 | apiSettings.image.tag | string | `""` | Image tag for teams-api. Defaults to the chart version. |
+| apiSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-api. [Reference][init-containers]. |
+| apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-api. [Reference][init-containers]. |
+| apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-api. [Reference][init-containers]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for teams-api. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for teams-api. [Reference][annotations]. |
@@ -425,14 +433,15 @@ appSettings:
 | apiSettings.securityContext | object | `{}` | Container security configuration for teams-api. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for teams-api. [Reference][annotations]. |
 | apiSettings.service.containerPort | int | `8000` | Service container port for teams-api. |
-| apiSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-api. [Reference][probes]. |
 | apiSettings.service.name | string | `"teams-api"` | Service name. |
 | apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api. |
 | apiSettings.service.port | int | `80` | Service port for teams-api. |
-| apiSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-api. [Reference][probes]. |
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for teams-api. [Reference][ports]. |
+| apiSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-api. [Reference][probes]. |
+| apiSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-api. [Reference][probes]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for teams-api. [Reference][service-type]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations]. |
+| apiSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-api deployment. [Reference][topology-spread-constraints]. |
 | apiSettings.volumeMounts | list | `[]` | Volume mounts for teams-api. [Reference][volumes]. |
 | apiSettings.volumes | list | `[]` | Volumes for teams-api. [Reference][volumes]. |
 | appSettings.affinity | object | `{}` | Affinity and anti-affinity for fiftyone-app. [Reference][affinity]. |
@@ -449,6 +458,9 @@ appSettings:
 | appSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | appSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for fiftyone-app. |
 | appSettings.image.tag | string | `""` | Image tag for fiftyone-app. Defaults to the chart version. |
+| appSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for fiftyone-app. [Reference][init-containers]. |
+| appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for fiftyone-app. [Reference][init-containers]. |
+| appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for fiftyone-app. [Reference][init-containers]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for fiftyone-app. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for fiftyone-app. [Reference][annotations]. |
@@ -458,14 +470,15 @@ appSettings:
 | appSettings.securityContext | object | `{}` | Container security configuration for fiftyone-app. [Reference][container-security-context]. |
 | appSettings.service.annotations | object | `{}` | Service annotations for fiftyone-app. [Reference][annotations]. |
 | appSettings.service.containerPort | int | `5151` | Service container port for fiftyone-app. |
-| appSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.name | string | `"fiftyone-app"` | Service name. |
 | appSettings.service.nodePort | int | `nil` | Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app. |
 | appSettings.service.port | int | `80` | Service port. |
-| appSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports]. |
+| appSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the fiftyone-app. [Reference][probes]. |
+| appSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for fiftyone-app. [Reference][service-type]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| appSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the fiftyone-app deployment. [Reference][topology-spread-constraints]. |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
@@ -478,6 +491,9 @@ appSettings:
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for teams-cas. |
 | casSettings.image.tag | string | `""` | Image tag for teams-cas. Defaults to the chart version. |
+| casSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-cas. [Reference][init-containers]. |
+| casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-cas. [Reference][init-containers]. |
+| casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-cas. [Reference][init-containers]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for teams-cas. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for teams-cas. [Reference][annotations]. |
@@ -487,14 +503,15 @@ appSettings:
 | casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
 | casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
 | casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
-| casSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | casSettings.service.name | string | `"teams-cas"` | Service name. |
 | casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas. |
 | casSettings.service.port | int | `80` | Service port. |
-| casSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
 | casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for teams-cas. [Reference][ports]. |
+| casSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-cas. [Reference][probes]. |
+| casSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes]. |
 | casSettings.service.type | string | `"ClusterIP"` | Service type for teams-cas. [Reference][service-type]. |
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
+| casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-cas deployment. [Reference][topology-spread-constraints]. |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
 | delegatedOperatorExecutorSettings.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
@@ -548,6 +565,9 @@ appSettings:
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for teams-plugins. |
 | pluginsSettings.image.tag | string | `""` | Image tag for teams-plugins. Defaults to the chart version. |
+| pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-plugins. [Reference][init-containers]. |
+| pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-plugins. [Reference][init-containers]. |
+| pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-plugins. [Reference][init-containers]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for teams-plugins. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for teams-plugins pods. [Reference][annotations]. |
@@ -557,14 +577,15 @@ appSettings:
 | pluginsSettings.securityContext | object | `{}` | Container security configuration for teams-plugins. [Reference][container-security-context]. |
 | pluginsSettings.service.annotations | object | `{}` | Service annotations for teams-plugins. [Reference][annotations]. |
 | pluginsSettings.service.containerPort | int | `5151` | Service container port for teams-plugins. |
-| pluginsSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.name | string | `"teams-plugins"` | Service name. |
 | pluginsSettings.service.nodePort | int | `nil` | Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins. |
 | pluginsSettings.service.port | int | `80` | Service port. |
-| pluginsSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports]. |
+| pluginsSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-plugins. [Reference][probes]. |
+| pluginsSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for teams-plugins. [Reference][service-type]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations]. |
+| pluginsSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-plugins deployment. [Reference][topology-spread-constraints]. |
 | pluginsSettings.volumeMounts | list | `[]` | Volume mounts for teams-plugins pods. [Reference][volumes]. |
 | pluginsSettings.volumes | list | `[]` | Volumes for teams-plugins. [Reference][volumes]. |
 | secret.create | bool | `true` | Controls whether to create the secret named `secret.name`. |
@@ -595,6 +616,9 @@ appSettings:
 | teamsAppSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy]. |
 | teamsAppSettings.image.repository | string | `"voxel51/fiftyone-teams-app"` | Container image for teams-app. |
 | teamsAppSettings.image.tag | string | `""` | Image tag for teams-app. Defaults to the chart version. |
+| teamsAppSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-app. [Reference][init-containers]. |
+| teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-app. [Reference][init-containers]. |
+| teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-app. [Reference][init-containers]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for teams-app. [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for teams-app pods. [Reference][annotations]. |
@@ -604,14 +628,15 @@ appSettings:
 | teamsAppSettings.securityContext | object | `{}` | Container security configuration for teams-app. [Reference][container-security-context]. |
 | teamsAppSettings.service.annotations | object | `{}` | Service annotations for teams-app. [Reference][annotations]. |
 | teamsAppSettings.service.containerPort | int | `3000` | Service container port for teams-app. |
-| teamsAppSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.name | string | `"teams-app"` | Service name. |
 | teamsAppSettings.service.nodePort | int | `nil` | Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app. |
 | teamsAppSettings.service.port | int | `80` | Service port. |
-| teamsAppSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for teams-app. [Reference][ports]. |
+| teamsAppSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-app. [Reference][probes]. |
+| teamsAppSettings.service.startup.periodSeconds | int | `5` | How often (in seconds) to perform the startup probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for teams-app. [Reference][service-type]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-app deployment. [Reference][topology-spread-constraints]. |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for teams-app pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for teams-app pods. [Reference][volumes]. |
 
@@ -997,6 +1022,7 @@ serviceAccount:
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
+[init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
@@ -1008,6 +1034,7 @@ serviceAccount:
 [service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+[topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
 
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/

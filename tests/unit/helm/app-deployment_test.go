@@ -222,6 +222,165 @@ func (s *deploymentAppTemplateTest) TestReplicas() {
 	}
 }
 
+func (s *deploymentAppTemplateTest) TestTopologySpreadConstraints() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(constraint []corev1.TopologySpreadConstraint)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsRequiredValues",
+			map[string]string{
+				"appSettings.topologySpreadConstraints[0].maxSkew":           "1",
+				"appSettings.topologySpreadConstraints[0].topologyKey":       "kubernetes.io/hostname",
+				"appSettings.topologySpreadConstraints[0].whenUnsatisfiable": "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+                    {
+                      "maxSkew": 1,
+                      "topologyKey": "kubernetes.io/hostname",
+                      "whenUnsatisfiable": "DoNotSchedule",
+                      "labelSelector": {
+                          "matchLabels": {
+                            "app.kubernetes.io/name": "fiftyone-teams-app",
+                            "app.kubernetes.io/instance": "fiftyone-test"
+                        }
+                      }
+                    }
+                  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsOptionalValues",
+			map[string]string{
+				"appSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[0].maxSkew":            "1",
+				"appSettings.topologySpreadConstraints[0].minDomains":         "1",
+				"appSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
+				"appSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
+				"appSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"appSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"appSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[1].maxSkew":            "2",
+				"appSettings.topologySpreadConstraints[1].minDomains":         "2",
+				"appSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
+				"appSettings.topologySpreadConstraints[1].nodeTaintsPolicy":   "Ignore",
+				"appSettings.topologySpreadConstraints[1].topologyKey":        "kubernetes.io/region",
+				"appSettings.topologySpreadConstraints[1].whenUnsatisfiable":  "ScheduleAnyway",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+                    {
+                      "matchLabelKeys": [
+                          "pod-template-hash"
+                      ],
+                      "maxSkew": 1,
+                      "minDomains": 1,
+                      "nodeAffinityPolicy": "Honor",
+                      "nodeTaintsPolicy": "Honor",
+                      "topologyKey": "kubernetes.io/hostname",
+                      "whenUnsatisfiable": "DoNotSchedule",
+                      "labelSelector": {
+                          "matchLabels": {
+                            "app.kubernetes.io/name": "fiftyone-teams-app",
+                            "app.kubernetes.io/instance": "fiftyone-test"
+                        }
+                      }
+                    },
+                    {
+                      "matchLabelKeys": [
+                          "pod-template-hash"
+                      ],
+                      "maxSkew": 2,
+                      "minDomains": 2,
+                      "nodeAffinityPolicy": "Ignore",
+                      "nodeTaintsPolicy": "Ignore",
+                      "topologyKey": "kubernetes.io/region",
+                      "whenUnsatisfiable": "ScheduleAnyway",
+                      "labelSelector": {
+                          "matchLabels": {
+                            "app.kubernetes.io/name": "fiftyone-teams-app",
+                            "app.kubernetes.io/instance": "fiftyone-test"
+                        }
+                      }
+                    }
+                  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsSelectorLabels",
+			map[string]string{
+				"appSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[0].maxSkew":                       "1",
+				"appSettings.topologySpreadConstraints[0].minDomains":                    "1",
+				"appSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
+				"appSettings.topologySpreadConstraints[0].nodeTaintsPolicy":              "Honor",
+				"appSettings.topologySpreadConstraints[0].labelSelector.matchLabels.app": "foo",
+				"appSettings.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
+				"appSettings.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+                    {
+                      "matchLabelKeys": [
+                          "pod-template-hash"
+                      ],
+                      "maxSkew": 1,
+                      "minDomains": 1,
+                      "nodeAffinityPolicy": "Honor",
+                      "nodeTaintsPolicy": "Honor",
+                      "topologyKey": "kubernetes.io/hostname",
+                      "whenUnsatisfiable": "DoNotSchedule",
+                      "labelSelector": {
+                          "matchLabels": {
+                            "app": "foo"
+                        }
+                      }
+                    }
+                  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.TopologySpreadConstraints)
+		})
+	}
+}
+
 func (s *deploymentAppTemplateTest) TestContainerCount() {
 	testCases := []struct {
 		name     string
@@ -661,7 +820,6 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "fiftyone-app"
           },
-          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -671,17 +829,15 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessInitialDelaySecondsAndShortName",
+			"overrideServiceLivenessShortName",
 			map[string]string{
-				"appSettings.service.liveness.initialDelaySeconds": "30",
-				"appSettings.service.shortname":                    "test-service-shortname",
+				"appSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "tcpSocket": {
             "port": "test-service-shortname"
           },
-          "initialDelaySeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -787,7 +943,6 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "fiftyone-app"
           },
-          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -797,17 +952,15 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessInitialDelaySecondsAndShortName",
+			"overrideServiceReadinessShortName",
 			map[string]string{
-				"appSettings.service.readiness.initialDelaySeconds": "30",
-				"appSettings.service.shortname":                     "test-service-shortname",
+				"appSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "tcpSocket": {
             "port": "test-service-shortname"
           },
-          "initialDelaySeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -832,6 +985,72 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Template.Spec.Containers[0].ReadinessProbe)
+		})
+	}
+}
+
+func (s *deploymentAppTemplateTest) TestContainerStartupProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "fiftyone-app"
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 5,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			map[string]string{
+				"appSettings.service.shortname":                "test-service-shortname",
+				"appSettings.service.startup.failureThreshold": "10",
+				"appSettings.service.startup.periodSeconds":    "10",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "test-service-shortname"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.Containers[0].StartupProbe)
 		})
 	}
 }
@@ -1021,6 +1240,135 @@ func (s *deploymentAppTemplateTest) TestContainerVolumeMounts() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Template.Spec.Containers[0].VolumeMounts)
+		})
+	}
+}
+
+func (s *deploymentAppTemplateTest) TestInitContainerCount() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected int
+	}{
+		{
+			"defaultValues",
+			nil,
+			1,
+		},
+		{
+			"overrideInitContainersEnabled",
+			map[string]string{
+				"appSettings.initContainers.enabled": "false",
+			},
+			0,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			s.Equal(testCase.expected, len(deployment.Spec.Template.Spec.InitContainers), "Init container count should be equal.")
+		})
+	}
+}
+
+func (s *deploymentAppTemplateTest) TestInitContainerImage() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected string
+	}{
+		{
+			"defaultValues",
+			nil,
+			"docker.io/busybox:stable-glibc",
+		},
+		{
+			"overrideImageRepositoryAndTag",
+			map[string]string{
+				"appSettings.initContainers.image.repository": "docker.io/bash",
+				"appSettings.initContainers.image.tag":        "devel-alpine3.20",
+			},
+			"docker.io/bash:devel-alpine3.20",
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			s.Equal(testCase.expected, deployment.Spec.Template.Spec.InitContainers[0].Image, "Image values should be equal.")
+		})
+	}
+}
+
+func (s *deploymentAppTemplateTest) TestInitContainerCommand() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(cmd []string)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(cmd []string) {
+				expectedCmd := []string{
+					"sh",
+					"-c",
+					"until nslookup teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+				}
+				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
+			},
+		},
+		{
+			"overrideCasHostname",
+			map[string]string{
+				"casSettings.service.name": "test-service-name",
+			},
+			func(cmd []string) {
+				expectedCmd := []string{
+					"sh",
+					"-c",
+					"until nslookup test-service-name.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+				}
+				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].Command)
 		})
 	}
 }

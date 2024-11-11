@@ -222,6 +222,165 @@ func (s *deploymentCasTemplateTest) TestReplicas() {
 	}
 }
 
+func (s *deploymentCasTemplateTest) TestTopologySpreadConstraints() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(constraint []corev1.TopologySpreadConstraint)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsRequiredValues",
+			map[string]string{
+				"casSettings.topologySpreadConstraints[0].maxSkew":           "1",
+				"casSettings.topologySpreadConstraints[0].topologyKey":       "kubernetes.io/hostname",
+				"casSettings.topologySpreadConstraints[0].whenUnsatisfiable": "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+                    {
+                      "maxSkew": 1,
+                      "topologyKey": "kubernetes.io/hostname",
+                      "whenUnsatisfiable": "DoNotSchedule",
+                      "labelSelector": {
+                          "matchLabels": {
+                            "app.kubernetes.io/name": "teams-cas",
+                            "app.kubernetes.io/instance": "fiftyone-test"
+                        }
+                      }
+                    }
+                  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsOptionalValues",
+			map[string]string{
+				"casSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"casSettings.topologySpreadConstraints[0].maxSkew":            "1",
+				"casSettings.topologySpreadConstraints[0].minDomains":         "1",
+				"casSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
+				"casSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
+				"casSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"casSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"casSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"casSettings.topologySpreadConstraints[1].maxSkew":            "2",
+				"casSettings.topologySpreadConstraints[1].minDomains":         "2",
+				"casSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
+				"casSettings.topologySpreadConstraints[1].nodeTaintsPolicy":   "Ignore",
+				"casSettings.topologySpreadConstraints[1].topologyKey":        "kubernetes.io/region",
+				"casSettings.topologySpreadConstraints[1].whenUnsatisfiable":  "ScheduleAnyway",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+                    {
+                      "matchLabelKeys": [
+                          "pod-template-hash"
+                      ],
+                      "maxSkew": 1,
+                      "minDomains": 1,
+                      "nodeAffinityPolicy": "Honor",
+                      "nodeTaintsPolicy": "Honor",
+                      "topologyKey": "kubernetes.io/hostname",
+                      "whenUnsatisfiable": "DoNotSchedule",
+                      "labelSelector": {
+                          "matchLabels": {
+                            "app.kubernetes.io/name": "teams-cas",
+                            "app.kubernetes.io/instance": "fiftyone-test"
+                        }
+                      }
+                    },
+                    {
+                      "matchLabelKeys": [
+                          "pod-template-hash"
+                      ],
+                      "maxSkew": 2,
+                      "minDomains": 2,
+                      "nodeAffinityPolicy": "Ignore",
+                      "nodeTaintsPolicy": "Ignore",
+                      "topologyKey": "kubernetes.io/region",
+                      "whenUnsatisfiable": "ScheduleAnyway",
+                      "labelSelector": {
+                          "matchLabels": {
+                            "app.kubernetes.io/name": "teams-cas",
+                            "app.kubernetes.io/instance": "fiftyone-test"
+                        }
+                      }
+                    }
+                  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+		{
+			"overrideTopologySpreadConstraintsSelectorLabels",
+			map[string]string{
+				"casSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"casSettings.topologySpreadConstraints[0].maxSkew":                       "1",
+				"casSettings.topologySpreadConstraints[0].minDomains":                    "1",
+				"casSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
+				"casSettings.topologySpreadConstraints[0].nodeTaintsPolicy":              "Honor",
+				"casSettings.topologySpreadConstraints[0].labelSelector.matchLabels.app": "foo",
+				"casSettings.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
+				"casSettings.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
+			},
+			func(constraint []corev1.TopologySpreadConstraint) {
+				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+				expectedTopologySpreadConstraintJSON := `[
+                    {
+                      "matchLabelKeys": [
+                          "pod-template-hash"
+                      ],
+                      "maxSkew": 1,
+                      "minDomains": 1,
+                      "nodeAffinityPolicy": "Honor",
+                      "nodeTaintsPolicy": "Honor",
+                      "topologyKey": "kubernetes.io/hostname",
+                      "whenUnsatisfiable": "DoNotSchedule",
+                      "labelSelector": {
+                          "matchLabels": {
+                            "app": "foo"
+                        }
+                      }
+                    }
+                  ]`
+				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+				s.NoError(err)
+				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.TopologySpreadConstraints)
+		})
+	}
+}
+
 func (s *deploymentCasTemplateTest) TestContainerCount() {
 	testCases := []struct {
 		name     string
@@ -283,6 +442,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
                 "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+		  {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
               }
             }
           },
@@ -365,6 +533,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
                 "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
               }
             }
           },
@@ -456,6 +633,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
             "name": "LICENSE_KEY_FILE_PATHS",
             "value": "/opt/fiftyone/licenses/fiftyone-license"
           },
@@ -539,6 +725,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
               "secretKeyRef": {
                 "name": "fiftyone-teams-secrets",
                 "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
               }
             }
           },
@@ -769,7 +964,6 @@ func (s *deploymentCasTemplateTest) TestContainerLivenessProbe() {
             "path": "/cas/api",
             "port": "teams-cas"
           },
-          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -779,10 +973,9 @@ func (s *deploymentCasTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessInitialDelaySecondsAndShortName",
+			"overrideServiceLivenessShortName",
 			map[string]string{
-				"casSettings.service.liveness.initialDelaySeconds": "30",
-				"casSettings.service.shortname":                    "test-service-shortname",
+				"casSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -790,7 +983,6 @@ func (s *deploymentCasTemplateTest) TestContainerLivenessProbe() {
             "path": "/cas/api",
             "port": "test-service-shortname"
           },
-          "initialDelaySeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -897,7 +1089,6 @@ func (s *deploymentCasTemplateTest) TestContainerReadinessProbe() {
             "path": "/cas/api",
             "port": "teams-cas"
           },
-          "initialDelaySeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -907,10 +1098,9 @@ func (s *deploymentCasTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessInitialDelaySecondsAndShortName",
+			"overrideServiceReadinessAndShortName",
 			map[string]string{
-				"casSettings.service.readiness.initialDelaySeconds": "30",
-				"casSettings.service.shortname":                     "test-service-shortname",
+				"casSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -918,7 +1108,6 @@ func (s *deploymentCasTemplateTest) TestContainerReadinessProbe() {
             "path": "/cas/api",
             "port": "test-service-shortname"
           },
-          "initialDelaySeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -943,6 +1132,74 @@ func (s *deploymentCasTemplateTest) TestContainerReadinessProbe() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Template.Spec.Containers[0].ReadinessProbe)
+		})
+	}
+}
+
+func (s *deploymentCasTemplateTest) TestContainerStartupProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/cas/api",
+            "port": "teams-cas"
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 5,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			map[string]string{
+				"casSettings.service.shortname":                "test-service-shortname",
+				"casSettings.service.startup.failureThreshold": "10",
+				"casSettings.service.startup.periodSeconds":    "10",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/cas/api",
+            "port": "test-service-shortname"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.Containers[0].StartupProbe)
 		})
 	}
 }

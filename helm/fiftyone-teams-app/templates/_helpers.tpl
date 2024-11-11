@@ -190,8 +190,12 @@ Plugins Combined labels
 
 {{/*
 Teams APP Selector labels
+
+NOTE: Selector labels are immutable.
+We will keep app.kubernetes.io/name
+as fiftyone-teams-app.name and not teams-app.name.
 */}}
-{{- define "fiftyone-teams-app.selectorLabels" -}}
+{{- define "teams-app.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "fiftyone-teams-app.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
@@ -199,9 +203,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Teams APP Combined labels
 */}}
-{{- define "fiftyone-teams-app.labels" -}}
+{{- define "teams-app.labels" -}}
 {{ include "fiftyone-teams-app.commonLabels" . }}
-{{ include "fiftyone-teams-app.selectorLabels" . }}
+{{ include "teams-app.selectorLabels" . }}
 {{- end }}
 
 {{/*
@@ -213,6 +217,71 @@ Create the name of the service account to use
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+{{/*
+Service Account labels
+*/}}
+{{- define "fiftyone-teams-app.serviceAccountLabels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+app.kubernetes.io/name: {{ default (include "fiftyone-teams-app.fullname" .) .Values.serviceAccount.name }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Ingress labels
+*/}}
+{{- define "fiftyone-teams-app.ingressLabels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+app.kubernetes.io/name: {{ include "fiftyone-teams-app.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.ingress.labels }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Common Topology Constraints
+*/}}
+{{- define "fiftyone-teams-app.commonTopologySpreadConstraints" -}}
+{{- range $constraint := .constraints -}}
+- maxSkew: {{ $constraint.maxSkew }}
+  {{- if $constraint.minDomains }}
+  minDomains: {{ $constraint.minDomains }}
+  {{- end }}
+  topologyKey: {{ $constraint.topologyKey }}
+  whenUnsatisfiable: {{ $constraint.whenUnsatisfiable }}
+  {{- if $constraint.labelSelector }}
+  labelSelector:
+    {{- $constraint.labelSelector | toYaml | nindent 4 }}
+  {{- else }}
+  labelSelector:
+    matchLabels:
+      {{- include $.selectorLabels $.context | nindent 6 }}
+  {{- end }}
+  {{- if $constraint.matchLabelKeys }}
+  matchLabelKeys:
+    {{- $constraint.matchLabelKeys | nindent 4 }}
+  {{- end }}
+  {{- if $constraint.nodeAffinityPolicy }}
+  nodeAffinityPolicy: {{ $constraint.nodeAffinityPolicy }}
+  {{- end }}
+  {{- if $constraint.nodeTaintsPolicy }}
+  nodeTaintsPolicy: {{ $constraint.nodeTaintsPolicy }}
+  {{- end }}
+{{ end }}
+{{- end }}
+
+{{/*
+Common Init Containers
+*/}}
+{{- define "fiftyone-teams-app.commonInitContainers" -}}
+- name: init-cas
+  image: {{ $.repository }}:{{ $.tag }}
+  command:
+    - 'sh'
+    - '-c'
+    - "until nslookup {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done"
 {{- end }}
 
 {{/*
@@ -353,6 +422,11 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
+- name: FIFTYONE_ENCRYPTION_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: encryptionKey
 - name: LICENSE_KEY_FILE_PATHS
   value: {{ include "teams-cas.license-key-file-paths" . | quote }}
 - name: NEXTAUTH_URL

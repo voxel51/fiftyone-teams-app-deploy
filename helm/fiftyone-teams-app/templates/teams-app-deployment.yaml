@@ -4,14 +4,14 @@ metadata:
   name: {{ include "teams-app.name" . }}
   namespace: {{ .Values.namespace.name }}
   labels:
-    {{- include "fiftyone-teams-app.labels" . | nindent 4 }}
+    {{- include "teams-app.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.teamsAppSettings.autoscaling.enabled }}
   replicas: {{ .Values.teamsAppSettings.replicaCount | default 2 }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "fiftyone-teams-app.selectorLabels" . | nindent 6 }}
+      {{- include "teams-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.teamsAppSettings.podAnnotations }}
@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "fiftyone-teams-app.selectorLabels" . | nindent 8 }}
+        {{- include "teams-app.selectorLabels" . | nindent 8 }}
         {{- with .Values.teamsAppSettings.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -47,13 +47,18 @@ spec:
             httpGet:
               path: /api/hello
               port: {{ .Values.teamsAppSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.teamsAppSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /api/hello
               port: {{ .Values.teamsAppSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.teamsAppSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /api/hello
+              port: {{ .Values.teamsAppSettings.service.shortname }}
+            failureThreshold: {{ .Values.teamsAppSettings.service.startup.failureThreshold }}
+            periodSeconds: {{ .Values.teamsAppSettings.service.startup.periodSeconds }}
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.teamsAppSettings.resources | nindent 12 }}
@@ -61,6 +66,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      {{- if .Values.teamsAppSettings.initContainers.enabled }}
+      initContainers:
+        {{-
+          include "fiftyone-teams-app.commonInitContainers"
+          (dict "repository" .Values.teamsAppSettings.initContainers.image.repository "tag" .Values.teamsAppSettings.initContainers.image.tag "casServiceName" (include "teams-cas.name" .) )
+          | nindent 8
+        }}
+      {{- end }}
       {{- with .Values.teamsAppSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -72,6 +85,10 @@ spec:
       {{- with .Values.teamsAppSettings.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.teamsAppSettings.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.teamsAppSettings.topologySpreadConstraints "selectorLabels" "teams-app.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
       {{- with .Values.teamsAppSettings.volumes }}
       volumes:
