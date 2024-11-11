@@ -370,15 +370,6 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
             "value": "http://teams-api:80"
           },
           {
-            "name": "FIFTYONE_API_KEY",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "delegatedOperatorApiKey"
-              }
-            }
-          },
-          {
             "name": "FIFTYONE_DATABASE_ADMIN",
             "value": "false"
           },
@@ -435,15 +426,6 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
-          },
-          {
-            "name": "FIFTYONE_API_KEY",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "delegatedOperatorApiKey"
-              }
-            }
           },
           {
             "name": "FIFTYONE_DATABASE_ADMIN",

@@ -572,10 +572,6 @@ secret:
     # This is used for inter-service authentication and for the SuperUser to
     #  authenticate at the CAS UI to configure the Central Authentication Service.
     fiftyoneAuthSecret: ""
-    # -- An admin API key to use for running delegated operations, like a service account.
-    # <https://docs.voxel51.com/teams/api_connection.html#generating-an-api-key>
-    # This key is only required if `.Values.delegatedOperatorExecutorSettings.enabled`.
-    delegatedOperatorApiKey: ""
 
 serviceAccount:
   # -- Service Account annotations. [Reference][annotations].

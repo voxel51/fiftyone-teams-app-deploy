@@ -291,11 +291,6 @@ Create a merged list of environment variables for delegated-operator-executor
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
-- name: FIFTYONE_API_KEY
-  valueFrom:
-    secretKeyRef:
-        name: {{ $secretName }}
-        key: delegatedOperatorApiKey
 - name: FIFTYONE_DATABASE_ADMIN
   value: "false"
 - name: FIFTYONE_DATABASE_NAME
