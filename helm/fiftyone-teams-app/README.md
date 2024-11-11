@@ -60,6 +60,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
 
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [FiftyOne Teams Features](#fiftyone-teams-features)
+  - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -123,6 +124,32 @@ When performing an upgrade, please review
 ## FiftyOne Teams Features
 
 Consider if you will require these settings for your deployment.
+
+### Builtin Delegated Operator Orchestrator
+
+FiftyOne Teams v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+instead of (or in addition to) configuring your own orchestrator such as Airflow.
+
+This option can be added to any of the 3 existing
+[plugin modes](fiftyone-teams-plugins). If you're using the builtin-operator
+only option, the Persistent Volume Claim should be omitted.
+
+To enable this mode
+
+- In `values.yaml`, set
+  - `delegatedOperatorExecutorSettings.enabled: true`
+  - The path for a Persistent Volume Claim mounted to the
+    `teams-do` deployment in
+    - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
+- See
+  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  - Mount a Persistent Volume Claim (PVC) that provides
+    - `ReadWrite` permissions to the `teams-do` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 ### Central Authentication Service
 
