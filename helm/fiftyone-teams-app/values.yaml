@@ -65,7 +65,7 @@ apiSettings:
       # -- Number of times to retry the startup probe for the teams-api. [Reference][probes].
       failureThreshold: 5
       # -- How often (in seconds) to perform the startup probe for teams-api. [Reference][probes].
-      periodSeconds: 5
+      periodSeconds: 15
     # -- Service type for teams-api. [Reference][service-type].
     type: ClusterIP
 
@@ -179,7 +179,7 @@ appSettings:
       # -- Number of times to retry the startup probe for the fiftyone-app. [Reference][probes].
       failureThreshold: 5
       # -- How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes].
-      periodSeconds: 5
+      periodSeconds: 15
     # -- Service type for fiftyone-app. [Reference][service-type].
     type: ClusterIP
 
@@ -282,7 +282,7 @@ casSettings:
       # -- Number of times to retry the startup probe for the teams-cas. [Reference][probes].
       failureThreshold: 5
       # -- How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes].
-      periodSeconds: 5
+      periodSeconds: 15
     # -- Service type for teams-cas. [Reference][service-type].
     type: ClusterIP
 
@@ -517,7 +517,7 @@ pluginsSettings:
       # -- Number of times to retry the startup probe for the teams-plugins. [Reference][probes].
       failureThreshold: 5
       # -- How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes].
-      periodSeconds: 5
+      periodSeconds: 15
     # -- Service type for teams-plugins. [Reference][service-type].
     type: ClusterIP
 
@@ -675,7 +675,7 @@ teamsAppSettings:
       # -- Number of times to retry the startup probe for the teams-app. [Reference][probes].
       failureThreshold: 5
       # -- How often (in seconds) to perform the startup probe for teams-app. [Reference][probes].
-      periodSeconds: 5
+      periodSeconds: 15
     # -- Service type for teams-app. [Reference][service-type].
     type: ClusterIP
 

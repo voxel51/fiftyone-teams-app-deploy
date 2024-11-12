@@ -1262,7 +1262,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerStartupProbe() {
             "port": "teams-plugins"
           },
           "failureThreshold": 5,
-          "periodSeconds": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe

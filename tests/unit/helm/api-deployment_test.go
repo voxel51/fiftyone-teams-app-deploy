@@ -1019,7 +1019,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "port": "teams-api"
           },
           "failureThreshold": 5,
-          "periodSeconds": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
