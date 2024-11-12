@@ -27,7 +27,7 @@ spec:
   defaultBackend:
     service:
       name: {{ include "teams-app.name" . }}
-      port: 
+      port:
         number: {{ .Values.teamsAppSettings.service.port }}
   {{- if .Values.ingress.tlsEnabled }}
   tls:
