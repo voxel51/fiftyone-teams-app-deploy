@@ -24,6 +24,11 @@ spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
+  defaultBackend:
+    service:
+      name: {{ include "teams-app.name" . }}
+      port:
+        number: {{ .Values.teamsAppSettings.service.port }}
   {{- if .Values.ingress.tlsEnabled }}
   tls:
     - hosts:
