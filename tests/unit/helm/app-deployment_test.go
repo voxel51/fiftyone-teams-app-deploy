@@ -1004,7 +1004,7 @@ func (s *deploymentAppTemplateTest) TestContainerStartupProbe() {
             "port": "fiftyone-app"
           },
           "failureThreshold": 5,
-          "periodSeconds": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
