@@ -52,6 +52,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
 - [Deploying FiftyOne Teams App with Docker Compose](#deploying-fiftyone-teams-app-with-docker-compose)
   - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
   - [FiftyOne Teams Features](#fiftyone-teams-features)
+    - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
     - [Central Authentication Service](#central-authentication-service)
     - [Snapshot Archival](#snapshot-archival)
     - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -59,7 +60,6 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
       - [Builtin Plugins Only](#builtin-plugins-only)
       - [Shared Plugins](#shared-plugins)
       - [Dedicated Plugins](#dedicated-plugins)
-      - [Delegated Operators](#delegated-operators)
     - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
     - [Proxies](#proxies)
     - [Text Similarity](#text-similarity)
@@ -144,6 +144,33 @@ quickstart  0.21.2
 ---
 
 ## FiftyOne Teams Features
+
+### Builtin Delegated Operator Orchestrator
+
+FiftyOne Teams v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+instead of (or in addition to) configuring your own orchestrator such as Airflow.
+
+This option can be added to any of the 3 existing
+[plugin modes](#fiftyone-teams-plugins).
+
+To enable this mode and launch worker containers, use
+[legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
+in conjunction with one of the 3 plugin configurations.
+
+- Example `docker compose` command for enabling this mode on top of dedicated
+  plugins mode, from the `legacy-auth` directory
+
+    ```shell
+    docker compose \
+      -f compose.dedicated-plugins.yaml \
+      -f compose.delegated-operators.yaml \
+      -f compose.override.yaml \
+      up --d
+    ```
+
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 ### Central Authentication Service
 
@@ -333,26 +360,6 @@ services.
     ```shell
     docker compose \
       -f compose.dedicated-plugins.yaml \
-      -f compose.override.yaml \
-      up --d
-    ```
-
-#### Delegated Operators
-
-If you would like to execute
-[delegated operations](https://docs.voxel51.com/teams/teams_plugins.html?highlight=delegated#teams-delegated-operations)
-without the need to setup your own orchestrator, such as Airflow,
-you can launch worker
-containers using [legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
-in conjunction with any of the plugin configurations above.
-
-- Example `docker compose` command for this mode from the `legacy-auth`
-  directory
-
-    ```shell
-    docker compose \
-      -f compose.dedicated-plugins.yaml \
-      -f compose.delegated-operators.yaml \
       -f compose.override.yaml \
       up --d
     ```
