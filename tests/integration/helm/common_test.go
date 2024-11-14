@@ -230,6 +230,12 @@ func checkPodLogsWithRetries(subT *testing.T, kubectlOptions *k8s.KubectlOptions
 	maxRetries := 6
 	retryDelay := 2 * time.Second
 
+	if svc == "teams-do" {
+		// AF: DO has no health/readiness probes. It also depends on the API
+		// so I think we should bump the timeout to address test flakes
+		maxRetries = 10
+	}
+
 	for _, pod := range pods {
 		var log string
 
