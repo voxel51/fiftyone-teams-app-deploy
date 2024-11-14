@@ -286,6 +286,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -363,6 +365,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -443,6 +447,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -522,6 +528,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
