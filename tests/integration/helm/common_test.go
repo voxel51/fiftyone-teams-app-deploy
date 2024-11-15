@@ -227,8 +227,14 @@ func checkPodLogsWithRetries(subT *testing.T, kubectlOptions *k8s.KubectlOptions
 	// The pods report they're ready before the final log that we sometimes
 	// test. The root issue is that pods report ready before they truly are.
 	// Once that is fixed, this test becomes redundant and isn't required.
-	maxRetries := 3
+	maxRetries := 6
 	retryDelay := 2 * time.Second
+
+	if svc == "teams-do" {
+		// AF: DO has no health/readiness probes. It also depends on the API
+		// so I think we should bump the timeout to address test flakes
+		maxRetries = 10
+	}
 
 	for _, pod := range pods {
 		var log string
