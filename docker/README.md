@@ -286,7 +286,7 @@ There are three modes for plugins
     - This is the default mode
     - Users may only run the builtin plugins shipped with Fiftyone Teams
     - Cannot run custom plugins
-2. Shared Plugins
+1. Shared Plugins
     - Users may run builtin and custom plugins
     - Plugins run in the existing `fiftyone-app` service
       - Plugins resource consumption may starve `fiftyone-app`,
@@ -294,7 +294,7 @@ There are three modes for plugins
     - Requires creating a volume mounted to the services
       - `fiftyone-app` (read-only)
       - `teams-api` (read-write)
-3. Dedicated Plugins
+1. Dedicated Plugins
     - Users may run builtin and custom plugins
     - Plugins run in an additional `teams-plugins` service
     - Plugins run in a dedicated `teams-plugins` service

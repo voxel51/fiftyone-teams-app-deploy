@@ -243,7 +243,7 @@ There are three modes for plugins
     - This is the default mode
     - Users may only run the builtin plugins shipped with Fiftyone Teams
     - Cannot run custom plugins
-2. Shared Plugins
+1. Shared Plugins
     - Users may run builtin and custom plugins
     - Requires creating a Persistent Volume backed by NFSwith the PVCs
       - `teams-api` (ReadWrite)
@@ -251,7 +251,7 @@ There are three modes for plugins
     - Plugins run in the existing `fiftyone-app` deployment
       - Plugins resource consumption may starve `fiftyone-app`,
         causing the app to be slow or crash
-3. Dedicated Plugins
+1. Dedicated Plugins
     - Users may run builtin and custom plugins
     - Plugins run in an additional `teams-plugins` deployment
     - Requires creating a Persistent Volume backed by NFS with the PVCs
