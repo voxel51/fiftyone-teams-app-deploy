@@ -42,8 +42,11 @@ includes both
 and
 [`internal` authentication mode][internal-auth-mode].
 
-Inviting users to join your FiftyOne Teams instance is not currently supported
+Prior to v2.2.0, inviting users to join your FiftyOne Teams instance was not supported
 when `FIFTYONE_AUTH_MODE` is set to `internal`.
+Starting in v2.2.0+, you can enable invitations for your organization through the CAS SuperAdmin
+UI.
+To enable sending invitations as emails, you must also configure an SMTP connection.
 
 ## Table of Contents
 
@@ -283,7 +286,7 @@ There are three modes for plugins
     - This is the default mode
     - Users may only run the builtin plugins shipped with Fiftyone Teams
     - Cannot run custom plugins
-1. Shared Plugins
+2. Shared Plugins
     - Users may run builtin and custom plugins
     - Plugins run in the existing `fiftyone-app` service
       - Plugins resource consumption may starve `fiftyone-app`,
@@ -291,7 +294,7 @@ There are three modes for plugins
     - Requires creating a volume mounted to the services
       - `fiftyone-app` (read-only)
       - `teams-api` (read-write)
-1. Dedicated Plugins
+3. Dedicated Plugins
     - Users may run builtin and custom plugins
     - Plugins run in an additional `teams-plugins` service
     - Plugins run in a dedicated `teams-plugins` service
@@ -366,7 +369,7 @@ services.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-As of FiftyOne Teams 1.1, containers based on the `fiftyone-teams-api` and
+As of FiftyOne Teams 1.1, containers based on the `fiftyone-teams-cas`, fiftyone-teams-api` and
 `fiftyone-app` images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
 This key is used to encrypt storage credentials in the MongoDB database.
 
