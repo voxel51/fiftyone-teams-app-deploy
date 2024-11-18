@@ -314,8 +314,8 @@ To enable this mode
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-Pods based on the `fiftyone-teams-cas`, `fiftyone-teams-api` and `fiftyone-app`
-images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
+Pods based on the `fiftyone-teams-cas`, `fiftyone-teams-api`,
+and `fiftyone-app` images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
 This key is used to encrypt storage credentials in the MongoDB database.
 
 To generate a value for `secret.fiftyone.encryptionKey`, run this
