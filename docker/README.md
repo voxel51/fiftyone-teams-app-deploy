@@ -44,8 +44,8 @@ and
 
 Prior to v2.2.0, inviting users to join your FiftyOne Teams instance was not supported
 when `FIFTYONE_AUTH_MODE` is set to `internal`.
-Starting in v2.2.0+, you can enable invitations for your organization through the 
-CAS SuperAdmin UI. To enable sending invitations as emails, you must also 
+Starting in v2.2.0+, you can enable invitations for your organization through the
+CAS SuperAdmin UI. To enable sending invitations as emails, you must also
 configure an SMTP connection.
 
 ## Table of Contents
@@ -369,9 +369,9 @@ services.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-As of FiftyOne Teams 1.1, containers based on the 
-`fiftyone-teams-cas`, `fiftyone-teams-api` and `fiftyone-app` images must 
-include the `FIFTYONE_ENCRYPTION_KEY` variable. This key is used to 
+As of FiftyOne Teams 1.1, containers based on the
+`fiftyone-teams-cas`, `fiftyone-teams-api` and `fiftyone-app` images must
+include the `FIFTYONE_ENCRYPTION_KEY` variable. This key is used to
 encrypt storage credentials in the MongoDB database.
 
 To generate a value for `FIFTYONE_ENCRYPTION_KEY`, run this
