@@ -401,6 +401,10 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH",
+            "value": ""
+          },
+          {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
@@ -457,6 +461,10 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH",
+            "value": ""
           },
           {
             "name": "FIFTYONE_INTERNAL_SERVICE",
