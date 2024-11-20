@@ -58,9 +58,8 @@ Additionally,
 
 > [!WARNING]
 > If you cannot update the orchestrator DAG/workflow code, you must set
-> `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
-> in `values.yaml` in order for the delegated operation system to function
-> properly.
+> `FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS=true` in order for the delegated
+> operation system to function properly.
 
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
 
