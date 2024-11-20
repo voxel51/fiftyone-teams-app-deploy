@@ -43,6 +43,36 @@ kubectl --namespace your-namepace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 
+## FiftyOne Teams v2.2+ Delegated Operator Changes
+
+FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
+below.
+
+### Delegated Operation Capacity
+
+By default, all deployments are provisioned with capacity to support up to 3
+delegated operations simultaneously. You will need to configure the [builtin
+orchestrator](#builtin-delegated-operator-orchestrator) or an external
+orchestrator, with enough workers, to be able to utilize this full capacity.
+If your team finds the usage is greater than this, please reach out to your
+Voxel51 support team for guidance and to increase this limit!
+
+### Existing Orchestrators
+
+> [!NOTE]
+> If you are currently utilizing an external orchestrator for delegated
+> operations, such as Airflow or Flyte, you may have an outdated execution
+> definition that could negatively affect the experience. Please reach out to
+> Voxel51 support team for guidance on updating this code.
+
+Additionally,
+
+> [!WARNING]
+> If you cannot update the orchestrator DAG/workflow code, you must set
+> `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
+> in `values.yaml` in order for the delegated operation system to function
+> properly.
+
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
 
 ### Invitations Disabled for Internal Authentication Mode
@@ -149,6 +179,14 @@ To enable this mode
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-do` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
+
+Optionally, the logs generated during running of a delegated operation can be
+uploaded to a network-mounted file system or cloud storage path that is
+available to this deployment. Logs are uploaded in this format:
+`<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
+In `values.yaml`, set `configured_path`
+
+- `delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
 
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
