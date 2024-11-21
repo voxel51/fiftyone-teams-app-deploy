@@ -63,7 +63,7 @@ jobs:
       - name: Trigger Internal Chart Build by Release
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.CROSS_REPOSITORY_TOKEN }}
+          github-token: ${{ secrets.WD_HCI_FG_PAT }}
           script: |
             const result = await github.rest.actions.createWorkflowDispatch({
               owner: "${{ github.repository_owner }}",
