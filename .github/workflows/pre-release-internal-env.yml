@@ -64,7 +64,7 @@ jobs:
         with:
           project_id: ${{ env.GCP_PROJECT }}
           service_account: ${{ env.GCP_SERVICE_ACCOUNT }}
-          workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+          workload_identity_provider: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
 
       - name: Helm login to Google Artifact Registry
         run: |

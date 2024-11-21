@@ -46,7 +46,7 @@ jobs:
           project_id: 'computer-vision-team'
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
           token_format: access_token
-          workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+          workload_identity_provider: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Login to GAR
@@ -83,7 +83,7 @@ jobs:
           project_id: 'computer-vision-team'
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
           token_format: access_token
-          workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+          workload_identity_provider: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Login to GAR
