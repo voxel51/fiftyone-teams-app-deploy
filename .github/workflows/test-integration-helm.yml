@@ -31,7 +31,7 @@ jobs:
         with:
           project_id: 'computer-vision-team'
           service_account: 'github@computer-vision-team.iam.gserviceaccount.com'
-          workload_identity_provider: ${{ secrets.ORG_GOOGLE_WORKLOAD_IDP }}
+          workload_identity_provider: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Run integration tests
