@@ -1726,6 +1726,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerLivenessP
 				"delegatedOperatorExecutorSettings.enabled":                   "true",
 				"delegatedOperatorExecutorSettings.liveness.failureThreshold": "10",
 				"delegatedOperatorExecutorSettings.liveness.periodSeconds":    "10",
+				"delegatedOperatorExecutorSettings.liveness.timeoutSeconds":   "10",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -1738,7 +1739,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerLivenessP
           },
           "failureThreshold": 10,
           "periodSeconds": 10,
-		  "timeoutSeconds": 30
+		  "timeoutSeconds": 10
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1802,6 +1803,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerReadiness
 				"delegatedOperatorExecutorSettings.enabled":                    "true",
 				"delegatedOperatorExecutorSettings.readiness.failureThreshold": "10",
 				"delegatedOperatorExecutorSettings.readiness.periodSeconds":    "10",
+				"delegatedOperatorExecutorSettings.readiness.timeoutSeconds":   "10",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -1814,7 +1816,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerReadiness
           },
           "failureThreshold": 10,
           "periodSeconds": 10,
-		  "timeoutSeconds": 30
+		  "timeoutSeconds": 10
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1878,6 +1880,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerStartupPr
 				"delegatedOperatorExecutorSettings.enabled":                  "true",
 				"delegatedOperatorExecutorSettings.startup.failureThreshold": "10",
 				"delegatedOperatorExecutorSettings.startup.periodSeconds":    "10",
+				"delegatedOperatorExecutorSettings.startup.timeoutSeconds":   "10",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -1890,7 +1893,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerStartupPr
           },
           "failureThreshold": 10,
           "periodSeconds": 10,
-		  "timeoutSeconds": 30
+		  "timeoutSeconds": 10
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)

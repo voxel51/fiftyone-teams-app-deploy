@@ -347,10 +347,12 @@ delegatedOperatorExecutorSettings:
   # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
   labels: {}
   liveness:
-    # -- Number of times to retry the readiness probe for the teams-do. [Reference][probes].
+    # -- Number of times to retry the liveness probe for the teams-do. [Reference][probes].
     failureThreshold: 5
-    # -- How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes].
+    # -- How often (in seconds) to perform the liveness probe for teams-do. [Reference][probes].
     periodSeconds: 30
+    # -- Timeout for the liveness probe for the teams-do. [Reference][probes].
+    timeoutSeconds: 30
   # -- Number of pods in the delegated-operator-executor deployment's ReplicaSet.
   # This should not exceed the value set in the deployment's license file for
   #  max concurrent delegated operators, which defaults to 3.
@@ -386,12 +388,16 @@ delegatedOperatorExecutorSettings:
     failureThreshold: 5
     # -- How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes].
     periodSeconds: 30
+    # -- Timeout for the readiness probe for the teams-do. [Reference][probes].
+    timeoutSeconds: 30
   securityContext: {}
   startup:
     # -- Number of times to retry the startup probe for the teams-do. [Reference][probes].
     failureThreshold: 5
     # -- How often (in seconds) to perform the startup probe for teams-do. [Reference][probes].
     periodSeconds: 30
+    # -- Timeout for the startup probe for the teams-do. [Reference][probes].
+    timeoutSeconds: 30
   # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
