@@ -1711,7 +1711,8 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerLivenessP
               ]
           },
           "failureThreshold": 5,
-          "periodSeconds": 30
+          "periodSeconds": 30,
+		  "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1736,7 +1737,8 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerLivenessP
               ]
           },
           "failureThreshold": 10,
-          "periodSeconds": 10
+          "periodSeconds": 10,
+		  "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1785,7 +1787,8 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerReadiness
               ]
           },
           "failureThreshold": 5,
-          "periodSeconds": 30
+          "periodSeconds": 30,
+		  "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1810,7 +1813,8 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerReadiness
               ]
           },
           "failureThreshold": 10,
-          "periodSeconds": 10
+          "periodSeconds": 10,
+		  "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1860,7 +1864,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerStartupPr
           },
           "failureThreshold": 5,
           "periodSeconds": 30,
-          "timeoutSeconds": 5
+		  "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1886,7 +1890,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerStartupPr
           },
           "failureThreshold": 10,
           "periodSeconds": 10,
-          "timeoutSeconds": 5
+		  "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
