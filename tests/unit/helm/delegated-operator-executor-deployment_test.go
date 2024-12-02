@@ -1689,3 +1689,173 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestVolumes() {
 		})
 	}
 }
+
+func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerLivenessProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled": "true",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o liveness"
+              ]
+          }
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.Containers[0].LivenessProbe)
+		})
+	}
+}
+
+func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerReadinessProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled": "true",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          }
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.Containers[0].ReadinessProbe)
+		})
+	}
+}
+
+func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerStartupProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled": "true",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled":                  "true",
+				"delegatedOperatorExecutorSettings.startup.failureThreshold": "10",
+				"delegatedOperatorExecutorSettings.startup.periodSeconds":    "10",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.Containers[0].StartupProbe)
+		})
+	}
+}
