@@ -598,6 +598,8 @@ Kubernetes: `>=1.18-0`
 | delegatedOperatorExecutorSettings.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
 | delegatedOperatorExecutorSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
 | delegatedOperatorExecutorSettings.securityContext | object | `{}` | Container security configuration for delegated-operator-executor. [Reference][container-security-context]. |
+| delegatedOperatorExecutorSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-do. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
 | delegatedOperatorExecutorSettings.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |

@@ -46,6 +46,27 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o liveness
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o readiness
+          startupProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o startup
+            failureThreshold: {{ .Values.delegatedOperatorExecutorSettings.startup.failureThreshold }}
+            periodSeconds: {{ .Values.delegatedOperatorExecutorSettings.startup.periodSeconds }}
+            timeoutSeconds: 5
       {{- with .Values.delegatedOperatorExecutorSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

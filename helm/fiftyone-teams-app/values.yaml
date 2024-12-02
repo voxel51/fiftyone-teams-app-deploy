@@ -377,6 +377,11 @@ delegatedOperatorExecutorSettings:
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
   # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
   securityContext: {}
+  startup:
+    # -- Number of times to retry the startup probe for the teams-do. [Reference][probes].
+    failureThreshold: 5
+    # -- How often (in seconds) to perform the startup probe for teams-do. [Reference][probes].
+    periodSeconds: 15
   # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
