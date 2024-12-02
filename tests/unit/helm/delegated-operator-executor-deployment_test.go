@@ -1709,12 +1709,39 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerLivenessP
                 "-c",
                 "fiftyone delegated list --limit 1 -o liveness"
               ]
-          }
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
 				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+			},
+		},
+		{
+			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled":                   "true",
+				"delegatedOperatorExecutorSettings.liveness.failureThreshold": "10",
+				"delegatedOperatorExecutorSettings.liveness.periodSeconds":    "10",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o liveness"
+              ]
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
 			},
 		},
 	}
@@ -1756,12 +1783,39 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerReadiness
                 "-c",
                 "fiftyone delegated list --limit 1 -o readiness"
               ]
-          }
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
 				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+			},
+		},
+		{
+			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled":                    "true",
+				"delegatedOperatorExecutorSettings.readiness.failureThreshold": "10",
+				"delegatedOperatorExecutorSettings.readiness.periodSeconds":    "10",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
 			},
 		},
 	}
@@ -1805,7 +1859,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerStartupPr
               ]
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
