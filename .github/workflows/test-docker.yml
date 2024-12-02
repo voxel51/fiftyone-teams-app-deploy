@@ -15,6 +15,10 @@ on:
       - tests/integration/compose/**
       - tests/unit/compose/**
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   unit-compose:
     runs-on: ubuntu-latest
