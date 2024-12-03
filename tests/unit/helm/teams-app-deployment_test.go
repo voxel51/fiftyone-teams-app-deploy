@@ -427,7 +427,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 	// Get version from chart info
 	chartVersion, exists := cInfo["version"]
 	s.True(exists, "failed to get version from chart info")
-	
+
 	testCases := []struct {
 		name     string
 		values   map[string]string
