@@ -131,7 +131,7 @@ clean: clean-unit-compose clean-unit-helm clean-integration-compose clean-integr
 clean-integration-compose:  ## delete docker compose integration test output and reports
 	rm -rf tests/integration/compose/test_output_internal || true
 	rm -rf tests/integration/compose/test_output_legacy || true
-	rm tests/integration/compose/test_output.log || true
+	rm tests/integration/compose/test_output*.log || true
 
 clean-integration-helm:  ## delete helm integration test output and reports
 	rm -rf tests/integration/helm/test_output_internal || true
