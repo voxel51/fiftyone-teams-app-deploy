@@ -416,6 +416,18 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerCount() {
 }
 
 func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
+	// Get chart info (to later obtain the chart's appVersion)
+	cInfo, err := chartInfo(s.T(), s.chartPath)
+	s.NoError(err)
+
+	// Get appVersion from chart info
+	_, exists := cInfo["appVersion"]
+	s.True(exists, "failed to get app version from chart info")
+
+	// Get version from chart info
+	chartVersion, exists := cInfo["version"]
+	s.True(exists, "failed to get version from chart info")
+	
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -425,7 +437,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			"defaultValues", // legacy auth mode
 			nil,
 			func(envVars []corev1.EnvVar) {
-				expectedEnvVarJSON := `[
+				expectedEnvVarJSON := fmt.Sprintf(`[
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
@@ -481,7 +493,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "2.2.0"
+            "value": "%s"
           },
           {
             "name": "FIFTYONE_APP_THEME",
@@ -491,7 +503,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
           }
-        ]`
+        ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
 				s.NoError(err)
@@ -504,7 +516,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 				"teamsAppSettings.env.TEST_KEY": "TEST_VALUE",
 			},
 			func(envVars []corev1.EnvVar) {
-				expectedEnvVarJSON := `[
+				expectedEnvVarJSON := fmt.Sprintf(`[
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
@@ -560,7 +572,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
-            "value": "2.2.0"
+            "value": "%s"
           },
           {
             "name": "FIFTYONE_APP_THEME",
@@ -574,7 +586,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
           }
-        ]`
+        ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
 				s.NoError(err)
