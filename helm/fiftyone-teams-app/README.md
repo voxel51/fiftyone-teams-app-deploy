@@ -244,7 +244,7 @@ Supported locations are network mounted filesystems and cloud storage folders.
   - Mount a Persistent Volume Claim with `ReadWrite` permissions to
     the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path.
     For an example, see
-    [Plugins Storage](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md).
+    [Plugins Storage][plugins-storage].
 - Cloud storage folder
   - In `values.yaml`, set the cloud storage path (for example
     `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
@@ -321,7 +321,7 @@ To enable this mode
   - `appSettings.env.FIFTYONE_PLUGINS_DIR`
   - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  [Adding Shared Storage for FiftyOne Teams Plugins][plugins-storage]
   - Mount a PVC that provides
     - `ReadWrite` permissions to the `teams-api` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
@@ -339,7 +339,7 @@ To enable this mode
     - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
     - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  [Adding Shared Storage for FiftyOne Teams Plugins][plugins-storage]
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-api` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
@@ -1106,9 +1106,12 @@ serviceAccount:
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
+[mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+[plugins-storage]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+[recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
 [resources]: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 [security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 [service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
@@ -1116,10 +1119,3 @@ serviceAccount:
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-
-[mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
-
-[recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
-
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
-[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
