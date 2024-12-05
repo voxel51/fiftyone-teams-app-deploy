@@ -136,6 +136,18 @@ See
     make auth start
     ```
 
+1. Download dev license file (legacy or internal)
+
+    ```shell
+    make license-secret-legacy
+    ```
+
+    or
+
+    ```shell
+    make license-secret-internal
+    ```
+
 1. Install cert-manager and mongodb into minikube
 
     ```shell
@@ -146,7 +158,7 @@ See
    (to expose the services within minikube outside of minikube)
 
     ```shell
-    sudo make tunnel
+    sudo minikube tunnel
     ```
 
     > **NOTE**: This command will prompt for sudo permission
@@ -157,6 +169,9 @@ See
     ```shell
     make test-integration-helm
     ```
+
+The helm integration tests may be run multiple times by invoking the previous step.
+It will re-use the cert-manager and mongodb deployed.
 
 ## Additional Links
 
