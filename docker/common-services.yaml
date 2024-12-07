@@ -1,7 +1,7 @@
 ---
 services:
   fiftyone-app-common:
-    image: voxel51/fiftyone-app:v2.1.3
+    image: voxel51/fiftyone-app:v2.2.0
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -30,7 +30,7 @@ services:
     restart: always
 
   teams-api-common:
-    image: voxel51/fiftyone-teams-api:v2.1.3
+    image: voxel51/fiftyone-teams-api:v2.2.0
     environment:
       CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -57,13 +57,13 @@ services:
     restart: always
 
   teams-app-common:
-    image: voxel51/fiftyone-teams-app:v2.1.3
+    image: voxel51/fiftyone-teams-app:v2.2.0
     environment:
       API_URL: ${API_URL}
       APP_USE_HTTPS: ${APP_USE_HTTPS:-true}
       FIFTYONE_API_URI: ${FIFTYONE_API_URI:-"Please contact your Admin for an API URI"}
       FIFTYONE_APP_ALLOW_MEDIA_EXPORT: ${FIFTYONE_APP_ALLOW_MEDIA_EXPORT:-true}
-      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.1.3
+      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.2.0
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
@@ -71,6 +71,8 @@ services:
       NODE_ENV: production
       RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
       FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: ${FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED:-true}
+      FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE: ${FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE}
+      FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE: ${FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
@@ -90,7 +92,7 @@ services:
     restart: always
 
   teams-cas-common:
-    image: voxel51/fiftyone-teams-cas:v2.1.3
+    image: voxel51/fiftyone-teams-cas:v2.2.0
     environment:
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
@@ -100,6 +102,7 @@ services:
       LICENSE_KEY_FILE_PATHS: ${LICENSE_KEY_FILE_PATHS:-/opt/fiftyone/licenses/license}
       TEAMS_API_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       TEAMS_API_MONGODB_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
@@ -124,7 +127,7 @@ services:
         read_only: true
 
   teams-plugins-common:
-    image: voxel51/fiftyone-app:v2.1.3
+    image: voxel51/fiftyone-app:v2.2.0
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -150,3 +153,23 @@ services:
       # https_proxy: ${HTTPS_PROXY_URL}
       # no_proxy: ${NO_PROXY_LIST}
     restart: always
+
+  teams-do-common:
+    image: voxel51/fiftyone-app:v2.2.0
+    deploy:
+      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: false
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_CACHE_ENABLED: true
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+    restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro

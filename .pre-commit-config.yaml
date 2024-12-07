@@ -28,7 +28,7 @@ repos:
           - go-sum
           - makefile
   - repo: https://github.com/norwoodj/helm-docs
-    rev: v1.11.3
+    rev: v1.14.2
     hooks:
       - id: helm-docs
         args:
@@ -94,3 +94,8 @@ repos:
         args:
           - -w
           - -s
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]

@@ -51,26 +51,34 @@ apiSettings:
     annotations: {}
     # -- Service container port for teams-api.
     containerPort: 8000
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe for teams-api. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: teams-api
     # -- (int) Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api.
     nodePort:
     # -- Service port for teams-api.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for teams-api. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for teams-api. [Reference][ports].
     shortname: teams-api
+    startup:
+      # -- Number of times to retry the startup probe for the teams-api. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for teams-api. [Reference][probes].
+      periodSeconds: 15
     # -- Service type for teams-api. [Reference][service-type].
     type: ClusterIP
 
   # -- Affinity and anti-affinity for teams-api. [Reference][affinity].
   affinity: {}
+  initContainers:
+    # -- Whether to enable init containers for teams-api. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for teams-api. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for teams-api. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for teams-api. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for teams-api. [Reference][annotations].
@@ -82,6 +90,9 @@ apiSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # Label selectors will be defaulted to those of the teams-api deployment. [Reference][topology-spread-constraints].
+  topologySpreadConstraints: []
   # -- Volume mounts for teams-api. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for teams-api. [Reference][volumes].
@@ -154,26 +165,34 @@ appSettings:
     annotations: {}
     # -- Service container port for fiftyone-app.
     containerPort: 5151
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: fiftyone-app
     # -- (int) Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app.
     nodePort:
     # -- Service port.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports].
     shortname: fiftyone-app
+    startup:
+      # -- Number of times to retry the startup probe for the fiftyone-app. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes].
+      periodSeconds: 15
     # -- Service type for fiftyone-app. [Reference][service-type].
     type: ClusterIP
 
   # -- Affinity and anti-affinity for fiftyone-app. [Reference][affinity].
   affinity: {}
+  initContainers:
+    # -- Whether to enable init containers for fiftyone-app. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for fiftyone-app. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for fiftyone-app. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for fiftyone-app. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for fiftyone-app. [Reference][annotations].
@@ -185,6 +204,9 @@ appSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # Label selectors will be defaulted to those of the fiftyone-app deployment. [Reference][topology-spread-constraints].
+  topologySpreadConstraints: []
   # -- Volume mounts for fiftyone-app. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for fiftyone-app. [Reference][volumes].
@@ -246,26 +268,34 @@ casSettings:
     annotations: {}
     # -- Service container port for teams-cas.
     containerPort: 3000
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: teams-cas
     # -- (int) Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas.
     nodePort:
     # -- Service port.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for teams-cas. [Reference][ports].
     shortname: teams-cas
+    startup:
+      # -- Number of times to retry the startup probe for the teams-cas. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes].
+      periodSeconds: 15
     # -- Service type for teams-cas. [Reference][service-type].
     type: ClusterIP
 
   # -- Affinity and anti-affinity for teams-cas. [Reference][affinity].
   affinity: {}
+  initContainers:
+    # -- Whether to enable init containers for teams-cas. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for teams-cas. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for teams-cas. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for teams-cas. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for teams-cas. [Reference][annotations].
@@ -277,9 +307,102 @@ casSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # Label selectors will be defaulted to those of the teams-cas deployment. [Reference][topology-spread-constraints].
+  topologySpreadConstraints: []
   # -- Volume mounts for teams-cas. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for teams-cas. [Reference][volumes].
+  volumes: []
+
+# FiftyOne Teams Delegated Operator Executor (teams-do) configurations.
+delegatedOperatorExecutorSettings:
+  # -- Controls whether to create a dedicated "teams-do" deployment. Disabled
+  # by default, meaning delegated operations will not be executed without an
+  # external executor system.
+  enabled: false
+  # Environment Variables are passed to the delegated-operator-executor containers.
+  env:
+    # -- Full path to a network-mounted file system or a cloud storage path to
+    # use for storing logs generated by delegated operation runs, one file
+    # per job. The default `""` means log upload is disabled.
+    FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH: ""
+    # -- Set the media cache size (in bytes) for the local FiftyOne Delegated
+    # Operator Executor processes.
+    # The default value is 32 GiB.
+    # `-1` is disabled.
+    FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+    # TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`
+    # -- Whether the SDK is running in an internal service context.
+    # When running in FiftyOne Teams, set to `true`.
+    FIFTYONE_INTERNAL_SERVICE: true
+  image:
+    # -- Instruct when the kubelet should pull (download) the specified image.
+    # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
+    pullPolicy: Always
+    # -- Container image for delegated-operator-executor.
+    repository: voxel51/fiftyone-app
+    # -- Image tag for delegated-operator-executor. Defaults to the chart version.
+    tag: ""
+  # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
+  labels: {}
+  liveness:
+    # -- Number of times to retry the liveness probe for the teams-do. [Reference][probes].
+    failureThreshold: 5
+    # -- How often (in seconds) to perform the liveness probe for teams-do. [Reference][probes].
+    periodSeconds: 30
+    # -- Timeout for the liveness probe for the teams-do. [Reference][probes].
+    timeoutSeconds: 30
+  # -- Number of pods in the delegated-operator-executor deployment's ReplicaSet.
+  # This should not exceed the value set in the deployment's license file for
+  #  max concurrent delegated operators, which defaults to 3.
+  replicaCount: 3
+
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # -- Container resource requests and limits for delegated-operator-executor. [Reference][resources].
+  resources:
+    limits: {}
+    #   cpu: 2
+    #   memory: 6Gi
+    requests: {}
+    #   cpu: 500m
+    #   memory: 1Gi
+
+  # -- Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity].
+  affinity: {}
+  # -- Deployment name
+  name: "teams-do"
+  # -- nodeSelector for delegated-operator-executor. [Reference][node-selector].
+  nodeSelector: {}
+  # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
+  podAnnotations: {}
+  # -- Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context].
+  podSecurityContext: {}
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
+  # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
+  readiness:
+    # -- Number of times to retry the readiness probe for the teams-do. [Reference][probes].
+    failureThreshold: 5
+    # -- How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes].
+    periodSeconds: 30
+    # -- Timeout for the readiness probe for the teams-do. [Reference][probes].
+    timeoutSeconds: 30
+  securityContext: {}
+  startup:
+    # -- Number of times to retry the startup probe for the teams-do. [Reference][probes].
+    failureThreshold: 5
+    # -- How often (in seconds) to perform the startup probe for teams-do. [Reference][probes].
+    periodSeconds: 30
+    # -- Timeout for the startup probe for the teams-do. [Reference][probes].
+    timeoutSeconds: 30
+  # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
+  tolerations: []
+  # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
+  volumeMounts: []
+  # -- Volumes for delegated-operator-executor. [Reference][volumes].
   volumes: []
 
 # -- List of secrets for FiftyOne Teams Licenses (one per org)
@@ -405,26 +528,34 @@ pluginsSettings:
     annotations: {}
     # -- Service container port for teams-plugins.
     containerPort: 5151
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe teams-plugins. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: teams-plugins
     # -- (int) Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins.
     nodePort:
     # -- Service port.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for teams-plugins. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports].
     shortname: teams-plugins
+    startup:
+      # -- Number of times to retry the startup probe for the teams-plugins. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes].
+      periodSeconds: 15
     # -- Service type for teams-plugins. [Reference][service-type].
     type: ClusterIP
 
   # -- Affinity and anti-affinity for teams-plugins. [Reference][affinity].
   affinity: {}
+  initContainers:
+    # -- Whether to enable init containers for teams-plugins. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for teams-plugins. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for teams-plugins. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for teams-plugins. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for teams-plugins pods. [Reference][annotations].
@@ -436,6 +567,9 @@ pluginsSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # Label selectors will be defaulted to those of the teams-plugins deployment. [Reference][topology-spread-constraints].
+  topologySpreadConstraints: []
   # -- Volume mounts for teams-plugins pods. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for teams-plugins. [Reference][volumes].
@@ -501,7 +635,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.1.3
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.2.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
@@ -514,6 +648,12 @@ teamsAppSettings:
     # -- Controls whether anonymous analytics are captured for the teams
     # application. Set to false to opt-out of anonymous analytics.
     FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: true
+    # -- Controls whether Query Performance mode is enabled by default for
+    # every dataset for the teams application. Set to false to set default mode to off.
+    FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE: true
+    # -- Controls whether Query Performance mode is enabled for the teams
+    # application. Set to false to disable Query Performance mode for entire application.
+    FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE: true
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy].
@@ -552,26 +692,34 @@ teamsAppSettings:
     annotations: {}
     # -- Service container port for teams-app.
     containerPort: 3000
-    liveness:
-      # -- Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes].
-      initialDelaySeconds: 15
     # -- Service name.
     name: teams-app
     # -- (int) Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app.
     nodePort:
     # -- Service port.
     port: 80
-    readiness:
-      # -- Number of seconds to wait before performing the readiness probe for teams-app. [Reference][probes].
-      initialDelaySeconds: 15
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
+    # TODO: Alex - Default should include protocol in the name per kubernetes standards.
     # -- Port name (maximum length is 15 characters) for teams-app. [Reference][ports].
     shortname: teams-app
+    startup:
+      # -- Number of times to retry the startup probe for the teams-app. [Reference][probes].
+      failureThreshold: 5
+      # -- How often (in seconds) to perform the startup probe for teams-app. [Reference][probes].
+      periodSeconds: 15
     # -- Service type for teams-app. [Reference][service-type].
     type: ClusterIP
 
   # -- Affinity and anti-affinity for teams-app. [Reference][affinity].
   affinity: {}
+  initContainers:
+    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    enabled: true
+    image:
+      # -- Init container images repositories for teams-app. [Reference][init-containers].
+      repository: docker.io/busybox
+      # -- Init container images tags for teams-app. [Reference][init-containers].
+      tag: stable-glibc
   # -- nodeSelector for teams-app. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for teams-app pods. [Reference][annotations].
@@ -583,6 +731,9 @@ teamsAppSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # Label selectors will be defaulted to those of the teams-app deployment. [Reference][topology-spread-constraints].
+  topologySpreadConstraints: []
   # -- Volume mounts for teams-app pods. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for teams-app pods. [Reference][volumes].

@@ -45,13 +45,18 @@ spec:
             httpGet:
               path: /cas/api
               port: {{ .Values.casSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.casSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /cas/api
               port: {{ .Values.casSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.casSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /cas/api
+              port: {{ .Values.casSettings.service.shortname }}
+            failureThreshold: {{ .Values.casSettings.service.startup.failureThreshold }}
+            periodSeconds: {{ .Values.casSettings.service.startup.periodSeconds }}
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.casSettings.resources | nindent 12 }}
@@ -75,6 +80,10 @@ spec:
       {{- with .Values.casSettings.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.casSettings.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.casSettings.topologySpreadConstraints "selectorLabels" "fiftyone-teams-cas.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
       volumes:
         {{- range $name := .Values.fiftyoneLicenseSecrets }}

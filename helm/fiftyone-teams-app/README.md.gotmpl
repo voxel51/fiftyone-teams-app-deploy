@@ -43,9 +43,39 @@ kubectl --namespace your-namepace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 
+## FiftyOne Teams v2.2+ Delegated Operator Changes
+
+FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
+below.
+
+### Delegated Operation Capacity
+
+By default, all deployments are provisioned with capacity to support up to 3
+delegated operations simultaneously. You will need to configure the [builtin
+orchestrator](#builtin-delegated-operator-orchestrator) or an external
+orchestrator, with enough workers, to be able to utilize this full capacity.
+If your team finds the usage is greater than this, please reach out to your
+Voxel51 support team for guidance and to increase this limit!
+
+### Existing Orchestrators
+
+> [!NOTE]
+> If you are currently utilizing an external orchestrator for delegated
+> operations, such as Airflow or Flyte, you may have an outdated execution
+> definition that could negatively affect the experience. Please reach out to
+> Voxel51 support team for guidance on updating this code.
+
+Additionally,
+
+> [!WARNING]
+> If you cannot update the orchestrator DAG/workflow code, you must set
+> `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
+> in `values.yaml` in order for the delegated operation system to function
+> properly.
+
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
 
-### Invitations Disabled for Internal Authentication Mode
+### Invitations Disabled for Internal Authentication Mode (v1.6.0-v2.1.X)
 
 FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
 includes both
@@ -53,8 +83,11 @@ includes both
 and
 [`internal` authentication mode][internal-auth-mode].
 
-Inviting users to join your FiftyOne Teams instance is not currently supported
+Prior to v2.2.0, inviting users to join your FiftyOne Teams instance was not supported
 when `FIFTYONE_AUTH_MODE` is set to `internal`.
+Starting in v2.2.0+, you can enable invitations for your organization through the
+CAS SuperAdmin UI. To enable sending invitations as emails, you must also
+configure an SMTP connection.
 
 ## Table of Contents
 
@@ -62,6 +95,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
 
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [FiftyOne Teams Features](#fiftyone-teams-features)
+  - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -72,6 +106,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
+- [Requirements](#requirements)
 - [Values](#values)
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
@@ -80,6 +115,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
   - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
   - [From FiftyOne Teams Version 2.0.0](#from-fiftyone-teams-version-200)
 - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
+  - [Deploying On GKE](#deploying-on-gke)
 
 <!-- tocstop -->
 
@@ -123,6 +159,40 @@ When performing an upgrade, please review
 ## FiftyOne Teams Features
 
 Consider if you will require these settings for your deployment.
+
+### Builtin Delegated Operator Orchestrator
+
+FiftyOne Teams v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+instead of (or in addition to) configuring your own orchestrator such as Airflow.
+
+This option can be added to any of the 3 existing
+[plugin modes](#fiftyone-teams-plugins). If you're using the builtin-operator
+only option, the Persistent Volume Claim should be omitted.
+
+To enable this mode
+
+- In `values.yaml`, set
+  - `delegatedOperatorExecutorSettings.enabled: true`
+  - The path for a Persistent Volume Claim mounted to the
+    `teams-do` deployment in
+    - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
+- See
+  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  - Mount a Persistent Volume Claim (PVC) that provides
+    - `ReadWrite` permissions to the `teams-do` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+
+Optionally, the logs generated during running of a delegated operation can be
+uploaded to a network-mounted file system or cloud storage path that is
+available to this deployment. Logs are uploaded in this format:
+`<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
+In `values.yaml`, set `configured_path`
+
+- `delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
+
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 ### Central Authentication Service
 
@@ -284,8 +354,8 @@ To enable this mode
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-Pods based on the `fiftyone-teams-api` and `fiftyone-app`
-images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
+Pods based on the `fiftyone-teams-cas`, `fiftyone-teams-api`,
+and `fiftyone-app` images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
 This key is used to encrypt storage credentials in the MongoDB database.
 
 To generate a value for `secret.fiftyone.encryptionKey`, run this
@@ -411,7 +481,9 @@ appSettings:
 
 {{ template "chart.sourcesSection" . }}
 
-{{ template "chart.requirementsSection" . }}
+## Requirements
+
+{{ template "chart.kubeVersionLine" . }}
 
 ## Values
 
@@ -451,14 +523,14 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -498,10 +570,10 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams v2.1.3](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams v2.2.0](#deploying-fiftyone-teams)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.1.3`
-1. Upgrade your FiftyOne SDKs to version 2.1.3
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.2.0`
+1. Upgrade your FiftyOne SDKs to version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -519,7 +591,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -537,7 +609,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -578,16 +650,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.3
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.3 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.3` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
         > your database.
 
     ```shell
@@ -602,7 +674,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -642,16 +714,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.3
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.3 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.3` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
         > your database.
 
     ```shell
@@ -666,9 +738,9 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.1.3, but it is not required
+   version 2.2.0, but it is not required
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -762,19 +834,44 @@ A minimal example `values.yaml` may be found
         > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
         > ```
 
+### Deploying On GKE
+
+Voxel51 FiftyOne Teams supports
+[Workload Identity Federation for GKE][about-wif]
+when installing via Helm into Google Kubernetes Engine (GKE).
+Workload Identity is achieved using service account annotations
+that can be defined in the `values.yaml` file when installing
+or upgrading the application.
+
+Please follow the steps
+[outlined by Google][howto-wif]
+to allow your cluster to utilize workload identity federation and to
+create a service account with the required IAM permissions.
+
+Once the cluster and service account are configured, you can permit your
+workloads to utilize the GCP service account via service account annotations
+defined in the `values.yaml` file:
+
+```yaml
+serviceAccount:
+  annotations:
+    iam.gke.io/gcp-service-account: <GSA_NAME>@<GSA_PROJECT>.iam.gserviceaccount.com
+```
+
 <!-- Reference Links -->
+[about-wif]: https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity
 [affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 [annotations]: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 [autoscaling]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 [container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
+[howto-wif]: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
 [image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
+[init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
@@ -789,4 +886,7 @@ A minimal example `values.yaml` may be found
 [service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+[topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
+[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html

@@ -47,12 +47,16 @@ spec:
           livenessProbe:
             tcpSocket:
               port: {{ .Values.pluginsSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.pluginsSettings.service.liveness.initialDelaySeconds }}
             timeoutSeconds: 5
           readinessProbe:
             tcpSocket:
               port: {{ .Values.pluginsSettings.service.shortname }}
-            initialDelaySeconds: {{ .Values.pluginsSettings.service.readiness.initialDelaySeconds }}
+            timeoutSeconds: 5
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.pluginsSettings.service.shortname }}
+            failureThreshold: {{ .Values.pluginsSettings.service.startup.failureThreshold }}
+            periodSeconds: {{ .Values.pluginsSettings.service.startup.periodSeconds }}
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.pluginsSettings.resources | nindent 12 }}
@@ -60,6 +64,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      {{- if .Values.pluginsSettings.initContainers.enabled }}
+      initContainers:
+        {{-
+          include "fiftyone-teams-app.commonInitContainers"
+          (dict "repository" .Values.pluginsSettings.initContainers.image.repository "tag" .Values.pluginsSettings.initContainers.image.tag "casServiceName" (include "teams-cas.name" .) )
+          | nindent 8
+        }}
+      {{- end }}
       {{- with .Values.pluginsSettings.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -71,6 +83,10 @@ spec:
       {{- with .Values.pluginsSettings.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pluginsSettings.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.pluginsSettings.topologySpreadConstraints "selectorLabels" "teams-plugins.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
       {{- with .Values.pluginsSettings.volumes }}
       volumes:

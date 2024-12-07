@@ -28,6 +28,7 @@ const (
 var internalAuthComposeFile = "compose.yaml"
 var internalAuthComposePluginsFile = "compose.plugins.yaml"
 var internalAuthComposeDedicatedPluginsFile = "compose.dedicated-plugins.yaml"
+var internalAuthComposeDelegatedOperationsFile = "compose.delegated-operators.yaml"
 var internalAuthEnvTemplateFilePath = filepath.Join(dockerInternalAuthDir, "env.template")
 
 type commonServicesInternalAuthDockerComposeUpTest struct {
@@ -36,6 +37,7 @@ type commonServicesInternalAuthDockerComposeUpTest struct {
 	dotEnvFiles          []string
 	overrideFiles        []string
 	overrideFilesPlugins []string
+	overrideFilesDO      []string
 }
 
 func TestDockerComposeUpInternalAuth(t *testing.T) {
@@ -55,10 +57,16 @@ func TestDockerComposeUpInternalAuth(t *testing.T) {
 	overrideFilesPlugins = append(overrideFilesPlugins, overrideFiles...)
 	overrideFilesPlugins = append(overrideFilesPlugins, mongodbComposeFilePlugins)
 
+	var overrideFilesDO []string
+	overrideFilesDO = append(overrideFilesDO, internalAuthComposePluginsFile)
+	overrideFilesDO = append(overrideFilesDO, overrideFiles...)
+	overrideFilesDO = append(overrideFilesDO, mongodbComposeFileDO)
+
 	// To run the containers on macOS arm64, we need to set the platform
 	if runtime.GOOS == "darwin" {
 		overrideFiles = append(overrideFiles, darwinOverrideFile)
 		overrideFilesPlugins = append(overrideFilesPlugins, darwinOverrideFile, darwinOverrideFilePlugins)
+		overrideFilesDO = append(overrideFilesDO, darwinOverrideFile, darwinOverrideFileDO)
 	}
 
 	suite.Run(t, &commonServicesInternalAuthDockerComposeUpTest{
@@ -70,6 +78,7 @@ func TestDockerComposeUpInternalAuth(t *testing.T) {
 		},
 		overrideFiles:        overrideFiles,
 		overrideFilesPlugins: overrideFilesPlugins,
+		overrideFilesDO:      overrideFilesDO,
 	})
 }
 
@@ -196,6 +205,50 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					responsePayload:  "",
 					httpResponseCode: 0,
 					log:              "[INFO] Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
+				},
+			},
+		},
+		{
+			"composeDelegatedOperations",
+			internalAuthComposeDelegatedOperationsFile,
+			s.overrideFilesDO,
+			s.dotEnvFiles,
+			[]serviceValidations{
+				{
+					name:             "teams-api",
+					url:              "http://127.0.0.1:8000/health",
+					responsePayload:  `{"status":{"teams":"available"}}`,
+					httpResponseCode: 200,
+					log:              "[INFO] Starting worker",
+				},
+				{
+					name:             "teams-app",
+					url:              "http://127.0.0.1:3000/api/hello",
+					responsePayload:  `{"name":"John Doe"}`,
+					httpResponseCode: 200,
+					log:              "Listening on port 3000",
+				},
+				{
+					name:             "teams-cas",
+					url:              "http://127.0.0.1:3030/cas/api",
+					responsePayload:  `{"status":"available"}`,
+					httpResponseCode: 200,
+					log:              " ✓ Ready in",
+				},
+				// ordering this last to avoid test flakes where testing for log before the container is running
+				{
+					name:             "fiftyone-app",
+					url:              "",
+					responsePayload:  "",
+					httpResponseCode: 0,
+					log:              "[INFO] Running on http://0.0.0.0:5151",
+				},
+				{
+					name:             "teams-do",
+					url:              "",
+					responsePayload:  "",
+					httpResponseCode: 0,
+					log:              "Executor started",
 				},
 			},
 		},

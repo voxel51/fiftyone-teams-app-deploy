@@ -68,12 +68,12 @@ secret:
 #     FIFTYONE_PLUGINS_DIR: /opt/plugins
 #     # Set FIFTYONE_TEAMS_VERSION_OVERRIDE to override the `Install FiftyOne`
 #     # bash command in the `Settings > Install FiftyOne` modal
-#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.1.3
+#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.2.0
 
 
 appSettings:
   env:
-    # FIFTYONE_DATABASE_ADMIN is set to `false` by default for v2.1.3
+    # FIFTYONE_DATABASE_ADMIN is set to `false` by default for v2.2.0
     # If you are performing a new install or an upgrade from v1.0 or earlier you may want to set
     # this value to `true`.
     # Please see https://helm.fiftyone.ai/#initial-installation-vs-upgrades for details
@@ -87,6 +87,15 @@ appSettings:
 casSettings:
   env:
     FIFTYONE_AUTH_MODE: legacy
+
+# delegatedOperatorExecutorSettings:
+#   enabled: true
+#   env:
+#     # Set FIFTYONE_PLUGINS_DIR and FIFTYONE_PLUGINS_CACHE_ENABLED if you are
+#     # enabling plugins in the builtin `teams-do` delegated operation orchestrator.
+#     # See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#builtin-delegated-operator-orchestrator
+#     FIFTYONE_PLUGINS_DIR: /opt/plugins
+#     FIFTYONE_PLUGINS_CACHE_ENABLED: true
 
 # pluginsSettings:
 #   enabled: true

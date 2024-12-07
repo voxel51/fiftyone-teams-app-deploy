@@ -46,9 +46,9 @@ With a Dockerfile like this, you could use the following commands to
 build, and publish, your image to your internal registry
 
 ```shell
-TEAMS_VERSION=v2.1.3
+TEAMS_VERSION=v2.2.0
 docker buildx build --push \
-  --build-arg TEAMS_IMAGE_NAME='voxel51/fiftyone-app:${TEAMS_VERSION}' \
+  --build-arg TEAMS_IMAGE_NAME="voxel51/fiftyone-app:${TEAMS_VERSION}" \
   -t your-internal-registry/fiftyone-app-internal:${TEAMS_VERSION} .
 ```
 
@@ -63,7 +63,7 @@ After your custom plugins image is built, you can add it to your
 ```yaml
 services:
   teams-plugins:
-    image: your-internal-registry/fiftyone-app-internal:v2.1.3
+    image: your-internal-registry/fiftyone-app-internal:v2.2.0
 ```
 
 Please see
@@ -78,6 +78,16 @@ After your custom plugins image is built, you can add it to your
 
 ```yaml
 pluginsSettings:
+  image:
+    repository: your-internal-registry/fiftyone-app-internal
+```
+
+If you are using the builtin delegated operation orchestrator, you should
+configure it to use the custom plugins image also, by adding it to your
+`values.yaml` like
+
+```yaml
+delegatedOperatorExecutorSettings:
   image:
     repository: your-internal-registry/fiftyone-app-internal
 ```

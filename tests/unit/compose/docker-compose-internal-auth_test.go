@@ -27,6 +27,7 @@ const (
 var internalAuthComposeFile = filepath.Join(dockerInternalAuthDir, "compose.yaml")
 var internalAuthComposePluginsFile = filepath.Join(dockerInternalAuthDir, "compose.plugins.yaml")
 var internalAuthComposeDedicatedPluginsFile = filepath.Join(dockerInternalAuthDir, "compose.dedicated-plugins.yaml")
+var internalAuthComposeDelegatedOperationsFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.yaml")
 var internalAuthEnvTemplateFilePath = filepath.Join(dockerInternalAuthDir, "env.template")
 
 type commonServicesInternalAuthDockerComposeTest struct {
@@ -94,6 +95,14 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 				"teams-plugins",
 			},
 		},
+		{
+			"composeDelegatedOperations",
+			[]string{internalAuthComposeDelegatedOperationsFile},
+			s.dotEnvFiles,
+			[]string{
+				"teams-do",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -141,35 +150,42 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			"fiftyone-app",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app:v2.1.3",
+			"voxel51/fiftyone-app:v2.2.0",
 		},
 		{
 			"defaultTeamsApi",
 			"teams-api",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-api:v2.1.3",
+			"voxel51/fiftyone-teams-api:v2.2.0",
 		},
 		{
 			"defaultTeamsApp",
 			"teams-app",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-app:v2.1.3",
+			"voxel51/fiftyone-teams-app:v2.2.0",
 		},
 		{
 			"defaultTeamsCas",
 			"teams-cas",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-cas:v2.1.3",
+			"voxel51/fiftyone-teams-cas:v2.2.0",
 		},
 		{
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app:v2.1.3",
+			"voxel51/fiftyone-app:v2.2.0",
+		},
+		{
+			"delegatedOperationsTeamsDo",
+			"teams-do",
+			[]string{internalAuthComposeDelegatedOperationsFile},
+			s.dotEnvFiles,
+			"voxel51/fiftyone-app:v2.2.0",
 		},
 	}
 
@@ -262,7 +278,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"APP_USE_HTTPS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
-				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.1.3",
+				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.2.0",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
@@ -270,6 +286,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -285,6 +303,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
 				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
@@ -343,7 +362,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"APP_USE_HTTPS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
-				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.1.3",
+				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.2.0",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
@@ -351,6 +370,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -366,6 +387,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
 				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
@@ -422,7 +444,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"APP_USE_HTTPS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
-				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.1.3",
+				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.2.0",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
@@ -431,6 +453,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -446,6 +470,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"DEBUG=cas:*,-cas:*:debug",
 				"FIFTYONE_AUTH_MODE=internal",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
 				"LICENSE_KEY_FILE_PATHS=/opt/fiftyone/licenses/license",
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
@@ -468,6 +493,23 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
+				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_PLUGINS_CACHE_ENABLED=true",
+				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+			},
+		},
+		{
+			"delegatedOperationsTeamsDo",
+			"teams-do",
+			[]string{internalAuthComposeDelegatedOperationsFile},
+			s.dotEnvFiles,
+			[]string{
+				"API_URL=http://teams-api:8000",
+				"FIFTYONE_DATABASE_ADMIN=false",
+				"FIFTYONE_DATABASE_NAME=fiftyone",
+				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
+				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_CACHE_ENABLED=true",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
@@ -655,6 +697,13 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceRestart() {
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
+			s.dotEnvFiles,
+			types.RestartPolicyAlways,
+		},
+		{
+			"delegatedOperationsTeamsDo",
+			"teams-do",
+			[]string{internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
@@ -849,6 +898,21 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 				},
 			},
 		},
+		{
+			"delegatedOperationsTeamsDo",
+			"teams-do",
+			[]string{internalAuthComposeDelegatedOperationsFile},
+			s.dotEnvFiles,
+			[]types.ServiceVolumeConfig{
+				{
+					Type:     "volume",
+					Source:   "plugins-vol",
+					Target:   "/opt/plugins",
+					ReadOnly: true,
+					Volume:   &types.ServiceVolumeVolume{},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -909,6 +973,16 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 		{
 			"dedicatedPlugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
+			s.dotEnvFiles,
+			types.Volumes{
+				"plugins-vol": {
+					Name: "fiftyone-compose-test_plugins-vol",
+				},
+			},
+		},
+		{
+			"delegatedOperations",
+			[]string{internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			types.Volumes{
 				"plugins-vol": {

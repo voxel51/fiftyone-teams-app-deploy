@@ -71,7 +71,7 @@ tag (found at the top of the test file).
 
     ```shell
     # From repo root
-    cd test/unit/helm
+    cd tests/unit/helm
 
     # replace the tag `unit` with any build tag
     go test -count=1 -timeout=3m -v -tags unit
@@ -82,7 +82,7 @@ tag (found at the top of the test file).
   matching the regex of the test function name `TestMetadataLabels`
 
     ```shell
-    cd test/unit/helm
+    cd tests/unit/helm
     go test \
       -count=1 \
       -timeout=30s \

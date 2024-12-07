@@ -83,6 +83,7 @@ func (s *horizontalPodAutoscalerTeamsAppTemplateTest) TestMetadataLabels() {
 				"teamsAppSettings.autoscaling.enabled": "true",
 				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
 				// does not affect the label `app.kubernetes.io/name` for teams-app.
+				// See note in _helpers.tpl.
 				"teamsAppSettings.service.name": "test-service-name",
 			},
 			map[string]string{

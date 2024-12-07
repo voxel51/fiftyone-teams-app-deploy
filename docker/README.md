@@ -32,6 +32,35 @@ mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
 mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 ```
 
+## FiftyOne Teams v2.2+ Delegated Operator Changes
+
+FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
+below.
+
+### Delegated Operation Capacity
+
+By default, all deployments are provisioned with capacity to support up to 3
+delegated operations simultaneously. You will need to configure the [builtin
+orchestrator](#builtin-delegated-operator-orchestrator) or an external
+orchestrator, with enough workers, to be able to utilize this full capacity.
+If your team finds the usage is greater than this, please reach out to your
+Voxel51 support team for guidance and to increase this limit!
+
+### Existing Orchestrators
+
+> [!NOTE]
+> If you are currently utilizing an external orchestrator for delegated
+> operations, such as Airflow or Flyte, you may have an outdated execution
+> definition that could negatively affect the experience. Please reach out to
+> Voxel51 support team for guidance on updating this code.
+
+Additionally,
+
+> [!WARNING]
+> If you cannot update the orchestrator DAG/workflow code, you must set
+> `FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS=true` in order for the delegated
+> operation system to function properly.
+
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
 
 ### Invitations Disabled for Internal Authentication Mode
@@ -42,8 +71,11 @@ includes both
 and
 [`internal` authentication mode][internal-auth-mode].
 
-Inviting users to join your FiftyOne Teams instance is not currently supported
+Prior to v2.2.0, inviting users to join your FiftyOne Teams instance was not supported
 when `FIFTYONE_AUTH_MODE` is set to `internal`.
+Starting in v2.2.0+, you can enable invitations for your organization through the
+CAS SuperAdmin UI. To enable sending invitations as emails, you must also
+configure an SMTP connection.
 
 ## Table of Contents
 
@@ -52,6 +84,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
 - [Deploying FiftyOne Teams App with Docker Compose](#deploying-fiftyone-teams-app-with-docker-compose)
   - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
   - [FiftyOne Teams Features](#fiftyone-teams-features)
+    - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
     - [Central Authentication Service](#central-authentication-service)
     - [Snapshot Archival](#snapshot-archival)
     - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -143,6 +176,39 @@ quickstart  0.21.2
 ---
 
 ## FiftyOne Teams Features
+
+### Builtin Delegated Operator Orchestrator
+
+FiftyOne Teams v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+instead of (or in addition to) configuring your own orchestrator such as Airflow.
+
+This option can be added to any of the 3 existing
+[plugin modes](#fiftyone-teams-plugins).
+
+To enable this mode and launch worker containers, use
+[legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
+in conjunction with one of the 3 plugin configurations.
+
+- Example `docker compose` command for enabling this mode on top of dedicated
+  plugins mode, from the `legacy-auth` directory
+
+    ```shell
+    docker compose \
+      -f compose.dedicated-plugins.yaml \
+      -f compose.delegated-operators.yaml \
+      -f compose.override.yaml \
+      up --d
+    ```
+
+Optionally, the logs generated during running of a delegated operation can be
+uploaded to a network-mounted file system or cloud storage path that is
+available to this deployment. Logs are uploaded in this format:
+`<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
+Set `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH` to `configured_path`
+
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 ### Central Authentication Service
 
@@ -338,9 +404,10 @@ services.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-As of FiftyOne Teams 1.1, containers based on the `fiftyone-teams-api` and
-`fiftyone-app` images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
-This key is used to encrypt storage credentials in the MongoDB database.
+As of FiftyOne Teams 1.1, containers based on the
+`fiftyone-teams-cas`, `fiftyone-teams-api` and `fiftyone-app` images must
+include the `FIFTYONE_ENCRYPTION_KEY` variable. This key is used to
+encrypt storage credentials in the MongoDB database.
 
 To generate a value for `FIFTYONE_ENCRYPTION_KEY`, run this
 Python code and add the output to your `.env` file:
@@ -438,7 +505,7 @@ might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.1.3
+    image: voxel51/fiftyone-app-torch:v2.2.0
 ```
 
 For more information, see the docs for
@@ -478,14 +545,14 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ your users to log in
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ your users to log in
 > after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -517,13 +584,13 @@ existing configuration to migrate to a new Auth0 Tenant.
    `/cas/*` traffic to the `teams-cas` service.
    Example nginx configurations can be found
    [here](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
-1. [Upgrade to FiftyOne Teams v2.1.3](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams v2.2.0](#deploying-fiftyone-teams)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
-    > Teams Database at this step until they upgrade to `fiftyone==2.1.3`
+    > Teams Database at this step until they upgrade to `fiftyone==2.2.0`
 
-1. Upgrade your FiftyOne SDKs to version 2.1.3
+1. Upgrade your FiftyOne SDKs to version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to
@@ -542,7 +609,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -560,7 +627,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -612,15 +679,15 @@ existing configuration to migrate to a new Auth0 Tenant.
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.3
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.1.3
+    > **NOTE** Any FiftyOne SDK less than 2.2.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.1.3` is required.
+    > Upgrading to `fiftyone==2.2.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -634,7 +701,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -669,15 +736,15 @@ existing configuration to migrate to a new Auth0 Tenant.
    mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
    ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.3
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.1.3
+    > **NOTE** Any FiftyOne SDK less than 2.2.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.1.3` is required.
+    > Upgrading to `fiftyone==2.2.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -691,9 +758,9 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.1.3, but it is not required
+   version 2.2.0, but it is not required
    - Login to the FiftyOne Teams UI
    - To obtain the CLI command to install the FiftyOne SDK associated with
      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -786,47 +853,50 @@ for the FiftyOne Teams API service.
 
 ## FiftyOne Teams Environment Variables
 
-| Variable                                     | Purpose                                                                                                                                                                                                                                                                        | Required                  |
-|----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
-| `API_BIND_ADDRESS`                           | The host address that `fiftyone-teams-api` should bind to; `127.0.0.1` is appropriate for this in most cases                                                                                                                                                                   | Yes                       |
-| `API_BIND_PORT`                              | The host port that `fiftyone-teams-api` should bind to; the default is `8000`                                                                                                                                                                                                  | Yes                       |
-| `API_LOGGING_LEVEL`                          | Logging Level for `teams-api` service                                                                                                                                                                                                                                          | Yes                       |
-| `API_URL`                                    | The URL that `fiftyone-teams-app` should use to communicate with `fiftyone-teams-api`; `teams-api` is the compose service name                                                                                                                                                 | Yes                       |
-| `APP_BIND_ADDRESS`                           | The host address that `fiftyone-teams-app` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                            | Yes                       |
-| `APP_BIND_PORT`                              | The host port that `fiftyone-teams-app` should bind to the default is `3000`                                                                                                                                                                                                   | Yes                       |
-| `APP_USE_HTTPS`                              | Set this to true if your Application endpoint uses TLS; this should be `true` in most cases'                                                                                                                                                                                   | Yes                       |
-| `BASE_URL`                                   | The URL where you plan to deploy your FiftyOne Teams                                                                                                                                                                                                                           | `internal` auth mode only |
-| `CAS_BASE_URL`                               | The URL that FiftyOne Teams Services should use to communicate with `teams-cas`; `teams-cas` is the compose service                                                                                                                                                            | Yes                       |
-| `CAS_BIND_ADDRESS`                           | The host address that `teams-cas` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                                     | Yes                       |
-| `CAS_BIND_PORT`                              | The host port that `teams-cas` should bind to; the default is `3030`                                                                                                                                                                                                           | Yes                       |
-| `CAS_DATABASE_NAME`                          | The MongoDB Database that the `teams-cas` service should use; the default is `fiftyone-cas`                                                                                                                                                                                    | Yes                       |
-| `CAS_DEBUG`                                  | The logs that `teams-cas` should provide to stdout; see [debug](https://www.npmjs.com/package/debug) for documentation                                                                                                                                                         | Yes                       |
-| `CAS_DEFAULT_USER_ROLE`                      | The default role when users initially log into the FiftyOne Teams application; the default is `GUEST`                                                                                                                                                                          | Yes                       |
-| `CAS_MONGODB_URI`                            | The MongoDB Connection STring for CAS; this will default to `FIFTYONE_DATABASE_URI`                                                                                                                                                                                            | No                        |
-| `FIFTYONE_APP_ALLOW_MEDIA_EXPORT`            | Set this to `"false"` if you want to disable media export options                                                                                                                                                                                                              | No                        |
-| `FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED`            | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics.                                                                                                                                                                                                              | No                        |
+| Variable                                    | Purpose                                                                                                                                                                                                                                                                        | Required                  |
+|---------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
+| `API_BIND_ADDRESS`                          | The host address that `fiftyone-teams-api` should bind to; `127.0.0.1` is appropriate for this in most cases                                                                                                                                                                   | Yes                       |
+| `API_BIND_PORT`                             | The host port that `fiftyone-teams-api` should bind to; the default is `8000`                                                                                                                                                                                                  | Yes                       |
+| `API_LOGGING_LEVEL`                         | Logging Level for `teams-api` service                                                                                                                                                                                                                                          | Yes                       |
+| `API_URL`                                   | The URL that `fiftyone-teams-app` should use to communicate with `fiftyone-teams-api`; `teams-api` is the compose service name                                                                                                                                                 | Yes                       |
+| `APP_BIND_ADDRESS`                          | The host address that `fiftyone-teams-app` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                            | Yes                       |
+| `APP_BIND_PORT`                             | The host port that `fiftyone-teams-app` should bind to the default is `3000`                                                                                                                                                                                                   | Yes                       |
+| `APP_USE_HTTPS`                             | Set this to true if your Application endpoint uses TLS; this should be `true` in most cases'                                                                                                                                                                                   | Yes                       |
+| `BASE_URL`                                  | The URL where you plan to deploy your FiftyOne Teams                                                                                                                                                                                                                           | `internal` auth mode only |
+| `CAS_BASE_URL`                              | The URL that FiftyOne Teams Services should use to communicate with `teams-cas`; `teams-cas` is the compose service                                                                                                                                                            | Yes                       |
+| `CAS_BIND_ADDRESS`                          | The host address that `teams-cas` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                                     | Yes                       |
+| `CAS_BIND_PORT`                             | The host port that `teams-cas` should bind to; the default is `3030`                                                                                                                                                                                                           | Yes                       |
+| `CAS_DATABASE_NAME`                         | The MongoDB Database that the `teams-cas` service should use; the default is `fiftyone-cas`                                                                                                                                                                                    | Yes                       |
+| `CAS_DEBUG`                                 | The logs that `teams-cas` should provide to stdout; see [debug](https://www.npmjs.com/package/debug) for documentation                                                                                                                                                         | Yes                       |
+| `CAS_DEFAULT_USER_ROLE`                     | The default role when users initially log into the FiftyOne Teams application; the default is `GUEST`                                                                                                                                                                          | Yes                       |
+| `CAS_MONGODB_URI`                           | The MongoDB Connection STring for CAS; this will default to `FIFTYONE_DATABASE_URI`                                                                                                                                                                                            | No                        |
+| `FIFTYONE_APP_ALLOW_MEDIA_EXPORT`           | Set this to `"false"` if you want to disable media export options                                                                                                                                                                                                              | No                        |
+| `FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED`           | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics.                                                                                                                                                                                                              | No                        |
 | `FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION` | The recommended fiftyone SDK version. This will be displayed in install modal (i.e. `pip install ... fiftyone==0.11.0`)                                                                                                                                                        | No                        |
-| `FIFTYONE_APP_THEME`                         | The default theme configuration for your FiftyOne Teams application as described [here](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                                                   | No                        |
-| `FIFTYONE_API_URI`                           | The URI to be displayed in the `Install FiftyOne` Modal and `API Keys` configuration screens                                                                                                                                                                                   | No                        |
-| `FIFTYONE_AUTH_SECRET`                       | The secret used for services to authenticate with `teams-cas`; also used to login to the SuperAdmin UI                                                                                                                                                                         | Yes                       |
-| `FIFTYONE_DATABASE_NAME`                     | The MongoDB Database that `fiftyone-app`, `teams-api`, and `teams-app` use for FiftyOne Teams dataset metadata; the default is `fiftyone`                                                                                                                                      | Yes                       |
-| `FIFTYONE_DATABASE_URI`                      | The MongoDB Connection String for FiftyOne Teams dataset metadata                                                                                                                                                                                                              | Yes                       |
-| `FIFTYONE_DEFAULT_APP_ADDRESS`               | The host address that `fiftyone-app` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                                  | Yes                       |
-| `FIFTYONE_DEFAULT_APP_PORT`                  | The host port that `fiftyone-app` should bind to; the default is `5151`                                                                                                                                                                                                        | Yes                       |
-| `FIFTYONE_ENCRYPTION_KEY`                    | Used to encrypt storage credentials in MongoDB                                                                                                                                                                                                                                 | Yes                       |
-| `FIFTYONE_ENV`                               | GraphQL verbosity for the `fiftyone-teams-api` service; `production` will not log every GraphQL query, any other value will                                                                                                                                                    | No                        |
-| `FIFTYONE_PLUGINS_DIR`                       | Persistent directory inside the containers for plugins to be mounted to. `teams-api` must have write access to this directory, all plugin nodes must have read access to this directory.                                                                                       | No                        |
-| `FIFTYONE_SIGNED_URL_EXPIRATION`             | Set the time-to-live for signed URLs generated by the application in hours. Set in the `fiftyone-app` service.                                                                                                                                                                 | 24                        |
-| `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`            | Full path to network-mounted file system or a cloud storage path to use for snapshot archive storage. The default `None` means archival is disabled.                                                                                                                           | No                        |
-| `FIFTYONE_SNAPSHOTS_MAX_IN_DB`               | The max total number of Snapshots allowed at once. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                   | No                        |
-| `FIFTYONE_SNAPSHOTS_MAX_PER_DATASET`         | The max number of Snapshots allowed per dataset. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                     | No                        |
-| `FIFTYONE_SNAPSHOTS_MIN_LAST_LOADED_SEC`     | The minimum last-loaded age in seconds (as defined by `now-last_loaded_at`) a snapshot must meet to be considered for automatic archival. This limit is intended to help curtail automatic archival of a snapshot a user is actively working with. The default value is 1 day. | No                        |
-| `FIFTYONE_TEAMS_PROXY_URL`                   | The URL that `fiftyone-teams-app` will use to proxy requests to `fiftyone-app`                                                                                                                                                                                                 | Yes                       |
-| `GRAPHQL_DEFAULT_LIMIT`                      | Default GraphQL limit for results                                                                                                                                                                                                                                              | No                        |
-| `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                        | No                        |
-| `HTTPS_PROXY_URL`                            | The URL for your environment https proxy                                                                                                                                                                                                                                       | No                        |
-| `LOCAL_LICENSE_FILE_DIR`                    | Location of the directory that contains the FiftyOne Teams license file on the local server.                                                                                                                                                                                                               | Yes                          |
-| `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
+| `FIFTYONE_APP_THEME`                        | The default theme configuration for your FiftyOne Teams application as described [here](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                                                   | No                        |
+| `FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE`    | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off.                                                                                                                            | No                        |
+| `FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE`     | Controls whether Query Performance mode is enabled for the teams application. Set to false to disable Query Performance mode for entire application.                                                                                                                           | No                        |
+| `FIFTYONE_API_URI`                          | The URI to be displayed in the `Install FiftyOne` Modal and `API Keys` configuration screens                                                                                                                                                                                   | No                        |
+| `FIFTYONE_AUTH_SECRET`                      | The secret used for services to authenticate with `teams-cas`; also used to login to the SuperAdmin UI                                                                                                                                                                         | Yes                       |
+| `FIFTYONE_DATABASE_NAME`                    | The MongoDB Database that `fiftyone-app`, `teams-api`, and `teams-app` use for FiftyOne Teams dataset metadata; the default is `fiftyone`                                                                                                                                      | Yes                       |
+| `FIFTYONE_DATABASE_URI`                     | The MongoDB Connection String for FiftyOne Teams dataset metadata                                                                                                                                                                                                              | Yes                       |
+| `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`| Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `null` means log upload is disabled.                                                                           | No                        |
+| `FIFTYONE_DEFAULT_APP_ADDRESS`              | The host address that `fiftyone-app` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                                  | Yes                       |
+| `FIFTYONE_DEFAULT_APP_PORT`                 | The host port that `fiftyone-app` should bind to; the default is `5151`                                                                                                                                                                                                        | Yes                       |
+| `FIFTYONE_ENCRYPTION_KEY`                   | Used to encrypt storage credentials in MongoDB                                                                                                                                                                                                                                 | Yes                       |
+| `FIFTYONE_ENV`                              | GraphQL verbosity for the `fiftyone-teams-api` service; `production` will not log every GraphQL query, any other value will                                                                                                                                                    | No                        |
+| `FIFTYONE_PLUGINS_DIR`                      | Persistent directory inside the containers for plugins to be mounted to. `teams-api` must have write access to this directory, all plugin nodes must have read access to this directory.                                                                                       | No                        |
+| `FIFTYONE_SIGNED_URL_EXPIRATION`            | Set the time-to-live for signed URLs generated by the application in hours. Set in the `fiftyone-app` service.                                                                                                                                                                 | 24                        |
+| `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`           | Full path to network-mounted file system or a cloud storage path to use for snapshot archive storage. The default `None` means archival is disabled.                                                                                                                           | No                        |
+| `FIFTYONE_SNAPSHOTS_MAX_IN_DB`              | The max total number of Snapshots allowed at once. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                   | No                        |
+| `FIFTYONE_SNAPSHOTS_MAX_PER_DATASET`        | The max number of Snapshots allowed per dataset. -1 for no limit. If this limit is exceeded then automatic archival is triggered if enabled, otherwise an error is raised.                                                                                                     | No                        |
+| `FIFTYONE_SNAPSHOTS_MIN_LAST_LOADED_SEC`    | The minimum last-loaded age in seconds (as defined by `now-last_loaded_at`) a snapshot must meet to be considered for automatic archival. This limit is intended to help curtail automatic archival of a snapshot a user is actively working with. The default value is 1 day. | No                        |
+| `FIFTYONE_TEAMS_PROXY_URL`                  | The URL that `fiftyone-teams-app` will use to proxy requests to `fiftyone-app`                                                                                                                                                                                                 | Yes                       |
+| `GRAPHQL_DEFAULT_LIMIT`                     | Default GraphQL limit for results                                                                                                                                                                                                                                              | No                        |
+| `HTTP_PROXY_URL`                            | The URL for your environment http proxy                                                                                                                                                                                                                                        | No                        |
+| `HTTPS_PROXY_URL`                           | The URL for your environment https proxy                                                                                                                                                                                                                                       | No                        |
+| `LOCAL_LICENSE_FILE_DIR`                   | Location of the directory that contains the FiftyOne Teams license file on the local server.                                                                                                                                                                                                               | Yes                          |
+| `NO_PROXY_LIST`                             | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
 
 <!-- Reference Links -->
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
