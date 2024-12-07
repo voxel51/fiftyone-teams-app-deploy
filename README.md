@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.1.3](https://img.shields.io/badge/Version-2.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.1.3](https://img.shields.io/badge/AppVersion-v2.1.3-informational?style=flat-square)
+![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.2.0](https://img.shields.io/badge/AppVersion-v2.2.0-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 <!-- markdownlint-enable line-length -->
@@ -41,9 +41,39 @@ kubectl --namespace your-namepace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 
+## FiftyOne Teams v2.2+ Delegated Operator Changes
+
+FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
+below.
+
+### Delegated Operation Capacity
+
+By default, all deployments are provisioned with capacity to support up to 3
+delegated operations simultaneously. You will need to configure the [builtin
+orchestrator](#builtin-delegated-operator-orchestrator) or an external
+orchestrator, with enough workers, to be able to utilize this full capacity.
+If your team finds the usage is greater than this, please reach out to your
+Voxel51 support team for guidance and to increase this limit!
+
+### Existing Orchestrators
+
+> [!NOTE]
+> If you are currently utilizing an external orchestrator for delegated
+> operations, such as Airflow or Flyte, you may have an outdated execution
+> definition that could negatively affect the experience. Please reach out to
+> Voxel51 support team for guidance on updating this code.
+
+Additionally,
+
+> [!WARNING]
+> If you cannot update the orchestrator DAG/workflow code, you must set
+> `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
+> in `values.yaml` in order for the delegated operation system to function
+> properly.
+
 ## Known Issues for FiftyOne Teams v1.6.0 and Above
 
-### Invitations Disabled for Internal Authentication Mode
+### Invitations Disabled for Internal Authentication Mode (v1.6.0-v2.1.X)
 
 FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
 includes both
@@ -51,8 +81,11 @@ includes both
 and
 [`internal` authentication mode][internal-auth-mode].
 
-Inviting users to join your FiftyOne Teams instance is not currently supported
+Prior to v2.2.0, inviting users to join your FiftyOne Teams instance was not supported
 when `FIFTYONE_AUTH_MODE` is set to `internal`.
+Starting in v2.2.0+, you can enable invitations for your organization through the
+CAS SuperAdmin UI. To enable sending invitations as emails, you must also
+configure an SMTP connection.
 
 ## Table of Contents
 
@@ -60,6 +93,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
 
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [FiftyOne Teams Features](#fiftyone-teams-features)
+  - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -70,6 +104,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
+- [Requirements](#requirements)
 - [Values](#values)
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
@@ -78,6 +113,7 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
   - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
   - [From FiftyOne Teams Version 2.0.0](#from-fiftyone-teams-version-200)
 - [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
+  - [Deploying On GKE](#deploying-on-gke)
 
 <!-- tocstop -->
 
@@ -121,6 +157,40 @@ When performing an upgrade, please review
 ## FiftyOne Teams Features
 
 Consider if you will require these settings for your deployment.
+
+### Builtin Delegated Operator Orchestrator
+
+FiftyOne Teams v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+instead of (or in addition to) configuring your own orchestrator such as Airflow.
+
+This option can be added to any of the 3 existing
+[plugin modes](#fiftyone-teams-plugins). If you're using the builtin-operator
+only option, the Persistent Volume Claim should be omitted.
+
+To enable this mode
+
+- In `values.yaml`, set
+  - `delegatedOperatorExecutorSettings.enabled: true`
+  - The path for a Persistent Volume Claim mounted to the
+    `teams-do` deployment in
+    - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
+- See
+  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
+  - Mount a Persistent Volume Claim (PVC) that provides
+    - `ReadWrite` permissions to the `teams-do` deployment
+      at the `FIFTYONE_PLUGINS_DIR` path
+
+Optionally, the logs generated during running of a delegated operation can be
+uploaded to a network-mounted file system or cloud storage path that is
+available to this deployment. Logs are uploaded in this format:
+`<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
+In `values.yaml`, set `configured_path`
+
+- `delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
+
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 ### Central Authentication Service
 
@@ -282,8 +352,8 @@ To enable this mode
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-Pods based on the `fiftyone-teams-api` and `fiftyone-app`
-images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
+Pods based on the `fiftyone-teams-cas`, `fiftyone-teams-api`,
+and `fiftyone-app` images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
 This key is used to encrypt storage credentials in the MongoDB database.
 
 To generate a value for `secret.fiftyone.encryptionKey`, run this
@@ -403,6 +473,10 @@ appSettings:
     repository: voxel51/fiftyone-app-torch
 ```
 
+## Requirements
+
+Kubernetes: `>=1.18-0`
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -416,6 +490,9 @@ appSettings:
 | apiSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | apiSettings.image.repository | string | `"voxel51/fiftyone-teams-api"` | Container image for the teams-api. |
 | apiSettings.image.tag | string | `""` | Image tag for teams-api. Defaults to the chart version. |
+| apiSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-api. [Reference][init-containers]. |
+| apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-api. [Reference][init-containers]. |
+| apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-api. [Reference][init-containers]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for teams-api. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for teams-api. [Reference][annotations]. |
@@ -424,14 +501,15 @@ appSettings:
 | apiSettings.securityContext | object | `{}` | Container security configuration for teams-api. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for teams-api. [Reference][annotations]. |
 | apiSettings.service.containerPort | int | `8000` | Service container port for teams-api. |
-| apiSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-api. [Reference][probes]. |
 | apiSettings.service.name | string | `"teams-api"` | Service name. |
 | apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api. |
 | apiSettings.service.port | int | `80` | Service port for teams-api. |
-| apiSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-api. [Reference][probes]. |
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for teams-api. [Reference][ports]. |
+| apiSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-api. [Reference][probes]. |
+| apiSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-api. [Reference][probes]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for teams-api. [Reference][service-type]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations]. |
+| apiSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-api deployment. [Reference][topology-spread-constraints]. |
 | apiSettings.volumeMounts | list | `[]` | Volume mounts for teams-api. [Reference][volumes]. |
 | apiSettings.volumes | list | `[]` | Volumes for teams-api. [Reference][volumes]. |
 | appSettings.affinity | object | `{}` | Affinity and anti-affinity for fiftyone-app. [Reference][affinity]. |
@@ -448,6 +526,9 @@ appSettings:
 | appSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | appSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for fiftyone-app. |
 | appSettings.image.tag | string | `""` | Image tag for fiftyone-app. Defaults to the chart version. |
+| appSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for fiftyone-app. [Reference][init-containers]. |
+| appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for fiftyone-app. [Reference][init-containers]. |
+| appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for fiftyone-app. [Reference][init-containers]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for fiftyone-app. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for fiftyone-app. [Reference][annotations]. |
@@ -457,14 +538,15 @@ appSettings:
 | appSettings.securityContext | object | `{}` | Container security configuration for fiftyone-app. [Reference][container-security-context]. |
 | appSettings.service.annotations | object | `{}` | Service annotations for fiftyone-app. [Reference][annotations]. |
 | appSettings.service.containerPort | int | `5151` | Service container port for fiftyone-app. |
-| appSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.name | string | `"fiftyone-app"` | Service name. |
 | appSettings.service.nodePort | int | `nil` | Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app. |
 | appSettings.service.port | int | `80` | Service port. |
-| appSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports]. |
+| appSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the fiftyone-app. [Reference][probes]. |
+| appSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for fiftyone-app. [Reference][service-type]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| appSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the fiftyone-app deployment. [Reference][topology-spread-constraints]. |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
@@ -477,6 +559,9 @@ appSettings:
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for teams-cas. |
 | casSettings.image.tag | string | `""` | Image tag for teams-cas. Defaults to the chart version. |
+| casSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-cas. [Reference][init-containers]. |
+| casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-cas. [Reference][init-containers]. |
+| casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-cas. [Reference][init-containers]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for teams-cas. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for teams-cas. [Reference][annotations]. |
@@ -486,16 +571,46 @@ appSettings:
 | casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
 | casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
 | casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
-| casSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for fiftyone-app. [Reference][probes]. |
 | casSettings.service.name | string | `"teams-cas"` | Service name. |
 | casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas. |
 | casSettings.service.port | int | `80` | Service port. |
-| casSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for fiftyone-app. [Reference][probes]. |
 | casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for teams-cas. [Reference][ports]. |
+| casSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-cas. [Reference][probes]. |
+| casSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes]. |
 | casSettings.service.type | string | `"ClusterIP"` | Service type for teams-cas. [Reference][service-type]. |
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
+| casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-cas deployment. [Reference][topology-spread-constraints]. |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
+| delegatedOperatorExecutorSettings.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
+| delegatedOperatorExecutorSettings.enabled | bool | `false` | Controls whether to create a dedicated "teams-do" deployment. Disabled by default, meaning delegated operations will not be executed without an external executor system. |
+| delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
+| delegatedOperatorExecutorSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
+| delegatedOperatorExecutorSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
+| delegatedOperatorExecutorSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
+| delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for delegated-operator-executor. |
+| delegatedOperatorExecutorSettings.image.tag | string | `""` | Image tag for delegated-operator-executor. Defaults to the chart version. |
+| delegatedOperatorExecutorSettings.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
+| delegatedOperatorExecutorSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.name | string | `"teams-do"` | Deployment name |
+| delegatedOperatorExecutorSettings.nodeSelector | object | `{}` | nodeSelector for delegated-operator-executor. [Reference][node-selector]. |
+| delegatedOperatorExecutorSettings.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
+| delegatedOperatorExecutorSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context]. |
+| delegatedOperatorExecutorSettings.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for delegated-operator-executor. [Reference][container-security-context]. |
+| delegatedOperatorExecutorSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
+| delegatedOperatorExecutorSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
+| delegatedOperatorExecutorSettings.securityContext | object | `{}` |  |
+| delegatedOperatorExecutorSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
+| delegatedOperatorExecutorSettings.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
+| delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Teams Licenses (one per org) |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
@@ -529,6 +644,9 @@ appSettings:
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for teams-plugins. |
 | pluginsSettings.image.tag | string | `""` | Image tag for teams-plugins. Defaults to the chart version. |
+| pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-plugins. [Reference][init-containers]. |
+| pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-plugins. [Reference][init-containers]. |
+| pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-plugins. [Reference][init-containers]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for teams-plugins. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for teams-plugins pods. [Reference][annotations]. |
@@ -538,14 +656,15 @@ appSettings:
 | pluginsSettings.securityContext | object | `{}` | Container security configuration for teams-plugins. [Reference][container-security-context]. |
 | pluginsSettings.service.annotations | object | `{}` | Service annotations for teams-plugins. [Reference][annotations]. |
 | pluginsSettings.service.containerPort | int | `5151` | Service container port for teams-plugins. |
-| pluginsSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.name | string | `"teams-plugins"` | Service name. |
 | pluginsSettings.service.nodePort | int | `nil` | Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins. |
 | pluginsSettings.service.port | int | `80` | Service port. |
-| pluginsSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports]. |
+| pluginsSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-plugins. [Reference][probes]. |
+| pluginsSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for teams-plugins. [Reference][service-type]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations]. |
+| pluginsSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-plugins deployment. [Reference][topology-spread-constraints]. |
 | pluginsSettings.volumeMounts | list | `[]` | Volume mounts for teams-plugins pods. [Reference][volumes]. |
 | pluginsSettings.volumes | list | `[]` | Volumes for teams-plugins. [Reference][volumes]. |
 | secret.create | bool | `true` | Controls whether to create the secret named `secret.name`. |
@@ -568,13 +687,18 @@ appSettings:
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics. |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.1.3"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off. |
+| teamsAppSettings.env.FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled for the teams application. Set to false to disable Query Performance mode for entire application. |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.2.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Teams API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
 | teamsAppSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy]. |
 | teamsAppSettings.image.repository | string | `"voxel51/fiftyone-teams-app"` | Container image for teams-app. |
 | teamsAppSettings.image.tag | string | `""` | Image tag for teams-app. Defaults to the chart version. |
+| teamsAppSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-app. [Reference][init-containers]. |
+| teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-app. [Reference][init-containers]. |
+| teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-app. [Reference][init-containers]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for teams-app. [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for teams-app pods. [Reference][annotations]. |
@@ -584,14 +708,15 @@ appSettings:
 | teamsAppSettings.securityContext | object | `{}` | Container security configuration for teams-app. [Reference][container-security-context]. |
 | teamsAppSettings.service.annotations | object | `{}` | Service annotations for teams-app. [Reference][annotations]. |
 | teamsAppSettings.service.containerPort | int | `3000` | Service container port for teams-app. |
-| teamsAppSettings.service.liveness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the liveness probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.name | string | `"teams-app"` | Service name. |
 | teamsAppSettings.service.nodePort | int | `nil` | Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app. |
 | teamsAppSettings.service.port | int | `80` | Service port. |
-| teamsAppSettings.service.readiness.initialDelaySeconds | int | `15` | Number of seconds to wait before performing the readiness probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for teams-app. [Reference][ports]. |
+| teamsAppSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-app. [Reference][probes]. |
+| teamsAppSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-app. [Reference][probes]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for teams-app. [Reference][service-type]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations]. |
+| teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-app deployment. [Reference][topology-spread-constraints]. |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for teams-app pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for teams-app pods. [Reference][volumes]. |
 
@@ -629,14 +754,14 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -676,10 +801,10 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams v2.1.3](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams v2.2.0](#deploying-fiftyone-teams)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.1.3`
-1. Upgrade your FiftyOne SDKs to version 2.1.3
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.2.0`
+1. Upgrade your FiftyOne SDKs to version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -697,7 +822,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -715,7 +840,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -756,16 +881,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.3
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.3 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.3` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
         > your database.
 
     ```shell
@@ -780,7 +905,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -820,16 +945,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.3
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.3 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.3` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
         > your database.
 
     ```shell
@@ -844,9 +969,9 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#deploying-fiftyone-teams)
+1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.1.3, but it is not required
+   version 2.2.0, but it is not required
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -940,19 +1065,44 @@ A minimal example `values.yaml` may be found
         > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
         > ```
 
+### Deploying On GKE
+
+Voxel51 FiftyOne Teams supports
+[Workload Identity Federation for GKE][about-wif]
+when installing via Helm into Google Kubernetes Engine (GKE).
+Workload Identity is achieved using service account annotations
+that can be defined in the `values.yaml` file when installing
+or upgrading the application.
+
+Please follow the steps
+[outlined by Google][howto-wif]
+to allow your cluster to utilize workload identity federation and to
+create a service account with the required IAM permissions.
+
+Once the cluster and service account are configured, you can permit your
+workloads to utilize the GCP service account via service account annotations
+defined in the `values.yaml` file:
+
+```yaml
+serviceAccount:
+  annotations:
+    iam.gke.io/gcp-service-account: <GSA_NAME>@<GSA_PROJECT>.iam.gserviceaccount.com
+```
+
 <!-- Reference Links -->
+[about-wif]: https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity
 [affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 [annotations]: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 [autoscaling]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 [container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
+[howto-wif]: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
 [image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
+[init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
@@ -967,4 +1117,7 @@ A minimal example `values.yaml` may be found
 [service-account]: https://kubernetes.io/docs/concepts/security/service-accounts/
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+[topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
+[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
