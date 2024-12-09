@@ -144,7 +144,7 @@ appSettings:
 
   # -- Secret variables to be passed to the fiftyone-app containers.
   secretEnv: {}
-  # ENV_VAR_NAME:
+  #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
   #     secretKey: the-key-in-the-secret
 
@@ -255,7 +255,7 @@ casSettings:
 
   # -- Secret variables to be passed to the teams-cas containers.
   secretEnv: {}
-  # ENV_VAR_NAME:
+  #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
   #     secretKey: the-key-in-the-secret
 
@@ -360,7 +360,7 @@ delegatedOperatorExecutorSettings:
 
   # -- Secret variables to be passed to the delegated-operator-executor containers.
   secretEnv: {}
-  # ENV_VAR_NAME:
+  #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
   #     secretKey: the-key-in-the-secret
 
@@ -528,7 +528,7 @@ pluginsSettings:
 
   # -- Secret variables to be passed to the teams-plugins containers.
   secretEnv: {}
-  # ENV_VAR_NAME:
+  #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
   #     secretKey: the-key-in-the-secret
 
@@ -692,7 +692,7 @@ teamsAppSettings:
 
   # -- Secret variables to be passed to the teams-app containers.
   secretEnv: {}
-  # ENV_VAR_NAME:
+  #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
   #     secretKey: the-key-in-the-secret
 
