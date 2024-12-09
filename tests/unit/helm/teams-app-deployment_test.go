@@ -513,7 +513,9 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 		{
 			"overrideEnv",
 			map[string]string{
-				"teamsAppSettings.env.TEST_KEY": "TEST_VALUE",
+				"teamsAppSettings.env.TEST_KEY":                                  "TEST_VALUE",
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "anExistingKey",      // pragma: allowlist secret
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[
@@ -585,6 +587,15 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          },
+          {
+            "name": "AN_ADDITIONAL_SECRET_ENV",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "an-existing-secret",
+                "key": "anExistingKey"
+              }
+            }
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar

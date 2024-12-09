@@ -312,6 +312,13 @@ Create a merged list of environment variables for delegated-operator-executor
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
+{{- range $key, $val := .Values.delegatedOperatorExecutorSettings.secretEnv }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.secretKey }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -350,6 +357,13 @@ Create a merged list of environment variables for fiftyone-teams-api
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
+{{- range $key, $val := .Values.apiSettings.secretEnv }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.secretKey }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -382,6 +396,13 @@ Create a merged list of environment variables for fiftyone-app
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
+{{- end }}
+{{- range $key, $val := .Values.appSettings.secretEnv }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.secretKey }}
 {{- end }}
 {{- end -}}
 
@@ -440,6 +461,13 @@ Create a merged list of environment variables for fiftyone-teams-cas
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
+{{- range $key, $val := .Values.casSettings.secretEnv }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.secretKey }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -474,6 +502,13 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
+{{- end }}
+{{- range $key, $val := .Values.pluginsSettings.secretEnv }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.secretKey }}
 {{- end }}
 {{- end -}}
 
@@ -513,5 +548,12 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
+{{- end }}
+{{- range $key, $val := .Values.teamsAppSettings.secretEnv }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.secretKey }}
 {{- end }}
 {{- end -}}

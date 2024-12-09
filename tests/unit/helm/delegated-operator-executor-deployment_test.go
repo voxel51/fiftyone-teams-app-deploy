@@ -422,8 +422,10 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
 		{
 			"overrideEnv",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.enabled":      "true",
-				"delegatedOperatorExecutorSettings.env.TEST_KEY": "TEST_VALUE",
+				"delegatedOperatorExecutorSettings.enabled":                                       "true",
+				"delegatedOperatorExecutorSettings.env.TEST_KEY":                                  "TEST_VALUE",
+				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
+				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "anExistingKey",      // pragma: allowlist secret
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
@@ -477,6 +479,15 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          },
+          {
+            "name": "AN_ADDITIONAL_SECRET_ENV",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "an-existing-secret",
+                "key": "anExistingKey"
+              }
+            }
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
