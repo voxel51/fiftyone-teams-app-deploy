@@ -26,7 +26,7 @@ apiSettings:
 
   # -- Secret variables to be passed to the teams-api containers.
   secretEnv: {}
-  # ENV_VAR_NAME:
+  #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
   #     secretKey: the-key-in-the-secret
 
