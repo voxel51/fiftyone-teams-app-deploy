@@ -13,7 +13,7 @@ spec:
   type: {{ .Values.apiSettings.service.type }}
   ports:
     - port: {{ .Values.apiSettings.service.port }}
-      targetPort: {{ .Values.apiSettings.service.containerPort | default 8000 }}
+      targetPort: {{ .Values.apiSettings.service.shortname }}
       protocol: TCP
       name: http
       {{- if and (eq .Values.apiSettings.service.type "NodePort") (.Values.apiSettings.service.nodePort) }}

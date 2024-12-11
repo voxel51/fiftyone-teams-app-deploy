@@ -14,7 +14,7 @@ spec:
   type: {{ .Values.pluginsSettings.service.type }}
   ports:
     - port: {{ .Values.pluginsSettings.service.port }}
-      targetPort: {{ .Values.pluginsSettings.service.containerPort | default 5151 }}
+      targetPort: {{ .Values.pluginsSettings.service.shortname }}
       protocol: TCP
       name: http
       {{- if and (eq .Values.pluginsSettings.service.type "NodePort") (.Values.pluginsSettings.service.nodePort) }}

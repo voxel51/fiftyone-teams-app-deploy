@@ -13,7 +13,7 @@ spec:
   type: {{ .Values.casSettings.service.type }}
   ports:
     - port: {{ .Values.casSettings.service.port }}
-      targetPort: {{ .Values.casSettings.service.containerPort | default 3000 }}
+      targetPort: {{ .Values.casSettings.service.shortname }}
       protocol: TCP
       name: http
       {{- if and (eq .Values.casSettings.service.type "NodePort") (.Values.casSettings.service.nodePort) }}

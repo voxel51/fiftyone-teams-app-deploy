@@ -242,7 +242,7 @@ func (s *serviceApiTemplateTest) TestPorts() {
 				expectedPortsJSON := `[
           {
             "port": 80,
-            "targetPort": 8000,
+            "targetPort": "teams-api",
             "protocol": "TCP",
             "name": "http"
           }
@@ -262,7 +262,7 @@ func (s *serviceApiTemplateTest) TestPorts() {
 				expectedPortsJSON := `[
           {
             "port": 80,
-            "targetPort": 8000,
+            "targetPort": "teams-api",
             "protocol": "TCP",
             "name": "http"
           }
@@ -283,7 +283,7 @@ func (s *serviceApiTemplateTest) TestPorts() {
 				expectedPortsJSON := `[
           {
             "port": 80,
-            "targetPort": 8000,
+            "targetPort": "teams-api",
             "protocol": "TCP",
             "name": "http",
             "nodePort": 9999
@@ -305,7 +305,28 @@ func (s *serviceApiTemplateTest) TestPorts() {
 				expectedPortsJSON := `[
           {
             "port": 88,
-            "targetPort": 8001,
+            "targetPort": "teams-api",
+            "protocol": "TCP",
+            "name": "http"
+          }
+        ]`
+				var expectedPorts []corev1.ServicePort
+				err := json.Unmarshal([]byte(expectedPortsJSON), &expectedPorts)
+				s.NoError(err)
+				s.Equal(expectedPorts, ports, "Ports should be equal")
+			},
+		},
+		{
+			"overrideServiceServiceShortnameValues",
+			map[string]string{
+				"apiSettings.service.shortname": "teams-override",
+				"apiSettings.service.port":      "88",
+			},
+			func(ports []corev1.ServicePort) {
+				expectedPortsJSON := `[
+          {
+            "port": 88,
+            "targetPort": "teams-override",
             "protocol": "TCP",
             "name": "http"
           }
