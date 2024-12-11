@@ -28,8 +28,6 @@ configured with your Kubernetes cluster.
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 <!-- markdownlint-enable line-length -->
 
-Please contact Voxel51 for more information regarding Fiftyone Teams.
-
 ## Table of Contents
 
 <!-- toc -->
