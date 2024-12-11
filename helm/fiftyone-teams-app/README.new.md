@@ -148,18 +148,11 @@ There are three modes for plugins
     - Cannot run custom plugins
 1. Shared Plugins
     - Users may run builtin and custom plugins
-    - Requires creating a Persistent Volume backed by NFSwith the PVCs
-      - `teams-api` (ReadWrite)
-      - `fiftyone-app` (ReadOnly)
     - Plugins run in the existing `fiftyone-app` deployment
       - Plugins resource consumption may starve `fiftyone-app`,
         causing the app to be slow or crash
 1. Dedicated Plugins
     - Users may run builtin and custom plugins
-    - Plugins run in an additional `teams-plugins` deployment
-    - Requires creating a Persistent Volume backed by NFS with the PVCs
-      - `teams-plugins` (ReadWrite)
-      - `fiftyone-app` (ReadOnly)
     - Plugins run in a dedicated `teams-plugins` deployment
       - Plugins resource consumption does not affect `fiftyone-app`
 
@@ -172,7 +165,7 @@ Early-adopter plugins installed manually must
 be redeployed using the FiftyOne Teams UI.
 
 For configuring your plugins, see
-[Configuring Plugins](../docs/plugin-configuration.md).
+[Configuring Plugins](../docs/configuring-plugins.md).
 
 ### Central Authentication Service
 
@@ -218,28 +211,9 @@ environment variable to the path of a chosen storage location.
 
 Supported locations are network mounted filesystems and cloud storage folders.
 
-- Network mounted filesystem
-  - In `values.yaml`, set the path for a Persistent Volume Claim mounted to the
-    `teams-api` deployment (not necessary to mount to other deployments) in both
-    - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-    - `teamsAppSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-  - Mount a Persistent Volume Claim with `ReadWrite` permissions to
-    the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path.
-    For an example, see
-    [Plugins Storage][plugins-storage].
-- Cloud storage folder
-  - In `values.yaml`, set the cloud storage path (for example
-    `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
-    in
-    - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-    - `apiSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-  - Ensure the
-    [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
-    loaded in the `teams-api` deployment have full edit capabilities to this bucket
-
-See the
-[configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
-for other configuration values that control the behavior of automatic snapshot archival.
+Please refer to the
+[snapshot archival configuration documentation](../docs/configuring-snapshot-archival.md)
+for configuring snapshot archival.
 
 ### FiftyOne Teams Authenticated API
 
@@ -288,73 +262,9 @@ configuration path.
 ### Proxies
 
 FiftyOne Teams supports routing traffic through proxy servers.
-To configure this, set the following environment variables on
-
-1. All pods, in the environment (`*.env`):
-
-    ```yaml
-    http_proxy: http://proxy.yourcompany.tld:3128
-    https_proxy: https://proxy.yourcompany.tld:3128
-    no_proxy: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
-    HTTP_PROXY: http://proxy.yourcompany.tld:3128
-    HTTPS_PROXY: https://proxy.yourcompany.tld:3128
-    NO_PROXY: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
-    ```
-
-    > **NOTE**: If you have enabled a
-    > [dedicated `teams-plugins`](../docs/plugin-configuration.md)
-    > deployment you will need to include `teams-plugins` in your `NO_PROXY` and
-    > `no_proxy` configurations
-
-    ---
-
-    > **NOTE**: If you have overridden your service names with `*.service.name`
-    > you will need to include the override service names in your `NO_PROXY` and
-    > `no_proxy` configurations instead
-
-1. The deployments based on the `fiftyone-teams-app` (`teamsAppSettings.env`) or
-   `fiftyone-teams-cas` (`casSettings.env`) images
-
-    ```yaml
-    GLOBAL_AGENT_HTTP_PROXY: http://proxy.yourcompany.tld:3128
-    GLOBAL_AGENT_HTTPS_PROXY: https://proxy.yourconpay.tld:3128
-    GLOBAL_AGENT_NO_PROXY: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
-    ```
-
-    > **NOTE**: If you have enabled a
-    > [dedicated `teams-plugins`](../docs/plugin-configuration.md)
-    > deployment you will need to include `teams-plugins` in your
-    > `GLOBAL_AGENT_NO_PROXY` configuration
-
-    ---
-
-    > **NOTE**: If you have overridden your service names with `*.service.name`
-    > you will need to include the override service names in your
-    > `GLOBAL_AGENT_NO_PROXY` configuration instead
-
-The `NO_PROXY`, `no_proxy`, and `GLOBAL_AGENT_NO_PROXY` values must include the
-Kubernetes service names that may communicate without going through a proxy
-server.
-By default, these service names are
-
-- `fiftyone-app`
-- `teams-app`
-- `teams-api`
-- `teams-cas`
-
-This list may also include `teams-plugins` if you have enabled a dedicated
-plugins service.
-
-If the service names were overridden in `*.service.name`, use the override
-values instead.
-
-By default, the Global Agent Proxy will log all outbound connections
-and identify which connections are routed through the proxy.
-To reduce the logging verbosity, add this environment variable to your `teamsAppSettings.env`
-
-```ini
-ROARR_LOG: false
-```
+Please refer to the
+[proxy configuration documentation](../docs/configuring-proxies.md)
+for information on how to configure proxies.
 
 ### Text Similarity
 
@@ -584,7 +494,6 @@ appSettings:
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
-[plugins-storage]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 [recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
