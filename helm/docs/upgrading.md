@@ -13,75 +13,37 @@ A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
 1. Edit the `values.yaml` file
-1. Deploy FiftyOne Teams with `helm install`
-    1. For a new installation
-        1. Create a new namespace and set the current namespace for your kubectl
-           context
+1, To upgrade an existing helm installation
 
-           ```shell
-           kubectl create namespace your-namespace-here
-           kubectl config set-context --current --namespace your-namespace-here
-           ```
+    1. Make sure you have followed the appropriate directions for
+       [Upgrading From Previous Versions](#upgrading-from-previous-versions)
 
-        1. If you are using the Voxel51 DockerHub registry to install your
-           container images, use the Voxel51-provided DockerHub credentials to
-           create an Image Pull Secret, and uncomment the `imagePullSecrets`
-           section of your `values.yaml`
+    1. Update your kubectl configuration to set your current namespace for
+       your kubectl context
 
-           ```shell
-           kubectl --namespace your-namespace-here create secret generic \
-           regcred --from-file=.dockerconfigjson=./voxel51-docker.json \
-           --type kubernetes.io/dockerconfigjson
-           ```
+        ```shell
+        kubectl config set-context --current --namespace your-namespace-here
+        ```
 
-        1. Use your Voxel51-provided License file to create a FiftyOne License
-           Secret
+    1. Update your Voxel51 Helm repository and upgrade your FiftyOne Teams
+       deployment
 
-           ```shell
-           kubectl --namespace your-namepace-here create secret generic \
-           fiftyone-license --from-file=license=./your-license-file
-           ```
-
-        1. Add the Voxel51 Helm repository and install FiftyOne Teams
-
-           ```shell
-           helm repo add voxel51 https://helm.fiftyone.ai
-           helm repo update voxel51
-           helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
-           -f ./values.yaml
-           ```
-
-    1. To upgrade an existing helm installation
-
-        1. Make sure you have followed the appropriate directions for
-           [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-
-        1. Update your kubectl configuration to set your current namespace for
-           your kubectl context
-
-           ```shell
-           kubectl config set-context --current --namespace your-namespace-here
-           ```
-
-        1. Update your Voxel51 Helm repository and upgrade your FiftyOne Teams
-           deployment
-
-           ```shell
+        ```shell
            helm repo update voxel51
            helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
            -f ./values.yaml
-           ```
+        ```
 
-        > **NOTE**  To view the changes Helm would apply during installations
-        > and upgrades, consider using
-        > [helm diff](https://github.com/databus23/helm-diff).
-        > Voxel51 is not affiliated with the author of this plugin.
-        >
-        > For example:
-        >
-        > ```shell
-        > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
-        > ```
+    > **NOTE**  To view the changes Helm would apply during installations
+    > and upgrades, consider using
+    > [helm diff](https://github.com/databus23/helm-diff).
+    > Voxel51 is not affiliated with the author of this plugin.
+    >
+    > For example:
+    >
+    > ```shell
+    > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
+    > ```
 
 ### From Early Adopter Versions (Versions less than 1.0)
 

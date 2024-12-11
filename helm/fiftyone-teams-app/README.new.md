@@ -78,16 +78,35 @@ kubectl --namespace your-namepace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 
+If you are using the Voxel51 DockerHub registry to install your
+container images, use the Voxel51-provided DockerHub credentials to
+create an Image Pull Secret, and uncomment the `imagePullSecrets`
+section of your `values.yaml`
+
+```shell
+kubectl --namespace your-namespace-here create secret generic \
+  regcred --from-file=.dockerconfigjson=./voxel51-docker.json \
+  --type kubernetes.io/dockerconfigjson
+```
+
 To use the Helm chart, add the Fiftyone helm repository and
 check that you have access to the chart:
 
 ```shell
 helm repo add voxel51 https://helm.fiftyone.ai
 helm repo update voxel51
+```
+
+Finally, edit your `values.yaml` file and install FiftyOne Teams:
+
+```shell
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
   --namespace your-namespace-here \
-  --set appSettings.env.FIFTYONE_DATABASE_ADMIN=true
+  -f ./values.yaml
 ```
+
+A minimal example `values.yaml` may be found
+[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
 ## Initial Installation vs. Upgrades
 
