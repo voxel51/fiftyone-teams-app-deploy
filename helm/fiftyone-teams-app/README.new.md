@@ -36,12 +36,11 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 
 - [Requirements](#requirements)
 - [Usage](#usage)
-- [Advanced Configuration](#advanced-configuration)
-  - [Plugins](#plugins)
+- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [Upgrading](#upgrading)
 - [Known Issues](#known-issues)
-- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
-- [FiftyOne Teams Features](#fiftyone-teams-features)
+- [Advanced Configuration](#advanced-configuration)
+  - [Plugins](#plugins)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -92,6 +91,47 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
   --set appSettings.env.FIFTYONE_DATABASE_ADMIN=true
 ```
 
+## Initial Installation vs. Upgrades
+
+Upgrades are more frequent than new installations.
+The chart's default behavior supports upgrades and the `values.yaml` contains
+
+```yaml
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: false
+```
+
+When performing an initial installation,
+in your `values.yaml`, set
+
+```yaml
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: true
+```
+
+After the initial installation, we recommend either commenting
+this environment variable or changing the value to `false`.
+
+When performing an upgrade, please review
+[Upgrading From Previous Versions](../docs/upgrading.md).
+
+## Upgrading
+
+Please refer to the
+[upgrade documentation](../docs/upgrading.md)
+for information about how to upgrade your specific version
+of fiftyone teams.
+
+## Known Issues
+
+Please refer to the
+[known-issues documentation](../docs/known-issues.md)
+for common issues and their resolution.
+For new issues, please submit a GitHub issue on the
+[repository](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
+
 ## Advanced Configuration
 
 ### Plugins
@@ -133,40 +173,6 @@ be redeployed using the FiftyOne Teams UI.
 
 For configuring your plugins, see
 [Configuring Plugins](../docs/plugin-configuration.md).
-
-## Upgrading
-
-## Known Issues
-
-## Initial Installation vs. Upgrades
-
-Upgrades are more frequent than new installations.
-The chart's default behavior supports upgrades and the `values.yaml` contains
-
-```yaml
-appSettings:
-  env:
-    FIFTYONE_DATABASE_ADMIN: false
-```
-
-When performing an initial installation,
-in your `values.yaml`, set
-
-```yaml
-appSettings:
-  env:
-    FIFTYONE_DATABASE_ADMIN: true
-```
-
-After the initial installation, we recommend either commenting
-this environment variable or changing the value to `false`.
-
-When performing an upgrade, please review
-[Upgrading From Previous Versions](../docs/upgrading.md).
-
-## FiftyOne Teams Features
-
-Consider if you will require these settings for your deployment.
 
 ### Central Authentication Service
 
