@@ -23,9 +23,6 @@ The FiftyoneTeams Helm chart is the recommended way to install and configure Fif
 <!-- markdownlint-enable line-length -->
 
 This page assumes general knowledge of FiftyoneTeams and how to use it.
-Using Helm to install FiftyoneTeams requires that Helm is properly installed
-and configured with your Kubernetes cluster.
-
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
 ## Table of Contents
