@@ -33,6 +33,8 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 <!-- toc -->
 
 - [Requirements](#requirements)
+  - [Kubernetes/Kubectl](#kuberneteskubectl)
+  - [Helm](#helm)
 - [Usage](#usage)
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [Upgrading](#upgrading)
@@ -51,14 +53,26 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 
 ## Requirements
 
+Helm and Kubectl must be installed and configured on your machine.
+
+### Kubernetes/Kubectl
+
 Kubernetes version >= 1.18 is required.
 However, it is recommended to use a
 [supported kubernetes version](https://kubernetes.io/releases/).
+Please refer to the
+[kubernetes installation documentation](https://kubernetes.io/docs/tasks/tools/)
+for steps on installing kubernetes and kubectl.
+
+### Helm
+
+Helm version >= 3.14 is required.
+
+Please refer to the
+[helm installation documentation](https://helm.sh/docs/intro/install/)
+for steps on installing helm.
 
 ## Usage
-
-Helm and Kubectl must be installed and configured on your machine.
-Please refer to the Helm documentation.
 
 FiftyOne Teams v2.0 introduces a new requirement for a license file.  This
 license file should be obtained from your Customer Success Team before
