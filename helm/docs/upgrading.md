@@ -305,12 +305,34 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    fiftyone migrate --info
    ```
 
-### FiftyOne Teams v2.2+ Delegated Operator Changes
+### From FiftyOne Teams Version 2.1.3
+
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
+   version 2.2.0, but it is not required
+    - Login to the FiftyOne Teams UI
+    - To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Voxel51 recommends that you upgrade all your datasets, but it is not
+   required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
+   uninterrupted during, and after, this migration
+
+   ```shell
+   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+   ```
+
+1. To ensure that all datasets are now at version 1.1.0, run
+
+   ```shell
+   fiftyone migrate --info
+   ```
+
+#### FiftyOne Teams v2.2+ Delegated Operator Changes
 
 FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
 below.
 
-#### Delegated Operation Capacity
+##### Delegated Operation Capacity
 
 By default, all deployments are provisioned with capacity to support up to 3
 delegated operations simultaneously. You will need to configure the [builtin
@@ -319,7 +341,7 @@ orchestrator, with enough workers, to be able to utilize this full capacity.
 If your team finds the usage is greater than this, please reach out to your
 Voxel51 support team for guidance and to increase this limit!
 
-#### Existing Orchestrators
+##### Existing Orchestrators
 
 > [!NOTE]
 > If you are currently utilizing an external orchestrator for delegated
