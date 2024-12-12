@@ -201,33 +201,8 @@ FiftyOne Teams v2.2 introduces a builtin orchestrator to run
 [Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
-This option can be added to any of the 3 existing
-[plugin modes](../docs/confuring-plugins.md). If you're using the builtin-operator
-only option, the Persistent Volume Claim should be omitted.
-
-To enable this mode
-
-- In `values.yaml`, set
-  - `delegatedOperatorExecutorSettings.enabled: true`
-  - The path for a Persistent Volume Claim mounted to the
-    `teams-do` deployment in
-    - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
-- See
-  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
-  - Mount a Persistent Volume Claim (PVC) that provides
-    - `ReadWrite` permissions to the `teams-do` deployment
-      at the `FIFTYONE_PLUGINS_DIR` path
-
-Optionally, the logs generated during running of a delegated operation can be
-uploaded to a network-mounted file system or cloud storage path that is
-available to this deployment. Logs are uploaded in this format:
-`<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
-In `values.yaml`, set `configured_path`
-
-- `delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
-
-To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+For configuring your delegated operators, see
+[Configuring Plugins](../docs/configuring-delegated-operators.md).
 
 ### FiftyOne Teams Authenticated API
 
