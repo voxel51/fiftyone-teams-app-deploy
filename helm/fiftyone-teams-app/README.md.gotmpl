@@ -35,8 +35,8 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 - [Usage](#usage)
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [Advanced Configuration](#advanced-configuration)
-  - [Central Authentication Service](#central-authentication-service)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
+  - [Central Authentication Service](#central-authentication-service)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [Plugins](#plugins)
   - [Proxies](#proxies)
@@ -162,6 +162,15 @@ When performing an upgrade, please review
 
 ## Advanced Configuration
 
+### Builtin Delegated Operator Orchestrator
+
+FiftyOne Teams v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+instead of (or in addition to) configuring your own orchestrator such as Airflow.
+
+For configuring your delegated operators, see
+[Configuring Plugins](../docs/configuring-delegated-operators.md).
+
 ### Central Authentication Service
 
 FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
@@ -195,15 +204,6 @@ to include the rule (add it before the `path: /` rule)
   serviceName: teams-cas
   servicePort: 80
 ```
-
-### Builtin Delegated Operator Orchestrator
-
-FiftyOne Teams v2.2 introduces a builtin orchestrator to run
-[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
-instead of (or in addition to) configuring your own orchestrator such as Airflow.
-
-For configuring your delegated operators, see
-[Configuring Plugins](../docs/configuring-delegated-operators.md).
 
 ### FiftyOne Teams Authenticated API
 
