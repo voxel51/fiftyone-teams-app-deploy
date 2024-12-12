@@ -40,12 +40,12 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 - [Upgrading](#upgrading)
 - [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
-  - [Plugins](#plugins)
   - [Central Authentication Service](#central-authentication-service)
-  - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
-  - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+  - [Plugins](#plugins)
   - [Proxies](#proxies)
+  - [Snapshot Archival](#snapshot-archival)
+  - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Text Similarity](#text-similarity)
 - [Values](#values)
 
@@ -165,39 +165,6 @@ For new issues, please submit a GitHub issue on the
 
 ## Advanced Configuration
 
-### Plugins
-
-FiftyOne Teams v1.3 introduced significant enhancements for
-[Plugins](https://docs.voxel51.com/plugins/index.html)
-to customize and enhance functionality.
-
-There are three modes for plugins
-
-1. Builtin Plugins Only
-    - This is the default mode
-    - Users may only run the builtin plugins shipped with Fiftyone Teams
-    - Cannot run custom plugins
-1. Shared Plugins
-    - Users may run builtin and custom plugins
-    - Plugins run in the existing `fiftyone-app` deployment
-      - Plugins resource consumption may starve `fiftyone-app`,
-        causing the app to be slow or crash
-1. Dedicated Plugins
-    - Users may run builtin and custom plugins
-    - Plugins run in a dedicated `teams-plugins` deployment
-      - Plugins resource consumption does not affect `fiftyone-app`
-
-To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
-
-To use the FiftyOne Teams UI to deploy plugins,
-navigate to `https://<DEPLOY_URL>/settings/plugins`.
-Early-adopter plugins installed manually must
-be redeployed using the FiftyOne Teams UI.
-
-For configuring your plugins, see
-[Configuring Plugins](../docs/configuring-plugins.md).
-
 ### Central Authentication Service
 
 FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
@@ -232,6 +199,56 @@ to include the rule (add it before the `path: /` rule)
   servicePort: 80
 ```
 
+### FiftyOne Teams Authenticated API
+
+FiftyOne Teams v1.3 introduced the capability to connect FiftyOne Teams SDKs
+through the FiftyOne Teams API (instead of direct MongoDB connection).
+
+To enable the FiftyOne Teams Authenticated API,
+[expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
+and
+[configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+
+### Plugins
+
+FiftyOne Teams v1.3 introduced significant enhancements for
+[Plugins](https://docs.voxel51.com/plugins/index.html)
+to customize and enhance functionality.
+
+There are three modes for plugins
+
+1. Builtin Plugins Only
+    - This is the default mode
+    - Users may only run the builtin plugins shipped with Fiftyone Teams
+    - Cannot run custom plugins
+1. Shared Plugins
+    - Users may run builtin and custom plugins
+    - Plugins run in the existing `fiftyone-app` deployment
+      - Plugins resource consumption may starve `fiftyone-app`,
+        causing the app to be slow or crash
+1. Dedicated Plugins
+    - Users may run builtin and custom plugins
+    - Plugins run in a dedicated `teams-plugins` deployment
+      - Plugins resource consumption does not affect `fiftyone-app`
+
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+
+To use the FiftyOne Teams UI to deploy plugins,
+navigate to `https://<DEPLOY_URL>/settings/plugins`.
+Early-adopter plugins installed manually must
+be redeployed using the FiftyOne Teams UI.
+
+For configuring your plugins, see
+[Configuring Plugins](../docs/configuring-plugins.md).
+
+### Proxies
+
+FiftyOne Teams supports routing traffic through proxy servers.
+Please refer to the
+[proxy configuration documentation](../docs/configuring-proxies.md)
+for information on how to configure proxies.
+
 ### Snapshot Archival
 
 Since version v1.5, FiftyOne Teams supports
@@ -245,16 +262,6 @@ Supported locations are network mounted filesystems and cloud storage folders.
 Please refer to the
 [snapshot archival configuration documentation](../docs/configuring-snapshot-archival.md)
 for configuring snapshot archival.
-
-### FiftyOne Teams Authenticated API
-
-FiftyOne Teams v1.3 introduced the capability to connect FiftyOne Teams SDKs
-through the FiftyOne Teams API (instead of direct MongoDB connection).
-
-To enable the FiftyOne Teams Authenticated API,
-[expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
-and
-[configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
@@ -289,13 +296,6 @@ mounted into pods or provided via environment variables.
 FiftyOne Teams continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
-
-### Proxies
-
-FiftyOne Teams supports routing traffic through proxy servers.
-Please refer to the
-[proxy configuration documentation](../docs/configuring-proxies.md)
-for information on how to configure proxies.
 
 ### Text Similarity
 
