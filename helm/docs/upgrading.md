@@ -304,3 +304,33 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
    ```shell
    fiftyone migrate --info
    ```
+
+### FiftyOne Teams v2.2+ Delegated Operator Changes
+
+FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
+below.
+
+#### Delegated Operation Capacity
+
+By default, all deployments are provisioned with capacity to support up to 3
+delegated operations simultaneously. You will need to configure the [builtin
+orchestrator](../README.md) or an external
+orchestrator, with enough workers, to be able to utilize this full capacity.
+If your team finds the usage is greater than this, please reach out to your
+Voxel51 support team for guidance and to increase this limit!
+
+#### Existing Orchestrators
+
+> [!NOTE]
+> If you are currently utilizing an external orchestrator for delegated
+> operations, such as Airflow or Flyte, you may have an outdated execution
+> definition that could negatively affect the experience. Please reach out to
+> Voxel51 support team for guidance on updating this code.
+
+Additionally,
+
+> [!WARNING]
+> If you cannot update the orchestrator DAG/workflow code, you must set
+> `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
+> in `values.yaml` in order for the delegated operation system to function
+> properly.
