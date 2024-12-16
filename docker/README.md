@@ -43,14 +43,14 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [Text Similarity](#text-similarity)
 - [Known Issues for FiftyOne Teams v1.6.0 and Above](#known-issues-for-fiftyone-teams-v160-and-above)
   - [Invitations Disabled for Internal Authentication Mode](#invitations-disabled-for-internal-authentication-mode)
-- [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
 - [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
 
 <!-- tocstop -->
 
 ## Requirements
 
-Docker must be installed and configured on your machine.
+[Docker Compose](https://docs.docker.com/compose/install/)
+must be installed and configured on your machine.
 
 ## Usage
 
@@ -84,6 +84,75 @@ We publish the following FiftyOne Teams private images to Docker Hub:
 - `voxel51/fiftyone-teams-cas`
 
 For Docker Hub credentials, please contact your Voxel51 support team.
+
+To deploy FiftyOne Teams:
+
+1. Choose to install using `legacy-auth` (recommended) or `internal-auth` by
+   `cd`ing into either the `legacy-auth` or `internal-auth` subdirectory in this
+   repository.
+1. In the directory chosen above
+    1. Rename the `env.template` file to `.env`
+    1. Edit the `.env` file, setting all the customer provided required
+    settings.
+       See the
+       [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
+       table.
+    1. Create a `compose.override.yaml` with any configuration overrides for
+       this deployment
+        1. For the first installation, set
+
+            ```yaml
+            services:
+              fiftyone-app-common:
+                environment:
+                  FIFTYONE_DATABASE_ADMIN: true
+            ```
+
+1. Make sure you have put your Voxel51-provided FiftyOne Teams license in the
+   local directory identified by the `LOCAL_LICENSE_FILE_DIR` configured in
+   your `.env` file.
+1. Deploy FiftyOne Teams
+    1. In the same directory, run
+
+        ```shell
+        docker-compose up -d
+        ```
+
+1. After the successful installation, and logging into Fiftyone Teams
+    1. In `compose.override.yaml`, remove the `FIFTYONE_DATABASE_ADMIN` override
+
+        ```yaml
+        services:
+          fiftyone-app-common:
+            environment:
+              # FIFTYONE_DATABASE_ADMIN: true
+        ```
+
+        > **NOTE**: This example shows commenting this line,
+        > however you may remove the line.
+
+        or set it to `false` like in
+
+        ```yaml
+        services:
+          fiftyone-app-common:
+            environment:
+              FIFTYONE_DATABASE_ADMIN: false
+        ```
+
+The FiftyOne Teams API is exposed on port `8000`.
+The FiftyOne Teams App is exposed on port `3000`.
+The FiftyOne Teams CAS is exposed on port `3030`.
+
+Configure an SSL endpoint (like a Load Balancer, Nginx Proxy, or similar)
+to route traffic to the appropriate endpoints. An example Nginx configuration
+for path-based routing can be found
+[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-path-routing.conf).
+Example Nginx configurations for hostname-based routing can be found
+[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf)
+for FiftyOne Teams App and FiftyOne Teams CAS services, and
+[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-api.conf)
+for the FiftyOne Teams API service.
 
 ## Initial Installation vs. Upgrades
 
@@ -489,79 +558,6 @@ when `FIFTYONE_AUTH_MODE` is set to `internal`.
 Starting in v2.2.0+, you can enable invitations for your organization through the
 CAS SuperAdmin UI. To enable sending invitations as emails, you must also
 configure an SMTP connection.
-
----
-
-## Deploying FiftyOne Teams
-
-1. Install
-   [Docker Compose](https://docs.docker.com/compose/install/)
-1. Choose to install using `legacy-auth` (recommended) or `internal-auth` by
-   `cd`ing into either the `legacy-auth` or `internal-auth` subdirectory in this
-   repository.
-1. In the directory chosen above
-    1. Rename the `env.template` file to `.env`
-    1. Edit the `.env` file, setting all the customer provided required
-    settings.
-       See the
-       [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
-       table.
-    1. Create a `compose.override.yaml` with any configuration overrides for
-       this deployment
-        1. For the first installation, set
-
-            ```yaml
-            services:
-              fiftyone-app-common:
-                environment:
-                  FIFTYONE_DATABASE_ADMIN: true
-            ```
-
-1. Make sure you have put your Voxel51-provided FiftyOne Teams license in the
-   local directory identified by the `LOCAL_LICENSE_FILE_DIR` configured in
-   your `.env` file.
-1. Deploy FiftyOne Teams
-    1. In the same directory, run
-
-        ```shell
-        docker-compose up -d
-        ```
-
-1. After the successful installation, and logging into Fiftyone Teams
-    1. In `compose.override.yaml`, remove the `FIFTYONE_DATABASE_ADMIN` override
-
-        ```yaml
-        services:
-          fiftyone-app-common:
-            environment:
-              # FIFTYONE_DATABASE_ADMIN: true
-        ```
-
-        > **NOTE**: This example shows commenting this line,
-        > however you may remove the line.
-
-        or set it to `false` like in
-
-        ```yaml
-        services:
-          fiftyone-app-common:
-            environment:
-              FIFTYONE_DATABASE_ADMIN: false
-        ```
-
-The FiftyOne Teams API is exposed on port `8000`.
-The FiftyOne Teams App is exposed on port `3000`.
-The FiftyOne Teams CAS is exposed on port `3030`.
-
-Configure an SSL endpoint (like a Load Balancer, Nginx Proxy, or similar)
-to route traffic to the appropriate endpoints. An example Nginx configuration
-for path-based routing can be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-path-routing.conf).
-Example Nginx configurations for hostname-based routing can be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf)
-for FiftyOne Teams App and FiftyOne Teams CAS services, and
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-api.conf)
-for the FiftyOne Teams API service.
 
 ---
 
