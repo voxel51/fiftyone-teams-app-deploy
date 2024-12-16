@@ -157,7 +157,7 @@ When performing an initial installation, in `compose.override.yaml` set
 When performing a FiftyOne Teams upgrade, set
 `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
 See
-[Upgrading From Previous Versions](./docs/docs/upgrading.md)
+[Upgrading From Previous Versions](./docs/upgrading.md)
 
 The environment variable `FIFTYONE_DATABASE_ADMIN`
 controls whether the database may be migrated.
