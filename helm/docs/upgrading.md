@@ -63,7 +63,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 > **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
-> [Central Authentication Service](../README.new.md)
+> [Central Authentication Service](../README.md)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
