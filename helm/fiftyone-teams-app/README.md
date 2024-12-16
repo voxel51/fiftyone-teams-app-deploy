@@ -22,7 +22,7 @@ The FiftyoneTeams Helm chart is the recommended way to install and configure Fif
 
 <!-- markdownlint-enable line-length -->
 
-This page assumes general knowledge of FiftyoneTeams and how to use it.
+This page assumes general knowledge of Fiftyone Teams and how to use it.
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
 ## Table of Contents
