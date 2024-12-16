@@ -34,6 +34,7 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [Helm](#helm)
 - [Usage](#usage)
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
@@ -158,6 +159,14 @@ this environment variable or changing the value to `false`.
 
 When performing an upgrade, please review
 [Upgrading From Previous Versions](../docs/upgrading.md).
+
+## Known Issues
+
+Please refer to the
+[known-issues documentation](../docs/known-issues.md)
+for common issues and their resolution.
+For new issues, please submit a GitHub issue on the
+[repository](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
 
 ## Advanced Configuration
 

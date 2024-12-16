@@ -29,20 +29,16 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
 - [Requirements](#requirements)
 - [Usage](#usage)
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
-    - [Builtin Plugins Only](#builtin-plugins-only)
-    - [Shared Plugins](#shared-plugins)
-    - [Dedicated Plugins](#dedicated-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
   - [Text Similarity](#text-similarity)
-- [Known Issues for FiftyOne Teams v1.6.0 and Above](#known-issues-for-fiftyone-teams-v160-and-above)
-  - [Invitations Disabled for Internal Authentication Mode](#invitations-disabled-for-internal-authentication-mode)
 - [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
 
 <!-- tocstop -->
@@ -207,6 +203,14 @@ quickstart  0.21.2
 When performing an upgrade, please review
 [Upgrading From Previous Versions](docs/upgrading.md).
 
+## Known Issues
+
+Please refer to the
+[known-issues documentation](docs/known-issues.md)
+for common issues and their resolution.
+For new issues, please submit a GitHub issue on the
+[repository](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
+
 ## Advanced Configuration
 
 ### Builtin Delegated Operator Orchestrator
@@ -215,32 +219,8 @@ FiftyOne Teams v2.2 introduces a builtin orchestrator to run
 [Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
-This option can be added to any of the 3 existing
-[plugin modes](#fiftyone-teams-plugins).
-
-To enable this mode and launch worker containers, use
-[legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
-in conjunction with one of the 3 plugin configurations.
-
-- Example `docker compose` command for enabling this mode on top of dedicated
-  plugins mode, from the `legacy-auth` directory
-
-    ```shell
-    docker compose \
-      -f compose.dedicated-plugins.yaml \
-      -f compose.delegated-operators.yaml \
-      -f compose.override.yaml \
-      up --d
-    ```
-
-Optionally, the logs generated during running of a delegated operation can be
-uploaded to a network-mounted file system or cloud storage path that is
-available to this deployment. Logs are uploaded in this format:
-`<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
-Set `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH` to `configured_path`
-
-To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+For configuring your delegated operators, see
+[Configuring Plugins](docs/configuring-delegated-operators.md).
 
 ### Central Authentication Service
 
@@ -292,43 +272,18 @@ To upgrade from versions prior to FiftyOne Teams v1.6
   `CAS_BIND_PORT`
 
 > **NOTE**: See
-> [Upgrading From Previous Versions](../docs/upgrading.md)
+> [Upgrading From Previous Versions](docs/upgrading.md)
 
 ### Snapshot Archival
 
 Since version v1.5, FiftyOne Teams supports
 [archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
 to cold storage locations to prevent filling up the MongoDB database.
-To enable this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-environment variable to the path of a chosen storage location.
-
 Supported locations are network mounted filesystems and cloud storage folders.
 
-- Network mounted filesystem
-  - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to the
-    mounted filesystem path in these containers
-    - `fiftyone-api`
-    - `teams-app`
-  - Mount the filesystem to the `fiftyone-api` container
-    (`teams-app` does not need this despite the variable set above).
-    For an example, see
-    [legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml).
-- Cloud storage folder
-  - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to a
-    cloud storage path (for example
-    `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
-    in these containers
-    - `fiftyone-api`
-    - `teams-app`
-  - Ensure the
-    [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
-    loaded in the `fiftyone-api` container have full edit capabilities to
-    this bucket
-
-See the
-[configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
-for other configuration values that control the behavior of automatic snapshot
-archival.
+Please refer to the
+[snapshot archival configuration documentation](docs/configuring-snapshot-archival.md)
+for configuring snapshot archival.
 
 ### FiftyOne Teams Authenticated API
 
@@ -380,59 +335,8 @@ To use the FiftyOne Teams UI to deploy plugins, navigate to
 `https://<DEPLOY_URL>/settings/plugins`. Early-adopter plugins installed
 manually must be redeployed using the FiftyOne Teams UI.
 
-#### Builtin Plugins Only
-
-Enabled by default. No additional configurations are required.
-
-#### Shared Plugins
-
-Plugins run in the `fiftyone-app` service.
-To enable this mode, use the file
-[legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
-instead of
-[legacy-auth/compose.yaml](legacy-auth/compose.yaml).
-This compose file creates a new Docker Volume shared between FiftyOne Teams
-services.
-
-- Configure the services to access to the plugin volume
-  - `fiftyone-app` requires `read`
-  - `fiftyone-api` requires `read-write`
-- Example `docker compose` command for this mode from the `legacy-auth`
-directory
-
-    ```shell
-    docker compose \
-      -f compose.plugins.yaml \
-      -f compose.override.yaml \
-      up -d
-    ```
-
-#### Dedicated Plugins
-
-Plugins run in the `teams-plugins` service. To enable this mode, use the file
-[legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
-instead of
-[legacy-auth/compose.yaml](legacy-auth/compose.yaml).
-This compose file creates a new Docker Volume shared between FiftyOne Teams
-services.
-
-- Configure the services to access to the plugin volume
-  - `teams-plugins` requires `read`
-  - `fiftyone-api` requires `read-write`
-- If you are
-  [using a proxy](#proxies),
-  add the `teams-plugins` service name to your environment variables
-  - `no_proxy`
-  - `NO_PROXY`
-- Example `docker compose` command for this mode from the `legacy-auth`
-  directory
-
-    ```shell
-    docker compose \
-      -f compose.dedicated-plugins.yaml \
-      -f compose.override.yaml \
-      up --d
-    ```
+For configuring your plugins, see
+[Configuring Plugins](docs/configuring-plugins.md).
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
@@ -471,52 +375,9 @@ providing an alternate configuration path.
 ### Proxies
 
 FiftyOne Teams supports routing traffic through proxy servers.
-To configure this, set following environment variables in your
-`compose.override.yaml`
-
-1. All services
-
-    ```yaml
-    http_proxy: ${HTTP_PROXY_URL}
-    https_proxy: ${HTTPS_PROXY_URL}
-    no_proxy: ${NO_PROXY_LIST}
-    HTTP_PROXY: ${HTTP_PROXY_URL}
-    HTTPS_PROXY: ${HTTPS_PROXY_URL}
-    NO_PROXY: ${NO_PROXY_LIST}
-    ```
-
-1. All services based on the `fiftyone-teams-app` and `fiftyone-teams-cas`
-   images
-
-    ```yaml
-    GLOBAL_AGENT_HTTP_PROXY: ${HTTP_PROXY_URL}
-    GLOBAL_AGENT_HTTPS_PROXY: ${HTTPS_PROXY_URL}
-    GLOBAL_AGENT_NO_PROXY: ${NO_PROXY_LIST}
-    ```
-
-The environment variable `NO_PROXY_LIST` value should be a comma-separated list
-of Docker Compose services that may communicate without going through a proxy
-server. By default these service names are:
-
-- `fiftyone-app`
-- `teams-api`
-- `teams-app`
-- `teams-cas`
-- `teams-plugins`
-
-Examples of these settings are included in the FiftyOne Teams configuration files
-
-- [common-services.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/common-services.yaml)
-- [legacy-auth/env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/legacy-auth/env.template)
-
-By default, the Global Agent Proxy will log all outbound connections and
-identify which connections are routed through the proxy.
-To reduce the logging verbosity, add this environment variable to your
-`teams-app` and `teams-cas` services.
-
-```yaml
-ROARR_LOG: false
-```
+Please refer to the
+[proxy configuration documentation](docs/configuring-proxies.md)
+for information on how to configure proxies.
 
 ### Text Similarity
 
@@ -542,22 +403,6 @@ services:
 
 For more information, see the docs for
 [Docker Compose Extend](https://docs.docker.com/compose/extends/).
-
-## Known Issues for FiftyOne Teams v1.6.0 and Above
-
-### Invitations Disabled for Internal Authentication Mode
-
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-includes both
-[`legacy` authentication mode][legacy-auth-mode]
-and
-[`internal` authentication mode][internal-auth-mode].
-
-Prior to v2.2.0, inviting users to join your FiftyOne Teams instance was not supported
-when `FIFTYONE_AUTH_MODE` is set to `internal`.
-Starting in v2.2.0+, you can enable invitations for your organization through the
-CAS SuperAdmin UI. To enable sending invitations as emails, you must also
-configure an SMTP connection.
 
 ---
 
