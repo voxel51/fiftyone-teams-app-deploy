@@ -18,7 +18,7 @@
 ![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.3.0](https://img.shields.io/badge/AppVersion-v2.3.0-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
-The FiftyoneTeams Helm chart is the recommended way to install and configure FiftyoneTeams on Kubernetes.
+The Fiftyone Teams Helm chart is the recommended way to install and configure Fiftyone Teams on Kubernetes.
 
 <!-- markdownlint-enable line-length -->
 
