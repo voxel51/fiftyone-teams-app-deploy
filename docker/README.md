@@ -220,7 +220,7 @@ FiftyOne Teams v2.2 introduces a builtin orchestrator to run
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
 For configuring your delegated operators, see
-[Configuring Plugins](./docs/configuring-delegated-operators.md).
+[Configuring Delegated Operators](./docs/configuring-delegated-operators.md).
 
 ### Central Authentication Service
 
