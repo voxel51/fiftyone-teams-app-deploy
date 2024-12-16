@@ -54,7 +54,7 @@ services.
   - `teams-plugins` requires `read`
   - `fiftyone-api` requires `read-write`
 - If you are
-  [using a proxy](./configuring-proxies.md),
+  [using a proxy](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/configuring-proxies.md),
   add the `teams-plugins` service name to your environment variables
   - `no_proxy`
   - `NO_PROXY`

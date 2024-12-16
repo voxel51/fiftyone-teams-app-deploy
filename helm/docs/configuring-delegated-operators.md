@@ -15,7 +15,8 @@
 # Configuring FiftyOne Teams Delegated Operators
 
 This option can be added to any of the 3 existing
-[plugin modes](./confuring-plugins.md). If you're using the builtin-operator
+[plugin modes](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/confuring-plugins.md).
+If you're using the builtin-operator
 only option, the Persistent Volume Claim should be omitted.
 
 To enable this mode
@@ -26,7 +27,7 @@ To enable this mode
     `teams-do` deployment in
     - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Teams Plugins](./plugins-storage.md)
+  [Adding Shared Storage for FiftyOne Teams Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-do` deployment
       at the `FIFTYONE_PLUGINS_DIR` path

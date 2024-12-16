@@ -34,7 +34,6 @@ Please contact Voxel51 for more information regarding Fiftyone Teams.
   - [Helm](#helm)
 - [Usage](#usage)
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
-- [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
@@ -158,15 +157,7 @@ After the initial installation, we recommend either commenting
 this environment variable or changing the value to `false`.
 
 When performing an upgrade, please review
-[Upgrading From Previous Versions](../docs/upgrading.md).
-
-## Known Issues
-
-Please refer to the
-[known-issues documentation](../docs/known-issues.md)
-for common issues and their resolution.
-For new issues, please submit a GitHub issue on the
-[repository](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
+[Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
 
 ## Advanced Configuration
 
@@ -177,7 +168,7 @@ FiftyOne Teams v2.2 introduces a builtin orchestrator to run
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
 For configuring your delegated operators, see
-[Configuring Plugins](../docs/configuring-delegated-operators.md).
+[Configuring Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 
 ### Central Authentication Service
 
@@ -254,13 +245,13 @@ Early-adopter plugins installed manually must
 be redeployed using the FiftyOne Teams UI.
 
 For configuring your plugins, see
-[Configuring Plugins](../docs/configuring-plugins.md).
+[Configuring Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-plugins.md).
 
 ### Proxies
 
 FiftyOne Teams supports routing traffic through proxy servers.
 Please refer to the
-[proxy configuration documentation](../docs/configuring-proxies.md)
+[proxy configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md)
 for information on how to configure proxies.
 
 ### Snapshot Archival
@@ -271,7 +262,7 @@ to cold storage locations to prevent filling up the MongoDB database.
 Supported locations are network mounted filesystems and cloud storage folders.
 
 Please refer to the
-[snapshot archival configuration documentation](../docs/configuring-snapshot-archival.md)
+[snapshot archival configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-snapshot-archival.md)
 for configuring snapshot archival.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`

@@ -15,7 +15,7 @@
 # Configuring FiftyOne Teams Delegated Operators
 
 This option can be added to any of the 3 existing
-[plugin modes](./configuring-plugins.md).
+[plugin modes](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/configuring-plugins.md).
 
 To enable this mode and launch worker containers, use
 [legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
