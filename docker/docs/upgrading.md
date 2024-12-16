@@ -27,7 +27,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 > (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
-> [Central Authentication Service](../README.md)
+> [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
@@ -73,7 +73,7 @@ existing configuration to migrate to a new Auth0 Tenant.
    `/cas/*` traffic to the `teams-cas` service.
    Example nginx configurations can be found
    [here](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
-1. [Upgrade to FiftyOne Teams v2.3.0](../README.md)
+1. [Upgrade to FiftyOne Teams v2.3.0](#upgrading-from-previous-versions)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
@@ -109,7 +109,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 > (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
-> [Central Authentication Service](../README.md)
+> [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
@@ -143,7 +143,7 @@ existing configuration to migrate to a new Auth0 Tenant.
     > **NOTE**: For the `CAS_*` variables, consider using
     > the seed values from the `.env.template` file.
     > See
-    > [Central Authentication Service](../README.md)
+    > [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
 1. Set the `LOCAL_LICENSE_FILE_DIR` value in your .env file and copy the
    license file to the `LOCAL_LICENSE_FILE_DIR` directory on your FiftyOne
    Teams docker compose host.
@@ -168,7 +168,7 @@ existing configuration to migrate to a new Auth0 Tenant.
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](../README.md)
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
@@ -225,7 +225,7 @@ existing configuration to migrate to a new Auth0 Tenant.
    mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
    ```
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](../README.md)
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
 1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     - Login to the FiftyOne Teams UI
     - To obtain the CLI command to install the FiftyOne SDK associated with
@@ -247,7 +247,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](../README.md)
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
    version 2.2.0, but it is not required
    - Login to the FiftyOne Teams UI
@@ -297,8 +297,9 @@ below.
 #### Delegated Operation Capacity
 
 By default, all deployments are provisioned with capacity to support up to 3
-delegated operations simultaneously. You will need to configure the [builtin
-orchestrator](../README.md) or an external
+delegated operations simultaneously. You will need to configure the
+[builtin orchestrator](https://helm.fiftyone.ai/#builtin-delegated-operator-orchestrator)
+or an external
 orchestrator, with enough workers, to be able to utilize this full capacity.
 If your team finds the usage is greater than this, please reach out to your
 Voxel51 support team for guidance and to increase this limit!
