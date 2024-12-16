@@ -157,7 +157,7 @@ When performing an initial installation, in `compose.override.yaml` set
 When performing a FiftyOne Teams upgrade, set
 `services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
 See
-[Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/upgrading.md)
+[Upgrading From Previous Versions](./docs/docs/upgrading.md)
 
 The environment variable `FIFTYONE_DATABASE_ADMIN`
 controls whether the database may be migrated.
@@ -201,12 +201,12 @@ quickstart  0.21.2
 ```
 
 When performing an upgrade, please review
-[Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/upgrading.md)
+[Upgrading From Previous Versions](./docs/upgrading.md)
 
 ## Known Issues
 
 Please refer to the
-[known-issues documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/known-issues.md)
+[known-issues documentation](./docs/known-issues.md)
 for common issues and their resolution.
 For new issues, please submit a GitHub issue on the
 [repository](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
@@ -220,7 +220,7 @@ FiftyOne Teams v2.2 introduces a builtin orchestrator to run
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
 For configuring your delegated operators, see
-[Configuring Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/configuring-delegated-operators.md).
+[Configuring Plugins](./docs/configuring-delegated-operators.md).
 
 ### Central Authentication Service
 
@@ -272,7 +272,7 @@ To upgrade from versions prior to FiftyOne Teams v1.6
   `CAS_BIND_PORT`
 
 > **NOTE**: See
-> [Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/upgrading.md)
+> [Upgrading From Previous Versions](./docs/upgrading.md)
 
 ### Snapshot Archival
 
@@ -282,7 +282,7 @@ to cold storage locations to prevent filling up the MongoDB database.
 Supported locations are network mounted filesystems and cloud storage folders.
 
 Please refer to the
-[snapshot archival configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/configuring-snapshot-archival.md)
+[snapshot archival configuration documentation](./docs/configuring-snapshot-archival.md)
 for configuring snapshot archival.
 
 ### FiftyOne Teams Authenticated API
@@ -292,7 +292,7 @@ through the FiftyOne Teams API (instead of creating a direct connection to
 MongoDB).
 
 To enable the FiftyOne Teams Authenticated API you will need to
-[expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/expose-teams-api.md)
+[expose the FiftyOne Teams API endpoint](./docs/expose-teams-api.md)
 and
 [configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
 
@@ -336,7 +336,7 @@ To use the FiftyOne Teams UI to deploy plugins, navigate to
 manually must be redeployed using the FiftyOne Teams UI.
 
 For configuring your plugins, see
-[Configuring Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/configuring-plugins.md).
+[Configuring Plugins](./docs/configuring-plugins.md).
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
@@ -376,7 +376,7 @@ providing an alternate configuration path.
 
 FiftyOne Teams supports routing traffic through proxy servers.
 Please refer to the
-[proxy configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/configuring-proxies.md)
+[proxy configuration documentation](./docs/configuring-proxies.md)
 for information on how to configure proxies.
 
 ### Text Similarity

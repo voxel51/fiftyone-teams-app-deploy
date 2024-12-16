@@ -27,7 +27,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 > (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
-> [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
+> [Central Authentication Service](../README.md#central-authentication-service)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
 > documentation before completing your upgrade.
@@ -298,7 +298,7 @@ below.
 
 By default, all deployments are provisioned with capacity to support up to 3
 delegated operations simultaneously. You will need to configure the
-[builtin orchestrator](https://helm.fiftyone.ai/#builtin-delegated-operator-orchestrator)
+[builtin orchestrator](../README.md#builtin-delegated-operator-orchestrator)
 or an external
 orchestrator, with enough workers, to be able to utilize this full capacity.
 If your team finds the usage is greater than this, please reach out to your
