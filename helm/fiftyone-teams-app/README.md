@@ -18,12 +18,31 @@
 ![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.3.0](https://img.shields.io/badge/AppVersion-v2.3.0-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
-The Fiftyone Teams Helm chart is the recommended way to install and configure Fiftyone Teams on Kubernetes.
+The FiftyoneTeams Helm chart is the recommended way to install and configure FiftyoneTeams on Kubernetes.
 
 <!-- markdownlint-enable line-length -->
 
 This page assumes general knowledge of Fiftyone Teams and how to use it.
 Please contact Voxel51 for more information regarding Fiftyone Teams.
+
+## :warning: Important :warning:
+
+### Version 2.0+ License File Requirement
+
+FiftyOne Teams v2.0 introduces a new requirement for a license file.
+This license file should be obtained from your Customer Success Team
+before upgrading to FiftyOne Teams 2.0 or beyond.
+
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-before-fiftyone-teams-version-110)
+for steps on how to add your license file.
+
+### Version 2.2+ Delegated Operator Changes
+
+FiftyOne Teams v2.2 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-teams-version-213)
+for steps on how to upgrade your delegated operators.
 
 ## Table of Contents
 

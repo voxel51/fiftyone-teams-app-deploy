@@ -22,6 +22,25 @@ install and configure FiftyoneTeams on Docker.
 This page assumes general knowledge of FiftyoneTeams and how to use it.
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
+## :warning: Important :warning:
+
+### Version 2.0+ License File Requirement
+
+FiftyOne Teams v2.0 introduces a new requirement for a license file.
+This license file should be obtained from your Customer Success Team
+before upgrading to FiftyOne Teams 2.0 or beyond.
+
+Please refer to the
+[upgrade documentation](./docs/upgrading.md#from-before-fiftyone-teams-version-110)
+for steps on how to add your license file.
+
+### Version 2.2+ Delegated Operator Changes
+
+FiftyOne Teams v2.2 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](./docs/upgrading.md#from-fiftyone-teams-version-213)
+for steps on how to upgrade your delegated operators.
+
 ## Table of Contents
 
 <!-- toc -->
