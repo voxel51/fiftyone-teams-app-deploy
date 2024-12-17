@@ -28,10 +28,10 @@ instead of
 to create a new Docker Volume shared between FiftyOne Teams
 services.
 
-- Configure the services to access to the plugin volume
+1. Configure the services to access to the plugin volume
   - `fiftyone-app` requires `read`
   - `fiftyone-api` requires `read-write`
-- Example `docker compose` command for this mode from the `legacy-auth`
+1. Example `docker compose` command for this mode from the `legacy-auth`
 directory
 
     ```shell
