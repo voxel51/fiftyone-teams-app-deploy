@@ -48,7 +48,14 @@ server. By default these service names are:
 - `teams-cas`
 - `teams-plugins`
 
-Examples of these settings are included in the FiftyOne Teams configuration files
+An example of the `NO_PROXY_LIST` is shown below:
+
+```shell
+NO_PROXY_LIST: "fiftyone-app,teams-api,teams-app,teams-cas,teams-plugins"
+```
+
+Examples of these settings are also included in the
+FiftyOne Teams configuration files:
 
 - [common-services.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/common-services.yaml)
 - [legacy-auth/env.template](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/legacy-auth/env.template)
