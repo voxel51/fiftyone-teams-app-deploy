@@ -144,7 +144,7 @@ existing configuration to migrate to a new Auth0 Tenant.
     > the seed values from the `.env.template` file.
     > See
     > [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
-1. Set the `LOCAL_LICENSE_FILE_DIR` value in your .env file and copy the
+1. In your `.env` file, set the `LOCAL_LICENSE_FILE_DIR` variable value. Copy the
    license file to the `LOCAL_LICENSE_FILE_DIR` directory on your FiftyOne
    Teams docker compose host.
 
