@@ -59,7 +59,7 @@ existing configuration to migrate to a new Auth0 Tenant.
     - `FIFTYONE_ENCRYPTION_KEY`
     - `FIFTYONE_API_URI`
     - `FIFTYONE_AUTH_SECRET`
-1. Set the `LOCAL_LICENSE_FILE_DIR` value in your .env file and copy the
+1. In your `.env` file, set the `LOCAL_LICENSE_FILE_DIR` variable value. Copy the
    license file to the `LOCAL_LICENSE_FILE_DIR` directory on your FiftyOne
    Teams docker compose host.
 
