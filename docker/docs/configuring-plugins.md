@@ -30,8 +30,8 @@ services.
 
 1. Configure the services to access to the plugin volume
 
-  - `fiftyone-app` requires `read`
-  - `fiftyone-api` requires `read-write`
+- `fiftyone-app` requires `read`
+- `fiftyone-api` requires `read-write`
 
 1. Example `docker compose` command for this mode from the `legacy-auth`
 directory
@@ -55,15 +55,15 @@ services.
 
 1. Configure the services to access to the plugin volume
 
-  - `teams-plugins` requires `read`
-  - `fiftyone-api` requires `read-write`
+- `teams-plugins` requires `read`
+- `fiftyone-api` requires `read-write`
 
 1. If you are
   [using a proxy](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/configuring-proxies.md),
   add the `teams-plugins` service name to your environment variables
 
-  - `no_proxy`
-  - `NO_PROXY`
+- `no_proxy`
+- `NO_PROXY`
 
 1. Example `docker compose` command for this mode from the `legacy-auth`
   directory

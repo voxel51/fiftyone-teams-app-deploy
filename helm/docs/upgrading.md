@@ -3,15 +3,15 @@
 <!-- toc -->
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-  - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
-  - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
-  - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
-  - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
-  - [From FiftyOne Teams Version 2.0.0](#from-fiftyone-teams-version-200)
   - [From FiftyOne Teams Version 2.1.3](#from-fiftyone-teams-version-213)
     - [FiftyOne Teams v2.2+ Delegated Operator Changes](#fiftyone-teams-v22-delegated-operator-changes)
       - [Delegated Operation Capacity](#delegated-operation-capacity)
       - [Existing Orchestrators](#existing-orchestrators)
+  - [From FiftyOne Teams Version 2.0.0](#from-fiftyone-teams-version-200)
+  - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
+  - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
+  - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
+  - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
 
 <!-- tocstop -->
 
