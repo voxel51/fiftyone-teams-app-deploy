@@ -15,6 +15,23 @@
 # Configuring Proxies
 
 FiftyOne Teams supports routing traffic through proxy servers.
+
+The `NO_PROXY`, `no_proxy`, and `GLOBAL_AGENT_NO_PROXY` values must include the
+Kubernetes service names that may communicate without going through a proxy
+server.
+By default, these service names are
+
+- `fiftyone-app`
+- `teams-app`
+- `teams-api`
+- `teams-cas`
+
+This list may also include `teams-plugins` if you have enabled a dedicated
+plugins service.
+
+If the service names were overridden in `*.service.name`, use the override
+values instead.
+
 To configure this, set the following environment variables on
 
 1. All pods, in the environment (`*.env`):
@@ -58,22 +75,6 @@ To configure this, set the following environment variables on
     > **NOTE**: If you have overridden your service names with `*.service.name`
     > you will need to include the override service names in your
     > `GLOBAL_AGENT_NO_PROXY` configuration instead
-
-The `NO_PROXY`, `no_proxy`, and `GLOBAL_AGENT_NO_PROXY` values must include the
-Kubernetes service names that may communicate without going through a proxy
-server.
-By default, these service names are
-
-- `fiftyone-app`
-- `teams-app`
-- `teams-api`
-- `teams-cas`
-
-This list may also include `teams-plugins` if you have enabled a dedicated
-plugins service.
-
-If the service names were overridden in `*.service.name`, use the override
-values instead.
 
 By default, the Global Agent Proxy will log all outbound connections
 and identify which connections are routed through the proxy.
