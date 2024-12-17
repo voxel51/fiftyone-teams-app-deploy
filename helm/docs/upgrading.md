@@ -81,8 +81,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
-> The license file now contains all of the Auth0 configuration that was
-> previously provided through kubernetes secrets; you may remove those secrets
+> The license file contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets. You may remove those secrets
 > from your `values.yaml` and from any secrets created outside of the Voxel51
 > install process.
 
@@ -234,8 +234,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 > **NOTE**: If you had previously set
 > `teamsAppSettings.env.FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` to include your
-> Voxel51 private PyPI token, you can remove it from your configuration. The
-> Voxel51 private PyPI token is now loaded correctly from your license file.
+> Voxel51 private PyPI token, remove it from your configuration. The
+> Voxel51 private PyPI token is loaded from your license file.
 
 ---
 
@@ -261,16 +261,16 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
         fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.3
-    - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated with
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
+    1. Login to the FiftyOne Teams UI
+    1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.3 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.3` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
         > your database.
 
     ```shell
@@ -285,7 +285,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.1.3](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
    version 2.2.0, but it is not required
     1. Login to the FiftyOne Teams UI
