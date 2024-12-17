@@ -22,22 +22,25 @@ environment variable to the path of a chosen storage location.
 
 Supported locations are network-mounted filesystems and cloud storage folders.
 
-- Network-mounted filesystem
-  - In `values.yaml`, set the path for a Persistent Volume Claim mounted to the
+## Network-mounted filesystem
+
+- In `values.yaml`, set the path for a Persistent Volume Claim mounted to the
     `teams-api` deployment (not necessary to mount to other deployments) in both
-    - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-    - `teamsAppSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-  - Mount a Persistent Volume Claim with `ReadWrite` permissions to
+  - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+  - `teamsAppSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+- Mount a Persistent Volume Claim with `ReadWrite` permissions to
     the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path.
     For an example, see
     [Plugins Storage][plugins-storage].
-- Cloud storage folder
-  - In `values.yaml`, set the cloud storage path (for example
+
+## Cloud storage folder
+
+- In `values.yaml`, set the cloud storage path (for example
     `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
     in
-    - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-    - `apiSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-  - Ensure the
+  - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+  - `apiSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
+- Ensure the
     [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
     loaded in the `teams-api` deployment have full edit capabilities to this bucket
 
