@@ -1,12 +1,5 @@
 # Upgrading FiftyOne Teams
 
-Voxel51 assumes you use the published
-Helm Chart to deploy your FiftyOne Teams environment.
-If you are using a custom deployment
-mechanism, carefully review the changes in the
-[Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
-and update your deployment accordingly.
-
 <!-- toc -->
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
@@ -23,6 +16,13 @@ and update your deployment accordingly.
 <!-- tocstop -->
 
 ## Upgrading From Previous Versions
+
+Voxel51 assumes you use the published
+Helm Chart to deploy your FiftyOne Teams environment.
+If you are using a custom deployment
+mechanism, carefully review the changes in the
+[Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
+and update your deployment accordingly.
 
 A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
