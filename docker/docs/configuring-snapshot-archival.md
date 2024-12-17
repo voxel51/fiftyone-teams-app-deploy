@@ -20,7 +20,7 @@ to cold storage locations to prevent filling up the MongoDB database.
 To enable this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
 environment variable to the path of a chosen storage location.
 
-Supported locations are network mounted filesystems and cloud storage folders.
+Supported locations are network-mounted filesystems and cloud storage folders.
 
 - Network-mounted filesystem
   - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to the
