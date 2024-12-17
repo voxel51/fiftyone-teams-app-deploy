@@ -14,7 +14,7 @@
 
 # Configuring FiftyOne Teams Delegated Operators
 
-This option can be added to any of the 3 existing
+This option can be added to any of the three existing
 [plugin modes](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/confuring-plugins.md).
 If you're using the builtin-operator
 only option, the Persistent Volume Claim should be omitted.
