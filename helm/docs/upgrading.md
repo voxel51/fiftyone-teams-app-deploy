@@ -29,9 +29,9 @@ A minimal example `values.yaml` may be found
        deployment
 
         ```shell
-           helm repo update voxel51
-           helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
-           -f ./values.yaml
+        helm repo update voxel51
+        helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+          -f ./values.yaml
         ```
 
     > **NOTE**  To view the changes Helm would apply during installations
@@ -70,7 +70,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -98,15 +98,14 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
         1. This is not the default value in the Helm Chart and must be overridden
     1. When using path-based routing, update your ingress with the rule
-       (add it before the `path: /` rule)
 
         ```yaml
         ingress:
-            paths:
-              - path: /cas
-                pathType: Prefix
-                serviceName: teams-cas
-                servicePort: 80
+          paths:
+            - path: /cas
+              pathType: Prefix
+              serviceName: teams-cas
+              servicePort: 80
         ```
 
 1. Use the license file provided by the Voxel51 Customer Success Team to create
@@ -117,10 +116,10 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams v2.1.3](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams v2.3.0](#upgrading-from-previous-versions)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.1.3`
-1. Upgrade your FiftyOne SDKs to version 2.1.3
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.2.0`
+1. Upgrade your FiftyOne SDKs to version 2.2.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -138,7 +137,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -197,10 +196,10 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.1.3](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.1.3
-    - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated with
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
+    1. Login to the FiftyOne Teams UI
+    1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
