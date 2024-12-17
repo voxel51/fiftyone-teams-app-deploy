@@ -266,8 +266,8 @@ existing configuration to migrate to a new Auth0 Tenant.
 1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
    version 2.2.0, but it is not required
-   - Login to the FiftyOne Teams UI
-   - To obtain the CLI command to install the FiftyOne SDK associated with
+   1. Login to the FiftyOne Teams UI
+   1. To obtain the CLI command to install the FiftyOne SDK associated with
      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Voxel51 recommends that you upgrade all your datasets, but it is not
    required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
