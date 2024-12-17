@@ -30,8 +30,8 @@ services.
 
 1. Configure the services to access to the plugin volume
 
-- `fiftyone-app` requires `read`
-- `fiftyone-api` requires `read-write`
+  - `fiftyone-app` requires `read`
+  - `fiftyone-api` requires `read-write`
 
 1. Example `docker compose` command for this mode from the `legacy-auth`
 directory
