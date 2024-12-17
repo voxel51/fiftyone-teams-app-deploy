@@ -296,7 +296,7 @@ below.
 
 #### Delegated Operation Capacity
 
-By default, all deployments are provisioned with capacity to support up to 3
+By default, all deployments are provisioned with capacity to support up to three
 delegated operations simultaneously. You will need to configure the
 [builtin orchestrator](../README.md#builtin-delegated-operator-orchestrator)
 or an external
