@@ -69,7 +69,7 @@ existing configuration to migrate to a new Auth0 Tenant.
    mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
    ```
 
-1. Ensure your web server routes are updated to include routing
+1. Update your web server routes to include routing
    `/cas/*` traffic to the `teams-cas` service.
    Example nginx configurations can be found
    [here](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
