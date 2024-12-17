@@ -22,7 +22,7 @@ environment variable to the path of a chosen storage location.
 
 Supported locations are network mounted filesystems and cloud storage folders.
 
-- Network mounted filesystem
+- Network-mounted filesystem
   - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to the
     mounted filesystem path in these containers
     - `fiftyone-api`
