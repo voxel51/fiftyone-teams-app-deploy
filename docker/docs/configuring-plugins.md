@@ -48,7 +48,7 @@ To enable this mode, use the file
 [legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
 instead of
 [legacy-auth/compose.yaml](legacy-auth/compose.yaml).
-This compose file creates a new Docker Volume shared between FiftyOne Teams
+to create a new Docker Volume shared between FiftyOne Teams
 services.
 
 - Configure the services to access to the plugin volume
