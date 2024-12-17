@@ -45,7 +45,7 @@ existing configuration to migrate to a new Auth0 Tenant.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
-> The license file now contains all of the Auth0 configuration that was
+> The license file contains all of the Auth0 configuration that was
 > previously provided through kubernetes secrets; you may remove those secrets
 > from your `.env` and from any secrets created outside of the Voxel51
 > install process.
