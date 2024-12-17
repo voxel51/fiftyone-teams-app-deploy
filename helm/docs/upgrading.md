@@ -60,37 +60,82 @@ A minimal example `values.yaml` may be found
     > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
     > ```
 
-### From Early Adopter Versions (Versions less than 1.0)
+### From FiftyOne Teams Version 2.1.3
 
-Please contact your Voxel51 Customer Success
-team member to coordinate this upgrade.
-You will need to either create a new Identity Provider (IdP)
-or modify your existing configuration to migrate to a new Auth0 Tenant.
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
+   version 2.2.0, but it is not required
+    1. Login to the FiftyOne Teams UI
+    1. To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Voxel51 recommends that you upgrade all your datasets, but it is not
+   required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
+   uninterrupted during, and after, this migration
 
-### From Before FiftyOne Teams Version 1.1.0
+   ```shell
+   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+   ```
 
-> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0
-> requires upgrading the database and will interrupt all SDK connections.
-> You should coordinate this upgrade carefully with your end-users.
+1. To ensure that all datasets are now at version 1.1.0, run
 
----
+   ```shell
+   fiftyone migrate --info
+   ```
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
-> CAS requires additional configurations and consumes additional resources.
-> Please review the upgrade instructions, the
-> [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
-> documentation and the
-> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
-> documentation before completing your upgrade.
+#### FiftyOne Teams v2.2+ Delegated Operator Changes
 
----
+FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
+below.
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_
-> your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
-> You should coordinate this upgrade carefully with your end-users.
+##### Delegated Operation Capacity
 
----
+By default, all deployments are provisioned with capacity to support up to three
+delegated operations simultaneously. You will need to configure the
+[builtin orchestrator](https://helm.fiftyone.ai/#builtin-delegated-operator-orchestrator)
+or an external
+orchestrator, with enough workers, to be able to utilize this full capacity.
+If your team finds the usage is greater than this, please reach out to your
+Voxel51 support team for guidance and to increase this limit!
+
+##### Existing Orchestrators
+
+> [!NOTE]
+> If you are currently utilizing an external orchestrator for delegated
+> operations, such as Airflow or Flyte, you may have an outdated execution
+> definition that could negatively affect the experience. Please reach out to
+> Voxel51 support team for guidance on updating this code.
+
+Additionally,
+
+> [!WARNING]
+> If you cannot update the orchestrator DAG/workflow code, you must set
+> `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
+> in `values.yaml` in order for the delegated operation system to function
+> properly.
+
+### From FiftyOne Teams Version 2.0.0
+
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
+   version 2.2.0, but it is not required
+    1. Login to the FiftyOne Teams UI
+    1. To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+1. Voxel51 recommends that you upgrade all your datasets, but it is not
+   required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
+   uninterrupted during, and after, this migration
+
+   ```shell
+   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+   ```
+
+1. To ensure that all datasets are now at version 0.25.1, run
+
+   ```shell
+   fiftyone migrate --info
+   ```
+
+### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
 > **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
@@ -103,24 +148,25 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-1. In your `values.yaml`, set the required values
-    1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
-        1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
-           in the appropriate service pods
-    1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
-        1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
-           in the appropriate service pods
-    1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
-        1. This is not the default value in the Helm Chart and must be overridden
-    1. When using path-based routing, update your ingress with the rule
+> **NOTE**: If you had previously set
+> `teamsAppSettings.env.FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` to include your
+> Voxel51 private PyPI token, remove it from your configuration. The
+> Voxel51 private PyPI token is loaded from your license file.
 
-        ```yaml
-        ingress:
-          paths:
-            - path: /cas
-              pathType: Prefix
-              serviceName: teams-cas
-              servicePort: 80
+---
+
+1. Ensure all FiftyOne SDK users either
+    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
+
+      ```shell
+      FIFTYONE_DATABASE_ADMIN=false
+      ```
+
+    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
+      (this should generally be your default)
+
+        ```shell
+        unset FIFTYONE_DATABASE_ADMIN
         ```
 
 1. Use the license file provided by the Voxel51 Customer Success Team to create
@@ -131,14 +177,17 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams v2.3.0](#upgrading-from-previous-versions)
-    > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.2.0`
-1. Upgrade your FiftyOne SDKs to version 2.2.0
+1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
     1. Login to the FiftyOne Teams UI
-    1. To obtain the CLI command to install the FiftyOne SDK associated
-      with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+    1. To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
+
+    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
+    > this point.
+    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
+        > your database.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -233,7 +282,30 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     fiftyone migrate --info
     ```
 
-### From FiftyOne Teams Versions 1.6.0 to 1.7.1
+### From Before FiftyOne Teams Version 1.1.0
+
+> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0
+> requires upgrading the database and will interrupt all SDK connections.
+> You should coordinate this upgrade carefully with your end-users.
+
+---
+
+> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> CAS requires additional configurations and consumes additional resources.
+> Please review the upgrade instructions, the
+> [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
+> documentation and the
+> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
+> documentation before completing your upgrade.
+
+---
+
+> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_
+> your users to log in after the upgrade is complete.
+> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> You should coordinate this upgrade carefully with your end-users.
+
+---
 
 > **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
@@ -246,25 +318,24 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: If you had previously set
-> `teamsAppSettings.env.FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` to include your
-> Voxel51 private PyPI token, remove it from your configuration. The
-> Voxel51 private PyPI token is loaded from your license file.
+1. In your `values.yaml`, set the required values
+    1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
+           in the appropriate service pods
+    1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
+        1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
+           in the appropriate service pods
+    1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
+        1. This is not the default value in the Helm Chart and must be overridden
+    1. When using path-based routing, update your ingress with the rule
 
----
-
-1. Ensure all FiftyOne SDK users either
-    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
-
-      ```shell
-      FIFTYONE_DATABASE_ADMIN=false
-      ```
-
-    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
-      (this should generally be your default)
-
-        ```shell
-        unset FIFTYONE_DATABASE_ADMIN
+        ```yaml
+        ingress:
+          paths:
+            - path: /cas
+              pathType: Prefix
+              serviceName: teams-cas
+              servicePort: 80
         ```
 
 1. Use the license file provided by the Voxel51 Customer Success Team to create
@@ -275,17 +346,14 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
+1. [Upgrade to FiftyOne Teams v2.3.0](#upgrading-from-previous-versions)
+    > **NOTE**: At this step, FiftyOne SDK users will lose access to the
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.2.0`
+1. Upgrade your FiftyOne SDKs to version 2.2.0
     1. Login to the FiftyOne Teams UI
-    1. To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+    1. To obtain the CLI command to install the FiftyOne SDK associated
+      with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-
-    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
-    > this point.
-    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
-        > your database.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -297,77 +365,9 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     fiftyone migrate --info
     ```
 
-### From FiftyOne Teams Version 2.0.0
+### From Early Adopter Versions (Versions less than 1.0)
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
-1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.2.0, but it is not required
-    1. Login to the FiftyOne Teams UI
-    1. To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Voxel51 recommends that you upgrade all your datasets, but it is not
-   required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
-   uninterrupted during, and after, this migration
-
-   ```shell
-   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-   ```
-
-1. To ensure that all datasets are now at version 0.25.1, run
-
-   ```shell
-   fiftyone migrate --info
-   ```
-
-### From FiftyOne Teams Version 2.1.3
-
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
-1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.2.0, but it is not required
-    1. Login to the FiftyOne Teams UI
-    1. To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Voxel51 recommends that you upgrade all your datasets, but it is not
-   required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
-   uninterrupted during, and after, this migration
-
-   ```shell
-   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-   ```
-
-1. To ensure that all datasets are now at version 1.1.0, run
-
-   ```shell
-   fiftyone migrate --info
-   ```
-
-#### FiftyOne Teams v2.2+ Delegated Operator Changes
-
-FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
-below.
-
-##### Delegated Operation Capacity
-
-By default, all deployments are provisioned with capacity to support up to three
-delegated operations simultaneously. You will need to configure the
-[builtin orchestrator](https://helm.fiftyone.ai/#builtin-delegated-operator-orchestrator)
-or an external
-orchestrator, with enough workers, to be able to utilize this full capacity.
-If your team finds the usage is greater than this, please reach out to your
-Voxel51 support team for guidance and to increase this limit!
-
-##### Existing Orchestrators
-
-> [!NOTE]
-> If you are currently utilizing an external orchestrator for delegated
-> operations, such as Airflow or Flyte, you may have an outdated execution
-> definition that could negatively affect the experience. Please reach out to
-> Voxel51 support team for guidance on updating this code.
-
-Additionally,
-
-> [!WARNING]
-> If you cannot update the orchestrator DAG/workflow code, you must set
-> `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
-> in `values.yaml` in order for the delegated operation system to function
-> properly.
+Please contact your Voxel51 Customer Success
+team member to coordinate this upgrade.
+You will need to either create a new Identity Provider (IdP)
+or modify your existing configuration to migrate to a new Auth0 Tenant.
