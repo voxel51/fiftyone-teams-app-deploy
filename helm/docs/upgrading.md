@@ -130,7 +130,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. Validate that all datasets are now at version 0.25.1
+1. To ensure that all datasets are now at version 0.25.1, run
 
     ```shell
     fiftyone migrate --info
@@ -213,7 +213,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. Validate that all datasets are now at version 0.25.1
+1. To ensure that all datasets are now at version 0.25.1, run
 
     ```shell
     fiftyone migrate --info
