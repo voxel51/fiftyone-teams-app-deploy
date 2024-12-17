@@ -79,6 +79,8 @@ By default, the Global Agent Proxy will log all outbound connections
 and identify which connections are routed through the proxy.
 To reduce the logging verbosity, add this environment variable to your `teamsAppSettings.env`
 
-```ini
-ROARR_LOG: false
+```yaml
+teamsAppSettings:
+  env:
+    ROARR_LOG: false
 ```
