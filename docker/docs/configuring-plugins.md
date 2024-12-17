@@ -43,7 +43,8 @@ directory
 
 ## Dedicated Plugins
 
-Plugins run in the `teams-plugins` service. To enable this mode, use the file
+Plugins run in the `teams-plugins` service. 
+To enable this mode, use the file
 [legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
 instead of
 [legacy-auth/compose.yaml](legacy-auth/compose.yaml).
