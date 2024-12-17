@@ -80,8 +80,8 @@ existing configuration to migrate to a new Auth0 Tenant.
     > Teams Database at this step until they upgrade to `fiftyone==2.2.0`
 
 1. Upgrade your FiftyOne SDKs to version 2.2.0
-    - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated
+    1. Login to the FiftyOne Teams UI
+    1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to
       `Account > Install FiftyOne`
 1. Confirm that datasets have been migrated to version 0.25.1
