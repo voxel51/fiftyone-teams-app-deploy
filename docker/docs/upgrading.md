@@ -195,7 +195,8 @@ existing configuration to migrate to a new Auth0 Tenant.
 > 2.0 or beyond.
 >
 > The license file now contains all of the Auth0 configuration that was
-> previously provided through kubernetes secrets; you may remove those secrets
+> previously provided through environment variables. You may remove those secrets
+
 > from your `.env` and from any secrets created outside of the Voxel51
 > install process.
 
