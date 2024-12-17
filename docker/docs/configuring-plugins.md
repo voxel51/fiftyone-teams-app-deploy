@@ -51,15 +51,15 @@ instead of
 to create a new Docker Volume shared between FiftyOne Teams
 services.
 
-- Configure the services to access to the plugin volume
+1. Configure the services to access to the plugin volume
   - `teams-plugins` requires `read`
   - `fiftyone-api` requires `read-write`
-- If you are
+1. If you are
   [using a proxy](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/configuring-proxies.md),
   add the `teams-plugins` service name to your environment variables
   - `no_proxy`
   - `NO_PROXY`
-- Example `docker compose` command for this mode from the `legacy-auth`
+1. Example `docker compose` command for this mode from the `legacy-auth`
   directory
 
     ```shell
