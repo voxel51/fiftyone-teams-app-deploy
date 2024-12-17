@@ -19,7 +19,7 @@ This option may be added to any of the three existing
 
 To enable this mode and launch worker containers, use
 [legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
-in conjunction with one of the 3 plugin configurations.
+in conjunction with one of the three plugin configurations.
 
 - Example `docker compose` command for enabling this mode on top of dedicated
   plugins mode, from the `legacy-auth` directory
