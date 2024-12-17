@@ -59,5 +59,11 @@ To reduce the logging verbosity, add this environment variable to your
 `teams-app` and `teams-cas` services.
 
 ```yaml
-ROARR_LOG: false
+services:
+  teams-app:
+    environment:
+      ROARR_LOG: false
+  teams-cas:
+    environment:
+      ROARR_LOG: false
 ```
