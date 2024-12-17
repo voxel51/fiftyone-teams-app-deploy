@@ -62,8 +62,8 @@ services.
   [using a proxy](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/configuring-proxies.md),
   add the `teams-plugins` service name to your environment variables
 
-- `no_proxy`
-- `NO_PROXY`
+  - `no_proxy`
+  - `NO_PROXY`
 
 1. Example `docker compose` command for this mode from the `legacy-auth`
   directory
