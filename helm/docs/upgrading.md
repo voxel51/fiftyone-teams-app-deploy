@@ -114,7 +114,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
     ```shell
     kubectl --namespace your-namepace-here create secret generic \
-        fiftyone-license --from-file=license=./your-license-file
+      fiftyone-license --from-file=license=./your-license-file
     ```
 
 1. [Upgrade to FiftyOne Teams v2.1.3](#upgrading-from-previous-versions)
@@ -160,8 +160,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
-> The license file now contains all of the Auth0 configuration that was
-> previously provided through kubernetes secrets; you may remove those secrets
+> The license file contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets. You may remove those secrets
 > from your `values.yaml` and from any secrets created outside of the Voxel51
 > install process.
 
@@ -186,7 +186,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
     ```shell
     kubectl --namespace your-namepace-here create secret generic \
-        fiftyone-license --from-file=license=./your-license-file
+      fiftyone-license --from-file=license=./your-license-file
     ```
 
 1. In your `values.yaml`, set the required values
@@ -225,8 +225,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
-> The license file now contains all of the Auth0 configuration that was
-> previously provided through kubernetes secrets; you may remove those secrets
+> The license file contains all of the Auth0 configuration that was
+> previously provided through kubernetes secrets. You may remove those secrets
 > from your `values.yaml` and from any secrets created outside of the Voxel51
 > install process.
 
@@ -258,7 +258,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
     ```shell
     kubectl --namespace your-namepace-here create secret generic \
-        fiftyone-license --from-file=license=./your-license-file
+      fiftyone-license --from-file=license=./your-license-file
     ```
 
 1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
@@ -277,7 +277,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. Validate that all datasets are now at version 0.25.1
+1. To ensure that all datasets are now at version 0.25.1, run
 
     ```shell
     fiftyone migrate --info
