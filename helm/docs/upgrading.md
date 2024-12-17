@@ -77,7 +77,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -121,8 +121,8 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
     > FiftyOne Teams Database until they upgrade to `fiftyone==2.1.3`
 1. Upgrade your FiftyOne SDKs to version 2.1.3
-    - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated
+    1. Login to the FiftyOne Teams UI
+    1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
@@ -156,7 +156,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -204,9 +204,9 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.1.3 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.1.3` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
         > your database.
 
     ```shell
@@ -221,7 +221,7 @@ or modify your existing configuration to migrate to a new Auth0 Tenant.
 
 ### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.1.3 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
