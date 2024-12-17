@@ -12,7 +12,7 @@ and
 
 Prior to v2.2.0, inviting users to join your FiftyOne Teams instance was not supported
 when `FIFTYONE_AUTH_MODE` is set to `internal`.
-Starting in v2.2.0+, you can enable invitations for your organization through the
+After v2.2.0+, you can enable invitations for your organization through the
 CAS SuperAdmin UI. To enable sending invitations as emails, you must also
 configure an SMTP connection.
 
