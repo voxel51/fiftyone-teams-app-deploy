@@ -34,7 +34,7 @@ To enable this mode
 
 Optionally, the logs generated during running of a delegated operation can be
 uploaded to a network-mounted file system or cloud storage path that is
-available to this deployment. Logs are uploaded in this format:
+available to this deployment. Logs are uploaded in the format
 `<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
 In `values.yaml`, set `configured_path`
 
