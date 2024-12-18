@@ -7,6 +7,7 @@
     - [FiftyOne Teams v2.2+ Delegated Operator Changes](#fiftyone-teams-v22-delegated-operator-changes)
       - [Delegated Operation Capacity](#delegated-operation-capacity)
       - [Existing Orchestrators](#existing-orchestrators)
+    - [Version 2.2+ InitContainers Additions](#version-22-initcontainers-additions)
   - [From FiftyOne Teams Version 2.0.0](#from-fiftyone-teams-version-200)
   - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
   - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
@@ -112,6 +113,32 @@ Additionally,
 > `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
 > in `values.yaml` in order for the delegated operation system to function
 > properly.
+
+#### Version 2.2+ InitContainers Additions
+
+Kubernetes [`initContainers`][init-containers]
+were added in Version 2.2.0 to enforce the order of pod startup.
+The image and tag are customizable.
+Any image supporting `nslookup`, such as `docker.io/busybox`, are applicable
+replacements.
+
+For a full list of settings, please refer to the
+[values list](https://helm.fiftyone.ai/#values).
+
+> [!NOTE]
+> It is recommended to add a `podSecurityContext` to avoid running
+> init containers as root.
+> An example policy is shown below:
+
+```yaml
+  podSecurityContext:
+    runAsUser: 1000
+```
+
+> [!NOTE]
+> Init containers can be disabled.
+> Voxel51 does not recommend disabling init containers to enforce
+> inter-pod dependencies are satisfied before proceeding.
 
 ### From FiftyOne Teams Version 2.0.0
 
@@ -371,3 +398,6 @@ Please contact your Voxel51 Customer Success
 team member to coordinate this upgrade.
 You will need to either create a new Identity Provider (IdP)
 or modify your existing configuration to migrate to a new Auth0 Tenant.
+
+<!-- Reference Links -->
+[init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/

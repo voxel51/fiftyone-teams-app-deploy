@@ -6,7 +6,7 @@ on:
     branches-ignore:
       - main
     paths:
-      - 'helm/**'
+      - 'helm/fiftyone-teams-app/**'
       - '.github/workflows/pre-release-internal-env.yml'
 
 jobs:
