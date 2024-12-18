@@ -137,8 +137,8 @@ For a full list of settings, please refer to the
 
 > [!NOTE]
 > Init containers can be disabled.
-> Voxel51 does not recommend disabling init containers to enforce that
-> interpod dependencies are satisfied before proceeding.
+> Voxel51 does not recommend disabling init containers to enforce
+> inter-pod dependencies are satisfied before proceeding.
 
 ### From FiftyOne Teams Version 2.0.0
 
