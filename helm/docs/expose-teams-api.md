@@ -109,7 +109,7 @@ To use this chart's ingress object
       -f ./values.yaml
     ```
 
-### Note For NGINX IngressClass Users
+## Note For NGINX IngressClass Users
 
 > [!NOTE]
 > Voxel51 is not affiliated with Nginx and you should reference the
