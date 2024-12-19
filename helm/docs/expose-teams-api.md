@@ -112,8 +112,8 @@ To use this chart's ingress object
 ### Note For NGINX IngressClass Users
 
 > [!NOTE]
-> Voxel51 is not affiliated with Nginx and you should reference the Nginx
-> documentation for advanced configuration.
+> Voxel51 is not affiliated with Nginx and you should reference the
+> [nginx documentation][nginx-docs] for advanced configuration.
 
 The FiftyOne Teams API utilizes websockets for client/server communication
 on a variety of methods.
@@ -132,9 +132,6 @@ ingress:
     nginx.org/proxy-send-timeout: "3600"
     nginx.org/websocket-services: teams-api
 ```
-
-A full list of Nginx annotations can be found in the
-[nginx documentation][nginx-docs].
 
 ## Configure your SDK
 
