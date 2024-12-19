@@ -109,6 +109,30 @@ To use this chart's ingress object
       -f ./values.yaml
     ```
 
+## Note For NGINX IngressClass Users
+
+> [!NOTE]
+> Voxel51 is not affiliated with Nginx and you should reference the
+> [nginx documentation][nginx-docs] for advanced configuration.
+
+The FiftyOne Teams API utilizes websockets for client/server communication
+on a variety of methods.
+If you are using an `nginx` ingress class for your ingress controller, it is
+possible that extra annotations are required for the HTTPS to WSS upgrade to
+happen.
+
+If you are experiencing issues when connecting to the FiftyOne Teams API
+from the SDK, Voxel51 has seen success with the following annotations:
+
+```yaml
+# values.yaml
+ingress:
+  annotations:
+    nginx.org/proxy-read-timeout: "3600"
+    nginx.org/proxy-send-timeout: "3600"
+    nginx.org/websocket-services: teams-api
+```
+
 ## Configure your SDK
 
 1. In `~/.fiftyone/config.json`, set
@@ -131,3 +155,6 @@ For more information, see
     $ curl https://<DEPOY_URL>/health
     {"status":"available"}
     ```
+
+<!-- Reference links -->
+[nginx-docs]: https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
