@@ -63,9 +63,9 @@ A minimal example `values.yaml` may be found
 
 ### From FiftyOne Teams Version 2.1.3
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.2.0, but it is not required
+   version 2.3.0, but it is not required
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -117,7 +117,7 @@ Additionally,
 #### Version 2.2+ InitContainers Additions
 
 Kubernetes [`initContainers`][init-containers]
-were added in Version 2.2.0 to enforce the order of pod startup.
+were added in Version 2.3.0 to enforce the order of pod startup.
 The image and tag are customizable.
 Any image supporting `nslookup`, such as `docker.io/busybox`, are applicable
 replacements.
@@ -142,9 +142,9 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.2.0, but it is not required
+   version 2.3.0, but it is not required
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -204,16 +204,16 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
+1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.3.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.3.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.3.0` is recommended before migrating
         > your database.
 
     ```shell
@@ -287,16 +287,16 @@ For a full list of settings, please refer to the
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
+1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.3.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.3.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.3.0` is recommended before migrating
         > your database.
 
     ```shell
@@ -375,8 +375,8 @@ For a full list of settings, please refer to the
 
 1. [Upgrade to FiftyOne Teams v2.3.0](#upgrading-from-previous-versions)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.2.0`
-1. Upgrade your FiftyOne SDKs to version 2.2.0
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.3.0`
+1. Upgrade your FiftyOne SDKs to version 2.3.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`

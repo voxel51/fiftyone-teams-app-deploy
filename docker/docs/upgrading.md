@@ -25,9 +25,9 @@ and update your deployment accordingly.
 
 ### From FiftyOne Teams Version 2.1.3
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.2.0, but it is not required
+   version 2.3.0, but it is not required
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -77,9 +77,9 @@ Additionally,
 
 ### From FiftyOne Teams Version 2.0.0
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.2.0, but it is not required
+   version 2.3.0, but it is not required
    1. Login to the FiftyOne Teams UI
    1. To obtain the CLI command to install the FiftyOne SDK associated with
      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -135,15 +135,15 @@ Additionally,
    mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
    ```
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
+1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.3.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.2.0
+    > **NOTE** Any FiftyOne SDK less than 2.3.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.2.0` is required.
+    > Upgrading to `fiftyone==2.3.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -227,15 +227,15 @@ Additionally,
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Teams version 2.2.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
+1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.3.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.2.0
+    > **NOTE** Any FiftyOne SDK less than 2.3.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.2.0` is required.
+    > Upgrading to `fiftyone==2.3.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -309,9 +309,9 @@ Additionally,
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
-    > Teams Database at this step until they upgrade to `fiftyone==2.2.0`
+    > Teams Database at this step until they upgrade to `fiftyone==2.3.0`
 
-1. Upgrade your FiftyOne SDKs to version 2.2.0
+1. Upgrade your FiftyOne SDKs to version 2.3.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to
