@@ -15,14 +15,83 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.2.0](https://img.shields.io/badge/AppVersion-v2.2.0-informational?style=flat-square)
+![Version: 2.3.0](https://img.shields.io/badge/Version-2.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.3.0](https://img.shields.io/badge/AppVersion-v2.3.0-informational?style=flat-square)
 
 FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
+The FiftyoneTeams Helm chart is the recommended way to install and configure FiftyoneTeams on Kubernetes.
+
 <!-- markdownlint-enable line-length -->
 
+This page assumes general knowledge of Fiftyone Teams and how to use it.
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
-## FiftyOne Teams v2.0+ Requires a License File
+## :warning: Important :warning:
+
+### Version 2.0+ License File Requirement
+
+FiftyOne Teams v2.0 introduces a new requirement for a license file.
+This license file should be obtained from your Customer Success Team
+before upgrading to FiftyOne Teams 2.0 or beyond.
+
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-before-fiftyone-teams-version-110)
+for steps on how to add your license file.
+
+### Version 2.2+ Delegated Operator Changes
+
+FiftyOne Teams v2.2 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-teams-version-213)
+for steps on how to upgrade your delegated operators.
+
+## Table of Contents
+
+<!-- toc -->
+
+- [Requirements](#requirements)
+  - [Kubernetes/Kubectl](#kuberneteskubectl)
+  - [Helm](#helm)
+- [Usage](#usage)
+- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [Advanced Configuration](#advanced-configuration)
+  - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
+  - [Central Authentication Service](#central-authentication-service)
+  - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
+  - [Plugins](#plugins)
+  - [Proxies](#proxies)
+  - [Snapshot Archival](#snapshot-archival)
+  - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+  - [Text Similarity](#text-similarity)
+- [Values](#values)
+  - [Deploying On GKE](#deploying-on-gke)
+
+<!-- tocstop -->
+
+## Requirements
+
+Helm and Kubectl must be installed and configured on your machine.
+
+### Kubernetes/Kubectl
+
+The following kubernetes/kubectl versions are required:
+
+Kubernetes: `>=1.18-0`
+
+However, it is recommended to use a
+[supported kubernetes version](https://kubernetes.io/releases/).
+Please refer to the
+[kubernetes installation documentation](https://kubernetes.io/docs/tasks/tools/)
+for steps on installing kubernetes and kubectl.
+
+### Helm
+
+Helm version >= 3.14 is required.
+
+Please refer to the
+[helm installation documentation](https://helm.sh/docs/intro/install/)
+for steps on installing helm.
+
+## Usage
 
 FiftyOne Teams v2.0 introduces a new requirement for a license file.  This
 license file should be obtained from your Customer Success Team before
@@ -37,85 +106,10 @@ Use the license file provided by the Voxel51 Customer Success Team to create
 a new license file secret:
 
 ```shell
+kubectl create namespace your-namespace-here
 kubectl --namespace your-namepace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
-
-## FiftyOne Teams v2.2+ Delegated Operator Changes
-
-FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
-below.
-
-### Delegated Operation Capacity
-
-By default, all deployments are provisioned with capacity to support up to 3
-delegated operations simultaneously. You will need to configure the [builtin
-orchestrator](#builtin-delegated-operator-orchestrator) or an external
-orchestrator, with enough workers, to be able to utilize this full capacity.
-If your team finds the usage is greater than this, please reach out to your
-Voxel51 support team for guidance and to increase this limit!
-
-### Existing Orchestrators
-
-> [!NOTE]
-> If you are currently utilizing an external orchestrator for delegated
-> operations, such as Airflow or Flyte, you may have an outdated execution
-> definition that could negatively affect the experience. Please reach out to
-> Voxel51 support team for guidance on updating this code.
-
-Additionally,
-
-> [!WARNING]
-> If you cannot update the orchestrator DAG/workflow code, you must set
-> `delegatedOperatorExecutorSettings.env.FIFTYONE_ALLOW_LEGACY_ORCHESTRATORS: true`
-> in `values.yaml` in order for the delegated operation system to function
-> properly.
-
-## Known Issues for FiftyOne Teams v1.6.0 and Above
-
-### Invitations Disabled for Internal Authentication Mode (v1.6.0-v2.1.X)
-
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS), which
-includes both
-[`legacy` authentication mode][legacy-auth-mode]
-and
-[`internal` authentication mode][internal-auth-mode].
-
-Prior to v2.2.0, inviting users to join your FiftyOne Teams instance was not supported
-when `FIFTYONE_AUTH_MODE` is set to `internal`.
-Starting in v2.2.0+, you can enable invitations for your organization through the
-CAS SuperAdmin UI. To enable sending invitations as emails, you must also
-configure an SMTP connection.
-
-## Table of Contents
-
-<!-- toc -->
-
-- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
-- [FiftyOne Teams Features](#fiftyone-teams-features)
-  - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
-  - [Central Authentication Service](#central-authentication-service)
-  - [Snapshot Archival](#snapshot-archival)
-  - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
-  - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
-    - [Builtin Plugins Only](#builtin-plugins-only)
-    - [Shared Plugins](#shared-plugins)
-    - [Dedicated Plugins](#dedicated-plugins)
-  - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
-  - [Proxies](#proxies)
-  - [Text Similarity](#text-similarity)
-- [Requirements](#requirements)
-- [Values](#values)
-- [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-  - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
-  - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
-  - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
-  - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
-  - [From FiftyOne Teams Version 2.0.0](#from-fiftyone-teams-version-200)
-- [Deploying FiftyOne Teams](#deploying-fiftyone-teams)
-  - [Deploying On GKE](#deploying-on-gke)
-
-<!-- tocstop -->
 
 We publish the following FiftyOne Teams private images to Docker Hub:
 
@@ -127,6 +121,36 @@ We publish the following FiftyOne Teams private images to Docker Hub:
 - `voxel51/fiftyone-teams-cas`
 
 For Docker Hub credentials, please contact your Voxel51 support team.
+
+If you are using the Voxel51 DockerHub registry to install your
+container images, use these Voxel51-provided DockerHub credentials to
+create an Image Pull Secret, and uncomment the `imagePullSecrets`
+section of your `values.yaml`
+
+```shell
+kubectl --namespace your-namespace-here create secret generic \
+  regcred --from-file=.dockerconfigjson=./voxel51-docker.json \
+  --type kubernetes.io/dockerconfigjson
+```
+
+To use the Helm chart, add the Fiftyone helm repository and
+check that you have access to the chart:
+
+```shell
+helm repo add voxel51 https://helm.fiftyone.ai
+helm repo update voxel51
+```
+
+Finally, edit your `values.yaml` file and install FiftyOne Teams:
+
+```shell
+helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
+  --namespace your-namespace-here \
+  -f ./values.yaml
+```
+
+A minimal example `values.yaml` may be found
+[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
 ## Initial Installation vs. Upgrades
 
@@ -152,11 +176,9 @@ After the initial installation, we recommend either commenting
 this environment variable or changing the value to `false`.
 
 When performing an upgrade, please review
-[Upgrading From Previous Versions](#upgrading-from-previous-versions).
+[Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
 
-## FiftyOne Teams Features
-
-Consider if you will require these settings for your deployment.
+## Advanced Configuration
 
 ### Builtin Delegated Operator Orchestrator
 
@@ -164,33 +186,8 @@ FiftyOne Teams v2.2 introduces a builtin orchestrator to run
 [Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
-This option can be added to any of the 3 existing
-[plugin modes](#fiftyone-teams-plugins). If you're using the builtin-operator
-only option, the Persistent Volume Claim should be omitted.
-
-To enable this mode
-
-- In `values.yaml`, set
-  - `delegatedOperatorExecutorSettings.enabled: true`
-  - The path for a Persistent Volume Claim mounted to the
-    `teams-do` deployment in
-    - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
-- See
-  [Adding Shared Storage for FiftyOne Teams Plugins](../docs/plugins-storage.md)
-  - Mount a Persistent Volume Claim (PVC) that provides
-    - `ReadWrite` permissions to the `teams-do` deployment
-      at the `FIFTYONE_PLUGINS_DIR` path
-
-Optionally, the logs generated during running of a delegated operation can be
-uploaded to a network-mounted file system or cloud storage path that is
-available to this deployment. Logs are uploaded in this format:
-`<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
-In `values.yaml`, set `configured_path`
-
-- `delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
-
-To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+For configuring your delegated operators, see
+[Configuring Delegated Operators](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 
 ### Central Authentication Service
 
@@ -226,39 +223,6 @@ to include the rule (add it before the `path: /` rule)
   servicePort: 80
 ```
 
-### Snapshot Archival
-
-Since version v1.5, FiftyOne Teams supports
-[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
-to cold storage locations to prevent filling up the MongoDB database.
-To enable this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-environment variable to the path of a chosen storage location.
-
-Supported locations are network mounted filesystems and cloud storage folders.
-
-- Network mounted filesystem
-  - In `values.yaml`, set the path for a Persistent Volume Claim mounted to the
-    `teams-api` deployment (not necessary to mount to other deployments) in both
-    - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-    - `teamsAppSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-  - Mount a Persistent Volume Claim with `ReadWrite` permissions to
-    the `teams-api` deployment at the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` path.
-    For an example, see
-    [Plugins Storage][plugins-storage].
-- Cloud storage folder
-  - In `values.yaml`, set the cloud storage path (for example
-    `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
-    in
-    - `appSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-    - `apiSettings.env.FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
-  - Ensure the
-    [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
-    loaded in the `teams-api` deployment have full edit capabilities to this bucket
-
-See the
-[configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
-for other configuration values that control the behavior of automatic snapshot archival.
-
 ### FiftyOne Teams Authenticated API
 
 FiftyOne Teams v1.3 introduced the capability to connect FiftyOne Teams SDKs
@@ -269,7 +233,7 @@ To enable the FiftyOne Teams Authenticated API,
 and
 [configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
 
-### FiftyOne Teams Plugins
+### Plugins
 
 FiftyOne Teams v1.3 introduced significant enhancements for
 [Plugins](https://docs.voxel51.com/plugins/index.html)
@@ -283,18 +247,11 @@ There are three modes for plugins
     - Cannot run custom plugins
 1. Shared Plugins
     - Users may run builtin and custom plugins
-    - Requires creating a Persistent Volume backed by NFSwith the PVCs
-      - `teams-api` (ReadWrite)
-      - `fiftyone-app` (ReadOnly)
     - Plugins run in the existing `fiftyone-app` deployment
       - Plugins resource consumption may starve `fiftyone-app`,
         causing the app to be slow or crash
 1. Dedicated Plugins
     - Users may run builtin and custom plugins
-    - Plugins run in an additional `teams-plugins` deployment
-    - Requires creating a Persistent Volume backed by NFS with the PVCs
-      - `teams-plugins` (ReadWrite)
-      - `fiftyone-app` (ReadOnly)
     - Plugins run in a dedicated `teams-plugins` deployment
       - Plugins resource consumption does not affect `fiftyone-app`
 
@@ -306,54 +263,31 @@ navigate to `https://<DEPLOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must
 be redeployed using the FiftyOne Teams UI.
 
-#### Builtin Plugins Only
+For configuring your plugins, see
+[Configuring Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-plugins.md).
 
-Enabled by default.
-No additional configurations are required.
+### Proxies
 
-#### Shared Plugins
+FiftyOne Teams supports routing traffic through proxy servers.
+Please refer to the
+[proxy configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md)
+for information on how to configure proxies.
 
-Plugins run in the `fiftyone-app` deployment.
-To enable this mode
+### Snapshot Archival
 
-- In `values.yaml`, set the path for a Persistent Volume Claim (PVC)
-  mounted to the `teams-api` and `fiftyone-app` deployments in both
-  - `appSettings.env.FIFTYONE_PLUGINS_DIR`
-  - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
-- See
-  [Adding Shared Storage for FiftyOne Teams Plugins][plugins-storage]
-  - Mount a PVC that provides
-    - `ReadWrite` permissions to the `teams-api` deployment
-      at the `FIFTYONE_PLUGINS_DIR` path
-    - `ReadOnly` permission to the `fiftyone-app` deployment
-      at the `FIFTYONE_PLUGINS_DIR` path
+Since version v1.5, FiftyOne Teams supports
+[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
+to cold storage locations to prevent filling up the MongoDB database.
+Supported locations are network mounted filesystems and cloud storage folders.
 
-#### Dedicated Plugins
-
-To enable this mode
-
-- In `values.yaml`, set
-  - `pluginsSettings.enabled: true`
-  - The path for a Persistent Volume Claim mounted to the
-    `teams-api` and `teams-plugins` deployments in both
-    - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
-    - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
-- See
-  [Adding Shared Storage for FiftyOne Teams Plugins][plugins-storage]
-  - Mount a Persistent Volume Claim (PVC) that provides
-    - `ReadWrite` permissions to the `teams-api` deployment
-      at the `FIFTYONE_PLUGINS_DIR` path
-    - `ReadOnly` permission to the `teams-plugins` deployment
-      at the `FIFTYONE_PLUGINS_DIR` path
-- If you are
-  [using a proxy](#proxies),
-  add the `teams-plugins` service name to your `no_proxy` and
-  `NO_PROXY` environment variables.
+Please refer to the
+[snapshot archival configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-snapshot-archival.md)
+for configuring snapshot archival.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
-Pods based on the `fiftyone-teams-cas`, `fiftyone-teams-api`,
-and `fiftyone-app` images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
+Pods based on the `fiftyone-teams-api` and `fiftyone-app`
+images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
 This key is used to encrypt storage credentials in the MongoDB database.
 
 To generate a value for `secret.fiftyone.encryptionKey`, run this
@@ -384,77 +318,6 @@ FiftyOne Teams continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
 
-### Proxies
-
-FiftyOne Teams supports routing traffic through proxy servers.
-To configure this, set the following environment variables on
-
-1. All pods, in the environment (`*.env`):
-
-    ```yaml
-    http_proxy: http://proxy.yourcompany.tld:3128
-    https_proxy: https://proxy.yourcompany.tld:3128
-    no_proxy: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
-    HTTP_PROXY: http://proxy.yourcompany.tld:3128
-    HTTPS_PROXY: https://proxy.yourcompany.tld:3128
-    NO_PROXY: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
-    ```
-
-    > **NOTE**: If you have enabled a
-    > [dedicated `teams-plugins`](#fiftyone-teams-plugins)
-    > deployment you will need to include `teams-plugins` in your `NO_PROXY` and
-    > `no_proxy` configurations
-
-    ---
-
-    > **NOTE**: If you have overridden your service names with `*.service.name`
-    > you will need to include the override service names in your `NO_PROXY` and
-    > `no_proxy` configurations instead
-
-1. The deployments based on the `fiftyone-teams-app` (`teamsAppSettings.env`) or
-   `fiftyone-teams-cas` (`casSettings.env`) images
-
-    ```yaml
-    GLOBAL_AGENT_HTTP_PROXY: http://proxy.yourcompany.tld:3128
-    GLOBAL_AGENT_HTTPS_PROXY: https://proxy.yourconpay.tld:3128
-    GLOBAL_AGENT_NO_PROXY: fiftyone-app, teams-app, teams-api, teams-cas, <your_other_exclusions>
-    ```
-
-    > **NOTE**: If you have enabled a
-    > [dedicated `teams-plugins`](#fiftyone-teams-plugins)
-    > deployment you will need to include `teams-plugins` in your
-    > `GLOBAL_AGENT_NO_PROXY` configuration
-
-    ---
-
-    > **NOTE**: If you have overridden your service names with `*.service.name`
-    > you will need to include the override service names in your
-    > `GLOBAL_AGENT_NO_PROXY` configuration instead
-
-The `NO_PROXY`, `no_proxy`, and `GLOBAL_AGENT_NO_PROXY` values must include the
-Kubernetes service names that may communicate without going through a proxy
-server.
-By default, these service names are
-
-- `fiftyone-app`
-- `teams-app`
-- `teams-api`
-- `teams-cas`
-
-This list may also include `teams-plugins` if you have enabled a dedicated
-plugins service.
-
-If the service names were overridden in `*.service.name`, use the override
-values instead.
-
-By default, the Global Agent Proxy will log all outbound connections
-and identify which connections are routed through the proxy.
-To reduce the logging verbosity, add this environment variable to your `teamsAppSettings.env`
-
-```ini
-ROARR_LOG: false
-```
-
 ### Text Similarity
 
 Since version v1.2, FiftyOne Teams supports using text similarity
@@ -472,10 +335,6 @@ appSettings:
   image:
     repository: voxel51/fiftyone-app-torch
 ```
-
-## Requirements
-
-Kubernetes: `>=1.18-0`
 
 ## Values
 
@@ -498,6 +357,7 @@ Kubernetes: `>=1.18-0`
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for teams-api. [Reference][annotations]. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-api. [Reference][security-context]. |
 | apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-api. [Reference][resources]. |
+| apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the teams-api containers. |
 | apiSettings.securityContext | object | `{}` | Container security configuration for teams-api. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for teams-api. [Reference][annotations]. |
 | apiSettings.service.containerPort | int | `8000` | Service container port for teams-api. |
@@ -535,6 +395,7 @@ Kubernetes: `>=1.18-0`
 | appSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for fiftyone-app. [Reference][security-context]. |
 | appSettings.replicaCount | int | `2` | Number of pods in the fiftyone-app deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | appSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for fiftyone-app. [Reference][resources]. |
+| appSettings.secretEnv | object | `{}` | Secret variables to be passed to the fiftyone-app containers. |
 | appSettings.securityContext | object | `{}` | Container security configuration for fiftyone-app. [Reference][container-security-context]. |
 | appSettings.service.annotations | object | `{}` | Service annotations for fiftyone-app. [Reference][annotations]. |
 | appSettings.service.containerPort | int | `5151` | Service container port for fiftyone-app. |
@@ -568,6 +429,7 @@ Kubernetes: `>=1.18-0`
 | casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-cas. [Reference][security-context]. |
 | casSettings.replicaCount | int | `2` | Number of pods in the teams-cas deployment's ReplicaSet. [Reference][deployment]. |
 | casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-cas. [Reference][resources]. |
+| casSettings.secretEnv | object | `{}` | Secret variables to be passed to the teams-cas containers. |
 | casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
 | casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
 | casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
@@ -604,6 +466,7 @@ Kubernetes: `>=1.18-0`
 | delegatedOperatorExecutorSettings.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the teams-do. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
 | delegatedOperatorExecutorSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
+| delegatedOperatorExecutorSettings.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
 | delegatedOperatorExecutorSettings.securityContext | object | `{}` |  |
 | delegatedOperatorExecutorSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-do. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for teams-do. [Reference][probes]. |
@@ -653,6 +516,7 @@ Kubernetes: `>=1.18-0`
 | pluginsSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-plugins. [Reference][security-context]. |
 | pluginsSettings.replicaCount | int | `2` | Number of pods in the teams-plugins deployment's ReplicaSet. Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | pluginsSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-plugins. [Reference][resources]. |
+| pluginsSettings.secretEnv | object | `{}` | Secret variables to be passed to the teams-plugins containers. |
 | pluginsSettings.securityContext | object | `{}` | Container security configuration for teams-plugins. [Reference][container-security-context]. |
 | pluginsSettings.service.annotations | object | `{}` | Service annotations for teams-plugins. [Reference][annotations]. |
 | pluginsSettings.service.containerPort | int | `5151` | Service container port for teams-plugins. |
@@ -689,7 +553,7 @@ Kubernetes: `>=1.18-0`
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off. |
 | teamsAppSettings.env.FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled for the teams application. Set to false to disable Query Performance mode for entire application. |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.2.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.3.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Teams API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
@@ -705,6 +569,7 @@ Kubernetes: `>=1.18-0`
 | teamsAppSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-app. [Reference][security-context]. |
 | teamsAppSettings.replicaCount | int | `2` | Number of pods in the teams-app deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-app. [Reference][resources]. |
+| teamsAppSettings.secretEnv | object | `{}` | Secret variables to be passed to the teams-app containers. |
 | teamsAppSettings.securityContext | object | `{}` | Container security configuration for teams-app. [Reference][container-security-context]. |
 | teamsAppSettings.service.annotations | object | `{}` | Service annotations for teams-app. [Reference][annotations]. |
 | teamsAppSettings.service.containerPort | int | `3000` | Service container port for teams-app. |
@@ -719,351 +584,6 @@ Kubernetes: `>=1.18-0`
 | teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-app deployment. [Reference][topology-spread-constraints]. |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for teams-app pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for teams-app pods. [Reference][volumes]. |
-
-## Upgrading From Previous Versions
-
-Voxel51 assumes you use the published
-Helm Chart to deploy your FiftyOne Teams environment.
-If you are using a custom deployment
-mechanism, carefully review the changes in the
-[Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
-and update your deployment accordingly.
-
-### From Early Adopter Versions (Versions less than 1.0)
-
-Please contact your Voxel51 Customer Success
-team member to coordinate this upgrade.
-You will need to either create a new Identity Provider (IdP)
-or modify your existing configuration to migrate to a new Auth0 Tenant.
-
-### From Before FiftyOne Teams Version 1.1.0
-
-> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0
-> requires upgrading the database and will interrupt all SDK connections.
-> You should coordinate this upgrade carefully with your end-users.
-
----
-
-> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
-> CAS requires additional configurations and consumes additional resources.
-> Please review the upgrade instructions, the
-> [Central Authentication Service](#central-authentication-service)
-> documentation and the
-> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
-> documentation before completing your upgrade.
-
----
-
-> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_
-> your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
-> You should coordinate this upgrade carefully with your end-users.
-
----
-
-> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
-> Please contact your Customer Success Team before upgrading to FiftyOne Teams
-> 2.0 or beyond.
->
-> The license file now contains all of the Auth0 configuration that was
-> previously provided through kubernetes secrets; you may remove those secrets
-> from your `values.yaml` and from any secrets created outside of the Voxel51
-> install process.
-
----
-
-1. In your `values.yaml`, set the required values
-    1. `secret.fiftyone.encryptionKey` (or your deployment's equivalent)
-        1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
-           in the appropriate service pods
-    1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
-        1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
-           in the appropriate service pods
-    1. `appSettings.env.FIFTYONE_DATABASE_ADMIN: true`
-        1. This is not the default value in the Helm Chart and must be overridden
-    1. When using path-based routing, update your ingress with the rule
-       (add it before the `path: /` rule)
-
-        ```yaml
-        ingress:
-            paths:
-              - path: /cas
-                pathType: Prefix
-                serviceName: teams-cas
-                servicePort: 80
-        ```
-
-1. Use the license file provided by the Voxel51 Customer Success Team to create
-   a new kubernetes secret:
-
-    ```shell
-    kubectl --namespace your-namepace-here create secret generic \
-        fiftyone-license --from-file=license=./your-license-file
-    ```
-
-1. [Upgrade to FiftyOne Teams v2.2.0](#deploying-fiftyone-teams)
-    > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.2.0`
-1. Upgrade your FiftyOne SDKs to version 2.2.0
-    - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated
-      with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Upgrade all the datasets
-
-    ```shell
-    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-    ```
-
-1. Validate that all datasets are now at version 0.25.1
-
-    ```shell
-    fiftyone migrate --info
-    ```
-
-### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
-
-> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_
-> your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted
-> Web App. You should coordinate this upgrade carefully with your
-> end-users.
-
----
-
-> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
-> CAS requires additional configurations and consumes additional resources.
-> Please review the upgrade instructions, the
-> [Central Authentication Service](#central-authentication-service)
-> documentation and the
-> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
-> documentation before completing your upgrade.
-
----
-
-> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
-> Please contact your Customer Success Team before upgrading to FiftyOne Teams
-> 2.0 or beyond.
->
-> The license file now contains all of the Auth0 configuration that was
-> previously provided through kubernetes secrets; you may remove those secrets
-> from your `values.yaml` and from any secrets created outside of the Voxel51
-> install process.
-
----
-
-1. Ensure all FiftyOne SDK users either
-    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
-
-      ```shell
-      FIFTYONE_DATABASE_ADMIN=false
-      ```
-
-    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
-      (this should generally be your default)
-
-        ```shell
-        unset FIFTYONE_DATABASE_ADMIN
-        ```
-
-1. Use the license file provided by the Voxel51 Customer Success Team to create
-   a new kubernetes secret:
-
-    ```shell
-    kubectl --namespace your-namepace-here create secret generic \
-        fiftyone-license --from-file=license=./your-license-file
-    ```
-
-1. In your `values.yaml`, set the required values
-    1. `secret.fiftyone.encryptionKey` (or your deployment's
-       equivalent)
-        1. This sets the `FIFTYONE_ENCRYPTION_KEY` environment variable
-           in the appropriate service pods
-    1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
-        1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
-           in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
-    - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Upgrade all the datasets
-
-    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
-    > this point.
-    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
-        > your database.
-
-    ```shell
-    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-    ```
-
-1. Validate that all datasets are now at version 0.25.1
-
-    ```shell
-    fiftyone migrate --info
-    ```
-
-### From FiftyOne Teams Versions 1.6.0 to 1.7.1
-
-> **NOTE**: Upgrading to FiftyOne Teams v2.2.0 _requires_ a license file.
-> Please contact your Customer Success Team before upgrading to FiftyOne Teams
-> 2.0 or beyond.
->
-> The license file now contains all of the Auth0 configuration that was
-> previously provided through kubernetes secrets; you may remove those secrets
-> from your `values.yaml` and from any secrets created outside of the Voxel51
-> install process.
-
----
-
-> **NOTE**: If you had previously set
-> `teamsAppSettings.env.FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE` to include your
-> Voxel51 private PyPI token, you can remove it from your configuration. The
-> Voxel51 private PyPI token is now loaded correctly from your license file.
-
----
-
-1. Ensure all FiftyOne SDK users either
-    - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
-
-      ```shell
-      FIFTYONE_DATABASE_ADMIN=false
-      ```
-
-    - Unset the environment variable `FIFTYONE_DATABASE_ADMIN`
-      (this should generally be your default)
-
-        ```shell
-        unset FIFTYONE_DATABASE_ADMIN
-        ```
-
-1. Use the license file provided by the Voxel51 Customer Success Team to create
-   a new kubernetes secret:
-
-    ```shell
-    kubectl --namespace your-namepace-here create secret generic \
-        fiftyone-license --from-file=license=./your-license-file
-    ```
-
-1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.2.0
-    - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Upgrade all the datasets
-
-    > **NOTE** Any FiftyOne SDK less than 2.2.0 will lose connectivity after
-    > this point.
-    > Upgrading all SDKs to `fiftyone==2.2.0` is recommended before migrating
-        > your database.
-
-    ```shell
-    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-    ```
-
-1. Validate that all datasets are now at version 0.25.1
-
-    ```shell
-    fiftyone migrate --info
-    ```
-
-### From FiftyOne Teams Version 2.0.0
-
-1. [Upgrade to FiftyOne Teams version 2.2.0](#deploying-fiftyone-teams)
-1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.2.0, but it is not required
-    - Login to the FiftyOne Teams UI
-    - To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Voxel51 recommends that you upgrade all your datasets, but it is not
-   required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
-   uninterrupted during, and after, this migration
-
-   ```shell
-   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-   ```
-
-1. To ensure that all datasets are now at version 0.25.1, run
-
-   ```shell
-   fiftyone migrate --info
-   ```
-
-## Deploying FiftyOne Teams
-
-A minimal example `values.yaml` may be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
-
-1. Edit the `values.yaml` file
-1. Deploy FiftyOne Teams with `helm install`
-    1. For a new installation
-        1. Create a new namespace and set the current namespace for your kubectl
-           context
-
-           ```shell
-           kubectl create namespace your-namespace-here
-           kubectl config set-context --current --namespace your-namespace-here
-           ```
-
-        1. If you are using the Voxel51 DockerHub registry to install your
-           container images, use the Voxel51-provided DockerHub credentials to
-           create an Image Pull Secret, and uncomment the `imagePullSecrets`
-           section of your `values.yaml`
-
-           ```shell
-           kubectl --namespace your-namespace-here create secret generic \
-           regcred --from-file=.dockerconfigjson=./voxel51-docker.json \
-           --type kubernetes.io/dockerconfigjson
-           ```
-
-        1. Use your Voxel51-provided License file to create a FiftyOne License
-           Secret
-
-           ```shell
-           kubectl --namespace your-namepace-here create secret generic \
-           fiftyone-license --from-file=license=./your-license-file
-           ```
-
-        1. Add the Voxel51 Helm repository and install FiftyOne Teams
-
-           ```shell
-           helm repo add voxel51 https://helm.fiftyone.ai
-           helm repo update voxel51
-           helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
-           -f ./values.yaml
-           ```
-
-    1. To upgrade an existing helm installation
-
-        1. Make sure you have followed the appropriate directions for
-           [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-
-        1. Update your kubectl configuration to set your current namespace for
-           your kubectl context
-
-           ```shell
-           kubectl config set-context --current --namespace your-namespace-here
-           ```
-
-        1. Update your Voxel51 Helm repository and upgrade your FiftyOne Teams
-           deployment
-
-           ```shell
-           helm repo update voxel51
-           helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
-           -f ./values.yaml
-           ```
-
-        > **NOTE**  To view the changes Helm would apply during installations
-        > and upgrades, consider using
-        > [helm diff](https://github.com/databus23/helm-diff).
-        > Voxel51 is not affiliated with the author of this plugin.
-        >
-        > For example:
-        >
-        > ```shell
-        > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
-        > ```
 
 ### Deploying On GKE
 
@@ -1108,7 +628,6 @@ serviceAccount:
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
-[plugins-storage]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 [recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/

@@ -510,7 +510,9 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 		{
 			"overrideEnv", // legacy auth mode
 			map[string]string{
-				"casSettings.env.TEST_KEY": "TEST_VALUE",
+				"casSettings.env.TEST_KEY":                                  "TEST_VALUE",
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "anExistingKey",      // pragma: allowlist secret
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
@@ -594,6 +596,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          },
+          {
+            "name": "AN_ADDITIONAL_SECRET_ENV",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "an-existing-secret",
+                "key": "anExistingKey"
+              }
+            }
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -605,8 +616,10 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 		{
 			"internalAuthMode",
 			map[string]string{
-				"casSettings.env.FIFTYONE_AUTH_MODE": "internal",
-				"casSettings.env.TEST_KEY":           "TEST_VALUE",
+				"casSettings.env.FIFTYONE_AUTH_MODE":                        "internal",
+				"casSettings.env.TEST_KEY":                                  "TEST_VALUE",
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "anExistingKey",      // pragma: allowlist secret
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
@@ -690,6 +703,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          },
+          {
+            "name": "AN_ADDITIONAL_SECRET_ENV",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "an-existing-secret",
+                "key": "anExistingKey"
+              }
+            }
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar

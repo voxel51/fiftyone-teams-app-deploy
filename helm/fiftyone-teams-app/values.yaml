@@ -23,6 +23,13 @@ apiSettings:
     # -- Logging level. Overrides the value of `FIFTYONE_ENV`.
     # Can be one of "DEBUG", "INFO", "WARN", "ERROR", or "CRITICAL".
     LOGGING_LEVEL: INFO
+
+  # -- Secret variables to be passed to the teams-api containers.
+  secretEnv: {}
+  #   ENV_VAR_NAME:
+  #     secretName: the-pre-existing-secret
+  #     secretKey: the-key-in-the-secret
+
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
@@ -134,6 +141,13 @@ appSettings:
     # AWS_CONFIG_FILE=/opt/secrets/aws/aws-credentials-file
     # GOOGLE_APPLICATION_CREDENTIALS=/opt/secrets/google/service-account
     # MINIO_CONFIG_FILE=/opt/secrets/minio/minio-credentials-file
+
+  # -- Secret variables to be passed to the fiftyone-app containers.
+  secretEnv: {}
+  #   ENV_VAR_NAME:
+  #     secretName: the-pre-existing-secret
+  #     secretKey: the-key-in-the-secret
+
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
@@ -238,6 +252,13 @@ casSettings:
     # -- Configure Authentication Mode.
     # One of `legacy` or `internal`
     FIFTYONE_AUTH_MODE: legacy
+
+  # -- Secret variables to be passed to the teams-cas containers.
+  secretEnv: {}
+  #   ENV_VAR_NAME:
+  #     secretName: the-pre-existing-secret
+  #     secretKey: the-key-in-the-secret
+
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
@@ -336,6 +357,13 @@ delegatedOperatorExecutorSettings:
     # -- Whether the SDK is running in an internal service context.
     # When running in FiftyOne Teams, set to `true`.
     FIFTYONE_INTERNAL_SERVICE: true
+
+  # -- Secret variables to be passed to the delegated-operator-executor containers.
+  secretEnv: {}
+  #   ENV_VAR_NAME:
+  #     secretName: the-pre-existing-secret
+  #     secretKey: the-key-in-the-secret
+
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
@@ -497,6 +525,13 @@ pluginsSettings:
     # -- Whether the SDK is running in an internal service context.
     # When running in FiftyOne Teams, set to `true`.
     FIFTYONE_INTERNAL_SERVICE: true
+
+  # -- Secret variables to be passed to the teams-plugins containers.
+  secretEnv: {}
+  #   ENV_VAR_NAME:
+  #     secretName: the-pre-existing-secret
+  #     secretKey: the-key-in-the-secret
+
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
@@ -635,7 +670,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.2.0
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.3.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
@@ -654,6 +689,13 @@ teamsAppSettings:
     # -- Controls whether Query Performance mode is enabled for the teams
     # application. Set to false to disable Query Performance mode for entire application.
     FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE: true
+
+  # -- Secret variables to be passed to the teams-app containers.
+  secretEnv: {}
+  #   ENV_VAR_NAME:
+  #     secretName: the-pre-existing-secret
+  #     secretKey: the-key-in-the-secret
+
   image:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy].
