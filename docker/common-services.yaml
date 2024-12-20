@@ -1,7 +1,7 @@
 ---
 services:
   fiftyone-app-common:
-    image: voxel51/fiftyone-app:v2.3.0-dev.34
+    image: voxel51/fiftyone-app:v2.3.0
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -30,7 +30,7 @@ services:
     restart: always
 
   teams-api-common:
-    image: voxel51/fiftyone-teams-api:v2.3.0.dev35
+    image: voxel51/fiftyone-teams-api:v2.3.0
     environment:
       CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -57,7 +57,7 @@ services:
     restart: always
 
   teams-app-common:
-    image: voxel51/fiftyone-teams-app:v2.3.0-dev.34
+    image: voxel51/fiftyone-teams-app:v2.3.0
     environment:
       API_URL: ${API_URL}
       APP_USE_HTTPS: ${APP_USE_HTTPS:-true}
@@ -92,7 +92,7 @@ services:
     restart: always
 
   teams-cas-common:
-    image: voxel51/fiftyone-teams-cas:v2.3.0-dev.34
+    image: voxel51/fiftyone-teams-cas:v2.3.0
     environment:
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
@@ -127,7 +127,7 @@ services:
         read_only: true
 
   teams-plugins-common:
-    image: voxel51/fiftyone-app:v2.3.0-dev.34
+    image: voxel51/fiftyone-app:v2.3.0
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -155,7 +155,7 @@ services:
     restart: always
 
   teams-do-common:
-    image: voxel51/fiftyone-app:v2.3.0-dev.34
+    image: voxel51/fiftyone-app:v2.3.0
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
     command: >
