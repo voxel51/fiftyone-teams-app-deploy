@@ -107,7 +107,7 @@ a new license file secret:
 
 ```shell
 kubectl create namespace your-namespace-here
-kubectl --namespace your-namepace-here create secret generic fiftyone-license \
+kubectl --namespace your-namespace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 

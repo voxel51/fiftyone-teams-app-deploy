@@ -14,7 +14,7 @@
 # # to create a fiftyoneLicenseSecret:
 # #
 # # ```shell
-# #  kubectl --namespace your-namepace create secret generic fiftyone-license \
+# #  kubectl --namespace your-namespace create secret generic fiftyone-license \
 # #    --from-file=license=./your-license-file
 # # ```
 # # Then set the name(s) of your license file secret(s) here (one per org):
