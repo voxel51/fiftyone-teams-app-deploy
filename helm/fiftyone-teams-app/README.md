@@ -25,7 +25,7 @@ The FiftyoneTeams Helm chart is the recommended way to install and configure Fif
 This page assumes general knowledge of Fiftyone Teams and how to use it.
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
-## :warning: Important :warning:
+## Important
 
 ### Version 2.0+ License File Requirement
 
