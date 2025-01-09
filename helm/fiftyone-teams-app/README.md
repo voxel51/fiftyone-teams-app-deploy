@@ -111,6 +111,11 @@ kubectl --namespace your-namepace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 
+> [!TIP]
+> When rotating the license, it may take a few minutes for the new secret
+> to propagate to all pods. To ensure that the new license values take effect
+> immediately, you may need to restart the CAS and API pods.
+
 We publish the following FiftyOne Teams private images to Docker Hub:
 
 - `voxel51/fiftyone-app`

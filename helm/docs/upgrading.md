@@ -279,6 +279,11 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
+   > [!TIP]
+   > When rotating the license, it may take a few minutes for the new secret
+   > to propagate to all pods. To ensure that the new license values take
+   > effect immediately, you may need to restart the CAS and API pods.
+
 1. In your `values.yaml`, set the required values
     1. `secret.fiftyone.encryptionKey` (or your deployment's
        equivalent)
