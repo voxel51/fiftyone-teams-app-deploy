@@ -176,7 +176,7 @@ For a full list of settings, please refer to the
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace-here create secret generic \
+    kubectl --namespace your-namespace-here create secret generic \
       fiftyone-license --from-file=license=./your-license-file
     ```
 
@@ -251,7 +251,7 @@ For a full list of settings, please refer to the
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace-here create secret generic \
+    kubectl --namespace your-namespace-here create secret generic \
       fiftyone-license --from-file=license=./your-license-file
     ```
 
@@ -345,7 +345,7 @@ For a full list of settings, please refer to the
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace-here create secret generic \
+    kubectl --namespace your-namespace-here create secret generic \
       fiftyone-license --from-file=license=./your-license-file
     ```
 
