@@ -282,7 +282,7 @@ For a full list of settings, please refer to the
    > [!TIP]
    > When rotating the license, it may take a few minutes for the new secret
    > to propagate to all pods. To ensure that the new license values take
-   > effect immediately, you may need to restart the CAS and API pods.
+   > effect immediately, you may need to restart the `teams-cas` and `teams-api` pods.
 
 1. In your `values.yaml`, set the required values
     1. `secret.fiftyone.encryptionKey` (or your deployment's
