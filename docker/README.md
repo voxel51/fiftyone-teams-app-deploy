@@ -22,7 +22,7 @@ install and configure FiftyoneTeams on Docker.
 This page assumes general knowledge of FiftyoneTeams and how to use it.
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
-## :warning: Important :warning:
+## Important
 
 ### Version 2.0+ License File Requirement
 
@@ -417,7 +417,7 @@ might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.3.0
+    image: voxel51/fiftyone-app-torch:v2.4.0
 ```
 
 For more information, see the docs for

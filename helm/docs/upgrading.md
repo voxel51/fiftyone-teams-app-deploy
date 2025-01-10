@@ -3,12 +3,11 @@
 <!-- toc -->
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-  - [From FiftyOne Teams Version 2.1.3](#from-fiftyone-teams-version-213)
+  - [From FiftyOne Teams Version 2.0.0 or Higher](#from-fiftyone-teams-version-200-or-higher)
     - [FiftyOne Teams v2.2+ Delegated Operator Changes](#fiftyone-teams-v22-delegated-operator-changes)
       - [Delegated Operation Capacity](#delegated-operation-capacity)
       - [Existing Orchestrators](#existing-orchestrators)
     - [Version 2.2+ InitContainers Additions](#version-22-initcontainers-additions)
-  - [From FiftyOne Teams Version 2.0.0](#from-fiftyone-teams-version-200)
   - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
   - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
   - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
@@ -18,10 +17,10 @@
 
 ## Upgrading From Previous Versions
 
-Voxel51 assumes you use the published
-Helm Chart to deploy your FiftyOne Teams environment.
-If you are using a custom deployment
-mechanism, carefully review the changes in the
+Voxel51 assumes you use the published Helm Chart to deploy your FiftyOne Teams
+environment.
+If you are using a custom deployment mechanism, carefully review the changes in
+the
 [Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
 and update your deployment accordingly.
 
@@ -61,23 +60,22 @@ A minimal example `values.yaml` may be found
     > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
     > ```
 
-### From FiftyOne Teams Version 2.1.3
+### From FiftyOne Teams Version 2.0.0 or Higher
 
-1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams version 2.4.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.3.0, but it is not required
+   version 2.4.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Voxel51 recommends that you upgrade all your datasets, but it is not
-   required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
-   uninterrupted during, and after, this migration
+   required.
 
    ```shell
    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
    ```
 
-1. To ensure that all datasets are now at version 1.1.0, run
+1. To ensure that all datasets are now at version 1.2.0, run
 
    ```shell
    fiftyone migrate --info
@@ -93,8 +91,8 @@ below.
 By default, all deployments are provisioned with capacity to support up to three
 delegated operations simultaneously. You will need to configure the
 [builtin orchestrator](https://helm.fiftyone.ai/#builtin-delegated-operator-orchestrator)
-or an external
-orchestrator, with enough workers, to be able to utilize this full capacity.
+or an external orchestrator, with enough workers, to be able to utilize this
+full capacity.
 If your team finds the usage is greater than this, please reach out to your
 Voxel51 support team for guidance and to increase this limit!
 
@@ -117,7 +115,7 @@ Additionally,
 #### Version 2.2+ InitContainers Additions
 
 Kubernetes [`initContainers`][init-containers]
-were added in Version 2.3.0 to enforce the order of pod startup.
+were added in Version 2.2.0 to enforce the order of pod startup.
 The image and tag are customizable.
 Any image supporting `nslookup`, such as `docker.io/busybox`, are applicable
 replacements.
@@ -140,31 +138,9 @@ For a full list of settings, please refer to the
 > Voxel51 does not recommend disabling init containers to enforce
 > inter-pod dependencies are satisfied before proceeding.
 
-### From FiftyOne Teams Version 2.0.0
-
-1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
-1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.3.0, but it is not required
-    1. Login to the FiftyOne Teams UI
-    1. To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
-1. Voxel51 recommends that you upgrade all your datasets, but it is not
-   required.  Users using the FiftyOne Teams 2.0.0 SDK will continue to operate
-   uninterrupted during, and after, this migration
-
-   ```shell
-   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
-   ```
-
-1. To ensure that all datasets are now at version 0.25.1, run
-
-   ```shell
-   fiftyone migrate --info
-   ```
-
 ### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.4.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -200,27 +176,27 @@ For a full list of settings, please refer to the
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace-here create secret generic \
+    kubectl --namespace your-namespace-here create secret generic \
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.3.0
+1. [Upgrade to FiftyOne Teams version 2.4.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.4.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.3.0 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.4.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.3.0` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.4.0` is recommended before migrating
         > your database.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 0.25.1, run
+1. To ensure that all datasets are now at version 1.2.0, run
 
     ```shell
     fiftyone migrate --info
@@ -228,7 +204,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.4.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -246,7 +222,7 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.4.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -275,7 +251,7 @@ For a full list of settings, please refer to the
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace-here create secret generic \
+    kubectl --namespace your-namespace-here create secret generic \
       fiftyone-license --from-file=license=./your-license-file
     ```
 
@@ -287,23 +263,23 @@ For a full list of settings, please refer to the
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.3.0
+1. [Upgrade to FiftyOne Teams version 2.4.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.4.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.3.0 will lose connectivity after
+    > **NOTE** Any FiftyOne SDK less than 2.4.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.3.0` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.4.0` is recommended before migrating
         > your database.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 0.25.1, run
+1. To ensure that all datasets are now at version 1.2.0, run
 
     ```shell
     fiftyone migrate --info
@@ -327,14 +303,14 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.4.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.3.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.4.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -369,14 +345,14 @@ For a full list of settings, please refer to the
    a new kubernetes secret:
 
     ```shell
-    kubectl --namespace your-namepace-here create secret generic \
+    kubectl --namespace your-namespace-here create secret generic \
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams v2.3.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams v2.4.0](#upgrading-from-previous-versions)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.3.0`
-1. Upgrade your FiftyOne SDKs to version 2.3.0
+    > FiftyOne Teams Database until they upgrade to `fiftyone==2.4.0`
+1. Upgrade your FiftyOne SDKs to version 2.4.0
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -386,7 +362,7 @@ For a full list of settings, please refer to the
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 0.25.1, run
+1. To ensure that all datasets are now at version 1.2.0, run
 
     ```shell
     fiftyone migrate --info
@@ -394,10 +370,10 @@ For a full list of settings, please refer to the
 
 ### From Early Adopter Versions (Versions less than 1.0)
 
-Please contact your Voxel51 Customer Success
-team member to coordinate this upgrade.
-You will need to either create a new Identity Provider (IdP)
-or modify your existing configuration to migrate to a new Auth0 Tenant.
+Please contact your Voxel51 Customer Success team member to coordinate this
+upgrade.
+You will need to either create a new Identity Provider (IdP) or modify your
+existing configuration to migrate to a new Auth0 Tenant.
 
 <!-- Reference Links -->
 [init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
