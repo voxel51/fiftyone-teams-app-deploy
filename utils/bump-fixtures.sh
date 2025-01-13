@@ -26,7 +26,7 @@ print_usage() {
   echo "-d, --dry-run                                       Perform a dry-run (print to stdout instead of modifying the file)"
 }
 
-source "$GIT_ROOT/utils/bump-fixtures-common.sh"
+source "${GIT_ROOT}/utils/bump-fixtures-common.sh"
 
 parse_arguments() {
   while test $# -gt 0; do
