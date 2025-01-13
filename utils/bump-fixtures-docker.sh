@@ -42,7 +42,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_APP_VERSION="$2"
+        FIFTYONE_APP_VERSION="${2}"
         shift 2
         ;;
       -i | --api-version)
@@ -51,7 +51,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_API_VERSION="$2"
+        FIFTYONE_TEAMS_API_VERSION="${2}"
         shift 2
         ;;
       -t | --teams-app-version)
@@ -60,7 +60,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_APP_VERSION="$2"
+        FIFTYONE_TEAMS_APP_VERSION="${2}"
         shift 2
         ;;
       -c | --cas-version)
@@ -69,7 +69,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_CAS_VERSION="$2"
+        FIFTYONE_TEAMS_CAS_VERSION="${2}"
         shift 2
         ;;
       -f | --file*)
@@ -79,8 +79,8 @@ parse_arguments() {
           exit 1
         fi
         INPUT_FILE="$2"
-        if [[ ! -f $INPUT_FILE ]]; then
-          echo "Error: File '$INPUT_FILE' does not exist." >&2
+        if [[ ! -f ${INPUT_FILE} ]]; then
+          echo "Error: File '${INPUT_FILE}' does not exist." >&2
           print_usage
           exit 1
         fi
@@ -95,13 +95,12 @@ parse_arguments() {
         ;;
     esac
   done
-
   # Check that all version variables are set
-  check_empty "FIFTYONE_APP_VERSION" "$FIFTYONE_APP_VERSION"
-  check_empty "FIFTYONE_TEAMS_API_VERSION" "$FIFTYONE_TEAMS_API_VERSION"
-  check_empty "FIFTYONE_TEAMS_APP_VERSION" "$FIFTYONE_TEAMS_APP_VERSION"
-  check_empty "FIFTYONE_TEAMS_CAS_VERSION" "$FIFTYONE_TEAMS_CAS_VERSION"
-  check_empty "INPUT_FILE" "$INPUT_FILE"
+  check_empty "FIFTYONE_APP_VERSION" "${FIFTYONE_APP_VERSION}"
+  check_empty "FIFTYONE_TEAMS_API_VERSION" "${FIFTYONE_TEAMS_API_VERSION}"
+  check_empty "FIFTYONE_TEAMS_APP_VERSION" "${FIFTYONE_TEAMS_APP_VERSION}"
+  check_empty "FIFTYONE_TEAMS_CAS_VERSION" "${FIFTYONE_TEAMS_CAS_VERSION}"
+  check_empty "INPUT_FILE" "${INPUT_FILE}"
 }
 
 source "$(git rev-parse --show-toplevel)/utils/bump-fixtures-common.sh"
@@ -110,30 +109,30 @@ source "$(git rev-parse --show-toplevel)/utils/bump-fixtures-common.sh"
 parse_arguments "$@"
 
 # Set up temporary file handling for dry run
-file="$INPUT_FILE"
-if [[ $DRY_RUN == "true" ]]; then
-  tempfile=$(mktemp)
-  cp "$INPUT_FILE" "$tempfile"
-  file="$tempfile"
+file="${INPUT_FILE}"
+if [[ ${DRY_RUN} == "true" ]]; then
+  tempfile="$(mktemp)"
+  cp "${INPUT_FILE}" "${tempfile}"
+  file="${tempfile}"
   echo "Performing dry-run: Changes will be printed but not saved."
 fi
 
 # Determine the appropriate `sed` flags based on the OS type
 sed_flags="-i"
 delete_backups="false"
-if [[ $OSTYPE == "darwin"* ]]; then
+if [[ ${OSTYPE} == "darwin"* ]]; then
   sed_flags="-ib" # macOS requires a backup extension when using `-i`
   delete_backups="true"
 fi
 
 # Perform replacements in the file
-sed "$sed_flags" "s/^FIFTYONE_APP_VERSION=.*/FIFTYONE_APP_VERSION=$FIFTYONE_APP_VERSION/" "$file"
-sed "$sed_flags" "s/^FIFTYONE_TEAMS_API_VERSION=.*/FIFTYONE_TEAMS_API_VERSION=$FIFTYONE_TEAMS_API_VERSION/" "$file"
-sed "$sed_flags" "s/^FIFTYONE_TEAMS_APP_VERSION=.*/FIFTYONE_TEAMS_APP_VERSION=$FIFTYONE_TEAMS_APP_VERSION/" "$file"
-sed "$sed_flags" "s/^FIFTYONE_TEAMS_CAS_VERSION=.*/FIFTYONE_TEAMS_CAS_VERSION=$FIFTYONE_TEAMS_CAS_VERSION/" "$file"
+sed "${sed_flags}" "s/^FIFTYONE_APP_VERSION=.*/FIFTYONE_APP_VERSION=${FIFTYONE_APP_VERSION}/" "${file}"
+sed "${sed_flags}" "s/^FIFTYONE_TEAMS_API_VERSION=.*/FIFTYONE_TEAMS_API_VERSION=${FIFTYONE_TEAMS_API_VERSION}/" "${file}"
+sed "${sed_flags}" "s/^FIFTYONE_TEAMS_APP_VERSION=.*/FIFTYONE_TEAMS_APP_VERSION=${FIFTYONE_TEAMS_APP_VERSION}/" "${file}"
+sed "${sed_flags}" "s/^FIFTYONE_TEAMS_CAS_VERSION=.*/FIFTYONE_TEAMS_CAS_VERSION=${FIFTYONE_TEAMS_CAS_VERSION}/" "${file}"
 
 # Output the file contents (dry-run will print the content)
-cat "$file"
+cat "${file}"
 
 # Clean up backup file if on macOS
 if [[ $delete_backups == "true" ]]; then
@@ -142,5 +141,5 @@ fi
 
 # Remove temporary file if dry-run
 if [[ $DRY_RUN == "true" ]]; then
-  rm "$tempfile"
+  rm "${tempfile}"
 fi

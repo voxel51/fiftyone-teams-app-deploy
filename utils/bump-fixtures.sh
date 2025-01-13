@@ -41,7 +41,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_APP_VERSION="$2"
+        FIFTYONE_APP_VERSION="${2}"
         shift 2
         ;;
       -i | --api-version)
@@ -50,7 +50,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_API_VERSION="$2"
+        FIFTYONE_TEAMS_API_VERSION="${2}"
         shift 2
         ;;
       -t | --teams-app-version)
@@ -59,7 +59,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_APP_VERSION="$2"
+        FIFTYONE_TEAMS_APP_VERSION="${2}"
         shift 2
         ;;
       -c | --cas-version)
@@ -68,7 +68,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_CAS_VERSION="$2"
+        FIFTYONE_TEAMS_CAS_VERSION="${2}"
         shift 2
         ;;
       -d | --dry-run)
@@ -84,10 +84,10 @@ parse_arguments() {
   done
 
   # Check that all version variables are set
-  check_empty "FIFTYONE_APP_VERSION" "$FIFTYONE_APP_VERSION"
-  check_empty "FIFTYONE_TEAMS_API_VERSION" "$FIFTYONE_TEAMS_API_VERSION"
-  check_empty "FIFTYONE_TEAMS_APP_VERSION" "$FIFTYONE_TEAMS_APP_VERSION"
-  check_empty "FIFTYONE_TEAMS_CAS_VERSION" "$FIFTYONE_TEAMS_CAS_VERSION"
+  check_empty "FIFTYONE_APP_VERSION" "${FIFTYONE_APP_VERSION}"
+  check_empty "FIFTYONE_TEAMS_API_VERSION" "${FIFTYONE_TEAMS_API_VERSION}"
+  check_empty "FIFTYONE_TEAMS_APP_VERSION" "${FIFTYONE_TEAMS_APP_VERSION}"
+  check_empty "FIFTYONE_TEAMS_CAS_VERSION" "${FIFTYONE_TEAMS_CAS_VERSION}"
 }
 
 # Parse the arguments
@@ -108,19 +108,19 @@ if [[ $DRY_RUN == "true" ]]; then
 fi
 
 for fixture in "${DOCKER_FIXTURES[@]}"; do
-  "$GIT_ROOT/utils/bump-fixtures-docker.sh" \
-    -a "$FIFTYONE_APP_VERSION" \
-    -i "$FIFTYONE_TEAMS_API_VERSION" \
-    -t "$FIFTYONE_TEAMS_APP_VERSION" \
-    -c "$FIFTYONE_TEAMS_CAS_VERSION" \
-    -f "$fixture" $dry_run_flag
+  "${GIT_ROOT}/utils/bump-fixtures-docker.sh" \
+    -a "${FIFTYONE_APP_VERSION}" \
+    -i "${FIFTYONE_TEAMS_API_VERSION}" \
+    -t "${FIFTYONE_TEAMS_APP_VERSION}" \
+    -c "${FIFTYONE_TEAMS_CAS_VERSION}" \
+    -f "${fixture}" $dry_run_flag
 done
 
 for fixture in "${HELM_FIXTURES[@]}"; do
-  "$GIT_ROOT/utils/bump-fixtures-helm.sh" \
-    -a "$FIFTYONE_APP_VERSION" \
-    -i "$FIFTYONE_TEAMS_API_VERSION" \
-    -t "$FIFTYONE_TEAMS_APP_VERSION" \
-    -c "$FIFTYONE_TEAMS_CAS_VERSION" \
-    -f "$fixture" $dry_run_flag
+  "${GIT_ROOT}/utils/bump-fixtures-helm.sh" \
+    -a "${FIFTYONE_APP_VERSION}" \
+    -i "${FIFTYONE_TEAMS_API_VERSION}" \
+    -t "${FIFTYONE_TEAMS_APP_VERSION}" \
+    -c "${FIFTYONE_TEAMS_CAS_VERSION}" \
+    -f "${fixture}" $dry_run_flag
 done

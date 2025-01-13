@@ -42,7 +42,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_APP_VERSION="$2"
+        FIFTYONE_APP_VERSION="${2}"
         shift 2
         ;;
       -i | --api-version)
@@ -51,7 +51,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_API_VERSION="$2"
+        FIFTYONE_TEAMS_API_VERSION="${2}"
         shift 2
         ;;
       -t | --teams-app-version)
@@ -60,7 +60,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_APP_VERSION="$2"
+        FIFTYONE_TEAMS_APP_VERSION="${2}"
         shift 2
         ;;
       -c | --cas-version)
@@ -69,7 +69,7 @@ parse_arguments() {
           print_usage
           exit 1
         fi
-        FIFTYONE_TEAMS_CAS_VERSION="$2"
+        FIFTYONE_TEAMS_CAS_VERSION="${2}"
         shift 2
         ;;
       -f | --file*)
@@ -79,8 +79,8 @@ parse_arguments() {
           exit 1
         fi
         INPUT_FILE="$2"
-        if [[ ! -f $INPUT_FILE ]]; then
-          echo "Error: File '$INPUT_FILE' does not exist." >&2
+        if [[ ! -f ${INPUT_FILE} ]]; then
+          echo "Error: File '${INPUT_FILE}' does not exist." >&2
           print_usage
           exit 1
         fi
@@ -96,11 +96,11 @@ parse_arguments() {
     esac
   done
   # Check that all version variables are set
-  check_empty "FIFTYONE_APP_VERSION" "$FIFTYONE_APP_VERSION"
-  check_empty "FIFTYONE_TEAMS_API_VERSION" "$FIFTYONE_TEAMS_API_VERSION"
-  check_empty "FIFTYONE_TEAMS_APP_VERSION" "$FIFTYONE_TEAMS_APP_VERSION"
-  check_empty "FIFTYONE_TEAMS_CAS_VERSION" "$FIFTYONE_TEAMS_CAS_VERSION"
-  check_empty "INPUT_FILE" "$INPUT_FILE"
+  check_empty "FIFTYONE_APP_VERSION" "${FIFTYONE_APP_VERSION}"
+  check_empty "FIFTYONE_TEAMS_API_VERSION" "${FIFTYONE_TEAMS_API_VERSION}"
+  check_empty "FIFTYONE_TEAMS_APP_VERSION" "${FIFTYONE_TEAMS_APP_VERSION}"
+  check_empty "FIFTYONE_TEAMS_CAS_VERSION" "${FIFTYONE_TEAMS_CAS_VERSION}"
+  check_empty "INPUT_FILE" "${INPUT_FILE}"
 }
 
 source "$(git rev-parse --show-toplevel)/utils/bump-fixtures-common.sh"
@@ -108,11 +108,11 @@ source "$(git rev-parse --show-toplevel)/utils/bump-fixtures-common.sh"
 parse_arguments "$@"
 
 # Set up temporary file handling for dry run
-file="$INPUT_FILE"
-if [[ $DRY_RUN == "true" ]]; then
-  tempfile=$(mktemp)
-  cp "$INPUT_FILE" "$tempfile"
-  file="$tempfile"
+file="${INPUT_FILE}"
+if [[ ${DRY_RUN} == "true" ]]; then
+  tempfile="$(mktemp)"
+  cp "${INPUT_FILE}" "${tempfile}"
+  file="${tempfile}"
   echo "Performing dry-run: Changes will be printed but not saved."
 fi
 
@@ -120,25 +120,25 @@ fi
 yq_flags="-i"
 
 # Perform replacements in the file
-yq "$yq_flags" ".appSettings.image.tag = \"$FIFTYONE_APP_VERSION\"" "$file"
-yq "$yq_flags" ".apiSettings.image.tag = \"$FIFTYONE_TEAMS_API_VERSION\"" "$file"
-yq "$yq_flags" ".teamsAppSettings.image.tag = \"$FIFTYONE_TEAMS_APP_VERSION\"" "$file"
-yq "$yq_flags" ".casSettings.image.tag = \"$FIFTYONE_TEAMS_CAS_VERSION\"" "$file"
-yq "$yq_flags" ".casSettings.image.tag = \"$FIFTYONE_TEAMS_CAS_VERSION\"" "$file"
-yq "$yq_flags" ".casSettings.image.tag = \"$FIFTYONE_TEAMS_CAS_VERSION\"" "$file"
+yq "$yq_flags" ".appSettings.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
+yq "$yq_flags" ".apiSettings.image.tag = \"${FIFTYONE_TEAMS_API_VERSION}\"" "${file}"
+yq "$yq_flags" ".teamsAppSettings.image.tag = \"${FIFTYONE_TEAMS_APP_VERSION}\"" "${file}"
+yq "$yq_flags" ".casSettings.image.tag = \"${FIFTYONE_TEAMS_CAS_VERSION}\"" "${file}"
+yq "$yq_flags" ".casSettings.image.tag = \"${FIFTYONE_TEAMS_CAS_VERSION}\"" "${file}"
+yq "$yq_flags" ".casSettings.image.tag = \"${FIFTYONE_TEAMS_CAS_VERSION}\"" "${file}"
 
 if yq -e ".pluginsSettings" "${file}" >/dev/null; then
-  yq "$yq_flags" ".pluginsSettings.image.tag = \"v${FIFTYONE_APP_VERSION//+/_}\"" "${file}"
+  yq "$yq_flags" ".pluginsSettings.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
 fi
 
 if yq -e ".delegatedOperatorExecutorSettings" "${file}" >/dev/null; then
-  yq "$yq_flags" ".delegatedOperatorExecutorSettings.image.tag = \"v${FIFTYONE_APP_VERSION//+/_}\"" "${file}"
+  yq "$yq_flags" ".delegatedOperatorExecutorSettings.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
 fi
 
 # Output the file contents (dry-run will print the content)
-cat "$file"
+cat "${file}"
 
 # Remove temporary file if dry-run
 if [[ $DRY_RUN == "true" ]]; then
-  rm "$tempfile"
+  rm "${tempfile}"
 fi
