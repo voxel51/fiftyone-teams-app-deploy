@@ -33,34 +33,52 @@ parse_arguments() {
         print_usage
         exit 0
         ;;
-      -a | --app-version)
-        check_empty "--app-version" "$2"
-        FIFTYONE_APP_VERSION="$2"
-        shift 2
+      -a | --app-version*)
+        shift
+        if test $# -gt 0; then
+          FIFTYONE_APP_VERSION=$1
+        else
+          print_usage
+          exit 1
+        fi
+        shift
         ;;
-      -i | --api-version)
-        check_empty "--api-version" "$2"
-        FIFTYONE_TEAMS_API_VERSION="$2"
-        shift 2
+      -i | --api-version*)
+        shift
+        if test $# -gt 0; then
+          FIFTYONE_TEAMS_API_VERSION=$1
+        else
+          print_usage
+          exit 1
+        fi
+        shift
         ;;
-      -t | --teams-app-version)
-        check_empty "--teams-app-version" "$2"
-        FIFTYONE_TEAMS_APP_VERSION="$2"
-        shift 2
+      -t | --teams-app-version*)
+        shift
+        if test $# -gt 0; then
+          FIFTYONE_TEAMS_APP_VERSION=$1
+        else
+          print_usage
+          exit 1
+        fi
+        shift
         ;;
-      -c | --cas-version)
-        check_empty "--cas-version" "$2"
-        FIFTYONE_TEAMS_CAS_VERSION="$2"
-        shift 2
+      -c | --cas-version*)
+        shift
+        if test $# -gt 0; then
+          FIFTYONE_TEAMS_CAS_VERSION=$1
+        else
+          print_usage
+          exit 1
+        fi
+        shift
         ;;
       -d | --dry-run)
         DRY_RUN="true"
         shift
         ;;
       *)
-        echo "Error: Unknown option: $1" >&2
-        print_usage
-        exit 1
+        break
         ;;
     esac
   done

@@ -29,7 +29,6 @@ print_usage() {
 
 # Parse command-line options
 parse_arguments() {
-  local parent_script="${1:-false}"
 
   while test $# -gt 0; do
     case "$1" in
@@ -37,49 +36,62 @@ parse_arguments() {
         print_usage
         exit 0
         ;;
-      -a | --app-version)
-        check_empty "--app-version" "$2"
-        FIFTYONE_APP_VERSION="$2"
-        shift 2
-        ;;
-      -i | --api-version)
-        check_empty "--api-version" "$2"
-        FIFTYONE_TEAMS_API_VERSION="$2"
-        shift 2
-        ;;
-      -t | --teams-app-version)
-        check_empty "--teams-app-version" "$2"
-        FIFTYONE_TEAMS_APP_VERSION="$2"
-        shift 2
-        ;;
-      -c | --cas-version)
-        check_empty "--cas-version" "$2"
-        FIFTYONE_TEAMS_CAS_VERSION="$2"
-        shift 2
-        ;;
-      -f | --file)
-        if [[ $parent_script == "true" ]]; then
-          # Skip processing the -f flag if this is the parent script
-          echo "Skipping -f flag processing for parent script."
+      -a | --app-version*)
+        shift
+        if test $# -gt 0; then
+          FIFTYONE_APP_VERSION=$1
         else
-          check_empty "--file" "$2"
-          INPUT_FILE="$2"
-          if [[ ! -f $INPUT_FILE ]]; then
-            echo "Error: File '$INPUT_FILE' does not exist." >&2
-            print_usage
-            exit 1
-          fi
+          print_usage
+          exit 1
         fi
-        shift 2
+        shift
+        ;;
+      -i | --api-version*)
+        shift
+        if test $# -gt 0; then
+          FIFTYONE_TEAMS_API_VERSION=$1
+        else
+          print_usage
+          exit 1
+        fi
+        shift
+        ;;
+      -t | --teams-app-version*)
+        shift
+        if test $# -gt 0; then
+          FIFTYONE_TEAMS_APP_VERSION=$1
+        else
+          print_usage
+          exit 1
+        fi
+        shift
+        ;;
+      -f | --file*)
+        shift
+        INPUT_FILE="$1"
+        if [[ ! -f $INPUT_FILE ]]; then
+          echo "Error: File '$INPUT_FILE' does not exist." >&2
+          print_usage
+          exit 1
+        fi
+        shift
+        ;;
+      -c | --cas-version*)
+        shift
+        if test $# -gt 0; then
+          FIFTYONE_TEAMS_CAS_VERSION=$1
+        else
+          print_usage
+          exit 1
+        fi
+        shift
         ;;
       -d | --dry-run)
         DRY_RUN="true"
         shift
         ;;
       *)
-        echo "Error: Unknown option: $1" >&2
-        print_usage
-        exit 1
+        break
         ;;
     esac
   done
