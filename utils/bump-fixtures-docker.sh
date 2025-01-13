@@ -36,55 +36,55 @@ parse_arguments() {
         print_usage
         exit 0
         ;;
-      -a | --app-version*)
-        shift
-        if test $# -gt 0; then
-          FIFTYONE_APP_VERSION=$1
-        else
+      -a | --app-version)
+        if [[ -z ${2-} ]]; then
+          echo "Error: --app-version requires a value" >&2
           print_usage
           exit 1
         fi
-        shift
+        FIFTYONE_APP_VERSION="$2"
+        shift 2
         ;;
-      -i | --api-version*)
-        shift
-        if test $# -gt 0; then
-          FIFTYONE_TEAMS_API_VERSION=$1
-        else
+      -i | --api-version)
+        if [[ -z ${2-} ]]; then
+          echo "Error: --api-version requires a value" >&2
           print_usage
           exit 1
         fi
-        shift
+        FIFTYONE_TEAMS_API_VERSION="$2"
+        shift 2
         ;;
-      -t | --teams-app-version*)
-        shift
-        if test $# -gt 0; then
-          FIFTYONE_TEAMS_APP_VERSION=$1
-        else
+      -t | --teams-app-version)
+        if [[ -z ${2-} ]]; then
+          echo "Error: --teams-app-version requires a value" >&2
           print_usage
           exit 1
         fi
-        shift
+        FIFTYONE_TEAMS_APP_VERSION="$2"
+        shift 2
+        ;;
+      -c | --cas-version)
+        if [[ -z ${2-} ]]; then
+          echo "Error: --cas-version requires a value" >&2
+          print_usage
+          exit 1
+        fi
+        FIFTYONE_TEAMS_CAS_VERSION="$2"
+        shift 2
         ;;
       -f | --file*)
-        shift
-        INPUT_FILE="$1"
+        if [[ -z ${2-} ]]; then
+          echo "Error: -file requires a file" >&2
+          print_usage
+          exit 1
+        fi
+        INPUT_FILE="$2"
         if [[ ! -f $INPUT_FILE ]]; then
           echo "Error: File '$INPUT_FILE' does not exist." >&2
           print_usage
           exit 1
         fi
-        shift
-        ;;
-      -c | --cas-version*)
-        shift
-        if test $# -gt 0; then
-          FIFTYONE_TEAMS_CAS_VERSION=$1
-        else
-          print_usage
-          exit 1
-        fi
-        shift
+        shift 2
         ;;
       -d | --dry-run)
         DRY_RUN="true"
@@ -104,7 +104,7 @@ parse_arguments() {
   check_empty "INPUT_FILE" "$INPUT_FILE"
 }
 
-source ./utils/bump-fixtures-common.sh
+source "$(git rev-parse --show-toplevel)/utils/bump-fixtures-common.sh"
 
 # Parse the arguments
 parse_arguments "$@"

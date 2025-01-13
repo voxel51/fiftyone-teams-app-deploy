@@ -8,6 +8,8 @@ FIFTYONE_TEAMS_APP_VERSION=''
 FIFTYONE_TEAMS_CAS_VERSION=''
 DRY_RUN='false'
 
+GIT_ROOT=$(git rev-parse --show-toplevel)
+
 print_usage() {
   local package
   package=$(basename "$0")
@@ -24,7 +26,7 @@ print_usage() {
   echo "-d, --dry-run                                       Perform a dry-run (print to stdout instead of modifying the file)"
 }
 
-source ./utils/bump-fixtures-common.sh
+source "$GIT_ROOT/utils/bump-fixtures-common.sh"
 
 parse_arguments() {
   while test $# -gt 0; do
@@ -33,52 +35,50 @@ parse_arguments() {
         print_usage
         exit 0
         ;;
-      -a | --app-version*)
-        shift
-        if test $# -gt 0; then
-          FIFTYONE_APP_VERSION=$1
-        else
+      -a | --app-version)
+        if [[ -z ${2-} ]]; then
+          echo "Error: --app-version requires a value" >&2
           print_usage
           exit 1
         fi
-        shift
+        FIFTYONE_APP_VERSION="$2"
+        shift 2
         ;;
-      -i | --api-version*)
-        shift
-        if test $# -gt 0; then
-          FIFTYONE_TEAMS_API_VERSION=$1
-        else
+      -i | --api-version)
+        if [[ -z ${2-} ]]; then
+          echo "Error: --api-version requires a value" >&2
           print_usage
           exit 1
         fi
-        shift
+        FIFTYONE_TEAMS_API_VERSION="$2"
+        shift 2
         ;;
-      -t | --teams-app-version*)
-        shift
-        if test $# -gt 0; then
-          FIFTYONE_TEAMS_APP_VERSION=$1
-        else
+      -t | --teams-app-version)
+        if [[ -z ${2-} ]]; then
+          echo "Error: --teams-app-version requires a value" >&2
           print_usage
           exit 1
         fi
-        shift
+        FIFTYONE_TEAMS_APP_VERSION="$2"
+        shift 2
         ;;
-      -c | --cas-version*)
-        shift
-        if test $# -gt 0; then
-          FIFTYONE_TEAMS_CAS_VERSION=$1
-        else
+      -c | --cas-version)
+        if [[ -z ${2-} ]]; then
+          echo "Error: --cas-version requires a value" >&2
           print_usage
           exit 1
         fi
-        shift
+        FIFTYONE_TEAMS_CAS_VERSION="$2"
+        shift 2
         ;;
       -d | --dry-run)
         DRY_RUN="true"
         shift
         ;;
       *)
-        break
+        echo "Error: Unknown option: $1" >&2
+        print_usage
+        exit 1
         ;;
     esac
   done
@@ -108,7 +108,7 @@ if [[ $DRY_RUN == "true" ]]; then
 fi
 
 for fixture in "${DOCKER_FIXTURES[@]}"; do
-  ./utils/bump-fixtures-docker.sh \
+  "$GIT_ROOT/utils/bump-fixtures-docker.sh" \
     -a "$FIFTYONE_APP_VERSION" \
     -i "$FIFTYONE_TEAMS_API_VERSION" \
     -t "$FIFTYONE_TEAMS_APP_VERSION" \
@@ -117,7 +117,7 @@ for fixture in "${DOCKER_FIXTURES[@]}"; do
 done
 
 for fixture in "${HELM_FIXTURES[@]}"; do
-  ./utils/bump-fixtures-helm.sh \
+  "$GIT_ROOT/utils/bump-fixtures-helm.sh" \
     -a "$FIFTYONE_APP_VERSION" \
     -i "$FIFTYONE_TEAMS_API_VERSION" \
     -t "$FIFTYONE_TEAMS_APP_VERSION" \
