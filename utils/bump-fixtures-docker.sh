@@ -13,7 +13,7 @@ DRY_RUN='false'
 print_usage() {
   local package
   package=$(basename "$0")
-  echo "$package - Bump versions in docker-compose fixture."
+  echo "$package - Bump versions in a docker-compose fixture."
   echo " "
   echo "$package [options]"
   echo " "
