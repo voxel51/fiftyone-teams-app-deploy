@@ -135,10 +135,8 @@ if yq -e ".delegatedOperatorExecutorSettings" "${file}" >/dev/null; then
   yq "$yq_flags" ".delegatedOperatorExecutorSettings.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
 fi
 
-# Output the file contents (dry-run will print the content)
-cat "${file}"
-
 # Remove temporary file if dry-run
 if [[ $DRY_RUN == "true" ]]; then
-  rm "${tempfile}"
+  cat "${file}"
+  rm "${file}"
 fi
