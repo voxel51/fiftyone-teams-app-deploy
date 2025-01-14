@@ -132,15 +132,13 @@ sed "${sed_flags}" "s/^FIFTYONE_TEAMS_API_VERSION=.*/FIFTYONE_TEAMS_API_VERSION=
 sed "${sed_flags}" "s/^FIFTYONE_TEAMS_APP_VERSION=.*/FIFTYONE_TEAMS_APP_VERSION=${FIFTYONE_TEAMS_APP_VERSION}/" "${file}"
 sed "${sed_flags}" "s/^FIFTYONE_TEAMS_CAS_VERSION=.*/FIFTYONE_TEAMS_CAS_VERSION=${FIFTYONE_TEAMS_CAS_VERSION}/" "${file}"
 
-# Output the file contents (dry-run will print the content)
-cat "${file}"
-
 # Clean up backup file if on macOS
-if [[ $delete_backups == "true" ]]; then
+if [[ ${delete_backups} == "true" ]]; then
   rm "${file}b"
 fi
 
 # Remove temporary file if dry-run
 if [[ $DRY_RUN == "true" ]]; then
-  rm "${tempfile}"
+  cat "${file}"
+  rm "${file}"
 fi
