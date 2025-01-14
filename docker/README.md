@@ -91,7 +91,8 @@ mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 
 > [!TIP]
 > When rotating the license, to ensure that the new license values are
-> picked up immediately, you may need to restart the CAS and API pods.
+> picked up immediately, you may need to restart the `teams-cas` and
+> `teams-api` services.
 
 We publish the following FiftyOne Teams private images to Docker Hub:
 
