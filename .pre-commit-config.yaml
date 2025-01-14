@@ -1,7 +1,7 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
@@ -19,7 +19,7 @@ repos:
       - id: pretty-format-json
       - id: trailing-whitespace
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.4
+    rev: v1.5.5
     hooks:
       - id: forbid-tabs
         exclude_types:
@@ -38,17 +38,17 @@ repos:
           # A base filename makes it relative to each chart directory found
           - --template-files=README.md.gotmpl
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.36.0
+    rev: v0.43.0
     hooks:
       - id: markdownlint
       - id: markdownlint-fix
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.5
+    rev: v2.3.0
     hooks:
       - id: codespell
         exclude: helm/local-self-signed-example/cert-manger-crds|tests/go.sum
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.32.0
+    rev: v1.35.1
     hooks:
       - id: yamllint
         entry: yamllint --config-file .yamllint.yaml
@@ -67,11 +67,11 @@ repos:
           - helm/README.md
           - CONTRIBUTING.md
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.23
+    rev: v0.1.25
     hooks:
       - id: helmlint
   - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
+    rev: v1.5.0
     hooks:
       - id: detect-secrets
         args:
@@ -83,7 +83,7 @@ repos:
       - id: go-fmt
       - id: go-mod-tidy
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.0
+    rev: v1.7.6
     hooks:
       - id: actionlint
   - repo: https://github.com/syntaqx/git-hooks
@@ -95,7 +95,7 @@ repos:
           - -w
           - -s
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.4.0
+    rev: v4.0.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
