@@ -126,6 +126,7 @@ if [[ ${OSTYPE} == "darwin"* ]]; then
 fi
 
 # Perform replacements in the file
+sed "${sed_flags}" "s/^VERSION=.*/VERSION=${FIFTYONE_APP_VERSION}/" "${file}"
 sed "${sed_flags}" "s/^FIFTYONE_APP_VERSION=.*/FIFTYONE_APP_VERSION=${FIFTYONE_APP_VERSION}/" "${file}"
 sed "${sed_flags}" "s/^FIFTYONE_TEAMS_API_VERSION=.*/FIFTYONE_TEAMS_API_VERSION=${FIFTYONE_TEAMS_API_VERSION}/" "${file}"
 sed "${sed_flags}" "s/^FIFTYONE_TEAMS_APP_VERSION=.*/FIFTYONE_TEAMS_APP_VERSION=${FIFTYONE_TEAMS_APP_VERSION}/" "${file}"
