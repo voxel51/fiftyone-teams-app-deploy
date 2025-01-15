@@ -53,6 +53,7 @@ for steps on how to upgrade your delegated operators.
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
+  - [Static Banner Configuration](#static-banner-configuration)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -303,6 +304,18 @@ Supported locations are network mounted filesystems and cloud storage folders.
 Please refer to the
 [snapshot archival configuration documentation](./docs/configuring-snapshot-archival.md)
 for configuring snapshot archival.
+
+### Static Banner Configuration
+
+Fiftyone Teams v2.5 introduces the ability to add a static banner to the
+application.
+
+Configure the Static Banner by setting the following environment variables in
+your `values.yaml`.
+
+Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
+
+Banner background color is configured with `FIFTYONE_APP_BANNER_COLOR`.
 
 ### FiftyOne Teams Authenticated API
 

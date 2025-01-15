@@ -54,7 +54,6 @@ for steps on how to upgrade your delegated operators.
 - [Usage](#usage)
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [Advanced Configuration](#advanced-configuration)
-  - [Static Banner Configuration](#static-banner-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -62,6 +61,7 @@ for steps on how to upgrade your delegated operators.
   - [Proxies](#proxies)
   - [Snapshot Archival](#snapshot-archival)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+  - [Static Banner Configuration](#static-banner-configuration)
   - [Text Similarity](#text-similarity)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
@@ -180,22 +180,6 @@ When performing an upgrade, please review
 [Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
 
 ## Advanced Configuration
-
-### Static Banner Configuration
-
-Fiftyone Teams v2.5 introduces the ability to add a static banner to the
-application.
-
-Configure the Static Banner by setting the following environment variables in
-your `values.yaml`.
-
-Banner text is configured with:
-`casSettings.env.FIFTYONE_APP_BANNER_TEXT` and
-`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT`
-
-Banner background color is configured with:
-`casSettings.env.FIFTYONE_APP_BANNER_COLOR` and
-`teamsAppSettings.env.FIFTYONE_APP_BANNER_COLOR`
 
 ### Builtin Delegated Operator Orchestrator
 
@@ -334,6 +318,22 @@ mounted into pods or provided via environment variables.
 FiftyOne Teams continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
+
+### Static Banner Configuration
+
+Fiftyone Teams v2.5 introduces the ability to add a static banner to the
+application.
+
+Configure the Static Banner by setting the following environment variables in
+your `values.yaml`.
+
+Banner text is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_TEXT` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT`
+
+Banner background color is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_COLOR` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_COLOR`
 
 ### Text Similarity
 
