@@ -414,8 +414,6 @@ appSettings:
 | casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
 | casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
-| casSettings.env.FIFTYONE_APP_BANNER_TEXT | string | `""` | Global banner text for cas app |
-| casSettings.env.FIFTYONE_APP_BANNER_COLOR | string | `""` | Global banner background color for cas app |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
 | casSettings.env.FIFTYONE_AUTH_MODE | string | `"legacy"` | Configure Authentication Mode. One of `legacy` or `internal` |
@@ -553,8 +551,6 @@ appSettings:
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics. |
-| teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT | string | `""` | Global banner text for teams app |
-| teamsAppSettings.env.FIFTYONE_APP_BANNER_COLOR | string | `""` | Global banner background color for teams app |
 | teamsAppSettings.env.FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off. |
 | teamsAppSettings.env.FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled for the teams application. Set to false to disable Query Performance mode for entire application. |
 | teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.4.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
