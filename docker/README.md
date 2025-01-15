@@ -311,7 +311,7 @@ Fiftyone Teams v2.5 introduces the ability to add a static banner to the
 application.
 
 Configure the Static Banner by setting the following environment variables in
-your `values.yaml`.
+your `compose.override.yaml`.
 
 Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
 
