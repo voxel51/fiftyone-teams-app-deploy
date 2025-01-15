@@ -73,8 +73,6 @@ services:
       FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: ${FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED:-true}
       FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE: ${FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE}
       FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE: ${FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE}
-      FIFTYONE_APP_BANNER_TEXT: ${FIFTYONE_APP_BANNER_TEXT}
-      FIFTYONE_APP_BANNER_COLOR: ${FIFTYONE_APP_BANNER_COLOR}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
@@ -105,8 +103,6 @@ services:
       TEAMS_API_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       TEAMS_API_MONGODB_URI: ${FIFTYONE_DATABASE_URI}
       FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
-      FIFTYONE_APP_BANNER_TEXT: ${FIFTYONE_APP_BANNER_TEXT}
-      FIFTYONE_APP_BANNER_COLOR: ${FIFTYONE_APP_BANNER_COLOR}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
