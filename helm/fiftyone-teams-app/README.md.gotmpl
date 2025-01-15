@@ -54,6 +54,7 @@ for steps on how to upgrade your delegated operators.
 - [Usage](#usage)
 - [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
 - [Advanced Configuration](#advanced-configuration)
+  - [Static Banner Configuration](#static-banner-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
@@ -64,7 +65,6 @@ for steps on how to upgrade your delegated operators.
   - [Text Similarity](#text-similarity)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
-  - [`FIFTYONE_APP_BANNER_TEXT` and `FIFTYONE_APP_BANNER_COLOR`](#fiftyone_app_banner_text-and-fiftyone_app_banner_color)
 
 <!-- tocstop -->
 
@@ -181,6 +181,23 @@ When performing an upgrade, please review
 
 
 ## Advanced Configuration
+
+### Static Banner Configuration
+
+Fiftyone Teams v2.5 introduces the ability to add a static banner to the
+application.
+
+Configure the Static Banner by setting the following environment variables in
+your `values.yaml`.
+
+Banner text is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_TEXT` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT`
+
+
+Banner background color is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_COLOR` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_COLOR`
 
 ### Builtin Delegated Operator Orchestrator
 
@@ -371,13 +388,6 @@ serviceAccount:
   annotations:
     iam.gke.io/gcp-service-account: <GSA_NAME>@<GSA_PROJECT>.iam.gserviceaccount.com
 ```
-
-### `FIFTYONE_APP_BANNER_TEXT` and `FIFTYONE_APP_BANNER_COLOR`
-
-Set these values in App and CAS to show a global banner with text and background
-color defined.
-
-
 
 <!-- Reference Links -->
 [about-wif]: https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity
