@@ -64,6 +64,7 @@ for steps on how to upgrade your delegated operators.
   - [Text Similarity](#text-similarity)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
+  - [`FIFTYONE_APP_BANNER_TEXT` and `FIFTYONE_APP_BANNER_COLOR`](#fiftyone_app_banner_text-and-fiftyone_app_banner_color)
 
 <!-- tocstop -->
 
@@ -608,6 +609,11 @@ serviceAccount:
   annotations:
     iam.gke.io/gcp-service-account: <GSA_NAME>@<GSA_PROJECT>.iam.gserviceaccount.com
 ```
+
+### `FIFTYONE_APP_BANNER_TEXT` and `FIFTYONE_APP_BANNER_COLOR`
+
+Set these values in App and CAS to show a global banner with text and background
+color defined.
 
 <!-- Reference Links -->
 [about-wif]: https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity
