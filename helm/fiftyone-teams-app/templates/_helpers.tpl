@@ -290,7 +290,7 @@ Create a merged list of environment variables for delegated-operator-executor
 {{- define "delegated-operator-executor.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
-  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: FIFTYONE_DATABASE_ADMIN
   value: "false"
 - name: FIFTYONE_DATABASE_NAME
@@ -327,7 +327,7 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- define "fiftyone-teams-api.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
 - name: CAS_BASE_URL
-  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name .Values.casSettings.service.port | quote }}
+  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name (float64 .Values.casSettings.service.port) | quote }}
 - name: FIFTYONE_AUTH_SECRET
   valueFrom:
     secretKeyRef:
@@ -372,7 +372,7 @@ Create a merged list of environment variables for fiftyone-app
 {{- define "fiftyone-app.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
-  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: FIFTYONE_AUTH_SECRET
   valueFrom:
     secretKeyRef:
@@ -476,7 +476,7 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 {{- define "teams-plugins.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
-  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: FIFTYONE_AUTH_SECRET
   valueFrom:
     secretKeyRef:
@@ -519,7 +519,7 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- define "fiftyone-teams-app.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
 - name: API_URL
-  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name .Values.apiSettings.service.port | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: FIFTYONE_API_URI
 {{- if .Values.teamsAppSettings.fiftyoneApiOverride }}
   value: {{ .Values.teamsAppSettings.fiftyoneApiOverride }}
@@ -538,12 +538,12 @@ Create a merged list of environment variables for fiftyone-teams-app
 - name: FIFTYONE_SERVER_PATH_PREFIX
   value: "/api/proxy/fiftyone-teams"
 - name: FIFTYONE_TEAMS_PROXY_URL
-  value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name .Values.appSettings.service.port | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
 - name: FIFTYONE_TEAMS_PLUGIN_URL
 {{- if .Values.pluginsSettings.enabled }}
-  value: {{ printf "http://%s:%.0f" .Values.pluginsSettings.service.name .Values.pluginsSettings.service.port | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.pluginsSettings.service.name (float64 .Values.pluginsSettings.service.port) | quote }}
 {{- else }}
-  value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name .Values.appSettings.service.port | quote }}
+  value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
 {{- end }}
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
