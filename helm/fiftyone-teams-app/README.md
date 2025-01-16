@@ -111,11 +111,12 @@ kubectl --namespace your-namepace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 
-> [!TIP]
-> To ensure that the new license values take effect
+ > [!TIP]
+ > To ensure that the new license values take effect
 > immediately, you may need to restart the `teams-cas` and `teams-api` services.
 > You can do this by deleting the pods, or by running the following command:
 > `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
+
 We publish the following FiftyOne Teams private images to Docker Hub:
 
 - `voxel51/fiftyone-app`
