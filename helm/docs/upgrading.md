@@ -279,7 +279,7 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-   > [!TIP]
+   > :bulb: **TIP**
    > To ensure that the new license values take
    > effect immediately, you may need to restart the `teams-cas` and `teams-api`
    > services. </br> You can do this by deleting the pods, or by running the following
