@@ -29,7 +29,7 @@ A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
 1. Edit the `values.yaml` file
-1, To upgrade an existing helm installation
+1. To upgrade an existing helm installation
 
     1. Make sure you have followed the appropriate directions for
        [Upgrading From Previous Versions](#upgrading-from-previous-versions)
@@ -60,12 +60,6 @@ A minimal example `values.yaml` may be found
     > ```shell
     > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
     > ```
-
-> [!TIP]
-> When just updating your license file, you may need to restart the `teams-cas` and
-> `teams-api` services to ensure that the new license values take effect immediately,
-> You can do this by deleting the pods, or by running the following
-> command:</br> `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
 
 ### From FiftyOne Teams Version 2.1.3
 
