@@ -111,6 +111,12 @@ These instructions assume you have
   - If you have not received this information, please contact your
     Voxel51 Support Team via your agreed-upon mechanism (Slack, email, etc.)
 
+> [!TIP]
+> Anytime a license file is updated, you may need to restart the `teams-cas`
+> and `teams-api` services. You can do this by deleting the pods, or by running
+> the following command: </br>
+> `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
+
 #### Download the Example Configuration Files
 
 Download the example configuration files from the
