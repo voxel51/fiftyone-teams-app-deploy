@@ -61,6 +61,12 @@ A minimal example `values.yaml` may be found
     > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
     > ```
 
+> [!TIP]
+> When just updating your license file, you may need to restart the `teams-cas` and
+> `teams-api` services to ensure that the new license values take effect immediately,
+> You can do this by deleting the pods, or by running the following
+> command:</br> `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
+
 ### From FiftyOne Teams Version 2.1.3
 
 1. [Upgrade to FiftyOne Teams version 2.3.0](#upgrading-from-previous-versions)
@@ -255,12 +261,6 @@ For a full list of settings, please refer to the
 > from your `values.yaml` and from any secrets created outside the Voxel51
 > install process.
 ---
-
-> [!TIP]
-> When updating your license file, you may need to restart the `teams-cas` and
-> `teams-api` services to ensure that the new license values take effect immediately,
-> You can do this by deleting the pods, or by running the following
-> command:</br> `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
 
 1. Ensure all FiftyOne SDK users either
     - Set the `FIFTYONE_DATABASE_ADMIN` to `false`
