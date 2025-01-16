@@ -604,6 +604,404 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
 			},
 		},
+		{
+			"overrideFiftyoneApiOverrideAndApidDnsNameAndAppDNsName",
+			map[string]string{
+				"teamsAppSettings.fiftyoneApiOverride": "https://some-other-api:9999/api",
+				"apiSettings.dnsName":                  "the-api:9999", // this should be ignored, so testing proper order of operations
+				"teamsAppSettings.dnsName":             "the-app:9999", // this should be ignored, so testing proper order of operations
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := fmt.Sprintf(`[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_API_URI",
+            "value": "https://some-other-api:9999/api"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_SERVER_ADDRESS",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_SERVER_PATH_PREFIX",
+            "value": "/api/proxy/fiftyone-teams"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PROXY_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PLUGIN_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "APP_USE_HTTPS",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
+            "value": "%s"
+          },
+          {
+            "name": "FIFTYONE_APP_THEME",
+            "value": "dark"
+          },
+          {
+            "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
+            "value": "false"
+          }
+        ]`, chartVersion)
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"overrideApidDnsNameAndAppDNsName",
+			map[string]string{
+				"apiSettings.dnsName":      "the-api:9999",
+				"teamsAppSettings.dnsName": "the-app:9999", // this should be ignored, so testing proper order of operations
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := fmt.Sprintf(`[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_API_URI",
+            "value": "https://the-api:9999"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_SERVER_ADDRESS",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_SERVER_PATH_PREFIX",
+            "value": "/api/proxy/fiftyone-teams"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PROXY_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PLUGIN_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "APP_USE_HTTPS",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
+            "value": "%s"
+          },
+          {
+            "name": "FIFTYONE_APP_THEME",
+            "value": "dark"
+          },
+          {
+            "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
+            "value": "false"
+          }
+        ]`, chartVersion)
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"overrideAppDNsName",
+			map[string]string{
+				"teamsAppSettings.dnsName": "the-app:9999",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := fmt.Sprintf(`[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_API_URI",
+            "value": "https://the-app:9999"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_SERVER_ADDRESS",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_SERVER_PATH_PREFIX",
+            "value": "/api/proxy/fiftyone-teams"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PROXY_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PLUGIN_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "APP_USE_HTTPS",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
+            "value": "%s"
+          },
+          {
+            "name": "FIFTYONE_APP_THEME",
+            "value": "dark"
+          },
+          {
+            "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
+            "value": "false"
+          }
+        ]`, chartVersion)
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"overridePluginsEnabled",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := fmt.Sprintf(`[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_API_URI",
+            "value": "https://"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_SERVER_ADDRESS",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_SERVER_PATH_PREFIX",
+            "value": "/api/proxy/fiftyone-teams"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PROXY_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PLUGIN_URL",
+            "value": "http://teams-plugins:80"
+          },
+          {
+            "name": "APP_USE_HTTPS",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
+            "value": "%s"
+          },
+          {
+            "name": "FIFTYONE_APP_THEME",
+            "value": "dark"
+          },
+          {
+            "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
+            "value": "false"
+          }
+        ]`, chartVersion)
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"overrideSecretName",
+			map[string]string{
+				"secret.name": "override-secret-name",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := fmt.Sprintf(`[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_API_URI",
+            "value": "https://"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_SERVER_ADDRESS",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_SERVER_PATH_PREFIX",
+            "value": "/api/proxy/fiftyone-teams"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PROXY_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "FIFTYONE_TEAMS_PLUGIN_URL",
+            "value": "http://fiftyone-app:80"
+          },
+          {
+            "name": "APP_USE_HTTPS",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
+            "value": "%s"
+          },
+          {
+            "name": "FIFTYONE_APP_THEME",
+            "value": "dark"
+          },
+          {
+            "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
+            "value": "false"
+          }
+        ]`, chartVersion)
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
