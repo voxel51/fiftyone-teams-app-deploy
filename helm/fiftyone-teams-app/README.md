@@ -112,12 +112,10 @@ kubectl --namespace your-namepace-here create secret generic fiftyone-license \
 ```
 
 > [!TIP]
-> When rotating the license, it may take a few minutes for the new secret
-> to propagate to all pods. To ensure that the new license values take effect
+> To ensure that the new license values take effect
 > immediately, you may need to restart the `teams-cas` and `teams-api` services.
 > You can do this by deleting the pods, or by running the following command:
 > `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
-
 We publish the following FiftyOne Teams private images to Docker Hub:
 
 - `voxel51/fiftyone-app`
