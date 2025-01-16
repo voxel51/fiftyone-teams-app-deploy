@@ -318,19 +318,20 @@ Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
 Banner background color is configured with `FIFTYONE_APP_BANNER_COLOR`.
 
 Examples:
-````suggestion
 
 ```yaml
 # compose.override.yaml
 services:
   teams-cas:
     environment:
-      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
       FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
   teams-app:
     environment:
-      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
       FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+```
+
 ### FiftyOne Teams Authenticated API
 
 FiftyOne Teams v1.3 introduces the capability to connect FiftyOne Teams SDK
