@@ -484,7 +484,7 @@ appSettings:
 | delegatedOperatorExecutorSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
 | delegatedOperatorExecutorSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
 | delegatedOperatorExecutorSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for delegated-operator-executor. |
+| delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-app-torch"` | Container image for delegated-operator-executor. |
 | delegatedOperatorExecutorSettings.image.tag | string | `""` | Image tag for delegated-operator-executor. Defaults to the chart version. |
 | delegatedOperatorExecutorSettings.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
 | delegatedOperatorExecutorSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the teams-do. [Reference][probes]. |
@@ -539,7 +539,7 @@ appSettings:
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Plugins processes. The default value is 32 GiB. `-1` is disabled. |
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for teams-plugins. |
+| pluginsSettings.image.repository | string | `"voxel51/fiftyone-app-torch"` | Container image for teams-plugins. |
 | pluginsSettings.image.tag | string | `""` | Image tag for teams-plugins. Defaults to the chart version. |
 | pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-plugins. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-plugins. [Reference][init-containers]. |

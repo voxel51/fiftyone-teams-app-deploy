@@ -369,7 +369,7 @@ delegatedOperatorExecutorSettings:
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
     # -- Container image for delegated-operator-executor.
-    repository: voxel51/fiftyone-app
+    repository: voxel51/fiftyone-app-torch
     # -- Image tag for delegated-operator-executor. Defaults to the chart version.
     tag: ""
   # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
@@ -537,7 +537,7 @@ pluginsSettings:
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
     # -- Container image for teams-plugins.
-    repository: voxel51/fiftyone-app
+    repository: voxel51/fiftyone-app-torch
     # -- Image tag for teams-plugins. Defaults to the chart version.
     tag: ""
   # -- Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors].
