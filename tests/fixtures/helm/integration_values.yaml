@@ -9,7 +9,7 @@ apiSettings:
     # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
     pullPolicy: IfNotPresent
-    tag: v2.3.0.dev35
+    tag: v2.5.0rc4
   service:
     liveness:
       initialDelaySeconds: 15
@@ -29,7 +29,7 @@ appSettings:
     # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
     pullPolicy: IfNotPresent
-    tag: v2.3.0.dev34
+    tag: v2.5.0rc4
 # TODO: Test `minikube addons configure registry-creds` or
 # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -44,13 +44,12 @@ casSettings:
     # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
     pullPolicy: IfNotPresent
-    tag: v2.3.0-dev.34
+    tag: v2.5.0-rc.3
 delegatedOperatorExecutorSettings:
   image:
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
     pullPolicy: IfNotPresent
-    tag: v2.3.0.dev34
-
+    tag: v2.5.0rc4
 ingress:
   annotations:
     # For using the nginx-ingress controller with cert-manager self signed certificates
@@ -93,13 +92,11 @@ secret:
     fiftyoneDatabaseName: fiftyone-internal
     # This password is randomly generated and is only used to initialize a local (ephemeral) MongoDB in `./skaffold-mongodb.yaml`
     # URL encoded to overcome errors with unencoded characters
-    mongodbConnectionString: mongodb://root:3-9XjJ-gUV%3Fvp%5Ee%28WUk%3ELD%26lAjh7yEji@mongodb.fiftyone-teams.svc.cluster.local/?authSource=admin  # pragma: allowlist secret
-
+    mongodbConnectionString: mongodb://root:3-9XjJ-gUV%3Fvp%5Ee%28WUk%3ELD%26lAjh7yEji@mongodb.fiftyone-teams.svc.cluster.local/?authSource=admin # pragma: allowlist secret
     # randomly generated value
     cookieSecret: 5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976
     # randomly generated value
     encryptionKey: btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=
-
     # randomly generated value
     fiftyoneAuthSecret: "aGM4?s&t-n;!*U96oA#bdo,+JU)ac1T7"
 pluginsSettings:
@@ -107,7 +104,7 @@ pluginsSettings:
     # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
     pullPolicy: IfNotPresent
-    tag: v2.3.0.dev34
+    tag: v2.5.0rc4
 teamsAppSettings:
   dnsName: local.fiftyone.ai
   # env:
@@ -124,4 +121,4 @@ teamsAppSettings:
     # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
     # This is a byproduct of `npm` versioning versus Python PEP 440.
     pullPolicy: IfNotPresent
-    tag: v2.3.0-dev.34
+    tag: v2.5.0-rc.3

@@ -1,4 +1,4 @@
-<!-- markdownlint-disable no-inline-html line-length -->
+<!-- markdownlint-disable no-inline-html line-length no-alt-text -->
 <!-- markdownlint-disable-next-line first-line-heading -->
 <div align="center">
 <p align="center">
@@ -8,7 +8,7 @@
 
 </p>
 </div>
-<!-- markdownlint-enable no-inline-html line-length -->
+<!-- markdownlint-enable no-inline-html line-length no-alt-text -->
 
 ---
 
@@ -25,7 +25,7 @@
 This page assumes general knowledge of Fiftyone Teams and how to use it.
 Please contact Voxel51 for more information regarding Fiftyone Teams.
 
-## :warning: Important :warning:
+## Important
 
 ### Version 2.0+ License File Requirement
 
@@ -61,6 +61,7 @@ for steps on how to upgrade your delegated operators.
   - [Proxies](#proxies)
   - [Snapshot Archival](#snapshot-archival)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+  - [Static Banner Configuration](#static-banner-configuration)
   - [Text Similarity](#text-similarity)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
@@ -107,7 +108,7 @@ a new license file secret:
 
 ```shell
 kubectl create namespace your-namespace-here
-kubectl --namespace your-namepace-here create secret generic fiftyone-license \
+kubectl --namespace your-namespace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 
@@ -324,6 +325,34 @@ mounted into pods or provided via environment variables.
 FiftyOne Teams continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
+
+### Static Banner Configuration
+
+Fiftyone Teams v2.5 introduces the ability to add a static banner to the
+application.
+
+Configure the Static Banner by setting the following environment variables in
+your `values.yaml`.
+
+Banner text is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_TEXT` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT`
+
+
+Banner background color is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_COLOR` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_COLOR`
+
+```yaml
+casSettings:
+  env:
+    FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+    FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+teamsAppSettings:
+  env:
+    FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+    FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+```
 
 ### Text Similarity
 

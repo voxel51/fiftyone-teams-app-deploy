@@ -1,4 +1,4 @@
-<!-- markdownlint-disable no-inline-html line-length -->
+<!-- markdownlint-disable no-inline-html line-length no-alt-text -->
 <!-- markdownlint-disable-next-line first-line-heading -->
 <div align="center">
 <p align="center">
@@ -8,7 +8,7 @@
 
 </p>
 </div>
-<!-- markdownlint-enable no-inline-html line-length -->
+<!-- markdownlint-enable no-inline-html line-length no-alt-text -->
 
 ---
 
@@ -46,7 +46,7 @@ With a Dockerfile like this, you could use the following commands to
 build, and publish, your image to your internal registry
 
 ```shell
-TEAMS_VERSION=v2.3.0
+TEAMS_VERSION=v2.4.0
 docker buildx build --push \
   --build-arg TEAMS_IMAGE_NAME="voxel51/fiftyone-app:${TEAMS_VERSION}" \
   -t your-internal-registry/fiftyone-app-internal:${TEAMS_VERSION} .
@@ -63,7 +63,7 @@ After your custom plugins image is built, you can add it to your
 ```yaml
 services:
   teams-plugins:
-    image: your-internal-registry/fiftyone-app-internal:v2.3.0
+    image: your-internal-registry/fiftyone-app-internal:v2.4.0
 ```
 
 Please see

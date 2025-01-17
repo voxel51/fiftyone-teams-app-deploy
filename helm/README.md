@@ -1,4 +1,4 @@
-<!-- markdownlint-disable no-inline-html line-length -->
+<!-- markdownlint-disable no-inline-html line-length no-alt-text -->
 <!-- markdownlint-disable-next-line first-line-heading -->
 <div align="center">
 <p align="center">
@@ -8,7 +8,7 @@
 
 </p>
 </div>
-<!-- markdownlint-enable no-inline-html line-length -->
+<!-- markdownlint-enable no-inline-html line-length no-alt-text -->
 
 <!-- toc -->
 
