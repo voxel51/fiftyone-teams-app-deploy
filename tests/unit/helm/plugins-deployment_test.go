@@ -973,7 +973,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerImage() {
 			map[string]string{
 				"pluginsSettings.enabled": "true",
 			},
-			fmt.Sprintf("voxel51/fiftyone-app:%s", chartAppVersion),
+			fmt.Sprintf("voxel51/fiftyone-app-torch:%s", chartAppVersion),
 		},
 		{
 			"overrideImageTag",
@@ -981,24 +981,24 @@ func (s *deploymentPluginsTemplateTest) TestContainerImage() {
 				"pluginsSettings.enabled":   "true",
 				"pluginsSettings.image.tag": "testTag",
 			},
-			"voxel51/fiftyone-app:testTag",
+			"voxel51/fiftyone-app-torch:testTag",
 		},
 		{
 			"overrideImageRepository",
 			map[string]string{
 				"pluginsSettings.enabled":          "true",
-				"pluginsSettings.image.repository": "ghcr.io/fiftyone-app",
+				"pluginsSettings.image.repository": "ghcr.io/fiftyone-app-torch",
 			},
-			fmt.Sprintf("ghcr.io/fiftyone-app:%s", chartAppVersion),
+			fmt.Sprintf("ghcr.io/fiftyone-app-torch:%s", chartAppVersion),
 		},
 		{
 			"overrideImageVersionAndRepository",
 			map[string]string{
 				"pluginsSettings.enabled":          "true",
 				"pluginsSettings.image.tag":        "testTag",
-				"pluginsSettings.image.repository": "ghcr.io/fiftyone-app",
+				"pluginsSettings.image.repository": "ghcr.io/fiftyone-app-torch",
 			},
-			"ghcr.io/fiftyone-app:testTag",
+			"ghcr.io/fiftyone-app-torch:testTag",
 		},
 	}
 
