@@ -28,7 +28,7 @@ A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
 1. Edit the `values.yaml` file
-1, To upgrade an existing helm installation
+1. To upgrade an existing helm installation
 
     1. Make sure you have followed the appropriate directions for
        [Upgrading From Previous Versions](#upgrading-from-previous-versions)
@@ -226,11 +226,10 @@ For a full list of settings, please refer to the
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
-> The license file contains all of the Auth0 configuration that was
+> The license file contains all the Auth0 configuration that was
 > previously provided through kubernetes secrets. You may remove those secrets
-> from your `values.yaml` and from any secrets created outside of the Voxel51
+> from your `values.yaml` and from any secrets created outside the Voxel51
 > install process.
-
 ---
 
 1. Ensure all FiftyOne SDK users either
