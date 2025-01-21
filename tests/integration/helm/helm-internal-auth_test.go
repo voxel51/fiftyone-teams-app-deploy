@@ -129,7 +129,6 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                        "cookieSecret",           // pragma: allowlist secret
 				"delegatedOperatorExecutorSettings.enabled":                                       "true",
 				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
-				"delegatedOperatorExecutorSettings.image.repository":                              "voxel51/fiftyone-app", // Temporary until new image published
 				"delegatedOperatorExecutorSettings.replicaCount":                                  "1",
 				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
 				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
@@ -209,7 +208,6 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                        "cookieSecret",           // pragma: allowlist secret
 				"delegatedOperatorExecutorSettings.enabled":                                       "true",
 				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
-				"delegatedOperatorExecutorSettings.image.repository":                              "voxel51/fiftyone-app", // Temporary until new image published
 				"delegatedOperatorExecutorSettings.replicaCount":                                  "1",
 				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
 				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
