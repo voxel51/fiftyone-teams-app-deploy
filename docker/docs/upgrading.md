@@ -4,6 +4,7 @@
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From FiftyOne Teams Version 2.0.0 and Later](#from-fiftyone-teams-version-200-and-later)
+    - [FiftyOne Teams v2.5+ Delegated Operator Changes](#fiftyone-teams-v25-delegated-operator-changes)
     - [FiftyOne Teams v2.2+ Delegated Operator Changes](#fiftyone-teams-v22-delegated-operator-changes)
     - [Delegated Operation Capacity](#delegated-operation-capacity)
     - [Existing Orchestrators](#existing-orchestrators)
@@ -41,6 +42,23 @@ and update your deployment accordingly.
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Teams v2.5+ Delegated Operator Changes
+
+FiftyOne Teams v2.5.0 changes the base image of the built-in delegated
+operators from `voxel51/fiftyone-app` to `voxel51/fiftyone-teams-cv-full`.
+The `voxel51/fiftyone-teams-cv-full` image comprises all of the dependencies
+required to run complex workflows out of the box, without building custom
+images.
+Please note: this image is approximately 2GB larger than its predecessor
+and, as such, might take longer to pull and start.
+
+To utilize the prior image, update your `common-services.yaml` similar to the below:
+
+```yaml
+  teams-do-common:
+    image: voxel51/fiftyone-app:v2.4.0
+```
 
 #### FiftyOne Teams v2.2+ Delegated Operator Changes
 
