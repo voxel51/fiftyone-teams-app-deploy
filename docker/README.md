@@ -316,6 +316,30 @@ Please refer to the
 [snapshot archival configuration documentation](./docs/configuring-snapshot-archival.md)
 for configuring snapshot archival.
 
+### Static Banner Configuration
+
+Fiftyone Teams v2.6 introduces the ability to add a static banner to the
+application.
+
+Configure the Static Banner by setting the following environment variables in
+your `compose.override.yaml`.
+
+Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
+
+Banner background color is configured with `FIFTYONE_APP_BANNER_COLOR`.
+
+Banner text color is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR`
+
+Examples:
+
+- (casSettings | teamsAppSettings).env.
+  `FIFTYONE_APP_BANNER_COLOR`: `green | rgb(34,139,34) | #f1f1f1`
+- (casSettings | teamsAppSettings).env.
+  `FIFTYONE_APP_BANNER_TEXT_COLOR`: `green | rgb(34,139,34") | #f1f1f1`
+- (casSettings | teamsAppSettings).env.`FIFTYONE_APP_BANNER_TEXT`="Internal Deployment"
+
 ### FiftyOne Teams Authenticated API
 
 FiftyOne Teams v1.3 introduces the capability to connect FiftyOne Teams SDK
