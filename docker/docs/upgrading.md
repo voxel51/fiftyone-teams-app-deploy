@@ -57,7 +57,7 @@ To utilize the prior image, update your `common-services.yaml` similar to the be
 
 ```yaml
   teams-do-common:
-    image: voxel51/fiftyone-app:v2.4.0
+    image: voxel51/fiftyone-app:v2.5.0
 ```
 
 #### FiftyOne Teams v2.2+ Delegated Operator Changes
