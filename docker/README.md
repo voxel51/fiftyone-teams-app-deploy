@@ -422,7 +422,7 @@ might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.4.0
+    image: voxel51/fiftyone-app-torch:v2.5.0
 ```
 
 For more information, see the docs for
