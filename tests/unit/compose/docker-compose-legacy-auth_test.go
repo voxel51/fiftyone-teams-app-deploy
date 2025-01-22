@@ -185,7 +185,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 			"teams-do",
 			[]string{legacyAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-cv-full:v2.4.0",
+			"voxel51/fiftyone-teams-cv-full:v2.5.0",
 		},
 	}
 
