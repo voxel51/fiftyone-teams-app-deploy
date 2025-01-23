@@ -51,7 +51,7 @@ The `voxel51/fiftyone-teams-cv-full` image includes all of the dependencies
 required to run complex workflows out of the box.
 
 If you built your own image with custom dependencies,
-you will likely want to remake those images based off 
+you will likely want to remake those images based off
 of this new `voxel51/fiftyone-teams-cv-full` image.
 
 Please note: this image is approximately 2GB larger than its predecessor
