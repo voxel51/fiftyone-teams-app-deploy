@@ -60,7 +60,6 @@ for steps on how to upgrade your delegated operators.
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
-  - [Static Banner Configuration](#static-banner-configuration)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -317,33 +316,6 @@ Please refer to the
 [snapshot archival configuration documentation](./docs/configuring-snapshot-archival.md)
 for configuring snapshot archival.
 
-### Static Banner Configuration
-
-Fiftyone Teams v2.5 introduces the ability to add a static banner to the
-application.
-
-Configure the Static Banner by setting the following environment variables in
-your `compose.override.yaml`.
-
-Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
-
-Banner background color is configured with `FIFTYONE_APP_BANNER_COLOR`.
-
-Examples:
-
-```yaml
-# compose.override.yaml
-services:
-  teams-cas:
-    environment:
-      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
-      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
-  teams-app:
-    environment:
-      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
-      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
-```
-
 ### FiftyOne Teams Authenticated API
 
 FiftyOne Teams v1.3 introduces the capability to connect FiftyOne Teams SDK
@@ -457,7 +429,7 @@ might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.4.0
+    image: voxel51/fiftyone-app-torch:v2.5.0
 ```
 
 For more information, see the docs for
@@ -486,8 +458,6 @@ For more information, see the docs for
 | `CAS_MONGODB_URI`                           | The MongoDB Connection STring for CAS; this will default to `FIFTYONE_DATABASE_URI`                                                                                                                                                                                            | No                        |
 | `FIFTYONE_APP_ALLOW_MEDIA_EXPORT`           | Set this to `"false"` if you want to disable media export options                                                                                                                                                                                                              | No                        |
 | `FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED`           | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics.                                                                                                                                                                                                              | No                        |
-| `FIFTYONE_APP_BANNER_COLOR`           | Global banner background color in App                                                                                                     | No                        |
-| `FIFTYONE_APP_BANNER_TEXT`           | Global banner text in App                                                                                                    | No                        |
 | `FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION` | The recommended fiftyone SDK version. This will be displayed in install modal (i.e. `pip install ... fiftyone==0.11.0`)                                                                                                                                                        | No                        |
 | `FIFTYONE_APP_THEME`                        | The default theme configuration for your FiftyOne Teams application as described [here](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                                                   | No                        |
 | `FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE`    | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off.                                                                                                                            | No                        |
