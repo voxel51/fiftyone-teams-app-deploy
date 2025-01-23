@@ -47,9 +47,9 @@ and update your deployment accordingly.
 
 FiftyOne Teams v2.5.0 changes the base image of the built-in delegated
 operators from `voxel51/fiftyone-app` to `voxel51/fiftyone-teams-cv-full`.
-The `voxel51/fiftyone-teams-cv-full` image comprises all of the dependencies
-required to run complex workflows out of the box, without building custom
-images.
+The `voxel51/fiftyone-teams-cv-full` image includes all of the dependencies
+required to run complex workflows out of the box.
+
 Please note: this image is approximately 2GB larger than its predecessor
 and, as such, might take longer to pull and start.
 
