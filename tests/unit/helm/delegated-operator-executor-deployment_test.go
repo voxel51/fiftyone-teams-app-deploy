@@ -679,7 +679,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerImage() {
 			map[string]string{
 				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
-			fmt.Sprintf("voxel51/fiftyone-app:%s", chartAppVersion),
+			fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion),
 		},
 		{
 			"overrideImageTag",
@@ -687,24 +687,24 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerImage() {
 				"delegatedOperatorExecutorSettings.enabled":   "true",
 				"delegatedOperatorExecutorSettings.image.tag": "testTag",
 			},
-			"voxel51/fiftyone-app:testTag",
+			"voxel51/fiftyone-teams-cv-full:testTag",
 		},
 		{
 			"overrideImageRepository",
 			map[string]string{
 				"delegatedOperatorExecutorSettings.enabled":          "true",
-				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-app",
+				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-teams-cv-full",
 			},
-			fmt.Sprintf("ghcr.io/fiftyone-app:%s", chartAppVersion),
+			fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
 		},
 		{
 			"overrideImageVersionAndRepository",
 			map[string]string{
 				"delegatedOperatorExecutorSettings.enabled":          "true",
 				"delegatedOperatorExecutorSettings.image.tag":        "testTag",
-				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-app",
+				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-teams-cv-full",
 			},
-			"ghcr.io/fiftyone-app:testTag",
+			"ghcr.io/fiftyone-teams-cv-full:testTag",
 		},
 	}
 
