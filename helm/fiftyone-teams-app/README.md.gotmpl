@@ -1,4 +1,4 @@
-<!-- markdownlint-disable no-inline-html line-length -->
+<!-- markdownlint-disable no-inline-html line-length no-alt-text -->
 <!-- markdownlint-disable-next-line first-line-heading -->
 <div align="center">
 <p align="center">
@@ -8,7 +8,7 @@
 
 </p>
 </div>
-<!-- markdownlint-enable no-inline-html line-length -->
+<!-- markdownlint-enable no-inline-html line-length no-alt-text -->
 
 ---
 
@@ -42,6 +42,13 @@ for steps on how to add your license file.
 FiftyOne Teams v2.2 introduces some changes to delegated operators.
 Please refer to the
 [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-teams-version-213)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.5+ Delegated Operator Changes
+
+FiftyOne Teams v2.5 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-teams-v25-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ## Table of Contents
@@ -110,6 +117,12 @@ kubectl create namespace your-namespace-here
 kubectl --namespace your-namespace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
+
+> **NOTE**
+> To ensure that the new license values take effect
+> immediately, you may need to restart the `teams-cas` and `teams-api` services.
+> You can do this by deleting the pods, or by running the following command:
+> `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
 
 We publish the following FiftyOne Teams private images to Docker Hub:
 

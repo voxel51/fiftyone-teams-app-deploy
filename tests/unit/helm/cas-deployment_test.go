@@ -812,6 +812,188 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
 			},
 		},
+		{
+			"overrideAppDNsName",
+			map[string]string{
+				"teamsAppSettings.dnsName": "the-app:9999",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := `[
+          {
+            "name": "CAS_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "CAS_URL",
+            "value": "https://the-app:9999"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "LICENSE_KEY_FILE_PATHS",
+            "value": "/opt/fiftyone/licenses/fiftyone-license"
+          },
+          {
+            "name": "NEXTAUTH_URL",
+            "value": "https://the-app:9999/cas/api/auth"
+          },
+          {
+            "name": "TEAMS_API_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "TEAMS_API_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "CAS_DATABASE_NAME",
+            "value": "cas"
+          },
+          {
+            "name": "CAS_DEFAULT_USER_ROLE",
+            "value": "GUEST"
+          },
+          {
+            "name": "CAS_MONGODB_URI_KEY",
+            "value": "mongodbConnectionString"
+          },
+          {
+            "name": "DEBUG",
+            "value": "cas:*,-cas:*:debug"
+          },
+          {
+            "name": "FIFTYONE_AUTH_MODE",
+            "value": "legacy"
+          }
+        ]`
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"overrideSecretName",
+			map[string]string{
+				"secret.name": "override-secret-name",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := `[
+          {
+            "name": "CAS_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "CAS_URL",
+            "value": "https://"
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "LICENSE_KEY_FILE_PATHS",
+            "value": "/opt/fiftyone/licenses/fiftyone-license"
+          },
+          {
+            "name": "NEXTAUTH_URL",
+            "value": "https:///cas/api/auth"
+          },
+          {
+            "name": "TEAMS_API_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "TEAMS_API_MONGODB_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "CAS_DATABASE_NAME",
+            "value": "cas"
+          },
+          {
+            "name": "CAS_DEFAULT_USER_ROLE",
+            "value": "GUEST"
+          },
+          {
+            "name": "CAS_MONGODB_URI_KEY",
+            "value": "mongodbConnectionString"
+          },
+          {
+            "name": "DEBUG",
+            "value": "cas:*,-cas:*:debug"
+          },
+          {
+            "name": "FIFTYONE_AUTH_MODE",
+            "value": "legacy"
+          }
+        ]`
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
 	}
 
 	for _, testCase := range testCases {

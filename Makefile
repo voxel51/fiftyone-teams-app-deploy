@@ -59,8 +59,8 @@ start:  ## Run minikube with ingress and gcp-auth
 	#
 	minikube addons enable gcp-auth
 
-	# registery-creds is an alternative methods for accessing private repositories.
-	# If used, needs to be reconfired every time minikube is deleted.
+	# registry-creds is an alternative methods for accessing private repositories.
+	# If used, needs to be reconfigured every time minikube is deleted.
 	# minikube addons configure registry-creds
 
 	# create the regcred secret to allow pulling images from dockerhub
@@ -80,7 +80,7 @@ delete:  ## Delete minikube
 dev: helm-repos  ## run skaffold dev
 	skaffold dev --kube-context minikube
 
-dev-keep: helm-repos  ## run skaffold dev with keep-runining-on-failure
+dev-keep: helm-repos  ## run skaffold dev with keep-running-on-failure
 	skaffold dev --keep-running-on-failure --kube-context minikube
 
 port-forward-app:  ## port forward the service `teams-app` on the host port 3000

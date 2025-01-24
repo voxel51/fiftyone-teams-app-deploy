@@ -496,6 +496,131 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
 				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
 			},
 		},
+		{
+			"overrideSecretName",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled": "true",
+				"secret.name": "override-secret-name",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "override-secret-name",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "-1"
+          }
+        ]`
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"overrideApiServiceNameAndPort",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled": "true",
+				"apiSettings.service.name":                  "teams-api-override",
+				"apiSettings.service.port":                  "8000",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api-override:8000"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "-1"
+          }
+        ]`
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -554,7 +679,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerImage() {
 			map[string]string{
 				"delegatedOperatorExecutorSettings.enabled": "true",
 			},
-			fmt.Sprintf("voxel51/fiftyone-app:%s", chartAppVersion),
+			fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion),
 		},
 		{
 			"overrideImageTag",
@@ -562,24 +687,24 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerImage() {
 				"delegatedOperatorExecutorSettings.enabled":   "true",
 				"delegatedOperatorExecutorSettings.image.tag": "testTag",
 			},
-			"voxel51/fiftyone-app:testTag",
+			"voxel51/fiftyone-teams-cv-full:testTag",
 		},
 		{
 			"overrideImageRepository",
 			map[string]string{
 				"delegatedOperatorExecutorSettings.enabled":          "true",
-				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-app",
+				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-teams-cv-full",
 			},
-			fmt.Sprintf("ghcr.io/fiftyone-app:%s", chartAppVersion),
+			fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
 		},
 		{
 			"overrideImageVersionAndRepository",
 			map[string]string{
 				"delegatedOperatorExecutorSettings.enabled":          "true",
 				"delegatedOperatorExecutorSettings.image.tag":        "testTag",
-				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-app",
+				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-teams-cv-full",
 			},
-			"ghcr.io/fiftyone-app:testTag",
+			"ghcr.io/fiftyone-teams-cv-full:testTag",
 		},
 	}
 

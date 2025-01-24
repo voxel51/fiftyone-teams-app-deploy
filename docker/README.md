@@ -1,4 +1,4 @@
-<!-- markdownlint-disable no-inline-html line-length -->
+<!-- markdownlint-disable no-inline-html line-length no-alt-text -->
 <!-- markdownlint-disable-next-line first-line-heading -->
 <div align="center">
 <p align="center">
@@ -8,7 +8,7 @@
 
 </p>
 </div>
-<!-- markdownlint-enable no-inline-html line-length -->
+<!-- markdownlint-enable no-inline-html line-length no-alt-text -->
 
 # fiftyone-teams-app
 
@@ -39,6 +39,13 @@ for steps on how to add your license file.
 FiftyOne Teams v2.2 introduces some changes to delegated operators.
 Please refer to the
 [upgrade documentation](./docs/upgrading.md#from-fiftyone-teams-version-213)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.5+ Delegated Operator Changes
+
+FiftyOne Teams v2.5 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/upgrading.md#fiftyone-teams-v25-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ## Table of Contents
@@ -88,6 +95,11 @@ e.g.:
 mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
 mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 ```
+
+> [!TIP]
+> When rotating the license, to ensure that the new license values are
+> picked up immediately, you may need to restart the `teams-cas` and
+> `teams-api` services.
 
 We publish the following FiftyOne Teams private images to Docker Hub:
 
@@ -417,7 +429,7 @@ might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.4.0
+    image: voxel51/fiftyone-app-torch:v2.5.0
 ```
 
 For more information, see the docs for
