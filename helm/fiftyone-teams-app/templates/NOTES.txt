@@ -1,3 +1,10 @@
+{{- if and (gt ( int .Values.apiSettings.replicaCount)  1) (not .Values.apiSettings.env.FIFTYONE_SHARED_ROOT_DIR) }}
+[WARN] You have set apiSettings.replicaCount to {{ .Values.apiSettings.replicaCount }}
+        but have not set apiSettings.env.FIFTYONE_SHARED_ROOT_DIR
+       apiSettings.replicaCount will be set to 1 for this deployment.  Please see
+        https://helm.fiftyone.ai for details.
+{{ end }}
+
 {{- if (semverCompare "<1.28-0" .Capabilities.KubeVersion.GitVersion) }}
 [WARN] You are running an older version of kubernetes!
 Currently supported versions of Kubernetes are described at the following link:
