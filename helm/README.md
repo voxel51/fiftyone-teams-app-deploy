@@ -73,7 +73,7 @@ in this directory.
         helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
         ```
 
-        > **NOTE**  Prior to running helm upgrade you may
+        > **NOTE** Prior to running helm upgrade you may
         > view the changes Helm would apply by using
         > [helm diff](https://github.com/databus23/helm-diff)
         > helm plugin.
@@ -111,7 +111,7 @@ These instructions assume you have
   - If you have not received this information, please contact your
     Voxel51 Support Team via your agreed-upon mechanism (Slack, email, etc.)
 
-> [!TIP]
+> **NOTE**
 > Anytime a license file is updated, you may need to restart the `teams-cas`
 > and `teams-api` services. You can do this by deleting the pods, or by running
 > the following command: </br>
