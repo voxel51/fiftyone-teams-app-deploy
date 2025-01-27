@@ -171,7 +171,7 @@ See
     ```
 
 The helm integration tests may be run multiple times by invoking the previous step.
-It will re-use the cert-manager and mongodb deployed.
+It will reuse the cert-manager and mongodb deployed.
 
 ## Additional Links
 
