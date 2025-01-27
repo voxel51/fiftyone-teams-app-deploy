@@ -68,6 +68,7 @@ for steps on how to upgrade your delegated operators.
   - [Proxies](#proxies)
   - [Snapshot Archival](#snapshot-archival)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+  - [Static Banner Configuration](#static-banner-configuration)
   - [Text Similarity](#text-similarity)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
