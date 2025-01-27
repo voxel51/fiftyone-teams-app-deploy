@@ -60,6 +60,7 @@ for steps on how to upgrade your delegated operators.
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
+  - [Static Banner Configuration](#static-banner-configuration)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
