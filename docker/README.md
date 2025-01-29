@@ -65,6 +65,7 @@ for steps on how to upgrade your delegated operators.
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Proxies](#proxies)
+  - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
   - [Text Similarity](#text-similarity)
 - [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
 
@@ -444,6 +445,27 @@ Please refer to the
 [proxy configuration documentation](./docs/configuring-proxies.md)
 for information on how to configure proxies.
 
+### Terms of Service, Privacy, and Imprint URLs
+
+Fiftyone Teams v2.6 introduces the ability to override
+the Terms of Service, Privacy, and Imprint (optional) links
+if required in the App.
+
+Configure the URLs by setting the following environment variables in
+your `compose.override.yaml`.
+
+Terms of Service URL is configured with `FIFTYONE_APP_TERMS_URL`.
+
+Privacy URL is configured with `FIFTYONE_APP_PRIVACY_URL`.
+
+Imprint/Impressum URL is configured with `FIFTYONE_APP_IMPRINT_URL`
+
+Examples:
+
+- teamsAppSettings.env.`FIFTYONE_APP_TERMS_URL`: `https://abc.com/tos`
+- teamsAppSettings.env.`FIFTYONE_APP_PRIVACY_URL`: `https://abc.com/privacy`
+- teamsAppSettings.env.`FIFTYONE_APP_IMPRINT_URL`: `https://abc.com/imprint`
+
 ### Text Similarity
 
 FiftyOne Teams version 1.2 and higher supports using text similarity searches
@@ -495,6 +517,9 @@ For more information, see the docs for
 | `FIFTYONE_APP_BANNER_COLOR`                 | Global banner background color in App                                                                                                                                                                                                                                          | No                        |
 | `FIFTYONE_APP_BANNER_TEXT_COLOR`            | Global banner text color in App                                                                                                                                                                                                                                                | No                        |
 | `FIFTYONE_APP_BANNER_TEXT`                  | Global banner text in App                                                                                                                                                                                                                                                      | No                        |
+| `FIFTYONE_APP_TERMS_URL`                  | Terms of Service URL used in App                                                                                                                                                                                                                                                      | No                        |
+| `FIFTYONE_APP_PRIVACY_URL`                  | Privacy URL used in App                                                                                                                                                                                                                                                      | No                        |
+| `FIFTYONE_APP_IMPRINT_URL`                  | Imprint URL used in App                                                                                                                                                                                                                                                      | No                        |
 | `FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION` | The recommended fiftyone SDK version. This will be displayed in install modal (i.e. `pip install ... fiftyone==0.11.0`)                                                                                                                                                       | No                        |
 | `FIFTYONE_APP_THEME`                        | The default theme configuration for your FiftyOne Teams application as described [here](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                                                   | No                        |
 | `FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE`    | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off.                                                                                                                            | No                        |

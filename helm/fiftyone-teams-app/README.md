@@ -69,6 +69,7 @@ for steps on how to upgrade your delegated operators.
   - [Snapshot Archival](#snapshot-archival)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Static Banner Configuration](#static-banner-configuration)
+  - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
   - [Text Similarity](#text-similarity)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
@@ -362,6 +363,31 @@ teamsAppSettings:
     FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
     FIFTYONE_APP_BANNER_TEXT_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
     FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+```
+
+### Terms of Service, Privacy, and Imprint URLs
+
+Fiftyone Teams v2.6 introduces the ability to override the Terms of Service, Privacy,
+and Imprint (optional) links if required in the App.
+
+Configure the URLs by setting the following environment variables in
+your `values.yaml`.
+
+Terms of Service URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_TERMS_URL`.
+
+Privacy URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_PRIVACY_URL`.
+
+Imprint/Impressum URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_IMPRINT_URL`
+
+```yaml
+teamsAppSettings:
+  env:
+    FIFTYONE_APP_TERMS_URL: "https://abc.com/tos"
+    FIFTYONE_APP_PRIVACY_URL: "https://abc.com/privacy"
+    FIFTYONE_APP_IMPRINT_URL: "https://abc.com/imprint"
 ```
 
 ### Text Similarity
