@@ -51,6 +51,8 @@ Please refer to the
 [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-teams-v25-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
+To upgrade to FiftyOne Teams v2.5 or later, ensure that the `dbAdmin` permission is set on the `fiftyone` database, as it is required for proper functionality.
+
 ## Table of Contents
 
 <!-- toc -->
