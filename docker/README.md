@@ -324,30 +324,27 @@ for configuring snapshot archival.
 Fiftyone Teams v2.6 introduces the ability to add a static banner to the
 application.
 
-Banner text is configured with
-`services.teams-cas.environment.FIFTYONE_APP_BANNER_TEXT` and
-`services.teams-app.environment.FIFTYONE_APP_BANNER_TEXT`.
-Banner background color is configured with
-`services.teams-cas.environment.FIFTYONE_APP_BANNER_COLOR` and
-`services.teams-app.environment.FIFTYONE_APP_BANNER_COLOR`.
-Banner text color is configured with
-`services.teams-cas.environment.FIFTYONE_APP_BANNER_TEXT_COLOR` and
-`services.teams-app.environment.FIFTYONE_APP_BANNER_TEXT_COLOR`.
+Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
 
-Configure the Static Banner by setting the following environment variables in
-your `compose.override.yaml` like
+Banner background color is configured with `FIFTYONE_APP_BANNER_COLOR`.
+
+Banner text color is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR`
+
+Examples:
 
 ```yaml
 services:
-  teams-app:
+  teams-app-common:
     environment:
-      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
-      FIFTYONE_APP_BANNER_TEXT_COLOR: "white" # or "rgb(255,255,255)" or "#FFFFFF"
+      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
       FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
-  teams-cas:
+  teams-cas-common:
     environment:
-      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
-      FIFTYONE_APP_BANNER_TEXT_COLOR: "white" # or "rgb(255,255,255)" or "#FFFFFF"
+      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
       FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
 ```
 
@@ -462,9 +459,14 @@ Imprint/Impressum URL is configured with `FIFTYONE_APP_IMPRINT_URL`
 
 Examples:
 
-- teamsAppSettings.env.`FIFTYONE_APP_TERMS_URL`: `https://abc.com/tos`
-- teamsAppSettings.env.`FIFTYONE_APP_PRIVACY_URL`: `https://abc.com/privacy`
-- teamsAppSettings.env.`FIFTYONE_APP_IMPRINT_URL`: `https://abc.com/imprint`
+```yaml
+services:
+  teams-app-common:
+    environment:
+      FIFTYONE_APP_TERMS_URL: https://abc.com/tos
+      FIFTYONE_APP_PRIVACY_URL: https://abc.com/privacy
+      FIFTYONE_APP_IMPRINT_URL: https://abc.com/imprint
+```
 
 ### Text Similarity
 
