@@ -336,11 +336,19 @@ Banner text color is configured with:
 
 Examples:
 
-- (casSettings | teamsAppSettings).env.
-  `FIFTYONE_APP_BANNER_COLOR`: `green | rgb(34,139,34) | #f1f1f1`
-- (casSettings | teamsAppSettings).env.
-  `FIFTYONE_APP_BANNER_TEXT_COLOR`: `green | rgb(34,139,34") | #f1f1f1`
-- (casSettings | teamsAppSettings).env.`FIFTYONE_APP_BANNER_TEXT`="Internal Deployment"
+```yaml
+services:
+  teams-app-common:
+    environment:
+      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+  teams-cas-common:
+    environment:
+      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+```
 
 ### FiftyOne Teams Authenticated API
 
@@ -453,9 +461,14 @@ Imprint/Impressum URL is configured with `FIFTYONE_APP_IMPRINT_URL`
 
 Examples:
 
-- teamsAppSettings.env.`FIFTYONE_APP_TERMS_URL`: `https://abc.com/tos`
-- teamsAppSettings.env.`FIFTYONE_APP_PRIVACY_URL`: `https://abc.com/privacy`
-- teamsAppSettings.env.`FIFTYONE_APP_IMPRINT_URL`: `https://abc.com/imprint`
+```yaml
+services:
+  teams-app-common:
+    environment:
+      FIFTYONE_APP_TERMS_URL: https://abc.com/tos
+      FIFTYONE_APP_PRIVACY_URL: https://abc.com/privacy
+      FIFTYONE_APP_IMPRINT_URL: https://abc.com/imprint
+```
 
 ### Text Similarity
 
