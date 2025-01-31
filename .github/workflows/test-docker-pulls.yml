@@ -2,10 +2,7 @@
 # Ensures that all of the default images in our
 # helm values.yaml file are pullable to authenticated
 # users.
-# Triggered on the first PR opening to the main branch.
-# Re-runs will need to be manually kicked off.
-# Add 'synchronize' to `on.pull_request.types`
-# if that's a hassle.
+# Triggered on the PRs to the main branch.
 
 name: Tests - Artifact Pulls
 
@@ -13,8 +10,9 @@ on:
   pull_request:
     types:
       - opened
+      - synchronize
     branches:
-      - main # test only on first opening to a main branch
+      - main # test only PRs to main branch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
