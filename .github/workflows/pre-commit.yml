@@ -21,9 +21,6 @@ jobs:
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
-      - name: DEBUG
-        run: |
-          which shfmt
-          shfmt --version
-          shfmt -d -w -s utils/bump-fixtures-common.sh utils/bump-fixtures-helm.sh utils/get-image-versions.sh utils/bump-fixtures-docker.sh
+        with:
+          asdf_branch: v0.14.1
       - uses: pre-commit/action@v3.0.1
