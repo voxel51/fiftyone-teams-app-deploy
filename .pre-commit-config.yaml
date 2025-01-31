@@ -92,6 +92,7 @@ repos:
       - id: shellcheck
       - id: shfmt
         args:
+          - -d
           - -w
           - -s
   - repo: https://github.com/compilerla/conventional-pre-commit
