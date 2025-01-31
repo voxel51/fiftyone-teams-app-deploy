@@ -72,10 +72,8 @@ docker_pull() {
 parse_arguments "$@"
 check_requirements
 
-cd "${GIT_ROOT}/helm/fiftyone-teams-app"
-
 images=$(
-  helm template . -f "${VALUES_YAML}" |
+  helm template "${GIT_ROOT}/helm/fiftyone-teams-app" -f "${VALUES_YAML}" |
     yq eval -o yaml '.. | select(.image? != null) | .image' |
     sort |
     uniq |
