@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# Validates the pulling of docker images.
+# It maintains a static list of what we expect to be pullable
+# during a helm/docker deployment. It then runs a helm template,
+# utilizing our default values files, to get a list of files that
+# would be deployed. It first compares that list to our
+# EXPECTED_IMAGES array - helping stop typos or unexpected images
+# from leaking into our system. Finally, it pulls each expected image
+# to make sure they are pullable.
+# See ./utils/validate-docker-pulls.sh -h for help.
+
 set -euo pipefail
 
 # These are images we expect to be pullable in an
@@ -29,6 +39,10 @@ print_usage() {
   echo "options:"
   echo "-h, --help               Show brief help"
   echo "-f, --values VALUES_YAML values.yaml to use in templating. Defaults to ${VALUES_YAML}"
+  echo " "
+  echo "examples:"
+  echo "./utils/validate-docker-pulls.sh"
+  echo "./utils/validate-docker-pulls.sh -f ./path/to/values.yaml"
 }
 
 parse_arguments() {
