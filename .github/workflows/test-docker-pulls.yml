@@ -1,0 +1,41 @@
+---
+# Ensures that all of the default images in our
+# helm values.yaml file are pullable to authenticated
+# users.
+# Triggered on the first PR opening to the main branch.
+# Re-runs will need to be manually kicked off.
+# Add 'synchronize' to `on.pull_request.types`
+# if that's a hassle.
+
+name: Tests - Artifact Pulls
+
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main # test only on first opening to a main branch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-python@v5.3.0
+      - name: Temporary SQLite/LZMA - Install missing libraries
+        run: sudo apt install -y libsqlite3-dev libbz2-dev
+      - name: install asdf & tools
+        uses: asdf-vm/actions/install@v3.0.2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Test all docker pulls
+        shell: bash
+        run: |
+          ./utils/validate-docker-pulls.sh
