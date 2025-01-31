@@ -22,5 +22,7 @@ jobs:
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
         with:
+          # Issue with some of the pre-commit hooks. So pin to an older version for now. See
+          # https://github.com/voxel51/fiftyone-teams-app-deploy/actions/runs/13078221229/job/36495530561
           asdf_branch: v0.14.1
       - uses: pre-commit/action@v3.0.1
