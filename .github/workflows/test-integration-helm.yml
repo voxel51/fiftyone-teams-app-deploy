@@ -30,6 +30,11 @@ jobs:
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v3.0.2
+        with:
+          # Issue with some of the tests. So pin to an older version for now. See
+          # https://github.com/voxel51/fiftyone-teams-app-deploy/actions/runs/13078221229/job/36495530561
+          # https://voxel51.atlassian.net/browse/AS-506
+          asdf_branch: v0.14.1
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
