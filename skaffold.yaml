@@ -54,7 +54,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
               pullPolicy: IfNotPresent
-              tag: v2.5.1rc6
+              tag: v2.5.1rc1
 
           # FiftyOne App (fiftyone-app) configurations
           appSettings:
