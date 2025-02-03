@@ -6,7 +6,7 @@ description: |
   FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
   The FiftyoneTeams Helm chart is the recommended way to install and configure FiftyoneTeams on Kubernetes.
 type: application
-version: 2.5.0
-appVersion: "v2.5.0"
+version: 2.5.1
+appVersion: "v2.5.1"
 icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
 kubeVersion: ">=1.18-0"
