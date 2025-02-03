@@ -7,7 +7,11 @@ metadata:
     app: {{ include "teams-api.name" . }}
     {{- include "fiftyone-teams-api.labels" . | nindent 4 }}
 spec:
+  {{- if and (gt ( int .Values.apiSettings.replicaCount)  1) (.Values.apiSettings.env.FIFTYONE_SHARED_ROOT_DIR) }}
+  replicas: {{ .Values.apiSettings.replicaCount }}
+  {{- else }}
   replicas: 1
+  {{- end }}
   selector:
     matchLabels:
       app: {{ include "teams-api.name" . }}

@@ -68,6 +68,8 @@ for steps on how to upgrade your delegated operators.
   - [Proxies](#proxies)
   - [Snapshot Archival](#snapshot-archival)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+  - [Static Banner Configuration](#static-banner-configuration)
+  - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
   - [Text Similarity](#text-similarity)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
@@ -330,6 +332,64 @@ mounted into pods or provided via environment variables.
 FiftyOne Teams continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
+
+### Static Banner Configuration
+
+Fiftyone Teams v2.6 introduces the ability to add a static banner to the
+application.
+
+Configure the Static Banner by setting the following environment variables in
+your `values.yaml`.
+
+Banner text is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_TEXT` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT`
+
+Banner background color is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_COLOR` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_COLOR`
+
+Banner text color is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR`
+
+```yaml
+casSettings:
+  env:
+    FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+    FIFTYONE_APP_BANNER_TEXT_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+    FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+teamsAppSettings:
+  env:
+    FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+    FIFTYONE_APP_BANNER_TEXT_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+    FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+```
+
+### Terms of Service, Privacy, and Imprint URLs
+
+Fiftyone Teams v2.6 introduces the ability to override the Terms of Service, Privacy,
+and Imprint (optional) links if required in the App.
+
+Configure the URLs by setting the following environment variables in
+your `values.yaml`.
+
+Terms of Service URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_TERMS_URL`.
+
+Privacy URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_PRIVACY_URL`.
+
+Imprint/Impressum URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_IMPRINT_URL`
+
+```yaml
+teamsAppSettings:
+  env:
+    FIFTYONE_APP_TERMS_URL: "https://abc.com/tos"
+    FIFTYONE_APP_PRIVACY_URL: "https://abc.com/privacy"
+    FIFTYONE_APP_IMPRINT_URL: "https://abc.com/imprint"
+```
 
 ### Text Similarity
 
