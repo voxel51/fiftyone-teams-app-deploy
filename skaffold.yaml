@@ -81,7 +81,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
               pullPolicy: IfNotPresent
-              tag: v2.5.1-rc.5
+              tag: v2.5.1-rc.0
 
           # TODO: Test `minikube addons configure registry-creds` or
           # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
