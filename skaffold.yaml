@@ -166,6 +166,6 @@ deploy:
               # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
               # This is a byproduct of `npm` versioning versus Python PEP 440.
               pullPolicy: IfNotPresent
-              tag: v2.5.1-rc.5
+              tag: v2.5.1-rc.0
 
   kubeContext: minikube
