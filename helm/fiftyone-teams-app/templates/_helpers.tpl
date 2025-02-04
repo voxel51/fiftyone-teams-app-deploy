@@ -281,7 +281,7 @@ Common Init Containers
   command:
     - 'sh'
     - '-c'
-    - "until nslookup {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done"
+    - "until wget -qO /dev/null {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local/cas/api; do echo waiting for cas; sleep 2; done"
 {{- end }}
 
 {{/*
