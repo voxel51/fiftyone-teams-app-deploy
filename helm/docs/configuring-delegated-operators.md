@@ -38,7 +38,7 @@ available to this deployment. Logs are uploaded in the format
 `<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
 In `values.yaml`, set `configured_path`
 
-- `delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
+- `delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH`
 
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).

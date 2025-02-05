@@ -401,7 +401,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH",
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
           },
           {
@@ -465,7 +465,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH",
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
           },
           {
@@ -540,7 +540,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH",
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
           },
           {
@@ -603,7 +603,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH",
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
           },
           {

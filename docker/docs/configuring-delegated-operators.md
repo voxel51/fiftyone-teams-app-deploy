@@ -36,7 +36,7 @@ Optionally, delegated operation run logs may be uploaded to a
 network-mounted file system or cloud storage path.
 Logs are uploaded in the format
 `<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`.
-Set `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH` to `configured_path`.
+Set `FIFTYONE_DELEGATED_OPERATION_LOG_PATH` to `configured_path`.
 
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
