@@ -4,6 +4,7 @@
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From FiftyOne Teams Version 2.0.0 or Higher](#from-fiftyone-teams-version-200-or-higher)
+    - [FiftyOne Teams v2.7+ Delegated Operator Changes](#fiftyone-teams-v27-delegated-operator-changes)
     - [FiftyOne Teams v2.5+ Delegated Operator Changes](#fiftyone-teams-v25-delegated-operator-changes)
     - [FiftyOne Teams v2.2+ Delegated Operator Changes](#fiftyone-teams-v22-delegated-operator-changes)
       - [Delegated Operation Capacity](#delegated-operation-capacity)
