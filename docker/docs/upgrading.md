@@ -4,6 +4,7 @@
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From FiftyOne Teams Version 2.0.0 and Later](#from-fiftyone-teams-version-200-and-later)
+    - [FiftyOne Teams v2.7+ Delegated Operator Changes](#fiftyone-teams-v27-delegated-operator-changes)
     - [FiftyOne Teams v2.5+ Delegated Operator Changes](#fiftyone-teams-v25-delegated-operator-changes)
     - [FiftyOne Teams v2.2+ Delegated Operator Changes](#fiftyone-teams-v22-delegated-operator-changes)
     - [Delegated Operation Capacity](#delegated-operation-capacity)
@@ -42,6 +43,13 @@ and update your deployment accordingly.
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Teams v2.7+ Delegated Operator Changes
+
+FiftyOne Teams v2.7.0 changes the `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
+environment variable to `FIFTYONE_DELEGATED_OPERATION_LOG_PATH`.
+Please note that this change is backwards compatible, but should
+be changed in your manifests moving forward.
 
 #### FiftyOne Teams v2.5+ Delegated Operator Changes
 
