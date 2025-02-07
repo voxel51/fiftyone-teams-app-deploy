@@ -197,6 +197,21 @@ func (s *deploymentApiTemplateTest) TestReplicas() {
 			nil,
 			1,
 		},
+		{
+			"overrideReplicaCountWithoutCacheDefined",
+			map[string]string{
+				"apiSettings.replicaCount": "3",
+			},
+			1,
+		},
+		{
+			"overrideReplicaCountWithCacheDefined",
+			map[string]string{
+				"apiSettings.replicaCount":                 "2",
+				"apiSettings.env.FIFTYONE_SHARED_ROOT_DIR": "/opt/shared",
+			},
+			2,
+		},
 	}
 
 	for _, testCase := range testCases {
