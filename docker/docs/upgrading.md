@@ -43,6 +43,13 @@ and update your deployment accordingly.
    fiftyone migrate --info
    ```
 
+#### FiftyOne Teams v2.6+ Delegated Operator Changes
+
+FiftyOne Teams v2.7.0 changes the `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
+environment variable to `FIFTYONE_DELEGATED_OPERATION_LOG_PATH`.
+Please note that this change is backwards compatible, but should
+be changed in your manifests moving forward.
+
 #### FiftyOne Teams v2.5+ Delegated Operator Changes
 
 FiftyOne Teams v2.5.0 changes the base image of the built-in delegated
