@@ -64,6 +64,7 @@ for steps on how to upgrade your delegated operators.
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
+  - [Highly Available FiftyOne `teams-api` Deployments](#highly-available-fiftyone-teams-api-deployments)
   - [Plugins](#plugins)
   - [Proxies](#proxies)
   - [Snapshot Archival](#snapshot-archival)
@@ -248,6 +249,17 @@ To enable the FiftyOne Teams Authenticated API,
 [expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
 and
 [configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+
+### Highly Available FiftyOne `teams-api` Deployments
+
+FiftyOne Teams v2.7 introduced support for running multiple `teams-api` pods for
+high availability [HA].
+
+Running multiple `teams-api` pods requires a read-write volume available to all
+of the pods in the `teams-api` deployment to synchronize the API cache.
+
+For configuring HA FiftyOne `teams-api` deployments see
+[Configuring Highly Available FiftyOne `teams-api` Deployments](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configure-ha-teams-api.md)
 
 ### Plugins
 
