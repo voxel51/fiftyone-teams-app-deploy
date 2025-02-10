@@ -2,20 +2,10 @@
 name: Tests - Integration Helm
 
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-    paths:
-      - .github/workflows/test-integration-helm.yml
-      - helm/fiftyone-teams-app/**
-      - tests/fixtures/helm/**
-      - tests/integration/helm/**
-      - tests/unit/helm/**
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
+    secrets:
+      REPO_GOOGLE_WORKLOAD_IDP:
+        required: true
 
 jobs:
   integration-helm:

@@ -1,13 +1,22 @@
 ---
+# Releases a pre-release chart and the charts
+# that depend on it. It is triggered by
+# The PR workflow. The PR workflow will first run any and all tests
+# that it has to. If the tests are successful,create a new RC-stamped
+# chart to use for internal environments.
 name: Release Pre-release charts
 
 on:
-  push:
-    branches-ignore:
-      - main
-    paths:
-      - 'helm/fiftyone-teams-app/**'
-      - '.github/workflows/pre-release-internal-env.yml'
+  workflow_call:
+    secrets:
+      REPO_GOOGLE_WORKLOAD_IDP:
+        required: true
+      WD_HCI_FG_PAT:
+        required: true
+      CROSS_REPOSITORY_REPOSITORY:
+        required: true
+      CROSS_REPOSITORY_WORKFLOW:
+        required: true
 
 jobs:
   pre-release:
