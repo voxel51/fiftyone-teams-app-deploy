@@ -3,11 +3,11 @@ name: Release Pre-release charts
 
 on:
   # push:
-    # branches-ignore:
-    #   - main
-    # paths:
-    #   - 'helm/fiftyone-teams-app/**'
-    #   - '.github/workflows/pre-release-internal-env.yml'
+  #   # branches-ignore:
+  #   #   - main
+  #   # paths:
+  #   #   - 'helm/fiftyone-teams-app/**'
+  #   #   - '.github/workflows/pre-release-internal-env.yml'
 
   workflow_run:
     workflows:
