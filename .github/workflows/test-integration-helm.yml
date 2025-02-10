@@ -1,7 +1,11 @@
 ---
 name: Tests - Integration Helm
 
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      REPO_GOOGLE_WORKLOAD_IDP:
+        required: true
 
 jobs:
   integration-helm:

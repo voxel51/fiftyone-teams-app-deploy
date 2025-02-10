@@ -10,7 +10,17 @@
 name: Release Pre-release charts
 
 on:
-  workflow_call: {}
+  workflow_call:
+    secrets:
+      REPO_GOOGLE_WORKLOAD_IDP:
+        required: true
+      WD_HCI_FG_PAT:
+        required: true
+      CROSS_REPOSITORY_REPOSITORY:
+        required: true
+      CROSS_REPOSITORY_WORKFLOW:
+        required: true
+
 
   push:
     branches-ignore:
