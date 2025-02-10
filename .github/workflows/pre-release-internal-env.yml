@@ -30,7 +30,8 @@ jobs:
       GCP_SERVICE_ACCOUNT: github@computer-vision-team.iam.gserviceaccount.com
       HELM_CHART_NAME: fiftyone-teams-app
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
+    if: |
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
     # outputs:
     #   fiftyone-teams-app-deploy-version: ${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}
