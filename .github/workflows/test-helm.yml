@@ -3,10 +3,6 @@ name: Tests - Helm
 
 on: workflow_call
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   unit-helm:
     runs-on: ubuntu-latest
