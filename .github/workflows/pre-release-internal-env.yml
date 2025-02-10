@@ -2,7 +2,7 @@
 name: Release Pre-release charts
 
 on:
-  push:
+  # push:
     # branches-ignore:
     #   - main
     # paths:
