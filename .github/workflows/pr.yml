@@ -50,11 +50,18 @@ jobs:
     needs: modified-files
     if: ${{ needs.modified-files.outputs.docker-unit-required == 'true' }}
     uses: ./.github/workflows/test-docker.yml
+    secrets:
+      REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
+      FO_INTERNAL_LICENSE: ${{ secrets.FO_INTERNAL_LICENSE }}
+      FO_LEGACY_LICENSE: ${{ secrets.FO_LEGACY_LICENSE }}
 
   helm-integration:
     needs: modified-files
     if: ${{ needs.modified-files.outputs.helm-integration-required == 'true' }}
     uses: ./.github/workflows/test-integration-helm.yml
+    secrets:
+      REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
+
 
   helm-unit:
     needs: modified-files
@@ -77,3 +84,8 @@ jobs:
       always() &&
       (needs.helm-unit.result == 'success' || needs.helm-integration.result == 'success')
     uses: ./.github/workflows/pre-release-internal-env.yml
+    secrets:
+      REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
+      WD_HCI_FG_PAT: ${{ secrets.WD_HCI_FG_PAT }}
+      CROSS_REPOSITORY_REPOSITORY: ${{ secrets.CROSS_REPOSITORY_REPOSITORY }}
+      CROSS_REPOSITORY_WORKFLOW: ${{ secrets.CROSS_REPOSITORY_WORKFLOW }}
