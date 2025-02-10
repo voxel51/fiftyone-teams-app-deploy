@@ -15,7 +15,7 @@ on:
       # - Tests - Docker Compose
       # - Tests - Helm
       # - Tests - Integration Helm
-    types: 
+    types:
       - completed
 
 jobs:
@@ -32,8 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
 
-    outputs:
-      fiftyone-teams-app-deploy-version: ${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}
+    # outputs:
+    #   fiftyone-teams-app-deploy-version: ${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}
 
     steps:
       - name: Checkout
