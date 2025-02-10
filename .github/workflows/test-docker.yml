@@ -1,19 +1,7 @@
 ---
 name: Tests - Docker Compose
 
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-    paths:
-      - .github/workflows/test-docker.yml
-      - docker/common-services.yaml
-      - docker/internal-auth/**
-      - docker/legacy-auth/**
-      - tests/fixtures/docker/**
-      - tests/integration/compose/**
-      - tests/unit/compose/**
+on: workflow_call
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

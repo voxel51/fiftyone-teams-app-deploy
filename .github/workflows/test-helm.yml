@@ -1,17 +1,7 @@
 ---
 name: Tests - Helm
 
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-    paths:
-      - .github/workflows/test-helm.yml
-      - helm/fiftyone-teams-app/**
-      - tests/fixtures/helm/**
-      - tests/integration/helm/**
-      - tests/unit/helm/**
+on: workflow_call
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
