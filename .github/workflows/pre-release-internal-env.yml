@@ -3,11 +3,11 @@ name: Release Pre-release charts
 
 on:
   push:
-    branches-ignore:
-      - main
-    paths:
-      - 'helm/fiftyone-teams-app/**'
-      - '.github/workflows/pre-release-internal-env.yml'
+    # branches-ignore:
+    #   - main
+    # paths:
+    #   - 'helm/fiftyone-teams-app/**'
+    #   - '.github/workflows/pre-release-internal-env.yml'
 
   workflow_run:
     workflows:
@@ -31,6 +31,7 @@ jobs:
       HELM_CHART_NAME: fiftyone-teams-app
     runs-on: ubuntu-latest
     if: |
+      github.event_name == 'push' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
     # outputs:
