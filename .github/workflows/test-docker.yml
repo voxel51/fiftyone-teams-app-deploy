@@ -2,22 +2,14 @@
 name: Tests - Docker Compose
 
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-    paths:
-      - .github/workflows/test-docker.yml
-      - docker/common-services.yaml
-      - docker/internal-auth/**
-      - docker/legacy-auth/**
-      - tests/fixtures/docker/**
-      - tests/integration/compose/**
-      - tests/unit/compose/**
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
+    secrets:
+      REPO_GOOGLE_WORKLOAD_IDP:
+        required: true
+      FO_INTERNAL_LICENSE:
+        required: true
+      FO_LEGACY_LICENSE:
+        required: true
 
 jobs:
   unit-compose:
