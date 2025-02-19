@@ -103,7 +103,7 @@ func (s *topologyAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
-					log:              "Listening on port 3000",
+					log:              " ✓ Ready in",
 				},
 				{
 					name:             "teams-cas",

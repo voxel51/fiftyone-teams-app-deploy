@@ -93,7 +93,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
-					log:              "Listening on port 3000",
+					log:              " ✓ Ready in",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -171,7 +171,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
-					log:              "Listening on port 3000",
+					log:              " ✓ Ready in",
 				},
 				{
 					name:             "teams-do",
@@ -250,7 +250,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
-					log:              "Listening on port 3000",
+					log:              " ✓ Ready in",
 				},
 				{
 					name:             "teams-plugins",
