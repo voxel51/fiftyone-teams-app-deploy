@@ -108,7 +108,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:3000/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
-					log:              "Listening on port 3000",
+					log:              " ✓ Ready in",
 				},
 				{
 					name:             "teams-cas",
@@ -145,7 +145,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:3000/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
-					log:              "Listening on port 3000",
+					log:              " ✓ Ready in",
 				},
 				{
 					name:             "teams-cas",
@@ -182,7 +182,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:3000/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
-					log:              "Listening on port 3000",
+					log:              " ✓ Ready in",
 				},
 				{
 					name:             "teams-cas",
@@ -226,7 +226,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:3000/api/hello",
 					responsePayload:  `{"name":"John Doe"}`,
 					httpResponseCode: 200,
-					log:              "Listening on port 3000",
+					log:              " ✓ Ready in",
 				},
 				{
 					name:             "teams-cas",
