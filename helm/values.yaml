@@ -68,7 +68,7 @@ secret:
 #     FIFTYONE_PLUGINS_DIR: /opt/plugins
 #     # Set FIFTYONE_TEAMS_VERSION_OVERRIDE to override the `Install FiftyOne`
 #     # bash command in the `Settings > Install FiftyOne` modal
-#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.5.1
+#     FIFTYONE_TEAMS_VERSION_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.7.0
 
 
 appSettings:
