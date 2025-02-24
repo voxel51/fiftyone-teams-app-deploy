@@ -1,0 +1,99 @@
+{{- $invalid := and (.Values.delegatedOperatorExecutorSettings.enabled) (gt (len .Values.delegatedOperatorInstances) 0) }}
+{{- if $invalid }}
+{{- fail "Both delegatedOperatorExecutorSettings.enabled and delegatedOperatorInstances configured. Please use one or the other" }}
+{{- end }}
+{{- range $k, $v := .Values.delegatedOperatorInstances }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ kebabcase $k }}
+  namespace: {{ $.Values.namespace.name }}
+  labels:
+    {{- include "delegated-operator-executor.labels" $ | nindent 4 }}
+    app.teams.operator/instance: {{ kebabcase $k }}
+spec:
+  replicas: {{ $v.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "delegated-operator-executor.selectorLabels" $ | nindent 6 }}
+      app.teams.operator/instance: {{ kebabcase $k }}
+  template:
+    metadata:
+      {{- with $v.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "delegated-operator-executor.selectorLabels" $ | nindent 8 }}
+        {{- with $v.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        app.teams.operator/instance: {{ kebabcase $k }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $v.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ kebabcase $k }}
+          command: ["fiftyone"]
+          args: ["delegated", "launch", "-t", "remote"]
+          securityContext:
+            {{- toYaml $v.securityContext | nindent 12 }}
+          image: "{{ $v.image.repository }}:{{ $v.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $v.image.pullPolicy | default "Always" }}
+          env:
+            {{- include "delegated-operator-executor.env-vars-list" $ | indent 12 }}
+          resources:
+            {{- toYaml $v.resources | nindent 12 }}
+          {{- with $v.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o liveness
+            failureThreshold: {{ $v.liveness.failureThreshold }}
+            periodSeconds: {{ $v.liveness.periodSeconds }}
+            timeoutSeconds: {{ $v.liveness.timeoutSeconds }}
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o readiness
+            failureThreshold: {{ $v.readiness.failureThreshold }}
+            periodSeconds: {{ $v.readiness.periodSeconds }}
+            timeoutSeconds: {{ $v.readiness.timeoutSeconds }}
+          startupProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o startup
+            failureThreshold: {{ $v.startup.failureThreshold }}
+            periodSeconds: {{ $v.startup.periodSeconds }}
+            timeoutSeconds: {{ $v.startup.timeoutSeconds }}
+      {{- with $v.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $v.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $v.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $v.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
