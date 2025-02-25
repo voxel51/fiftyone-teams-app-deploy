@@ -2775,7 +2775,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 					var expectedProbe *corev1.Probe
 					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 					s.NoError(err)
-					s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+					s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 				},
 				func(probe *corev1.Probe) {
 					expectedProbeJSON := `{
@@ -2793,7 +2793,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 					var expectedProbe *corev1.Probe
 					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 					s.NoError(err)
-					s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+					s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 				},
 			},
 		},
@@ -2824,7 +2824,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 					var expectedProbe *corev1.Probe
 					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 					s.NoError(err)
-					s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+					s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 				},
 				func(probe *corev1.Probe) {
 					expectedProbeJSON := `{
@@ -2842,7 +2842,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 					var expectedProbe *corev1.Probe
 					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 					s.NoError(err)
-					s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+					s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 				},
 			},
 		},
@@ -2876,7 +2876,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 					var expectedProbe *corev1.Probe
 					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 					s.NoError(err)
-					s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+					s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 				},
 				func(probe *corev1.Probe) {
 					expectedProbeJSON := `{
@@ -2885,6 +2885,550 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
                 "sh",
                 "-c",
                 "fiftyone delegated list --limit 1 -o liveness"
+              ]
+          },
+          "failureThreshold": 30,
+          "periodSeconds": 35,
+          "timeoutSeconds": 40
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].LivenessProbe)
+				}
+			}
+		})
+	}
+}
+
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadinessProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					s.Empty(probe, "Readiness probe should not be set.")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30,
+          "timeoutSeconds": 30
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30,
+          "timeoutSeconds": 30
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30,
+          "timeoutSeconds": 30
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateReadinessProbe",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":          "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":       "nil",
+				"delegatedOperatorDeployments.template.readiness.failureThreshold": "10",
+				"delegatedOperatorDeployments.template.readiness.periodSeconds":    "10",
+				"delegatedOperatorDeployments.template.readiness.timeoutSeconds":   "10",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 10
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 10
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceReadinessProbe",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.readiness.failureThreshold":    "15",
+				"delegatedOperatorDeployments.deployments.teamsDo.readiness.periodSeconds":       "20",
+				"delegatedOperatorDeployments.deployments.teamsDo.readiness.timeoutSeconds":      "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.failureThreshold": "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.periodSeconds":    "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.timeoutSeconds":   "40",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 15,
+          "periodSeconds": 20,
+          "timeoutSeconds": 25
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 30,
+          "periodSeconds": 35,
+          "timeoutSeconds": 40
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceReadinessProbe",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.readiness.failureThreshold":    "15",
+				"delegatedOperatorDeployments.deployments.teamsDo.readiness.periodSeconds":       "20",
+				"delegatedOperatorDeployments.deployments.teamsDo.readiness.timeoutSeconds":      "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.failureThreshold": "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.periodSeconds":    "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.timeoutSeconds":   "40",
+				"delegatedOperatorDeployments.template.readiness.failureThreshold":               "10",
+				"delegatedOperatorDeployments.template.readiness.periodSeconds":                  "10",
+				"delegatedOperatorDeployments.template.readiness.timeoutSeconds":                 "10",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 15,
+          "periodSeconds": 20,
+          "timeoutSeconds": 25
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o readiness"
+              ]
+          },
+          "failureThreshold": 30,
+          "periodSeconds": 35,
+          "timeoutSeconds": 40
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].ReadinessProbe)
+				}
+			}
+		})
+	}
+}
+
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupProbe() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(probe *corev1.Probe)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					s.Empty(probe, "Startup probe should not be set.")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30,
+          "timeoutSeconds": 30
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "startup Probes should be equal")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30,
+          "timeoutSeconds": 30
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "startup Probes should be equal")
+				},
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30,
+          "timeoutSeconds": 30
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "startup Probes should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateStartupProbe",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":        "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":     "nil",
+				"delegatedOperatorDeployments.template.startup.failureThreshold": "10",
+				"delegatedOperatorDeployments.template.startup.periodSeconds":    "10",
+				"delegatedOperatorDeployments.template.startup.timeoutSeconds":   "10",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 10
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "startup Probes should be equal")
+				},
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 10,
+          "timeoutSeconds": 10
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "startup Probes should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceStartupProbe",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.startup.failureThreshold":    "15",
+				"delegatedOperatorDeployments.deployments.teamsDo.startup.periodSeconds":       "20",
+				"delegatedOperatorDeployments.deployments.teamsDo.startup.timeoutSeconds":      "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.failureThreshold": "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.periodSeconds":    "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.timeoutSeconds":   "40",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 15,
+          "periodSeconds": 20,
+          "timeoutSeconds": 25
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+				},
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 30,
+          "periodSeconds": 35,
+          "timeoutSeconds": 40
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceStartupProbe",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.startup.failureThreshold":    "15",
+				"delegatedOperatorDeployments.deployments.teamsDo.startup.periodSeconds":       "20",
+				"delegatedOperatorDeployments.deployments.teamsDo.startup.timeoutSeconds":      "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.failureThreshold": "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.periodSeconds":    "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.timeoutSeconds":   "40",
+				"delegatedOperatorDeployments.template.startup.failureThreshold":               "10",
+				"delegatedOperatorDeployments.template.startup.periodSeconds":                  "10",
+				"delegatedOperatorDeployments.template.startup.timeoutSeconds":                 "10",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
+              ]
+          },
+          "failureThreshold": 15,
+          "periodSeconds": 20,
+          "timeoutSeconds": 25
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+				},
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o startup"
               ]
           },
           "failureThreshold": 30,
@@ -2928,163 +3472,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 					var deployment appsv1.Deployment
 					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].LivenessProbe)
+					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].StartupProbe)
 				}
 			}
 		})
 	}
 }
-
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadinessProbe() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(probe *corev1.Probe)
-// 	}{
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(probe *corev1.Probe) {
-// 				expectedProbeJSON := `{
-//           "exec": {
-//               "command": [
-//                 "sh",
-//                 "-c",
-//                 "fiftyone delegated list --limit 1 -o readiness"
-//               ]
-//           },
-//           "failureThreshold": 5,
-//           "periodSeconds": 30,
-//           "timeoutSeconds": 30
-//         }`
-// 				var expectedProbe *corev1.Probe
-// 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
-// 				s.NoError(err)
-// 				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
-// 			},
-// 		},
-// 		{
-// 			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                    "true",
-// 				"delegatedOperatorExecutorSettings.readiness.failureThreshold": "10",
-// 				"delegatedOperatorExecutorSettings.readiness.periodSeconds":    "10",
-// 				"delegatedOperatorExecutorSettings.readiness.timeoutSeconds":   "10",
-// 			},
-// 			func(probe *corev1.Probe) {
-// 				expectedProbeJSON := `{
-//           "exec": {
-//               "command": [
-//                 "sh",
-//                 "-c",
-//                 "fiftyone delegated list --limit 1 -o readiness"
-//               ]
-//           },
-//           "failureThreshold": 10,
-//           "periodSeconds": 10,
-//           "timeoutSeconds": 10
-//         }`
-// 				var expectedProbe *corev1.Probe
-// 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
-// 				s.NoError(err)
-// 				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
-// 			},
-// 		},
-// 	}
-
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
-
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
-
-// 			options := &helm.Options{SetValues: testCase.values}
-// 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
-
-// 			var deployment appsv1.Deployment
-// 			helm.UnmarshalK8SYaml(subT, output, &deployment)
-
-// 			testCase.expected(deployment.Spec.Template.Spec.Containers[0].ReadinessProbe)
-// 		})
-// 	}
-// }
-
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupProbe() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(probe *corev1.Probe)
-// 	}{
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(probe *corev1.Probe) {
-// 				expectedProbeJSON := `{
-//           "exec": {
-//               "command": [
-//                 "sh",
-//                 "-c",
-//                 "fiftyone delegated list --limit 1 -o startup"
-//               ]
-//           },
-//           "failureThreshold": 5,
-//           "periodSeconds": 30,
-//           "timeoutSeconds": 30
-//         }`
-// 				var expectedProbe *corev1.Probe
-// 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
-// 				s.NoError(err)
-// 				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
-// 			},
-// 		},
-// 		{
-// 			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                  "true",
-// 				"delegatedOperatorExecutorSettings.startup.failureThreshold": "10",
-// 				"delegatedOperatorExecutorSettings.startup.periodSeconds":    "10",
-// 				"delegatedOperatorExecutorSettings.startup.timeoutSeconds":   "10",
-// 			},
-// 			func(probe *corev1.Probe) {
-// 				expectedProbeJSON := `{
-//           "exec": {
-//               "command": [
-//                 "sh",
-//                 "-c",
-//                 "fiftyone delegated list --limit 1 -o startup"
-//               ]
-//           },
-//           "failureThreshold": 10,
-//           "periodSeconds": 10,
-//           "timeoutSeconds": 10
-//         }`
-// 				var expectedProbe *corev1.Probe
-// 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
-// 				s.NoError(err)
-// 				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
-// 			},
-// 		},
-// 	}
-
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
-
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
-
-// 			options := &helm.Options{SetValues: testCase.values}
-// 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
-
-// 			var deployment appsv1.Deployment
-// 			helm.UnmarshalK8SYaml(subT, output, &deployment)
-
-// 			testCase.expected(deployment.Spec.Template.Spec.Containers[0].StartupProbe)
-// 		})
-// 	}
-// }
