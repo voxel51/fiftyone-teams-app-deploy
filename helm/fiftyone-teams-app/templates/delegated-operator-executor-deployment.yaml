@@ -1,4 +1,3 @@
-{{- template "fiftyone-teams-app.teams-do-deprecation-validation" . }}
 {{- if .Values.delegatedOperatorExecutorSettings.enabled }}
 apiVersion: apps/v1
 kind: Deployment

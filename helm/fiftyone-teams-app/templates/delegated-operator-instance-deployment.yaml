@@ -2,14 +2,14 @@
 {{- $baseTpl := .Values.delegatedOperatorDeployments.template }}
 {{- range $k, $v := .Values.delegatedOperatorDeployments.deployments }}
 {{- $name := kebabcase $k }}
-{{- $labelContext := (merge $ (dict "name" $name)) }}
+{{- $labelContext := (merge (dict "name" $name) $) }}
 {{-
   $envContext := (
     dict "secretName" $.Values.secret.name
     "apiServiceName" $.Values.apiSettings.service.name
     "apiServicePort" (float64 $.Values.apiSettings.service.port)
-    "env" (merge $baseTpl.env ($v.env | default dict) )
-    "secretEnv" (merge $baseTpl.secretEnv ($v.secretEnv | default dict))
+    "env" (merge (dict) ($baseTpl.env) ($v.env | default dict) )
+    "secretEnv" (merge (dict) ($baseTpl.secretEnv) ($v.secretEnv | default dict))
   )
 }}
 apiVersion: apps/v1
@@ -34,7 +34,7 @@ spec:
       {{- end }}
       labels:
         {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 8 }}
-        {{- with $v.labels | default $baseTpl.labels }}
+        {{- with merge $baseTpl.labels ($v.labels | default dict) }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         app.teams.operator/instance: {{ $name }}
@@ -115,4 +115,5 @@ spec:
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+---
 {{- end }}
