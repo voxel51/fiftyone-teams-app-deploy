@@ -1,34 +1,43 @@
-{{- $invalid := and (.Values.delegatedOperatorExecutorSettings.enabled) (gt (len .Values.delegatedOperatorInstances) 0) }}
-{{- if $invalid }}
-{{- fail "Both delegatedOperatorExecutorSettings.enabled and delegatedOperatorInstances configured. Please use one or the other" }}
-{{- end }}
-{{- range $k, $v := .Values.delegatedOperatorInstances }}
+{{- template "fiftyone-teams-app.teams-do-deprecation-validation" . }}
+{{- $baseTpl := .Values.delegatedOperatorDeployments.template }}
+{{- range $k, $v := .Values.delegatedOperatorDeployments.deployments }}
+{{- $name := kebabcase $k }}
+{{- $labelContext := (merge $ (dict "name" $name)) }}
+{{-
+  $envContext := (
+    dict "secretName" $.Values.secret.name
+    "apiServiceName" $.Values.apiSettings.service.name
+    "apiServicePort" (float64 $.Values.apiSettings.service.port)
+    "env" (merge $baseTpl.env ($v.env | default dict) )
+    "secretEnv" (merge $baseTpl.secretEnv ($v.secretEnv | default dict))
+  )
+}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ kebabcase $k }}
+  name: {{ $name }}
   namespace: {{ $.Values.namespace.name }}
   labels:
-    {{- include "delegated-operator-executor.labels" $ | nindent 4 }}
-    app.teams.operator/instance: {{ kebabcase $k }}
+    {{- include "delegated-operator-deployments.labels" $labelContext | nindent 4 }}
+    app.teams.operator/instance: {{ $name }}
 spec:
-  replicas: {{ $v.replicaCount }}
+  replicas: {{ $v.replicaCount | default $baseTpl.replicaCount }}
   selector:
     matchLabels:
-      {{- include "delegated-operator-executor.selectorLabels" $ | nindent 6 }}
-      app.teams.operator/instance: {{ kebabcase $k }}
+      {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 6 }}
+      app.teams.operator/instance: {{ $name }}
   template:
     metadata:
-      {{- with $v.podAnnotations }}
+      {{- with $v.podAnnotations | default $baseTpl.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "delegated-operator-executor.selectorLabels" $ | nindent 8 }}
-        {{- with $v.labels }}
+        {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 8 }}
+        {{- with $v.labels | default $baseTpl.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        app.teams.operator/instance: {{ kebabcase $k }}
+        app.teams.operator/instance: {{ $name }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
@@ -36,20 +45,30 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
       securityContext:
-        {{- toYaml $v.podSecurityContext | nindent 8 }}
+        {{- toYaml $v.podSecurityContext | default $baseTpl.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ kebabcase $k }}
+        - name: {{ $name }}
           command: ["fiftyone"]
-          args: ["delegated", "launch", "-t", "remote"]
+          args:
+            - delegated
+            - launch
+            - -t
+            - remote
+            - -n
+            - {{ $name }}
+            {{- if $v.description }}
+            - -d
+            - {{ $v.description | quote }}
+            {{- end }}
           securityContext:
-            {{- toYaml $v.securityContext | nindent 12 }}
-          image: "{{ $v.image.repository }}:{{ $v.image.tag | default $.Chart.AppVersion }}"
-          imagePullPolicy: {{ $v.image.pullPolicy | default "Always" }}
+            {{- toYaml $v.securityContext | default $baseTpl.securityContext | nindent 12 }}
+          image: "{{ ($v.image).repository | default $baseTpl.image.repository }}:{{ ($v.image).tag | default $baseTpl.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ ($v.image).pullPolicy | default $baseTpl.image.pullPolicy }}
           env:
-            {{- include "delegated-operator-executor.env-vars-list" $ | indent 12 }}
+            {{- include "delegated-operator-deployments.env-vars-list" $envContext | indent 12 }}
           resources:
-            {{- toYaml $v.resources | nindent 12 }}
-          {{- with $v.volumeMounts }}
+            {{- toYaml $v.resources | default $baseTpl.resources | nindent 12 }}
+          {{- with $v.volumeMounts | default $baseTpl.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -59,40 +78,40 @@ spec:
                 - sh
                 - -c
                 - fiftyone delegated list --limit 1 -o liveness
-            failureThreshold: {{ $v.liveness.failureThreshold }}
-            periodSeconds: {{ $v.liveness.periodSeconds }}
-            timeoutSeconds: {{ $v.liveness.timeoutSeconds }}
+            failureThreshold: {{ ($v.liveness).failureThreshold | default $baseTpl.liveness.failureThreshold  }}
+            periodSeconds: {{ ($v.liveness).periodSeconds | default $baseTpl.liveness.periodSeconds }}
+            timeoutSeconds: {{ ($v.liveness).timeoutSeconds | default $baseTpl.liveness.timeoutSeconds }}
           readinessProbe:
             exec:
               command:
                 - sh
                 - -c
                 - fiftyone delegated list --limit 1 -o readiness
-            failureThreshold: {{ $v.readiness.failureThreshold }}
-            periodSeconds: {{ $v.readiness.periodSeconds }}
-            timeoutSeconds: {{ $v.readiness.timeoutSeconds }}
+            failureThreshold: {{ ($v.readiness).failureThreshold | default $baseTpl.readiness.timeoutSeconds }}
+            periodSeconds: {{ ($v.readiness).periodSeconds | default $baseTpl.readiness.timeoutSeconds }}
+            timeoutSeconds: {{ ($v.readiness).timeoutSeconds | default $baseTpl.readiness.timeoutSeconds }}
           startupProbe:
             exec:
               command:
                 - sh
                 - -c
                 - fiftyone delegated list --limit 1 -o startup
-            failureThreshold: {{ $v.startup.failureThreshold }}
-            periodSeconds: {{ $v.startup.periodSeconds }}
-            timeoutSeconds: {{ $v.startup.timeoutSeconds }}
-      {{- with $v.nodeSelector }}
+            failureThreshold: {{ ($v.startup).failureThreshold | default $baseTpl.startup.timeoutSeconds }}
+            periodSeconds: {{ ($v.startup).periodSeconds | default $baseTpl.startup.timeoutSeconds }}
+            timeoutSeconds: {{ ($v.startup).timeoutSeconds | default $baseTpl.startup.timeoutSeconds }}
+      {{- with $v.nodeSelector | default $baseTpl.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $v.affinity }}
+      {{- with $v.affinity  | default $baseTpl.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $v.tolerations }}
+      {{- with $v.tolerations  | default $baseTpl.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $v.volumes }}
+      {{- with $v.volumes  | default $baseTpl.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}

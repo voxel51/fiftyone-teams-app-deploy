@@ -435,11 +435,16 @@ delegatedOperatorExecutorSettings:
   volumes: []
 
 # FiftyOne Teams Delegated Operator Executor (teams-do) configurations.
-delegatedOperatorInstances:
-  # -- Multiple instances can be configured. A default configuration is
-  # provided below. The name of the deployment will be the map key in
-  # kebabcase.
-  teamsDo:
+delegatedOperatorDeployments:
+  # -- Controls whether to create dedicated "teams-do" deployments. Disabled
+  # by default, meaning delegated operations will not be executed without an
+  # external executor system. Please configure individual deployments using
+  # .Values.delegatedOperatorDeployments.template and
+  # .Values.delegatedOperatorDeployments.deployments below.
+  enabled: false
+  # -- A common template applied to all deployments. Each deployment can
+  # then override individual fields as needed by the operator.
+  template:
     # Environment Variables are passed to the delegated-operator-executor containers.
     env:
       # -- Full path to a network-mounted file system or a cloud storage path to
@@ -455,6 +460,9 @@ delegatedOperatorInstances:
       # -- Whether the SDK is running in an internal service context.
       # When running in FiftyOne Teams, set to `true`.
       FIFTYONE_INTERNAL_SERVICE: true
+
+    # -- A description for the delegated operator instance.
+    description: "Default teams-do instance"
 
     # -- Secret variables to be passed to the delegated-operator-executor containers.
     secretEnv: {}
@@ -499,8 +507,6 @@ delegatedOperatorInstances:
 
     # -- Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity].
     affinity: {}
-    # -- Deployment name
-    name: "teams-do"
     # -- nodeSelector for delegated-operator-executor. [Reference][node-selector].
     nodeSelector: {}
     # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
@@ -530,6 +536,25 @@ delegatedOperatorInstances:
     volumeMounts: []
     # -- Volumes for delegated-operator-executor. [Reference][volumes].
     volumes: []
+
+  # -- Multiple instances can be configured. A default configuration is
+  # provided below. The name of the deployment will be the map key in
+  # kebabcase.
+  deployments:
+    # -- Additional deployments to configure. Each additional template
+    # will use .Values.delegatedOperatorDeployments.template as a base.
+    # Each value present in the template is individually overridable.
+    teamsDo: {}
+
+    # Configure additional deployments, for example:
+    # gpuEnabled:
+    #   env:
+    #     FIFTYONE_DELEGATED_OPERATION_LOG_PATH: gs://mygpulogs/
+    #   nodeSelector:
+    #     cloud.google.com/gke-accelerator: nvidia-l4
+    #     cloud.google.com/gke-accelerator-count: "1"
+    #   requests:
+    #     nvidia.com/gpu: 1
 
 # -- List of secrets for FiftyOne Teams Licenses (one per org)
 fiftyoneLicenseSecrets:
