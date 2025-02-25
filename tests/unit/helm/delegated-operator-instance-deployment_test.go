@@ -83,7 +83,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 			},
 		},
 		{
-			"multipleInstances",
+			"defaultValuesMultipleInstances",
 			map[string]string{
 				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
@@ -2079,7 +2079,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets()
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
 					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
-					fmt.Printf("%v\n", testCase.expected)
 
 					if testCase.expected[i] == "" {
 						s.Nil(deployment.Spec.Template.Spec.ImagePullSecrets, "ImagePullSecrets should be nil.")
@@ -2092,69 +2091,130 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets()
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected map[string]string
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			nil,
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			nil,
-// 		},
-// 		{
-// 			"overrideNodeSelector",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":               "true",
-// 				"delegatedOperatorExecutorSettings.nodeSelector.disktype": "ssd",
-// 			},
-// 			map[string]string{
-// 				"disktype": "ssd",
-// 			},
-// 		},
-// 	}
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []map[string]string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]map[string]string{
+				map[string]string{},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]map[string]string{
+				map[string]string{},
+				map[string]string{},
+			},
+		},
+		{
+			"overrideBaseTemplateNodeSelector",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":     "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":  "nil",
+				"delegatedOperatorDeployments.template.nodeSelector.disktype": "ssd",
+			},
+			[]map[string]string{
+				map[string]string{
+					"disktype": "ssd",
+				},
+				map[string]string{
+					"disktype": "ssd",
+				},
+			},
+		},
+		{
+			"overrideInstanceNodeSelector",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.nodeSelector.region":      "us-east1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.nodeSelector.disktype": "pd-standard",
+			},
+			[]map[string]string{
+				map[string]string{
+					"region": "us-east1",
+				},
+				map[string]string{
+					"disktype": "pd-standard",
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceNodeSelector",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.nodeSelector.region":      "us-east1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.nodeSelector.disktype": "pd-standard",
+				"delegatedOperatorDeployments.template.nodeSelector.disktype":               "ssd",
+			},
+			[]map[string]string{
+				map[string]string{
+					"region":   "us-east1",
+					"disktype": "ssd",
+				},
+				map[string]string{
+					"disktype": "pd-standard",
+				},
+			},
+		},
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				for key, value := range testCase.expected {
-// 					foundValue := deployment.Spec.Template.Spec.NodeSelector[key]
-// 					s.Equal(value, foundValue, "NodeSelector should contain all set labels.")
-// 				}
-// 			}
-// 		})
-// 	}
-// }
+				var deployment appsv1.Deployment
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				for i, rawOutput := range allRange[1:] {
+
+					var deployment appsv1.Deployment
+
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					for key, value := range testCase.expected[i] {
+						foundValue := deployment.Spec.Template.Spec.NodeSelector[key]
+						s.Equal(value, foundValue, "NodeSelector should contain all set labels.")
+					}
+				}
+			}
+		})
+	}
+}
 
 // func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
 // 	testCases := []struct {

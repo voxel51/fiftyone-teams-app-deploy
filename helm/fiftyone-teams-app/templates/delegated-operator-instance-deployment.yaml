@@ -99,7 +99,7 @@ spec:
             failureThreshold: {{ ($v.startup).failureThreshold | default $baseTpl.startup.failureThreshold }}
             periodSeconds: {{ ($v.startup).periodSeconds | default $baseTpl.startup.periodSeconds }}
             timeoutSeconds: {{ ($v.startup).timeoutSeconds | default $baseTpl.startup.timeoutSeconds }}
-      {{- with $v.nodeSelector | default $baseTpl.nodeSelector }}
+      {{- with (merge (dict) ($v.nodeSelector | default dict) ($baseTpl.nodeSelector)) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
