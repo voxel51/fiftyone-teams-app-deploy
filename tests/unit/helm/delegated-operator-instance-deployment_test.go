@@ -258,7 +258,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 			[]string{"fiftyone-teams"},
 		},
 		{
-			"multipleInstances",
+			"defaultValuesMultipleInstances",
 			map[string]string{
 				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
@@ -323,103 +323,154 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected int32
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			0,
-// 		},
-// 		{
-// 			"overrideReplicaCount",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":      "true",
-// 				"delegatedOperatorExecutorSettings.replicaCount": "3",
-// 			},
-// 			3,
-// 		},
-// 	}
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []int32
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]int32{3},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]int32{3, 3},
+		},
+		{
+			"overrideBaseTemplateReplicaCount",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.replicaCount":         "2",
+			},
+			[]int32{2, 2},
+		},
+		{
+			"overrideInstanceReplicaCount",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.replicaCount":    "2",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.replicaCount": "6",
+			},
+			[]int32{2, 6},
+		},
+		{
+			"overrideBaseTemplateAndInstanceReplicaCount",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.replicaCount":    "2",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.replicaCount": "6",
+				"delegatedOperatorDeployments.template.replicaCount":               "4",
+			},
+			[]int32{2, 6},
+		},
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			options := &helm.Options{SetValues: testCase.values}
-// 			if testCase.expected == 0 {
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+			options := &helm.Options{SetValues: testCase.values}
+			if testCase.expected == nil {
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				var deployment appsv1.Deployment
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Empty(&deployment.Spec.Replicas, "Replica count should be nil.")
-// 			} else {
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Empty(&deployment.Spec.Replicas, "Replica count should be nil.")
+			} else {
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				s.Equal(testCase.expected, *deployment.Spec.Replicas, "Replica count should be equal.")
-// 			}
-// 		})
-// 	}
-// }
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCount() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected int
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			0,
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			1,
-// 		},
-// 	}
+					s.Equal(testCase.expected[i], *deployment.Spec.Replicas, "Replica count should be equal.")
+				}
+			}
+		})
+	}
+}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCount() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []int
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]int{1},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]int{1, 1},
+		},
+	}
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 			options := &helm.Options{SetValues: testCase.values}
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			if testCase.expected == 0 {
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+			options := &helm.Options{SetValues: testCase.values}
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+			if testCase.expected == nil {
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
 
-// 				s.Equal(testCase.expected, len(deployment.Spec.Template.Spec.Containers), "Container count should be equal.")
-// 			} else {
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				var deployment appsv1.Deployment
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				s.Equal(0, len(deployment.Spec.Template.Spec.Containers), "Container count should be equal.")
+			} else {
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.Equal(testCase.expected, len(deployment.Spec.Template.Spec.Containers), "Container count should be equal.")
-// 			}
-// 		})
-// 	}
-// }
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					s.Equal(testCase.expected[i], len(deployment.Spec.Template.Spec.Containers), "Container count should be equal.")
+				}
+			}
+		})
+	}
+}
 
 // func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 // 	testCases := []struct {
@@ -734,149 +785,285 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 // 	}
 // }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 
-// 	// Get chart info (to later obtain the chart's appVersion)
-// 	cInfo, err := chartInfo(s.T(), s.chartPath)
-// 	s.NoError(err)
+	// Get chart info (to later obtain the chart's appVersion)
+	cInfo, err := chartInfo(s.T(), s.chartPath)
+	s.NoError(err)
 
-// 	// Get appVersion from chart info
-// 	chartAppVersion, exists := cInfo["appVersion"]
-// 	s.True(exists, "failed to get app version from chart info")
+	// Get appVersion from chart info
+	chartAppVersion, exists := cInfo["appVersion"]
+	s.True(exists, "failed to get app version from chart info")
 
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected string
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			"",
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion),
-// 		},
-// 		{
-// 			"overrideImageTag",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":   "true",
-// 				"delegatedOperatorExecutorSettings.image.tag": "testTag",
-// 			},
-// 			"voxel51/fiftyone-teams-cv-full:testTag",
-// 		},
-// 		{
-// 			"overrideImageRepository",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":          "true",
-// 				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-teams-cv-full",
-// 			},
-// 			fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
-// 		},
-// 		{
-// 			"overrideImageVersionAndRepository",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":          "true",
-// 				"delegatedOperatorExecutorSettings.image.tag":        "testTag",
-// 				"delegatedOperatorExecutorSettings.image.repository": "ghcr.io/fiftyone-teams-cv-full",
-// 			},
-// 			"ghcr.io/fiftyone-teams-cv-full:testTag",
-// 		},
-// 	}
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]string{fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion)},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]string{
+				fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion),
+				fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion),
+			},
+		},
+		// Base Template Tests
+		{
+			"overrideBaseTemplateImageTag",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.image.tag":            "testTag",
+			},
+			[]string{
+				"voxel51/fiftyone-teams-cv-full:testTag",
+				"voxel51/fiftyone-teams-cv-full:testTag",
+			},
+		},
+		{
+			"overrideBaseTemplateImageRepository",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.image.repository":     "ghcr.io/fiftyone-teams-cv-full",
+			},
+			[]string{
+				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
+				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
+			},
+		},
+		{
+			"overrideBaseTemplateImageRepository",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.image.tag":            "testTag",
+				"delegatedOperatorDeployments.template.image.repository":     "ghcr.io/fiftyone-teams-cv-full",
+			},
+			[]string{
+				"ghcr.io/fiftyone-teams-cv-full:testTag",
+				"ghcr.io/fiftyone-teams-cv-full:testTag",
+			},
+		},
+		// Instance Tests
+		{
+			"overrideInstanceImageTag",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.image.tag":    "foo",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag": "bar",
+			},
+			[]string{
+				"voxel51/fiftyone-teams-cv-full:foo",
+				"voxel51/fiftyone-teams-cv-full:bar",
+			},
+		},
+		{
+			"overrideInstanceImageRepository",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.image.repository":    "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository": "ghcr.io/fiftyone-teams-cv-slim",
+			},
+			[]string{
+				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
+				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-slim:%s", chartAppVersion),
+			},
+		},
+		{
+			"overrideInstanceImageTagAndRepository",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.image.tag":           "foo",
+				"delegatedOperatorDeployments.deployments.teamsDo.image.repository":    "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag":        "bar",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository": "ghcr.io/fiftyone-teams-cv-slim",
+			},
+			[]string{
+				"ghcr.io/fiftyone-teams-cv-full:foo",
+				"ghcr.io/fiftyone-teams-cv-slim:bar",
+			},
+		},
+		// Conflict Tests
+		{
+			"overrideBaseTemplateAndInstanceImageTag",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.image.tag":    "foo",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag": "bar",
+				"delegatedOperatorDeployments.template.image.tag":               "biz",
+			},
+			[]string{
+				"voxel51/fiftyone-teams-cv-full:foo",
+				"voxel51/fiftyone-teams-cv-full:bar",
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceImageRepository",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.image.repository":    "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository": "ghcr.io/fiftyone-teams-cv-slim",
+				"delegatedOperatorDeployments.template.image.repository":               "ghcr.io/fiftyone-teams-cv-template",
+			},
+			[]string{
+				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
+				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-slim:%s", chartAppVersion),
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceImageTagAndRepository",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.image.tag":           "foo",
+				"delegatedOperatorDeployments.deployments.teamsDo.image.repository":    "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag":        "bar",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository": "ghcr.io/fiftyone-teams-cv-slim",
+				"delegatedOperatorDeployments.template.image.tag":                      "biz",
+				"delegatedOperatorDeployments.template.image.repository":               "ghcr.io/fiftyone-teams-cv-template",
+			},
+			[]string{
+				"ghcr.io/fiftyone-teams-cv-full:foo",
+				"ghcr.io/fiftyone-teams-cv-slim:bar",
+			},
+		},
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				s.Equal(testCase.expected, deployment.Spec.Template.Spec.Containers[0].Image, "Image values should be equal.")
-// 			}
-// 		})
-// 	}
-// }
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImagePullPolicy() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected string
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			"",
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			"Always",
-// 		},
-// 		{
-// 			"overrideImagePullPolicy",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":          "true",
-// 				"delegatedOperatorExecutorSettings.image.pullPolicy": "IfNotPresent",
-// 			},
-// 			"IfNotPresent",
-// 		},
-// 	}
+					s.Equal(testCase.expected[i], deployment.Spec.Template.Spec.Containers[0].Image, "Image values should be equal.")
+				}
+			}
+		})
+	}
+}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImagePullPolicy() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]string{"Always"},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]string{"Always", "Always"},
+		},
+		{
+			"overrideBaseTemplatePullPolicy",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.image.pullPolicy":     "IfNotPresent",
+			},
+			[]string{"IfNotPresent", "IfNotPresent"},
+		},
+		{
+			"overrideInstancePullPolicy",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.image.pullPolicy":    "Always",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.pullPolicy": "Never",
+			},
+			[]string{"Always", "Never"},
+		},
+		{
+			"overrideBaseTemplateAndInstancePullPolicy",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.image.pullPolicy":    "Always",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.pullPolicy": "Never",
+				"delegatedOperatorDeployments.template.image.pullPolicy":               "IfNotPresent",
+			},
+			[]string{"Always", "Never"},
+		},
+	}
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.Equal(testCase.expected, string(deployment.Spec.Template.Spec.Containers[0].ImagePullPolicy), "Image pull policy should be equal.")
-// 			}
-// 		})
-// 	}
-// }
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					s.Equal(testCase.expected[i], string(deployment.Spec.Template.Spec.Containers[0].ImagePullPolicy), "Image pull policy should be equal.")
+				}
+			}
+		})
+	}
+}
 
 // func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerName() {
 // 	testCases := []struct {
