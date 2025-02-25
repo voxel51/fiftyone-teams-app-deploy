@@ -2014,68 +2014,83 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected string
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			"",
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			"",
-// 		},
-// 		{
-// 			"overrideImagePullSecrets",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 				"imagePullSecrets[0].name":                  "test-pull-secret",
-// 			},
-// 			"test-pull-secret",
-// 		},
-// 	}
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]string{""},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]string{"", ""},
+		},
+		{
+			"overrideImagePullSecrets",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"imagePullSecrets[0].name":                                   "test-pull-secret",
+			},
+			[]string{"test-pull-secret", "test-pull-secret"},
+		},
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				if testCase.expected == "" {
-// 					s.Nil(deployment.Spec.Template.Spec.ImagePullSecrets, "Image pull secret should be nil")
-// 				} else {
-// 					s.Equal(testCase.expected, deployment.Spec.Template.Spec.ImagePullSecrets[0].Name, "Image pull secret should be equal.")
-// 				}
-// 			}
-// 		})
-// 	}
-// }
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+					fmt.Printf("%v\n", testCase.expected)
+
+					if testCase.expected[i] == "" {
+						s.Nil(deployment.Spec.Template.Spec.ImagePullSecrets, "ImagePullSecrets should be nil.")
+					} else {
+						s.Equal(testCase.expected[i], deployment.Spec.Template.Spec.ImagePullSecrets[0].Name, "Image pull secret should be equal.")
+					}
+				}
+			}
+		})
+	}
+}
 
 // func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 // 	testCases := []struct {
