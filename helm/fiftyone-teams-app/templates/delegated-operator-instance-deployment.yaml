@@ -8,8 +8,8 @@
     dict "secretName" $.Values.secret.name
     "apiServiceName" $.Values.apiSettings.service.name
     "apiServicePort" (float64 $.Values.apiSettings.service.port)
-    "env" (merge (dict) ($baseTpl.env) ($v.env | default dict) )
-    "secretEnv" (merge (dict) ($baseTpl.secretEnv) ($v.secretEnv | default dict))
+    "env" (merge (dict) ($v.env | default dict) ($baseTpl.env))
+    "secretEnv" (merge (dict) ($v.secretEnv | default dict) ($baseTpl.secretEnv))
   )
 }}
 apiVersion: apps/v1
@@ -61,13 +61,13 @@ spec:
             - {{ $v.description | quote }}
             {{- end }}
           securityContext:
-            {{- toYaml $v.securityContext | default $baseTpl.securityContext | nindent 12 }}
+            {{- toYaml (merge (dict) ($v.securityContext | default dict) ($baseTpl.securityContext)) | nindent 12 }}
           image: "{{ ($v.image).repository | default $baseTpl.image.repository }}:{{ ($v.image).tag | default $baseTpl.image.tag | default $.Chart.AppVersion }}"
           imagePullPolicy: {{ ($v.image).pullPolicy | default $baseTpl.image.pullPolicy }}
           env:
             {{- include "delegated-operator-deployments.env-vars-list" $envContext | indent 12 }}
           resources:
-            {{- toYaml $v.resources | default $baseTpl.resources | nindent 12 }}
+            {{- toYaml (merge (dict) ($v.resources | default dict) ($baseTpl.resources)) | nindent 12 }}
           {{- with $v.volumeMounts | default $baseTpl.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}

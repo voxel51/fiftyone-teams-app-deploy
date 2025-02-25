@@ -14,10 +14,10 @@ import (
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	// "k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	appsv1 "k8s.io/api/apps/v1"
-	// corev1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 )
 
 type deploymentDelegatedOperatorInstanceTemplateTest struct {
@@ -1065,222 +1065,538 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImagePull
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerName() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected string
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			"",
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			"teams-do",
-// 		},
-// 		{
-// 			"overrideServiceAccountName",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 				"delegatedOperatorExecutorSettings.name":    "test-service-account",
-// 			},
-// 			"test-service-account",
-// 		},
-// 	}
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerName() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]string{"teams-do"},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]string{"teams-do", "teams-do-two"},
+		},
+		// Names not overridable, so omitting tests
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				s.Equal(testCase.expected, deployment.Spec.Template.Spec.Containers[0].Name, "Container name should be equal.")
-// 			}
-// 		})
-// 	}
-// }
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceRequirements() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(resourceRequirements corev1.ResourceRequirements)
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			func(resourceRequirements corev1.ResourceRequirements) {
-// 				s.Empty(resourceRequirements, "Resource Requirements should be empty")
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(resourceRequirements corev1.ResourceRequirements) {
-// 				s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
-// 				s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
-// 				s.Nil(resourceRequirements.Claims, "should be nil")
-// 			},
-// 		},
-// 		{
-// 			"overrideResources",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                   "true",
-// 				"delegatedOperatorExecutorSettings.resources.limits.cpu":      "1",
-// 				"delegatedOperatorExecutorSettings.resources.limits.memory":   "1Gi",
-// 				"delegatedOperatorExecutorSettings.resources.requests.cpu":    "500m",
-// 				"delegatedOperatorExecutorSettings.resources.requests.memory": "512Mi",
-// 			},
-// 			func(resourceRequirements corev1.ResourceRequirements) {
-// 				resourceExpected := corev1.ResourceRequirements{
-// 					Limits: corev1.ResourceList{
-// 						"cpu":    resource.MustParse("1"),
-// 						"memory": resource.MustParse("1Gi"),
-// 					},
-// 					Requests: corev1.ResourceList{
-// 						"cpu":    resource.MustParse("500m"),
-// 						"memory": resource.MustParse("512Mi"),
-// 					},
-// 				}
-// 				s.Equal(resourceExpected, resourceRequirements, "should be equal")
-// 				s.Nil(resourceRequirements.Claims, "should be nil")
-// 			},
-// 		},
-// 	}
+					s.Equal(testCase.expected[i], deployment.Spec.Template.Spec.Containers[0].Name, "Container name should be equal.")
+				}
+			}
+		})
+	}
+}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceRequirements() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(resourceRequirements corev1.ResourceRequirements)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					s.Empty(resourceRequirements, "Resource Requirements should be empty")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
+					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
+					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+				func(resourceRequirements corev1.ResourceRequirements) {
+					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
+					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateResources",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":         "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":      "nil",
+				"delegatedOperatorDeployments.template.resources.limits.cpu":      "1",
+				"delegatedOperatorDeployments.template.resources.limits.memory":   "1Gi",
+				"delegatedOperatorDeployments.template.resources.requests.cpu":    "500m",
+				"delegatedOperatorDeployments.template.resources.requests.memory": "512Mi",
+			},
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("1"),
+							"memory": resource.MustParse("1Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("500m"),
+							"memory": resource.MustParse("512Mi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("1"),
+							"memory": resource.MustParse("1Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("500m"),
+							"memory": resource.MustParse("512Mi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideInstanceResources",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.cpu":         "3",
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.memory":      "3Gi",
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.cpu":       "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.memory":    "2Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":      "4",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory":   "4Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":    "3",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory": "3Gi",
+			},
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("3"),
+							"memory": resource.MustParse("3Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("2"),
+							"memory": resource.MustParse("2Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("4"),
+							"memory": resource.MustParse("4Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("3"),
+							"memory": resource.MustParse("3Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceResourcesLimits",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.cpu":       "3",
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.memory":    "3Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":    "4",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory": "4Gi",
+				"delegatedOperatorDeployments.template.resources.limits.cpu":                  "1",
+				"delegatedOperatorDeployments.template.resources.limits.memory":               "1Gi",
+				"delegatedOperatorDeployments.template.resources.requests.cpu":                "500m",
+				"delegatedOperatorDeployments.template.resources.requests.memory":             "512Mi",
+			},
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("3"),
+							"memory": resource.MustParse("3Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("500m"),
+							"memory": resource.MustParse("512Mi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("4"),
+							"memory": resource.MustParse("4Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("500m"),
+							"memory": resource.MustParse("512Mi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceResourcesRequests",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.cpu":       "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.memory":    "2Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":    "3",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory": "3Gi",
+				"delegatedOperatorDeployments.template.resources.limits.cpu":                    "1",
+				"delegatedOperatorDeployments.template.resources.limits.memory":                 "1Gi",
+				"delegatedOperatorDeployments.template.resources.requests.cpu":                  "500m",
+				"delegatedOperatorDeployments.template.resources.requests.memory":               "512Mi",
+			},
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("1"),
+							"memory": resource.MustParse("1Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("2"),
+							"memory": resource.MustParse("2Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("1"),
+							"memory": resource.MustParse("1Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("3"),
+							"memory": resource.MustParse("3Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceResources",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.cpu":         "3",
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.memory":      "3Gi",
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.cpu":       "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.memory":    "2Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":      "4",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory":   "4Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":    "3",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory": "3Gi",
+				"delegatedOperatorDeployments.template.resources.limits.cpu":                    "1",
+				"delegatedOperatorDeployments.template.resources.limits.memory":                 "1Gi",
+				"delegatedOperatorDeployments.template.resources.requests.cpu":                  "500m",
+				"delegatedOperatorDeployments.template.resources.requests.memory":               "512Mi",
+			},
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("3"),
+							"memory": resource.MustParse("3Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("2"),
+							"memory": resource.MustParse("2Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":    resource.MustParse("4"),
+							"memory": resource.MustParse("4Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":    resource.MustParse("3"),
+							"memory": resource.MustParse("3Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "should be equal")
+					s.Nil(resourceRequirements.Claims, "should be nil")
+				},
+			},
+		},
+	}
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				testCase.expected(deployment.Spec.Template.Spec.Containers[0].Resources)
-// 			}
-// 		})
-// 	}
-// }
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityContext() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(securityContext *corev1.SecurityContext)
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			func(securityContext *corev1.SecurityContext) {
-// 				s.Empty(securityContext, "should be not be set")
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(securityContext *corev1.SecurityContext) {
-// 				s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
-// 				s.Nil(securityContext.Capabilities, "should be nil")
-// 				s.Nil(securityContext.Privileged, "should be nil")
-// 				s.Nil(securityContext.ProcMount, "should be nil")
-// 				s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
-// 				s.Nil(securityContext.RunAsGroup, "should be nil")
-// 				s.Nil(securityContext.RunAsNonRoot, "should be nil")
-// 				s.Nil(securityContext.RunAsUser, "should be nil")
-// 				s.Nil(securityContext.SeccompProfile, "should be nil")
-// 				s.Nil(securityContext.SELinuxOptions, "should be nil")
-// 				s.Nil(securityContext.WindowsOptions, "should be nil")
-// 			},
-// 		},
-// 		{
-// 			"overrideSecurityContext",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                    "true",
-// 				"delegatedOperatorExecutorSettings.securityContext.runAsGroup": "3000",
-// 				"delegatedOperatorExecutorSettings.securityContext.runAsUser":  "1000",
-// 			},
-// 			func(securityContext *corev1.SecurityContext) {
-// 				s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
-// 				s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
-// 			},
-// 		},
-// 	}
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].Resources)
+				}
+			}
+		})
+	}
+}
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityContext() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(securityContext *corev1.SecurityContext)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(securityContext *corev1.SecurityContext){
+				func(securityContext *corev1.SecurityContext) {
+					s.Empty(securityContext, "should be not be set")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(securityContext *corev1.SecurityContext){
+				func(securityContext *corev1.SecurityContext) {
+					s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
+					s.Nil(securityContext.Capabilities, "should be nil")
+					s.Nil(securityContext.Privileged, "should be nil")
+					s.Nil(securityContext.ProcMount, "should be nil")
+					s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
+					s.Nil(securityContext.RunAsGroup, "should be nil")
+					s.Nil(securityContext.RunAsNonRoot, "should be nil")
+					s.Nil(securityContext.RunAsUser, "should be nil")
+					s.Nil(securityContext.SeccompProfile, "should be nil")
+					s.Nil(securityContext.SELinuxOptions, "should be nil")
+					s.Nil(securityContext.WindowsOptions, "should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(securityContext *corev1.SecurityContext){
+				func(securityContext *corev1.SecurityContext) {
+					s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
+					s.Nil(securityContext.Capabilities, "should be nil")
+					s.Nil(securityContext.Privileged, "should be nil")
+					s.Nil(securityContext.ProcMount, "should be nil")
+					s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
+					s.Nil(securityContext.RunAsGroup, "should be nil")
+					s.Nil(securityContext.RunAsNonRoot, "should be nil")
+					s.Nil(securityContext.RunAsUser, "should be nil")
+					s.Nil(securityContext.SeccompProfile, "should be nil")
+					s.Nil(securityContext.SELinuxOptions, "should be nil")
+					s.Nil(securityContext.WindowsOptions, "should be nil")
+				},
+				func(securityContext *corev1.SecurityContext) {
+					s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
+					s.Nil(securityContext.Capabilities, "should be nil")
+					s.Nil(securityContext.Privileged, "should be nil")
+					s.Nil(securityContext.ProcMount, "should be nil")
+					s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
+					s.Nil(securityContext.RunAsGroup, "should be nil")
+					s.Nil(securityContext.RunAsNonRoot, "should be nil")
+					s.Nil(securityContext.RunAsUser, "should be nil")
+					s.Nil(securityContext.SeccompProfile, "should be nil")
+					s.Nil(securityContext.SELinuxOptions, "should be nil")
+					s.Nil(securityContext.WindowsOptions, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateSecurityContext",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":          "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":       "nil",
+				"delegatedOperatorDeployments.template.securityContext.runAsGroup": "3000",
+				"delegatedOperatorDeployments.template.securityContext.runAsUser":  "1000",
+			},
+			[]func(securityContext *corev1.SecurityContext){
+				func(securityContext *corev1.SecurityContext) {
+					s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
+					s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
+				},
+				func(securityContext *corev1.SecurityContext) {
+					s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
+					s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
+				},
+			},
+		},
+		{
+			"overrideInstanceSecurityContext",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.securityContext.runAsGroup":    "4000",
+				"delegatedOperatorDeployments.deployments.teamsDo.securityContext.runAsUser":     "1001",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsGroup": "5000",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsUser":  "1002",
+			},
+			[]func(securityContext *corev1.SecurityContext){
+				func(securityContext *corev1.SecurityContext) {
+					s.Equal(int64(4000), *securityContext.RunAsGroup, "runAsGroup should be 4000")
+					s.Equal(int64(1001), *securityContext.RunAsUser, "runAsUser should be 1001")
+				},
+				func(securityContext *corev1.SecurityContext) {
+					s.Equal(int64(5000), *securityContext.RunAsGroup, "runAsGroup should be 5000")
+					s.Equal(int64(1002), *securityContext.RunAsUser, "runAsUser should be 1002")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateInstanceSecurityContext",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.securityContext.runAsGroup":    "4000",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsGroup": "5000",
+				"delegatedOperatorDeployments.template.securityContext.runAsGroup":               "3000",
+				"delegatedOperatorDeployments.template.securityContext.runAsUser":                "1000",
+			},
+			[]func(securityContext *corev1.SecurityContext){
+				func(securityContext *corev1.SecurityContext) {
+					s.Equal(int64(4000), *securityContext.RunAsGroup, "runAsGroup should be 4000")
+					s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
+				},
+				func(securityContext *corev1.SecurityContext) {
+					s.Equal(int64(5000), *securityContext.RunAsGroup, "runAsGroup should be 5000")
+					s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
+				},
+			},
+		},
+	}
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				testCase.expected(deployment.Spec.Template.Spec.Containers[0].SecurityContext)
-// 			}
-// 		})
-// 	}
-// }
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].SecurityContext)
+				}
+			}
+		})
+	}
+}
 
 // func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMounts() {
 // 	testCases := []struct {
