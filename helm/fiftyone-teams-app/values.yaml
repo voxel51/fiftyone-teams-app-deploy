@@ -436,12 +436,6 @@ delegatedOperatorExecutorSettings:
 
 # FiftyOne Teams Delegated Operator Executor (teams-do) configurations.
 delegatedOperatorDeployments:
-  # -- Controls whether to create dedicated "teams-do" deployments. Disabled
-  # by default, meaning delegated operations will not be executed without an
-  # external executor system. Please configure individual deployments using
-  # .Values.delegatedOperatorDeployments.template and
-  # .Values.delegatedOperatorDeployments.deployments below.
-  enabled: false
   # -- A common template applied to all deployments. Each deployment can
   # then override individual fields as needed by the operator.
   template:
@@ -537,16 +531,14 @@ delegatedOperatorDeployments:
     # -- Volumes for delegated-operator-executor. [Reference][volumes].
     volumes: []
 
-  # -- Multiple instances can be configured. A default configuration is
-  # provided below. The name of the deployment will be the map key in
-  # kebabcase.
-  deployments:
-    # -- Additional deployments to configure. Each additional template
-    # will use .Values.delegatedOperatorDeployments.template as a base.
-    # Each value present in the template is individually overridable.
-    teamsDo: {}
-
-    # Configure additional deployments, for example:
+  # -- Additional deployments to configure. Each additional template
+  # ill use .Values.delegatedOperatorDeployments.template as a base.
+  # Each value present in the template is individually overridable.
+  deployments: {}
+    # Example: Use values from base template only
+    # teamsDo: {}
+    #
+    # Example: Configure GPUs and a custom log link path
     # gpuEnabled:
     #   env:
     #     FIFTYONE_DELEGATED_OPERATION_LOG_PATH: gs://mygpulogs/
