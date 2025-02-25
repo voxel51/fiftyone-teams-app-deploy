@@ -629,7 +629,7 @@ Enforces that we can't have both
 .Values.delegatedOperatorDeployments enabled.
 */}}
 {{- define "fiftyone-teams-app.teams-do-deprecation-validation" -}}
-{{- $invalid := and (.Values.delegatedOperatorExecutorSettings.enabled) (gt (len .Values.delegatedOperatorDeployments) 0) }}
+{{- $invalid := and (.Values.delegatedOperatorExecutorSettings.enabled) (gt (len .Values.delegatedOperatorDeployments.deployments) 0) }}
 {{- if $invalid }}
 {{- fail "Both delegatedOperatorExecutorSettings.enabled and delegatedOperatorDeployments configured. Please use one or the other" }}
 {{- end }}
