@@ -103,7 +103,7 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $v.affinity  | default $baseTpl.affinity }}
+      {{- with (merge (dict) ($v.affinity  | default dict) ($baseTpl.affinity)) }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}

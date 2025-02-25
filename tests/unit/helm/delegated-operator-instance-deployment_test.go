@@ -4,7 +4,7 @@
 package unit
 
 import (
-	// "encoding/json"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -1700,95 +1700,319 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 // 	}
 // }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(affinity *corev1.Affinity)
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			func(affinity *corev1.Affinity) {
-// 				s.Nil(affinity, "should be nil")
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(affinity *corev1.Affinity) {
-// 				s.Nil(affinity, "should be nil")
-// 			},
-// 		},
-// 		{
-// 			"overrideAffinity",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 				"delegatedOperatorExecutorSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "disktype",
-// 				"delegatedOperatorExecutorSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":  "In",
-// 				"delegatedOperatorExecutorSettings.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]": "ssd",
-// 			},
-// 			func(affinity *corev1.Affinity) {
-// 				affinityJSON := `{
-//           "nodeAffinity": {
-//             "requiredDuringSchedulingIgnoredDuringExecution": {
-//               "nodeSelectorTerms": [
-//                 {
-//                   "matchExpressions": [
-//                     {
-//                       "key": "disktype",
-//                       "operator": "In",
-//                       "values": [
-//                         "ssd"
-//                       ]
-//                     }
-//                   ]
-//                 }
-//               ]
-//             }
-//           }
-//         }`
-// 				var expectedAffinity corev1.Affinity
-// 				err := json.Unmarshal([]byte(affinityJSON), &expectedAffinity)
-// 				s.NoError(err)
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(affinity *corev1.Affinity)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(affinity *corev1.Affinity){
+				func(affinity *corev1.Affinity) {
+					s.Nil(affinity, "should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(affinity *corev1.Affinity){
+				func(affinity *corev1.Affinity) {
+					s.Nil(affinity, "should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(affinity *corev1.Affinity){
+				func(affinity *corev1.Affinity) {
+					s.Nil(affinity, "should be nil")
+				},
+				func(affinity *corev1.Affinity) {
+					s.Nil(affinity, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAffinity",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "disktype",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":  "In",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]": "ssd",
+			},
+			[]func(affinity *corev1.Affinity){
+				func(affinity *corev1.Affinity) {
+					affinityJSON := `{
+          "nodeAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "nodeSelectorTerms": [
+                {
+                  "matchExpressions": [
+                    {
+                      "key": "disktype",
+                      "operator": "In",
+                      "values": [
+                        "ssd"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }`
+					var expectedAffinity corev1.Affinity
+					err := json.Unmarshal([]byte(affinityJSON), &expectedAffinity)
+					s.NoError(err)
 
-// 				s.Equal(expectedAffinity, *affinity, "Affinity should be equal")
-// 			},
-// 		},
-// 	}
+					s.Equal(expectedAffinity, *affinity, "Affinity should be equal")
+				},
+				func(affinity *corev1.Affinity) {
+					affinityJSON := `{
+          "nodeAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "nodeSelectorTerms": [
+                {
+                  "matchExpressions": [
+                    {
+                      "key": "disktype",
+                      "operator": "In",
+                      "values": [
+                        "ssd"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }`
+					var expectedAffinity corev1.Affinity
+					err := json.Unmarshal([]byte(affinityJSON), &expectedAffinity)
+					s.NoError(err)
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+					s.Equal(expectedAffinity, *affinity, "Affinity should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceAffinity",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                      "1",
+				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":          "topology.kubernetes.io/zone",
+				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":     "In",
+				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]":    "antarctica-west1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                   "1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":       "topology.kubernetes.io/zone",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":  "In",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]": "antarctica-east1",
+			},
+			[]func(affinity *corev1.Affinity){
+				func(affinity *corev1.Affinity) {
+					affinityJSON := `{
+          "nodeAffinity": {
+            "preferredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "weight": 1,
+                "preference": {
+                  "matchExpressions": [
+                    {
+                      "key": "topology.kubernetes.io/zone",
+                      "operator": "In",
+                      "values": [
+                        "antarctica-west1"
+                      ]
+                    }
+                  ]
+                }
+			  }
+			]
+          }
+        }`
+					var expectedAffinity corev1.Affinity
+					err := json.Unmarshal([]byte(affinityJSON), &expectedAffinity)
+					s.NoError(err)
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+					s.Equal(expectedAffinity, *affinity, "Affinity should be equal")
+				},
+				func(affinity *corev1.Affinity) {
+					affinityJSON := `{
+          "nodeAffinity": {
+            "preferredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "weight": 1,
+                "preference": {
+                  "matchExpressions": [
+                    {
+                      "key": "topology.kubernetes.io/zone",
+                      "operator": "In",
+                      "values": [
+                        "antarctica-east1"
+                      ]
+                    }
+                  ]
+                }
+			  }
+			]
+          }
+        }`
+					var expectedAffinity corev1.Affinity
+					err := json.Unmarshal([]byte(affinityJSON), &expectedAffinity)
+					s.NoError(err)
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+					s.Equal(expectedAffinity, *affinity, "Affinity should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceAffinity",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                      "1",
+				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":          "topology.kubernetes.io/zone",
+				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":     "In",
+				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]":    "antarctica-west1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                   "1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":       "topology.kubernetes.io/zone",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":  "In",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]": "antarctica-east1",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":               "disktype",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":          "In",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]":         "ssd",
+			},
+			[]func(affinity *corev1.Affinity){
+				func(affinity *corev1.Affinity) {
+					affinityJSON := `{
+          "nodeAffinity": {
+            "preferredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "weight": 1,
+                "preference": {
+                  "matchExpressions": [
+                    {
+                      "key": "topology.kubernetes.io/zone",
+                      "operator": "In",
+                      "values": [
+                        "antarctica-west1"
+                      ]
+                    }
+                  ]
+                }
+			  }
+			],
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "nodeSelectorTerms": [
+                {
+                  "matchExpressions": [
+                    {
+                      "key": "disktype",
+                      "operator": "In",
+                      "values": [
+                        "ssd"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }`
+					var expectedAffinity corev1.Affinity
+					err := json.Unmarshal([]byte(affinityJSON), &expectedAffinity)
+					s.NoError(err)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+					s.Equal(expectedAffinity, *affinity, "Affinity should be equal")
+				},
+				func(affinity *corev1.Affinity) {
+					affinityJSON := `{
+          "nodeAffinity": {
+            "preferredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "weight": 1,
+                "preference": {
+                  "matchExpressions": [
+                    {
+                      "key": "topology.kubernetes.io/zone",
+                      "operator": "In",
+                      "values": [
+                        "antarctica-east1"
+                      ]
+                    }
+                  ]
+                }
+			  }
+			],
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "nodeSelectorTerms": [
+                {
+                  "matchExpressions": [
+                    {
+                      "key": "disktype",
+                      "operator": "In",
+                      "values": [
+                        "ssd"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }`
+					var expectedAffinity corev1.Affinity
+					err := json.Unmarshal([]byte(affinityJSON), &expectedAffinity)
+					s.NoError(err)
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+					s.Equal(expectedAffinity, *affinity, "Affinity should be equal")
+				},
+			},
+		},
+	}
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 				testCase.expected(deployment.Spec.Template.Spec.Affinity)
-// 			}
-// 		})
-// 	}
-// }
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Template.Spec.Affinity)
+				}
+			}
+		})
+	}
+}
 
 // func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets() {
 // 	testCases := []struct {
