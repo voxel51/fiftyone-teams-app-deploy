@@ -531,14 +531,18 @@ delegatedOperatorDeployments:
     # -- Volumes for delegated-operator-executor. [Reference][volumes].
     volumes: []
 
-  # -- Additional deployments to configure. Each additional template
-  # ill use .Values.delegatedOperatorDeployments.template as a base.
-  # Each value present in the template is individually overridable.
+  # -- Additional deployments to configure. Each template
+  # will use .Values.delegatedOperatorDeployments.template as a base.
+  # Each template value may be overridden.
+  # Maps/dictionaries will be merged key-wise, with the deployment instance
+  # taking precedence.
+  # List values will not be merged, but be overridden completely by the
+  # deployment instance.
   deployments: {}
     # Example: Use values from base template only
     # teamsDo: {}
     #
-    # Example: Configure GPUs and a custom log link path
+    # Example: Configure Google GKE Autopilot nodes with GPUs and a custom log link path
     # gpuEnabled:
     #   env:
     #     FIFTYONE_DELEGATED_OPERATION_LOG_PATH: gs://mygpulogs/
