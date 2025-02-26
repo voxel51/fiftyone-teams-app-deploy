@@ -557,6 +557,7 @@ appSettings:
 | delegatedOperatorExecutorSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for teams-do. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the teams-do. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
+| delegatedOperatorExecutorSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-api deployment. [Reference][topology-spread-constraints]. |
 | delegatedOperatorExecutorSettings.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Teams Licenses (one per org) |
