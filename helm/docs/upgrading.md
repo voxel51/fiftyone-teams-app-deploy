@@ -85,10 +85,19 @@ A minimal example `values.yaml` may be found
 
 #### FiftyOne Teams v2.7+ Delegated Operator Changes
 
-FiftyOne Teams v2.7.0 changes the `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
-environment variable to `FIFTYONE_DELEGATED_OPERATION_LOG_PATH`.
-Please note that this change is backwards compatible, but should
-be changed in your manifests moving forward.
+FiftyOne Teams v2.7.0 introduces numerous changes to delegated operators.
+
+1. The `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
+   environment variable has been changed to to
+   `FIFTYONE_DELEGATED_OPERATION_LOG_PATH`.
+   Please note that this change is backwards compatible, but should
+   be changed in your manifests moving forward.
+
+1. The `delegatedOperatorExecutorSettings` setting in `values.yaml` has
+   been deprecated in favor of `delegatedOperatorDeployments`.
+   Please refer to
+   [the delegated operator documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md#v270)
+   for migrating to the new setting.
 
 #### FiftyOne Teams v2.5+ Delegated Operator Changes
 
