@@ -81,7 +81,8 @@ is needed.
 
 ```yaml
 delegatedOperatorDeployments:
-  teamsDo: {}
+  deployments:
+    teamsDo: {}
 ```
 
 ### Shared/Dedicated Plugins
@@ -145,7 +146,7 @@ In `values.yaml`, set `FIFTYONE_DELEGATED_OPERATION_LOG_PATH` in either:
 1. The template (applies to all instances):
 
   ```yaml
-  delegatedOperatorExecutorSettings:
+  delegatedOperatorDeployments:
     template:
       env:
         FIFTYONE_DELEGATED_OPERATION_LOG_PATH: /your/path/
@@ -154,7 +155,7 @@ In `values.yaml`, set `FIFTYONE_DELEGATED_OPERATION_LOG_PATH` in either:
 1. Or, per instance:
 
   ```yaml
-  delegatedOperatorExecutorSettings:
+  delegatedOperatorDeployments:
     deployments:
       teamsDo:
         env:
@@ -240,6 +241,17 @@ Note that `delegatedOperatorDeployments.template.tolerations`
 was overridden by `delegatedOperatorDeployments.deployments.teamsDo.tolerations`.
 
 ## Migrating from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeployments`
+
+To migrate from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeployments`:
+
+1. Add a `teamsDo` object to `delegatedOperatorDeployments.deployments`.
+1. Copy any configuration details from `delegatedOperatorExecutorSettings` to
+   either `delegatedOperatorDeployments.template` or
+   `delegatedOperatorDeployments.deployments.teamsDo`.
+      1. Be mindful of spacing as
+         `delegatedOperatorDeployments.deployments.teamsDo` is more
+         indented than its predecessor.
+1. Set `delegatedOperatorExecutorSettings.enabled` to `false`
 
 ## Prior to v2.7.0
 
