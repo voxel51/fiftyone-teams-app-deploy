@@ -51,6 +51,13 @@ Please refer to the
 [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-teams-v25-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
+### Version 2.7+ Delegated Operator Changes
+
+FiftyOne Teams v2.7 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-teams-v27-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
 ## Table of Contents
 
 <!-- toc -->
