@@ -33,6 +33,9 @@
 
 As of version 2.7.0, `delegatedOperatorExecutorSettings`
 has been deprecated in favor of `delegatedOperatorDeployments`.
+`delegatedOperatorExecutorSettings` has been marked for deletion
+for versions released after May 31st, 2025.
+
 This additional value allows users to deploy multiple instances
 of delegated operators, targeting different hardware or different
 use-cases.
