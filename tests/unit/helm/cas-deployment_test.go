@@ -266,14 +266,14 @@ func (s *deploymentCasTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsOptionalValues",
 			map[string]string{
-				"casSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"casSettings.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
 				"casSettings.topologySpreadConstraints[0].maxSkew":            "1",
 				"casSettings.topologySpreadConstraints[0].minDomains":         "1",
 				"casSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
 				"casSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
 				"casSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"casSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
-				"casSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"casSettings.topologySpreadConstraints[1].matchLabelKeys[0]":  "pod-template-hash",
 				"casSettings.topologySpreadConstraints[1].maxSkew":            "2",
 				"casSettings.topologySpreadConstraints[1].minDomains":         "2",
 				"casSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
@@ -327,7 +327,7 @@ func (s *deploymentCasTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsSelectorLabels",
 			map[string]string{
-				"casSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"casSettings.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
 				"casSettings.topologySpreadConstraints[0].maxSkew":                       "1",
 				"casSettings.topologySpreadConstraints[0].minDomains":                    "1",
 				"casSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",

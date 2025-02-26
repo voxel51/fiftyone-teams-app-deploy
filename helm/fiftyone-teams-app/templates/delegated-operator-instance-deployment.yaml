@@ -111,6 +111,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if ($v.topologySpreadConstraints | default $baseTpl.topologySpreadConstraints) }}
+      topologySpreadConstraints:
+        {{-
+          include "fiftyone-teams-app.commonTopologySpreadConstraints"
+          (
+            dict "constraints" ($v.topologySpreadConstraints | default $baseTpl.topologySpreadConstraints)
+            "selectorLabels" "delegated-operator-deployments.selectorLabels"
+            "context" $labelContext
+          ) | nindent 8
+        }}
+      {{- end }}
       {{- with $v.volumes | default $baseTpl.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
