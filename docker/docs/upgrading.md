@@ -25,9 +25,9 @@ and update your deployment accordingly.
 
 ### From FiftyOne Teams Version 2.0.0 and Later
 
-1. [Upgrade to FiftyOne Teams version 2.6.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams version 2.6.1](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
-   version 2.6.0
+   version 2.6.1
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
@@ -37,7 +37,7 @@ and update your deployment accordingly.
    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
    ```
 
-1. To ensure that all datasets are now at version 1.3.0, run
+1. To ensure that all datasets are now at version 1.3.1, run
 
    ```shell
    fiftyone migrate --info
@@ -45,7 +45,7 @@ and update your deployment accordingly.
 
 #### FiftyOne Teams v2.5+ Delegated Operator Changes
 
-FiftyOne Teams v2.6.0 changes the base image of the built-in delegated
+FiftyOne Teams v2.6 changes the base image of the built-in delegated
 operators (`teams-do`) from `voxel51/fiftyone-app` to `voxel51/fiftyone-teams-cv-full`.
 The `voxel51/fiftyone-teams-cv-full` image includes all of the dependencies
 required to run complex workflows out of the box.
@@ -61,7 +61,7 @@ To utilize the prior image, update your `common-services.yaml` similar to the be
 
 ```yaml
 teams-do-common:
-  image: voxel51/fiftyone-app:v2.6.0
+  image: voxel51/fiftyone-app:v2.6.1
 ```
 
 #### FiftyOne Teams v2.2+ Delegated Operator Changes
@@ -96,7 +96,7 @@ Additionally,
 
 ### From FiftyOne Teams Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.6.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.6.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -131,21 +131,21 @@ Additionally,
    mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
    ```
 
-1. [Upgrade to FiftyOne Teams version 2.6.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.6.0
+1. [Upgrade to FiftyOne Teams version 2.6.1](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.6.1
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.6.0
+    > **NOTE** Any FiftyOne SDK less than 2.6.1
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.6.0` is required.
+    > Upgrading to `fiftyone==2.6.1` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.3.0, run
+1. To ensure that all datasets are now at version 1.3.1, run
 
     ```shell
     fiftyone migrate --info
@@ -153,7 +153,7 @@ Additionally,
 
 ### From FiftyOne Teams Version 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.6.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Teams v2.6.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -171,7 +171,7 @@ Additionally,
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.6.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.6.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -223,21 +223,21 @@ Additionally,
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Teams version 2.6.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.6.0
+1. [Upgrade to FiftyOne Teams version 2.6.1](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.6.1
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.6.0
+    > **NOTE** Any FiftyOne SDK less than 2.6.1
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.6.0` is required.
+    > Upgrading to `fiftyone==2.6.1` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.3.0, run
+1. To ensure that all datasets are now at version 1.3.1, run
 
     ```shell
     fiftyone migrate --info
@@ -262,14 +262,14 @@ Additionally,
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.6.0 _requires_ your users to log in
+> **NOTE**: Upgrading to FiftyOne Teams v2.6.1 _requires_ your users to log in
 > after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.6.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Teams v2.6.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Teams
 > 2.0 or beyond.
 >
@@ -301,18 +301,18 @@ Additionally,
    `/cas/*` traffic to the `teams-cas` service.
    Example nginx configurations can be found
    [here](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
-1. [Upgrade to FiftyOne Teams v2.6.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Teams v2.6.1](#upgrading-from-previous-versions)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
-    > Teams Database at this step until they upgrade to `fiftyone==2.6.0`
+    > Teams Database at this step until they upgrade to `fiftyone==2.6.1`
 
-1. Upgrade your FiftyOne SDKs to version 2.6.0
+1. Upgrade your FiftyOne SDKs to version 2.6.1
     1. Login to the FiftyOne Teams UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Teams version, navigate to
       `Account > Install FiftyOne`
-1. Confirm that datasets have been migrated to version 1.3.0
+1. Confirm that datasets have been migrated to version 1.3.1
 
     ```shell
     fiftyone migrate --info
