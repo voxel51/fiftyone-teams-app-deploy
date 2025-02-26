@@ -456,7 +456,7 @@ delegatedOperatorDeployments:
       FIFTYONE_INTERNAL_SERVICE: true
 
     # -- A description for the delegated operator instance.
-    description: "Default teams-do instance"
+    description: "Default teams-do description"
 
     # -- Secret variables to be passed to the delegated-operator-executor containers.
     secretEnv: {}

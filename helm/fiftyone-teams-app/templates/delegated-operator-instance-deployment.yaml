@@ -56,9 +56,9 @@ spec:
             - remote
             - -n
             - {{ $name }}
-            {{- if $v.description }}
+            {{- if ($v.description | default $baseTpl.description) }}
             - -d
-            - {{ $v.description | quote }}
+            - {{ ($v.description | default $baseTpl.description) | quote }}
             {{- end }}
           securityContext:
             {{- toYaml (merge (dict) ($v.securityContext | default dict) ($baseTpl.securityContext)) | nindent 12 }}

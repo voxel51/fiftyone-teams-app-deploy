@@ -4473,3 +4473,218 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 		})
 	}
 }
+
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(args []string)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(args []string){
+				func(args []string) {
+					s.Empty(args, "Args should not be set.")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(args []string){
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do",
+						"-d",
+						"Default teams-do description",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(args []string){
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do",
+						"-d",
+						"Default teams-do description",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do-two",
+						"-d",
+						"Default teams-do description",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateDescription",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.description":          "Delegated Operator",
+			},
+			[]func(args []string){
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do",
+						"-d",
+						"Delegated Operator",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do-two",
+						"-d",
+						"Delegated Operator",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceDescription",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.description": "Used for non-gpu workloads",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":   "nil",
+			},
+			[]func(args []string){
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do",
+						"-d",
+						"Used for non-gpu workloads",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do-two",
+						"-d",
+						"Default teams-do description",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateInstanceDescription",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.description": "Used for non-gpu workloads",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":   "nil",
+				"delegatedOperatorDeployments.template.description":            "Delegated Operator",
+			},
+			[]func(args []string){
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do",
+						"-d",
+						"Used for non-gpu workloads",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+				func(args []string) {
+					expectedArgs := []string{
+						"delegated",
+						"launch",
+						"-t",
+						"remote",
+						"-n",
+						"teams-do-two",
+						"-d",
+						"Delegated Operator",
+					}
+					s.Equal(expectedArgs, args, "Args should be equal")
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].Args)
+				}
+			}
+		})
+	}
+}
