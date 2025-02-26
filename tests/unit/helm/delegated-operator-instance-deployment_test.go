@@ -415,6 +415,332 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
 	}
 }
 
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadConstraints() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(constraint []corev1.TopologySpreadConstraint)
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(constraint []corev1.TopologySpreadConstraint){
+				func(constraint []corev1.TopologySpreadConstraint) {
+					s.Empty(constraint, "Constrains should be empty")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(constraint []corev1.TopologySpreadConstraint){
+				func(constraint []corev1.TopologySpreadConstraint) {
+					s.Empty(constraint, "Constrains should be empty")
+				},
+				func(constraint []corev1.TopologySpreadConstraint) {
+					s.Empty(constraint, "Constrains should be empty")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateTopologyConstraints",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":                               "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                            "nil",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].maxSkew":            "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].minDomains":         "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+			},
+			[]func(constraint []corev1.TopologySpreadConstraint){
+				func(constraint []corev1.TopologySpreadConstraint) {
+					var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+					expectedTopologySpreadConstraintJSON := `[
+          {
+            "matchLabelKeys": [
+              "pod-template-hash"
+            ],
+            "maxSkew": 1,
+            "minDomains": 1,
+            "nodeAffinityPolicy": "Honor",
+            "nodeTaintsPolicy": "Honor",
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {
+              "matchLabels": {
+                "app.kubernetes.io/name": "teams-do",
+                "app.kubernetes.io/instance": "fiftyone-test"
+              }
+            }
+          }
+        ]`
+					err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+					s.NoError(err)
+					s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+				},
+				func(constraint []corev1.TopologySpreadConstraint) {
+					var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+					expectedTopologySpreadConstraintJSON := `[
+          {
+            "matchLabelKeys": [
+              "pod-template-hash"
+            ],
+            "maxSkew": 1,
+            "minDomains": 1,
+            "nodeAffinityPolicy": "Honor",
+            "nodeTaintsPolicy": "Honor",
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {
+              "matchLabels": {
+                "app.kubernetes.io/name": "teams-do-two",
+                "app.kubernetes.io/instance": "fiftyone-test"
+              }
+            }
+          }
+        ]`
+					err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+					s.NoError(err)
+					s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceTopologyConstraints",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].maxSkew":            "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].minDomains":         "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeAffinityPolicy": "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeTaintsPolicy":   "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                       "nil",
+			},
+			[]func(constraint []corev1.TopologySpreadConstraint){
+				func(constraint []corev1.TopologySpreadConstraint) {
+					var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+					expectedTopologySpreadConstraintJSON := `[
+          {
+            "matchLabelKeys": [
+              "pod-template-hash"
+            ],
+            "maxSkew": 2,
+            "minDomains": 2,
+            "nodeAffinityPolicy": "Ignore",
+            "nodeTaintsPolicy": "Ignore",
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {
+              "matchLabels": {
+                "app.kubernetes.io/name": "teams-do",
+                "app.kubernetes.io/instance": "fiftyone-test"
+              }
+            }
+          }
+        ]`
+					err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+					s.NoError(err)
+					s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+				},
+				func(constraint []corev1.TopologySpreadConstraint) {
+					s.Empty(constraint, "Constrains should be empty")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateInstanceTopologyConstraints",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].maxSkew":            "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].minDomains":         "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeAffinityPolicy": "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeTaintsPolicy":   "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                       "nil",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].maxSkew":                       "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].minDomains":                    "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeTaintsPolicy":              "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
+			},
+			[]func(constraint []corev1.TopologySpreadConstraint){
+				func(constraint []corev1.TopologySpreadConstraint) {
+					var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+					expectedTopologySpreadConstraintJSON := `[
+          {
+            "matchLabelKeys": [
+              "pod-template-hash"
+            ],
+            "maxSkew": 2,
+            "minDomains": 2,
+            "nodeAffinityPolicy": "Ignore",
+            "nodeTaintsPolicy": "Ignore",
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {
+              "matchLabels": {
+                "app.kubernetes.io/name": "teams-do",
+                "app.kubernetes.io/instance": "fiftyone-test"
+              }
+            }
+          }
+        ]`
+					err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+					s.NoError(err)
+					s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+				},
+				func(constraint []corev1.TopologySpreadConstraint) {
+					var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+					expectedTopologySpreadConstraintJSON := `[
+          {
+            "matchLabelKeys": [
+              "pod-template-hash"
+            ],
+            "maxSkew": 1,
+            "minDomains": 1,
+            "nodeAffinityPolicy": "Honor",
+            "nodeTaintsPolicy": "Honor",
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {
+              "matchLabels": {
+                "app.kubernetes.io/name": "teams-do-two",
+                "app.kubernetes.io/instance": "fiftyone-test"
+              }
+            }
+          }
+        ]`
+					err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+					s.NoError(err)
+					s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateInstanceTopologyConstraintsLabelSelectors",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].maxSkew":                       "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].minDomains":                    "2",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeAffinityPolicy":            "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeTaintsPolicy":              "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].labelSelector.matchLabels.app": "instance-label-override",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                                  "nil",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].matchLabelKeys[0]":                        "pod-template-hash",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].maxSkew":                                  "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].minDomains":                               "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeAffinityPolicy":                       "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeTaintsPolicy":                         "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].topologyKey":                              "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].whenUnsatisfiable":                        "DoNotSchedule",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].labelSelector.matchLabels.app":            "template-label-override",
+			},
+			[]func(constraint []corev1.TopologySpreadConstraint){
+				func(constraint []corev1.TopologySpreadConstraint) {
+					var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+					expectedTopologySpreadConstraintJSON := `[
+          {
+            "matchLabelKeys": [
+              "pod-template-hash"
+            ],
+            "maxSkew": 2,
+            "minDomains": 2,
+            "nodeAffinityPolicy": "Ignore",
+            "nodeTaintsPolicy": "Ignore",
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {
+              "matchLabels": {
+                "app": "instance-label-override"
+              }
+            }
+          }
+        ]`
+					err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+					s.NoError(err)
+					s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+				},
+				func(constraint []corev1.TopologySpreadConstraint) {
+					var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
+					expectedTopologySpreadConstraintJSON := `[
+          {
+            "matchLabelKeys": [
+              "pod-template-hash"
+            ],
+            "maxSkew": 1,
+            "minDomains": 1,
+            "nodeAffinityPolicy": "Honor",
+            "nodeTaintsPolicy": "Honor",
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {
+              "matchLabels": {
+                "app": "template-label-override"
+              }
+            }
+          }
+        ]`
+					err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
+					s.NoError(err)
+					s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+
+			if testCase.values == nil {
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+
+				var deployment appsv1.Deployment
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Empty(deployment.Spec.Template.Spec.TopologySpreadConstraints, "Topology constraints should be nil")
+			} else {
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Template.Spec.TopologySpreadConstraints)
+				}
+			}
+		})
+	}
+}
+
 func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCount() {
 	testCases := []struct {
 		name     string
