@@ -1603,107 +1603,181 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMounts() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(volumeMounts []corev1.VolumeMount)
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			func(volumeMounts []corev1.VolumeMount) {
-// 				s.Empty(volumeMounts, "VolumeMounts should not be set")
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(volumeMounts []corev1.VolumeMount) {
-// 				s.Nil(volumeMounts, "VolumeMounts should be nil")
-// 			},
-// 		},
-// 		{
-// 			"overrideVolumeMountsSingle",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                   "true",
-// 				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath": "/test-data-volume",
-// 				"delegatedOperatorExecutorSettings.volumeMounts[0].name":      "test-volume",
-// 			},
-// 			func(volumeMounts []corev1.VolumeMount) {
-// 				expectedJSON := `[
-//           {
-//             "mountPath": "/test-data-volume",
-//             "name": "test-volume"
-//           }
-//         ]`
-// 				var expectedVolumeMounts []corev1.VolumeMount
-// 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
-// 				s.NoError(err)
-// 				s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
-// 			},
-// 		},
-// 		{
-// 			"overrideVolumeMountsMultiple",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                   "true",
-// 				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath": "/test-data-volume1",
-// 				"delegatedOperatorExecutorSettings.volumeMounts[0].name":      "test-volume1",
-// 				"delegatedOperatorExecutorSettings.volumeMounts[1].mountPath": "/test-data-volume2",
-// 				"delegatedOperatorExecutorSettings.volumeMounts[1].name":      "test-volume2",
-// 			},
-// 			func(volumeMounts []corev1.VolumeMount) {
-// 				expectedJSON := `[
-//           {
-//             "mountPath": "/test-data-volume1",
-//             "name": "test-volume1"
-//           },
-//           {
-//             "mountPath": "/test-data-volume2",
-//             "name": "test-volume2"
-//           }
-//         ]`
-// 				var expectedVolumeMounts []corev1.VolumeMount
-// 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
-// 				s.NoError(err)
-// 				s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
-// 			},
-// 		},
-// 	}
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMounts() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(volumeMounts []corev1.VolumeMount)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(volumeMounts []corev1.VolumeMount){
+				func(volumeMounts []corev1.VolumeMount) {
+					s.Empty(volumeMounts, "VolumeMounts should not be set")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(volumeMounts []corev1.VolumeMount){
+				func(volumeMounts []corev1.VolumeMount) {
+					s.Nil(volumeMounts, "VolumeMounts should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(volumeMounts []corev1.VolumeMount){
+				func(volumeMounts []corev1.VolumeMount) {
+					s.Nil(volumeMounts, "VolumeMounts should be nil")
+				},
+				func(volumeMounts []corev1.VolumeMount) {
+					s.Nil(volumeMounts, "VolumeMounts should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateVolumeMounts",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":         "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":      "nil",
+				"delegatedOperatorDeployments.template.volumeMounts[0].mountPath": "/template-test-data-volume",
+				"delegatedOperatorDeployments.template.volumeMounts[0].name":      "template-test-volume",
+			},
+			[]func(volumeMounts []corev1.VolumeMount){
+				func(volumeMounts []corev1.VolumeMount) {
+					expectedJSON := `[
+          {
+            "mountPath": "/template-test-data-volume",
+            "name": "template-test-volume"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
+				},
+				func(volumeMounts []corev1.VolumeMount) {
+					expectedJSON := `[
+          {
+            "mountPath": "/template-test-data-volume",
+            "name": "template-test-volume"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceVolumeMounts",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].mountPath": "/teams-do-test-data-volume",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].name":      "teams-do-test-volume",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                 "nil",
+			},
+			[]func(volumeMounts []corev1.VolumeMount){
+				func(volumeMounts []corev1.VolumeMount) {
+					expectedJSON := `[
+          {
+            "mountPath": "/teams-do-test-data-volume",
+            "name": "teams-do-test-volume"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
+				},
+				func(volumeMounts []corev1.VolumeMount) {
+					s.Nil(volumeMounts, "VolumeMounts should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateInstanceVolumeMounts",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].mountPath": "/teams-do-test-data-volume",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].name":      "teams-do-test-volume",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                 "nil",
+				"delegatedOperatorDeployments.template.volumeMounts[0].mountPath":            "/template-test-data-volume",
+				"delegatedOperatorDeployments.template.volumeMounts[0].name":                 "template-test-volume",
+			},
+			[]func(volumeMounts []corev1.VolumeMount){
+				func(volumeMounts []corev1.VolumeMount) {
+					expectedJSON := `[
+          {
+            "mountPath": "/teams-do-test-data-volume",
+            "name": "teams-do-test-volume"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
+				},
+				func(volumeMounts []corev1.VolumeMount) {
+					expectedJSON := `[
+          {
+            "mountPath": "/template-test-data-volume",
+            "name": "template-test-volume"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
+				},
+			},
+		},
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				testCase.expected(deployment.Spec.Template.Spec.Containers[0].VolumeMounts)
-// 			}
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// 		})
-// 	}
-// }
+					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].VolumeMounts)
+				}
+			}
+
+		})
+	}
+}
 
 func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 	testCases := []struct {
@@ -3014,113 +3088,213 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(volumes []corev1.Volume)
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			func(volumes []corev1.Volume) {
-// 				s.Empty(volumes, "Volumes should be be set")
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(volumes []corev1.Volume) {
-// 				s.Nil(volumes, "Volumes should be nil")
-// 			},
-// 		},
-// 		{
-// 			"overrideVolumesSingle",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                  "true",
-// 				"delegatedOperatorExecutorSettings.volumes[0].name":          "test-volume",
-// 				"delegatedOperatorExecutorSettings.volumes[0].hostPath.path": "/test-volume",
-// 			},
-// 			func(volumes []corev1.Volume) {
-// 				expectedJSON := `[
-//           {
-//             "name": "test-volume",
-//             "hostPath": {
-//               "path": "/test-volume"
-//             }
-//           }
-//         ]`
-// 				var expectedVolumes []corev1.Volume
-// 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
-// 				s.NoError(err)
-// 				s.Equal(expectedVolumes, volumes, "Volumes should be equal")
-// 			},
-// 		},
-// 		{
-// 			"overrideVolumesMultiple",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                                    "true",
-// 				"delegatedOperatorExecutorSettings.volumes[0].name":                            "test-volume1",
-// 				"delegatedOperatorExecutorSettings.volumes[0].hostPath.path":                   "/test-volume1",
-// 				"delegatedOperatorExecutorSettings.volumes[1].name":                            "pvc1",
-// 				"delegatedOperatorExecutorSettings.volumes[1].persistentVolumeClaim.claimName": "pvc1",
-// 			},
-// 			func(volumes []corev1.Volume) {
-// 				expectedJSON := `[
-//           {
-//             "name": "test-volume1",
-//             "hostPath": {
-//               "path": "/test-volume1"
-//             }
-//           },
-//           {
-//             "name": "pvc1",
-//             "persistentVolumeClaim": {
-//               "claimName": "pvc1"
-//             }
-//           }
-//         ]`
-// 				var expectedVolumes []corev1.Volume
-// 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
-// 				s.NoError(err)
-// 				s.Equal(expectedVolumes, volumes, "Volumes should be equal")
-// 			},
-// 		},
-// 	}
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(volumes []corev1.Volume)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(volumes []corev1.Volume){
+				func(volumes []corev1.Volume) {
+					s.Empty(volumes, "Volumes should be be set")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(volumes []corev1.Volume){
+				func(volumes []corev1.Volume) {
+					s.Nil(volumes, "Volumes should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(volumes []corev1.Volume){
+				func(volumes []corev1.Volume) {
+					s.Nil(volumes, "Volumes should be nil")
+				},
+				func(volumes []corev1.Volume) {
+					s.Nil(volumes, "Volumes should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateVolumes",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":                          "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                       "nil",
+				"delegatedOperatorDeployments.template.volumes[0].name":                            "template-test-volume1",
+				"delegatedOperatorDeployments.template.volumes[0].hostPath.path":                   "/template-test-volume1",
+				"delegatedOperatorDeployments.template.volumes[1].name":                            "template-pvc1",
+				"delegatedOperatorDeployments.template.volumes[1].persistentVolumeClaim.claimName": "template-pvc1",
+			},
+			[]func(volumes []corev1.Volume){
+				func(volumes []corev1.Volume) {
+					expectedJSON := `[
+          {
+            "name": "template-test-volume1",
+            "hostPath": {
+              "path": "/template-test-volume1"
+            }
+          },
+          {
+            "name": "template-pvc1",
+            "persistentVolumeClaim": {
+              "claimName": "template-pvc1"
+            }
+          }
+        ]`
+					var expectedVolumes []corev1.Volume
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+					s.NoError(err)
+					s.Equal(expectedVolumes, volumes, "Volumes should be equal")
+				},
+				func(volumes []corev1.Volume) {
+					expectedJSON := `[
+          {
+            "name": "template-test-volume1",
+            "hostPath": {
+              "path": "/template-test-volume1"
+            }
+          },
+          {
+            "name": "template-pvc1",
+            "persistentVolumeClaim": {
+              "claimName": "template-pvc1"
+            }
+          }
+        ]`
+					var expectedVolumes []corev1.Volume
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+					s.NoError(err)
+					s.Equal(expectedVolumes, volumes, "Volumes should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceVolumes",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].name":          "teams-do-test-volume1",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].hostPath.path": "/teams-do-test-volume1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                "nil",
+			},
+			[]func(volumes []corev1.Volume){
+				func(volumes []corev1.Volume) {
+					expectedJSON := `[
+          {
+            "name": "teams-do-test-volume1",
+            "hostPath": {
+              "path": "/teams-do-test-volume1"
+            }
+          }
+        ]`
+					var expectedVolumes []corev1.Volume
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+					s.NoError(err)
+					s.Equal(expectedVolumes, volumes, "Volumes should be equal")
+				},
+				func(volumes []corev1.Volume) {
+					s.Nil(volumes, "Volumes should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceVolumes",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].name":                 "teams-do-test-volume1",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].hostPath.path":        "/teams-do-test-volume1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                       "nil",
+				"delegatedOperatorDeployments.template.volumes[0].name":                            "template-test-volume1",
+				"delegatedOperatorDeployments.template.volumes[0].hostPath.path":                   "/template-test-volume1",
+				"delegatedOperatorDeployments.template.volumes[1].name":                            "template-pvc1",
+				"delegatedOperatorDeployments.template.volumes[1].persistentVolumeClaim.claimName": "template-pvc1",
+			},
+			[]func(volumes []corev1.Volume){
+				func(volumes []corev1.Volume) {
+					expectedJSON := `[
+          {
+            "name": "teams-do-test-volume1",
+            "hostPath": {
+              "path": "/teams-do-test-volume1"
+            }
+          }
+        ]`
+					var expectedVolumes []corev1.Volume
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+					s.NoError(err)
+					s.Equal(expectedVolumes, volumes, "Volumes should be equal")
+				},
+				func(volumes []corev1.Volume) {
+					expectedJSON := `[
+          {
+            "name": "template-test-volume1",
+            "hostPath": {
+              "path": "/template-test-volume1"
+            }
+          },
+          {
+            "name": "template-pvc1",
+            "persistentVolumeClaim": {
+              "claimName": "template-pvc1"
+            }
+          }
+        ]`
+					var expectedVolumes []corev1.Volume
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+					s.NoError(err)
+					s.Equal(expectedVolumes, volumes, "Volumes should be equal")
+				},
+			},
+		},
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				testCase.expected(deployment.Spec.Template.Spec.Volumes)
-// 			}
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// 		})
-// 	}
-// }
+					testCase.expected[i](deployment.Spec.Template.Spec.Volumes)
+				}
+			}
+
+		})
+	}
+}
 
 func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessProbe() {
 	testCases := []struct {
