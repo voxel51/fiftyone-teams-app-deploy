@@ -45,11 +45,15 @@ casSettings:
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
     pullPolicy: IfNotPresent
     tag: v2.7.0-dev.17
-delegatedOperatorExecutorSettings:
-  image:
-    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
-    pullPolicy: IfNotPresent
-    tag: v2.7.0.dev17
+
+delegatedOperatorDeployments:
+  deployments:
+    teamsDo:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+        pullPolicy: IfNotPresent
+        tag: v2.7.0.dev17
+
 ingress:
   annotations:
     # For using the nginx-ingress controller with cert-manager self signed certificates
