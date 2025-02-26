@@ -60,6 +60,7 @@ for steps on how to upgrade your delegated operators.
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
+  - [Static Banner Configuration](#static-banner-configuration)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -334,11 +335,19 @@ Banner text color is configured with:
 
 Examples:
 
-- (casSettings | teamsAppSettings).env.
-  `FIFTYONE_APP_BANNER_COLOR`: `green | rgb(34,139,34) | #f1f1f1`
-- (casSettings | teamsAppSettings).env.
-  `FIFTYONE_APP_BANNER_TEXT_COLOR`: `green | rgb(34,139,34") | #f1f1f1`
-- (casSettings | teamsAppSettings).env.`FIFTYONE_APP_BANNER_TEXT`="Internal Deployment"
+```yaml
+services:
+  teams-app-common:
+    environment:
+      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+  teams-cas-common:
+    environment:
+      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+```
 
 ### FiftyOne Teams Authenticated API
 
