@@ -28,6 +28,11 @@ type deploymentDelegatedOperatorInstanceTemplateTest struct {
 	templates   []string
 }
 
+type deploymentDelegatedOperatorInstanceTemplateLabelsExpected struct {
+	selectorMatch    map[string]string
+	templateMetadata map[string]string
+}
+
 func TestDeploymentDelegatedOperatorInstanceTemplate(t *testing.T) {
 	t.Parallel()
 
@@ -2216,252 +2221,532 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected map[string]string
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			nil,
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			nil,
-// 		},
-// 		{
-// 			"overridePodAnnotations",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                     "true",
-// 				"delegatedOperatorExecutorSettings.podAnnotations.annotation-1": "annotation-1-value",
-// 			},
-// 			map[string]string{
-// 				"annotation-1": "annotation-1-value",
-// 			},
-// 		},
-// 	}
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []map[string]string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]map[string]string{
+				map[string]string{},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]map[string]string{
+				nil,
+				nil,
+			},
+		},
+		{
+			"overrideBaseTemplatePodAnnotations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":           "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":        "nil",
+				"delegatedOperatorDeployments.template.podAnnotations.annotation-1": "annotation-1-value",
+			},
+			[]map[string]string{
+				map[string]string{
+					"annotation-1": "annotation-1-value",
+				},
+				map[string]string{
+					"annotation-1": "annotation-1-value",
+				},
+			},
+		},
+		{
+			"overrideInstancePodAnnotations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.podAnnotations.teams-do-annotation-1":        "teams-do-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.annotation-1":              "teams-do-two-annotation-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+			},
+			[]map[string]string{
+				map[string]string{
+					"teams-do-annotation-1": "teams-do-annotation-1-value",
+				},
+				map[string]string{
+					"annotation-1":              "teams-do-two-annotation-value",
+					"teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstancePodAnnotations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.podAnnotations.teams-do-annotation":          "teams-do-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.annotation-1":              "teams-do-two-annotation-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+				"delegatedOperatorDeployments.template.podAnnotations.annotation-1":                            "annotation-1-value",
+			},
+			[]map[string]string{
+				map[string]string{
+					"annotation-1":        "annotation-1-value",
+					"teams-do-annotation": "teams-do-annotation-1-value",
+				},
+				map[string]string{
+					"annotation-1":              "teams-do-two-annotation-value",
+					"teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+				},
+			},
+		},
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				for i, rawOutput := range allRange[1:] {
 
-// 				if testCase.expected == nil {
-// 					s.Nil(deployment.Spec.Template.ObjectMeta.Annotations, "Annotations should be nil")
-// 				} else {
-// 					for key, value := range testCase.expected {
-// 						foundValue := deployment.Spec.Template.ObjectMeta.Annotations[key]
-// 						s.Equal(value, foundValue, "Annotations should contain all set annotations.")
-// 					}
-// 				}
-// 			}
-// 		})
-// 	}
-// }
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(podSecurityContext *corev1.PodSecurityContext)
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			func(podSecurityContext *corev1.PodSecurityContext) {
-// 				s.Empty(podSecurityContext.FSGroup, "should not be set")
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(podSecurityContext *corev1.PodSecurityContext) {
-// 				s.Nil(podSecurityContext.FSGroup, "should be nil")
-// 				s.Nil(podSecurityContext.FSGroupChangePolicy, "should be nil")
-// 				s.Nil(podSecurityContext.RunAsGroup, "should be nil")
-// 				s.Nil(podSecurityContext.RunAsNonRoot, "should be nil")
-// 				s.Nil(podSecurityContext.RunAsUser, "should be nil")
-// 				s.Nil(podSecurityContext.SeccompProfile, "should be nil")
-// 				s.Nil(podSecurityContext.SELinuxOptions, "should be nil")
-// 				s.Nil(podSecurityContext.SupplementalGroups, "should be nil")
-// 				s.Nil(podSecurityContext.Sysctls, "should be nil")
-// 				s.Nil(podSecurityContext.WindowsOptions, "should be nil")
-// 			},
-// 		},
-// 		{
-// 			"overridePodSecurityContext",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                       "true",
-// 				"delegatedOperatorExecutorSettings.podSecurityContext.fsGroup":    "2000",
-// 				"delegatedOperatorExecutorSettings.podSecurityContext.runAsGroup": "3000",
-// 				"delegatedOperatorExecutorSettings.podSecurityContext.runAsUser":  "1000",
-// 			},
-// 			func(podSecurityContext *corev1.PodSecurityContext) {
-// 				s.Equal(int64(2000), *podSecurityContext.FSGroup, "fsGroup should be 2000")
-// 				s.Equal(int64(3000), *podSecurityContext.RunAsGroup, "runAsGroup should be 3000")
-// 				s.Equal(int64(1000), *podSecurityContext.RunAsUser, "runAsUser should be 1000")
-// 			},
-// 		},
-// 	}
+					if testCase.expected[i] == nil {
+						s.Nil(deployment.Spec.Template.ObjectMeta.Annotations, "Annotations should be nil")
+					} else {
+						for key, value := range testCase.expected[i] {
+							foundValue := deployment.Spec.Template.ObjectMeta.Annotations[key]
+							s.Equal(value, foundValue, "Annotations should contain all set annotations.")
+						}
+					}
+				}
+			}
+		})
+	}
+}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(podSecurityContext *corev1.PodSecurityContext)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(podSecurityContext *corev1.PodSecurityContext){
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Empty(podSecurityContext.FSGroup, "should not be set")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(podSecurityContext *corev1.PodSecurityContext){
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Nil(podSecurityContext.FSGroup, "should be nil")
+					s.Nil(podSecurityContext.FSGroupChangePolicy, "should be nil")
+					s.Nil(podSecurityContext.RunAsGroup, "should be nil")
+					s.Nil(podSecurityContext.RunAsNonRoot, "should be nil")
+					s.Nil(podSecurityContext.RunAsUser, "should be nil")
+					s.Nil(podSecurityContext.SeccompProfile, "should be nil")
+					s.Nil(podSecurityContext.SELinuxOptions, "should be nil")
+					s.Nil(podSecurityContext.SupplementalGroups, "should be nil")
+					s.Nil(podSecurityContext.Sysctls, "should be nil")
+					s.Nil(podSecurityContext.WindowsOptions, "should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(podSecurityContext *corev1.PodSecurityContext){
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Nil(podSecurityContext.FSGroup, "should be nil")
+					s.Nil(podSecurityContext.FSGroupChangePolicy, "should be nil")
+					s.Nil(podSecurityContext.RunAsGroup, "should be nil")
+					s.Nil(podSecurityContext.RunAsNonRoot, "should be nil")
+					s.Nil(podSecurityContext.RunAsUser, "should be nil")
+					s.Nil(podSecurityContext.SeccompProfile, "should be nil")
+					s.Nil(podSecurityContext.SELinuxOptions, "should be nil")
+					s.Nil(podSecurityContext.SupplementalGroups, "should be nil")
+					s.Nil(podSecurityContext.Sysctls, "should be nil")
+					s.Nil(podSecurityContext.WindowsOptions, "should be nil")
+				},
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Nil(podSecurityContext.FSGroup, "should be nil")
+					s.Nil(podSecurityContext.FSGroupChangePolicy, "should be nil")
+					s.Nil(podSecurityContext.RunAsGroup, "should be nil")
+					s.Nil(podSecurityContext.RunAsNonRoot, "should be nil")
+					s.Nil(podSecurityContext.RunAsUser, "should be nil")
+					s.Nil(podSecurityContext.SeccompProfile, "should be nil")
+					s.Nil(podSecurityContext.SELinuxOptions, "should be nil")
+					s.Nil(podSecurityContext.SupplementalGroups, "should be nil")
+					s.Nil(podSecurityContext.Sysctls, "should be nil")
+					s.Nil(podSecurityContext.WindowsOptions, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateSecurityContext",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":             "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":          "nil",
+				"delegatedOperatorDeployments.template.podSecurityContext.fsGroup":    "2000",
+				"delegatedOperatorDeployments.template.podSecurityContext.runAsGroup": "3000",
+				"delegatedOperatorDeployments.template.podSecurityContext.runAsUser":  "1000",
+			},
+			[]func(podSecurityContext *corev1.PodSecurityContext){
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Equal(int64(2000), *podSecurityContext.FSGroup, "fsGroup should be 2000")
+					s.Equal(int64(3000), *podSecurityContext.RunAsGroup, "runAsGroup should be 3000")
+					s.Equal(int64(1000), *podSecurityContext.RunAsUser, "runAsUser should be 1000")
+				},
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Equal(int64(2000), *podSecurityContext.FSGroup, "fsGroup should be 2000")
+					s.Equal(int64(3000), *podSecurityContext.RunAsGroup, "runAsGroup should be 3000")
+					s.Equal(int64(1000), *podSecurityContext.RunAsUser, "runAsUser should be 1000")
+				},
+			},
+		},
+		{
+			"overrideInstanceSecurityContext",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.fsGroup":       "2001",
+				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.runAsGroup":    "3001",
+				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.runAsUser":     "1001",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.fsGroup":    "2002",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.runAsGroup": "3002",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.runAsUser":  "1002",
+			},
+			[]func(podSecurityContext *corev1.PodSecurityContext){
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Equal(int64(2001), *podSecurityContext.FSGroup, "fsGroup should be 2001")
+					s.Equal(int64(3001), *podSecurityContext.RunAsGroup, "runAsGroup should be 3001")
+					s.Equal(int64(1001), *podSecurityContext.RunAsUser, "runAsUser should be 1001")
+				},
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Equal(int64(2002), *podSecurityContext.FSGroup, "fsGroup should be 2002")
+					s.Equal(int64(3002), *podSecurityContext.RunAsGroup, "runAsGroup should be 3002")
+					s.Equal(int64(1002), *podSecurityContext.RunAsUser, "runAsUser should be 1002")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateInstanceSecurityContext",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.fsGroup":    "2001",
+				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.runAsGroup": "3001",
+				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.runAsUser":  "1001",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.fsGroup": "2002",
+				"delegatedOperatorDeployments.template.podSecurityContext.fsGroup":               "2000",
+				"delegatedOperatorDeployments.template.podSecurityContext.runAsGroup":            "3000",
+				"delegatedOperatorDeployments.template.podSecurityContext.runAsUser":             "1000",
+			},
+			[]func(podSecurityContext *corev1.PodSecurityContext){
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Equal(int64(2001), *podSecurityContext.FSGroup, "fsGroup should be 2001")
+					s.Equal(int64(3001), *podSecurityContext.RunAsGroup, "runAsGroup should be 3001")
+					s.Equal(int64(1001), *podSecurityContext.RunAsUser, "runAsUser should be 1001")
+				},
+				func(podSecurityContext *corev1.PodSecurityContext) {
+					s.Equal(int64(2002), *podSecurityContext.FSGroup, "fsGroup should be 2002")
+					s.Equal(int64(3000), *podSecurityContext.RunAsGroup, "runAsGroup should be 3000")
+					s.Equal(int64(1000), *podSecurityContext.RunAsUser, "runAsUser should be 1000")
+				},
+			},
+		},
+	}
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				testCase.expected(deployment.Spec.Template.Spec.SecurityContext)
-// 			}
-// 		})
-// 	}
-// }
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
-// 	testCases := []struct {
-// 		name                     string
-// 		values                   map[string]string
-// 		selectorMatchExpected    map[string]string
-// 		templateMetadataExpected map[string]string
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			nil,
-// 			nil,
-// 		},
-// 		{
-// 			"addTemplateMetadataLabels",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":        "true",
-// 				"delegatedOperatorExecutorSettings.labels.myLabel": "unruly",
-// 			},
-// 			map[string]string{
-// 				"app.kubernetes.io/name":     "teams-do",
-// 				"app.kubernetes.io/instance": "fiftyone-test",
-// 			},
-// 			map[string]string{
-// 				"app.kubernetes.io/name":     "teams-do",
-// 				"app.kubernetes.io/instance": "fiftyone-test",
-// 				"myLabel":                    "unruly",
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			map[string]string{
-// 				"app.kubernetes.io/name":     "teams-do",
-// 				"app.kubernetes.io/instance": "fiftyone-test",
-// 			},
-// 			map[string]string{
-// 				"app.kubernetes.io/name":     "teams-do",
-// 				"app.kubernetes.io/instance": "fiftyone-test",
-// 			},
-// 		},
-// 		{
-// 			"overrideSelectorMatchLabels",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 				"delegatedOperatorExecutorSettings.name":    "test-service-name",
-// 			},
-// 			map[string]string{
-// 				"app.kubernetes.io/name":     "test-service-name",
-// 				"app.kubernetes.io/instance": "fiftyone-test",
-// 			},
-// 			map[string]string{
-// 				"app.kubernetes.io/name":     "test-service-name",
-// 				"app.kubernetes.io/instance": "fiftyone-test",
-// 			},
-// 		},
-// 	}
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+					testCase.expected[i](deployment.Spec.Template.Spec.SecurityContext)
+				}
+			}
+		})
+	}
+}
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []deploymentDelegatedOperatorInstanceTemplateLabelsExpected
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+					},
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+					},
+				},
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do-two",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do-two",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do-two",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do-two",
+					},
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateLabels",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.labels.myLabel":       "unruly",
+			},
+			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+						"myLabel":                     "unruly",
+					},
+				},
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do-two",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do-two",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do-two",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do-two",
+						"myLabel":                     "unruly",
+					},
+				},
+			},
+		},
+		{
+			"overrideInstanceLabels",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.labels.teams-do-label":        "teams-do-label-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.teams-do-two-label": "teams-do-two-label-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.myLabel":            "very-ruly",
+			},
+			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+						"teams-do-label":              "teams-do-label-value",
+					},
+				},
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do-two",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do-two",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do-two",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do-two",
+						"teams-do-two-label":          "teams-do-two-label-value",
+						"myLabel":                     "very-ruly",
+					},
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceLabels",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.labels.teams-do-label":        "teams-do-label-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.teams-do-two-label": "teams-do-two-label-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.myLabel":            "very-ruly",
+				"delegatedOperatorDeployments.template.labels.myLabel":                          "unruly",
+			},
+			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do",
+						"teams-do-label":              "teams-do-label-value",
+						"myLabel":                     "unruly",
+					},
+				},
+				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
+					selectorMatch: map[string]string{
+						"app.kubernetes.io/name":      "teams-do-two",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do-two",
+					},
+					templateMetadata: map[string]string{
+						"app.kubernetes.io/name":      "teams-do-two",
+						"app.kubernetes.io/instance":  "fiftyone-test",
+						"app.teams.operator/instance": "teams-do-two",
+						"teams-do-two-label":          "teams-do-two-label-value",
+						"myLabel":                     "very-ruly",
+					},
+				},
+			},
+		},
+	}
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				for key, value := range testCase.selectorMatchExpected {
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 					foundValue := deployment.Spec.Selector.MatchLabels[key]
-// 					s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
-// 				}
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				for key, value := range testCase.templateMetadataExpected {
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
 
-// 					foundValue := deployment.Spec.Template.ObjectMeta.Labels[key]
-// 					s.Equal(value, foundValue, "Template Metadata Labels should contain all set labels.")
-// 				}
-// 			}
-// 		})
-// 	}
-// }
+					for key, value := range testCase.expected[i].selectorMatch {
+
+						foundValue := deployment.Spec.Selector.MatchLabels[key]
+						s.Equal(value, foundValue, "Selector Labels should contain all set labels.")
+					}
+
+					for key, value := range testCase.expected[i].templateMetadata {
+
+						foundValue := deployment.Spec.Template.ObjectMeta.Labels[key]
+						s.Equal(value, foundValue, "Template Metadata Labels should contain all set labels.")
+					}
+				}
+			}
+		})
+	}
+}
 
 func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestServiceAccountName() {
 	testCases := []struct {

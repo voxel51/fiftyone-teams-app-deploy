@@ -28,13 +28,13 @@ spec:
       app.teams.operator/instance: {{ $name }}
   template:
     metadata:
-      {{- with $v.podAnnotations | default $baseTpl.podAnnotations }}
+      {{- with (merge (dict) ($v.podAnnotations|default dict) ($baseTpl.podAnnotations)) }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 8 }}
-        {{- with merge $baseTpl.labels ($v.labels | default dict) }}
+        {{- with (merge (dict) ($v.labels | default dict) ($baseTpl.labels)) }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         app.teams.operator/instance: {{ $name }}
@@ -45,7 +45,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
       securityContext:
-        {{- toYaml $v.podSecurityContext | default $baseTpl.podSecurityContext | nindent 8 }}
+        {{- toYaml (merge (dict) ($v.podSecurityContext | default dict) ($baseTpl.podSecurityContext)) | nindent 8 }}
       containers:
         - name: {{ $name }}
           command: ["fiftyone"]
