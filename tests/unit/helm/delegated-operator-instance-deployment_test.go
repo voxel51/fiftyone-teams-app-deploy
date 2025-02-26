@@ -477,318 +477,680 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCount() {
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(envVars []corev1.EnvVar)
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			func(envVars []corev1.EnvVar) {
-// 				expectedEnvVarJSON := `[]`
-// 				var expectedEnvVars []corev1.EnvVar
-// 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
-// 				s.NoError(err)
-// 				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(envVars []corev1.EnvVar) {
-// 				expectedEnvVarJSON := `[
-//           {
-//             "name": "API_URL",
-//             "value": "http://teams-api:80"
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_ADMIN",
-//             "value": "false"
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_NAME",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "fiftyoneDatabaseName"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_URI",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "mongodbConnectionString"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_ENCRYPTION_KEY",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "encryptionKey"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
-//             "value": ""
-//           },
-//           {
-//             "name": "FIFTYONE_INTERNAL_SERVICE",
-//             "value": "true"
-//           },
-//           {
-//             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-//             "value": "-1"
-//           }
-//         ]`
-// 				var expectedEnvVars []corev1.EnvVar
-// 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
-// 				s.NoError(err)
-// 				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
-// 			},
-// 		},
-// 		{
-// 			"overrideEnv",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                                       "true",
-// 				"delegatedOperatorExecutorSettings.env.TEST_KEY":                                  "TEST_VALUE",
-// 				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
-// 				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "anExistingKey",      // pragma: allowlist secret
-// 			},
-// 			func(envVars []corev1.EnvVar) {
-// 				expectedEnvVarJSON := `[
-//           {
-//             "name": "API_URL",
-//             "value": "http://teams-api:80"
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_ADMIN",
-//             "value": "false"
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_NAME",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "fiftyoneDatabaseName"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_URI",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "mongodbConnectionString"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_ENCRYPTION_KEY",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "encryptionKey"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
-//             "value": ""
-//           },
-//           {
-//             "name": "FIFTYONE_INTERNAL_SERVICE",
-//             "value": "true"
-//           },
-//           {
-//             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-//             "value": "-1"
-//           },
-//           {
-//             "name": "TEST_KEY",
-//             "value": "TEST_VALUE"
-//           },
-//           {
-//             "name": "AN_ADDITIONAL_SECRET_ENV",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "an-existing-secret",
-//                 "key": "anExistingKey"
-//               }
-//             }
-//           }
-//         ]`
-// 				var expectedEnvVars []corev1.EnvVar
-// 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
-// 				s.NoError(err)
-// 				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
-// 			},
-// 		},
-// 		{
-// 			"overrideSecretName",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 				"secret.name": "override-secret-name",
-// 			},
-// 			func(envVars []corev1.EnvVar) {
-// 				expectedEnvVarJSON := `[
-//           {
-//             "name": "API_URL",
-//             "value": "http://teams-api:80"
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_ADMIN",
-//             "value": "false"
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_NAME",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "override-secret-name",
-//                 "key": "fiftyoneDatabaseName"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_URI",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "override-secret-name",
-//                 "key": "mongodbConnectionString"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_ENCRYPTION_KEY",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "override-secret-name",
-//                 "key": "encryptionKey"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
-//             "value": ""
-//           },
-//           {
-//             "name": "FIFTYONE_INTERNAL_SERVICE",
-//             "value": "true"
-//           },
-//           {
-//             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-//             "value": "-1"
-//           }
-//         ]`
-// 				var expectedEnvVars []corev1.EnvVar
-// 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
-// 				s.NoError(err)
-// 				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
-// 			},
-// 		},
-// 		{
-// 			"overrideApiServiceNameAndPort",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 				"apiSettings.service.name":                  "teams-api-override",
-// 				"apiSettings.service.port":                  "8000",
-// 			},
-// 			func(envVars []corev1.EnvVar) {
-// 				expectedEnvVarJSON := `[
-//           {
-//             "name": "API_URL",
-//             "value": "http://teams-api-override:8000"
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_ADMIN",
-//             "value": "false"
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_NAME",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "fiftyoneDatabaseName"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_DATABASE_URI",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "mongodbConnectionString"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_ENCRYPTION_KEY",
-//             "valueFrom": {
-//               "secretKeyRef": {
-//                 "name": "fiftyone-teams-secrets",
-//                 "key": "encryptionKey"
-//               }
-//             }
-//           },
-//           {
-//             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
-//             "value": ""
-//           },
-//           {
-//             "name": "FIFTYONE_INTERNAL_SERVICE",
-//             "value": "true"
-//           },
-//           {
-//             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-//             "value": "-1"
-//           }
-//         ]`
-// 				var expectedEnvVars []corev1.EnvVar
-// 				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
-// 				s.NoError(err)
-// 				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
-// 			},
-// 		},
-// 	}
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(envVars []corev1.EnvVar)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(envVars []corev1.EnvVar){
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(envVars []corev1.EnvVar){
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "-1"
+          }
+        ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(envVars []corev1.EnvVar){
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "-1"
+          }
+        ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "-1"
+          }
+        ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateEnv",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":                             "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                          "nil",
+				"delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":     "gs://template",
+				"delegatedOperatorDeployments.template.env.TEST_KEY":                                  "TEMPLATE_TEST_VALUE",
+				"delegatedOperatorDeployments.template.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "template-existing-secret", // pragma: allowlist secret
+				"delegatedOperatorDeployments.template.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "templateAnExistingKey",    // pragma: allowlist secret
+			},
+			[]func(envVars []corev1.EnvVar){
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+            "value": "gs://template"
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "-1"
+          },
+          {
+            "name": "TEST_KEY",
+            "value": "TEMPLATE_TEST_VALUE"
+          },
+          {
+            "name": "AN_ADDITIONAL_SECRET_ENV",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "template-existing-secret",
+                "key": "templateAnExistingKey"
+              }
+            }
+          }
+        ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+            "value": "gs://template"
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "-1"
+          },
+          {
+            "name": "TEST_KEY",
+            "value": "TEMPLATE_TEST_VALUE"
+          },
+          {
+            "name": "AN_ADDITIONAL_SECRET_ENV",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "template-existing-secret",
+                "key": "templateAnExistingKey"
+              }
+            }
+          }
+        ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceEnv",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":     "gs://foo.com",
+				"delegatedOperatorDeployments.deployments.teamsDo.env.TEST_KEY":                                  "INSTANCE_TEST_VALUE",
+				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "instance-existing-secret", // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "instanceAnExistingKey",    // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                     "nil",
+			},
+			[]func(envVars []corev1.EnvVar){
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+                  {
+                    "name": "API_URL",
+                    "value": "http://teams-api:80"
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_ADMIN",
+                    "value": "false"
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_NAME",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "fiftyoneDatabaseName"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_URI",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "mongodbConnectionString"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_ENCRYPTION_KEY",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "encryptionKey"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+                    "value": "gs://foo.com"
+                  },
+                  {
+                    "name": "FIFTYONE_INTERNAL_SERVICE",
+                    "value": "true"
+                  },
+                  {
+                    "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+                    "value": "-1"
+                  },
+                  {
+                    "name": "TEST_KEY",
+                    "value": "INSTANCE_TEST_VALUE"
+                  },
+                  {
+                    "name": "AN_ADDITIONAL_SECRET_ENV",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "instance-existing-secret",
+                        "key": "instanceAnExistingKey"
+                      }
+                    }
+                  }
+                ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+                  {
+                    "name": "API_URL",
+                    "value": "http://teams-api:80"
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_ADMIN",
+                    "value": "false"
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_NAME",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "fiftyoneDatabaseName"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_URI",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "mongodbConnectionString"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_ENCRYPTION_KEY",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "encryptionKey"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+                    "value": ""
+                  },
+                  {
+                    "name": "FIFTYONE_INTERNAL_SERVICE",
+                    "value": "true"
+                  },
+                  {
+                    "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+                    "value": "-1"
+                  }
+                ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceEnv",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":     "gs://foo.com",
+				"delegatedOperatorDeployments.deployments.teamsDo.env.TEST_KEY":                                  "INSTANCE_TEST_VALUE",
+				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "instance-existing-secret", // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "instanceAnExistingKey",    // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                     "nil",
+				"delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":                "gs://template",
+				"delegatedOperatorDeployments.template.env.TEST_KEY":                                             "TEMPLATE_TEST_VALUE",
+				"delegatedOperatorDeployments.template.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":            "template-existing-secret", // pragma: allowlist secret
+				"delegatedOperatorDeployments.template.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":             "templateAnExistingKey",    // pragma: allowlist secret
+			},
+			[]func(envVars []corev1.EnvVar){
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+                  {
+                    "name": "API_URL",
+                    "value": "http://teams-api:80"
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_ADMIN",
+                    "value": "false"
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_NAME",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "fiftyoneDatabaseName"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_URI",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "mongodbConnectionString"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_ENCRYPTION_KEY",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "encryptionKey"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+                    "value": "gs://foo.com"
+                  },
+                  {
+                    "name": "FIFTYONE_INTERNAL_SERVICE",
+                    "value": "true"
+                  },
+                  {
+                    "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+                    "value": "-1"
+                  },
+                  {
+                    "name": "TEST_KEY",
+                    "value": "INSTANCE_TEST_VALUE"
+                  },
+                  {
+                    "name": "AN_ADDITIONAL_SECRET_ENV",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "instance-existing-secret",
+                        "key": "instanceAnExistingKey"
+                      }
+                    }
+                  }
+                ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+                  {
+                    "name": "API_URL",
+                    "value": "http://teams-api:80"
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_ADMIN",
+                    "value": "false"
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_NAME",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "fiftyoneDatabaseName"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_DATABASE_URI",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "mongodbConnectionString"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_ENCRYPTION_KEY",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "fiftyone-teams-secrets",
+                        "key": "encryptionKey"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+                    "value": "gs://template"
+                  },
+                  {
+                    "name": "FIFTYONE_INTERNAL_SERVICE",
+                    "value": "true"
+                  },
+                  {
+                    "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+                    "value": "-1"
+                  },
+                  {
+                    "name": "TEST_KEY",
+                    "value": "TEMPLATE_TEST_VALUE"
+                  },
+                  {
+                    "name": "AN_ADDITIONAL_SECRET_ENV",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "template-existing-secret",
+                        "key": "templateAnExistingKey"
+                      }
+                    }
+                  }
+                ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+			},
+		},
+	}
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
 
-// 				testCase.expected(deployment.Spec.Template.Spec.Containers[0].Env)
-// 			}
-// 		})
-// 	}
-// }
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].Env)
+				}
+			}
+		})
+	}
+}
 
 func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 
