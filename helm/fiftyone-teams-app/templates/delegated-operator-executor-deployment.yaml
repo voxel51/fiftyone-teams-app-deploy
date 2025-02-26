@@ -87,7 +87,14 @@ spec:
       {{- end }}
       {{- if .Values.delegatedOperatorExecutorSettings.topologySpreadConstraints }}
       topologySpreadConstraints:
-        {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.delegatedOperatorExecutorSettings.topologySpreadConstraints "selectorLabels" "delegated-operator-executor.selectorLabels" "context" $) | nindent 8 }}
+        {{-
+          include "fiftyone-teams-app.commonTopologySpreadConstraints"
+          (
+            dict "constraints" .Values.delegatedOperatorExecutorSettings.topologySpreadConstraints
+            "selectorLabels" "delegated-operator-executor.selectorLabels"
+            "context" $
+          ) | nindent 8
+        }}
       {{- end }}
       {{- with .Values.delegatedOperatorExecutorSettings.volumes }}
       volumes:
