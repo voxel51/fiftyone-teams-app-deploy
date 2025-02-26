@@ -24,6 +24,7 @@
     - [Map Merges](#map-merges)
     - [List Merges](#list-merges)
 - [Migrating from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeployments`](#migrating-from-delegatedoperatorexecutorsettings-to-delegatedoperatordeployments)
+  - [Example](#example)
 - [Prior to v2.7.0](#prior-to-v270)
 
 <!-- tocstop -->
@@ -252,6 +253,86 @@ To migrate from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeploym
          `delegatedOperatorDeployments.deployments.teamsDo` is more
          indented than its predecessor.
 1. Set `delegatedOperatorExecutorSettings.enabled` to `false`
+
+### Example
+
+If my version 2.6.0 values file contained:
+
+```yaml
+delegatedOperatorExecutorSettings:
+  enabled: true
+  env:
+    FIFTYONE_PLUGINS_CACHE_ENABLED: true
+    FIFTYONE_PLUGINS_DIR: /opt/plugins
+  image:
+    repository: my-internal-repo/fiftyone-teams-cv-full
+    tag: v2.6.0
+  replicaCount: 3
+  resources:
+    limits:
+      cpu: 2
+      ephemeral-storage: 1Gi
+      memory: 6Gi
+    requests:
+      cpu: 2
+      ephemeral-storage: 1Gi
+      memory: 6Gi
+  securityContext:
+    readOnlyRootFilesystem: true
+  volumeMounts:
+    - name: opt-fiftyone
+      mountPath: /opt/fiftyone
+    - name: tmpdir
+      mountPath: /tmp
+  volumes:
+    - name: nfs-plugins-ro-vol
+      persistentVolumeClaim:
+        claimName: release-rc-plugins-pvc
+        readOnly: true
+    - name: tmpdir
+      emptyDir: {}
+```
+
+A migrated `values.yaml` file would contain:
+
+```yaml
+delegatedOperatorExecutorSettings:
+  enabled: false
+
+delegatedOperatorDeployments:
+  deployments:
+    teamsDo:
+      env:
+        FIFTYONE_PLUGINS_CACHE_ENABLED: true
+        FIFTYONE_PLUGINS_DIR: /opt/plugins
+      image:
+        repository: my-internal-repo/fiftyone-teams-cv-full
+        tag: v2.6.0
+      replicaCount: 3
+      resources:
+        limits:
+          cpu: 2
+          ephemeral-storage: 1Gi
+          memory: 6Gi
+        requests:
+          cpu: 2
+          ephemeral-storage: 1Gi
+          memory: 6Gi
+      securityContext:
+        readOnlyRootFilesystem: true
+      volumeMounts:
+        - name: opt-fiftyone
+          mountPath: /opt/fiftyone
+        - name: tmpdir
+          mountPath: /tmp
+      volumes:
+        - name: nfs-plugins-ro-vol
+          persistentVolumeClaim:
+            claimName: release-rc-plugins-pvc
+            readOnly: true
+        - name: tmpdir
+          emptyDir: {}
+```
 
 ## Prior to v2.7.0
 
