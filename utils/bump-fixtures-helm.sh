@@ -131,8 +131,8 @@ if yq -e ".pluginsSettings" "${file}" >/dev/null; then
   yq "$yq_flags" ".pluginsSettings.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
 fi
 
-if yq -e ".delegatedOperatorExecutorSettings" "${file}" >/dev/null; then
-  yq "$yq_flags" ".delegatedOperatorExecutorSettings.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
+if yq -e ".delegatedOperatorDeployments.deployments" "${file}" >/dev/null; then
+  yq "$yq_flags" ".delegatedOperatorDeployments.deployments.*.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
 fi
 
 # Remove temporary file if dry-run
