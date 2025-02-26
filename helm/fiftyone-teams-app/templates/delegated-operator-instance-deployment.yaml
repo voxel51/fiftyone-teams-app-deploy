@@ -103,15 +103,15 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (merge (dict) ($v.affinity  | default dict) ($baseTpl.affinity)) }}
+      {{- with (merge (dict) ($v.affinity | default dict) ($baseTpl.affinity)) }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $v.tolerations  | default $baseTpl.tolerations }}
+      {{- with $v.tolerations | default $baseTpl.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $v.volumes  | default $baseTpl.volumes }}
+      {{- with $v.volumes | default $baseTpl.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}

@@ -2812,7 +2812,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestServiceAccountName
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
 					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
-					fmt.Printf("%v\n", testCase.expected)
 
 					s.Equal(testCase.expected[i], deployment.Spec.Template.Spec.ServiceAccountName, "Service account name should be equal.")
 				}
@@ -2821,84 +2820,199 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestServiceAccountName
 	}
 }
 
-// func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
-// 	testCases := []struct {
-// 		name     string
-// 		values   map[string]string
-// 		expected func(tolerations []corev1.Toleration)
-// 	}{
-// 		{
-// 			"defaultValues",
-// 			nil,
-// 			func(tolerations []corev1.Toleration) {
-// 				s.Empty(tolerations, "should not be set")
-// 			},
-// 		},
-// 		{
-// 			"defaultValuesDOEnabled",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled": "true",
-// 			},
-// 			func(tolerations []corev1.Toleration) {
-// 				s.Nil(tolerations, "should be nil")
-// 			},
-// 		},
-// 		{
-// 			"overrideTolerations",
-// 			map[string]string{
-// 				"delegatedOperatorExecutorSettings.enabled":                 "true",
-// 				"delegatedOperatorExecutorSettings.tolerations[0].key":      "example-key",
-// 				"delegatedOperatorExecutorSettings.tolerations[0].operator": "Exists",
-// 				"delegatedOperatorExecutorSettings.tolerations[0].effect":   "NoSchedule",
-// 			},
-// 			func(tolerations []corev1.Toleration) {
-// 				tolerationJSON := `[
-//           {
-//             "key": "example-key",
-//             "operator": "Exists",
-//             "effect": "NoSchedule"
-//           }
-//         ]`
-// 				var expectedTolerations []corev1.Toleration
-// 				err := json.Unmarshal([]byte(tolerationJSON), &expectedTolerations)
-// 				s.NoError(err)
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(tolerations []corev1.Toleration)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(tolerations []corev1.Toleration){
+				func(tolerations []corev1.Toleration) {
+					s.Empty(tolerations, "should not be set")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(tolerations []corev1.Toleration){
+				func(tolerations []corev1.Toleration) {
+					s.Nil(tolerations, "should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(tolerations []corev1.Toleration){
+				func(tolerations []corev1.Toleration) {
+					s.Nil(tolerations, "should be nil")
+				},
+				func(tolerations []corev1.Toleration) {
+					s.Nil(tolerations, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateTolerations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":       "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":    "nil",
+				"delegatedOperatorDeployments.template.tolerations[0].key":      "example-key",
+				"delegatedOperatorDeployments.template.tolerations[0].operator": "Exists",
+				"delegatedOperatorDeployments.template.tolerations[0].effect":   "NoSchedule",
+			},
+			[]func(tolerations []corev1.Toleration){
+				func(tolerations []corev1.Toleration) {
+					tolerationJSON := `[
+                {
+                  "key": "example-key",
+                  "operator": "Exists",
+                  "effect": "NoSchedule"
+                }
+              ]`
+					var expectedTolerations []corev1.Toleration
+					err := json.Unmarshal([]byte(tolerationJSON), &expectedTolerations)
+					s.NoError(err)
 
-// 				s.Len(tolerations, 1, "Should only have 1 toleration")
-// 				s.Equal(expectedTolerations[0], tolerations[0], "Toleration should be equal")
-// 			},
-// 		},
-// 	}
+					s.Len(tolerations, 1, "Should only have 1 toleration")
+					s.Equal(expectedTolerations[0], tolerations[0], "Toleration should be equal")
+				},
+				func(tolerations []corev1.Toleration) {
+					tolerationJSON := `[
+                {
+                  "key": "example-key",
+                  "operator": "Exists",
+                  "effect": "NoSchedule"
+                }
+              ]`
+					var expectedTolerations []corev1.Toleration
+					err := json.Unmarshal([]byte(tolerationJSON), &expectedTolerations)
+					s.NoError(err)
 
-// 	for _, testCase := range testCases {
-// 		testCase := testCase
+					s.Len(tolerations, 1, "Should only have 1 toleration")
+					s.Equal(expectedTolerations[0], tolerations[0], "Toleration should be equal")
+				},
+			},
+		},
+		{
+			"overrideInstanceTolerations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].key":      "example-key-teams-do",
+				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].operator": "Exists",
+				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].effect":   "PreferNoSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":               "nil",
+			},
+			[]func(tolerations []corev1.Toleration){
+				func(tolerations []corev1.Toleration) {
+					tolerationJSON := `[
+                {
+                  "key": "example-key-teams-do",
+                  "operator": "Exists",
+                  "effect": "PreferNoSchedule"
+                }
+              ]`
+					var expectedTolerations []corev1.Toleration
+					err := json.Unmarshal([]byte(tolerationJSON), &expectedTolerations)
+					s.NoError(err)
 
-// 		s.Run(testCase.name, func() {
-// 			subT := s.T()
-// 			subT.Parallel()
+					s.Len(tolerations, 1, "Should only have 1 toleration")
+					s.Equal(expectedTolerations[0], tolerations[0], "Toleration should be equal")
+				},
+				func(tolerations []corev1.Toleration) {
+					s.Nil(tolerations, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateInstanceTolerations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].key":      "example-key-teams-do",
+				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].operator": "Exists",
+				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].effect":   "PreferNoSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":               "nil",
+				"delegatedOperatorDeployments.template.tolerations[0].key":                 "example-key",
+				"delegatedOperatorDeployments.template.tolerations[0].operator":            "Exists",
+				"delegatedOperatorDeployments.template.tolerations[0].effect":              "NoSchedule",
+			},
+			[]func(tolerations []corev1.Toleration){
+				func(tolerations []corev1.Toleration) {
+					tolerationJSON := `[
+                {
+                  "key": "example-key-teams-do",
+                  "operator": "Exists",
+                  "effect": "PreferNoSchedule"
+                }
+              ]`
+					var expectedTolerations []corev1.Toleration
+					err := json.Unmarshal([]byte(tolerationJSON), &expectedTolerations)
+					s.NoError(err)
 
-// 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
-// 			if testCase.values == nil {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+					s.Len(tolerations, 1, "Should only have 1 toleration")
+					s.Equal(expectedTolerations[0], tolerations[0], "Toleration should be equal")
+				},
+				func(tolerations []corev1.Toleration) {
+					tolerationJSON := `[
+                {
+                  "key": "example-key",
+                  "operator": "Exists",
+                  "effect": "NoSchedule"
+                }
+              ]`
+					var expectedTolerations []corev1.Toleration
+					err := json.Unmarshal([]byte(tolerationJSON), &expectedTolerations)
+					s.NoError(err)
 
-// 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
-// 				var deployment appsv1.Deployment
+					s.Len(tolerations, 1, "Should only have 1 toleration")
+					s.Equal(expectedTolerations[0], tolerations[0], "Toleration should be equal")
+				},
+			},
+		},
+	}
 
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+	for _, testCase := range testCases {
+		testCase := testCase
 
-// 				s.Nil(deployment.Spec.Template.Spec.Containers)
-// 			} else {
-// 				options := &helm.Options{SetValues: testCase.values}
-// 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
 
-// 				var deployment appsv1.Deployment
-// 				helm.UnmarshalK8SYaml(subT, output, &deployment)
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
-// 				testCase.expected(deployment.Spec.Template.Spec.Tolerations)
-// 			}
-// 		})
-// 	}
-// }
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Template.Spec.Tolerations)
+				}
+			}
+		})
+	}
+}
 
 // func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 // 	testCases := []struct {
