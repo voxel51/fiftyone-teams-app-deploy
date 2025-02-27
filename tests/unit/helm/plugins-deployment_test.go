@@ -346,15 +346,15 @@ func (s *deploymentPluginsTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsOptionalValues",
 			map[string]string{
-				"pluginsSettings.enabled":                                         "true",
-				"pluginsSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"pluginsSettings.enabled": "true",
+				"pluginsSettings.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
 				"pluginsSettings.topologySpreadConstraints[0].maxSkew":            "1",
 				"pluginsSettings.topologySpreadConstraints[0].minDomains":         "1",
 				"pluginsSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
 				"pluginsSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
 				"pluginsSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"pluginsSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
-				"pluginsSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"pluginsSettings.topologySpreadConstraints[1].matchLabelKeys[0]":  "pod-template-hash",
 				"pluginsSettings.topologySpreadConstraints[1].maxSkew":            "2",
 				"pluginsSettings.topologySpreadConstraints[1].minDomains":         "2",
 				"pluginsSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
@@ -408,8 +408,8 @@ func (s *deploymentPluginsTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsSelectorLabels",
 			map[string]string{
-				"pluginsSettings.enabled":                                                    "true",
-				"pluginsSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"pluginsSettings.enabled": "true",
+				"pluginsSettings.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
 				"pluginsSettings.topologySpreadConstraints[0].maxSkew":                       "1",
 				"pluginsSettings.topologySpreadConstraints[0].minDomains":                    "1",
 				"pluginsSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
