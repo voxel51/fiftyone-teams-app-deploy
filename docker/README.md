@@ -131,7 +131,7 @@ To deploy FiftyOne Teams:
 
             ```yaml
             services:
-              fiftyone-app-common:
+              fiftyone-app:
                 environment:
                   FIFTYONE_DATABASE_ADMIN: true
             ```
@@ -151,7 +151,7 @@ To deploy FiftyOne Teams:
 
         ```yaml
         services:
-          fiftyone-app-common:
+          fiftyone-app:
             environment:
               # FIFTYONE_DATABASE_ADMIN: true
         ```
@@ -163,7 +163,7 @@ To deploy FiftyOne Teams:
 
         ```yaml
         services:
-          fiftyone-app-common:
+          fiftyone-app:
             environment:
               FIFTYONE_DATABASE_ADMIN: false
         ```
@@ -322,30 +322,30 @@ for configuring snapshot archival.
 Fiftyone Teams v2.6 introduces the ability to add a static banner to the
 application.
 
+Banner text is configured with
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_TEXT` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_TEXT`.
+Banner background color is configured with
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_COLOR` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_COLOR`.
+Banner text color is configured with
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_TEXT_COLOR` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_TEXT_COLOR`.
+
 Configure the Static Banner by setting the following environment variables in
-your `compose.override.yaml`.
-
-Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
-
-Banner background color is configured with `FIFTYONE_APP_BANNER_COLOR`.
-
-Banner text color is configured with:
-`casSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR` and
-`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR`
-
-Examples:
+your `compose.override.yaml` like
 
 ```yaml
 services:
-  teams-app-common:
+  teams-app:
     environment:
-      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
-      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
+      FIFTYONE_APP_BANNER_TEXT_COLOR: "white" # or "rgb(255,255,255)" or "#FFFFFF"
       FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
-  teams-cas-common:
+  teams-cas:
     environment:
-      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
-      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
+      FIFTYONE_APP_BANNER_TEXT_COLOR: "white" # or "rgb(255,255,255)" or "#FFFFFF"
       FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
 ```
 

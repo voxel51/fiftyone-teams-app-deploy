@@ -337,31 +337,29 @@ configuration path.
 Fiftyone Teams v2.6 introduces the ability to add a static banner to the
 application.
 
-Configure the Static Banner by setting the following environment variables in
-your `values.yaml`.
-
-Banner text is configured with:
+Banner text is configured with
 `casSettings.env.FIFTYONE_APP_BANNER_TEXT` and
-`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT`
-
-Banner background color is configured with:
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT`.
+Banner background color is configured with
 `casSettings.env.FIFTYONE_APP_BANNER_COLOR` and
-`teamsAppSettings.env.FIFTYONE_APP_BANNER_COLOR`
-
-Banner text color is configured with:
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_COLOR`.
+Banner text color is configured with
 `casSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR` and
-`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR`
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR`.
+
+Configure the Static Banner by setting the following environment variables in
+your `values.yaml` like
 
 ```yaml
 casSettings:
   env:
-    FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
-    FIFTYONE_APP_BANNER_TEXT_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+    FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
+    FIFTYONE_APP_BANNER_TEXT_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
     FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
 teamsAppSettings:
   env:
-    FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
-    FIFTYONE_APP_BANNER_TEXT_COLOR: "green" # or "rgb(34,139,34)" or ""#f1f1f1"
+    FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
+    FIFTYONE_APP_BANNER_TEXT_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
     FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
 ```
 
