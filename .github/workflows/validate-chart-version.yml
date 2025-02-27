@@ -21,9 +21,9 @@ jobs:
       - name: Validate Helm Chart Version
         run: |
           actual=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
-          expected="${ref#release\/v}"
 
           ref="${{ github.event.pull_request.base.ref }}"
+          expected="${ref#release\/v}"
 
           if [[ "${ref}" == "release/"* ]] && [[ "${actual}" != "${expected}" ]]; then
             echo "[ERROR] Version from Chart.yaml (${actual}) should match"
