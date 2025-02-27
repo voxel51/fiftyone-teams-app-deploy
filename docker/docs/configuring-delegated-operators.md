@@ -12,7 +12,7 @@
 
 ---
 
-# Configuring FiftyOne Teams Delegated Operators
+# Configuring FiftyOne Enterprise Delegated Operators
 
 This option may be added to any of the three existing
 [plugin modes](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/configuring-plugins.md).

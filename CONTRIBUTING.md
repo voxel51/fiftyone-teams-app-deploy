@@ -249,8 +249,8 @@ By default, Skaffold will Helm install
   - CRDs
   - self-singed ClusterIssuer
   - cert-manager from chart defaults
-- FiftyOne Teams License
-- FiftyOne Teams
+- FiftyOne Enterprise License
+- FiftyOne Enterprise
 
 #### profiles
 
@@ -274,7 +274,7 @@ skaffold dev --profile only-fiftyone
 
 #### Container Images Stored in Private Repositories
 
-Our FiftyOne Teams container images are stored in the private repositories
+Our FiftyOne Enterprise container images are stored in the private repositories
 
 - [Google Artifact Repository (Docker)](#google-artifact-repository)
   - Contains private development images created by our private repository
@@ -512,7 +512,7 @@ This section assumes the use of TLS certificates and the `https` protocol.
 
 To access the teams-app webpage, run a kubernetes port forward
 (to forward traffic from the host's port) to the kubernetes service `teams-app`.
-Afterwards, access the FiftyOne Teams app via
+Afterwards, access the FiftyOne Enterprise app via
 [http://localhost:3000](http://localhost:3000).
 
 1. Initiate the port forward to the service `teams-app` on port 3000
