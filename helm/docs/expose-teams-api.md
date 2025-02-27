@@ -14,7 +14,7 @@
 
 # Exposing the `enterprise-api` Service
 
-There are two methods for SDK access to Fiftyone Enterprise
+There are two methods for SDK access to FiftyOne Enterprise
 
 - Direct MongoDB connection
 - FiftyOne Enterprise API

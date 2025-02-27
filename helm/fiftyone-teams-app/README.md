@@ -17,13 +17,13 @@
 <!-- markdownlint-disable line-length -->
 ![Version: 2.7.0](https://img.shields.io/badge/Version-2.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.7.0](https://img.shields.io/badge/AppVersion-v2.7.0-informational?style=flat-square)
 
-FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
-The FiftyoneTeams Helm chart is the recommended way to install and configure FiftyoneTeams on Kubernetes.
+FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
+The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
 
 <!-- markdownlint-enable line-length -->
 
-This page assumes general knowledge of Fiftyone Enterprise and how to use it.
-Please contact Voxel51 for more information regarding Fiftyone Enterprise.
+This page assumes general knowledge of FiftyOne Enterprise and how to use it.
+Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
@@ -158,7 +158,7 @@ kubectl --namespace your-namespace-here create secret generic \
   --type kubernetes.io/dockerconfigjson
 ```
 
-To use the Helm chart, add the Fiftyone helm repository and
+To use the Helm chart, add the FiftyOne helm repository and
 check that you have access to the chart:
 
 ```shell
@@ -280,7 +280,7 @@ There are three modes for plugins
 
 1. Builtin Plugins Only
     - This is the default mode
-    - Users may only run the builtin plugins shipped with Fiftyone Enterprise
+    - Users may only run the builtin plugins shipped with FiftyOne Enterprise
     - Cannot run custom plugins
 1. Shared Plugins
     - Users may run builtin and custom plugins
@@ -357,7 +357,7 @@ configuration path.
 
 ### Static Banner Configuration
 
-Fiftyone Enterprise v2.6 introduces the ability to add a static banner to the
+FiftyOne Enterprise v2.6 introduces the ability to add a static banner to the
 application.
 
 Banner text is configured with
@@ -388,7 +388,7 @@ teamsAppSettings:
 
 ### Terms of Service, Privacy, and Imprint URLs
 
-Fiftyone Enterprise v2.6 introduces the ability to override the Terms of
+FiftyOne Enterprise v2.6 introduces the ability to override the Terms of
 Service, Privacy, and Imprint (optional) links if required in the App.
 
 Configure the URLs by setting the following environment variables in

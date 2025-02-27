@@ -16,11 +16,11 @@ FiftyOne Enterprise is the enterprise version of the open source
 [FiftyOne](https://github.com/voxel51/fiftyone)
 project.
 
-The Fiftyone Enterprise docker-compose files are the recommended way to
-install and configure Fiftyone Enterprise on Docker.
+The FiftyOne Enterprise docker-compose files are the recommended way to
+install and configure FiftyOne Enterprise on Docker.
 
-This page assumes general knowledge of Fiftyone Enterprise and how to use it.
-Please contact Voxel51 for more information regarding Fiftyone Enterprise.
+This page assumes general knowledge of FiftyOne Enterprise and how to use it.
+Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
@@ -150,7 +150,7 @@ To deploy FiftyOne Enterprise:
         docker-compose up -d
         ```
 
-1. After the successful installation, and logging into Fiftyone Enterprise
+1. After the successful installation, and logging into FiftyOne Enterprise
     1. In `compose.override.yaml`, remove the `FIFTYONE_DATABASE_ADMIN` override
 
         ```yaml
@@ -323,7 +323,7 @@ for configuring snapshot archival.
 
 ### Static Banner Configuration
 
-Fiftyone Enterprise v2.6 introduces the ability to add a static banner to the
+FiftyOne Enterprise v2.6 introduces the ability to add a static banner to the
 application.
 
 Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
@@ -371,7 +371,7 @@ There are three modes for plugins
 
 1. Builtin Plugins Only
     - This is the default mode
-    - Users may only run the builtin plugins shipped with Fiftyone Enterprise
+    - Users may only run the builtin plugins shipped with FiftyOne Enterprise
     - Cannot run custom plugins
 1. Shared Plugins
     - Users may run builtin and custom plugins
@@ -446,7 +446,7 @@ for information on how to configure proxies.
 
 ### Terms of Service, Privacy, and Imprint URLs
 
-Fiftyone Enterprise v2.6 introduces the ability to override
+FiftyOne Enterprise v2.6 introduces the ability to override
 the Terms of Service, Privacy, and Imprint (optional) links
 if required in the App.
 
