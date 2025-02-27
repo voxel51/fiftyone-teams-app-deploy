@@ -8,17 +8,17 @@
 <img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
 <!-- markdownlint-enable no-inline-html line-length no-alt-text -->
 
-## Fiftyone Enterprise Deployment Assets
+## FiftyOne Enterprise Deployment Assets
 
 ---
 
 | Directory | Purpose                                                                   |
 |-----------|---------------------------------------------------------------------------|
-| `docker`  | Contains configurations to run Fiftyone Enterprise in Docker Compose      |
-| `helm`    | Contains the Fiftyone Enterprise Helm Chart for installing in Kubernetes  |
+| `docker`  | Contains configurations to run FiftyOne Enterprise in Docker Compose      |
+| `helm`    | Contains the FiftyOne Enterprise Helm Chart for installing in Kubernetes  |
 
 To use these instructions, you will need Auth0 information and
 Docker Hub credentials provided by Voxel51.
 
-If you are interested in Fiftyone Enterprise, please contact
+If you are interested in FiftyOne Enterprise, please contact
 [Voxel51](https://voxel51.com/book-a-demo).
