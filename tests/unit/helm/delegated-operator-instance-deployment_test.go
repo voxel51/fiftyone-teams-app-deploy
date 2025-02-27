@@ -83,7 +83,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 					"app.kubernetes.io/managed-by": "Helm",
 					"app.kubernetes.io/name":       "teams-do",
 					"app.kubernetes.io/instance":   "fiftyone-test",
-					"app.teams.operator/instance":  "teams-do",
 				},
 			},
 		},
@@ -100,7 +99,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 					"app.kubernetes.io/managed-by": "Helm",
 					"app.kubernetes.io/name":       "teams-do",
 					"app.kubernetes.io/instance":   "fiftyone-test",
-					"app.teams.operator/instance":  "teams-do",
 				},
 				map[string]string{
 					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -108,7 +106,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 					"app.kubernetes.io/managed-by": "Helm",
 					"app.kubernetes.io/name":       "teams-do-two",
 					"app.kubernetes.io/instance":   "fiftyone-test",
-					"app.teams.operator/instance":  "teams-do-two",
 				},
 			},
 		},
@@ -124,7 +121,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 					"app.kubernetes.io/managed-by": "Helm",
 					"app.kubernetes.io/name":       "teams-do-new-name",
 					"app.kubernetes.io/instance":   "fiftyone-test",
-					"app.teams.operator/instance":  "teams-do-new-name",
 				},
 			},
 		},
@@ -2979,14 +2975,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 				},
 			},
@@ -3000,26 +2994,22 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 				},
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do-two",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do-two",
+						"app.kubernetes.io/name":     "teams-do-two",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do-two",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do-two",
+						"app.kubernetes.io/name":     "teams-do-two",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 				},
 			},
@@ -3034,28 +3024,24 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
-						"myLabel":                     "unruly",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
+						"myLabel":                    "unruly",
 					},
 				},
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do-two",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do-two",
+						"app.kubernetes.io/name":     "teams-do-two",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do-two",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do-two",
-						"myLabel":                     "unruly",
+						"app.kubernetes.io/name":     "teams-do-two",
+						"app.kubernetes.io/instance": "fiftyone-test",
+						"myLabel":                    "unruly",
 					},
 				},
 			},
@@ -3070,29 +3056,25 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
-						"teams-do-label":              "teams-do-label-value",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
+						"teams-do-label":             "teams-do-label-value",
 					},
 				},
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do-two",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do-two",
+						"app.kubernetes.io/name":     "teams-do-two",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do-two",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do-two",
-						"teams-do-two-label":          "teams-do-two-label-value",
-						"myLabel":                     "very-ruly",
+						"app.kubernetes.io/name":     "teams-do-two",
+						"app.kubernetes.io/instance": "fiftyone-test",
+						"teams-do-two-label":         "teams-do-two-label-value",
+						"myLabel":                    "very-ruly",
 					},
 				},
 			},
@@ -3108,30 +3090,26 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do",
-						"teams-do-label":              "teams-do-label-value",
-						"myLabel":                     "unruly",
+						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/instance": "fiftyone-test",
+						"teams-do-label":             "teams-do-label-value",
+						"myLabel":                    "unruly",
 					},
 				},
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":      "teams-do-two",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do-two",
+						"app.kubernetes.io/name":     "teams-do-two",
+						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":      "teams-do-two",
-						"app.kubernetes.io/instance":  "fiftyone-test",
-						"app.teams.operator/instance": "teams-do-two",
-						"teams-do-two-label":          "teams-do-two-label-value",
-						"myLabel":                     "very-ruly",
+						"app.kubernetes.io/name":     "teams-do-two",
+						"app.kubernetes.io/instance": "fiftyone-test",
+						"teams-do-two-label":         "teams-do-two-label-value",
+						"myLabel":                    "very-ruly",
 					},
 				},
 			},
