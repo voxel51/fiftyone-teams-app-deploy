@@ -19,13 +19,11 @@ metadata:
   namespace: {{ $.Values.namespace.name }}
   labels:
     {{- include "delegated-operator-deployments.labels" $labelContext | nindent 4 }}
-    app.teams.operator/instance: {{ $name }}
 spec:
   replicas: {{ $v.replicaCount | default $baseTpl.replicaCount }}
   selector:
     matchLabels:
       {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 6 }}
-      app.teams.operator/instance: {{ $name }}
   template:
     metadata:
       {{- with (merge (dict) ($v.podAnnotations|default dict) ($baseTpl.podAnnotations)) }}
@@ -37,7 +35,6 @@ spec:
         {{- with (merge (dict) ($v.labels | default dict) ($baseTpl.labels)) }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        app.teams.operator/instance: {{ $name }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
