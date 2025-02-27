@@ -18,5 +18,5 @@
         for greater flexibility within your environment.
 {{- end }}
 
-Visit the following URL to access your FiftyOne Teams application:
+Visit the following URL to access your FiftyOne Enterprise application:
   http{{ if $.Values.ingress.tlsEnabled }}s{{ end }}://{{ .Values.teamsAppSettings.dnsName }}

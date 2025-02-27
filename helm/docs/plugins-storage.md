@@ -12,10 +12,10 @@
 
 ---
 
-# Adding Shared Storage for FiftyOne Teams Plugins
+# Adding Shared Storage for FiftyOne Enterprise Plugins
 
 This document will provide guidance for adding shared
-storage for FiftyOne Teams Plugins using
+storage for FiftyOne Enterprise Plugins using
 
 * Persistent Volumes (PVs)
 * Persistent Volume Claims (PVCs)

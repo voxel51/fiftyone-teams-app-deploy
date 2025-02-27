@@ -12,18 +12,18 @@
 
 ---
 
-# Exposing the `teams-api` Service
+# Exposing the `enterprise-api` Service
 
-There are two methods for SDK access to Fiftyone Teams
+There are two methods for SDK access to Fiftyone Enterprise
 
 - Direct MongoDB connection
-- FiftyOne Teams API
+- FiftyOne Enterprise API
 
 The database direct connection requires each user to have root database privileges.
 
-The FiftyOne Teams API provides Role Based Access Control (RBAC) permissions.
+The FiftyOne Enterprise API provides Role Based Access Control (RBAC) permissions.
 By default, the API is not exposed.
-To expose the FiftyOne Teams API, configure a
+To expose the FiftyOne Enterprise API, configure a
 Kubernetes Ingress to route traffic to the Kubernetes
 `teams-api` service on port 80 via the WebSocket protocol.
 
@@ -114,13 +114,13 @@ To use this chart's ingress object
 > Voxel51 is not affiliated with Nginx and you should reference the
 > [nginx documentation][nginx-docs] for advanced configuration.
 
-The FiftyOne Teams API utilizes websockets for client/server communication
+The FiftyOne Enterprise API utilizes websockets for client/server communication
 on a variety of methods.
 If you are using an `nginx` ingress class for your ingress controller, it is
 possible that extra annotations are required for the HTTPS to WSS upgrade to
 happen.
 
-If you are experiencing issues when connecting to the FiftyOne Teams API
+If you are experiencing issues when connecting to the FiftyOne Enterprise API
 from the SDK, Voxel51 has seen success with the following annotations:
 
 ```yaml
@@ -144,11 +144,11 @@ ingress:
     ```
 
 For more information, see
-[API Connection](https://docs.voxel51.com/teams/api_connection.html).
+[API Connection](https://docs.voxel51.com/enterprise/api_connection.html).
 
 ## Validation
 
-1. Verify the connectivity by accessing the FiftyOne Teams API's the health endpoint
+1. Verify the connectivity by accessing the FiftyOne Enterprise API's health endpoint
 
     ```shell
     $ curl https://<DEPOY_URL>/health

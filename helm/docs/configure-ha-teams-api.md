@@ -14,8 +14,8 @@
 
 # Configuring Highly Available FiftyOne `teams-api` Deployments
 
-FiftyOne Teams v2.7 introduces support for running multiple `teams-api` pods for
-high availability [HA].
+FiftyOne Enterprise v2.7 introduces support for running multiple `teams-api`
+pods for high availability [HA].
 
 Running multiple `teams-api` pods requires a read-write volume available to all
 of the pods in the `teams-api` deployment to synchronize the API cache.
@@ -45,7 +45,7 @@ $ cat /etc/exports
 ```
 
 > [!TIP]
-> The NFS share used for HA FiftyOne Teams API pods can be the same NFS share
+> The NFS share used for HA FiftyOne Enterprise API pods can be the same NFS share
 > used for plugins.  Voxel51 uses the parent directory as the shared root, and
 > a subdirectory for read-only plugin PVCs.
 

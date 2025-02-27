@@ -3,23 +3,23 @@
 <!-- toc -->
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-  - [From FiftyOne Teams Version 2.0.0 or Higher](#from-fiftyone-teams-version-200-or-higher)
-    - [FiftyOne Teams v2.7+ Delegated Operator Changes](#fiftyone-teams-v27-delegated-operator-changes)
-    - [FiftyOne Teams v2.5+ Delegated Operator Changes](#fiftyone-teams-v25-delegated-operator-changes)
-    - [FiftyOne Teams v2.2+ Delegated Operator Changes](#fiftyone-teams-v22-delegated-operator-changes)
+  - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
+    - [FiftyOne Enterprise v2.5+ Delegated Operator Changes](#fiftyone-enterprise-v25-delegated-operator-changes)
+    - [FiftyOne Enterprise v2.2+ Delegated Operator Changes](#fiftyone-enterprise-v22-delegated-operator-changes)
       - [Delegated Operation Capacity](#delegated-operation-capacity)
       - [Existing Orchestrators](#existing-orchestrators)
     - [Version 2.2+ InitContainers Additions](#version-22-initcontainers-additions)
-  - [From FiftyOne Teams Versions 1.6.0 to 1.7.1](#from-fiftyone-teams-versions-160-to-171)
-  - [From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-teams-versions-after-110-and-before-version-160)
-  - [From Before FiftyOne Teams Version 1.1.0](#from-before-fiftyone-teams-version-110)
+  - [From FiftyOne Enterprise Versions 1.6.0 to 1.7.1](#from-fiftyone-enterprise-versions-160-to-171)
+  - [From FiftyOne Enterprise Versions After 1.1.0 and Before Version 1.6.0](#from-fiftyone-enterprise-versions-after-110-and-before-version-160)
+  - [From Before FiftyOne Enterprise Version 1.1.0](#from-before-fiftyone-enterprise-version-110)
   - [From Early Adopter Versions (Versions less than 1.0)](#from-early-adopter-versions-versions-less-than-10)
 
 <!-- tocstop -->
 
 ## Upgrading From Previous Versions
 
-Voxel51 assumes you use the published Helm Chart to deploy your FiftyOne Teams
+Voxel51 assumes you use the published Helm Chart to deploy your FiftyOne Enterprise
 environment.
 If you are using a custom deployment mechanism, carefully review the changes in
 the
@@ -42,7 +42,7 @@ A minimal example `values.yaml` may be found
         kubectl config set-context --current --namespace your-namespace-here
         ```
 
-    1. Update your Voxel51 Helm repository and upgrade your FiftyOne Teams
+    1. Update your Voxel51 Helm repository and upgrade your FiftyOne Enterprise
        deployment
 
         ```shell
@@ -62,14 +62,14 @@ A minimal example `values.yaml` may be found
     > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
     > ```
 
-### From FiftyOne Teams Version 2.0.0 or Higher
+### From FiftyOne Enterprise Version 2.0.0 or Higher
 
-1. [Upgrade to FiftyOne Teams version 2.7.0](#upgrading-from-previous-versions)
-1. Voxel51 recommends upgrading all FiftyOne Teams SDK users to FiftyOne Teams
+1. [Upgrade to FiftyOne Enterprise version 2.7.0](#upgrading-from-previous-versions)
+1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
    version 2.7.0
-    1. Login to the FiftyOne Teams UI
+    1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+      your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Voxel51 recommends that you upgrade all your datasets, but it is not
    required.
 
@@ -83,9 +83,9 @@ A minimal example `values.yaml` may be found
    fiftyone migrate --info
    ```
 
-#### FiftyOne Teams v2.7+ Delegated Operator Changes
+#### FiftyOne Enterprise v2.7+ Delegated Operator Changes
 
-FiftyOne Teams v2.7.0 introduces numerous changes to delegated operators.
+FiftyOne Enterprise v2.7.0 introduces numerous changes to delegated operators.
 
 1. The `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
    environment variable has been changed to to
@@ -99,9 +99,9 @@ FiftyOne Teams v2.7.0 introduces numerous changes to delegated operators.
    [the delegated operator documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md#v270)
    for migrating to the new setting.
 
-#### FiftyOne Teams v2.5+ Delegated Operator Changes
+#### FiftyOne Enterprise v2.5+ Delegated Operator Changes
 
-FiftyOne Teams v2.7.0 changes the base image of the built-in delegated
+FiftyOne Enterprise v2.7.0 changes the base image of the built-in delegated
 operators (`teams-do`) from `voxel51/fiftyone-app` to `voxel51/fiftyone-teams-cv-full`.
 The `voxel51/fiftyone-teams-cv-full` image includes all of the dependencies
 required to run complex workflows out of the box.
@@ -121,9 +121,9 @@ delegatedOperatorExecutorSettings:
     repository: voxel51/fiftyone-app
 ```
 
-#### FiftyOne Teams v2.2+ Delegated Operator Changes
+#### FiftyOne Enterprise v2.2+ Delegated Operator Changes
 
-FiftyOne Teams v2.2 introduces some changes to delegated operators, detailed
+FiftyOne Enterprise v2.2 introduces some changes to delegated operators, detailed
 below.
 
 ##### Delegated Operation Capacity
@@ -178,10 +178,10 @@ For a full list of settings, please refer to the
 > Voxel51 does not recommend disabling init containers to enforce
 > inter-pod dependencies are satisfied before proceeding.
 
-### From FiftyOne Teams Versions 1.6.0 to 1.7.1
+### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.7.0 _requires_ a license file.
-> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
 > The license file contains all of the Auth0 configuration that was
@@ -220,11 +220,11 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams version 2.7.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.7.0
-    1. Login to the FiftyOne Teams UI
+1. [Upgrade to FiftyOne Enterprise version 2.7.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.7.0
+    1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+      your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
     > **NOTE** Any FiftyOne SDK less than 2.7.0 will lose connectivity after
@@ -242,28 +242,29 @@ For a full list of settings, please refer to the
     fiftyone migrate --info
     ```
 
-### From FiftyOne Teams Versions After 1.1.0 and Before Version 1.6.0
+### From FiftyOne Enterprise Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.7.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.0 _requires_
 > your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted
+> This will interrupt active workflows in the FiftyOne Enterprise Hosted
 > Web App. You should coordinate this upgrade carefully with your
 > end-users.
 
 ---
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> **NOTE**: FiftyOne Enterprise v1.6 introduces the Central Authentication
+> Service (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
 > [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
 > documentation and the
-> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
+> [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 > documentation before completing your upgrade.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.7.0 _requires_ a license file.
-> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
 > The license file contains all the Auth0 configuration that was
@@ -302,11 +303,11 @@ For a full list of settings, please refer to the
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Teams version 2.7.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Teams SDK users to FiftyOne Teams version 2.7.0
-    1. Login to the FiftyOne Teams UI
+1. [Upgrade to FiftyOne Enterprise version 2.7.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.7.0
+    1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+      your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
     > **NOTE** Any FiftyOne SDK less than 2.7.0 will lose connectivity after
@@ -324,33 +325,34 @@ For a full list of settings, please refer to the
     fiftyone migrate --info
     ```
 
-### From Before FiftyOne Teams Version 1.1.0
+### From Before FiftyOne Enterprise Version 1.1.0
 
-> **NOTE**: Upgrading from versions of FiftyOne Teams prior to v1.1.0
+> **NOTE**: Upgrading from versions of FiftyOne Enterprise prior to v1.1.0
 > requires upgrading the database and will interrupt all SDK connections.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+> **NOTE**: FiftyOne Enterprise v1.6 introduces the Central Authentication
+> Service (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
 > [Central Authentication Service](https://helm.fiftyone.ai/#central-authentication-service)
 > documentation and the
-> [Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
+> [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 > documentation before completing your upgrade.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.7.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.0 _requires_
 > your users to log in after the upgrade is complete.
-> This will interrupt active workflows in the FiftyOne Teams Hosted Web App.
+> This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Teams v2.7.0 _requires_ a license file.
-> Please contact your Customer Success Team before upgrading to FiftyOne Teams
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.0 _requires_ a license file.
+> Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
 > The license file contains all of the Auth0 configuration that was
@@ -388,13 +390,14 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Teams v2.7.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise v2.7.0](#upgrading-from-previous-versions)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Teams Database until they upgrade to `fiftyone==2.7.0`
+    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.7.0`
 1. Upgrade your FiftyOne SDKs to version 2.7.0
-    1. Login to the FiftyOne Teams UI
+    1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
-      with your FiftyOne Teams version, navigate to `Account > Install FiftyOne`
+      with your FiftyOne Enterprise version, navigate to
+      `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
     ```shell

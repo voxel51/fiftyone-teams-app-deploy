@@ -1,19 +1,19 @@
-# FiftyOne Teams v2.1.0 SDK Upgrade and Database Migration
+# FiftyOne Enterprise v2.1.0 SDK Upgrade and Database Migration
 
 ## What is happening?
 
-With FiftyOne Teams v2.1.0, new `created_at` and `last_modified_at`
+With FiftyOne Enterprise v2.1.0, new `created_at` and `last_modified_at`
 [built-in
 fields][1]
 are being added to all FiftyOne `Sample` objects. These fields will
 enable tracking changes and comparing datasets across time. The new
-fields are added to your FiftyOne Teams datasets when they are
+fields are added to your FiftyOne Enterprise datasets when they are
 [migrated][2]
 to the new Database version (Database version 1.0.0), or
 when they are edited by the v2.1.0 SDK.
 
 [1]: https://docs.voxel51.com/user_guide/using_datasets.html#default-sample-fields
-[2]: https://docs.voxel51.com/teams/migrations.html#upgrading-your-deployment
+[2]: https://docs.voxel51.com/enterprise/migrations.html#upgrading-your-deployment
 
 ***Upgrading to v2.1.0 requires a high degree of care. Please read this document
 carefully***!
@@ -93,7 +93,7 @@ Path A.
 
 FiftyOne dataset/database migrations are done using the `fiftyone
 migrate` CLI command. As [described in the
-doc](https://docs.voxel51.com/teams/migrations.html#upgrading-your-deployment),
+doc](https://docs.voxel51.com/enterprise/migrations.html#upgrading-your-deployment),
 there are several options. We list the most important cases here:
 
 ```bash

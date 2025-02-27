@@ -12,7 +12,7 @@
 
 ---
 
-# Configuring FiftyOne Teams Plugins
+# Configuring FiftyOne Enterprise Plugins
 
 ## Builtin Plugins Only
 
@@ -25,7 +25,7 @@ To enable this mode, use the file
 [legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
 instead of
 [legacy-auth/compose.yaml](legacy-auth/compose.yaml)
-to create a new Docker Volume shared between FiftyOne Teams
+to create a new Docker Volume shared between FiftyOne Enterprise
 services.
 
 1. Configure the services to access to the plugin volume
@@ -50,7 +50,7 @@ To enable this mode, use the file
 [legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
 instead of
 [legacy-auth/compose.yaml](legacy-auth/compose.yaml).
-to create a new Docker Volume shared between FiftyOne Teams
+to create a new Docker Volume shared between FiftyOne Enterprise
 services.
 
 1. Configure the services to access to the plugin volume
