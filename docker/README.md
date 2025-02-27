@@ -323,14 +323,14 @@ Fiftyone Teams v2.6 introduces the ability to add a static banner to the
 application.
 
 Banner text is configured with
-`teams-cas.env.FIFTYONE_APP_BANNER_TEXT` and
-`teams-app.env.FIFTYONE_APP_BANNER_TEXT`.
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_TEXT` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_TEXT`.
 Banner background color is configured with
-`teams-cas.env.FIFTYONE_APP_BANNER_COLOR` and
-`teams-app.env.FIFTYONE_APP_BANNER_COLOR`.
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_COLOR` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_COLOR`.
 Banner text color is configured with
-`teams-cas.env.FIFTYONE_APP_BANNER_TEXT_COLOR` and
-`teams-app.env.FIFTYONE_APP_BANNER_TEXT_COLOR`.
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_TEXT_COLOR` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_TEXT_COLOR`.
 
 Configure the Static Banner by setting the following environment variables in
 your `compose.override.yaml` like
