@@ -266,14 +266,14 @@ func (s *deploymentAppTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsOptionalValues",
 			map[string]string{
-				"appSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
 				"appSettings.topologySpreadConstraints[0].maxSkew":            "1",
 				"appSettings.topologySpreadConstraints[0].minDomains":         "1",
 				"appSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
 				"appSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
 				"appSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"appSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
-				"appSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[1].matchLabelKeys[0]":  "pod-template-hash",
 				"appSettings.topologySpreadConstraints[1].maxSkew":            "2",
 				"appSettings.topologySpreadConstraints[1].minDomains":         "2",
 				"appSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
@@ -327,7 +327,7 @@ func (s *deploymentAppTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsSelectorLabels",
 			map[string]string{
-				"appSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
 				"appSettings.topologySpreadConstraints[0].maxSkew":                       "1",
 				"appSettings.topologySpreadConstraints[0].minDomains":                    "1",
 				"appSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",

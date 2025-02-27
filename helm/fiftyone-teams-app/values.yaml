@@ -429,6 +429,9 @@ delegatedOperatorExecutorSettings:
     timeoutSeconds: 30
   # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
+  # -- Control how Pods are spread across your distributed footprint.
+  # Label selectors will be defaulted to those of the teams-do deployment. [Reference][topology-spread-constraints].
+  topologySpreadConstraints: []
   # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for delegated-operator-executor. [Reference][volumes].
@@ -524,6 +527,9 @@ delegatedOperatorDeployments:
       periodSeconds: 30
       # -- Timeout for the startup probe for the teams-do. [Reference][probes].
       timeoutSeconds: 30
+    # -- Control how Pods are spread across your distributed footprint.
+    # Label selectors will be defaulted to those of the teams-do deployment(s). [Reference][topology-spread-constraints].
+    topologySpreadConstraints: []
     # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
     tolerations: []
     # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].

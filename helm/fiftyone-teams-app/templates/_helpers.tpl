@@ -286,7 +286,7 @@ Common Topology Constraints
   {{- end }}
   {{- if $constraint.matchLabelKeys }}
   matchLabelKeys:
-    {{- $constraint.matchLabelKeys | nindent 4 }}
+    {{- $constraint.matchLabelKeys | toYaml | nindent 4 }}
   {{- end }}
   {{- if $constraint.nodeAffinityPolicy }}
   nodeAffinityPolicy: {{ $constraint.nodeAffinityPolicy }}

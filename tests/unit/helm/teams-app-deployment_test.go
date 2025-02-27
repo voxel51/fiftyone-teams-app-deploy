@@ -269,14 +269,14 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsOptionalValues",
 			map[string]string{
-				"teamsAppSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"teamsAppSettings.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
 				"teamsAppSettings.topologySpreadConstraints[0].maxSkew":            "1",
 				"teamsAppSettings.topologySpreadConstraints[0].minDomains":         "1",
 				"teamsAppSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
 				"teamsAppSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
 				"teamsAppSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"teamsAppSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
-				"teamsAppSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"teamsAppSettings.topologySpreadConstraints[1].matchLabelKeys[0]":  "pod-template-hash",
 				"teamsAppSettings.topologySpreadConstraints[1].maxSkew":            "2",
 				"teamsAppSettings.topologySpreadConstraints[1].minDomains":         "2",
 				"teamsAppSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
@@ -330,7 +330,7 @@ func (s *deploymentTeamsAppTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsSelectorLabels",
 			map[string]string{
-				"teamsAppSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"teamsAppSettings.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
 				"teamsAppSettings.topologySpreadConstraints[0].maxSkew":                       "1",
 				"teamsAppSettings.topologySpreadConstraints[0].minDomains":                    "1",
 				"teamsAppSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
