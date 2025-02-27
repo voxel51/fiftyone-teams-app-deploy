@@ -18,6 +18,11 @@ on:
       CROSS_REPOSITORY_WORKFLOW:
         required: true
 
+  push:
+    branches:
+      - release/*
+      - release-next
+
 jobs:
   pre-release:
     permissions:
@@ -30,16 +35,14 @@ jobs:
       GCP_SERVICE_ACCOUNT: github@computer-vision-team.iam.gserviceaccount.com
       HELM_CHART_NAME: fiftyone-teams-app
     runs-on: ubuntu-latest
-
-    outputs:
-      fiftyone-teams-app-deploy-version: ${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-          ref: "${{ github.ref }}"
+          # If a pull request, checkout the source branch
+          # If a push, checkout the actual branch
+          ref: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}"
 
       - name: Configure Git
         run: |
@@ -50,15 +53,29 @@ jobs:
         id: find-versions
         run: |
           version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
-          if [[ "${GITHUB_REF_NAME}" == "release/"* ]]; then
-            version="${version}-rc-${GITHUB_SHA::7}"
+          sha="$(git rev-parse --short HEAD)"
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # If this was triggered via a pull_request and then workflow_call.
+            # The workflow is triggered by pull_request, not workflow_call,
+            # which is why the above conditional uses the event name pull_request.
+            # In this case, it is a development branch, so mark it as a
+            # sha build.
+            version="${version}-sha-${sha}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            # After the PR is merged, a push event is triggered to
+            # the branch. So mark it as an rc build.
+            version="${version}-rc-${sha}"
           else
-            version="${version}-sha-${GITHUB_SHA::7}"
+            # This isn't really needed but, in my opinion, adds clarity
+            # to the above two conditionals.
+            echo "This was triggered by ${{ github.event.name }}. Exiting..."
+            exit 1
           fi
 
-          echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_ENV}"
-          echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_OUTPUT}"
+          echo "Triggered via ${{ github.event_name }}. Setting version to ${version}"
 
+          echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_ENV}"
 
       - name: Install Helm
         uses: azure/setup-helm@v4
@@ -105,6 +122,6 @@ jobs:
               workflow_id: "${{ secrets.CROSS_REPOSITORY_WORKFLOW }}",
               ref: "main",
               inputs: {
-                "fiftyone-teams-app-deploy-version": "${{ steps.find-versions.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
+                "fiftyone-teams-app-deploy-version": "${{ env.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
               }
             })
