@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
           ref: "${{ github.ref }}"
 
-      - name: Set Helm Chart Version
+      - name: Validate Helm Chart Version
         run: |
           version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
 
