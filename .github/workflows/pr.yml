@@ -62,27 +62,33 @@ jobs:
     secrets:
       REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
 
-
   helm-unit:
     needs: modified-files
     if: ${{ needs.modified-files.outputs.helm-unit-required == 'true' }}
     uses: ./.github/workflows/test-helm.yml
 
+  validate-chart-version:
+    # Always run check, even if no helm changes.
+    uses: ./.github/workflows/validate-chart-version.yml
+
   all-tests:
     runs-on: ubuntu-latest
-    needs: [docker-unit, helm-unit, helm-integration]
+    needs: [docker-unit, helm-unit, helm-integration, validate-chart-version]
     if: always()
     steps:
       - run: sh -c ${{
           (needs.docker-unit.result == 'success' || needs.docker-unit.result == 'skipped') &&
           (needs.helm-integration.result == 'success' || needs.helm-integration.result == 'skipped') &&
-          (needs.helm-unit.result == 'success' || needs.helm-unit.result == 'skipped') }}
+          (needs.helm-unit.result == 'success' || needs.helm-unit.result == 'skipped') &&
+          (needs.validate-chart-version.result == 'success') }}
 
   helm-pre-release:
-    needs: [all-tests, helm-unit, helm-integration]
+    needs: [all-tests, helm-unit, helm-integration, validate-chart-version]
     if: |
       always() &&
-      (needs.helm-unit.result == 'success' || needs.helm-integration.result == 'success')
+      (needs.helm-unit.result == 'success' &&
+       needs.helm-integration.result == 'success' &&
+       needs.validate-chart-version.result == 'success')
     uses: ./.github/workflows/pre-release-internal-env.yml
     secrets:
       REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}

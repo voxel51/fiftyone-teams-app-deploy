@@ -1,0 +1,31 @@
+---
+# Validates that, for release branches, the Chart.yaml has been appropriately
+# updated. This is important because we publish pre-release charts based on
+# the Chart.yaml and want to publish accurately versioned charts.
+name: Validate Chart Version
+
+on:
+  workflow_call:
+
+jobs:
+  validate-chart-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          ref: "${{ github.ref }}"
+
+      - name: Set Helm Chart Version
+        run: |
+          version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
+
+          ref="${{ github.event.pull_request.base.ref }}"
+
+          if [[ "${ref}" == "release/"* ]] && [[ "${version}" != "${ref#release\/v}" ]]; then
+            echo "[ERROR] Version from Chart.yaml (${version}) should match"
+            echo "        version derived from branch name (${ref#release\/v})"
+            exit 1
+          fi
