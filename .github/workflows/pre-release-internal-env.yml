@@ -40,7 +40,9 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-          ref: "${{ github.ref }}"
+          # If a pull request, checkout the source branch
+          # If a push, checkout the actual branch
+          ref: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}"
 
       - name: Configure Git
         run: |
@@ -51,18 +53,19 @@ jobs:
         id: find-versions
         run: |
           version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
+          sha="$(git rev-parse --short HEAD)"
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             # If this was triggered via a pull_request and then workflow_call.
             # The workflow is triggered by pull_request, not workflow_call,
             # which is why the above conditional uses the event name pull_request.
-            # In this case, use the head_ref from the pull requests (i.e. the
-            # source branch that triggered the PR).
-            version="${version}-sha-${GITHUB_SHA::7}"
+            # In this case, it is a development branch, so mark it as a
+            # sha build.
+            version="${version}-sha-${sha}"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             # After the PR is merged, a push event is triggered to
-            # the branch. So, just use the ref_name of the push action.
-            version="${version}-rc-${GITHUB_SHA::7}"
+            # the branch. So mark it as an rc build.
+            version="${version}-rc-${sha}"
           else
             # This isn't really needed but, in my opinion, adds clarity
             # to the above two conditionals.
