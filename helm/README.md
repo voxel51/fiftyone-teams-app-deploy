@@ -12,8 +12,8 @@
 
 <!-- toc -->
 
-- [FiftyOne Teams Helm Resources](#fiftyone-teams-helm-resources)
-  - [Installing FiftyOne Teams](#installing-fiftyone-teams)
+- [FiftyOne Enterprise Helm Resources](#fiftyone-enterprise-helm-resources)
+  - [Installing FiftyOne Enterprise](#installing-fiftyone-enterprise)
     - [Example with `values.yaml`](#example-with-valuesyaml)
     - [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke)
       - [Download the Example Configuration Files](#download-the-example-configuration-files)
@@ -23,14 +23,14 @@
       - [Install and Configure MongoDB](#install-and-configure-mongodb)
       - [Obtain a Global Static IP Address and Configure a DNS Entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry)
       - [Set up http to https Forwarding](#set-up-http-to-https-forwarding)
-      - [Install FiftyOne Teams App](#install-fiftyone-teams-app)
+      - [Install FiftyOne Enterprise App](#install-fiftyone-enterprise-app)
       - [Installation Complete](#installation-complete)
 
 <!-- tocstop -->
 
 ---
 
-# FiftyOne Teams Helm Resources
+# FiftyOne Enterprise Helm Resources
 
 This directory contains resources and information related to Helm deployments
 
@@ -41,13 +41,13 @@ This directory contains resources and information related to Helm deployments
   - `fiftyone-teams-app` contains the helm chart voxel51/fiftyone-teams-app.
     For the chart documentation, see the fiftyone-teams-app/README.md file.
   - `gke-example` contains additional kubernetes resources
-    to install FiftyOne Teams on Google Kubernetes Engine (GKE).
+    to install FiftyOne Enterprise on Google Kubernetes Engine (GKE).
     See
     [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
 - Files
   - `values.yaml` is example of overrides for the chart's defaults for a deployment
 
-## Installing FiftyOne Teams
+## Installing FiftyOne Enterprise
 
 ### Example with `values.yaml`
 
@@ -57,7 +57,7 @@ To highlight some of these, see an example
 in this directory.
 
 1. Edit the `./values.yaml` file
-1. Deploy FiftyOne Teams with `helm install`
+1. Deploy FiftyOne Enterprise with `helm install`
     - For new installations, run
 
         ```shell
@@ -213,7 +213,7 @@ helm install fiftyone-mongodb \
 ```
 
 Wait until the MongoDB pods are in the `Ready` state before
-beginning the "Install FiftyOne Teams App" instructions.
+beginning the "Install FiftyOne Enterprise App" instructions.
 
 While waiting,
 [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
@@ -247,7 +247,7 @@ kubectl apply -f frontend-config.yaml
 For more information, see
 [HTTP to HTTPS redirects](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#https_redirect).
 
-#### Install FiftyOne Teams App
+#### Install FiftyOne Enterprise App
 
 ```shell
 kubectl create namespace fiftyone-teams
@@ -289,5 +289,5 @@ and add your storage credentials to access sample data.
 #### Installation Complete
 
 Congratulations! You should now be able to access your
-FiftyOne Teams installation at the DNS address you created
+FiftyOne Enterprise installation at the DNS address you created
 [earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).

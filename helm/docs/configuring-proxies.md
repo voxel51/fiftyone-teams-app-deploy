@@ -14,7 +14,7 @@
 
 # Configuring Proxies
 
-FiftyOne Teams supports routing traffic through proxy servers.
+FiftyOne Enterprise supports routing traffic through proxy servers.
 
 The `NO_PROXY`, `no_proxy`, and `GLOBAL_AGENT_NO_PROXY` values must include the
 Kubernetes service names that may communicate without going through a proxy

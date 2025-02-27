@@ -14,8 +14,8 @@
 
 # Configuring Snapshot Archival
 
-Since version v1.5, FiftyOne Teams supports
-[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
+Since version v1.5, FiftyOne Enterprise supports
+[archiving snapshots](https://docs.voxel51.com/enterprise/dataset_versioning.html#snapshot-archival)
 to cold storage locations to prevent filling up the MongoDB database.
 To enable this feature, set the `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH`
 environment variable to the path of a chosen storage location.
@@ -39,11 +39,11 @@ Supported locations are network-mounted filesystems and cloud storage folders.
     - `fiftyone-api`
     - `teams-app`
   - Ensure the
-    [cloud credentials](https://docs.voxel51.com/teams/installation.html#cloud-credentials)
+    [cloud credentials](https://docs.voxel51.com/enterprise/installation.html#cloud-credentials)
     loaded in the `fiftyone-api` container have full edit capabilities to
     this bucket
 
 See the
-[configuration documentation](https://docs.voxel51.com/teams/dataset_versioning.html#dataset-versioning-configuration)
+[configuration documentation](https://docs.voxel51.com/enterprise/dataset_versioning.html#dataset-versioning-configuration)
 for other configuration values that control the behavior of automatic snapshot
 archival.

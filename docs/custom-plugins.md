@@ -53,7 +53,7 @@ docker buildx build --push \
 ```
 
 You should upgrade your custom plugins image using the `TEAMS_VERSION`
-you plan to use in your FiftyOne Teams Deployment.
+you plan to use in your FiftyOne Enterprise Deployment.
 
 ## Using Your Custom Plugins Image in Docker Compose
 
@@ -67,7 +67,7 @@ services:
 ```
 
 Please see
-[Enabling FiftyOne Teams Plugins](../docker/README.md#enabling-fiftyone-teams-plugins)
+[Enabling FiftyOne Enterprise Plugins](../docker/README.md#enabling-fiftyone-enterprise-plugins)
 for example `docker compose` commands for starting and upgrading your
 deployment.
 
@@ -93,9 +93,9 @@ delegatedOperatorExecutorSettings:
 ```
 
 Assuming you tagged your custom container with the same version
-number as the FiftyOne Teams release, the Helm chart will
+number as the FiftyOne Enterprise release, the Helm chart will
 automatically use the chart version to pull your image.
 
 Please see
-[FiftyOne Teams Plugins](../helm/fiftyone-teams-app/README.md#fiftyone-teams-plugins)
+[FiftyOne Enterprise Plugins](../helm/fiftyone-teams-app/README.md#fiftyone-enterprise-plugins)
 for additional information regarding `teams-plugins` configuration.

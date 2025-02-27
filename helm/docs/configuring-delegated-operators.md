@@ -12,7 +12,7 @@
 
 ---
 
-# Configuring FiftyOne Teams Delegated Operators
+# Configuring FiftyOne Enterprise Delegated Operators
 
 <!-- toc -->
 
@@ -136,7 +136,7 @@ delegatedOperatorDeployments:
 ```
 
 See
-[Adding Shared Storage for FiftyOne Teams Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+[Adding Shared Storage for FiftyOne Enterprise Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
 for configuring persistent volumes and claims.
 
 Optionally, the logs generated during running of a delegated operation can be
@@ -352,7 +352,7 @@ To enable this mode
     `teams-do` deployment in
     - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Teams Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+  [Adding Shared Storage for FiftyOne Enterprise Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-do` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
