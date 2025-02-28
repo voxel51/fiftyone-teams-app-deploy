@@ -110,6 +110,7 @@ We publish the following FiftyOne Teams private images to Docker Hub:
 - `voxel51/fiftyone-teams-api`
 - `voxel51/fiftyone-teams-app`
 - `voxel51/fiftyone-teams-cas`
+- `voxel51/fiftyone-teams-cv-full`
 
 For Docker Hub credentials, please contact your Voxel51 support team.
 
