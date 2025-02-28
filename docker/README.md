@@ -60,6 +60,7 @@ for steps on how to upgrade your delegated operators.
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [Snapshot Archival](#snapshot-archival)
+  - [Static Banner Configuration](#static-banner-configuration)
   - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
   - [FiftyOne Teams Plugins](#fiftyone-teams-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -109,6 +110,7 @@ We publish the following FiftyOne Teams private images to Docker Hub:
 - `voxel51/fiftyone-teams-api`
 - `voxel51/fiftyone-teams-app`
 - `voxel51/fiftyone-teams-cas`
+- `voxel51/fiftyone-teams-cv-full`
 
 For Docker Hub credentials, please contact your Voxel51 support team.
 
@@ -130,7 +132,7 @@ To deploy FiftyOne Teams:
 
             ```yaml
             services:
-              fiftyone-app-common:
+              fiftyone-app:
                 environment:
                   FIFTYONE_DATABASE_ADMIN: true
             ```
@@ -150,7 +152,7 @@ To deploy FiftyOne Teams:
 
         ```yaml
         services:
-          fiftyone-app-common:
+          fiftyone-app:
             environment:
               # FIFTYONE_DATABASE_ADMIN: true
         ```
@@ -162,7 +164,7 @@ To deploy FiftyOne Teams:
 
         ```yaml
         services:
-          fiftyone-app-common:
+          fiftyone-app:
             environment:
               FIFTYONE_DATABASE_ADMIN: false
         ```
@@ -316,6 +318,38 @@ Please refer to the
 [snapshot archival configuration documentation](./docs/configuring-snapshot-archival.md)
 for configuring snapshot archival.
 
+### Static Banner Configuration
+
+Fiftyone Teams v2.6 introduces the ability to add a static banner to the
+application.
+
+Banner text is configured with
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_TEXT` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_TEXT`.
+Banner background color is configured with
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_COLOR` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_COLOR`.
+Banner text color is configured with
+`services.teams-cas.environment.FIFTYONE_APP_BANNER_TEXT_COLOR` and
+`services.teams-app.environment.FIFTYONE_APP_BANNER_TEXT_COLOR`.
+
+Configure the Static Banner by setting the following environment variables in
+your `compose.override.yaml` like
+
+```yaml
+services:
+  teams-app:
+    environment:
+      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
+      FIFTYONE_APP_BANNER_TEXT_COLOR: "white" # or "rgb(255,255,255)" or "#FFFFFF"
+      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+  teams-cas:
+    environment:
+      FIFTYONE_APP_BANNER_COLOR: "green" # or "rgb(34,139,34)" or "#f1f1f1"
+      FIFTYONE_APP_BANNER_TEXT_COLOR: "white" # or "rgb(255,255,255)" or "#FFFFFF"
+      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+```
+
 ### FiftyOne Teams Authenticated API
 
 FiftyOne Teams v1.3 introduces the capability to connect FiftyOne Teams SDK
@@ -429,7 +463,7 @@ might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.6.0
+    image: voxel51/fiftyone-app-torch:v2.6.1
 ```
 
 For more information, see the docs for
