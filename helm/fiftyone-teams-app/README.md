@@ -79,6 +79,7 @@ for steps on how to upgrade your delegated operators.
   - [Static Banner Configuration](#static-banner-configuration)
   - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
   - [Text Similarity](#text-similarity)
+- [Validating](#validating)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
 
@@ -426,6 +427,12 @@ appSettings:
   image:
     repository: voxel51/fiftyone-app-torch
 ```
+
+## Validating
+
+After deploying FiftyOne Enterprise and configuring authentication, please
+follow
+[validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
 
 ## Values
 

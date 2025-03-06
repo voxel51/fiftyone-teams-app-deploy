@@ -67,6 +67,7 @@ for steps on how to upgrade your delegated operators.
   - [Proxies](#proxies)
   - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
   - [Text Similarity](#text-similarity)
+- [Validating](#validating)
 - [FiftyOne Teams Environment Variables](#fiftyone-teams-environment-variables)
 
 <!-- tocstop -->
@@ -494,6 +495,12 @@ For more information, see the docs for
 [Docker Compose Extend](https://docs.docker.com/compose/extends/).
 
 ---
+
+## Validating
+
+After deploying FiftyOne Enterprise and configuring authentication, please
+follow
+[validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
 
 ## FiftyOne Teams Environment Variables
 
