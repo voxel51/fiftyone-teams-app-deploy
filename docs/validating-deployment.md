@@ -51,7 +51,7 @@ Test the API connection:
 python -c 'import fiftyone.management as fom; fom.test_api_connection()'
 ```
 
-When successful, the it will return:
+When successful, it will return:
 
 ```shell
 $ python -c 'import fiftyone.management as fom; fom.test_api_connection()'
