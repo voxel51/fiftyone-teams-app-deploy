@@ -28,11 +28,12 @@ The following validation method assumes:
 
 1. You have deployed FiftyOne enterprise in either kubernetes or
    docker-compose.
-1. You have configured a DNS record(s) for your application
-1. You have configured TLS termination for your application
+1. You have configured a DNS record(s) for your application.
+1. You have configured TLS termination for your application.
 1. You have configured
    [your authentication provider](https://docs.voxel51.com/teams/pluggable_auth.html).
-1. You have installed the FiftyOne Enterprise SDK
+1. You have installed the FiftyOne Enterprise SDK.
+1. You have generated an API Key via the Enterprise UI.
 
 ## Running Checks
 
