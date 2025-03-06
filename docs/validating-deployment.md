@@ -24,34 +24,34 @@ attempt to validate the connection between your SDK and your deployment.
 
 ## Pre-requisites
 
-The following validation method assumes:
+The following validation method assumes you:
 
-1. You have deployed FiftyOne enterprise in either kubernetes or
-   docker-compose.
-1. You have configured a DNS record(s) for your application.
-1. You have configured TLS termination for your application.
-1. You have configured
-   [your authentication provider](https://docs.voxel51.com/teams/pluggable_auth.html).
-1. You have installed the FiftyOne Enterprise SDK.
-1. You have generated an API Key via the Enterprise UI.
+1. Deployed FiftyOne enterprise in either kubernetes or
+   docker-compose
+1. Configured a DNS record(s) for your application
+1. Configured TLS termination for your application
+1. Configured
+   [your authentication provider](https://docs.voxel51.com/teams/pluggable_auth.html)
+1. Installed the FiftyOne Enterprise SDK
+1. Generated an API Key via the Enterprise UI
 
 ## Running Checks
 
-To run the checks, ensure your `FIFTYONE_API_KEY` and `FIFTYONE_API_URL`
-are set in your environment:
+To run the checks, set the `FIFTYONE_API_KEY` and `FIFTYONE_API_URL`
+environment variables:
 
 ```shell
 export FIFTYONE_API_URL=https://your-api-url
 export FIFTYONE_API_KEY=you4ap1k3y
 ```
 
-Then run `fiftyone.management.test_api_connection()`:
+Test the API connection:
 
 ```shell
 python -c 'import fiftyone.management as fom; fom.test_api_connection()'
 ```
 
-If all goes well, you will see the following log:
+When successful, the it will return:
 
 ```shell
 $ python -c 'import fiftyone.management as fom; fom.test_api_connection()'

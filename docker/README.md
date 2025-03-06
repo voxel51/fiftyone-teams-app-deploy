@@ -499,9 +499,8 @@ For more information, see the docs for
 ## Validating
 
 After deploying FiftyOne Enterprise and configuring authentication, please
-refer to
-[validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md)
-for validation information.
+follow
+[validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
 
 ## FiftyOne Teams Environment Variables
 
