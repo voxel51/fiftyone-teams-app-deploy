@@ -30,7 +30,7 @@ Supported locations are network-mounted filesystems and cloud storage folders.
   - Mount the filesystem to the `fiftyone-api` container
     (`teams-app` does not need this despite the variable set above).
     For an example, see
-    [legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml).
+    [legacy-auth/compose.plugins.yaml](../legacy-auth/compose.plugins.yaml).
 - Cloud storage folder
   - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to a
     cloud storage path (for example

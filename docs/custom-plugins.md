@@ -67,7 +67,7 @@ services:
 ```
 
 Please see
-[Enabling FiftyOne Enterprise Plugins](../docker/README.md#enabling-fiftyone-enterprise-plugins)
+[Enabling FiftyOne Enterprise Plugins](../docker/README.md#fiftyone-enterprise-plugins)
 for example `docker compose` commands for starting and upgrading your
 deployment.
 

@@ -31,14 +31,14 @@ This license file should be obtained from your Customer Success Team
 before upgrading to FiftyOne Enterprise 2.0 or beyond.
 
 Please refer to the
-[upgrade documentation](./docs/upgrading.md#from-before-fiftyone-enterprise-version-110)
+[upgrade documentation](./docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
 for steps on how to add your license file.
 
 ### Version 2.2+ Delegated Operator Changes
 
 FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](./docs/upgrading.md#from-fiftyone-enterprise-version-213)
+[upgrade documentation](./docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.5+ Delegated Operator Changes
@@ -356,7 +356,7 @@ Enterprise SDK through the FiftyOne Enterprise API (instead of creating a
 direct connection to MongoDB).
 
 To enable the FiftyOne Enterprise Authenticated API you will need to
-[expose the FiftyOne Enterprise API endpoint](./docs/expose-enterprise-api.md)
+[expose the FiftyOne Enterprise API endpoint](./docs/expose-teams-api.md)
 and
 [configure your SDK](https://docs.voxel51.com/enterprise/api_connection.html).
 

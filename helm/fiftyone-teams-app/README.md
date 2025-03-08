@@ -34,14 +34,14 @@ This license file should be obtained from your Customer Success Team
 before upgrading to FiftyOne Enterprise 2.0 or beyond.
 
 Please refer to the
-[upgrade documentation](../docs/upgrading.md#from-before-fiftyone-enterprise-version-110)
+[upgrade documentation](../docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
 for steps on how to add your license file.
 
 ### Version 2.2+ Delegated Operator Changes
 
 FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](../docs/upgrading.md#from-fiftyone-enterprise-version-213)
+[upgrade documentation](../docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.5+ Delegated Operator Changes

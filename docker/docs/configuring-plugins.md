@@ -22,9 +22,9 @@ Enabled by default. No additional configurations are required.
 
 Plugins run in the `fiftyone-app` service.
 To enable this mode, use the file
-[legacy-auth/compose.plugins.yaml](legacy-auth/compose.plugins.yaml)
+[legacy-auth/compose.plugins.yaml](../legacy-auth/compose.plugins.yaml)
 instead of
-[legacy-auth/compose.yaml](legacy-auth/compose.yaml)
+[legacy-auth/compose.yaml](../legacy-auth/compose.yaml)
 to create a new Docker Volume shared between FiftyOne Enterprise
 services.
 
@@ -47,9 +47,9 @@ directory
 
 Plugins run in the `teams-plugins` service.
 To enable this mode, use the file
-[legacy-auth/compose.dedicated-plugins.yaml](legacy-auth/compose.dedicated-plugins.yaml)
+[legacy-auth/compose.dedicated-plugins.yaml](../legacy-auth/compose.dedicated-plugins.yaml)
 instead of
-[legacy-auth/compose.yaml](legacy-auth/compose.yaml).
+[legacy-auth/compose.yaml](../legacy-auth/compose.yaml).
 to create a new Docker Volume shared between FiftyOne Enterprise
 services.
 
