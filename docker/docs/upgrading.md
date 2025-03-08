@@ -21,7 +21,7 @@
 Voxel51 assumes you use the published Docker compose files to deploy your
 FiftyOne Enterprise environment.
 If you use custom deployment mechanisms, carefully review the changes in the
-[Docker Compose Files](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
+[Docker Compose Files](../)
 and update your deployment accordingly.
 
 ### From FiftyOne Enterprise Version 2.0.0 and Later
@@ -308,7 +308,7 @@ Additionally,
 1. Update your web server routes to include routing
    `/cas/*` traffic to the `teams-cas` service.
    Example nginx configurations can be found
-   [here](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker)
+   [here](../)
 1. [Upgrade to FiftyOne Enterprise v2.7.0](#upgrading-from-previous-versions)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).

@@ -45,7 +45,7 @@ for steps on how to upgrade your delegated operators.
 
 FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
+[upgrade documentation](./docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ## Table of Contents
@@ -178,11 +178,11 @@ The FiftyOne Enterprise CAS is exposed on port `3030`.
 Configure an SSL endpoint (like a Load Balancer, Nginx Proxy, or similar)
 to route traffic to the appropriate endpoints. An example Nginx configuration
 for path-based routing can be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-path-routing.conf).
+[here](./example-nginx-path-routing.conf).
 Example Nginx configurations for hostname-based routing can be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-site.conf)
+[here](./example-nginx-site.conf)
 for FiftyOne Enterprise App and FiftyOne Enterprise CAS services, and
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/example-nginx-api.conf)
+[here](./example-nginx-api.conf)
 for the FiftyOne Enterprise API service.
 
 ## Initial Installation vs. Upgrades
@@ -393,7 +393,7 @@ For multi-node deployments, please implement a storage
 solution that provides access to the deployed plugins.
 
 To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+[Custom Plugins Images](../docs/custom-plugins.md).
 
 To use the FiftyOne Enterprise UI to deploy plugins, navigate to
 `https://<DEPLOY_URL>/settings/plugins`. Early-adopter plugins installed
@@ -500,7 +500,7 @@ For more information, see the docs for
 
 After deploying FiftyOne Enterprise and configuring authentication, please
 follow
-[validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
+[validating your deployment](../docs/validating-deployment.md).
 
 ## FiftyOne Enterprise Environment Variables
 

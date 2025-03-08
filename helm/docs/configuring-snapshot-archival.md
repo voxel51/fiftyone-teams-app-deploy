@@ -48,4 +48,4 @@ See the
 [configuration documentation](https://docs.voxel51.com/enterprise/dataset_versioning.html#dataset-versioning-configuration)
 for other configuration values that control the behavior of automatic snapshot archival.
 
-[plugins-storage]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md
+[plugins-storage]: ./plugins-storage.md

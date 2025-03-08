@@ -53,7 +53,7 @@ This directory contains resources and information related to Helm deployments
 
 There are some value overrides that you must make for a successful deployment.
 To highlight some of these, see an example
-[`./values.yaml`](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml)
+[`./values.yaml`](./values.yaml)
 in this directory.
 
 1. Edit the `./values.yaml` file
@@ -120,7 +120,7 @@ These instructions assume you have
 #### Download the Example Configuration Files
 
 Download the example configuration files from the
-[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/gke-example)
+[voxel51/fiftyone-teams-app-deploy](./gke-example)
 GitHub repository.
 
 For example

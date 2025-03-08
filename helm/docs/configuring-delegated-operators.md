@@ -76,7 +76,7 @@ map by applying kebab-case to it.
 In the above example, the resulting kubernetes object would be named `teams-do`.
 
 Delegated operators can be added to any of the three existing
-[plugin modes](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/confuring-plugins.md).
+[plugin modes](./confuring-plugins.md).
 
 ### Built-in Plugins
 
@@ -136,7 +136,7 @@ delegatedOperatorDeployments:
 ```
 
 See
-[Adding Shared Storage for FiftyOne Enterprise Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+[Adding Shared Storage for FiftyOne Enterprise Plugins](./plugins-storage.md)
 for configuring persistent volumes and claims.
 
 Optionally, the logs generated during running of a delegated operation can be
@@ -167,7 +167,7 @@ In `values.yaml`, set `FIFTYONE_DELEGATED_OPERATION_LOG_PATH` in either:
   ```
 
 To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+[Custom Plugins Images](../../docs/custom-plugins.md).
 
 ### Examples
 
@@ -340,7 +340,7 @@ delegatedOperatorDeployments:
 ## Prior to v2.7.0
 
 This option can be added to any of the three existing
-[plugin modes](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/confuring-plugins.md).
+[plugin modes](./confuring-plugins.md).
 If you're using the builtin-operator
 only option, the Persistent Volume Claim should be omitted.
 
@@ -352,7 +352,7 @@ To enable this mode
     `teams-do` deployment in
     - `delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Enterprise Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md)
+  [Adding Shared Storage for FiftyOne Enterprise Plugins](./plugins-storage.md)
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-do` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
@@ -366,4 +366,4 @@ In `values.yaml`, set `configured_path`
 - `delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH`
 
 To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+[Custom Plugins Images](../../docs/custom-plugins.md).

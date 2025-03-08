@@ -54,8 +54,8 @@ To enable this mode
     - `ReadOnly` permission to the `teams-plugins` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
 - If you are
-  [using a proxy](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md),
+  [using a proxy](./configuring-proxies.md),
   add the `teams-plugins` service name to your `no_proxy` and
   `NO_PROXY` environment variables.
 
-[plugins-storage]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md
+[plugins-storage]: ,/plugins-storage.md

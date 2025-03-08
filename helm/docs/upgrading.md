@@ -27,7 +27,7 @@ the
 and update your deployment accordingly.
 
 A minimal example `values.yaml` may be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+[here](../values.yaml).
 
 1. Edit the `values.yaml` file
 1. To upgrade an existing helm installation
@@ -96,7 +96,7 @@ FiftyOne Enterprise v2.7.0 introduces numerous changes to delegated operators.
 1. The `delegatedOperatorExecutorSettings` setting in `values.yaml` has
    been deprecated in favor of `delegatedOperatorDeployments`.
    Please refer to
-   [the delegated operator documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md#v270)
+   [the delegated operator documentation](./configuring-delegated-operators.md#v270)
    for migrating to the new setting.
 
 #### FiftyOne Enterprise v2.5+ Delegated Operator Changes

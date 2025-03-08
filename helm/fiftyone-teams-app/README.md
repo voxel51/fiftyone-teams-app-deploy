@@ -255,7 +255,7 @@ Enterprise SDKs through the FiftyOne Enterprise API (instead of direct
 MongoDB connection).
 
 To enable the FiftyOne Enterprise Authenticated API,
-[expose the FiftyOne Enterprise API endpoint](../docs/expose-enterprise-api.md)
+[expose the FiftyOne Enterprise API endpoint](../docs/expose-teams-api.md)
 and
 [configure your SDK](https://docs.voxel51.com/enterprise/api_connection.html).
 
@@ -293,7 +293,7 @@ There are three modes for plugins
       - Plugins resource consumption does not affect `fiftyone-app`
 
 To use plugins with custom dependencies, build and use
-[Custom Plugins Images](../docs/custom-plugins.md).
+[Custom Plugins Images](../../docs/custom-plugins.md).
 
 To use the FiftyOne Enterprise UI to deploy plugins,
 navigate to `https://<DEPLOY_URL>/settings/plugins`.
@@ -433,7 +433,7 @@ appSettings:
 
 After deploying FiftyOne Enterprise and configuring authentication, please
 follow
-[validating your deployment](../docs/validating-deployment.md).
+[validating your deployment](../../docs/validating-deployment.md).
 
 ## Values
 
@@ -769,5 +769,5 @@ serviceAccount:
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
+[fiftyone-encryption-key]: #storage-credentials-and-fiftyone_encryption_key
 [fiftyone-config]: https://docs.voxel51.com/user_guide/config.html

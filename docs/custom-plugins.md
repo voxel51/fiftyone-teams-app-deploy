@@ -48,7 +48,7 @@ build, and publish, your image to your internal registry
 ```shell
 FIFTYONE_ENTERPRISE_VERSION=v2.7.0
 docker buildx build --push \
-  --build-arg TEAMS_IMAGE_NAME="voxel51/fiftyone-app:${FIFTYONE_ENTERPRISE_VERSION}" \
+  --build-arg FIFTYONE_ENTERPRISE_IMAGE_NAME="voxel51/fiftyone-app:${FIFTYONE_ENTERPRISE_VERSION}" \
   -t your-internal-registry/fiftyone-app-internal:${FIFTYONE_ENTERPRISE_VERSION} .
 ```
 
