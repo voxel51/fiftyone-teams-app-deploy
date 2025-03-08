@@ -69,7 +69,6 @@ for steps on how to upgrade your delegated operators.
   - [Text Similarity](#text-similarity)
 - [Validating](#validating)
 - [FiftyOne Enterprise Environment Variables](#fiftyone-enterprise-environment-variables)
->>>>>>> 9b0e240 (teams->enterprise in docs only)
 
 <!-- tocstop -->
 
