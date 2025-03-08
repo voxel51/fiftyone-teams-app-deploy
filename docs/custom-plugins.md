@@ -29,13 +29,13 @@ As an example, you might use the following Dockerfile to build a
 custom `your-internal-registry/fiftyone-app-internal` image:
 
 ```dockerfile
-ARG TEAMS_IMAGE_NAME
+ARG FIFTYONE_ENTERPRISE_IMAGE_NAME
 
 FROM python:3.10 as wheelhouse
 
 RUN pip wheel --wheel-dir=/tmp/wheels pandas
 
-FROM ${TEAMS_IMAGE_NAME} as pandarelease
+FROM ${FIFTYONE_ENTERPRISE_IMAGE_NAME} as pandarelease
 
 RUN --mount=type=cache,from=wheelhouse,target=/wheelhouse,ro \
     pip --no-cache-dir install -q --no-index \
@@ -46,13 +46,13 @@ With a Dockerfile like this, you could use the following commands to
 build, and publish, your image to your internal registry
 
 ```shell
-TEAMS_VERSION=v2.7.0
+FIFTYONE_ENTERPRISE_VERSION=v2.7.0
 docker buildx build --push \
-  --build-arg TEAMS_IMAGE_NAME="voxel51/fiftyone-app:${TEAMS_VERSION}" \
-  -t your-internal-registry/fiftyone-app-internal:${TEAMS_VERSION} .
+  --build-arg TEAMS_IMAGE_NAME="voxel51/fiftyone-app:${FIFTYONE_ENTERPRISE_VERSION}" \
+  -t your-internal-registry/fiftyone-app-internal:${FIFTYONE_ENTERPRISE_VERSION} .
 ```
 
-You should upgrade your custom plugins image using the `TEAMS_VERSION`
+You should upgrade your custom plugins image using the `FIFTYONE_ENTERPRISE_VERSION`
 you plan to use in your FiftyOne Enterprise Deployment.
 
 ## Using Your Custom Plugins Image in Docker Compose
@@ -97,5 +97,5 @@ number as the FiftyOne Enterprise release, the Helm chart will
 automatically use the chart version to pull your image.
 
 Please see
-[FiftyOne Enterprise Plugins](../helm/fiftyone-teams-app/README.md#fiftyone-enterprise-plugins)
+[FiftyOne Enterprise Plugins](../helm/fiftyone-teams-app/README.md#plugins)
 for additional information regarding `teams-plugins` configuration.
