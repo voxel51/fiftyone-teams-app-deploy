@@ -739,7 +739,7 @@ secret:
   # -- Controls whether to create the secret named `secret.name`.
   create: true
   # -- Name of the secret (existing or to be created) in the namespace `namespace.name`.
-  name: fiftyone-enterprise-secrets
+  name: fiftyone-teams-secrets
   fiftyone:
     # -- MongoDB Database Name for FiftyOne Enterprise.
     fiftyoneDatabaseName: ""
