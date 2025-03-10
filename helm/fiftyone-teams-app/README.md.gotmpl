@@ -175,7 +175,7 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 ```
 
 A minimal example `values.yaml` may be found
-[here](./values.yaml).
+[here](../values.yaml).
 
 ## Initial Installation vs. Upgrades
 
