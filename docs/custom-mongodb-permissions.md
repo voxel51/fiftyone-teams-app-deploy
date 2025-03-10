@@ -14,10 +14,12 @@
 
 # Custom MongoDB Permissions
 
-Generally, we recommend that FiftyOne Teams connect to MongoDB [with root access](https://docs.voxel51.com/user_guide/config.html?highlight=mongodb%20uri#configuring-a-mongodb-connection).
+Generally, we recommend that FiftyOne Teams connect to MongoDB [with root access][1].
 
-In some cases, more limited connection permissions are desired. The following set of custom permissions may be used as of
-FiftyOne Teams v2.6.0:
+[1]: https://docs.voxel51.com/user_guide/config.html?highlight=mongodb%20uri#configuring-a-mongodb-connection
+
+In some cases, more limited connection permissions are desired. The following
+set of custom permissions may be used as of FiftyOne Teams v2.6.0:
 
 * `clusterMonitor@admin`
 * `read@admin`
