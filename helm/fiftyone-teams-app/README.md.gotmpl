@@ -41,7 +41,7 @@ for steps on how to add your license file.
 
 FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](../docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
+[upgrade documentation](../docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.5+ Delegated Operator Changes
