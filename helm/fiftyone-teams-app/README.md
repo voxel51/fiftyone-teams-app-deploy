@@ -34,28 +34,28 @@ This license file should be obtained from your Customer Success Team
 before upgrading to FiftyOne Enterprise 2.0 or beyond.
 
 Please refer to the
-[upgrade documentation](../docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
 for steps on how to add your license file.
 
 ### Version 2.2+ Delegated Operator Changes
 
 FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](../docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.5+ Delegated Operator Changes
 
 FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](../docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.7+ Delegated Operator Changes
 
 FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](../docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ## Table of Contents
@@ -175,7 +175,7 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 ```
 
 A minimal example `values.yaml` may be found
-[here](../values.yaml).
+[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
 ## Initial Installation vs. Upgrades
 
@@ -201,7 +201,7 @@ After the initial installation, we recommend either commenting
 this environment variable or changing the value to `false`.
 
 When performing an upgrade, please review
-[Upgrading From Previous Versions](../docs/upgrading.md).
+[Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
 
 ## Advanced Configuration
 
@@ -212,7 +212,7 @@ FiftyOne Enterprise v2.2 introduces a builtin orchestrator to run
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
 For configuring your delegated operators, see
-[Configuring Delegated Operators](../docs/configuring-delegated-operators.md).
+[Configuring Delegated Operators](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 
 ### Central Authentication Service
 
@@ -255,7 +255,7 @@ Enterprise SDKs through the FiftyOne Enterprise API (instead of direct
 MongoDB connection).
 
 To enable the FiftyOne Enterprise Authenticated API,
-[expose the FiftyOne Enterprise API endpoint](../docs/expose-teams-api.md)
+[expose the FiftyOne Enterprise API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
 and
 [configure your SDK](https://docs.voxel51.com/enterprise/api_connection.html).
 
@@ -268,7 +268,7 @@ Running multiple `teams-api` pods requires a read-write volume available to all
 of the pods in the `teams-api` deployment to synchronize the API cache.
 
 For configuring HA FiftyOne `teams-api` deployments see
-[Configuring Highly Available FiftyOne `teams-api` Deployments](../docs/configure-ha-teams-api.md)
+[Configuring Highly Available FiftyOne `teams-api` Deployments](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configure-ha-teams-api.md)
 
 ### Plugins
 
@@ -293,7 +293,7 @@ There are three modes for plugins
       - Plugins resource consumption does not affect `fiftyone-app`
 
 To use plugins with custom dependencies, build and use
-[Custom Plugins Images](../../docs/custom-plugins.md).
+[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
 To use the FiftyOne Enterprise UI to deploy plugins,
 navigate to `https://<DEPLOY_URL>/settings/plugins`.
@@ -301,13 +301,13 @@ Early-adopter plugins installed manually must
 be redeployed using the FiftyOne Enterprise UI.
 
 For configuring your plugins, see
-[Configuring Plugins](../docs/configuring-plugins.md).
+[Configuring Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-plugins.md).
 
 ### Proxies
 
 FiftyOne Enterprise supports routing traffic through proxy servers.
 Please refer to the
-[proxy configuration documentation](../docs/configuring-proxies.md)
+[proxy configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md)
 for information on how to configure proxies.
 
 ### Snapshot Archival
@@ -318,7 +318,7 @@ to cold storage locations to prevent filling up the MongoDB database.
 Supported locations are network mounted filesystems and cloud storage folders.
 
 Please refer to the
-[snapshot archival configuration documentation](../docs/configuring-snapshot-archival.md)
+[snapshot archival configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-snapshot-archival.md)
 for configuring snapshot archival.
 
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
@@ -433,7 +433,7 @@ appSettings:
 
 After deploying FiftyOne Enterprise and configuring authentication, please
 follow
-[validating your deployment](../../docs/validating-deployment.md).
+[validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
 
 ## Values
 
@@ -769,5 +769,5 @@ serviceAccount:
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-[fiftyone-encryption-key]: #storage-credentials-and-fiftyone_encryption_key
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/#storage-credentials-and-fiftyone_encryption_key
 [fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
