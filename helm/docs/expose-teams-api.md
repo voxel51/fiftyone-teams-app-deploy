@@ -12,7 +12,7 @@
 
 ---
 
-# Exposing the `enterprise-api` Service
+# Exposing the Enterprise `teams-api` Service
 
 There are two methods for SDK access to FiftyOne Enterprise
 
