@@ -12,7 +12,7 @@
 
 ---
 
-# Configuring FiftyOne Teams Plugins
+# Configuring FiftyOne Enterprise Plugins
 
 ## Builtin Plugins Only
 
@@ -29,7 +29,7 @@ To enable this mode
   - `appSettings.env.FIFTYONE_PLUGINS_DIR`
   - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Teams Plugins][plugins-storage]
+  [Adding Shared Storage for FiftyOne Enterprise Plugins][plugins-storage]
   - Mount a PVC that provides
     - `ReadWrite` permissions to the `teams-api` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
@@ -47,15 +47,15 @@ To enable this mode
     - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR`
     - `apiSettings.env.FIFTYONE_PLUGINS_DIR`
 - See
-  [Adding Shared Storage for FiftyOne Teams Plugins][plugins-storage]
+  [Adding Shared Storage for FiftyOne Enterprise Plugins][plugins-storage]
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-api` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
     - `ReadOnly` permission to the `teams-plugins` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
 - If you are
-  [using a proxy](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md),
+  [using a proxy](./configuring-proxies.md),
   add the `teams-plugins` service name to your `no_proxy` and
   `NO_PROXY` environment variables.
 
-[plugins-storage]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/plugins-storage.md
+[plugins-storage]: ,/plugins-storage.md

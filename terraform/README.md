@@ -1,6 +1,6 @@
-# Deploying FiftyOne Teams Infrastructure using Terraform
+# Deploying FiftyOne Enterprise Infrastructure using Terraform
 
-Module for deploying FiftyOne Teams Infrastructure
+Module for deploying FiftyOne Enterprise Infrastructure
 
 ## Google Compute
 
@@ -36,4 +36,4 @@ defined in the `public-ssh-keys` file will have ssh access to the system.
 - Add a dedicated data drive for MongoDB
 - Make the MongoDB Data Drive XFS formatted
 - Disable Transparent Huge Pages for `fiftyone-dbnode`
-- Find a elegant way to have Terraform deploy MongoDB and FiftyOne Teams
+- Find a elegant way to have Terraform deploy MongoDB and FiftyOne Enterprise

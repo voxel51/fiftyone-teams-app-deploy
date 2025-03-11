@@ -12,10 +12,10 @@
 
 ---
 
-# Configuring FiftyOne Teams Delegated Operators
+# Configuring FiftyOne Enterprise Delegated Operators
 
 This option may be added to any of the three existing
-[plugin modes](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/configuring-plugins.md).
+[plugin modes](./configuring-plugins.md).
 
 To enable this mode and launch worker containers, use
 [legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
@@ -39,4 +39,4 @@ Logs are uploaded in the format
 Set `FIFTYONE_DELEGATED_OPERATION_LOG_PATH` to `configured_path`.
 
 To use plugins with custom dependencies, build and use
-[Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+[Custom Plugins Images](../../docs/custom-plugins.md).

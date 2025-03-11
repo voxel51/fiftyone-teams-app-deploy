@@ -45,7 +45,7 @@ security implications before using this method.
 
 1. Edit your `.env` file setting `API_BIND_ADDRESS` to `0.0.0.0`
 1. Recreate your environment using the
-   [plugin specific](../README.md#enabling-fiftyone-teams-plugins)
+   [plugin specific](./configuring-plugins.md)
    command
 
    ```shell

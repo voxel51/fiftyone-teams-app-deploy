@@ -12,7 +12,7 @@
 
 # Validating Your Deployment
 
-FiftyOne enterprise comes with a `test_api_connection()` method which will
+FiftyOne Enterprise comes with a `test_api_connection()` method which will
 attempt to validate the connection between your SDK and your deployment.
 
 <!-- toc -->
@@ -26,7 +26,7 @@ attempt to validate the connection between your SDK and your deployment.
 
 The following validation method assumes you:
 
-1. Deployed FiftyOne enterprise in either kubernetes or
+1. Deployed FiftyOne Enterprise in either kubernetes or
    docker-compose
 1. Configured a DNS record(s) for your application
 1. Configured TLS termination for your application

@@ -22,40 +22,40 @@
 {{ template "chart.description" . }}
 <!-- markdownlint-enable line-length -->
 
-This page assumes general knowledge of Fiftyone Teams and how to use it.
-Please contact Voxel51 for more information regarding Fiftyone Teams.
+This page assumes general knowledge of FiftyOne Enterprise and how to use it.
+Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
 ### Version 2.0+ License File Requirement
 
-FiftyOne Teams v2.0 introduces a new requirement for a license file.
+FiftyOne Enterprise v2.0 introduces a new requirement for a license file.
 This license file should be obtained from your Customer Success Team
-before upgrading to FiftyOne Teams 2.0 or beyond.
+before upgrading to FiftyOne Enterprise 2.0 or beyond.
 
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-before-fiftyone-teams-version-110)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
 for steps on how to add your license file.
 
 ### Version 2.2+ Delegated Operator Changes
 
-FiftyOne Teams v2.2 introduces some changes to delegated operators.
+FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-teams-version-213)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.5+ Delegated Operator Changes
 
-FiftyOne Teams v2.5 introduces some changes to delegated operators.
+FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-teams-v25-delegated-operator-changes)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.7+ Delegated Operator Changes
 
-FiftyOne Teams v2.7 introduces some changes to delegated operators.
+FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-teams-v27-delegated-operator-changes)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ## Table of Contents
@@ -70,7 +70,7 @@ for steps on how to upgrade your delegated operators.
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
-  - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
+  - [FiftyOne Enterprise Authenticated API](#fiftyone-enterprise-authenticated-api)
   - [Highly Available FiftyOne `teams-api` Deployments](#highly-available-fiftyone-teams-api-deployments)
   - [Plugins](#plugins)
   - [Proxies](#proxies)
@@ -111,9 +111,9 @@ for steps on installing helm.
 
 ## Usage
 
-FiftyOne Teams v2.0 introduces a new requirement for a license file.  This
+FiftyOne Enterprise v2.0 introduces a new requirement for a license file.  This
 license file should be obtained from your Customer Success Team before
-upgrading to FiftyOne Teams 2.0 or beyond.
+upgrading to FiftyOne Enterprise 2.0 or beyond.
 
 The license file now contains all of the Auth0 configuration that was
 previously provided through kubernetes secrets; you may remove those secrets
@@ -135,7 +135,7 @@ kubectl --namespace your-namespace-here create secret generic fiftyone-license \
 > You can do this by deleting the pods, or by running the following command:
 > `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
 
-We publish the following FiftyOne Teams private images to Docker Hub:
+We publish the following FiftyOne Enterprise private images to Docker Hub:
 
 - `voxel51/fiftyone-app`
 - `voxel51/fiftyone-app-gpt`
@@ -158,7 +158,7 @@ kubectl --namespace your-namespace-here create secret generic \
   --type kubernetes.io/dockerconfigjson
 ```
 
-To use the Helm chart, add the Fiftyone helm repository and
+To use the Helm chart, add the FiftyOne helm repository and
 check that you have access to the chart:
 
 ```shell
@@ -166,7 +166,7 @@ helm repo add voxel51 https://helm.fiftyone.ai
 helm repo update voxel51
 ```
 
-Finally, edit your `values.yaml` file and install FiftyOne Teams:
+Finally, edit your `values.yaml` file and install FiftyOne Enterprise:
 
 ```shell
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
@@ -208,8 +208,8 @@ When performing an upgrade, please review
 
 ### Builtin Delegated Operator Orchestrator
 
-FiftyOne Teams v2.2 introduces a builtin orchestrator to run
-[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+FiftyOne Enterprise v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/enterprise/enterprise_plugins.html#delegated-operations),
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
 For configuring your delegated operators, see
@@ -217,10 +217,10 @@ For configuring your delegated operators, see
 
 ### Central Authentication Service
 
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+FiftyOne Enterprise v1.6 introduces the Central Authentication Service (CAS).
 CAS requires additional configurations and consumes additional resources.
 Please review these notes, and the
-[Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
+[Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
@@ -249,20 +249,21 @@ to include the rule (add it before the `path: /` rule)
   servicePort: 80
 ```
 
-### FiftyOne Teams Authenticated API
+### FiftyOne Enterprise Authenticated API
 
-FiftyOne Teams v1.3 introduced the capability to connect FiftyOne Teams SDKs
-through the FiftyOne Teams API (instead of direct MongoDB connection).
+FiftyOne Enterprise v1.3 introduced the capability to connect FiftyOne
+Enterprise SDKs through the FiftyOne Enterprise API (instead of direct
+MongoDB connection).
 
-To enable the FiftyOne Teams Authenticated API,
-[expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
+To enable the FiftyOne Enterprise Authenticated API,
+[expose the FiftyOne Enterprise API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
 and
-[configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+[configure your SDK](https://docs.voxel51.com/enterprise/api_connection.html).
 
 ### Highly Available FiftyOne `teams-api` Deployments
 
-FiftyOne Teams v2.7 introduced support for running multiple `teams-api` pods for
-high availability [HA].
+FiftyOne Enterprise v2.7 introduced support for running multiple `teams-api`
+pods for high availability [HA].
 
 Running multiple `teams-api` pods requires a read-write volume available to all
 of the pods in the `teams-api` deployment to synchronize the API cache.
@@ -272,7 +273,7 @@ For configuring HA FiftyOne `teams-api` deployments see
 
 ### Plugins
 
-FiftyOne Teams v1.3 introduced significant enhancements for
+FiftyOne Enterprise v1.3 introduced significant enhancements for
 [Plugins](https://docs.voxel51.com/plugins/index.html)
 to customize and enhance functionality.
 
@@ -280,7 +281,7 @@ There are three modes for plugins
 
 1. Builtin Plugins Only
     - This is the default mode
-    - Users may only run the builtin plugins shipped with Fiftyone Teams
+    - Users may only run the builtin plugins shipped with FiftyOne Enterprise
     - Cannot run custom plugins
 1. Shared Plugins
     - Users may run builtin and custom plugins
@@ -295,25 +296,25 @@ There are three modes for plugins
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
-To use the FiftyOne Teams UI to deploy plugins,
+To use the FiftyOne Enterprise UI to deploy plugins,
 navigate to `https://<DEPLOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must
-be redeployed using the FiftyOne Teams UI.
+be redeployed using the FiftyOne Enterprise UI.
 
 For configuring your plugins, see
 [Configuring Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-plugins.md).
 
 ### Proxies
 
-FiftyOne Teams supports routing traffic through proxy servers.
+FiftyOne Enterprise supports routing traffic through proxy servers.
 Please refer to the
 [proxy configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md)
 for information on how to configure proxies.
 
 ### Snapshot Archival
 
-Since version v1.5, FiftyOne Teams supports
-[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
+Since version v1.5, FiftyOne Enterprise supports
+[archiving snapshots](https://docs.voxel51.com/enterprise/dataset_versioning.html#snapshot-archival)
 to cold storage locations to prevent filling up the MongoDB database.
 Supported locations are network mounted filesystems and cloud storage folders.
 
@@ -345,19 +346,19 @@ If the key is lost, you will need to
     1. Replace the encryption key
     1. Add the storage credentials via the UI again.
 
-Users with `Admin` permissions may use the FiftyOne Teams UI to manage storage
+Users with `Admin` permissions may use the FiftyOne Enterprise UI to manage storage
 credentials by navigating to `https://<DEPOY_URL>/settings/cloud_storage_credentials`.
 
 If added via the UI, storage credentials no longer need to be
 mounted into pods or provided via environment variables.
 
-FiftyOne Teams continues to support the use of environment variables to set
+FiftyOne Enterprise continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
 
 ### Static Banner Configuration
 
-Fiftyone Teams v2.6 introduces the ability to add a static banner to the
+FiftyOne Enterprise v2.6 introduces the ability to add a static banner to the
 application.
 
 Banner text is configured with
@@ -388,8 +389,8 @@ teamsAppSettings:
 
 ### Terms of Service, Privacy, and Imprint URLs
 
-Fiftyone Teams v2.6 introduces the ability to override the Terms of Service, Privacy,
-and Imprint (optional) links if required in the App.
+FiftyOne Enterprise v2.6 introduces the ability to override the Terms of
+Service, Privacy, and Imprint (optional) links if required in the App.
 
 Configure the URLs by setting the following environment variables in
 your `values.yaml`.
@@ -413,7 +414,7 @@ teamsAppSettings:
 
 ### Text Similarity
 
-Since version v1.2, FiftyOne Teams supports using text similarity
+Since version v1.2, FiftyOne Enterprise supports using text similarity
 searches for images that are indexed with a model that
 [supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text).
 Use the Voxel51 provided image `fiftyone-app-torch` or
@@ -447,7 +448,7 @@ follow
 
 ### Deploying On GKE
 
-Voxel51 FiftyOne Teams supports
+Voxel51 FiftyOne Enterprise supports
 [Workload Identity Federation for GKE][about-wif]
 when installing via Helm into Google Kubernetes Engine (GKE).
 Workload Identity is achieved using service account annotations
@@ -483,9 +484,9 @@ serviceAccount:
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
 [init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-[internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
+[internal-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-[legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
+[legacy-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#legacy-mode
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
@@ -498,5 +499,5 @@ serviceAccount:
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/#storage-credentials-and-fiftyone_encryption_key
 [fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
