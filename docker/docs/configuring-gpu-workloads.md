@@ -52,7 +52,10 @@ We will configure the
 with GPUs.
 
 In your `compose.delegated-operators.yaml`, under `.services.teams-do`,
-add the `deploy.resource.reservation.devices` configuration:
+add the `deploy.resource.reservation.devices` configuration.
+
+The below will deploy a CPU-based delegated operator (`teams-do`) as well
+as a GPU-based delegated operator (`teams-do-with-gpu`):
 
 ```yaml
 services:
@@ -60,13 +63,33 @@ services:
     extends:
       file: ../common-services.yaml
       service: teams-do-common
-      deploy:
-        resources:
-          reservations:
-            devices:
-              - driver: nvidia
-                count: 1
-                capabilities: [gpu]
+
+  teams-do-with-gpu:
+    image: voxel51/fiftyone-teams-cv-full:v2.7.0
+    deploy:
+      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: false
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_CACHE_ENABLED: true
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+    restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 ```
 
 Redeploy the stack via `docker compose up -d` and wait for the

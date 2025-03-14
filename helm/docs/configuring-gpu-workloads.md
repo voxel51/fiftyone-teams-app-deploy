@@ -62,11 +62,15 @@ The deployment should also set the `LD_LIBRARY_PATH` variable to the
 corresponding
 [google GPU driver][gke-gpu-how-to-cuda].
 Also be sure to modify the deployment's `resources.requests` to request
-the desired amount of GPUs from the Kubernetes scheduler:
+the desired amount of GPUs from the Kubernetes scheduler.
+
+The below will deploy a CPU-based delegated operator (`teamsDo`) as well
+as a GPU-based delegated operator (`teamsDoWithGpu`):
 
 ```yaml
 delegatedOperatorDeployments:
   deployments:
+    teamsDo: {}  # A CPU Based Deployment
     teamsDoWithGpu:
       nodeSelector:
         cloud.google.com/gke-accelerator: nvidia-l4  # Modify For Your Needs
