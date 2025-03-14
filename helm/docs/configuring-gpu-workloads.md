@@ -33,7 +33,7 @@ GPU-enabled nodes using the `nodeSelector` values for individual services.
 
 The below will show an example on Google Kubernetes Engine (GKE)
 following their
-[documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus)
+[documentation][gke-gpu-how-to]
 in a FiftyOne Enterprise context.
 
 ## Utilizing GKE GPUs For Delegated Operations
@@ -42,9 +42,9 @@ in a FiftyOne Enterprise context.
 
 This example assumes you have a GKE cluster with GPU-available nodes.
 Please refer to the
-[autopilot documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus)
+[autopilot documentation][gke-autopilot-gke-how-to]
 or the
-[standard node pool documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus)
+[standard node pool documentation][gke-gpu-how-to]
 for assistance in setting up those clusters.
 
 ### Deploying GPU-enabled Delegated Operator Pods
@@ -55,10 +55,10 @@ In this example, we will leverage GKE GPUs for
 Under `.Values.delegatedOperatorDeployments.deployments`, add a new delegated
 operator deployment.
 Ensure the delegated operator deployment has `nodeSelector` set to valid
-[GKE accelerator values and counts](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#multiple_gpus).
+[GKE accelerator values and counts][gke-gpu-how-to-multi].
 The deployment should also set the `LD_LIBRARY_PATH` variable to the
 corresponding
-[google GPU driver](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#cuda).
+[google GPU driver][gke-gpu-how-to-cuda].
 Also be sure to modify the deployment's `resources.requests` to request
 the desired amount of GPUs from the Kubernetes scheduler:
 
@@ -88,8 +88,8 @@ Now upgrade your deployment via `helm upgrade` and wait for the
 ### Validating GPU Access
 
 You can validate that the pod can correctly access the GPU drivers using
-PyTorches
-[cuda.is_available method](https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html)
+PyTorch's
+[cuda.is_available method][pytorch-cuda-is-available]
 from within the pod.
 
 ```shell
@@ -99,3 +99,11 @@ True
 ```
 
 If `True` is printed, then you are ready to run computations on GPU hardware.
+
+<!-- Reference Links -->
+
+[gke-autopilot-gke-how-to]: https://cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus
+[gke-gpu-how-to]: https://cloud.google.com/kubernetes-engine/docs/how-to/gpus
+[gke-gpu-how-to-cuda]: https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#cuda
+[gke-gpu-how-to-multi]: https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#multiple_gpus
+[pytorch-cuda-is-available]: https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html
