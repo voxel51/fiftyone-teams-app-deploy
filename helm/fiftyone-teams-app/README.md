@@ -266,7 +266,7 @@ FiftyOne services can be scheduled on GPU-enabled hardware for more efficient
 computation.
 
 To schedule pods on GPU-enabled hardware, see the
-[configuring GPU workloads documentation][gpu-workloads].
+[configuring GPU workloads documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-gpu-workloads.md).
 
 ### Highly Available FiftyOne `teams-api` Deployments
 
@@ -756,7 +756,6 @@ serviceAccount:
 [autoscaling]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 [container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-[gpu-workloads]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-gpu-workloads.md
 [howto-wif]: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
 [image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
