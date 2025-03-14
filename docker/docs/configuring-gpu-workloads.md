@@ -69,7 +69,7 @@ services:
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
     command: >
-      /bin/sh -c "fiftyone delegated launch -t remote"
+      /bin/sh -c "fiftyone delegated launch -t remote  -n 'teams-do-with-gpu'"
     environment:
       API_URL: ${API_URL}
       FIFTYONE_DATABASE_ADMIN: false
