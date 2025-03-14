@@ -327,7 +327,7 @@ FiftyOne services can be scheduled on GPU-enabled hardware for more efficient
 computation.
 
 To schedule pods on GPU-enabled hardware, see the
-[configuring GPU workloads documentation][gpu-workloads].
+[configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
 
 ### Plugins
 
@@ -565,6 +565,5 @@ follow
 | `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
 
 <!-- Reference Links -->
-[gpu-workloads]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/configuring-gpu-workloads.md
 [internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
 [legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
