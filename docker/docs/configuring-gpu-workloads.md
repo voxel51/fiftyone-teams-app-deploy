@@ -26,12 +26,11 @@
 
 ## Overview
 
-In many machine learning applications, it is desirable to utilize available
+Many machine learning applications utilize
 GPU hardware for intensive computations.
-The FiftyOne Enterprise compose files allow users to schedule containers on
-GPU-enabled nodes using the docker compose
-[`deploy.resource.reservation.devices`][compose-deploy-resources]
-settings for individual services.
+The FiftyOne Enterprise docker compose files allow users to schedule containers on
+GPU-enabled nodes using a service's
+[`deploy.resource.reservation.devices`][compose-deploy-resources].
 
 The below will show an example deploying a GPU-enabled container via docker
 compose by following their
@@ -42,20 +41,21 @@ in a FiftyOne Enterprise context.
 
 ### Prerequisites
 
-This example assumes you have a docker compose node with GPU devices available.
-This example also assumes you have followed the
-[GPU prerequisites][compose-gpu-resources]
-outlined by docker.
+This example assumes you have a docker compose node with GPU devices available
+and you have followed Docker's
+[GPU prerequisites][compose-gpu-resources].
 
 ### Deploying GPU-enabled Delegated Operator Containers
 
-In this example, we will leverage GPUs for
-[delegated operators](./configuring-delegated-operators.md).
+We will configure the
+[delegated operators](./configuring-delegated-operators.md)
+with GPUs.
 
-Under `.services.teams-do` in your `compose.delegated-operators.yaml`,
+In your `compose.delegated-operators.yaml`, under `.services.teams-do`,
 add the `deploy.resource.reservation.devices` configuration:
 
 ```yaml
+services:
   teams-do:
     extends:
       file: ../common-services.yaml
@@ -69,7 +69,7 @@ add the `deploy.resource.reservation.devices` configuration:
                 capabilities: [gpu]
 ```
 
-Now redeploy your stack via `docker compose up -d` and wait for the
+Redeploy the stack via `docker compose up -d` and wait for the
 `teams-do` containers to be deployed.
 
 For advanced GPU configuration, including selecting specific GPU devices,
@@ -78,10 +78,10 @@ please refer to the
 
 ### Validating GPU Access
 
-You can validate that the container can correctly access the GPU drivers using
+You may validate that the container can access the GPU drivers using
 PyTorch's
 [cuda.is_available method][pytorch-cuda-is-available]
-from within the container.
+by execing into the container and running
 
 ```shell
 $ docker compose exec teams-do \
@@ -89,7 +89,7 @@ $ docker compose exec teams-do \
 True
 ```
 
-If `True` is printed, then you are ready to run computations on GPU hardware.
+If `True` is printed, then computations may run on GPU hardware.
 
 <!-- Reference Links -->
 

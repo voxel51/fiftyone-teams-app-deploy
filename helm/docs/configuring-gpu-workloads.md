@@ -26,7 +26,7 @@
 
 ## Overview
 
-In many machine learning applications, it is desirable to utilize available
+Many machine learning applications utilize
 GPU hardware for intensive computations.
 The FiftyOne Enterprise helm chart allows users to schedule pods on
 GPU-enabled nodes using the `nodeSelector` values for individual services.
@@ -49,10 +49,12 @@ for assistance in setting up those clusters.
 
 ### Deploying GPU-enabled Delegated Operator Pods
 
-In this example, we will leverage GKE GPUs for
-[delegated operators](./configuring-delegated-operators.md).
+We will configure the
+[delegated operators](./configuring-delegated-operators.md)
+with GKE GPUs.
 
-Under `.Values.delegatedOperatorDeployments.deployments`, add a new delegated
+In your `values.yaml`,
+under `.Values.delegatedOperatorDeployments.deployments`, add a new delegated
 operator deployment.
 Ensure the delegated operator deployment has `nodeSelector` set to valid
 [GKE accelerator values and counts][gke-gpu-how-to-multi].
@@ -82,15 +84,15 @@ delegatedOperatorDeployments:
         LD_LIBRARY_PATH: /usr/local/nvidia/lib64  # Modify For Your Needs
 ```
 
-Now upgrade your deployment via `helm upgrade` and wait for the
+Upgrade your deployment via `helm upgrade` and wait for the
 `teams-do-with-gpu` pods to be scheduled and deployed.
 
 ### Validating GPU Access
 
-You can validate that the pod can correctly access the GPU drivers using
+You may validate that the pod can access the GPU drivers using
 PyTorch's
 [cuda.is_available method][pytorch-cuda-is-available]
-from within the pod.
+by execing into the pod and running
 
 ```shell
 $ kubectl exec -it -n <YOUR_NAMESPACE> \
@@ -98,7 +100,7 @@ $ kubectl exec -it -n <YOUR_NAMESPACE> \
 True
 ```
 
-If `True` is printed, then you are ready to run computations on GPU hardware.
+If `True` is printed, then computations may run on GPU hardware.
 
 <!-- Reference Links -->
 
