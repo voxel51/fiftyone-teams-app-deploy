@@ -64,22 +64,22 @@ the desired amount of GPUs from the Kubernetes scheduler:
 
 ```yaml
 delegatedOperatorDeployments:
-    deployments:
-        teamsDoWithGpu:
-            nodeSelector:
-                cloud.google.com/gke-accelerator: nvidia-l4  # Modify For Your Needs
-                cloud.google.com/gke-accelerator-count: "1"  # Modify For Your Needs
-            resources:
-                limits:
-                    cpu: 4        # Modify For Your Needs
-                    memory: 12Gi  # Modify For Your Needs
-                requests:
-                    cpu: 4             # Modify For Your Needs
-                    memory: 12Gi       # Modify For Your Needs
-                    nvidia.com/gpu: 1  # Modify For Your Needs
-            env:
-                [...existing environment variables...]
-                LD_LIBRARY_PATH: /usr/local/nvidia/lib64  # Modify For Your Needs
+  deployments:
+    teamsDoWithGpu:
+      nodeSelector:
+        cloud.google.com/gke-accelerator: nvidia-l4  # Modify For Your Needs
+        cloud.google.com/gke-accelerator-count: "1"  # Modify For Your Needs
+      resources:
+        limits:
+          cpu: 4        # Modify For Your Needs
+          memory: 12Gi  # Modify For Your Needs
+        requests:
+          cpu: 4             # Modify For Your Needs
+          memory: 12Gi       # Modify For Your Needs
+          nvidia.com/gpu: 1  # Modify For Your Needs
+      env:
+        [...existing environment variables...]
+        LD_LIBRARY_PATH: /usr/local/nvidia/lib64  # Modify For Your Needs
 ```
 
 Now upgrade your deployment via `helm upgrade` and wait for the
