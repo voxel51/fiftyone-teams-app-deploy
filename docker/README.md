@@ -59,12 +59,13 @@ for steps on how to upgrade your delegated operators.
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
+  - [FiftyOne Enterprise Authenticated API](#fiftyone-enterprise-authenticated-api)
+  - [GPU Enabled Workloads](#gpu-enabled-workloads)
+  - [Plugins](#plugins)
+  - [Proxies](#proxies)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
-  - [FiftyOne Enterprise Authenticated API](#fiftyone-enterprise-authenticated-api)
-  - [FiftyOne Enterprise Plugins](#fiftyone-enterprise-plugins)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
-  - [Proxies](#proxies)
   - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
   - [Text Similarity](#text-similarity)
 - [Validating](#validating)
@@ -309,46 +310,6 @@ To upgrade from versions prior to FiftyOne Enterprise v1.6
 > **NOTE**: See
 > [Upgrading From Previous Versions](./docs/upgrading.md)
 
-### Snapshot Archival
-
-Since version v1.5, FiftyOne Enterprise supports
-[archiving snapshots](https://docs.voxel51.com/enterprise/dataset_versioning.html#snapshot-archival)
-to cold storage locations to prevent filling up the MongoDB database.
-Supported locations are network mounted filesystems and cloud storage folders.
-
-Please refer to the
-[snapshot archival configuration documentation](./docs/configuring-snapshot-archival.md)
-for configuring snapshot archival.
-
-### Static Banner Configuration
-
-FiftyOne Enterprise v2.6 introduces the ability to add a static banner to the
-application.
-
-Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
-
-Banner background color is configured with `FIFTYONE_APP_BANNER_COLOR`.
-
-Banner text color is configured with:
-`casSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR` and
-`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR`
-
-Examples:
-
-```yaml
-services:
-  teams-app-common:
-    environment:
-      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
-      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
-      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
-  teams-cas-common:
-    environment:
-      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
-      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
-      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
-```
-
 ### FiftyOne Enterprise Authenticated API
 
 FiftyOne Enterprise v1.3 introduces the capability to connect FiftyOne
@@ -360,7 +321,15 @@ To enable the FiftyOne Enterprise Authenticated API you will need to
 and
 [configure your SDK](https://docs.voxel51.com/enterprise/api_connection.html).
 
-### FiftyOne Enterprise Plugins
+### GPU Enabled Workloads
+
+FiftyOne services can be scheduled on GPU-enabled hardware for more efficient
+computation.
+
+To schedule pods on GPU-enabled hardware, see the
+[configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
+
+### Plugins
 
 FiftyOne Enterprise v1.3+ includes significant enhancements for
 [Plugins](https://docs.voxel51.com/plugins/index.html)
@@ -402,6 +371,53 @@ manually must be redeployed using the FiftyOne Enterprise UI.
 For configuring your plugins, see
 [Configuring Plugins](./docs/configuring-plugins.md).
 
+### Proxies
+
+FiftyOne Enterprise supports routing traffic through proxy servers.
+Please refer to the
+[proxy configuration documentation](./docs/configuring-proxies.md)
+for information on how to configure proxies.
+
+### Snapshot Archival
+
+Since version v1.5, FiftyOne Enterprise supports
+[archiving snapshots](https://docs.voxel51.com/enterprise/dataset_versioning.html#snapshot-archival)
+to cold storage locations to prevent filling up the MongoDB database.
+Supported locations are network mounted filesystems and cloud storage folders.
+
+Please refer to the
+[snapshot archival configuration documentation](./docs/configuring-snapshot-archival.md)
+for configuring snapshot archival.
+
+### Static Banner Configuration
+
+FiftyOne Enterprise v2.6 introduces the ability to add a static banner to the
+application.
+
+Banner text is configured with `FIFTYONE_APP_BANNER_TEXT`.
+
+Banner background color is configured with `FIFTYONE_APP_BANNER_COLOR`.
+
+Banner text color is configured with:
+`casSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR` and
+`teamsAppSettings.env.FIFTYONE_APP_BANNER_TEXT_COLOR`
+
+Examples:
+
+```yaml
+services:
+  teams-app-common:
+    environment:
+      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+  teams-cas-common:
+    environment:
+      FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
+      FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
+```
+
 ### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
 
 As of FiftyOne Enterprise 1.1, containers based on the
@@ -435,13 +451,6 @@ to manage storage credentials by navigating to
 FiftyOne Enterprise version 1.3+ continues to support the use of environment
 variables to set storage credentials in the application context and is
 providing an alternate configuration path.
-
-### Proxies
-
-FiftyOne Enterprise supports routing traffic through proxy servers.
-Please refer to the
-[proxy configuration documentation](./docs/configuring-proxies.md)
-for information on how to configure proxies.
 
 ### Terms of Service, Privacy, and Imprint URLs
 

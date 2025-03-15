@@ -71,6 +71,7 @@ for steps on how to upgrade your delegated operators.
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [FiftyOne Enterprise Authenticated API](#fiftyone-enterprise-authenticated-api)
+  - [GPU Enabled Workloads](#gpu-enabled-workloads)
   - [Highly Available FiftyOne `teams-api` Deployments](#highly-available-fiftyone-teams-api-deployments)
   - [Plugins](#plugins)
   - [Proxies](#proxies)
@@ -259,6 +260,14 @@ To enable the FiftyOne Enterprise Authenticated API,
 [expose the FiftyOne Enterprise API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
 and
 [configure your SDK](https://docs.voxel51.com/enterprise/api_connection.html).
+
+### GPU Enabled Workloads
+
+FiftyOne services can be scheduled on GPU-enabled hardware for more efficient
+computation.
+
+To schedule pods on GPU-enabled hardware, see the
+[configuring GPU workloads documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-gpu-workloads.md).
 
 ### Highly Available FiftyOne `teams-api` Deployments
 
