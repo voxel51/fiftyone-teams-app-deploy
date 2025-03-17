@@ -64,7 +64,7 @@ jobs:
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Login to GAR
-        uses: docker/login-action@v3.3.0
+        uses: docker/login-action@v3.4.0
         with:
           registry: us-central1-docker.pkg.dev
           username: oauth2accesstoken
@@ -106,7 +106,7 @@ jobs:
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Login to GAR
-        uses: docker/login-action@v3.3.0
+        uses: docker/login-action@v3.4.0
         with:
           registry: us-central1-docker.pkg.dev
           username: oauth2accesstoken
