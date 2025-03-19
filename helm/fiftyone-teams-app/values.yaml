@@ -458,8 +458,13 @@ delegatedOperatorDeployments:
       # When running in FiftyOne Enterprise, set to `true`.
       FIFTYONE_INTERNAL_SERVICE: true
 
-    # -- A description for the delegated operator instance.
-    description: "Default teams-do description"
+    # -- A description for the delegated operator instance. This is unused
+    # in the template context. Each operator should either set their own
+    # description or, optionally, use the default. If unset at the
+    # operator context, it will be defaulted to
+    # `Long running operations delegated to $name` where `$name` is the name
+    # of the Deployment object.
+    description: ""
 
     # -- Secret variables to be passed to the delegated-operator-executor containers.
     secretEnv: {}

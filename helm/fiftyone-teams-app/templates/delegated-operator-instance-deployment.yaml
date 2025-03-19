@@ -12,6 +12,7 @@
     "secretEnv" (merge (dict) ($v.secretEnv | default dict) ($baseTpl.secretEnv))
   )
 }}
+{{- $defaultDescription := printf "Long running operations delegated to %s" $name }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -53,9 +54,9 @@ spec:
             - remote
             - -n
             - {{ $name }}
-            {{- if ($v.description | default $baseTpl.description) }}
+            {{- if ($v.description | default $defaultDescription) }}
             - -d
-            - {{ ($v.description | default $baseTpl.description) | quote }}
+            - {{ ($v.description | default $defaultDescription) | quote }}
             {{- end }}
           securityContext:
             {{- toYaml (merge (dict) ($v.securityContext | default dict) ($baseTpl.securityContext)) | nindent 12 }}
