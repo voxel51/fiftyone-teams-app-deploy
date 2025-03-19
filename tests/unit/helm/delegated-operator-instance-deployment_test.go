@@ -4808,7 +4808,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-n",
 						"teams-do",
 						"-d",
-						"Default teams-do description",
+						"Long running operations delegated to teams-do",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -4830,7 +4830,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-n",
 						"teams-do",
 						"-d",
-						"Default teams-do description",
+						"Long running operations delegated to teams-do",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -4843,7 +4843,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-n",
 						"teams-do-two",
 						"-d",
-						"Default teams-do description",
+						"Long running operations delegated to teams-do-two",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -4914,7 +4914,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-n",
 						"teams-do-two",
 						"-d",
-						"Default teams-do description",
+						"Long running operations delegated to teams-do-two",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
