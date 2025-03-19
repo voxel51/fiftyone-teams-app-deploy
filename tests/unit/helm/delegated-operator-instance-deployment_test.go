@@ -4850,7 +4850,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 			},
 		},
 		{
-			"overrideBaseTemplateDescription",
+			"overrideBaseTemplateDescription", // This should still show the defaults
 			map[string]string{
 				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
@@ -4866,7 +4866,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-n",
 						"teams-do",
 						"-d",
-						"Delegated Operator",
+						"Long running operations delegated to teams-do",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -4879,7 +4879,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-n",
 						"teams-do-two",
 						"-d",
-						"Delegated Operator",
+						"Long running operations delegated to teams-do-two",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -4950,7 +4950,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-n",
 						"teams-do-two",
 						"-d",
-						"Delegated Operator",
+						"Long running operations delegated to teams-do-two",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
