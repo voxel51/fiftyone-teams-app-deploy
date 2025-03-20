@@ -145,7 +145,7 @@ Additionally,
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.7.0
+    > **NOTE**: Any FiftyOne SDK less than 2.7.0
     > will lose connectivity at this point.
     > Upgrading to `fiftyone==2.7.0` is required.
 
@@ -237,7 +237,7 @@ Additionally,
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE** Any FiftyOne SDK less than 2.7.0
+    > **NOTE**: Any FiftyOne SDK less than 2.7.0
     > will lose connectivity at this point.
     > Upgrading to `fiftyone==2.7.0` is required.
 

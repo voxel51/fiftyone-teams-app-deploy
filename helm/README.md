@@ -73,7 +73,7 @@ in this directory.
         helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
         ```
 
-        > **NOTE** Prior to running helm upgrade you may
+        > **NOTE**: Prior to running helm upgrade you may
         > view the changes Helm would apply by using
         > [helm diff](https://github.com/databus23/helm-diff)
         > helm plugin.
@@ -111,11 +111,16 @@ These instructions assume you have
   - If you have not received this information, please contact your
     Voxel51 Support Team via your agreed-upon mechanism (Slack, email, etc.)
 
-> **NOTE**
-> Anytime a license file is updated, you may need to restart the `teams-cas`
-> and `teams-api` services. You can do this by deleting the pods, or by running
-> the following command: </br>
-> `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
+> **NOTE**: Anytime a license file secret is updated, you
+> must restart the `teams-cas` and `teams-api` services.
+> You may delete the pods, or run
+>
+> ```shell
+> kubectl rollout restart deploy \
+>   -n your-namespace \
+>   teams-cas \
+>   teams-api
+> ```
 
 #### Download the Example Configuration Files
 

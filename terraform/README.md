@@ -6,7 +6,7 @@ Module for deploying FiftyOne Enterprise Infrastructure
 
 ### Simple Two-Node Deploy
 
-**NOTE** This deploys a simple two-node infrastructure
+**NOTE**: This deploys a simple two-node infrastructure
 that does not provide High Availability.
 If High Availability is a requirement in your environment, consider modifying
 this deployment to include multiple MongoDB nodes and multiple app nodes.
