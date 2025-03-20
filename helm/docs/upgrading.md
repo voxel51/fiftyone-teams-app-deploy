@@ -51,7 +51,7 @@ A minimal example `values.yaml` may be found
           -f ./values.yaml
         ```
 
-    > **NOTE** To view the changes Helm would apply during installations
+    > **NOTE**: To view the changes Helm would apply during installations
     > and upgrades, consider using
     > [helm diff](https://github.com/databus23/helm-diff).
     > Voxel51 is not affiliated with the author of this plugin.
@@ -213,7 +213,7 @@ For a full list of settings, please refer to the
         ```
 
 1. Use the license file provided by the Voxel51 Customer Success Team to create
-   a new kubernetes secret:
+   a new kubernetes secret
 
     ```shell
     kubectl --namespace your-namespace-here create secret generic \
@@ -227,7 +227,7 @@ For a full list of settings, please refer to the
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.7.0 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.7.0 will lose connectivity after
     > this point.
     > Upgrading all SDKs to `fiftyone==2.7.0` is recommended before migrating
     > your database.
@@ -310,7 +310,7 @@ For a full list of settings, please refer to the
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
 
-    > **NOTE** Any FiftyOne SDK less than 2.7.0 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.7.0 will lose connectivity after
     > this point.
     > Upgrading all SDKs to `fiftyone==2.7.0` is recommended before migrating
     > your database.
