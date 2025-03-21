@@ -266,14 +266,14 @@ func (s *deploymentAppTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsOptionalValues",
 			map[string]string{
-				"appSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
 				"appSettings.topologySpreadConstraints[0].maxSkew":            "1",
 				"appSettings.topologySpreadConstraints[0].minDomains":         "1",
 				"appSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
 				"appSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
 				"appSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"appSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
-				"appSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[1].matchLabelKeys[0]":  "pod-template-hash",
 				"appSettings.topologySpreadConstraints[1].maxSkew":            "2",
 				"appSettings.topologySpreadConstraints[1].minDomains":         "2",
 				"appSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
@@ -327,7 +327,7 @@ func (s *deploymentAppTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsSelectorLabels",
 			map[string]string{
-				"appSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"appSettings.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
 				"appSettings.topologySpreadConstraints[0].maxSkew":                       "1",
 				"appSettings.topologySpreadConstraints[0].minDomains":                    "1",
 				"appSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
@@ -1505,7 +1505,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerCommand() {
 				expectedCmd := []string{
 					"sh",
 					"-c",
-					"until nslookup teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+					"until wget -qO /dev/null teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local/cas/api; do echo waiting for cas; sleep 2; done",
 				}
 				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
 			},
@@ -1519,7 +1519,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerCommand() {
 				expectedCmd := []string{
 					"sh",
 					"-c",
-					"until nslookup test-service-name.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+					"until wget -qO /dev/null test-service-name.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local/cas/api; do echo waiting for cas; sleep 2; done",
 				}
 				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
 			},

@@ -47,6 +47,10 @@ repos:
     hooks:
       - id: codespell
         exclude: helm/local-self-signed-example/cert-manger-crds|tests/go.sum
+        args:
+          - -L
+          # fiftyone.management as fom
+          - fom
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
     hooks:
@@ -92,8 +96,9 @@ repos:
       - id: shellcheck
       - id: shfmt
         args:
-          - -w
-          - -s
+          - --diff
+          - --write
+          - --simplify
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.0.0
     hooks:

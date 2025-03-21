@@ -41,7 +41,7 @@ deploy:
     releases:
       - name: fiftyone-teams
         chartPath: helm/fiftyone-teams-app
-        version: v2.6.2
+        version: 2.7.0
         createNamespace: true
         namespace: fiftyone-teams
         overrides:
@@ -54,7 +54,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api
               pullPolicy: IfNotPresent
-              tag: v2.6.2
+              tag: v2.7.0
 
           # FiftyOne App (fiftyone-app) configurations
           appSettings:
@@ -71,7 +71,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v2.6.2
+              tag: v2.7.0
 
           # Central Authentication Service (teams-cas) configurations
           casSettings:
@@ -81,7 +81,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas
               pullPolicy: IfNotPresent
-              tag: v2.6.2
+              tag: v2.7.0
 
           # TODO: Test `minikube addons configure registry-creds` or
           # When using minikube's addon registry-creds, we may also need to create the k8s secret `regcred`
@@ -97,6 +97,8 @@ deploy:
               nginx.ingress.kubernetes.io/proxy-buffer-size: 256k
               # Configure nginx-ingress controller proxy buffers for the app
               nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+              # Force http to https redirect
+              nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
             # For using the nginx-ingress controller
             className: nginx
             paths:
@@ -147,7 +149,7 @@ deploy:
               # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
               repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
               pullPolicy: IfNotPresent
-              tag: v2.6.2
+              tag: v2.7.0
 
           # FiftyOne Teams App (teams-app) configurations
           teamsAppSettings:
@@ -166,6 +168,6 @@ deploy:
               # The others are `vW.X.Y.devZ` (note `.devZ` vs `-dev.Z`).
               # This is a byproduct of `npm` versioning versus Python PEP 440.
               pullPolicy: IfNotPresent
-              tag: v2.6.2
+              tag: v2.7.0
 
   kubeContext: minikube

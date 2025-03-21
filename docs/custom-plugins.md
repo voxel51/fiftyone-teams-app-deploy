@@ -29,13 +29,13 @@ As an example, you might use the following Dockerfile to build a
 custom `your-internal-registry/fiftyone-app-internal` image:
 
 ```dockerfile
-ARG TEAMS_IMAGE_NAME
+ARG FIFTYONE_ENTERPRISE_IMAGE_NAME
 
 FROM python:3.10 as wheelhouse
 
 RUN pip wheel --wheel-dir=/tmp/wheels pandas
 
-FROM ${TEAMS_IMAGE_NAME} as pandarelease
+FROM ${FIFTYONE_ENTERPRISE_IMAGE_NAME} as pandarelease
 
 RUN --mount=type=cache,from=wheelhouse,target=/wheelhouse,ro \
     pip --no-cache-dir install -q --no-index \
@@ -46,14 +46,14 @@ With a Dockerfile like this, you could use the following commands to
 build, and publish, your image to your internal registry
 
 ```shell
-TEAMS_VERSION=v2.6.2
+FIFTYONE_ENTERPRISE_VERSION=v2.7.0
 docker buildx build --push \
-  --build-arg TEAMS_IMAGE_NAME="voxel51/fiftyone-app:${TEAMS_VERSION}" \
-  -t your-internal-registry/fiftyone-app-internal:${TEAMS_VERSION} .
+  --build-arg FIFTYONE_ENTERPRISE_IMAGE_NAME="voxel51/fiftyone-app:${FIFTYONE_ENTERPRISE_VERSION}" \
+  -t your-internal-registry/fiftyone-app-internal:${FIFTYONE_ENTERPRISE_VERSION} .
 ```
 
-You should upgrade your custom plugins image using the `TEAMS_VERSION`
-you plan to use in your FiftyOne Teams Deployment.
+You should upgrade your custom plugins image using the `FIFTYONE_ENTERPRISE_VERSION`
+you plan to use in your FiftyOne Enterprise Deployment.
 
 ## Using Your Custom Plugins Image in Docker Compose
 
@@ -63,11 +63,11 @@ After your custom plugins image is built, you can add it to your
 ```yaml
 services:
   teams-plugins:
-    image: your-internal-registry/fiftyone-app-internal:v2.6.2
+    image: your-internal-registry/fiftyone-app-internal:v2.7.0
 ```
 
 Please see
-[Enabling FiftyOne Teams Plugins](../docker/README.md#enabling-fiftyone-teams-plugins)
+[Enabling FiftyOne Enterprise Plugins](../docker/README.md#fiftyone-enterprise-plugins)
 for example `docker compose` commands for starting and upgrading your
 deployment.
 
@@ -93,9 +93,9 @@ delegatedOperatorExecutorSettings:
 ```
 
 Assuming you tagged your custom container with the same version
-number as the FiftyOne Teams release, the Helm chart will
+number as the FiftyOne Enterprise release, the Helm chart will
 automatically use the chart version to pull your image.
 
 Please see
-[FiftyOne Teams Plugins](../helm/fiftyone-teams-app/README.md#fiftyone-teams-plugins)
+[FiftyOne Enterprise Plugins](../helm/fiftyone-teams-app/README.md#plugins)
 for additional information regarding `teams-plugins` configuration.

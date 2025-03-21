@@ -109,6 +109,10 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 
 {{/*
 Delegated Operator Executor Selector labels
+
+TODO: Deprecated in v2.7.0. Remove as part
+of a future release after deprecation is
+finished.
 */}}
 {{- define "delegated-operator-executor.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "delegated-operator-executor.name" . }}
@@ -116,11 +120,32 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Delegated Operator Executor Selector labels
+*/}}
+{{- define "delegated-operator-deployments.selectorLabels" -}}
+app.kubernetes.io/name: {{ .name }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+
+{{/*
 Delegated Operator Executor Combined labels
+
+TODO: Deprecated in v2.7.0. Remove as part
+of a future release after deprecation is
+finished.
 */}}
 {{- define "delegated-operator-executor.labels" -}}
 {{ include "fiftyone-teams-app.commonLabels" . }}
 {{ include "delegated-operator-executor.selectorLabels" . }}
+{{- end }}
+
+{{/*
+Delegated Operator Executor Combined labels
+*/}}
+{{- define "delegated-operator-deployments.labels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+{{ include "delegated-operator-deployments.selectorLabels" . }}
 {{- end }}
 
 {{/*
@@ -261,7 +286,7 @@ Common Topology Constraints
   {{- end }}
   {{- if $constraint.matchLabelKeys }}
   matchLabelKeys:
-    {{- $constraint.matchLabelKeys | nindent 4 }}
+    {{- $constraint.matchLabelKeys | toYaml | nindent 4 }}
   {{- end }}
   {{- if $constraint.nodeAffinityPolicy }}
   nodeAffinityPolicy: {{ $constraint.nodeAffinityPolicy }}
@@ -281,11 +306,15 @@ Common Init Containers
   command:
     - 'sh'
     - '-c'
-    - "until nslookup {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done"
+    - "until wget -qO /dev/null {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local/cas/api; do echo waiting for cas; sleep 2; done"
 {{- end }}
 
 {{/*
 Create a merged list of environment variables for delegated-operator-executor
+
+TODO: Deprecated in v2.7.0. Remove as part
+of a future release after deprecation is
+finished.
 */}}
 {{- define "delegated-operator-executor.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
@@ -320,6 +349,42 @@ Create a merged list of environment variables for delegated-operator-executor
       key: {{ $val.secretKey }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Create a merged list of environment variables for delegated-operator-executor
+*/}}
+{{- define "delegated-operator-deployments.env-vars-list" }}
+- name: API_URL
+  value: {{ printf "http://%s:%.0f" .apiServiceName .apiServicePort | quote }}
+- name: FIFTYONE_DATABASE_ADMIN
+  value: "false"
+- name: FIFTYONE_DATABASE_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ .secretName }}
+      key: fiftyoneDatabaseName
+- name: FIFTYONE_DATABASE_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ .secretName }}
+      key: mongodbConnectionString
+- name: FIFTYONE_ENCRYPTION_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .secretName }}
+      key: encryptionKey
+{{- range $key, $val := .env }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- range $key, $val := .secretEnv }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.secretKey }}
+{{- end }}
+{{- end }}
 
 {{/*
 Create a merged list of environment variables for fiftyone-teams-api
@@ -557,3 +622,15 @@ Create a merged list of environment variables for fiftyone-teams-app
       key: {{ $val.secretKey }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Enforces that we can't have both
+.Values.delegatedOperatorExecutorSettings.enabled and
+.Values.delegatedOperatorDeployments enabled.
+*/}}
+{{- define "fiftyone-teams-app.teams-do-deprecation-validation" -}}
+{{- $invalid := and (.Values.delegatedOperatorExecutorSettings.enabled) (gt (len .Values.delegatedOperatorDeployments.deployments) 0) }}
+{{- if $invalid }}
+{{- fail "Both delegatedOperatorExecutorSettings.enabled and delegatedOperatorDeployments configured. Please use one or the other" }}
+{{- end }}
+{{- end }}

@@ -1,12 +1,12 @@
-# Deploying FiftyOne Teams Infrastructure using Terraform
+# Deploying FiftyOne Enterprise Infrastructure using Terraform
 
-Module for deploying FiftyOne Teams Infrastructure
+Module for deploying FiftyOne Enterprise Infrastructure
 
 ## Google Compute
 
 ### Simple Two-Node Deploy
 
-**NOTE** This deploys a simple two-node infrastructure
+**NOTE**: This deploys a simple two-node infrastructure
 that does not provide High Availability.
 If High Availability is a requirement in your environment, consider modifying
 this deployment to include multiple MongoDB nodes and multiple app nodes.
@@ -36,4 +36,4 @@ defined in the `public-ssh-keys` file will have ssh access to the system.
 - Add a dedicated data drive for MongoDB
 - Make the MongoDB Data Drive XFS formatted
 - Disable Transparent Huge Pages for `fiftyone-dbnode`
-- Find a elegant way to have Terraform deploy MongoDB and FiftyOne Teams
+- Find a elegant way to have Terraform deploy MongoDB and FiftyOne Enterprise

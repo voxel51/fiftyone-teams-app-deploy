@@ -197,6 +197,21 @@ func (s *deploymentApiTemplateTest) TestReplicas() {
 			nil,
 			1,
 		},
+		{
+			"overrideReplicaCountWithoutCacheDefined",
+			map[string]string{
+				"apiSettings.replicaCount": "3",
+			},
+			1,
+		},
+		{
+			"overrideReplicaCountWithCacheDefined",
+			map[string]string{
+				"apiSettings.replicaCount":                 "2",
+				"apiSettings.env.FIFTYONE_SHARED_ROOT_DIR": "/opt/shared",
+			},
+			2,
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -261,14 +276,14 @@ func (s *deploymentApiTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsOptionalValues",
 			map[string]string{
-				"apiSettings.topologySpreadConstraints[0].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"apiSettings.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
 				"apiSettings.topologySpreadConstraints[0].maxSkew":            "1",
 				"apiSettings.topologySpreadConstraints[0].minDomains":         "1",
 				"apiSettings.topologySpreadConstraints[0].nodeAffinityPolicy": "Honor",
 				"apiSettings.topologySpreadConstraints[0].nodeTaintsPolicy":   "Honor",
 				"apiSettings.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
 				"apiSettings.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
-				"apiSettings.topologySpreadConstraints[1].matchLabelKeys":     "[\"pod-template-hash\"]",
+				"apiSettings.topologySpreadConstraints[1].matchLabelKeys[0]":  "pod-template-hash",
 				"apiSettings.topologySpreadConstraints[1].maxSkew":            "2",
 				"apiSettings.topologySpreadConstraints[1].minDomains":         "2",
 				"apiSettings.topologySpreadConstraints[1].nodeAffinityPolicy": "Ignore",
@@ -322,7 +337,7 @@ func (s *deploymentApiTemplateTest) TestTopologySpreadConstraints() {
 		{
 			"overrideTopologySpreadConstraintsSelectorLabels",
 			map[string]string{
-				"apiSettings.topologySpreadConstraints[0].matchLabelKeys":                "[\"pod-template-hash\"]",
+				"apiSettings.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
 				"apiSettings.topologySpreadConstraints[0].maxSkew":                       "1",
 				"apiSettings.topologySpreadConstraints[0].minDomains":                    "1",
 				"apiSettings.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
@@ -1531,7 +1546,7 @@ func (s *deploymentApiTemplateTest) TestInitContainerCommand() {
 				expectedCmd := []string{
 					"sh",
 					"-c",
-					"until nslookup teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+					"until wget -qO /dev/null teams-cas.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local/cas/api; do echo waiting for cas; sleep 2; done",
 				}
 				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
 			},
@@ -1545,7 +1560,7 @@ func (s *deploymentApiTemplateTest) TestInitContainerCommand() {
 				expectedCmd := []string{
 					"sh",
 					"-c",
-					"until nslookup test-service-name.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for cas; sleep 2; done",
+					"until wget -qO /dev/null test-service-name.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local/cas/api; do echo waiting for cas; sleep 2; done",
 				}
 				s.Equal(expectedCmd, cmd, "InitContainer commands should be equal")
 			},

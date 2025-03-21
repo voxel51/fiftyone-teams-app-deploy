@@ -114,38 +114,37 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"sharedPlugins", // plugins run in fiftyone-app deployment
 			map[string]string{
-				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                            "/opt/plugins",
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                       "fiftyone-teams-secrets", // pragma: allowlist secret
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                        "cookieSecret",           // pragma: allowlist secret
-				"apiSettings.volumes[0].name":                                                     "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                          "pvc-leg-sp-" + suffix,
-				"apiSettings.volumeMounts[0].name":                                                "plugins-vol",
-				"apiSettings.volumeMounts[0].mountPath":                                           "/opt/plugins",
-				"appSettings.env.FIFTYONE_PLUGINS_DIR":                                            "/opt/plugins",
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                       "fiftyone-teams-secrets", // pragma: allowlist secret
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                        "cookieSecret",           // pragma: allowlist secret
-				"appSettings.volumes[0].name":                                                     "plugins-vol-ro",
-				"appSettings.volumes[0].persistentVolumeClaim.claimName":                          "pvc-leg-sp-" + suffix,
-				"appSettings.volumes[0].persistentVolumeClaim.readOnly":                           "true",
-				"appSettings.volumeMounts[0].name":                                                "plugins-vol-ro",
-				"appSettings.volumeMounts[0].mountPath":                                           "/opt/plugins",
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                              "legacy",
-				"casSettings.env.CAS_DATABASE_NAME":                                               "cas-leg-sp-" + suffix,
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                       "fiftyone-teams-secrets", // pragma: allowlist secret
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                        "cookieSecret",           // pragma: allowlist secret
-				"delegatedOperatorExecutorSettings.enabled":                                       "true",
-				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
-				"delegatedOperatorExecutorSettings.replicaCount":                                  "1",
-				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
-				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
-				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                     "/opt/plugins",
-				"delegatedOperatorExecutorSettings.volumeMounts[0].name":                          "plugins-vol-ro",
-				"delegatedOperatorExecutorSettings.volumes[0].name":                               "plugins-vol-ro",
-				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName":    "pvc-leg-sp-" + suffix,
-				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":     "true",
-				"secret.fiftyone.fiftyoneDatabaseName":                                            "fiftyone-leg-sp-" + suffix,
-				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                  "fiftyone-teams-secrets", // pragma: allowlist secret
-				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                   "cookieSecret",           // pragma: allowlist secret
+				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                                           "/opt/plugins",
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                      "fiftyone-teams-secrets", // pragma: allowlist secret
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                       "cookieSecret",           // pragma: allowlist secret
+				"apiSettings.volumes[0].name":                                                                    "plugins-vol",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                                         "pvc-leg-sp-" + suffix,
+				"apiSettings.volumeMounts[0].name":                                                               "plugins-vol",
+				"apiSettings.volumeMounts[0].mountPath":                                                          "/opt/plugins",
+				"appSettings.env.FIFTYONE_PLUGINS_DIR":                                                           "/opt/plugins",
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                      "fiftyone-teams-secrets", // pragma: allowlist secret
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                       "cookieSecret",           // pragma: allowlist secret
+				"appSettings.volumes[0].name":                                                                    "plugins-vol-ro",
+				"appSettings.volumes[0].persistentVolumeClaim.claimName":                                         "pvc-leg-sp-" + suffix,
+				"appSettings.volumes[0].persistentVolumeClaim.readOnly":                                          "true",
+				"appSettings.volumeMounts[0].name":                                                               "plugins-vol-ro",
+				"appSettings.volumeMounts[0].mountPath":                                                          "/opt/plugins",
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                                             "legacy",
+				"casSettings.env.CAS_DATABASE_NAME":                                                              "cas-leg-sp-" + suffix,
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                      "fiftyone-teams-secrets", // pragma: allowlist secret
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                       "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDo.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDo.replicaCount":                                  "1",
+				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].mountPath":                     "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].name":                          "plugins-vol-ro",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].name":                               "plugins-vol-ro",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].persistentVolumeClaim.claimName":    "pvc-leg-sp-" + suffix,
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].persistentVolumeClaim.readOnly":     "true",
+				"secret.fiftyone.fiftyoneDatabaseName":                                                           "fiftyone-leg-sp-" + suffix,
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                 "fiftyone-teams-secrets", // pragma: allowlist secret
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                  "cookieSecret",           // pragma: allowlist secret
 			},
 			[]serviceValidations{
 				{
@@ -189,41 +188,40 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
-				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                            "/opt/plugins",
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                       "fiftyone-teams-secrets", // pragma: allowlist secret
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                        "cookieSecret",           // pragma: allowlist secret
-				"apiSettings.volumes[0].name":                                                     "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                          "pv-fiftyone-leg-dp-" + suffix,
-				"apiSettings.volumeMounts[0].name":                                                "plugins-vol",
-				"apiSettings.volumeMounts[0].mountPath":                                           "/opt/plugins",
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                       "fiftyone-teams-secrets", // pragma: allowlist secret
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                        "cookieSecret",           // pragma: allowlist secret
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                              "legacy",
-				"casSettings.env.CAS_DATABASE_NAME":                                               "cas-leg-dp-" + suffix,
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                       "fiftyone-teams-secrets", // pragma: allowlist secret
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                        "cookieSecret",           // pragma: allowlist secret
-				"delegatedOperatorExecutorSettings.enabled":                                       "true",
-				"delegatedOperatorExecutorSettings.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
-				"delegatedOperatorExecutorSettings.replicaCount":                                  "1",
-				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
-				"delegatedOperatorExecutorSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
-				"delegatedOperatorExecutorSettings.volumeMounts[0].mountPath":                     "/opt/plugins",
-				"delegatedOperatorExecutorSettings.volumeMounts[0].name":                          "plugins-vol-ro",
-				"delegatedOperatorExecutorSettings.volumes[0].name":                               "plugins-vol-ro",
-				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.claimName":    "pv-fiftyone-leg-dp-" + suffix,
-				"delegatedOperatorExecutorSettings.volumes[0].persistentVolumeClaim.readOnly":     "true",
-				"pluginsSettings.enabled":                                                         "true",
-				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                                        "/opt/plugins",
-				"pluginsSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                   "fiftyone-teams-secrets", // pragma: allowlist secret
-				"pluginsSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                    "cookieSecret",           // pragma: allowlist secret
-				"pluginsSettings.volumes[0].name":                                                 "plugins-vol-ro",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName":                      "pv-fiftyone-leg-dp-" + suffix,
-				"pluginsSettings.volumeås[0].persistentVolumeClaim.readOnly":                      "true",
-				"pluginsSettings.volumeMounts[0].name":                                            "plugins-vol-ro",
-				"pluginsSettings.volumeMounts[0].mountPath":                                       "/opt/plugins",
-				"secret.fiftyone.fiftyoneDatabaseName":                                            "fiftyone-leg-dp-" + suffix,
-				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                  "fiftyone-teams-secrets", // pragma: allowlist secret
-				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                   "cookieSecret",           // pragma: allowlist secret
+				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                                           "/opt/plugins",
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                      "fiftyone-teams-secrets", // pragma: allowlist secret
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                       "cookieSecret",           // pragma: allowlist secret
+				"apiSettings.volumes[0].name":                                                                    "plugins-vol",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                                         "pv-fiftyone-leg-dp-" + suffix,
+				"apiSettings.volumeMounts[0].name":                                                               "plugins-vol",
+				"apiSettings.volumeMounts[0].mountPath":                                                          "/opt/plugins",
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                      "fiftyone-teams-secrets", // pragma: allowlist secret
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                       "cookieSecret",           // pragma: allowlist secret
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                                             "legacy",
+				"casSettings.env.CAS_DATABASE_NAME":                                                              "cas-leg-dp-" + suffix,
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                      "fiftyone-teams-secrets", // pragma: allowlist secret
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                       "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDo.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDo.replicaCount":                                  "1",
+				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].mountPath":                     "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].name":                          "plugins-vol-ro",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].name":                               "plugins-vol-ro",
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].persistentVolumeClaim.claimName":    "pv-fiftyone-leg-dp-" + suffix,
+				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].persistentVolumeClaim.readOnly":     "true",
+				"pluginsSettings.enabled":                                                                        "true",
+				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                                                       "/opt/plugins",
+				"pluginsSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                  "fiftyone-teams-secrets", // pragma: allowlist secret
+				"pluginsSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                   "cookieSecret",           // pragma: allowlist secret
+				"pluginsSettings.volumes[0].name":                                                                "plugins-vol-ro",
+				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName":                                     "pv-fiftyone-leg-dp-" + suffix,
+				"pluginsSettings.volumeås[0].persistentVolumeClaim.readOnly":                                     "true",
+				"pluginsSettings.volumeMounts[0].name":                                                           "plugins-vol-ro",
+				"pluginsSettings.volumeMounts[0].mountPath":                                                      "/opt/plugins",
+				"secret.fiftyone.fiftyoneDatabaseName":                                                           "fiftyone-leg-dp-" + suffix,
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                 "fiftyone-teams-secrets", // pragma: allowlist secret
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                  "cookieSecret",           // pragma: allowlist secret
 			},
 			[]serviceValidations{
 				{

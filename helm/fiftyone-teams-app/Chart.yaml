@@ -3,10 +3,10 @@ apiVersion: v2
 name: fiftyone-teams-app
 namespace: fiftyone-teams
 description: |
-  FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
-  The FiftyoneTeams Helm chart is the recommended way to install and configure FiftyoneTeams on Kubernetes.
+  FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
+  The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
 type: application
-version: 2.6.2
-appVersion: "v2.6.2"
+version: 2.7.0
+appVersion: "v2.7.0"
 icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
 kubeVersion: ">=1.18-0"

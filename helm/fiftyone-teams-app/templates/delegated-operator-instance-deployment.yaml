@@ -1,0 +1,128 @@
+{{- template "fiftyone-teams-app.teams-do-deprecation-validation" . }}
+{{- $baseTpl := .Values.delegatedOperatorDeployments.template }}
+{{- range $k, $v := .Values.delegatedOperatorDeployments.deployments }}
+{{- $name := kebabcase $k }}
+{{- $labelContext := (merge (dict "name" $name) $) }}
+{{-
+  $envContext := (
+    dict "secretName" $.Values.secret.name
+    "apiServiceName" $.Values.apiSettings.service.name
+    "apiServicePort" (float64 $.Values.apiSettings.service.port)
+    "env" (merge (dict) ($v.env | default dict) ($baseTpl.env))
+    "secretEnv" (merge (dict) ($v.secretEnv | default dict) ($baseTpl.secretEnv))
+  )
+}}
+{{- $defaultDescription := printf "Long running operations delegated to %s" $name }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.namespace.name }}
+  labels:
+    {{- include "delegated-operator-deployments.labels" $labelContext | nindent 4 }}
+spec:
+  replicas: {{ $v.replicaCount | default $baseTpl.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 6 }}
+  template:
+    metadata:
+      {{- with (merge (dict) ($v.podAnnotations|default dict) ($baseTpl.podAnnotations)) }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 8 }}
+        {{- with (merge (dict) ($v.labels | default dict) ($baseTpl.labels)) }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml (merge (dict) ($v.podSecurityContext | default dict) ($baseTpl.podSecurityContext)) | nindent 8 }}
+      containers:
+        - name: {{ $name }}
+          command: ["fiftyone"]
+          args:
+            - delegated
+            - launch
+            - -t
+            - remote
+            - -n
+            - {{ $name }}
+            {{- if ($v.description | default $defaultDescription) }}
+            - -d
+            - {{ ($v.description | default $defaultDescription) | quote }}
+            {{- end }}
+          securityContext:
+            {{- toYaml (merge (dict) ($v.securityContext | default dict) ($baseTpl.securityContext)) | nindent 12 }}
+          image: "{{ ($v.image).repository | default $baseTpl.image.repository }}:{{ ($v.image).tag | default $baseTpl.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ ($v.image).pullPolicy | default $baseTpl.image.pullPolicy }}
+          env:
+            {{- include "delegated-operator-deployments.env-vars-list" $envContext | indent 12 }}
+          resources:
+            {{- toYaml (merge (dict) ($v.resources | default dict) ($baseTpl.resources)) | nindent 12 }}
+          {{- with $v.volumeMounts | default $baseTpl.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o liveness
+            failureThreshold: {{ ($v.liveness).failureThreshold | default $baseTpl.liveness.failureThreshold  }}
+            periodSeconds: {{ ($v.liveness).periodSeconds | default $baseTpl.liveness.periodSeconds }}
+            timeoutSeconds: {{ ($v.liveness).timeoutSeconds | default $baseTpl.liveness.timeoutSeconds }}
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o readiness
+            failureThreshold: {{ ($v.readiness).failureThreshold | default $baseTpl.readiness.failureThreshold }}
+            periodSeconds: {{ ($v.readiness).periodSeconds | default $baseTpl.readiness.periodSeconds }}
+            timeoutSeconds: {{ ($v.readiness).timeoutSeconds | default $baseTpl.readiness.timeoutSeconds }}
+          startupProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - fiftyone delegated list --limit 1 -o startup
+            failureThreshold: {{ ($v.startup).failureThreshold | default $baseTpl.startup.failureThreshold }}
+            periodSeconds: {{ ($v.startup).periodSeconds | default $baseTpl.startup.periodSeconds }}
+            timeoutSeconds: {{ ($v.startup).timeoutSeconds | default $baseTpl.startup.timeoutSeconds }}
+      {{- with (merge (dict) ($v.nodeSelector | default dict) ($baseTpl.nodeSelector)) }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (merge (dict) ($v.affinity | default dict) ($baseTpl.affinity)) }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $v.tolerations | default $baseTpl.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if ($v.topologySpreadConstraints | default $baseTpl.topologySpreadConstraints) }}
+      topologySpreadConstraints:
+        {{-
+          include "fiftyone-teams-app.commonTopologySpreadConstraints"
+          (
+            dict "constraints" ($v.topologySpreadConstraints | default $baseTpl.topologySpreadConstraints)
+            "selectorLabels" "delegated-operator-deployments.selectorLabels"
+            "context" $labelContext
+          ) | nindent 8
+        }}
+      {{- end }}
+      {{- with $v.volumes | default $baseTpl.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+{{- end }}
