@@ -100,40 +100,40 @@ of the two ways below:
 
 1. The template (applies to all instances):
 
-```yaml
-delegatedOperatorDeployments:
-  template:
-    env:
-      FIFTYONE_PLUGINS_DIR: /opt/plugins
-    volumes:
-      - name: plugins-vol
-        persistentVolumeClaim:
-          claimName: plugins-pvc
-          readOnly: true
-    volumeMounts:
-      - name: plugins-vol
-        mountPath: /opt/plugins
-  deployments:
-    teamsDo: {}
-```
+    ```yaml
+    delegatedOperatorDeployments:
+      template:
+        env:
+          FIFTYONE_PLUGINS_DIR: /opt/plugins
+        volumes:
+          - name: plugins-vol
+            persistentVolumeClaim:
+              claimName: plugins-pvc
+              readOnly: true
+        volumeMounts:
+          - name: plugins-vol
+            mountPath: /opt/plugins
+      deployments:
+        teamsDo: {}
+    ```
 
 1. Or, per instance:
 
-```yaml
-delegatedOperatorDeployments:
-  deployments:
-    teamsDo:
-      env:
-        FIFTYONE_PLUGINS_DIR: /opt/plugins
-      volumes:
-        - name: plugins-vol
-          persistentVolumeClaim:
-            claimName: plugins-pvc
-            readOnly: true
-      volumeMounts:
-        - name: plugins-vol
-          mountPath: /opt/plugins
-```
+    ```yaml
+    delegatedOperatorDeployments:
+      deployments:
+        teamsDo:
+          env:
+            FIFTYONE_PLUGINS_DIR: /opt/plugins
+          volumes:
+            - name: plugins-vol
+              persistentVolumeClaim:
+                claimName: plugins-pvc
+                readOnly: true
+          volumeMounts:
+            - name: plugins-vol
+              mountPath: /opt/plugins
+    ```
 
 See
 [Adding Shared Storage for FiftyOne Enterprise Plugins](./plugins-storage.md)
@@ -149,22 +149,22 @@ In `values.yaml`, set `FIFTYONE_DELEGATED_OPERATION_LOG_PATH` in either:
 
 1. The template (applies to all instances):
 
-  ```yaml
-  delegatedOperatorDeployments:
-    template:
-      env:
-        FIFTYONE_DELEGATED_OPERATION_LOG_PATH: /your/path/
-  ```
+    ```yaml
+    delegatedOperatorDeployments:
+      template:
+        env:
+          FIFTYONE_DELEGATED_OPERATION_LOG_PATH: /your/path/
+    ```
 
 1. Or, per instance:
 
-  ```yaml
-  delegatedOperatorDeployments:
-    deployments:
-      teamsDo:
-        env:
-          FIFTYONE_DELEGATED_OPERATION_LOG_PATH: /your/path
-  ```
+    ```yaml
+    delegatedOperatorDeployments:
+      deployments:
+        teamsDo:
+          env:
+            FIFTYONE_DELEGATED_OPERATION_LOG_PATH: /your/path
+    ```
 
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](../../docs/custom-plugins.md).
