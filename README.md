@@ -15,40 +15,47 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.6.2](https://img.shields.io/badge/Version-2.6.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.6.2](https://img.shields.io/badge/AppVersion-v2.6.2-informational?style=flat-square)
+![Version: 2.7.0](https://img.shields.io/badge/Version-2.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.7.0](https://img.shields.io/badge/AppVersion-v2.7.0-informational?style=flat-square)
 
-FiftyOne Teams is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
-The FiftyoneTeams Helm chart is the recommended way to install and configure FiftyoneTeams on Kubernetes.
+FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
+The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
 
 <!-- markdownlint-enable line-length -->
 
-This page assumes general knowledge of Fiftyone Teams and how to use it.
-Please contact Voxel51 for more information regarding Fiftyone Teams.
+This page assumes general knowledge of FiftyOne Enterprise and how to use it.
+Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
 ### Version 2.0+ License File Requirement
 
-FiftyOne Teams v2.0 introduces a new requirement for a license file.
+FiftyOne Enterprise v2.0 introduces a new requirement for a license file.
 This license file should be obtained from your Customer Success Team
-before upgrading to FiftyOne Teams 2.0 or beyond.
+before upgrading to FiftyOne Enterprise 2.0 or beyond.
 
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-before-fiftyone-teams-version-110)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
 for steps on how to add your license file.
 
 ### Version 2.2+ Delegated Operator Changes
 
-FiftyOne Teams v2.2 introduces some changes to delegated operators.
+FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-teams-version-213)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.5+ Delegated Operator Changes
 
-FiftyOne Teams v2.5 introduces some changes to delegated operators.
+FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-teams-v25-delegated-operator-changes)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.7+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ## Table of Contents
@@ -63,13 +70,17 @@ for steps on how to upgrade your delegated operators.
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
-  - [FiftyOne Teams Authenticated API](#fiftyone-teams-authenticated-api)
+  - [FiftyOne Enterprise Authenticated API](#fiftyone-enterprise-authenticated-api)
+  - [GPU Enabled Workloads](#gpu-enabled-workloads)
+  - [Highly Available FiftyOne `teams-api` Deployments](#highly-available-fiftyone-teams-api-deployments)
   - [Plugins](#plugins)
   - [Proxies](#proxies)
   - [Snapshot Archival](#snapshot-archival)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Static Banner Configuration](#static-banner-configuration)
+  - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
   - [Text Similarity](#text-similarity)
+- [Validating](#validating)
 - [Values](#values)
   - [Deploying On GKE](#deploying-on-gke)
 
@@ -101,9 +112,9 @@ for steps on installing helm.
 
 ## Usage
 
-FiftyOne Teams v2.0 introduces a new requirement for a license file.  This
+FiftyOne Enterprise v2.0 introduces a new requirement for a license file.  This
 license file should be obtained from your Customer Success Team before
-upgrading to FiftyOne Teams 2.0 or beyond.
+upgrading to FiftyOne Enterprise 2.0 or beyond.
 
 The license file now contains all of the Auth0 configuration that was
 previously provided through kubernetes secrets; you may remove those secrets
@@ -119,13 +130,18 @@ kubectl --namespace your-namespace-here create secret generic fiftyone-license \
 --from-file=license=./your-license-file
 ```
 
-> **NOTE**
-> To ensure that the new license values take effect
-> immediately, you may need to restart the `teams-cas` and `teams-api` services.
-> You can do this by deleting the pods, or by running the following command:
-> `kubectl rollout restart deploy -n your-namespace teams-cas teams-api`
+> **NOTE**: To ensure that the new license values take effect
+> immediately, you must to restart the `teams-cas` and `teams-api` services.
+> You may delete the pods, or run
+>
+> ```shell
+> kubectl rollout restart deploy \
+>   -n your-namespace \
+>   teams-cas \
+>   teams-api
+> ```
 
-We publish the following FiftyOne Teams private images to Docker Hub:
+We publish the following FiftyOne Enterprise private images to Docker Hub:
 
 - `voxel51/fiftyone-app`
 - `voxel51/fiftyone-app-gpt`
@@ -148,7 +164,7 @@ kubectl --namespace your-namespace-here create secret generic \
   --type kubernetes.io/dockerconfigjson
 ```
 
-To use the Helm chart, add the Fiftyone helm repository and
+To use the Helm chart, add the FiftyOne helm repository and
 check that you have access to the chart:
 
 ```shell
@@ -156,7 +172,7 @@ helm repo add voxel51 https://helm.fiftyone.ai
 helm repo update voxel51
 ```
 
-Finally, edit your `values.yaml` file and install FiftyOne Teams:
+Finally, edit your `values.yaml` file and install FiftyOne Enterprise:
 
 ```shell
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
@@ -197,8 +213,8 @@ When performing an upgrade, please review
 
 ### Builtin Delegated Operator Orchestrator
 
-FiftyOne Teams v2.2 introduces a builtin orchestrator to run
-[Delegated Operations](https://docs.voxel51.com/teams/teams_plugins.html#delegated-operations),
+FiftyOne Enterprise v2.2 introduces a builtin orchestrator to run
+[Delegated Operations](https://docs.voxel51.com/enterprise/enterprise_plugins.html#delegated-operations),
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
 For configuring your delegated operators, see
@@ -206,10 +222,10 @@ For configuring your delegated operators, see
 
 ### Central Authentication Service
 
-FiftyOne Teams v1.6 introduces the Central Authentication Service (CAS).
+FiftyOne Enterprise v1.6 introduces the Central Authentication Service (CAS).
 CAS requires additional configurations and consumes additional resources.
 Please review these notes, and the
-[Pluggable Authentication](https://docs.voxel51.com/teams/pluggable_auth.html)
+[Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 documentation before completing your upgrade.
 
 Voxel51 recommends upgrading your deployment using
@@ -238,19 +254,39 @@ to include the rule (add it before the `path: /` rule)
   servicePort: 80
 ```
 
-### FiftyOne Teams Authenticated API
+### FiftyOne Enterprise Authenticated API
 
-FiftyOne Teams v1.3 introduced the capability to connect FiftyOne Teams SDKs
-through the FiftyOne Teams API (instead of direct MongoDB connection).
+FiftyOne Enterprise v1.3 introduced the capability to connect FiftyOne
+Enterprise SDKs through the FiftyOne Enterprise API (instead of direct
+MongoDB connection).
 
-To enable the FiftyOne Teams Authenticated API,
-[expose the FiftyOne Teams API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
+To enable the FiftyOne Enterprise Authenticated API,
+[expose the FiftyOne Enterprise API endpoint](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md)
 and
-[configure your SDK](https://docs.voxel51.com/teams/api_connection.html).
+[configure your SDK](https://docs.voxel51.com/enterprise/api_connection.html).
+
+### GPU Enabled Workloads
+
+FiftyOne services can be scheduled on GPU-enabled hardware for more efficient
+computation.
+
+To schedule pods on GPU-enabled hardware, see the
+[configuring GPU workloads documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-gpu-workloads.md).
+
+### Highly Available FiftyOne `teams-api` Deployments
+
+FiftyOne Enterprise v2.7 introduced support for running multiple `teams-api`
+pods for high availability [HA].
+
+Running multiple `teams-api` pods requires a read-write volume available to all
+of the pods in the `teams-api` deployment to synchronize the API cache.
+
+For configuring HA FiftyOne `teams-api` deployments see
+[Configuring Highly Available FiftyOne `teams-api` Deployments](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configure-ha-teams-api.md)
 
 ### Plugins
 
-FiftyOne Teams v1.3 introduced significant enhancements for
+FiftyOne Enterprise v1.3 introduced significant enhancements for
 [Plugins](https://docs.voxel51.com/plugins/index.html)
 to customize and enhance functionality.
 
@@ -258,7 +294,7 @@ There are three modes for plugins
 
 1. Builtin Plugins Only
     - This is the default mode
-    - Users may only run the builtin plugins shipped with Fiftyone Teams
+    - Users may only run the builtin plugins shipped with FiftyOne Enterprise
     - Cannot run custom plugins
 1. Shared Plugins
     - Users may run builtin and custom plugins
@@ -273,25 +309,25 @@ There are three modes for plugins
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
 
-To use the FiftyOne Teams UI to deploy plugins,
+To use the FiftyOne Enterprise UI to deploy plugins,
 navigate to `https://<DEPLOY_URL>/settings/plugins`.
 Early-adopter plugins installed manually must
-be redeployed using the FiftyOne Teams UI.
+be redeployed using the FiftyOne Enterprise UI.
 
 For configuring your plugins, see
 [Configuring Plugins](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-plugins.md).
 
 ### Proxies
 
-FiftyOne Teams supports routing traffic through proxy servers.
+FiftyOne Enterprise supports routing traffic through proxy servers.
 Please refer to the
 [proxy configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md)
 for information on how to configure proxies.
 
 ### Snapshot Archival
 
-Since version v1.5, FiftyOne Teams supports
-[archiving snapshots](https://docs.voxel51.com/teams/dataset_versioning.html#snapshot-archival)
+Since version v1.5, FiftyOne Enterprise supports
+[archiving snapshots](https://docs.voxel51.com/enterprise/dataset_versioning.html#snapshot-archival)
 to cold storage locations to prevent filling up the MongoDB database.
 Supported locations are network mounted filesystems and cloud storage folders.
 
@@ -323,19 +359,19 @@ If the key is lost, you will need to
     1. Replace the encryption key
     1. Add the storage credentials via the UI again.
 
-Users with `Admin` permissions may use the FiftyOne Teams UI to manage storage
+Users with `Admin` permissions may use the FiftyOne Enterprise UI to manage storage
 credentials by navigating to `https://<DEPOY_URL>/settings/cloud_storage_credentials`.
 
 If added via the UI, storage credentials no longer need to be
 mounted into pods or provided via environment variables.
 
-FiftyOne Teams continues to support the use of environment variables to set
+FiftyOne Enterprise continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
 
 ### Static Banner Configuration
 
-Fiftyone Teams v2.6 introduces the ability to add a static banner to the
+FiftyOne Enterprise v2.6 introduces the ability to add a static banner to the
 application.
 
 Banner text is configured with
@@ -364,9 +400,34 @@ teamsAppSettings:
     FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
 ```
 
+### Terms of Service, Privacy, and Imprint URLs
+
+FiftyOne Enterprise v2.6 introduces the ability to override the Terms of
+Service, Privacy, and Imprint (optional) links if required in the App.
+
+Configure the URLs by setting the following environment variables in
+your `values.yaml`.
+
+Terms of Service URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_TERMS_URL`.
+
+Privacy URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_PRIVACY_URL`.
+
+Imprint/Impressum URL is configured with
+`teamsAppSettings.env.FIFTYONE_APP_IMPRINT_URL`
+
+```yaml
+teamsAppSettings:
+  env:
+    FIFTYONE_APP_TERMS_URL: "https://abc.com/tos"
+    FIFTYONE_APP_PRIVACY_URL: "https://abc.com/privacy"
+    FIFTYONE_APP_IMPRINT_URL: "https://abc.com/imprint"
+```
+
 ### Text Similarity
 
-Since version v1.2, FiftyOne Teams supports using text similarity
+Since version v1.2, FiftyOne Enterprise supports using text similarity
 searches for images that are indexed with a model that
 [supports text queries](https://docs.voxel51.com/user_guide/brain.html#brain-similarity-text).
 Use the Voxel51 provided image `fiftyone-app-torch` or
@@ -382,6 +443,12 @@ appSettings:
     repository: voxel51/fiftyone-app-torch
 ```
 
+## Validating
+
+After deploying FiftyOne Enterprise and configuring authentication, please
+follow
+[validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -389,7 +456,7 @@ appSettings:
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-api. [Reference][affinity]. |
 | apiSettings.dnsName | string | `""` | Controls whether teams-api is added to the chart's ingress. When an empty string, a rule for teams-api is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. |
 | apiSettings.env.FIFTYONE_ENV | string | `"production"` | Controls FiftyOne GraphQL verbosity. When "production", debug mode is disabled and the default logging level is "INFO". When "development", debug mode is enabled and the default logging level is "DEBUG". Can be overridden by setting `apiSettings.env.LOGGING_LEVEL`. |
-| apiSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
+| apiSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | apiSettings.env.GRAPHQL_DEFAULT_LIMIT | int | `10` | Default number of returned items when listing in GraphQL queries. Can be overridden in the request. |
 | apiSettings.env.LOGGING_LEVEL | string | `"INFO"` | Logging level. Overrides the value of `FIFTYONE_ENV`. Can be one of "DEBUG", "INFO", "WARN", "ERROR", or "CRITICAL". |
 | apiSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
@@ -425,7 +492,7 @@ appSettings:
 | appSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for fiftyone-app. |
 | appSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for fiftyone-app. |
 | appSettings.env.FIFTYONE_DATABASE_ADMIN | bool | `false` | Controls whether the client is allowed to trigger database migrations. [Reference][fiftyone-config]. |
-| appSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
+| appSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | appSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
 | appSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne App processes. The default value is 32 GiB. `-1` is disabled. |
 | appSettings.env.FIFTYONE_SIGNED_URL_EXPIRATION | int | `24` | Set the time-to-live for signed URLs generated by the application in hours |
@@ -490,10 +557,41 @@ appSettings:
 | casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-cas deployment. [Reference][topology-spread-constraints]. |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
+| delegatedOperatorDeployments.deployments | object | `{}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
+| delegatedOperatorDeployments.template | object | `{"affinity":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
+| delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
+| delegatedOperatorDeployments.template.description | string | `""` | A description for the delegated operator instance. This is unused in the template context. Each operator should either set their own description or, optionally, use the default. If unset at the operator context, it will be defaulted to `Long running operations delegated to $name` where `$name` is the name of the Deployment object. |
+| delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
+| delegatedOperatorDeployments.template.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
+| delegatedOperatorDeployments.template.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
+| delegatedOperatorDeployments.template.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
+| delegatedOperatorDeployments.template.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for delegated-operator-executor. |
+| delegatedOperatorDeployments.template.image.tag | string | `""` | Image tag for delegated-operator-executor. Defaults to the chart version. |
+| delegatedOperatorDeployments.template.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
+| delegatedOperatorDeployments.template.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.nodeSelector | object | `{}` | nodeSelector for delegated-operator-executor. [Reference][node-selector]. |
+| delegatedOperatorDeployments.template.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
+| delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context]. |
+| delegatedOperatorDeployments.template.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for delegated-operator-executor. [Reference][container-security-context]. |
+| delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
+| delegatedOperatorDeployments.template.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
+| delegatedOperatorDeployments.template.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
+| delegatedOperatorDeployments.template.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
+| delegatedOperatorDeployments.template.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-do deployment(s). [Reference][topology-spread-constraints]. |
+| delegatedOperatorDeployments.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
+| delegatedOperatorDeployments.template.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
 | delegatedOperatorExecutorSettings.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
 | delegatedOperatorExecutorSettings.enabled | bool | `false` | Controls whether to create a dedicated "teams-do" deployment. Disabled by default, meaning delegated operations will not be executed without an external executor system. |
-| delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
-| delegatedOperatorExecutorSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
+| delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
+| delegatedOperatorExecutorSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | delegatedOperatorExecutorSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
 | delegatedOperatorExecutorSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for delegated-operator-executor. |
@@ -518,9 +616,10 @@ appSettings:
 | delegatedOperatorExecutorSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for teams-do. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the teams-do. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
+| delegatedOperatorExecutorSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-do deployment. [Reference][topology-spread-constraints]. |
 | delegatedOperatorExecutorSettings.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
-| fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Teams Licenses (one per org) |
+| fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
@@ -547,7 +646,7 @@ appSettings:
 | pluginsSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for teams-plugins. |
 | pluginsSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for teams-plugins. |
 | pluginsSettings.enabled | bool | `false` | Controls whether to create a dedicated "teams-plugins" deployment. |
-| pluginsSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Teams, set to `true`. |
+| pluginsSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Plugins processes. The default value is 32 GiB. `-1` is disabled. |
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
@@ -581,7 +680,7 @@ appSettings:
 | secret.fiftyone.cookieSecret | string | `""` | A randomly generated string for cookie encryption. To generate, run `openssl rand -hex 32`. |
 | secret.fiftyone.encryptionKey | string | `""` | Encryption key for storage credentials. [Reference][fiftyone-encryption-key]. |
 | secret.fiftyone.fiftyoneAuthSecret | string | `""` | A randomly generated string for CAS Authentication. This can be any string you care to use generated by any mechanism you   prefer. This is used for inter-service authentication and for the SuperUser to  authenticate at the CAS UI to configure the Central Authentication Service. |
-| secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Teams. |
+| secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Enterprise. |
 | secret.fiftyone.mongodbConnectionString | string | `""` | MongoDB Connection String. [Reference][mongodb-connection-string]. |
 | secret.name | string | `"fiftyone-teams-secrets"` | Name of the secret (existing or to be created) in the namespace `namespace.name`. |
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
@@ -596,13 +695,13 @@ appSettings:
 | teamsAppSettings.dnsName | string | `""` | DNS Name for the teams-app service. Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`) |
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
-| teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the teams application. Set to false to opt-out of anonymous analytics. |
+| teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off. |
-| teamsAppSettings.env.FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled for the teams application. Set to false to disable Query Performance mode for entire application. |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.6.2"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application. |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.7.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
-| teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Teams API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
+| teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
 | teamsAppSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy]. |
 | teamsAppSettings.image.repository | string | `"voxel51/fiftyone-teams-app"` | Container image for teams-app. |
 | teamsAppSettings.image.tag | string | `""` | Image tag for teams-app. Defaults to the chart version. |
@@ -633,7 +732,7 @@ appSettings:
 
 ### Deploying On GKE
 
-Voxel51 FiftyOne Teams supports
+Voxel51 FiftyOne Enterprise supports
 [Workload Identity Federation for GKE][about-wif]
 when installing via Helm into Google Kubernetes Engine (GKE).
 Workload Identity is achieved using service account annotations
@@ -669,9 +768,9 @@ serviceAccount:
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
 [init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-[internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
+[internal-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-[legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
+[legacy-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#legacy-mode
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
@@ -684,5 +783,5 @@ serviceAccount:
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#storage-credentials-and-fiftyone_encryption_key
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/#storage-credentials-and-fiftyone_encryption_key
 [fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
