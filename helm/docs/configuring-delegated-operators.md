@@ -16,7 +16,7 @@
 
 <!-- toc -->
 
-- [v2.8.0+](#v270)
+- [v2.8.0+](#v280)
 - [Using `delegatedOperatorDeployments`](#using-delegatedoperatordeployments)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
@@ -25,7 +25,7 @@
     - [List Merges](#list-merges)
 - [Migrating from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeployments`](#migrating-from-delegatedoperatorexecutorsettings-to-delegatedoperatordeployments)
   - [Example](#example)
-- [Prior to v2.8.0](#prior-to-v270)
+- [Prior to v2.8.0](#prior-to-v280)
 
 <!-- tocstop -->
 
