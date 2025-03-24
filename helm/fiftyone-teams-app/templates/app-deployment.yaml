@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: {{ include "fiftyone-app.name" . }}
   namespace: {{ .Values.namespace.name }}
+  {{- with .Values.appSettings.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{- include "fiftyone-app.labels" . | nindent 4 }}
 spec:

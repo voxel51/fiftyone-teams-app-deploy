@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: {{ include "teams-app.name" . }}
   namespace: {{ .Values.namespace.name }}
+  {{- with .Values.teamsAppSettings.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{- include "teams-app.labels" . | nindent 4 }}
 spec:

@@ -6,6 +6,8 @@ apiSettings:
   # When not an empty string, becomes the value to the `host` in the ingress' rule and
   # set `ingress.api` too.
   dnsName: ""
+  # -- Annotations for the teams-api `Deployment`. [Reference][annotations].
+  deploymentAnnotations: {}
   # Environment Variables are passed to the teams-api containers
   env:
     # -- Controls FiftyOne GraphQL verbosity.
@@ -118,6 +120,8 @@ appSettings:
     targetCPUUtilizationPercentage: 80
     # -- Percent memory utilization for autoscaling for fiftyone-app.
     targetMemoryUtilizationPercentage: 80
+  # -- Annotations for the fiftyone-app `Deployment`. [Reference][annotations].
+  deploymentAnnotations: {}
   # Environment Variables are passed to the fiftyone-app containers
   env:
     # -- Controls whether the client is allowed to trigger database migrations.
@@ -228,6 +232,8 @@ appSettings:
 
 # Central Authentication Service (teams-cas) configurations
 casSettings:
+  # -- Annotations for the teams-cas `Deployment`. [Reference][annotations].
+  deploymentAnnotations: {}
   # -- Allow ADMINs to invite users by email
   # NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal`
   enable_invitations: true
@@ -339,6 +345,8 @@ casSettings:
 # Deprecated: Please refer to delegatedOperatorInstances below.
 # FiftyOne Enterprise Delegated Operator Executor (teams-do) configurations.
 delegatedOperatorExecutorSettings:
+  # -- Annotations for the teams-do `Deployment`. [Reference][annotations].
+  deploymentAnnotations: {}
   # -- Controls whether to create a dedicated "teams-do" deployment. Disabled
   # by default, meaning delegated operations will not be executed without an
   # external executor system.
@@ -465,7 +473,8 @@ delegatedOperatorDeployments:
     # `Long running operations delegated to $name` where `$name` is the name
     # of the Deployment object.
     description: ""
-
+    # -- Annotations for the teams-do `Deployment`. [Reference][annotations].
+    deploymentAnnotations: {}
     # -- Secret variables to be passed to the delegated-operator-executor containers.
     secretEnv: {}
     #   ENV_VAR_NAME:
@@ -628,6 +637,8 @@ namespace:
 
 # FiftyOne Enterprise Plugins (teams-plugins) configurations. [Reference][fiftyone-plugins].
 pluginsSettings:
+  # -- Annotations for the teams-plugins `Deployment`. [Reference][annotations].
+  deploymentAnnotations: {}
   # -- Controls whether to create a dedicated "teams-plugins" deployment.
   enabled: false
   # [Reference][autoscaling].
@@ -790,6 +801,8 @@ teamsAppSettings:
   # -- DNS Name for the teams-app service.
   # Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`)
   dnsName: ""
+  # -- Annotations for the teams-app `Deployment`. [Reference][annotations].
+  deploymentAnnotations: {}
   # Environment Variables are passed to the teams-app containers.
   env:
     # -- Controls the protocol of the teams-app. Configure your ingress to match.

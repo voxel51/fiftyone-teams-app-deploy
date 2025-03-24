@@ -1696,6 +1696,53 @@ func (s *deploymentAppTemplateTest) TestNodeSelector() {
 	}
 }
 
+func (s *deploymentAppTemplateTest) TestDeploymentAnnotations() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected map[string]string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"overrideDeploymentAnnotations",
+			map[string]string{
+				"appSettings.deploymentAnnotations.annotation-1": "annotation-1-value",
+			},
+			map[string]string{
+				"annotation-1": "annotation-1-value",
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			if testCase.expected == nil {
+				s.Nil(deployment.ObjectMeta.Annotations, "Annotations should be nil")
+			} else {
+				for key, value := range testCase.expected {
+					foundValue := deployment.ObjectMeta.Annotations[key]
+					s.Equal(value, foundValue, "Annotations should contain all set annotations.")
+				}
+			}
+		})
+	}
+}
+
 func (s *deploymentAppTemplateTest) TestPodAnnotations() {
 	testCases := []struct {
 		name     string
