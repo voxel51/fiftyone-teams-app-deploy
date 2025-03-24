@@ -46,14 +46,14 @@ and update your deployment accordingly.
 
 #### FiftyOne Enterprise v2.7+ Delegated Operator Changes
 
-FiftyOne Enterprise v2.8.0 changes the `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
+FiftyOne Enterprise v2.7.0 changes the `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
 environment variable to `FIFTYONE_DELEGATED_OPERATION_LOG_PATH`.
 Please note that this change is backwards compatible, but should
 be changed in your manifests moving forward.
 
 #### FiftyOne Enterprise v2.5+ Delegated Operator Changes
 
-FiftyOne Enterprise v2.8.0 changes the base image of the built-in delegated
+FiftyOne Enterprise v2.5.0 changes the base image of the built-in delegated
 operators (`teams-do`) from `voxel51/fiftyone-app` to `voxel51/fiftyone-teams-cv-full`.
 The `voxel51/fiftyone-teams-cv-full` image includes all of the dependencies
 required to run complex workflows out of the box.

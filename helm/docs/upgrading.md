@@ -85,7 +85,7 @@ A minimal example `values.yaml` may be found
 
 #### FiftyOne Enterprise v2.7+ Delegated Operator Changes
 
-FiftyOne Enterprise v2.8.0 introduces numerous changes to delegated operators.
+FiftyOne Enterprise v2.7.0 introduces numerous changes to delegated operators.
 
 1. The `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH`
    environment variable has been changed to to
@@ -101,7 +101,7 @@ FiftyOne Enterprise v2.8.0 introduces numerous changes to delegated operators.
 
 #### FiftyOne Enterprise v2.5+ Delegated Operator Changes
 
-FiftyOne Enterprise v2.8.0 changes the base image of the built-in delegated
+FiftyOne Enterprise v2.5.0 changes the base image of the built-in delegated
 operators (`teams-do`) from `voxel51/fiftyone-app` to `voxel51/fiftyone-teams-cv-full`.
 The `voxel51/fiftyone-teams-cv-full` image includes all of the dependencies
 required to run complex workflows out of the box.

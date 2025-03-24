@@ -16,7 +16,7 @@
 
 <!-- toc -->
 
-- [v2.8.0+](#v280)
+- [v2.7.0+](#v270)
 - [Using `delegatedOperatorDeployments`](#using-delegatedoperatordeployments)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
@@ -29,9 +29,9 @@
 
 <!-- tocstop -->
 
-## v2.8.0+
+## v2.7.0+
 
-As of version 2.8.0, `delegatedOperatorExecutorSettings`
+As of version 2.7.0, `delegatedOperatorExecutorSettings`
 has been deprecated in favor of `delegatedOperatorDeployments`.
 `delegatedOperatorExecutorSettings` has been marked for deletion
 for versions released after May 31st, 2025.
