@@ -16,7 +16,7 @@
 
 <!-- toc -->
 
-- [v2.7.0+](#v270)
+- [v2.8.0+](#v270)
 - [Using `delegatedOperatorDeployments`](#using-delegatedoperatordeployments)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
@@ -25,13 +25,13 @@
     - [List Merges](#list-merges)
 - [Migrating from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeployments`](#migrating-from-delegatedoperatorexecutorsettings-to-delegatedoperatordeployments)
   - [Example](#example)
-- [Prior to v2.7.0](#prior-to-v270)
+- [Prior to v2.8.0](#prior-to-v270)
 
 <!-- tocstop -->
 
-## v2.7.0+
+## v2.8.0+
 
-As of version 2.7.0, `delegatedOperatorExecutorSettings`
+As of version 2.8.0, `delegatedOperatorExecutorSettings`
 has been deprecated in favor of `delegatedOperatorDeployments`.
 `delegatedOperatorExecutorSettings` has been marked for deletion
 for versions released after May 31st, 2025.
@@ -337,7 +337,7 @@ delegatedOperatorDeployments:
           emptyDir: {}
 ```
 
-## Prior to v2.7.0
+## Prior to v2.8.0
 
 This option can be added to any of the three existing
 [plugin modes](./confuring-plugins.md).

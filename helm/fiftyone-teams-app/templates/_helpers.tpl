@@ -110,7 +110,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Delegated Operator Executor Selector labels
 
-TODO: Deprecated in v2.7.0. Remove as part
+TODO: Deprecated in v2.8.0. Remove as part
 of a future release after deprecation is
 finished.
 */}}
@@ -131,7 +131,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Delegated Operator Executor Combined labels
 
-TODO: Deprecated in v2.7.0. Remove as part
+TODO: Deprecated in v2.8.0. Remove as part
 of a future release after deprecation is
 finished.
 */}}
@@ -312,7 +312,7 @@ Common Init Containers
 {{/*
 Create a merged list of environment variables for delegated-operator-executor
 
-TODO: Deprecated in v2.7.0. Remove as part
+TODO: Deprecated in v2.8.0. Remove as part
 of a future release after deprecation is
 finished.
 */}}
