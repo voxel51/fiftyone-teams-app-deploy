@@ -1,14 +1,14 @@
 ---
-# FiftyOne Enterprise API (teams-api)
+# FiftyOne Enterprise API (`teams-api`)
 apiSettings:
-  # -- Controls whether teams-api is added to the chart's ingress.
-  # When an empty string, a rule for teams-api is not added to the chart managed ingress.
+  # -- Controls whether `teams-api` is added to the chart's ingress.
+  # When an empty string, a rule for `teams-api` is not added to the chart managed ingress.
   # When not an empty string, becomes the value to the `host` in the ingress' rule and
   # set `ingress.api` too.
   dnsName: ""
-  # -- Annotations for the teams-api `Deployment`. [Reference][annotations].
+  # -- Annotations for the `teams-api` deployment. [Reference][annotations].
   deploymentAnnotations: {}
-  # Environment Variables are passed to the teams-api containers
+  # Environment Variables are passed to the `teams-api` containers
   env:
     # -- Controls FiftyOne GraphQL verbosity.
     # When "production", debug mode is disabled and the default logging level is "INFO".
@@ -26,7 +26,7 @@ apiSettings:
     # Can be one of "DEBUG", "INFO", "WARN", "ERROR", or "CRITICAL".
     LOGGING_LEVEL: INFO
 
-  # -- Secret variables to be passed to the teams-api containers.
+  # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
   #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
@@ -36,9 +36,9 @@ apiSettings:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
-    # -- Container image for the teams-api.
+    # -- Container image for the `teams-api`.
     repository: voxel51/fiftyone-teams-api
-    # -- Image tag for teams-api. Defaults to the chart version.
+    # -- Image tag for `teams-api`. Defaults to the chart version.
     tag: ""
   # -- Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors].
   labels: {}
@@ -47,7 +47,7 @@ apiSettings:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # -- Container resource requests and limits for teams-api. [Reference][resources].
+  # -- Container resource requests and limits for `teams-api`. [Reference][resources].
   resources:
     limits: {}
     #   cpu: 2
@@ -56,73 +56,73 @@ apiSettings:
     #   cpu: 500m
     #   memory: 512Mi
   service:
-    # -- Service annotations for teams-api. [Reference][annotations].
+    # -- Service annotations for `teams-api`. [Reference][annotations].
     annotations: {}
-    # -- Service container port for teams-api.
+    # -- Service container port for `teams-api`.
     containerPort: 8000
     # -- Service name.
     name: teams-api
-    # -- (int) Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api.
+    # -- (int) Service nodePort set only when `apiSettings.service.type: NodePort` for `teams-api`.
     nodePort:
-    # -- Service port for teams-api.
+    # -- Service port for `teams-api`.
     port: 80
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # TODO: Alex - Default should include protocol in the name per kubernetes standards.
-    # -- Port name (maximum length is 15 characters) for teams-api. [Reference][ports].
+    # -- Port name (maximum length is 15 characters) for `teams-api`. [Reference][ports].
     shortname: teams-api
     startup:
-      # -- Number of times to retry the startup probe for the teams-api. [Reference][probes].
+      # -- Number of times to retry the startup probe for the `teams-api`. [Reference][probes].
       failureThreshold: 5
-      # -- How often (in seconds) to perform the startup probe for teams-api. [Reference][probes].
+      # -- How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes].
       periodSeconds: 15
-    # -- Service type for teams-api. [Reference][service-type].
+    # -- Service type for `teams-api`. [Reference][service-type].
     type: ClusterIP
 
-  # -- Affinity and anti-affinity for teams-api. [Reference][affinity].
+  # -- Affinity and anti-affinity for `teams-api`. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for teams-api. [Reference][init-containers].
+    # -- Whether to enable init containers for `teams-api`. [Reference][init-containers].
     enabled: true
     image:
-      # -- Init container images repositories for teams-api. [Reference][init-containers].
+      # -- Init container images repositories for `teams-api`. [Reference][init-containers].
       repository: docker.io/busybox
-      # -- Init container images tags for teams-api. [Reference][init-containers].
+      # -- Init container images tags for `teams-api`. [Reference][init-containers].
       tag: stable-glibc
-  # -- nodeSelector for teams-api. [Reference][node-selector].
+  # -- nodeSelector for `teams-api`. [Reference][node-selector].
   nodeSelector: {}
-  # -- Annotations for pods for teams-api. [Reference][annotations].
+  # -- Annotations for pods for `teams-api`. [Reference][annotations].
   podAnnotations: {}
-  # -- Pod-level security attributes and common container settings for teams-api. [Reference][security-context].
+  # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext``
-  # -- Container security configuration for teams-api. [Reference][container-security-context].
+  # -- Container security configuration for `teams-api`. [Reference][container-security-context].
   securityContext: {}
-  # -- Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations].
+  # -- Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # Label selectors will be defaulted to those of the teams-api deployment. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
-  # -- Volume mounts for teams-api. [Reference][volumes].
+  # -- Volume mounts for `teams-api`. [Reference][volumes].
   volumeMounts: []
-  # -- Volumes for teams-api. [Reference][volumes].
+  # -- Volumes for `teams-api`. [Reference][volumes].
   volumes: []
 
-# FiftyOne App (fiftyone-app) configurations
+# FiftyOne App (`fiftyone-app`) configurations
 appSettings:
   autoscaling:
-    # -- Controls horizontal pod autoscaling for fiftyone-app. [Reference][autoscaling].
+    # -- Controls horizontal pod autoscaling for `fiftyone-app`. [Reference][autoscaling].
     enabled: false
-    # -- Maximum replicas for horizontal pod autoscaling for fiftyone-app.
+    # -- Maximum replicas for horizontal pod autoscaling for `fiftyone-app`.
     maxReplicas: 20
-    # -- Minimum Replicas for horizontal pod autoscaling for fiftyone-app.
+    # -- Minimum Replicas for horizontal pod autoscaling for `fiftyone-app`.
     minReplicas: 2
-    # -- Percent CPU utilization for autoscaling for fiftyone-app.
+    # -- Percent CPU utilization for autoscaling for `fiftyone-app`.
     targetCPUUtilizationPercentage: 80
-    # -- Percent memory utilization for autoscaling for fiftyone-app.
+    # -- Percent memory utilization for autoscaling for `fiftyone-app`.
     targetMemoryUtilizationPercentage: 80
-  # -- Annotations for the fiftyone-app `Deployment`. [Reference][annotations].
+  # -- Annotations for the `fiftyone-app` deployment. [Reference][annotations].
   deploymentAnnotations: {}
-  # Environment Variables are passed to the fiftyone-app containers
+  # Environment Variables are passed to the `fiftyone-app` containers
   env:
     # -- Controls whether the client is allowed to trigger database migrations.
     # [Reference][fiftyone-config].
@@ -146,7 +146,7 @@ appSettings:
     # GOOGLE_APPLICATION_CREDENTIALS=/opt/secrets/google/service-account
     # MINIO_CONFIG_FILE=/opt/secrets/minio/minio-credentials-file
 
-  # -- Secret variables to be passed to the fiftyone-app containers.
+  # -- Secret variables to be passed to the `fiftyone-app` containers.
   secretEnv: {}
   #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
@@ -156,13 +156,13 @@ appSettings:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
-    # -- Container image for fiftyone-app.
+    # -- Container image for `fiftyone-app`.
     repository: voxel51/fiftyone-app
-    # -- Image tag for fiftyone-app. Defaults to the chart version.
+    # -- Image tag for `fiftyone-app`. Defaults to the chart version.
     tag: ""
   # -- Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors].
   labels: {}
-  # -- Number of pods in the fiftyone-app deployment's ReplicaSet.
+  # -- Number of pods in the `fiftyone-app` deployment's ReplicaSet.
   # Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
@@ -170,7 +170,7 @@ appSettings:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # -- Container resource requests and limits for fiftyone-app. [Reference][resources].
+  # -- Container resource requests and limits for `fiftyone-app`. [Reference][resources].
   resources:
     limits: {}
     #   cpu: 2
@@ -179,65 +179,65 @@ appSettings:
     #   cpu: 500m
     #   memory: 512Mi
   service:
-    # -- Service annotations for fiftyone-app. [Reference][annotations].
+    # -- Service annotations for `fiftyone-app`. [Reference][annotations].
     annotations: {}
-    # -- Service container port for fiftyone-app.
+    # -- Service container port for `fiftyone-app`.
     containerPort: 5151
     # -- Service name.
     name: fiftyone-app
-    # -- (int) Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app.
+    # -- (int) Service nodePort set only when `appSettings.service.type: NodePort` for `fiftyone-app`.
     nodePort:
     # -- Service port.
     port: 80
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # TODO: Alex - Default should include protocol in the name per kubernetes standards.
-    # -- Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports].
+    # -- Port name (maximum length is 15 characters) for `fiftyone-app`. [Reference][ports].
     shortname: fiftyone-app
     startup:
-      # -- Number of times to retry the startup probe for the fiftyone-app. [Reference][probes].
+      # -- Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes].
       failureThreshold: 5
-      # -- How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes].
+      # -- How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes].
       periodSeconds: 15
-    # -- Service type for fiftyone-app. [Reference][service-type].
+    # -- Service type for `fiftyone-app`. [Reference][service-type].
     type: ClusterIP
 
-  # -- Affinity and anti-affinity for fiftyone-app. [Reference][affinity].
+  # -- Affinity and anti-affinity for `fiftyone-app`. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for fiftyone-app. [Reference][init-containers].
+    # -- Whether to enable init containers for `fiftyone-app`. [Reference][init-containers].
     enabled: true
     image:
-      # -- Init container images repositories for fiftyone-app. [Reference][init-containers].
+      # -- Init container images repositories for `fiftyone-app`. [Reference][init-containers].
       repository: docker.io/busybox
-      # -- Init container images tags for fiftyone-app. [Reference][init-containers].
+      # -- Init container images tags for `fiftyone-app`. [Reference][init-containers].
       tag: stable-glibc
-  # -- nodeSelector for fiftyone-app. [Reference][node-selector].
+  # -- nodeSelector for `fiftyone-app`. [Reference][node-selector].
   nodeSelector: {}
-  # -- Annotations for pods for fiftyone-app. [Reference][annotations].
+  # -- Annotations for pods for `fiftyone-app`. [Reference][annotations].
   podAnnotations: {}
-  # -- Pod-level security attributes and common container settings for fiftyone-app. [Reference][security-context].
+  # -- Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
-  # -- Container security configuration for fiftyone-app. [Reference][container-security-context].
+  # -- Container security configuration for `fiftyone-app`. [Reference][container-security-context].
   securityContext: {}
-  # -- Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations].
+  # -- Allow the k8s scheduler to schedule `fiftyone-app` pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # Label selectors will be defaulted to those of the fiftyone-app deployment. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the `fiftyone-app` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
-  # -- Volume mounts for fiftyone-app. [Reference][volumes].
+  # -- Volume mounts for `fiftyone-app`. [Reference][volumes].
   volumeMounts: []
-  # -- Volumes for fiftyone-app. [Reference][volumes].
+  # -- Volumes for `fiftyone-app`. [Reference][volumes].
   volumes: []
 
-# Central Authentication Service (teams-cas) configurations
+# Central Authentication Service (`teams-cas`) configurations
 casSettings:
-  # -- Annotations for the teams-cas `Deployment`. [Reference][annotations].
+  # -- Annotations for the `teams-cas` deployment. [Reference][annotations].
   deploymentAnnotations: {}
   # -- Allow ADMINs to invite users by email
   # NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal`
   enable_invitations: true
-  # Environment Variables are passed to the teams-cas containers
+  # Environment Variables are passed to the `teams-cas` containers
   env:
     # -- Provide the name for the CAS database.
     # When multiple deployments use the same database instance,
@@ -259,7 +259,7 @@ casSettings:
     # One of `legacy` or `internal`
     FIFTYONE_AUTH_MODE: legacy
 
-  # -- Secret variables to be passed to the teams-cas containers.
+  # -- Secret variables to be passed to the `teams-cas` containers.
   secretEnv: {}
   #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
@@ -269,20 +269,20 @@ casSettings:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
-    # -- Container image for teams-cas.
+    # -- Container image for `teams-cas`.
     repository: voxel51/fiftyone-teams-cas
-    # -- Image tag for teams-cas. Defaults to the chart version.
+    # -- Image tag for `teams-cas`. Defaults to the chart version.
     tag: ""
   # -- Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors].
   labels: {}
-  # -- Number of pods in the teams-cas deployment's ReplicaSet. [Reference][deployment].
+  # -- Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].
   replicaCount: 2
 
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # -- Container resource requests and limits for teams-cas. [Reference][resources].
+  # -- Container resource requests and limits for `teams-cas`. [Reference][resources].
   resources:
     limits: {}
     #   cpu: 2
@@ -291,63 +291,63 @@ casSettings:
     #   cpu: 500m
     #   memory: 512Mi
   service:
-    # -- Service annotations for teams-cas. [Reference][annotations].
+    # -- Service annotations for `teams-cas`. [Reference][annotations].
     annotations: {}
-    # -- Service container port for teams-cas.
+    # -- Service container port for `teams-cas`.
     containerPort: 3000
     # -- Service name.
     name: teams-cas
-    # -- (int) Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas.
+    # -- (int) Service nodePort set only when `casSettings.service.type: NodePort` for `teams-cas`.
     nodePort:
     # -- Service port.
     port: 80
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # TODO: Alex - Default should include protocol in the name per kubernetes standards.
-    # -- Port name (maximum length is 15 characters) for teams-cas. [Reference][ports].
+    # -- Port name (maximum length is 15 characters) for `teams-cas`. [Reference][ports].
     shortname: teams-cas
     startup:
-      # -- Number of times to retry the startup probe for the teams-cas. [Reference][probes].
+      # -- Number of times to retry the startup probe for the `teams-cas`. [Reference][probes].
       failureThreshold: 5
-      # -- How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes].
+      # -- How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes].
       periodSeconds: 15
-    # -- Service type for teams-cas. [Reference][service-type].
+    # -- Service type for `teams-cas`. [Reference][service-type].
     type: ClusterIP
 
-  # -- Affinity and anti-affinity for teams-cas. [Reference][affinity].
+  # -- Affinity and anti-affinity for `teams-cas`. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for teams-cas. [Reference][init-containers].
+    # -- Whether to enable init containers for `teams-cas`. [Reference][init-containers].
     enabled: true
     image:
-      # -- Init container images repositories for teams-cas. [Reference][init-containers].
+      # -- Init container images repositories for `teams-cas`. [Reference][init-containers].
       repository: docker.io/busybox
-      # -- Init container images tags for teams-cas. [Reference][init-containers].
+      # -- Init container images tags for `teams-cas`. [Reference][init-containers].
       tag: stable-glibc
-  # -- nodeSelector for teams-cas. [Reference][node-selector].
+  # -- nodeSelector for `teams-cas`. [Reference][node-selector].
   nodeSelector: {}
-  # -- Annotations for pods for teams-cas. [Reference][annotations].
+  # -- Annotations for pods for `teams-cas`. [Reference][annotations].
   podAnnotations: {}
-  # -- Pod-level security attributes and common container settings for teams-cas. [Reference][security-context].
+  # -- Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
-  # -- Container security configuration for teams-cas. [Reference][container-security-context].
+  # -- Container security configuration for `teams-cas`. [Reference][container-security-context].
   securityContext: {}
-  # -- Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations].
+  # -- Allow the k8s scheduler to schedule `teams-cas` pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # Label selectors will be defaulted to those of the teams-cas deployment. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the `teams-cas` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
-  # -- Volume mounts for teams-cas. [Reference][volumes].
+  # -- Volume mounts for `teams-cas`. [Reference][volumes].
   volumeMounts: []
-  # -- Volumes for teams-cas. [Reference][volumes].
+  # -- Volumes for `teams-cas`. [Reference][volumes].
   volumes: []
 
 # Deprecated: Please refer to delegatedOperatorInstances below.
 # FiftyOne Enterprise Delegated Operator Executor (teams-do) configurations.
 delegatedOperatorExecutorSettings:
-  # -- Annotations for the teams-do `Deployment`. [Reference][annotations].
+  # -- Annotations for the `teams-do` deployment. [Reference][annotations].
   deploymentAnnotations: {}
-  # -- Controls whether to create a dedicated "teams-do" deployment. Disabled
+  # -- Controls whether to create a dedicated `teams-do` deployment. Disabled
   # by default, meaning delegated operations will not be executed without an
   # external executor system.
   enabled: false
@@ -384,11 +384,11 @@ delegatedOperatorExecutorSettings:
   # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
   labels: {}
   liveness:
-    # -- Number of times to retry the liveness probe for the teams-do. [Reference][probes].
+    # -- Number of times to retry the liveness probe for the `teams-do`. [Reference][probes].
     failureThreshold: 5
-    # -- How often (in seconds) to perform the liveness probe for teams-do. [Reference][probes].
+    # -- How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes].
     periodSeconds: 30
-    # -- Timeout for the liveness probe for the teams-do. [Reference][probes].
+    # -- Timeout for the liveness probe for the `teams-do`. [Reference][probes].
     timeoutSeconds: 30
   # -- Number of pods in the delegated-operator-executor deployment's ReplicaSet.
   # This should not exceed the value set in the deployment's license file for
@@ -421,24 +421,24 @@ delegatedOperatorExecutorSettings:
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
   # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
   readiness:
-    # -- Number of times to retry the readiness probe for the teams-do. [Reference][probes].
+    # -- Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].
     failureThreshold: 5
-    # -- How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes].
+    # -- How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes].
     periodSeconds: 30
-    # -- Timeout for the readiness probe for the teams-do. [Reference][probes].
+    # -- Timeout for the readiness probe for the `teams-do`. [Reference][probes].
     timeoutSeconds: 30
   securityContext: {}
   startup:
-    # -- Number of times to retry the startup probe for the teams-do. [Reference][probes].
+    # -- Number of times to retry the startup probe for the `teams-do`. [Reference][probes].
     failureThreshold: 5
-    # -- How often (in seconds) to perform the startup probe for teams-do. [Reference][probes].
+    # -- How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes].
     periodSeconds: 30
-    # -- Timeout for the startup probe for the teams-do. [Reference][probes].
+    # -- Timeout for the startup probe for the `teams-do`. [Reference][probes].
     timeoutSeconds: 30
   # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # Label selectors will be defaulted to those of the teams-do deployment. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the `teams-do` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
   # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
   volumeMounts: []
@@ -473,7 +473,7 @@ delegatedOperatorDeployments:
     # `Long running operations delegated to $name` where `$name` is the name
     # of the Deployment object.
     description: ""
-    # -- Annotations for the teams-do `Deployment`. [Reference][annotations].
+    # -- Annotations for the `teams-do` deployment. [Reference][annotations].
     deploymentAnnotations: {}
     # -- Secret variables to be passed to the delegated-operator-executor containers.
     secretEnv: {}
@@ -492,11 +492,11 @@ delegatedOperatorDeployments:
     # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
     labels: {}
     liveness:
-      # -- Number of times to retry the liveness probe for the teams-do. [Reference][probes].
+      # -- Number of times to retry the liveness probe for the `teams-do`. [Reference][probes].
       failureThreshold: 5
-      # -- How often (in seconds) to perform the liveness probe for teams-do. [Reference][probes].
+      # -- How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes].
       periodSeconds: 30
-      # -- Timeout for the liveness probe for the teams-do. [Reference][probes].
+      # -- Timeout for the liveness probe for the `teams-do`. [Reference][probes].
       timeoutSeconds: 30
     # -- Number of pods in the delegated-operator-executor deployment's ReplicaSet.
     # This should not exceed the value set in the deployment's license file for
@@ -527,22 +527,22 @@ delegatedOperatorDeployments:
     # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
     # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
     readiness:
-      # -- Number of times to retry the readiness probe for the teams-do. [Reference][probes].
+      # -- Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].
       failureThreshold: 5
-      # -- How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes].
+      # -- How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes].
       periodSeconds: 30
-      # -- Timeout for the readiness probe for the teams-do. [Reference][probes].
+      # -- Timeout for the readiness probe for the `teams-do`. [Reference][probes].
       timeoutSeconds: 30
     securityContext: {}
     startup:
-      # -- Number of times to retry the startup probe for the teams-do. [Reference][probes].
+      # -- Number of times to retry the startup probe for the `teams-do`. [Reference][probes].
       failureThreshold: 5
-      # -- How often (in seconds) to perform the startup probe for teams-do. [Reference][probes].
+      # -- How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes].
       periodSeconds: 30
-      # -- Timeout for the startup probe for the teams-do. [Reference][probes].
+      # -- Timeout for the startup probe for the `teams-do`. [Reference][probes].
       timeoutSeconds: 30
     # -- Control how Pods are spread across your distributed footprint.
-    # Label selectors will be defaulted to those of the teams-do deployment(s). [Reference][topology-spread-constraints].
+    # Label selectors will be defaulted to those of the `teams-do` deployment(s). [Reference][topology-spread-constraints].
     topologySpreadConstraints: []
     # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
     tolerations: []
@@ -623,7 +623,7 @@ ingress:
   # -- Controls whether the chart managed ingress contains a `spec.tls` stanza.
   tlsEnabled: true
 
-  # -- Name of secret containing TLS certificate for teams-app.
+  # -- Name of secret containing TLS certificate for `teams-app`.
   # Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`.
   # When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`.
   tlsSecretName: fiftyone-teams-tls-secret
@@ -637,23 +637,23 @@ namespace:
 
 # FiftyOne Enterprise Plugins (teams-plugins) configurations. [Reference][fiftyone-plugins].
 pluginsSettings:
-  # -- Annotations for the teams-plugins `Deployment`. [Reference][annotations].
+  # -- Annotations for the `teams-plugins` deployment. [Reference][annotations].
   deploymentAnnotations: {}
-  # -- Controls whether to create a dedicated "teams-plugins" deployment.
+  # -- Controls whether to create a dedicated `teams-plugins` deployment.
   enabled: false
   # [Reference][autoscaling].
   autoscaling:
-    # -- Controls horizontal pod autoscaling for teams-plugins. [Reference][autoscaling].
+    # -- Controls horizontal pod autoscaling for `teams-plugins`. [Reference][autoscaling].
     enabled: false
-    # -- Maximum replicas for horizontal pod autoscaling for teams-plugins.
+    # -- Maximum replicas for horizontal pod autoscaling for `teams-plugins`.
     maxReplicas: 20
-    # -- Minimum Replicas for horizontal pod autoscaling for teams-plugins.
+    # -- Minimum Replicas for horizontal pod autoscaling for `teams-plugins`.
     minReplicas: 2
-    # -- Percent CPU utilization for autoscaling for teams-plugins.
+    # -- Percent CPU utilization for autoscaling for `teams-plugins`.
     targetCPUUtilizationPercentage: 80
-    # -- Percent memory utilization for autoscaling for teams-plugins.
+    # -- Percent memory utilization for autoscaling for `teams-plugins`.
     targetMemoryUtilizationPercentage: 80
-  # Environment Variables are passed to the teams-plugins containers.
+  # Environment Variables are passed to the `teams-plugins` containers.
   env:
     # -- Controls whether cloud media images will be downloaded and added to
     # the local cache upon viewing media in the app.
@@ -667,7 +667,7 @@ pluginsSettings:
     # When running in FiftyOne Enterprise, set to `true`.
     FIFTYONE_INTERNAL_SERVICE: true
 
-  # -- Secret variables to be passed to the teams-plugins containers.
+  # -- Secret variables to be passed to the `teams-plugins` containers.
   secretEnv: {}
   #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
@@ -677,13 +677,13 @@ pluginsSettings:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
-    # -- Container image for teams-plugins.
+    # -- Container image for `teams-plugins`.
     repository: voxel51/fiftyone-app
-    # -- Image tag for teams-plugins. Defaults to the chart version.
+    # -- Image tag for `teams-plugins`. Defaults to the chart version.
     tag: ""
   # -- Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors].
   labels: {}
-  # -- Number of pods in the teams-plugins deployment's ReplicaSet.
+  # -- Number of pods in the `teams-plugins` deployment's ReplicaSet.
   # Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
@@ -691,7 +691,7 @@ pluginsSettings:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # -- Container resource requests and limits for teams-plugins. [Reference][resources].
+  # -- Container resource requests and limits for `teams-plugins`. [Reference][resources].
   resources:
     limits: {}
     #   cpu: 2
@@ -700,55 +700,55 @@ pluginsSettings:
     #   cpu: 500m
     #   memory: 1Gi
   service:
-    # -- Service annotations for teams-plugins. [Reference][annotations].
+    # -- Service annotations for `teams-plugins`. [Reference][annotations].
     annotations: {}
-    # -- Service container port for teams-plugins.
+    # -- Service container port for `teams-plugins`.
     containerPort: 5151
     # -- Service name.
     name: teams-plugins
-    # -- (int) Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins.
+    # -- (int) Service nodePort set only when `pluginsSettings.service.type: NodePort` for `teams-plugins`.
     nodePort:
     # -- Service port.
     port: 80
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # TODO: Alex - Default should include protocol in the name per kubernetes standards.
-    # -- Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports].
+    # -- Port name (maximum length is 15 characters) for `teams-plugins`. [Reference][ports].
     shortname: teams-plugins
     startup:
-      # -- Number of times to retry the startup probe for the teams-plugins. [Reference][probes].
+      # -- Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes].
       failureThreshold: 5
-      # -- How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes].
+      # -- How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes].
       periodSeconds: 15
-    # -- Service type for teams-plugins. [Reference][service-type].
+    # -- Service type for `teams-plugins`. [Reference][service-type].
     type: ClusterIP
 
-  # -- Affinity and anti-affinity for teams-plugins. [Reference][affinity].
+  # -- Affinity and anti-affinity for `teams-plugins`. [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for teams-plugins. [Reference][init-containers].
+    # -- Whether to enable init containers for `teams-plugins`. [Reference][init-containers].
     enabled: true
     image:
-      # -- Init container images repositories for teams-plugins. [Reference][init-containers].
+      # -- Init container images repositories for `teams-plugins`. [Reference][init-containers].
       repository: docker.io/busybox
-      # -- Init container images tags for teams-plugins. [Reference][init-containers].
+      # -- Init container images tags for `teams-plugins`. [Reference][init-containers].
       tag: stable-glibc
-  # -- nodeSelector for teams-plugins. [Reference][node-selector].
+  # -- nodeSelector for `teams-plugins`. [Reference][node-selector].
   nodeSelector: {}
-  # -- Annotations for teams-plugins pods. [Reference][annotations].
+  # -- Annotations for `teams-plugins` pods. [Reference][annotations].
   podAnnotations: {}
-  # -- Pod-level security attributes and common container settings for teams-plugins. [Reference][security-context].
+  # -- Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
-  # -- Container security configuration for teams-plugins. [Reference][container-security-context].
+  # -- Container security configuration for `teams-plugins`. [Reference][container-security-context].
   securityContext: {}
-  # -- Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations].
+  # -- Allow the k8s scheduler to schedule `teams-plugins` pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # Label selectors will be defaulted to those of the teams-plugins deployment. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the `teams-plugins` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
-  # -- Volume mounts for teams-plugins pods. [Reference][volumes].
+  # -- Volume mounts for `teams-plugins` pods. [Reference][volumes].
   volumeMounts: []
-  # -- Volumes for teams-plugins. [Reference][volumes].
+  # -- Volumes for `teams-plugins`. [Reference][volumes].
   volumes: []
 
 secret:
@@ -787,25 +787,25 @@ serviceAccount:
 teamsAppSettings:
   # [Reference][autoscaling].
   autoscaling:
-    # -- Controls horizontal pod autoscaling for teams-app. [Reference][autoscaling].
+    # -- Controls horizontal pod autoscaling for `teams-app`.  [Reference][autoscaling].
     enabled: false
-    # -- Maximum Replicas for horizontal autoscaling for teams-app.
+    # -- Maximum Replicas for horizontal autoscaling for `teams-app`.
     maxReplicas: 5
-    # -- Minimum Replicas for horizontal autoscaling for teams-app.
+    # -- Minimum Replicas for horizontal autoscaling for `teams-app`.
     minReplicas: 2
-    # -- Percent CPU utilization for autoscaling for teams-app.
+    # -- Percent CPU utilization for autoscaling for `teams-app`.
     targetCPUUtilizationPercentage: 80
-    # -- Percent memory utilization for autoscaling for teams-app.
+    # -- Percent memory utilization for autoscaling for `teams-app`.
     targetMemoryUtilizationPercentage: 80
 
-  # -- DNS Name for the teams-app service.
+  # -- DNS Name for the `teams-app` service.
   # Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`)
   dnsName: ""
-  # -- Annotations for the teams-app `Deployment`. [Reference][annotations].
+  # -- Annotations for the `teams-app` `Deployment`. [Reference][annotations].
   deploymentAnnotations: {}
-  # Environment Variables are passed to the teams-app containers.
+  # Environment Variables are passed to the `teams-app` containers.
   env:
-    # -- Controls the protocol of the teams-app. Configure your ingress to match.
+    # -- Controls the protocol of the `teams-app`.  Configure your ingress to match.
     # When `true`, uses the https protocol.
     # When `false`, uses the http protocol.
     APP_USE_HTTPS: true
@@ -833,7 +833,7 @@ teamsAppSettings:
     # application. Set to false to disable Query Performance mode for entire application.
     FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE: true
 
-  # -- Secret variables to be passed to the teams-app containers.
+  # -- Secret variables to be passed to the `teams-app` containers.
   secretEnv: {}
   #   ENV_VAR_NAME:
   #     secretName: the-pre-existing-secret
@@ -843,9 +843,9 @@ teamsAppSettings:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy].
     pullPolicy: Always
-    # -- Container image for teams-app.
+    # -- Container image for `teams-app`.
     repository: voxel51/fiftyone-teams-app
-    # -- Image tag for teams-app. Defaults to the chart version.
+    # -- Image tag for `teams-app`.  Defaults to the chart version.
     tag: ""
   # -- Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors].
   labels: {}
@@ -856,7 +856,7 @@ teamsAppSettings:
   # uses the teamsAppSettings.dnsName
   fiftyoneApiOverride: ""
 
-  # -- Number of pods in the teams-app deployment's ReplicaSet.
+  # -- Number of pods in the `teams-app` deployment's ReplicaSet.
   # Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
@@ -864,7 +864,7 @@ teamsAppSettings:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # -- Container resource requests and limits for teams-app. [Reference][resources].
+  # -- Container resource requests and limits for `teams-app`.  [Reference][resources].
   resources:
     limits: {}
     #   cpu: 1
@@ -873,53 +873,53 @@ teamsAppSettings:
     #   cpu: 500m
     #   memory: 1Gi
   service:
-    # -- Service annotations for teams-app. [Reference][annotations].
+    # -- Service annotations for `teams-app`.  [Reference][annotations].
     annotations: {}
-    # -- Service container port for teams-app.
+    # -- Service container port for `teams-app`.
     containerPort: 3000
     # -- Service name.
     name: teams-app
-    # -- (int) Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app.
+    # -- (int) Service nodePort set only when `teamsAppSettings.service.type: NodePort` for `teams-app`.
     nodePort:
     # -- Service port.
     port: 80
     # TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.
     # TODO: Alex - Default should include protocol in the name per kubernetes standards.
-    # -- Port name (maximum length is 15 characters) for teams-app. [Reference][ports].
+    # -- Port name (maximum length is 15 characters) for `teams-app`.  [Reference][ports].
     shortname: teams-app
     startup:
-      # -- Number of times to retry the startup probe for the teams-app. [Reference][probes].
+      # -- Number of times to retry the startup probe for the `teams-app`.  [Reference][probes].
       failureThreshold: 5
-      # -- How often (in seconds) to perform the startup probe for teams-app. [Reference][probes].
+      # -- How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes].
       periodSeconds: 15
-    # -- Service type for teams-app. [Reference][service-type].
+    # -- Service type for `teams-app`.  [Reference][service-type].
     type: ClusterIP
 
-  # -- Affinity and anti-affinity for teams-app. [Reference][affinity].
+  # -- Affinity and anti-affinity for `teams-app`.  [Reference][affinity].
   affinity: {}
   initContainers:
-    # -- Whether to enable init containers for teams-app. [Reference][init-containers].
+    # -- Whether to enable init containers for `teams-app`.  [Reference][init-containers].
     enabled: true
     image:
-      # -- Init container images repositories for teams-app. [Reference][init-containers].
+      # -- Init container images repositories for `teams-app`.  [Reference][init-containers].
       repository: docker.io/busybox
-      # -- Init container images tags for teams-app. [Reference][init-containers].
+      # -- Init container images tags for `teams-app`.  [Reference][init-containers].
       tag: stable-glibc
-  # -- nodeSelector for teams-app. [Reference][node-selector].
+  # -- nodeSelector for `teams-app`.  [Reference][node-selector].
   nodeSelector: {}
-  # -- Annotations for teams-app pods. [Reference][annotations].
+  # -- Annotations for `teams-app` pods. [Reference][annotations].
   podAnnotations: {}
-  # -- Pod-level security attributes and common container settings for teams-app. [Reference][security-context].
+  # -- Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context].
   podSecurityContext: {}
   # TODO: Consider renaming `securityContext` to `containerSecurityContext`
-  # -- Container security configuration for teams-app. [Reference][container-security-context].
+  # -- Container security configuration for `teams-app`.  [Reference][container-security-context].
   securityContext: {}
-  # -- Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations].
+  # -- Allow the k8s scheduler to schedule `teams-app` pods with matching taints. [Reference][taints-and-tolerations].
   tolerations: []
   # -- Control how Pods are spread across your distributed footprint.
-  # Label selectors will be defaulted to those of the teams-app deployment. [Reference][topology-spread-constraints].
+  # Label selectors will be defaulted to those of the `teams-app` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
-  # -- Volume mounts for teams-app pods. [Reference][volumes].
+  # -- Volume mounts for `teams-app` pods. [Reference][volumes].
   volumeMounts: []
-  # -- Volumes for teams-app pods. [Reference][volumes].
+  # -- Volumes for `teams-app` pods. [Reference][volumes].
   volumes: []
