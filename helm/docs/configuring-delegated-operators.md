@@ -25,7 +25,7 @@
     - [List Merges](#list-merges)
 - [Migrating from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeployments`](#migrating-from-delegatedoperatorexecutorsettings-to-delegatedoperatordeployments)
   - [Example](#example)
-- [Prior to v2.8.0](#prior-to-v280)
+- [Prior to v2.7.0](#prior-to-v270)
 
 <!-- tocstop -->
 
@@ -337,7 +337,7 @@ delegatedOperatorDeployments:
           emptyDir: {}
 ```
 
-## Prior to v2.8.0
+## Prior to v2.7.0
 
 This option can be added to any of the three existing
 [plugin modes](./confuring-plugins.md).
