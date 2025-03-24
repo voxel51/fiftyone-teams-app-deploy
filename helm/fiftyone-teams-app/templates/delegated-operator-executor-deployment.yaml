@@ -4,6 +4,10 @@ kind: Deployment
 metadata:
   name: {{ include "delegated-operator-executor.name" . }}
   namespace: {{ .Values.namespace.name }}
+  {{- with .Values.delegatedOperatorExecutorSettings.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{- include "delegated-operator-executor.labels" . | nindent 4 }}
 spec:

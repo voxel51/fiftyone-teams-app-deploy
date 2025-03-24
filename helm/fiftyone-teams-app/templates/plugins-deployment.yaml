@@ -4,6 +4,10 @@ kind: Deployment
 metadata:
   name: {{ include "teams-plugins.name" . }}
   namespace: {{ .Values.namespace.name }}
+  {{- with .Values.pluginsSettings.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{- include "teams-plugins.labels" . | nindent 4 }}
 spec:

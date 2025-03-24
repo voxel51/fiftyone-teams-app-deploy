@@ -18,6 +18,10 @@ kind: Deployment
 metadata:
   name: {{ $name }}
   namespace: {{ $.Values.namespace.name }}
+  {{- with (merge (dict) ($v.deploymentAnnotations|default dict) ($baseTpl.deploymentAnnotations)) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{- include "delegated-operator-deployments.labels" $labelContext | nindent 4 }}
 spec:

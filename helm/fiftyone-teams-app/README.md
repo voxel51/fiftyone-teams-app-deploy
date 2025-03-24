@@ -453,77 +453,80 @@ follow
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| apiSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-api. [Reference][affinity]. |
-| apiSettings.dnsName | string | `""` | Controls whether teams-api is added to the chart's ingress. When an empty string, a rule for teams-api is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. |
+| apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
+| apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
+| apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. |
 | apiSettings.env.FIFTYONE_ENV | string | `"production"` | Controls FiftyOne GraphQL verbosity. When "production", debug mode is disabled and the default logging level is "INFO". When "development", debug mode is enabled and the default logging level is "DEBUG". Can be overridden by setting `apiSettings.env.LOGGING_LEVEL`. |
 | apiSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | apiSettings.env.GRAPHQL_DEFAULT_LIMIT | int | `10` | Default number of returned items when listing in GraphQL queries. Can be overridden in the request. |
 | apiSettings.env.LOGGING_LEVEL | string | `"INFO"` | Logging level. Overrides the value of `FIFTYONE_ENV`. Can be one of "DEBUG", "INFO", "WARN", "ERROR", or "CRITICAL". |
 | apiSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| apiSettings.image.repository | string | `"voxel51/fiftyone-teams-api"` | Container image for the teams-api. |
-| apiSettings.image.tag | string | `""` | Image tag for teams-api. Defaults to the chart version. |
-| apiSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-api. [Reference][init-containers]. |
-| apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-api. [Reference][init-containers]. |
-| apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-api. [Reference][init-containers]. |
+| apiSettings.image.repository | string | `"voxel51/fiftyone-teams-api"` | Container image for the `teams-api`. |
+| apiSettings.image.tag | string | `""` | Image tag for `teams-api`. Defaults to the chart version. |
+| apiSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-api`. [Reference][init-containers]. |
+| apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-api`. [Reference][init-containers]. |
+| apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-api`. [Reference][init-containers]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors]. |
-| apiSettings.nodeSelector | object | `{}` | nodeSelector for teams-api. [Reference][node-selector]. |
-| apiSettings.podAnnotations | object | `{}` | Annotations for pods for teams-api. [Reference][annotations]. |
-| apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-api. [Reference][security-context]. |
-| apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-api. [Reference][resources]. |
-| apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the teams-api containers. |
-| apiSettings.securityContext | object | `{}` | Container security configuration for teams-api. [Reference][container-security-context]. |
-| apiSettings.service.annotations | object | `{}` | Service annotations for teams-api. [Reference][annotations]. |
-| apiSettings.service.containerPort | int | `8000` | Service container port for teams-api. |
+| apiSettings.nodeSelector | object | `{}` | nodeSelector for `teams-api`. [Reference][node-selector]. |
+| apiSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-api`. [Reference][annotations]. |
+| apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
+| apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
+| apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-api` containers. |
+| apiSettings.securityContext | object | `{}` | Container security configuration for `teams-api`. [Reference][container-security-context]. |
+| apiSettings.service.annotations | object | `{}` | Service annotations for `teams-api`. [Reference][annotations]. |
+| apiSettings.service.containerPort | int | `8000` | Service container port for `teams-api`. |
 | apiSettings.service.name | string | `"teams-api"` | Service name. |
-| apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for teams-api. |
-| apiSettings.service.port | int | `80` | Service port for teams-api. |
-| apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for teams-api. [Reference][ports]. |
-| apiSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-api. [Reference][probes]. |
-| apiSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-api. [Reference][probes]. |
-| apiSettings.service.type | string | `"ClusterIP"` | Service type for teams-api. [Reference][service-type]. |
-| apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for teams-api. [Reference][taints-and-tolerations]. |
-| apiSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-api deployment. [Reference][topology-spread-constraints]. |
-| apiSettings.volumeMounts | list | `[]` | Volume mounts for teams-api. [Reference][volumes]. |
-| apiSettings.volumes | list | `[]` | Volumes for teams-api. [Reference][volumes]. |
-| appSettings.affinity | object | `{}` | Affinity and anti-affinity for fiftyone-app. [Reference][affinity]. |
-| appSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for fiftyone-app. [Reference][autoscaling]. |
-| appSettings.autoscaling.maxReplicas | int | `20` | Maximum replicas for horizontal pod autoscaling for fiftyone-app. |
-| appSettings.autoscaling.minReplicas | int | `2` | Minimum Replicas for horizontal pod autoscaling for fiftyone-app. |
-| appSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for fiftyone-app. |
-| appSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for fiftyone-app. |
+| apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for `teams-api`. |
+| apiSettings.service.port | int | `80` | Service port for `teams-api`. |
+| apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for `teams-api`. [Reference][ports]. |
+| apiSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-api`. [Reference][probes]. |
+| apiSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes]. |
+| apiSettings.service.type | string | `"ClusterIP"` | Service type for `teams-api`. [Reference][service-type]. |
+| apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations]. |
+| apiSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints]. |
+| apiSettings.volumeMounts | list | `[]` | Volume mounts for `teams-api`. [Reference][volumes]. |
+| apiSettings.volumes | list | `[]` | Volumes for `teams-api`. [Reference][volumes]. |
+| appSettings.affinity | object | `{}` | Affinity and anti-affinity for `fiftyone-app`. [Reference][affinity]. |
+| appSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for `fiftyone-app`. [Reference][autoscaling]. |
+| appSettings.autoscaling.maxReplicas | int | `20` | Maximum replicas for horizontal pod autoscaling for `fiftyone-app`. |
+| appSettings.autoscaling.minReplicas | int | `2` | Minimum Replicas for horizontal pod autoscaling for `fiftyone-app`. |
+| appSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for `fiftyone-app`. |
+| appSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for `fiftyone-app`. |
+| appSettings.deploymentAnnotations | object | `{}` | Annotations for the `fiftyone-app` deployment. [Reference][annotations]. |
 | appSettings.env.FIFTYONE_DATABASE_ADMIN | bool | `false` | Controls whether the client is allowed to trigger database migrations. [Reference][fiftyone-config]. |
 | appSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | appSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
 | appSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne App processes. The default value is 32 GiB. `-1` is disabled. |
 | appSettings.env.FIFTYONE_SIGNED_URL_EXPIRATION | int | `24` | Set the time-to-live for signed URLs generated by the application in hours |
 | appSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| appSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for fiftyone-app. |
-| appSettings.image.tag | string | `""` | Image tag for fiftyone-app. Defaults to the chart version. |
-| appSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for fiftyone-app. [Reference][init-containers]. |
-| appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for fiftyone-app. [Reference][init-containers]. |
-| appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for fiftyone-app. [Reference][init-containers]. |
+| appSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for `fiftyone-app`. |
+| appSettings.image.tag | string | `""` | Image tag for `fiftyone-app`. Defaults to the chart version. |
+| appSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `fiftyone-app`. [Reference][init-containers]. |
+| appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `fiftyone-app`. [Reference][init-containers]. |
+| appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors]. |
-| appSettings.nodeSelector | object | `{}` | nodeSelector for fiftyone-app. [Reference][node-selector]. |
-| appSettings.podAnnotations | object | `{}` | Annotations for pods for fiftyone-app. [Reference][annotations]. |
-| appSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for fiftyone-app. [Reference][security-context]. |
-| appSettings.replicaCount | int | `2` | Number of pods in the fiftyone-app deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
-| appSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for fiftyone-app. [Reference][resources]. |
-| appSettings.secretEnv | object | `{}` | Secret variables to be passed to the fiftyone-app containers. |
-| appSettings.securityContext | object | `{}` | Container security configuration for fiftyone-app. [Reference][container-security-context]. |
-| appSettings.service.annotations | object | `{}` | Service annotations for fiftyone-app. [Reference][annotations]. |
-| appSettings.service.containerPort | int | `5151` | Service container port for fiftyone-app. |
+| appSettings.nodeSelector | object | `{}` | nodeSelector for `fiftyone-app`. [Reference][node-selector]. |
+| appSettings.podAnnotations | object | `{}` | Annotations for pods for `fiftyone-app`. [Reference][annotations]. |
+| appSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context]. |
+| appSettings.replicaCount | int | `2` | Number of pods in the `fiftyone-app` deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
+| appSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
+| appSettings.secretEnv | object | `{}` | Secret variables to be passed to the `fiftyone-app` containers. |
+| appSettings.securityContext | object | `{}` | Container security configuration for `fiftyone-app`. [Reference][container-security-context]. |
+| appSettings.service.annotations | object | `{}` | Service annotations for `fiftyone-app`. [Reference][annotations]. |
+| appSettings.service.containerPort | int | `5151` | Service container port for `fiftyone-app`. |
 | appSettings.service.name | string | `"fiftyone-app"` | Service name. |
-| appSettings.service.nodePort | int | `nil` | Service nodePort set only when `appSettings.service.type: NodePort` for fiftyone-app. |
+| appSettings.service.nodePort | int | `nil` | Service nodePort set only when `appSettings.service.type: NodePort` for `fiftyone-app`. |
 | appSettings.service.port | int | `80` | Service port. |
-| appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for fiftyone-app. [Reference][ports]. |
-| appSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the fiftyone-app. [Reference][probes]. |
-| appSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for fiftyone-app. [Reference][probes]. |
-| appSettings.service.type | string | `"ClusterIP"` | Service type for fiftyone-app. [Reference][service-type]. |
-| appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule fiftyone-app pods with matching taints. [Reference][taints-and-tolerations]. |
-| appSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the fiftyone-app deployment. [Reference][topology-spread-constraints]. |
-| appSettings.volumeMounts | list | `[]` | Volume mounts for fiftyone-app. [Reference][volumes]. |
-| appSettings.volumes | list | `[]` | Volumes for fiftyone-app. [Reference][volumes]. |
-| casSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-cas. [Reference][affinity]. |
+| appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for `fiftyone-app`. [Reference][ports]. |
+| appSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes]. |
+| appSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes]. |
+| appSettings.service.type | string | `"ClusterIP"` | Service type for `fiftyone-app`. [Reference][service-type]. |
+| appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `fiftyone-app` pods with matching taints. [Reference][taints-and-tolerations]. |
+| appSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `fiftyone-app` deployment. [Reference][topology-spread-constraints]. |
+| appSettings.volumeMounts | list | `[]` | Volume mounts for `fiftyone-app`. [Reference][volumes]. |
+| appSettings.volumes | list | `[]` | Volumes for `fiftyone-app`. [Reference][volumes]. |
+| casSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-cas`. [Reference][affinity]. |
+| casSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-cas` deployment. [Reference][annotations]. |
 | casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
 | casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
@@ -531,35 +534,36 @@ follow
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
 | casSettings.env.FIFTYONE_AUTH_MODE | string | `"legacy"` | Configure Authentication Mode. One of `legacy` or `internal` |
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for teams-cas. |
-| casSettings.image.tag | string | `""` | Image tag for teams-cas. Defaults to the chart version. |
-| casSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-cas. [Reference][init-containers]. |
-| casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-cas. [Reference][init-containers]. |
-| casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-cas. [Reference][init-containers]. |
+| casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for `teams-cas`. |
+| casSettings.image.tag | string | `""` | Image tag for `teams-cas`. Defaults to the chart version. |
+| casSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-cas`. [Reference][init-containers]. |
+| casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-cas`. [Reference][init-containers]. |
+| casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-cas`. [Reference][init-containers]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors]. |
-| casSettings.nodeSelector | object | `{}` | nodeSelector for teams-cas. [Reference][node-selector]. |
-| casSettings.podAnnotations | object | `{}` | Annotations for pods for teams-cas. [Reference][annotations]. |
-| casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-cas. [Reference][security-context]. |
-| casSettings.replicaCount | int | `2` | Number of pods in the teams-cas deployment's ReplicaSet. [Reference][deployment]. |
-| casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-cas. [Reference][resources]. |
-| casSettings.secretEnv | object | `{}` | Secret variables to be passed to the teams-cas containers. |
-| casSettings.securityContext | object | `{}` | Container security configuration for teams-cas. [Reference][container-security-context]. |
-| casSettings.service.annotations | object | `{}` | Service annotations for teams-cas. [Reference][annotations]. |
-| casSettings.service.containerPort | int | `3000` | Service container port for teams-cas. |
+| casSettings.nodeSelector | object | `{}` | nodeSelector for `teams-cas`. [Reference][node-selector]. |
+| casSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-cas`. [Reference][annotations]. |
+| casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context]. |
+| casSettings.replicaCount | int | `2` | Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment]. |
+| casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
+| casSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-cas` containers. |
+| casSettings.securityContext | object | `{}` | Container security configuration for `teams-cas`. [Reference][container-security-context]. |
+| casSettings.service.annotations | object | `{}` | Service annotations for `teams-cas`. [Reference][annotations]. |
+| casSettings.service.containerPort | int | `3000` | Service container port for `teams-cas`. |
 | casSettings.service.name | string | `"teams-cas"` | Service name. |
-| casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for teams-cas. |
+| casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for `teams-cas`. |
 | casSettings.service.port | int | `80` | Service port. |
-| casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for teams-cas. [Reference][ports]. |
-| casSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-cas. [Reference][probes]. |
-| casSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-cas. [Reference][probes]. |
-| casSettings.service.type | string | `"ClusterIP"` | Service type for teams-cas. [Reference][service-type]. |
-| casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-cas pods with matching taints. [Reference][taints-and-tolerations]. |
-| casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-cas deployment. [Reference][topology-spread-constraints]. |
-| casSettings.volumeMounts | list | `[]` | Volume mounts for teams-cas. [Reference][volumes]. |
-| casSettings.volumes | list | `[]` | Volumes for teams-cas. [Reference][volumes]. |
+| casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for `teams-cas`. [Reference][ports]. |
+| casSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-cas`. [Reference][probes]. |
+| casSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes]. |
+| casSettings.service.type | string | `"ClusterIP"` | Service type for `teams-cas`. [Reference][service-type]. |
+| casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-cas` pods with matching taints. [Reference][taints-and-tolerations]. |
+| casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-cas` deployment. [Reference][topology-spread-constraints]. |
+| casSettings.volumeMounts | list | `[]` | Volume mounts for `teams-cas`. [Reference][volumes]. |
+| casSettings.volumes | list | `[]` | Volumes for `teams-cas`. [Reference][volumes]. |
 | delegatedOperatorDeployments.deployments | object | `{}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
-| delegatedOperatorDeployments.template | object | `{"affinity":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
+| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
+| delegatedOperatorDeployments.template.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
 | delegatedOperatorDeployments.template.description | string | `""` | A description for the delegated operator instance. This is unused in the template context. Each operator should either set their own description or, optionally, use the default. If unset at the operator context, it will be defaulted to `Long running operations delegated to $name` where `$name` is the name of the Deployment object. |
 | delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
 | delegatedOperatorDeployments.template.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
@@ -568,28 +572,29 @@ follow
 | delegatedOperatorDeployments.template.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for delegated-operator-executor. |
 | delegatedOperatorDeployments.template.image.tag | string | `""` | Image tag for delegated-operator-executor. Defaults to the chart version. |
 | delegatedOperatorDeployments.template.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
-| delegatedOperatorDeployments.template.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the teams-do. [Reference][probes]. |
-| delegatedOperatorDeployments.template.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for teams-do. [Reference][probes]. |
-| delegatedOperatorDeployments.template.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-do`. [Reference][probes]. |
+| delegatedOperatorDeployments.template.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes]. |
+| delegatedOperatorDeployments.template.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.nodeSelector | object | `{}` | nodeSelector for delegated-operator-executor. [Reference][node-selector]. |
 | delegatedOperatorDeployments.template.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
 | delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context]. |
 | delegatedOperatorDeployments.template.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for delegated-operator-executor. [Reference][container-security-context]. |
-| delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the teams-do. [Reference][probes]. |
-| delegatedOperatorDeployments.template.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes]. |
-| delegatedOperatorDeployments.template.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
+| delegatedOperatorDeployments.template.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
+| delegatedOperatorDeployments.template.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
 | delegatedOperatorDeployments.template.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
 | delegatedOperatorDeployments.template.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
-| delegatedOperatorDeployments.template.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-do. [Reference][probes]. |
-| delegatedOperatorDeployments.template.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for teams-do. [Reference][probes]. |
-| delegatedOperatorDeployments.template.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorDeployments.template.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-do`. [Reference][probes]. |
+| delegatedOperatorDeployments.template.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes]. |
+| delegatedOperatorDeployments.template.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
-| delegatedOperatorDeployments.template.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-do deployment(s). [Reference][topology-spread-constraints]. |
+| delegatedOperatorDeployments.template.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-do` deployment(s). [Reference][topology-spread-constraints]. |
 | delegatedOperatorDeployments.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorDeployments.template.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
 | delegatedOperatorExecutorSettings.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
-| delegatedOperatorExecutorSettings.enabled | bool | `false` | Controls whether to create a dedicated "teams-do" deployment. Disabled by default, meaning delegated operations will not be executed without an external executor system. |
+| delegatedOperatorExecutorSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
+| delegatedOperatorExecutorSettings.enabled | bool | `false` | Controls whether to create a dedicated `teams-do` deployment. Disabled by default, meaning delegated operations will not be executed without an external executor system. |
 | delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
 | delegatedOperatorExecutorSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | delegatedOperatorExecutorSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
@@ -597,26 +602,26 @@ follow
 | delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for delegated-operator-executor. |
 | delegatedOperatorExecutorSettings.image.tag | string | `""` | Image tag for delegated-operator-executor. Defaults to the chart version. |
 | delegatedOperatorExecutorSettings.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
-| delegatedOperatorExecutorSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the teams-do. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for teams-do. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-do`. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.name | string | `"teams-do"` | Deployment name |
 | delegatedOperatorExecutorSettings.nodeSelector | object | `{}` | nodeSelector for delegated-operator-executor. [Reference][node-selector]. |
 | delegatedOperatorExecutorSettings.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
 | delegatedOperatorExecutorSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context]. |
 | delegatedOperatorExecutorSettings.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for delegated-operator-executor. [Reference][container-security-context]. |
-| delegatedOperatorExecutorSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the teams-do. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for teams-do. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
 | delegatedOperatorExecutorSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
 | delegatedOperatorExecutorSettings.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
 | delegatedOperatorExecutorSettings.securityContext | object | `{}` |  |
-| delegatedOperatorExecutorSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-do. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for teams-do. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the teams-do. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-do`. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes]. |
+| delegatedOperatorExecutorSettings.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
-| delegatedOperatorExecutorSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-do deployment. [Reference][topology-spread-constraints]. |
+| delegatedOperatorExecutorSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-do` deployment. [Reference][topology-spread-constraints]. |
 | delegatedOperatorExecutorSettings.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
@@ -636,46 +641,47 @@ follow
 | ingress.paths[1].serviceName | string | `"teams-app"` | Ingress path service name |
 | ingress.paths[1].servicePort | int | `80` | Ingress path service port |
 | ingress.tlsEnabled | bool | `true` | Controls whether the chart managed ingress contains a `spec.tls` stanza. |
-| ingress.tlsSecretName | string | `"fiftyone-teams-tls-secret"` | Name of secret containing TLS certificate for teams-app. Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`. When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`. |
+| ingress.tlsSecretName | string | `"fiftyone-teams-tls-secret"` | Name of secret containing TLS certificate for `teams-app`. Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`. When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`. |
 | namespace.create | bool | `false` | Controls whether to create the namespace. When `false`, the namespace must already exists. |
 | namespace.name | string | `"fiftyone-teams"` | The namespace name used for chart resources. |
-| pluginsSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-plugins. [Reference][affinity]. |
-| pluginsSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for teams-plugins. [Reference][autoscaling]. |
-| pluginsSettings.autoscaling.maxReplicas | int | `20` | Maximum replicas for horizontal pod autoscaling for teams-plugins. |
-| pluginsSettings.autoscaling.minReplicas | int | `2` | Minimum Replicas for horizontal pod autoscaling for teams-plugins. |
-| pluginsSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for teams-plugins. |
-| pluginsSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for teams-plugins. |
-| pluginsSettings.enabled | bool | `false` | Controls whether to create a dedicated "teams-plugins" deployment. |
+| pluginsSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-plugins`. [Reference][affinity]. |
+| pluginsSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for `teams-plugins`. [Reference][autoscaling]. |
+| pluginsSettings.autoscaling.maxReplicas | int | `20` | Maximum replicas for horizontal pod autoscaling for `teams-plugins`. |
+| pluginsSettings.autoscaling.minReplicas | int | `2` | Minimum Replicas for horizontal pod autoscaling for `teams-plugins`. |
+| pluginsSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for `teams-plugins`. |
+| pluginsSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for `teams-plugins`. |
+| pluginsSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-plugins` deployment. [Reference][annotations]. |
+| pluginsSettings.enabled | bool | `false` | Controls whether to create a dedicated `teams-plugins` deployment. |
 | pluginsSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Plugins processes. The default value is 32 GiB. `-1` is disabled. |
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for teams-plugins. |
-| pluginsSettings.image.tag | string | `""` | Image tag for teams-plugins. Defaults to the chart version. |
-| pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-plugins. [Reference][init-containers]. |
-| pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-plugins. [Reference][init-containers]. |
-| pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-plugins. [Reference][init-containers]. |
+| pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for `teams-plugins`. |
+| pluginsSettings.image.tag | string | `""` | Image tag for `teams-plugins`. Defaults to the chart version. |
+| pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-plugins`. [Reference][init-containers]. |
+| pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-plugins`. [Reference][init-containers]. |
+| pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors]. |
-| pluginsSettings.nodeSelector | object | `{}` | nodeSelector for teams-plugins. [Reference][node-selector]. |
-| pluginsSettings.podAnnotations | object | `{}` | Annotations for teams-plugins pods. [Reference][annotations]. |
-| pluginsSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-plugins. [Reference][security-context]. |
-| pluginsSettings.replicaCount | int | `2` | Number of pods in the teams-plugins deployment's ReplicaSet. Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment]. |
-| pluginsSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-plugins. [Reference][resources]. |
-| pluginsSettings.secretEnv | object | `{}` | Secret variables to be passed to the teams-plugins containers. |
-| pluginsSettings.securityContext | object | `{}` | Container security configuration for teams-plugins. [Reference][container-security-context]. |
-| pluginsSettings.service.annotations | object | `{}` | Service annotations for teams-plugins. [Reference][annotations]. |
-| pluginsSettings.service.containerPort | int | `5151` | Service container port for teams-plugins. |
+| pluginsSettings.nodeSelector | object | `{}` | nodeSelector for `teams-plugins`. [Reference][node-selector]. |
+| pluginsSettings.podAnnotations | object | `{}` | Annotations for `teams-plugins` pods. [Reference][annotations]. |
+| pluginsSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context]. |
+| pluginsSettings.replicaCount | int | `2` | Number of pods in the `teams-plugins` deployment's ReplicaSet. Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment]. |
+| pluginsSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-plugins`. [Reference][resources]. |
+| pluginsSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-plugins` containers. |
+| pluginsSettings.securityContext | object | `{}` | Container security configuration for `teams-plugins`. [Reference][container-security-context]. |
+| pluginsSettings.service.annotations | object | `{}` | Service annotations for `teams-plugins`. [Reference][annotations]. |
+| pluginsSettings.service.containerPort | int | `5151` | Service container port for `teams-plugins`. |
 | pluginsSettings.service.name | string | `"teams-plugins"` | Service name. |
-| pluginsSettings.service.nodePort | int | `nil` | Service nodePort set only when `pluginsSettings.service.type: NodePort` for teams-plugins. |
+| pluginsSettings.service.nodePort | int | `nil` | Service nodePort set only when `pluginsSettings.service.type: NodePort` for `teams-plugins`. |
 | pluginsSettings.service.port | int | `80` | Service port. |
-| pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for teams-plugins. [Reference][ports]. |
-| pluginsSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-plugins. [Reference][probes]. |
-| pluginsSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-plugins. [Reference][probes]. |
-| pluginsSettings.service.type | string | `"ClusterIP"` | Service type for teams-plugins. [Reference][service-type]. |
-| pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-plugins pods with matching taints. [Reference][taints-and-tolerations]. |
-| pluginsSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-plugins deployment. [Reference][topology-spread-constraints]. |
-| pluginsSettings.volumeMounts | list | `[]` | Volume mounts for teams-plugins pods. [Reference][volumes]. |
-| pluginsSettings.volumes | list | `[]` | Volumes for teams-plugins. [Reference][volumes]. |
+| pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for `teams-plugins`. [Reference][ports]. |
+| pluginsSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.service.type | string | `"ClusterIP"` | Service type for `teams-plugins`. [Reference][service-type]. |
+| pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-plugins` pods with matching taints. [Reference][taints-and-tolerations]. |
+| pluginsSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-plugins` deployment. [Reference][topology-spread-constraints]. |
+| pluginsSettings.volumeMounts | list | `[]` | Volume mounts for `teams-plugins` pods. [Reference][volumes]. |
+| pluginsSettings.volumes | list | `[]` | Volumes for `teams-plugins`. [Reference][volumes]. |
 | secret.create | bool | `true` | Controls whether to create the secret named `secret.name`. |
 | secret.fiftyone.cookieSecret | string | `""` | A randomly generated string for cookie encryption. To generate, run `openssl rand -hex 32`. |
 | secret.fiftyone.encryptionKey | string | `""` | Encryption key for storage credentials. [Reference][fiftyone-encryption-key]. |
@@ -686,14 +692,15 @@ follow
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
 | serviceAccount.create | bool | `true` | Controls whether to create the service account named `serviceAccount.name`. |
 | serviceAccount.name | string | `"fiftyone-teams"` | Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments. [Reference][service-account]. |
-| teamsAppSettings.affinity | object | `{}` | Affinity and anti-affinity for teams-app. [Reference][affinity]. |
-| teamsAppSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for teams-app. [Reference][autoscaling]. |
-| teamsAppSettings.autoscaling.maxReplicas | int | `5` | Maximum Replicas for horizontal autoscaling for teams-app. |
-| teamsAppSettings.autoscaling.minReplicas | int | `2` | Minimum Replicas for horizontal autoscaling for teams-app. |
-| teamsAppSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for teams-app. |
-| teamsAppSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for teams-app. |
-| teamsAppSettings.dnsName | string | `""` | DNS Name for the teams-app service. Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`) |
-| teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the teams-app. Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
+| teamsAppSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-app`.  [Reference][affinity]. |
+| teamsAppSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for `teams-app`.  [Reference][autoscaling]. |
+| teamsAppSettings.autoscaling.maxReplicas | int | `5` | Maximum Replicas for horizontal autoscaling for `teams-app`. |
+| teamsAppSettings.autoscaling.minReplicas | int | `2` | Minimum Replicas for horizontal autoscaling for `teams-app`. |
+| teamsAppSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for `teams-app`. |
+| teamsAppSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for `teams-app`. |
+| teamsAppSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-app` `Deployment`. [Reference][annotations]. |
+| teamsAppSettings.dnsName | string | `""` | DNS Name for the `teams-app` service. Used in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`) |
+| teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the `teams-app`.  Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off. |
@@ -703,32 +710,32 @@ follow
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
 | teamsAppSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy]. |
-| teamsAppSettings.image.repository | string | `"voxel51/fiftyone-teams-app"` | Container image for teams-app. |
-| teamsAppSettings.image.tag | string | `""` | Image tag for teams-app. Defaults to the chart version. |
-| teamsAppSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for teams-app. [Reference][init-containers]. |
-| teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for teams-app. [Reference][init-containers]. |
-| teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for teams-app. [Reference][init-containers]. |
+| teamsAppSettings.image.repository | string | `"voxel51/fiftyone-teams-app"` | Container image for `teams-app`. |
+| teamsAppSettings.image.tag | string | `""` | Image tag for `teams-app`.  Defaults to the chart version. |
+| teamsAppSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-app`.  [Reference][init-containers]. |
+| teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-app`.  [Reference][init-containers]. |
+| teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors]. |
-| teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for teams-app. [Reference][node-selector]. |
-| teamsAppSettings.podAnnotations | object | `{}` | Annotations for teams-app pods. [Reference][annotations]. |
-| teamsAppSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for teams-app. [Reference][security-context]. |
-| teamsAppSettings.replicaCount | int | `2` | Number of pods in the teams-app deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
-| teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for teams-app. [Reference][resources]. |
-| teamsAppSettings.secretEnv | object | `{}` | Secret variables to be passed to the teams-app containers. |
-| teamsAppSettings.securityContext | object | `{}` | Container security configuration for teams-app. [Reference][container-security-context]. |
-| teamsAppSettings.service.annotations | object | `{}` | Service annotations for teams-app. [Reference][annotations]. |
-| teamsAppSettings.service.containerPort | int | `3000` | Service container port for teams-app. |
+| teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for `teams-app`.  [Reference][node-selector]. |
+| teamsAppSettings.podAnnotations | object | `{}` | Annotations for `teams-app` pods. [Reference][annotations]. |
+| teamsAppSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context]. |
+| teamsAppSettings.replicaCount | int | `2` | Number of pods in the `teams-app` deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
+| teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-app`.  [Reference][resources]. |
+| teamsAppSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-app` containers. |
+| teamsAppSettings.securityContext | object | `{}` | Container security configuration for `teams-app`.  [Reference][container-security-context]. |
+| teamsAppSettings.service.annotations | object | `{}` | Service annotations for `teams-app`.  [Reference][annotations]. |
+| teamsAppSettings.service.containerPort | int | `3000` | Service container port for `teams-app`. |
 | teamsAppSettings.service.name | string | `"teams-app"` | Service name. |
-| teamsAppSettings.service.nodePort | int | `nil` | Service nodePort set only when `teamsAppSettings.service.type: NodePort` for teams-app. |
+| teamsAppSettings.service.nodePort | int | `nil` | Service nodePort set only when `teamsAppSettings.service.type: NodePort` for `teams-app`. |
 | teamsAppSettings.service.port | int | `80` | Service port. |
-| teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for teams-app. [Reference][ports]. |
-| teamsAppSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the teams-app. [Reference][probes]. |
-| teamsAppSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for teams-app. [Reference][probes]. |
-| teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for teams-app. [Reference][service-type]. |
-| teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule teams-app pods with matching taints. [Reference][taints-and-tolerations]. |
-| teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the teams-app deployment. [Reference][topology-spread-constraints]. |
-| teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for teams-app pods. [Reference][volumes]. |
-| teamsAppSettings.volumes | list | `[]` | Volumes for teams-app pods. [Reference][volumes]. |
+| teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for `teams-app`.  [Reference][ports]. |
+| teamsAppSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for `teams-app`.  [Reference][service-type]. |
+| teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-app` pods with matching taints. [Reference][taints-and-tolerations]. |
+| teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-app` deployment. [Reference][topology-spread-constraints]. |
+| teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
+| teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
 
 ### Deploying On GKE
 

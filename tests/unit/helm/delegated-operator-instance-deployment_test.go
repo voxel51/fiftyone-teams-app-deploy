@@ -2979,6 +2979,134 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 	}
 }
 
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentAnnotations() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []map[string]string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]map[string]string{
+				map[string]string{},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]map[string]string{
+				nil,
+				nil,
+			},
+		},
+		{
+			"overrideBaseTemplateDeploymentAnnotations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":                  "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":               "nil",
+				"delegatedOperatorDeployments.template.deploymentAnnotations.annotation-1": "annotation-1-value",
+			},
+			[]map[string]string{
+				map[string]string{
+					"annotation-1": "annotation-1-value",
+				},
+				map[string]string{
+					"annotation-1": "annotation-1-value",
+				},
+			},
+		},
+		{
+			"overrideInstanceDeploymentAnnotations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.deploymentAnnotations.teams-do-annotation-1":        "teams-do-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.annotation-1":              "teams-do-two-annotation-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+			},
+			[]map[string]string{
+				map[string]string{
+					"teams-do-annotation-1": "teams-do-annotation-1-value",
+				},
+				map[string]string{
+					"annotation-1":              "teams-do-two-annotation-value",
+					"teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateAndInstanceDeploymentAnnotations",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.deploymentAnnotations.teams-do-annotation":          "teams-do-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.annotation-1":              "teams-do-two-annotation-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+				"delegatedOperatorDeployments.template.deploymentAnnotations.annotation-1":                            "annotation-1-value",
+			},
+			[]map[string]string{
+				map[string]string{
+					"annotation-1":        "annotation-1-value",
+					"teams-do-annotation": "teams-do-annotation-1-value",
+				},
+				map[string]string{
+					"annotation-1":              "teams-do-two-annotation-value",
+					"teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+
+				for i, rawOutput := range allRange[1:] {
+
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					if testCase.expected[i] == nil {
+						s.Nil(deployment.ObjectMeta.Annotations, "Annotations should be nil")
+					} else {
+						for key, value := range testCase.expected[i] {
+							foundValue := deployment.ObjectMeta.Annotations[key]
+							s.Equal(value, foundValue, "Annotations should contain all set annotations.")
+						}
+					}
+				}
+			}
+		})
+	}
+}
+
 func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
 	testCases := []struct {
 		name     string

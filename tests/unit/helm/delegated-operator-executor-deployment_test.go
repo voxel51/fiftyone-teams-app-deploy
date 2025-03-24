@@ -1507,6 +1507,74 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestNodeSelector() {
 	}
 }
 
+func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestDeploymentAnnotations() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected map[string]string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled": "true",
+			},
+			nil,
+		},
+		{
+			"overrideDeploymentAnnotations",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled":                            "true",
+				"delegatedOperatorExecutorSettings.deploymentAnnotations.annotation-1": "annotation-1-value",
+			},
+			map[string]string{
+				"annotation-1": "annotation-1-value",
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/delegated-operator-executor-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Nil(deployment.Spec.Template.Spec.Containers)
+			} else {
+				options := &helm.Options{SetValues: testCase.values}
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				var deployment appsv1.Deployment
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				if testCase.expected == nil {
+					s.Nil(deployment.ObjectMeta.Annotations, "Annotations should be nil")
+				} else {
+					for key, value := range testCase.expected {
+						foundValue := deployment.ObjectMeta.Annotations[key]
+						s.Equal(value, foundValue, "Annotations should contain all set annotations.")
+					}
+				}
+			}
+		})
+	}
+}
+
 func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestPodAnnotations() {
 	testCases := []struct {
 		name     string
