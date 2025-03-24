@@ -2129,7 +2129,7 @@ func (s *deploymentPluginsTemplateTest) TestDeploymentAnnotations() {
 			"overrideDeploymentAnnotations",
 			map[string]string{
 				"pluginsSettings.deploymentAnnotations.annotation-1": "annotation-1-value",
-				"pluginsSettings.enabled":                     "true",
+				"pluginsSettings.enabled":                            "true",
 			},
 			map[string]string{
 				"annotation-1": "annotation-1-value",

@@ -1528,7 +1528,7 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestDeploymentAnnotati
 		{
 			"overrideDeploymentAnnotations",
 			map[string]string{
-				"delegatedOperatorExecutorSettings.enabled": "true",
+				"delegatedOperatorExecutorSettings.enabled":                            "true",
 				"delegatedOperatorExecutorSettings.deploymentAnnotations.annotation-1": "annotation-1-value",
 			},
 			map[string]string{

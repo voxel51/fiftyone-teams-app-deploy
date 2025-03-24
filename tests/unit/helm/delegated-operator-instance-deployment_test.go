@@ -3013,8 +3013,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentAnnotati
 		{
 			"overrideBaseTemplateDeploymentAnnotations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":           "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":        "nil",
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":                  "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":               "nil",
 				"delegatedOperatorDeployments.template.deploymentAnnotations.annotation-1": "annotation-1-value",
 			},
 			[]map[string]string{
