@@ -1214,7 +1214,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "path": "/health/",
             "port": "teams-api"
           },
-          "failureThreshold": 5,
+          "failureThreshold": 10,
           "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
@@ -1228,7 +1228,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
 			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
 			map[string]string{
 				"apiSettings.service.shortname":                "test-service-shortname",
-				"apiSettings.service.startup.failureThreshold": "10",
+				"apiSettings.service.startup.failureThreshold": "15",
 				"apiSettings.service.startup.periodSeconds":    "10",
 			},
 			func(probe *corev1.Probe) {
@@ -1237,7 +1237,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "path": "/health/",
             "port": "test-service-shortname"
           },
-          "failureThreshold": 10,
+          "failureThreshold": 15,
           "periodSeconds": 10,
           "timeoutSeconds": 5
         }`
