@@ -69,7 +69,6 @@ To enable delegated operators, add an object to `delegatedOperatorDeployments.de
 
 ```yaml
 delegatedOperatorDeployments:
-  enabled: true
   deployments:
     teamsDo: {}
 ```
@@ -89,7 +88,6 @@ is needed.
 
 ```yaml
 delegatedOperatorDeployments:
-  enabled: true
   deployments:
     teamsDo: {}
 ```
@@ -107,7 +105,6 @@ of these two ways:
 
     ```yaml
     delegatedOperatorDeployments:
-      enabled: true
       deployments:
         teamsDo: {}
       template:
@@ -186,7 +183,6 @@ The following values:
 
 ```yaml
 delegatedOperatorDeployments:
-  enabled: true
   template:
     resources:
       limits:
@@ -257,7 +253,6 @@ To migrate from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeploym
 In your `values.yaml`
 
 1. Set `delegatedOperatorExecutorSettings.enabled` to `false`
-1. Set `delegatedOperatorDeployments.enabled` to `true`
 1. Add `delegatedOperatorDeployments.deployments.teamsDo`
 1. Copy any configuration details from `delegatedOperatorExecutorSettings` to
    either `delegatedOperatorDeployments.template` or
