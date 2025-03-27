@@ -72,7 +72,7 @@ apiSettings:
     shortname: teams-api
     startup:
       # -- Number of times to retry the startup probe for the `teams-api`. [Reference][probes].
-      failureThreshold: 5
+      failureThreshold: 10
       # -- How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes].
       periodSeconds: 15
     # -- Service type for `teams-api`. [Reference][service-type].

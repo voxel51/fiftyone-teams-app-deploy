@@ -479,7 +479,7 @@ follow
 | apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for `teams-api`. |
 | apiSettings.service.port | int | `80` | Service port for `teams-api`. |
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for `teams-api`. [Reference][ports]. |
-| apiSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-api`. [Reference][probes]. |
+| apiSettings.service.startup.failureThreshold | int | `10` | Number of times to retry the startup probe for the `teams-api`. [Reference][probes]. |
 | apiSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for `teams-api`. [Reference][service-type]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations]. |
