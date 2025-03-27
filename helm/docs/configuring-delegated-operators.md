@@ -36,32 +36,34 @@ has been deprecated in favor of `delegatedOperatorDeployments`.
 `delegatedOperatorExecutorSettings` has been marked for deletion
 for versions released after May 31st, 2025.
 
-This additional value allows users to deploy multiple instances
-of delegated operators, targeting different hardware or different
-use-cases.
+`delegatedOperatorDeployments` enables you to deploy multiple instances
+of delegated operators targeting different hardware or use-cases.
 
 ## Using `delegatedOperatorDeployments`
 
-`delegatedOperatorDeployments` allows you to apply a basic
-template to one or multiple delegated operator deployments.
-Values in `delegatedOperatorDeployments.template` will be applied to
-each deployment instance under `delegatedOperatorDeployments.deployments`.
+The values in `delegatedOperatorDeployments.template` will be applied to
+every deployment instance under `delegatedOperatorDeployments.deployments`.
+Per deployment values set in
+`delegatedOperatorDeployments.deployments.<DEPLOYMENT>`
+will override the template.
 
-For settings applied in both places, the following rules apply:
+For overlapping settings, the following rules apply:
 
-1. If the setting is a `map` object, the
-   `delegatedOperatorDeployments.template.SETTING` will be merged, key-wise,
-   with `delegatedOperatorDeployments.deployments.DEPLOYMENT.SETTING`.
-   For settings that are multiply defined, the
-   `delegatedOperatorDeployments.deployments.DEPLOYMENT.SETTING` will
+1. When the setting is a `map` object, the
+   `delegatedOperatorDeployments.template.<SETTING>` will be key-wise merged
+   with `delegatedOperatorDeployments.deployments.<DEPLOYMENT>.<SETTING>`.
+   For duplicate setting definitions, the
+   `delegatedOperatorDeployments.deployments.<DEPLOYMENT>.<SETTING>` will
    take precedence.
 
-1. If the setting is a `list` object, the
-   `delegatedOperatorDeployments.template.SETTING` will be ignored and the
-   `delegatedOperatorDeployments.deployments.DEPLOYMENT.SETTING` will
+1. When the setting is a `list` object, the
+   `delegatedOperatorDeployments.template.<SETTING>` will be ignored and the
+   `delegatedOperatorDeployments.deployments.<DEPLOYMENT>.<SETTING>` will
    take precedence.
 
-See [examples](#examples) for more information.
+See
+[examples](#examples)
+for more information.
 
 To enable delegated operators, add an object to `delegatedOperatorDeployments.deployments`:
 
@@ -71,9 +73,10 @@ delegatedOperatorDeployments:
     teamsDo: {}
 ```
 
-The Kubernetes name will be generated from the key-name in the `deployments`
-map by applying kebab-case to it.
-In the above example, the resulting kubernetes object would be named `teams-do`.
+The Kubernetes deployment's name will be generated from `deployments` key-name
+converted to kebab-case.
+In the above example (key named `teamsDo`),
+the resulting deployment name would be `teams-do`.
 
 Delegated operators can be added to any of the three existing
 [plugin modes](./confuring-plugins.md).
@@ -91,17 +94,19 @@ delegatedOperatorDeployments:
 
 ### Shared/Dedicated Plugins
 
-For shared/dedicated plugins, you'll need to mount
-the plugins `PersistentVolumeClaim` with `Read` access.
-It should be mounted at `FIFTYONE_PLUGINS_DIR`.
+For shared/dedicated plugins, mount the plugins'
+`PersistentVolumeClaim` with `Read` access
+at `FIFTYONE_PLUGINS_DIR`.
 
 This can be done by modifying `values.yaml` in one
-of the two ways below:
+of these two ways:
 
 1. The template (applies to all instances):
 
     ```yaml
     delegatedOperatorDeployments:
+      deployments:
+        teamsDo: {}
       template:
         env:
           FIFTYONE_PLUGINS_DIR: /opt/plugins
@@ -113,8 +118,6 @@ of the two ways below:
         volumeMounts:
           - name: plugins-vol
             mountPath: /opt/plugins
-      deployments:
-        teamsDo: {}
     ```
 
 1. Or, per instance:
@@ -139,13 +142,14 @@ See
 [Adding Shared Storage for FiftyOne Enterprise Plugins](./plugins-storage.md)
 for configuring persistent volumes and claims.
 
-Optionally, the logs generated during running of a delegated operation can be
-uploaded to a network-mounted file system or cloud storage path that is
+Optionally, the logs generated during running of a delegated operation may be
+uploaded to a network-mounted file system or cloud storage path
 available to this deployment.
 Logs are uploaded in the format
 `<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
 
-In `values.yaml`, set `FIFTYONE_DELEGATED_OPERATION_LOG_PATH` in either:
+In `values.yaml`, set the environment variable
+`FIFTYONE_DELEGATED_OPERATION_LOG_PATH` in either:
 
 1. The template (applies to all instances):
 
@@ -187,7 +191,6 @@ delegatedOperatorDeployments:
       requests:
         cpu: 1
         memory: 1Gi
-
   deployments:
     teamsDo:
       resources:
@@ -196,7 +199,7 @@ delegatedOperatorDeployments:
           memory: 6Gi
 ```
 
-Would result in the following:
+Would result in a Kubernetes deployment resource with:
 
 ```yaml
 resources:
@@ -208,8 +211,9 @@ resources:
     memory: 6Gi
 ```
 
-Note that `requests` was merged key-wise and, therefore,
-settings from both the template and instance are included.
+Note that `requests` was merged key-wise.
+Therefore, settings from both the template and instance are included,
+with the instance values taking precedent.
 
 #### List Merges
 
@@ -222,8 +226,6 @@ delegatedOperatorDeployments:
       - key: "template-example-key"
         operator: "Exists"
         effect: "NoSchedule"
-
-
   deployments:
     teamsDo:
       tolerations:
@@ -232,7 +234,7 @@ delegatedOperatorDeployments:
           effect: "PreferNoSchedule"
 ```
 
-Would result in the following:
+Would result in a Kubernetes deployment resource with:
 
 ```yaml
 tolerations:
@@ -248,18 +250,20 @@ was overridden by `delegatedOperatorDeployments.deployments.teamsDo.tolerations`
 
 To migrate from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeployments`:
 
-1. Add a `teamsDo` object to `delegatedOperatorDeployments.deployments`.
+In your `values.yaml`
+
+1. Set `delegatedOperatorExecutorSettings.enabled` to `false`
+1. Add `delegatedOperatorDeployments.deployments.teamsDo`
 1. Copy any configuration details from `delegatedOperatorExecutorSettings` to
    either `delegatedOperatorDeployments.template` or
-   `delegatedOperatorDeployments.deployments.teamsDo`.
-      1. Be mindful of spacing as
+   `delegatedOperatorDeployments.deployments.teamsDo`
+      1. Note the spacing as
          `delegatedOperatorDeployments.deployments.teamsDo` is more
-         indented than its predecessor.
-1. Set `delegatedOperatorExecutorSettings.enabled` to `false`
+         indented than `delegatedOperatorExecutorSettings`
 
 ### Example
 
-If my version 2.6.0 values file contained:
+A version 2.6.0 values file contained:
 
 ```yaml
 delegatedOperatorExecutorSettings:
