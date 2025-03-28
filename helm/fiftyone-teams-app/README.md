@@ -80,9 +80,9 @@ for steps on how to upgrade your delegated operators.
   - [Static Banner Configuration](#static-banner-configuration)
   - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
   - [Text Similarity](#text-similarity)
+  - [Workload Identity Federation](#workload-identity-federation)
 - [Validating](#validating)
 - [Values](#values)
-  - [Deploying On GKE](#deploying-on-gke)
 
 <!-- tocstop -->
 
@@ -443,6 +443,18 @@ appSettings:
     repository: voxel51/fiftyone-app-torch
 ```
 
+### Workload Identity Federation
+
+Voxel51 FiftyOne Enterprise supports Workload Identity Federation
+when installing via Helm into various cloud providers.
+Workload Identity is achieved using service account annotations
+that can be defined in the `values.yaml` file when installing
+or upgrading the application.
+
+See
+[configuring workload identity federation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configure-workload-identity-federation.md)
+for more information.
+
 ## Validating
 
 After deploying FiftyOne Enterprise and configuring authentication, please
@@ -737,38 +749,12 @@ follow
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
 
-### Deploying On GKE
-
-Voxel51 FiftyOne Enterprise supports
-[Workload Identity Federation for GKE][about-wif]
-when installing via Helm into Google Kubernetes Engine (GKE).
-Workload Identity is achieved using service account annotations
-that can be defined in the `values.yaml` file when installing
-or upgrading the application.
-
-Please follow the steps
-[outlined by Google][howto-wif]
-to allow your cluster to utilize workload identity federation and to
-create a service account with the required IAM permissions.
-
-Once the cluster and service account are configured, you can permit your
-workloads to utilize the GCP service account via service account annotations
-defined in the `values.yaml` file:
-
-```yaml
-serviceAccount:
-  annotations:
-    iam.gke.io/gcp-service-account: <GSA_NAME>@<GSA_PROJECT>.iam.gserviceaccount.com
-```
-
 <!-- Reference Links -->
-[about-wif]: https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity
 [affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 [annotations]: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 [autoscaling]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 [container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-[howto-wif]: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
 [image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
