@@ -1,28 +1,51 @@
+<!-- markdownlint-disable no-inline-html line-length no-alt-text -->
+<!-- markdownlint-disable-next-line first-line-heading -->
+<div align="center">
+<p align="center">
+
+<img src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
+<img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
+
+</p>
+</div>
+<!-- markdownlint-enable no-inline-html line-length no-alt-text -->
+
+---
+
 # Workload Identity With FiftyOne Enterprise
 
 FiftyOne enterprise supports authentication to your cloud provider via
 workload identity federation.
+
+<!-- toc -->
+
+- [Workload Identity With GCP](#workload-identity-with-gcp)
+  - [Via `gcloud` CLI](#via-gcloud-cli)
+  - [Via `terraform`](#via-terraform)
+- [References](#references)
+
+<!-- tocstop -->
 
 ## Workload Identity With GCP
 
 For bare-minimum access, FiftyOne Enterprise needs the following permissions
 for your media bucket(s) in GCP:
 
-* `iam.serviceAccounts.signBlob`
-* `storage.buckets.get`
-* `storage.buckets.list`
-* `storage.folders.create`
-* `storage.folders.get`
-* `storage.folders.list`
-* `storage.managedFolders.create`
-* `storage.managedFolders.get`
-* `storage.managedFolders.list`
-* `storage.multipartUploads.abort`
-* `storage.multipartUploads.create`
-* `storage.multipartUploads.listParts`
-* `storage.objects.create`
-* `storage.objects.get`
-* `storage.objects.list`
+- `iam.serviceAccounts.signBlob`
+- `storage.buckets.get`
+- `storage.buckets.list`
+- `storage.folders.create`
+- `storage.folders.get`
+- `storage.folders.list`
+- `storage.managedFolders.create`
+- `storage.managedFolders.get`
+- `storage.managedFolders.list`
+- `storage.multipartUploads.abort`
+- `storage.multipartUploads.create`
+- `storage.multipartUploads.listParts`
+- `storage.objects.create`
+- `storage.objects.get`
+- `storage.objects.list`
 
 ### Via `gcloud` CLI
 
@@ -168,4 +191,4 @@ To configure workload identity via the `terraform`:
 
 ## References
 
-* [How To: GKE Workload Identity Federation](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity)
+- [How To: GKE Workload Identity Federation](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity)
