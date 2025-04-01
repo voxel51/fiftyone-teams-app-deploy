@@ -14,8 +14,6 @@
 
 ## FiftyOne Enterprise Deployment Assets
 
----
-
 | Directory | Purpose                                                                   |
 |-----------|---------------------------------------------------------------------------|
 | `docker`  | Contains configurations to run FiftyOne Enterprise in Docker Compose      |
