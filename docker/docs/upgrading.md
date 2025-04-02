@@ -52,7 +52,7 @@ and update your deployment accordingly.
    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
    ```
 
-1. To ensure that all datasets are now at version 1.3.1, run
+1. To ensure that all datasets are now at version 1.4.1, run
 
    ```shell
    fiftyone migrate --info
@@ -167,7 +167,7 @@ Additionally,
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.3.1, run
+1. To ensure that all datasets are now at version 1.4.1, run
 
     ```shell
     fiftyone migrate --info
@@ -259,7 +259,7 @@ Additionally,
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.3.1, run
+1. To ensure that all datasets are now at version 1.4.1, run
 
     ```shell
     fiftyone migrate --info
@@ -334,7 +334,7 @@ Additionally,
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to
       `Account > Install FiftyOne`
-1. Confirm that datasets have been migrated to version 1.3.1
+1. Confirm that datasets have been migrated to version 1.4.1
 
     ```shell
     fiftyone migrate --info

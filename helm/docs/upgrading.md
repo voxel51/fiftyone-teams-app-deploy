@@ -91,7 +91,7 @@ A minimal example `values.yaml` may be found
    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
    ```
 
-1. To ensure that all datasets are now at version 1.3.1, run
+1. To ensure that all datasets are now at version 1.4.1, run
 
    ```shell
    fiftyone migrate --info
@@ -250,7 +250,7 @@ For a full list of settings, please refer to the
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.3.1, run
+1. To ensure that all datasets are now at version 1.4.1, run
 
     ```shell
     fiftyone migrate --info
@@ -333,7 +333,7 @@ For a full list of settings, please refer to the
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.3.1, run
+1. To ensure that all datasets are now at version 1.4.1, run
 
     ```shell
     fiftyone migrate --info
@@ -418,7 +418,7 @@ For a full list of settings, please refer to the
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.3.1, run
+1. To ensure that all datasets are now at version 1.4.1, run
 
     ```shell
     fiftyone migrate --info
