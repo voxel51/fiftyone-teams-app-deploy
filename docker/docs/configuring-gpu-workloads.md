@@ -65,7 +65,7 @@ services:
       service: teams-do-common
 
   teams-do-with-gpu:
-    image: voxel51/fiftyone-teams-cv-full:v2.8.0
+    image: voxel51/fiftyone-teams-cv-full:v2.7.2
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
     command: >
