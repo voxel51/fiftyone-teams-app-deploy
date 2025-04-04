@@ -84,6 +84,7 @@ A minimal example `values.yaml` may be found
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
+
 1. Voxel51 recommends that you upgrade all your datasets, but it is not
    required.
 
@@ -239,6 +240,7 @@ For a full list of settings, please refer to the
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
+
 1. Upgrade all the datasets
 
     > **NOTE**: Any FiftyOne SDK less than 2.7.2 will lose connectivity after
@@ -322,6 +324,7 @@ For a full list of settings, please refer to the
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
+
 1. Upgrade all the datasets
 
     > **NOTE**: Any FiftyOne SDK less than 2.7.2 will lose connectivity after
@@ -412,6 +415,7 @@ For a full list of settings, please refer to the
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to
       `Account > Install FiftyOne`
+
 1. Upgrade all the datasets
 
     ```shell
