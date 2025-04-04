@@ -46,11 +46,7 @@ With a Dockerfile like this, you could use the following commands to
 build, and publish, your image to your internal registry
 
 ```shell
-<<<<<<< HEAD
 FIFTYONE_ENTERPRISE_VERSION=v2.7.2
-=======
-FIFTYONE_ENTERPRISE_VERSION=v2.7.1
->>>>>>> main
 docker buildx build --push \
   --build-arg FIFTYONE_ENTERPRISE_IMAGE_NAME="voxel51/fiftyone-app:${FIFTYONE_ENTERPRISE_VERSION}" \
   -t your-internal-registry/fiftyone-app-internal:${FIFTYONE_ENTERPRISE_VERSION} .
@@ -67,11 +63,7 @@ After your custom plugins image is built, you can add it to your
 ```yaml
 services:
   teams-plugins:
-<<<<<<< HEAD
     image: your-internal-registry/fiftyone-app-internal:v2.7.2
-=======
-    image: your-internal-registry/fiftyone-app-internal:v2.7.1
->>>>>>> main
 ```
 
 Please see
