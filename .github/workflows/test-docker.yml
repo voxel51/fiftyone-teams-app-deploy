@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
-      - uses: actions/setup-python@v5.4.0
+      - uses: actions/setup-python@v5.5.0
       - name: install asdf & tools
         uses: asdf-vm/actions/install@1117842ea70e2711a0072e3a71265cbfe2c830be
       - name: Run unit tests
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
-      - uses: actions/setup-python@v5.4.0
+      - uses: actions/setup-python@v5.5.0
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
-      - uses: actions/setup-python@v5.4.0
+      - uses: actions/setup-python@v5.5.0
       - name: install asdf & tools
         uses: asdf-vm/actions/install@1117842ea70e2711a0072e3a71265cbfe2c830be
       - name: Authenticate to Google Cloud

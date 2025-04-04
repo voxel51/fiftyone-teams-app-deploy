@@ -1214,7 +1214,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "path": "/health/",
             "port": "teams-api"
           },
-          "failureThreshold": 5,
+          "failureThreshold": 10,
           "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
@@ -1228,7 +1228,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
 			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
 			map[string]string{
 				"apiSettings.service.shortname":                "test-service-shortname",
-				"apiSettings.service.startup.failureThreshold": "10",
+				"apiSettings.service.startup.failureThreshold": "15",
 				"apiSettings.service.startup.periodSeconds":    "10",
 			},
 			func(probe *corev1.Probe) {
@@ -1237,7 +1237,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "path": "/health/",
             "port": "test-service-shortname"
           },
-          "failureThreshold": 10,
+          "failureThreshold": 15,
           "periodSeconds": 10,
           "timeoutSeconds": 5
         }`
@@ -1732,6 +1732,53 @@ func (s *deploymentApiTemplateTest) TestNodeSelector() {
 			for key, value := range testCase.expected {
 				foundValue := deployment.Spec.Template.Spec.NodeSelector[key]
 				s.Equal(value, foundValue, "NodeSelector should contain all set labels.")
+			}
+		})
+	}
+}
+
+func (s *deploymentApiTemplateTest) TestDeploymentAnnotations() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected map[string]string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"overrideDeploymentAnnotations",
+			map[string]string{
+				"apiSettings.deploymentAnnotations.annotation-1": "annotation-1-value",
+			},
+			map[string]string{
+				"annotation-1": "annotation-1-value",
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			if testCase.expected == nil {
+				s.Nil(deployment.ObjectMeta.Annotations, "Annotations should be nil")
+			} else {
+				for key, value := range testCase.expected {
+					foundValue := deployment.ObjectMeta.Annotations[key]
+					s.Equal(value, foundValue, "Annotations should contain all set annotations.")
+				}
 			}
 		})
 	}

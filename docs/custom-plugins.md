@@ -1,14 +1,14 @@
-<!-- markdownlint-disable no-inline-html line-length no-alt-text -->
+<!-- markdownlint-disable no-inline-html line-length -->
 <!-- markdownlint-disable-next-line first-line-heading -->
 <div align="center">
 <p align="center">
 
-<img src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
-<img src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
+<img alt="Voxel51 Logo" src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
+<img alt="Voxel51 FiftyOne" src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
 
 </p>
 </div>
-<!-- markdownlint-enable no-inline-html line-length no-alt-text -->
+<!-- markdownlint-enable no-inline-html line-length -->
 
 ---
 
@@ -46,7 +46,7 @@ With a Dockerfile like this, you could use the following commands to
 build, and publish, your image to your internal registry
 
 ```shell
-FIFTYONE_ENTERPRISE_VERSION=v2.7.1
+FIFTYONE_ENTERPRISE_VERSION=v2.7.2
 docker buildx build --push \
   --build-arg FIFTYONE_ENTERPRISE_IMAGE_NAME="voxel51/fiftyone-app:${FIFTYONE_ENTERPRISE_VERSION}" \
   -t your-internal-registry/fiftyone-app-internal:${FIFTYONE_ENTERPRISE_VERSION} .
@@ -63,7 +63,7 @@ After your custom plugins image is built, you can add it to your
 ```yaml
 services:
   teams-plugins:
-    image: your-internal-registry/fiftyone-app-internal:v2.7.1
+    image: your-internal-registry/fiftyone-app-internal:v2.7.2
 ```
 
 Please see

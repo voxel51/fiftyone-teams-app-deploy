@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: {{ include "teams-cas.name" . }}
   namespace: {{ .Values.namespace.name }}
+  {{- with .Values.casSettings.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{- include "fiftyone-teams-cas.labels" . | nindent 4 }}
 spec:

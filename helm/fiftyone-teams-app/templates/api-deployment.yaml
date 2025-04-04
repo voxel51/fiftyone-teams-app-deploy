@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: {{ include "teams-api.name" . }}
   namespace: {{ .Values.namespace.name }}
+  {{- with .Values.apiSettings.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     app: {{ include "teams-api.name" . }}
     {{- include "fiftyone-teams-api.labels" . | nindent 4 }}
