@@ -13,7 +13,7 @@
 
 {{- if .Values.delegatedOperatorExecutorSettings.enabled }}
 [WARN]  You are using delegatedOperatorExecutorSettings.enabled, which
-        has been deprecated in v2.7.2 and marked for deletion in 2.9.0.
+        has been deprecated in v2.7.0 and marked for deletion in 2.9.0.
         This is being replaced by delegatedOperatorDeployments.deployments to allow
         for greater flexibility within your environment.
 {{- end }}
