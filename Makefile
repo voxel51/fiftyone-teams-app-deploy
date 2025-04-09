@@ -23,7 +23,7 @@ asdf:  ## Update plugins, add plugins, install plugins, set local, reshim
 	@cat .tool-versions | xargs -I{} bash -c 'asdf install {}'
 
 	@echo "Setting local package versions..."
-	@cat .tool-versions | xargs -I{} bash -c 'asdf local {}'
+	@cat .tool-versions | xargs -I{} bash -c 'asdf set {}'
 
 	@echo "Reshimming.."
 	@asdf reshim
