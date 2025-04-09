@@ -20,5 +20,5 @@ jobs:
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
-        uses: asdf-vm/actions/install@1117842ea70e2711a0072e3a71265cbfe2c830be
+        uses: asdf-vm/actions/install@9cd779f40fe38688dd19505ccbc4eaaf018b44e7
       - uses: pre-commit/action@v3.0.1
