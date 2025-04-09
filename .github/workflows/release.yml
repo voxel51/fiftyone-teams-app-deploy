@@ -13,6 +13,7 @@ jobs:
       changed_charts: ${{ steps.chart_releaser.outputs.changed_charts }}
     permissions:
       contents: write
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,12 +34,17 @@ jobs:
       - name: Run chart-releaser
         id: chart_releaser
         env:
-          CR_TOKEN: "${{ secrets.CR_TOKEN }}"
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_SKIP_EXISTING: true
         uses: helm/chart-releaser-action@v1.7.0
         with:
           charts_dir: helm
 
+      - name: Upload README artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: helm-fiftyone-ai-readme
+          path: helm/fiftyone-teams-app/README.md
 
   update-chart-version:
     if: ${{ needs.release.outputs.changed_charts != '' }}
@@ -74,3 +80,43 @@ jobs:
                 "fiftyone-teams-app-deploy-version": "${{ steps.get-version.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
               }
             })
+
+  update-gh-pages:
+    if: ${{ needs.release.outputs.changed_charts != '' }}
+    needs: release
+    permissions:
+      contents: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          ref: gh-pages
+          token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Download README artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: helm-fiftyone-ai-readme
+          path: helm-fiftyone-ai-readme
+
+      - name: Move README to target directory
+        run: |
+          mv helm-fiftyone-ai-readme/README.md README.md
+
+      - name: Commit and push if changed
+        run: |-
+          git add README.md
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(release): Update README on helm.fiftyone.ai with contents from helm directory"
+            git push origin gh-pages
+          fi
