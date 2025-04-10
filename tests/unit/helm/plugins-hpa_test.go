@@ -74,8 +74,8 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataLabels() {
 		{
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
-				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
+				"pluginsSettings.enabled":             "true",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -88,8 +88,8 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.service.name":        "test-service-name",
 			},
 			map[string]string{
@@ -502,8 +502,8 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetrics() {
 		{
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
-				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
+				"pluginsSettings.enabled":             "true",
 			},
 			func(metrics []autoscalingv2.MetricSpec) {
 				expectedJSON := `[
@@ -537,10 +537,10 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetrics() {
 		{
 			"overrideTargetCpuAndMemory",
 			map[string]string{
-				"pluginsSettings.enabled":                                       "true",
 				"pluginsSettings.autoscaling.enabled":                           "true",
 				"pluginsSettings.autoscaling.targetCPUUtilizationPercentage":    "99",
 				"pluginsSettings.autoscaling.targetMemoryUtilizationPercentage": "98",
+				"pluginsSettings.enabled":                                       "true",
 			},
 			func(metrics []autoscalingv2.MetricSpec) {
 				expectedJSON := `[
