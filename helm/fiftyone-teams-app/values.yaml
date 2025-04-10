@@ -562,6 +562,15 @@ delegatedOperatorDeployments:
     nodeSelector: {}
     # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
     podAnnotations: {}
+    podDisruptionBudget:
+      # -- Whether a pod disruption budget is enabled for `teams-plugins`.
+      enabled: false
+      # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+      # Either integers or percentages supported.
+      # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+      # If both are set, `minAvailable` will be preferred.
+      minAvailable: ""
+      # maxUnavailable: ""
     # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
     podSecurityContext: {}
     # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
