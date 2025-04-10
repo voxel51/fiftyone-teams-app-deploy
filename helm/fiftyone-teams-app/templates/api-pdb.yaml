@@ -1,0 +1,21 @@
+{{- if .Values.apiSettings.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "teams-api.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: {{ include "teams-api.name" . }}
+    {{- include "fiftyone-teams-api.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.apiSettings.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.apiSettings.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.apiSettings.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.apiSettings.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  {{- fail "You must set either 'minAvailable' or 'maxUnavailable' for the PodDisruptionBudget." }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "fiftyone-teams-api.selectorLabels" . | nindent 6 }}
+{{- end }}

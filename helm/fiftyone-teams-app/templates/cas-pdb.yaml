@@ -1,0 +1,21 @@
+{{- if .Values.casSettings.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "teams-cas.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: {{ include "teams-cas.name" . }}
+    {{- include "fiftyone-teams-cas.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.casSettings.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.casSettings.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.casSettings.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.casSettings.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  {{- fail "You must set either 'minAvailable' or 'maxUnavailable' for the PodDisruptionBudget." }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "fiftyone-teams-cas.selectorLabels" . | nindent 6 }}
+{{- end }}
