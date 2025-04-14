@@ -92,6 +92,16 @@ apiSettings:
   nodeSelector: {}
   # -- Annotations for pods for `teams-api`. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `teams-api`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext``
@@ -215,6 +225,16 @@ appSettings:
   nodeSelector: {}
   # -- Annotations for pods for `fiftyone-app`. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `fiftyone-app`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
@@ -327,6 +347,16 @@ casSettings:
   nodeSelector: {}
   # -- Annotations for pods for `teams-cas`. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `teams-cas`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
@@ -377,9 +407,9 @@ delegatedOperatorExecutorSettings:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
-    # -- Container image for delegated-operator-executor.
+    # -- Container image for `delegated-operator-executor`.
     repository: voxel51/fiftyone-teams-cv-full
-    # -- Image tag for delegated-operator-executor. Defaults to the chart version.
+    # -- Image tag for `delegated-operator-executor`. Defaults to the chart version.
     tag: ""
   # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
   labels: {}
@@ -399,7 +429,7 @@ delegatedOperatorExecutorSettings:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # -- Container resource requests and limits for delegated-operator-executor. [Reference][resources].
+  # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
   resources:
     limits: {}
     #   cpu: 2
@@ -408,18 +438,28 @@ delegatedOperatorExecutorSettings:
     #   cpu: 500m
     #   memory: 1Gi
 
-  # -- Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity].
+  # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
   affinity: {}
   # -- Deployment name
   name: "teams-do"
-  # -- nodeSelector for delegated-operator-executor. [Reference][node-selector].
+  # -- nodeSelector for `delegated-operator-executor`. [Reference][node-selector].
   nodeSelector: {}
-  # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
+  # -- Annotations for `delegated-operator-executor` pods. [Reference][annotations].
   podAnnotations: {}
-  # -- Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context].
+  # -- Pod Disruption Budget for pods for `delegated-operator-executor`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `delegated-operator-executor`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
+  # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
-  # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
+  # -- Container security configuration for `delegated-operator-executor`. [Reference][container-security-context].
   readiness:
     # -- Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].
     failureThreshold: 5
@@ -442,7 +482,7 @@ delegatedOperatorExecutorSettings:
   topologySpreadConstraints: []
   # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
   volumeMounts: []
-  # -- Volumes for delegated-operator-executor. [Reference][volumes].
+  # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
   volumes: []
 
 # FiftyOne Enterprise Delegated Operator Executor (teams-do) configurations.
@@ -485,9 +525,9 @@ delegatedOperatorDeployments:
       # -- Instruct when the kubelet should pull (download) the specified image.
       # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
       pullPolicy: Always
-      # -- Container image for delegated-operator-executor.
+      # -- Container image for `delegated-operator-executor`.
       repository: voxel51/fiftyone-teams-cv-full
-      # -- Image tag for delegated-operator-executor. Defaults to the chart version.
+      # -- Image tag for `delegated-operator-executor`. Defaults to the chart version.
       tag: ""
     # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
     labels: {}
@@ -507,7 +547,7 @@ delegatedOperatorDeployments:
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # -- Container resource requests and limits for delegated-operator-executor. [Reference][resources].
+    # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
     resources:
       limits: {}
       #   cpu: 2
@@ -516,16 +556,25 @@ delegatedOperatorDeployments:
       #   cpu: 500m
       #   memory: 1Gi
 
-    # -- Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity].
+    # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
     affinity: {}
-    # -- nodeSelector for delegated-operator-executor. [Reference][node-selector].
+    # -- nodeSelector for `delegated-operator-executor`. [Reference][node-selector].
     nodeSelector: {}
     # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
     podAnnotations: {}
-    # -- Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context].
+    podDisruptionBudget:
+      # -- Whether a pod disruption budget is enabled for `teams-plugins`.
+      enabled: false
+      # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+      # Either integers or percentages supported.
+      # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+      # If both are set, `minAvailable` will be preferred.
+      minAvailable: ""
+      # maxUnavailable: ""
+    # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
     podSecurityContext: {}
     # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
-    # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
+    # -- Container security configuration for `delegated-operator-executor`. [Reference][container-security-context].
     readiness:
       # -- Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].
       failureThreshold: 5
@@ -548,7 +597,7 @@ delegatedOperatorDeployments:
     tolerations: []
     # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
     volumeMounts: []
-    # -- Volumes for delegated-operator-executor. [Reference][volumes].
+    # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
     volumes: []
 
   # -- Additional deployments to configure. Each template
@@ -736,6 +785,16 @@ pluginsSettings:
   nodeSelector: {}
   # -- Annotations for `teams-plugins` pods. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `teams-plugins`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
@@ -909,6 +968,16 @@ teamsAppSettings:
   nodeSelector: {}
   # -- Annotations for `teams-app` pods. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `teams-app`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context].
   podSecurityContext: {}
   # TODO: Consider renaming `securityContext` to `containerSecurityContext`

@@ -481,6 +481,9 @@ follow
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for `teams-api`. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-api`. [Reference][annotations]. |
+| apiSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget]. |
+| apiSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-api`. |
+| apiSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
 | apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
 | apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-api` containers. |
@@ -519,6 +522,9 @@ follow
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for `fiftyone-app`. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for `fiftyone-app`. [Reference][annotations]. |
+| appSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget]. |
+| appSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `fiftyone-app`. |
+| appSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | appSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context]. |
 | appSettings.replicaCount | int | `2` | Number of pods in the `fiftyone-app` deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | appSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
@@ -554,6 +560,9 @@ follow
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for `teams-cas`. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-cas`. [Reference][annotations]. |
+| casSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget]. |
+| casSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-cas`. |
+| casSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context]. |
 | casSettings.replicaCount | int | `2` | Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment]. |
 | casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
@@ -573,29 +582,31 @@ follow
 | casSettings.volumeMounts | list | `[]` | Volume mounts for `teams-cas`. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for `teams-cas`. [Reference][volumes]. |
 | delegatedOperatorDeployments.deployments | object | `{}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
-| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
-| delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
+| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":""},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
+| delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
 | delegatedOperatorDeployments.template.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
 | delegatedOperatorDeployments.template.description | string | `""` | A description for the delegated operator instance. This is unused in the template context. Each operator should either set their own description or, optionally, use the default. If unset at the operator context, it will be defaulted to `Long running operations delegated to $name` where `$name` is the name of the Deployment object. |
 | delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
 | delegatedOperatorDeployments.template.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | delegatedOperatorDeployments.template.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
 | delegatedOperatorDeployments.template.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| delegatedOperatorDeployments.template.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for delegated-operator-executor. |
-| delegatedOperatorDeployments.template.image.tag | string | `""` | Image tag for delegated-operator-executor. Defaults to the chart version. |
+| delegatedOperatorDeployments.template.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for `delegated-operator-executor`. |
+| delegatedOperatorDeployments.template.image.tag | string | `""` | Image tag for `delegated-operator-executor`. Defaults to the chart version. |
 | delegatedOperatorDeployments.template.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
 | delegatedOperatorDeployments.template.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the `teams-do`. [Reference][probes]. |
-| delegatedOperatorDeployments.template.nodeSelector | object | `{}` | nodeSelector for delegated-operator-executor. [Reference][node-selector]. |
+| delegatedOperatorDeployments.template.nodeSelector | object | `{}` | nodeSelector for `delegated-operator-executor`. [Reference][node-selector]. |
 | delegatedOperatorDeployments.template.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
-| delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context]. |
-| delegatedOperatorDeployments.template.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for delegated-operator-executor. [Reference][container-security-context]. |
+| delegatedOperatorDeployments.template.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
+| delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
+| delegatedOperatorDeployments.template.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
-| delegatedOperatorDeployments.template.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
+| delegatedOperatorDeployments.template.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `delegated-operator-executor`. [Reference][resources]. |
 | delegatedOperatorDeployments.template.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
 | delegatedOperatorDeployments.template.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes]. |
@@ -603,30 +614,33 @@ follow
 | delegatedOperatorDeployments.template.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
 | delegatedOperatorDeployments.template.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-do` deployment(s). [Reference][topology-spread-constraints]. |
 | delegatedOperatorDeployments.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
-| delegatedOperatorDeployments.template.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
-| delegatedOperatorExecutorSettings.affinity | object | `{}` | Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity]. |
+| delegatedOperatorDeployments.template.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
+| delegatedOperatorExecutorSettings.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
 | delegatedOperatorExecutorSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
 | delegatedOperatorExecutorSettings.enabled | bool | `false` | Controls whether to create a dedicated `teams-do` deployment. Disabled by default, meaning delegated operations will not be executed without an external executor system. |
 | delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
 | delegatedOperatorExecutorSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | delegatedOperatorExecutorSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
 | delegatedOperatorExecutorSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for delegated-operator-executor. |
-| delegatedOperatorExecutorSettings.image.tag | string | `""` | Image tag for delegated-operator-executor. Defaults to the chart version. |
+| delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for `delegated-operator-executor`. |
+| delegatedOperatorExecutorSettings.image.tag | string | `""` | Image tag for `delegated-operator-executor`. Defaults to the chart version. |
 | delegatedOperatorExecutorSettings.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
 | delegatedOperatorExecutorSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.name | string | `"teams-do"` | Deployment name |
-| delegatedOperatorExecutorSettings.nodeSelector | object | `{}` | nodeSelector for delegated-operator-executor. [Reference][node-selector]. |
-| delegatedOperatorExecutorSettings.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
-| delegatedOperatorExecutorSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context]. |
-| delegatedOperatorExecutorSettings.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for delegated-operator-executor. [Reference][container-security-context]. |
+| delegatedOperatorExecutorSettings.nodeSelector | object | `{}` | nodeSelector for `delegated-operator-executor`. [Reference][node-selector]. |
+| delegatedOperatorExecutorSettings.podAnnotations | object | `{}` | Annotations for `delegated-operator-executor` pods. [Reference][annotations]. |
+| delegatedOperatorExecutorSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `delegated-operator-executor`. [Reference][pod-disruption-budget]. |
+| delegatedOperatorExecutorSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `delegated-operator-executor`. |
+| delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| delegatedOperatorExecutorSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
+| delegatedOperatorExecutorSettings.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorExecutorSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
-| delegatedOperatorExecutorSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for delegated-operator-executor. [Reference][resources]. |
+| delegatedOperatorExecutorSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `delegated-operator-executor`. [Reference][resources]. |
 | delegatedOperatorExecutorSettings.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
 | delegatedOperatorExecutorSettings.securityContext | object | `{}` |  |
 | delegatedOperatorExecutorSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-do`. [Reference][probes]. |
@@ -635,7 +649,7 @@ follow
 | delegatedOperatorExecutorSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
 | delegatedOperatorExecutorSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-do` deployment. [Reference][topology-spread-constraints]. |
 | delegatedOperatorExecutorSettings.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
-| delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for delegated-operator-executor. [Reference][volumes]. |
+| delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
@@ -676,6 +690,9 @@ follow
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for `teams-plugins`. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for `teams-plugins` pods. [Reference][annotations]. |
+| pluginsSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget]. |
+| pluginsSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
+| pluginsSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | pluginsSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context]. |
 | pluginsSettings.replicaCount | int | `2` | Number of pods in the `teams-plugins` deployment's ReplicaSet. Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | pluginsSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-plugins`. [Reference][resources]. |
@@ -730,6 +747,9 @@ follow
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for `teams-app`.  [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for `teams-app` pods. [Reference][annotations]. |
+| teamsAppSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget]. |
+| teamsAppSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-app`. |
+| teamsAppSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | teamsAppSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context]. |
 | teamsAppSettings.replicaCount | int | `2` | Number of pods in the `teams-app` deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-app`.  [Reference][resources]. |
@@ -766,6 +786,7 @@ follow
 [legacy-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#legacy-mode
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+[pod-disruption-budget]: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
 [ports]: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
 [probes]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 [recoil-env]: https://recoiljs.org/docs/api-reference/core/RecoilEnv/
