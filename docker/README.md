@@ -18,7 +18,7 @@ FiftyOne Enterprise is the enterprise version of the open source
 [FiftyOne](https://github.com/voxel51/fiftyone)
 project.
 
-The FiftyOne Enterprise docker-compose files are the recommended way to
+The FiftyOne Enterprise Docker Compose files are the recommended way to
 install and configure FiftyOne Enterprise on Docker.
 
 This page assumes general knowledge of FiftyOne Enterprise and how to use it.
@@ -149,7 +149,7 @@ To deploy FiftyOne Enterprise:
     1. In the same directory, run
 
         ```shell
-        docker-compose up -d
+        docker compose up -d
         ```
 
 1. After the successful installation, and logging into FiftyOne Enterprise
