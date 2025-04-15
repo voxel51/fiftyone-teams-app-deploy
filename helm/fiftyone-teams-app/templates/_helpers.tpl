@@ -309,7 +309,7 @@ Common Init Containers
     - "until wget -qO /dev/null {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local/cas/api; do echo waiting for cas; sleep 2; done"
   {{- if hasKey $ "resources" }}
   resources:
-    {{- toYaml $.resources | nindent 2 }}
+    {{- toYaml $.resources | nindent 4 }}
   {{- end }}
 {{- end }}
 
