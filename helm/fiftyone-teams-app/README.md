@@ -478,6 +478,7 @@ follow
 | apiSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-api`. [Reference][init-containers]. |
+| apiSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for `teams-api`. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-api`. [Reference][annotations]. |
@@ -519,6 +520,7 @@ follow
 | appSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `fiftyone-app`. [Reference][init-containers]. |
+| appSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for `fiftyone-app`. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for `fiftyone-app`. [Reference][annotations]. |
@@ -557,6 +559,7 @@ follow
 | casSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-cas`. [Reference][init-containers]. |
+| casSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for `teams-cas`. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-cas`. [Reference][annotations]. |
@@ -687,6 +690,7 @@ follow
 | pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-plugins`. [Reference][init-containers]. |
+| pluginsSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for `teams-plugins`. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for `teams-plugins` pods. [Reference][annotations]. |
@@ -744,6 +748,7 @@ follow
 | teamsAppSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-app`.  [Reference][init-containers]. |
+| teamsAppSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for `teams-app`.  [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for `teams-app` pods. [Reference][annotations]. |

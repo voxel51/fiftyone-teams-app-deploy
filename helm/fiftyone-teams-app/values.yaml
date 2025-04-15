@@ -88,6 +88,18 @@ apiSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-api`. [Reference][init-containers].
       tag: stable-glibc
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # -- Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources].
+    resources:
+      limits: {}
+      #   cpu: 2
+      #   memory: 6Gi
+      requests: {}
+      #   cpu: 500m
+      #   memory: 512Mi
   # -- nodeSelector for `teams-api`. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for `teams-api`. [Reference][annotations].
@@ -221,6 +233,18 @@ appSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `fiftyone-app`. [Reference][init-containers].
       tag: stable-glibc
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # -- Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources].
+    resources:
+      limits: {}
+      #   cpu: 2
+      #   memory: 6Gi
+      requests: {}
+      #   cpu: 500m
+      #   memory: 512Mi
   # -- nodeSelector for `fiftyone-app`. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for `fiftyone-app`. [Reference][annotations].
@@ -343,6 +367,18 @@ casSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-cas`. [Reference][init-containers].
       tag: stable-glibc
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # -- Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources].
+    resources:
+      limits: {}
+      #   cpu: 2
+      #   memory: 6Gi
+      requests: {}
+      #   cpu: 500m
+      #   memory: 512Mi
   # -- nodeSelector for `teams-cas`. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for `teams-cas`. [Reference][annotations].
@@ -781,6 +817,18 @@ pluginsSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-plugins`. [Reference][init-containers].
       tag: stable-glibc
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # -- Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources].
+    resources:
+      limits: {}
+      #   cpu: 2
+      #   memory: 6Gi
+      requests: {}
+      #   cpu: 500m
+      #   memory: 512Mi
   # -- nodeSelector for `teams-plugins`. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for `teams-plugins` pods. [Reference][annotations].
@@ -964,6 +1012,18 @@ teamsAppSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-app`.  [Reference][init-containers].
       tag: stable-glibc
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # -- Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources].
+    resources:
+      limits: {}
+      #   cpu: 2
+      #   memory: 6Gi
+      requests: {}
+      #   cpu: 500m
+      #   memory: 512Mi
   # -- nodeSelector for `teams-app`.  [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for `teams-app` pods. [Reference][annotations].
