@@ -9,6 +9,9 @@ metadata:
   namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "teams-app.labels" . | nindent 4 }}
+    {{- with .Values.teamsAppSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   type: {{ .Values.teamsAppSettings.service.type }}
   ports:

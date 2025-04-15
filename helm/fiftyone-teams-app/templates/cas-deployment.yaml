@@ -9,6 +9,9 @@ metadata:
   {{- end }}
   labels:
     {{- include "fiftyone-teams-cas.labels" . | nindent 4 }}
+    {{- with .Values.casSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.casSettings.replicaCount | default 2 }}
   selector:

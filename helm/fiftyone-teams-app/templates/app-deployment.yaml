@@ -9,6 +9,9 @@ metadata:
   {{- end }}
   labels:
     {{- include "fiftyone-app.labels" . | nindent 4 }}
+    {{- with .Values.appSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   {{- if not .Values.appSettings.autoscaling.enabled }}
   replicas: {{ .Values.appSettings.replicaCount | default 2 }}

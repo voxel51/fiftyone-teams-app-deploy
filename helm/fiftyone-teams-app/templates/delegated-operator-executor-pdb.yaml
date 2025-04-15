@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "delegated-operator-executor.labels" . | nindent 4 }}
+    {{- with .Values.casSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   {{- if .Values.delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable }}

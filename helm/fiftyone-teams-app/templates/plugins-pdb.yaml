@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "teams-plugins.labels" . | nindent 4 }}
+    {{- with .Values.pluginsSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   {{- if .Values.pluginsSettings.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.pluginsSettings.podDisruptionBudget.minAvailable }}
