@@ -103,10 +103,11 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 		{
 			"overrideBaseTemplateEnabledAndInstanceEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":               "true",
-				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":          "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                         "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled": "false",
+				"delegatedOperatorDeployments.template.labels.color":                     "blue",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.color":       "red",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -115,6 +116,15 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 					"app.kubernetes.io/managed-by": "Helm",
 					"app.kubernetes.io/name":       "teams-do",
 					"app.kubernetes.io/instance":   "fiftyone-test",
+					"color":                        "blue",
+				},
+				map[string]string{
+					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
+					"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
+					"app.kubernetes.io/managed-by": "Helm",
+					"app.kubernetes.io/name":       "teams-do-two",
+					"app.kubernetes.io/instance":   "fiftyone-test",
+					"color":                        "red",
 				},
 			},
 		},
