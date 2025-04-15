@@ -10,9 +10,6 @@ metadata:
   labels:
     app: {{ include "teams-api.name" . }}
     {{- include "fiftyone-teams-api.labels" . | nindent 4 }}
-    {{- with .Values.apiSettings.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
 spec:
   {{- if and (gt ( int .Values.apiSettings.replicaCount)  1) (.Values.apiSettings.env.FIFTYONE_SHARED_ROOT_DIR) }}
   replicas: {{ .Values.apiSettings.replicaCount }}

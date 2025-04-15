@@ -10,9 +10,6 @@ metadata:
   {{- end }}
   labels:
     {{- include "teams-plugins.labels" . | nindent 4 }}
-    {{- with .Values.pluginsSettings.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
 spec:
   {{- if not .Values.pluginsSettings.autoscaling.enabled }}
   replicas: {{ .Values.pluginsSettings.replicaCount | default 2 }}

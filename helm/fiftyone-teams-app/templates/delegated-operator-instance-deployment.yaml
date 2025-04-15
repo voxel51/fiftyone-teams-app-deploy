@@ -24,9 +24,6 @@ metadata:
   {{- end }}
   labels:
     {{- include "delegated-operator-deployments.labels" $labelContext | nindent 4 }}
-    {{- with (merge (dict) ($v.labels | default dict) ($baseTpl.labels)) }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
 spec:
   replicas: {{ $v.replicaCount | default $baseTpl.replicaCount }}
   selector:

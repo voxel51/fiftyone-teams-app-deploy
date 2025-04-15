@@ -80,6 +80,7 @@ func (s *pdbTeamsAppTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
+				"teamsAppSettings.labels.color":                     "blue",
 				"teamsAppSettings.podDisruptionBudget.enabled":      "true",
 				"teamsAppSettings.podDisruptionBudget.minAvailable": "1",
 				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
@@ -93,6 +94,7 @@ func (s *pdbTeamsAppTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "fiftyone-teams-app",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

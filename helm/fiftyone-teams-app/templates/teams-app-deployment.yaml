@@ -9,9 +9,6 @@ metadata:
   {{- end }}
   labels:
     {{- include "teams-app.labels" . | nindent 4 }}
-    {{- with .Values.teamsAppSettings.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
 spec:
   {{- if not .Values.teamsAppSettings.autoscaling.enabled }}
   replicas: {{ .Values.teamsAppSettings.replicaCount | default 2 }}
