@@ -1890,6 +1890,67 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerCommand() {
 	}
 }
 
+func (s *deploymentPluginsTemplateTest) TestInitContainerResourceRequirements() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(resourceRequirements corev1.ResourceRequirements)
+	}{
+		{
+			"defaultValues",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			func(resourceRequirements corev1.ResourceRequirements) {
+				s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
+				s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
+				s.Nil(resourceRequirements.Claims, "should be nil")
+			},
+		},
+		{
+			"overrideResources",
+			map[string]string{
+				"pluginsSettings.enabled":                                  "true",
+				"pluginsSettings.initContainers.resources.limits.cpu":      "1",
+				"pluginsSettings.initContainers.resources.limits.memory":   "1Gi",
+				"pluginsSettings.initContainers.resources.requests.cpu":    "500m",
+				"pluginsSettings.initContainers.resources.requests.memory": "512Mi",
+			},
+			func(resourceRequirements corev1.ResourceRequirements) {
+				resourceExpected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("1"),
+						"memory": resource.MustParse("1Gi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("500m"),
+						"memory": resource.MustParse("512Mi"),
+					},
+				}
+				s.Equal(resourceExpected, resourceRequirements, "should be equal")
+				s.Nil(resourceRequirements.Claims, "should be nil")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].Resources)
+		})
+	}
+}
+
 func (s *deploymentPluginsTemplateTest) TestAffinity() {
 	testCases := []struct {
 		name     string

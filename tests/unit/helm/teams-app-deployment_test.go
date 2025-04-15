@@ -1734,6 +1734,64 @@ func (s *deploymentTeamsAppTemplateTest) TestInitContainerCommand() {
 	}
 }
 
+func (s *deploymentTeamsAppTemplateTest) TestInitContainerResourceRequirements() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(resourceRequirements corev1.ResourceRequirements)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(resourceRequirements corev1.ResourceRequirements) {
+				s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
+				s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
+				s.Nil(resourceRequirements.Claims, "should be nil")
+			},
+		},
+		{
+			"overrideResources",
+			map[string]string{
+				"teamsAppSettings.initContainers.resources.limits.cpu":      "1",
+				"teamsAppSettings.initContainers.resources.limits.memory":   "1Gi",
+				"teamsAppSettings.initContainers.resources.requests.cpu":    "500m",
+				"teamsAppSettings.initContainers.resources.requests.memory": "512Mi",
+			},
+			func(resourceRequirements corev1.ResourceRequirements) {
+				resourceExpected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("1"),
+						"memory": resource.MustParse("1Gi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("500m"),
+						"memory": resource.MustParse("512Mi"),
+					},
+				}
+				s.Equal(resourceExpected, resourceRequirements, "should be equal")
+				s.Nil(resourceRequirements.Claims, "should be nil")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].Resources)
+		})
+	}
+}
+
 func (s *deploymentTeamsAppTemplateTest) TestAffinity() {
 	testCases := []struct {
 		name     string

@@ -172,7 +172,7 @@ Additionally,
 Kubernetes [`initContainers`][init-containers]
 were added in Version 2.2.0 to enforce the order of pod startup.
 The image and tag are customizable.
-Any image supporting `nslookup`, such as `docker.io/busybox`, are applicable
+Any image supporting `wget`, such as `docker.io/busybox`, are applicable
 replacements.
 
 For a full list of settings, please refer to the
