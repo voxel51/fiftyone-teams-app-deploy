@@ -43,6 +43,9 @@ apiSettings:
   # -- Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors].
   labels: {}
 
+  # -- Number of pods in the `teams-api` deployment's ReplicaSet.
+  # Must be used in conjunction with `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`.
+  replicaCount: 1
   # Instead of setting default resources, we require the user define them
   # This enables running on resource constrained environments
   # (like Minikube). To set resources, uncomment the following

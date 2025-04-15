@@ -486,6 +486,7 @@ follow
 | apiSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-api`. |
 | apiSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
+| apiSettings.replicaCount | int | `1` | Number of pods in the `teams-api` deployment's ReplicaSet. Must be used in conjunction with `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`. |
 | apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
 | apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-api` containers. |
 | apiSettings.securityContext | object | `{}` | Container security configuration for `teams-api`. [Reference][container-security-context]. |
