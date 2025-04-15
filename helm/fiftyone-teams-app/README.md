@@ -479,7 +479,7 @@ follow
 | apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
-| apiSettings.labels | object | `{}` | Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors]. |
+| apiSettings.labels | object | `{}` | Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for `teams-api`. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-api`. [Reference][annotations]. |
 | apiSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget]. |
@@ -521,7 +521,7 @@ follow
 | appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
-| appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors]. |
+| appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for `fiftyone-app`. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for `fiftyone-app`. [Reference][annotations]. |
 | appSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget]. |
@@ -560,7 +560,7 @@ follow
 | casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
-| casSettings.labels | object | `{}` | Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors]. |
+| casSettings.labels | object | `{}` | Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for `teams-cas`. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-cas`. [Reference][annotations]. |
 | casSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget]. |
@@ -595,7 +595,7 @@ follow
 | delegatedOperatorDeployments.template.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | delegatedOperatorDeployments.template.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for `delegated-operator-executor`. |
 | delegatedOperatorDeployments.template.image.tag | string | `""` | Image tag for `delegated-operator-executor`. Defaults to the chart version. |
-| delegatedOperatorDeployments.template.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
+| delegatedOperatorDeployments.template.labels | object | `{}` | Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors]. |
 | delegatedOperatorDeployments.template.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the `teams-do`. [Reference][probes]. |
@@ -627,7 +627,7 @@ follow
 | delegatedOperatorExecutorSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for `delegated-operator-executor`. |
 | delegatedOperatorExecutorSettings.image.tag | string | `""` | Image tag for `delegated-operator-executor`. Defaults to the chart version. |
-| delegatedOperatorExecutorSettings.labels | object | `{}` | Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors]. |
+| delegatedOperatorExecutorSettings.labels | object | `{}` | Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors]. |
 | delegatedOperatorExecutorSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorExecutorSettings.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the `teams-do`. [Reference][probes]. |
@@ -691,7 +691,7 @@ follow
 | pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
-| pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors]. |
+| pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for `teams-plugins`. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for `teams-plugins` pods. [Reference][annotations]. |
 | pluginsSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget]. |
@@ -721,9 +721,11 @@ follow
 | secret.fiftyone.fiftyoneAuthSecret | string | `""` | A randomly generated string for CAS Authentication. This can be any string you care to use generated by any mechanism you   prefer. This is used for inter-service authentication and for the SuperUser to  authenticate at the CAS UI to configure the Central Authentication Service. |
 | secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Enterprise. |
 | secret.fiftyone.mongodbConnectionString | string | `""` | MongoDB Connection String. [Reference][mongodb-connection-string]. |
+| secret.labels | object | `{}` | Additional labels for the generated secret. [Reference][labels-and-selectors]. |
 | secret.name | string | `"fiftyone-teams-secrets"` | Name of the secret (existing or to be created) in the namespace `namespace.name`. |
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
 | serviceAccount.create | bool | `true` | Controls whether to create the service account named `serviceAccount.name`. |
+| serviceAccount.labels | object | `{}` | Additional labels for the generated service account. [Reference][labels-and-selectors]. |
 | serviceAccount.name | string | `"fiftyone-teams"` | Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments. [Reference][service-account]. |
 | teamsAppSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-app`.  [Reference][affinity]. |
 | teamsAppSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for `teams-app`.  [Reference][autoscaling]. |
@@ -749,7 +751,7 @@ follow
 | teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
-| teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors]. |
+| teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for `teams-app`.  [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for `teams-app` pods. [Reference][annotations]. |
 | teamsAppSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget]. |
