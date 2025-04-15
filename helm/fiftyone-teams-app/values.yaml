@@ -43,10 +43,10 @@ apiSettings:
   # -- Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors].
   labels: {}
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-api`. [Reference][resources].
   resources:
     limits: {}
@@ -88,10 +88,10 @@ apiSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-api`. [Reference][init-containers].
       tag: stable-glibc
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # Instead of setting default resources, we require the user define them
+    # This enables running on resource constrained environments
+    # (like Minikube). To set resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
     # -- Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources].
     resources:
       limits: {}
@@ -188,10 +188,10 @@ appSettings:
   # Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `fiftyone-app`. [Reference][resources].
   resources:
     limits: {}
@@ -233,10 +233,10 @@ appSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `fiftyone-app`. [Reference][init-containers].
       tag: stable-glibc
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # Instead of setting default resources, we require the user define them
+    # This enables running on resource constrained environments
+    # (like Minikube). To set resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
     # -- Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources].
     resources:
       limits: {}
@@ -322,10 +322,10 @@ casSettings:
   # -- Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].
   replicaCount: 2
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-cas`. [Reference][resources].
   resources:
     limits: {}
@@ -367,10 +367,10 @@ casSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-cas`. [Reference][init-containers].
       tag: stable-glibc
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # Instead of setting default resources, we require the user define them
+    # This enables running on resource constrained environments
+    # (like Minikube). To set resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
     # -- Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources].
     resources:
       limits: {}
@@ -461,10 +461,10 @@ delegatedOperatorExecutorSettings:
   #  max concurrent delegated operators, which defaults to 3.
   replicaCount: 3
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
   resources:
     limits: {}
@@ -579,10 +579,10 @@ delegatedOperatorDeployments:
     #  max concurrent delegated operators, which defaults to 3.
     replicaCount: 3
 
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # Instead of setting default resources, we require the user define them
+    # This enables running on resource constrained environments
+    # (like Minikube). To set resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
     # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
     resources:
       limits: {}
@@ -772,10 +772,10 @@ pluginsSettings:
   # Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-plugins`. [Reference][resources].
   resources:
     limits: {}
@@ -817,10 +817,10 @@ pluginsSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-plugins`. [Reference][init-containers].
       tag: stable-glibc
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # Instead of setting default resources, we require the user define them
+    # This enables running on resource constrained environments
+    # (like Minikube). To set resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
     # -- Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources].
     resources:
       limits: {}
@@ -967,10 +967,10 @@ teamsAppSettings:
   # Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-app`.  [Reference][resources].
   resources:
     limits: {}
@@ -1012,10 +1012,10 @@ teamsAppSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-app`.  [Reference][init-containers].
       tag: stable-glibc
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # Instead of setting default resources, we require the user define them
+    # This enables running on resource constrained environments
+    # (like Minikube). To set resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
     # -- Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources].
     resources:
       limits: {}
