@@ -80,6 +80,7 @@ func (s *pdbAppTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
+				"appSettings.labels.color":                     "blue",
 				"appSettings.podDisruptionBudget.enabled":      "true",
 				"appSettings.podDisruptionBudget.minAvailable": "1",
 				"appSettings.service.name":                     "test-service-name",
@@ -90,6 +91,7 @@ func (s *pdbAppTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

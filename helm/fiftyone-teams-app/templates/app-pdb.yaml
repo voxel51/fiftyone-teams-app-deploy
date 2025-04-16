@@ -7,6 +7,9 @@ metadata:
   labels:
     app: {{ include "fiftyone-app.name" . }}
     {{- include "fiftyone-app.labels" . | nindent 4 }}
+    {{- with .Values.appSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   {{- if .Values.appSettings.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.appSettings.podDisruptionBudget.minAvailable }}

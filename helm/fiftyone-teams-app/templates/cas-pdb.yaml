@@ -7,6 +7,9 @@ metadata:
   labels:
     app: {{ include "teams-cas.name" . }}
     {{- include "fiftyone-teams-cas.labels" . | nindent 4 }}
+    {{- with .Values.casSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   {{- if .Values.casSettings.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.casSettings.podDisruptionBudget.minAvailable }}

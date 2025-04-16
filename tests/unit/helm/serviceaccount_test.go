@@ -248,7 +248,8 @@ func (s *serviceAccountTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				"serviceAccount.name": "test-service-account-name",
+				"serviceAccount.name":         "test-service-account-name",
+				"serviceAccount.labels.color": "blue",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -256,6 +257,7 @@ func (s *serviceAccountTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-account-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

@@ -40,7 +40,7 @@ apiSettings:
     repository: voxel51/fiftyone-teams-api
     # -- Image tag for `teams-api`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors].
   labels: {}
 
   # Instead of setting default resources, we require the user define them
@@ -182,7 +182,7 @@ appSettings:
     repository: voxel51/fiftyone-app
     # -- Image tag for `fiftyone-app`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the `fiftyone-app` deployment's ReplicaSet.
   # Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].
@@ -317,7 +317,7 @@ casSettings:
     repository: voxel51/fiftyone-teams-cas
     # -- Image tag for `teams-cas`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].
   replicaCount: 2
@@ -447,7 +447,7 @@ delegatedOperatorExecutorSettings:
     repository: voxel51/fiftyone-teams-cv-full
     # -- Image tag for `delegated-operator-executor`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors].
   labels: {}
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-do`. [Reference][probes].
@@ -565,7 +565,7 @@ delegatedOperatorDeployments:
       repository: voxel51/fiftyone-teams-cv-full
       # -- Image tag for `delegated-operator-executor`. Defaults to the chart version.
       tag: ""
-    # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
+    # -- Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors].
     labels: {}
     liveness:
       # -- Number of times to retry the liveness probe for the `teams-do`. [Reference][probes].
@@ -766,7 +766,7 @@ pluginsSettings:
     repository: voxel51/fiftyone-app
     # -- Image tag for `teams-plugins`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the `teams-plugins` deployment's ReplicaSet.
   # Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].
@@ -880,6 +880,8 @@ secret:
     # This is used for inter-service authentication and for the SuperUser to
     #  authenticate at the CAS UI to configure the Central Authentication Service.
     fiftyoneAuthSecret: ""
+  # -- Additional labels for the generated secret. [Reference][labels-and-selectors].
+  labels: {}
 
 serviceAccount:
   # -- Service Account annotations. [Reference][annotations].
@@ -889,6 +891,8 @@ serviceAccount:
   # -- Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments.
   # [Reference][service-account].
   name: "fiftyone-teams"
+  # -- Additional labels for the generated service account. [Reference][labels-and-selectors].
+  labels: {}
 
 # FiftyOne Enterprise App (teams-app) configurations
 teamsAppSettings:
@@ -954,7 +958,7 @@ teamsAppSettings:
     repository: voxel51/fiftyone-teams-app
     # -- Image tag for `teams-app`.  Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors].
   labels: {}
   # -- Overrides the `FIFTYONE_API_URI` environment variable. When set
   # `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance

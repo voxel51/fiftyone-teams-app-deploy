@@ -120,6 +120,7 @@ func (s *serviceAppTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
+				"appSettings.labels.color": "blue",
 				"appSettings.service.name": "test-service-name",
 			},
 			map[string]string{
@@ -128,6 +129,7 @@ func (s *serviceAppTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

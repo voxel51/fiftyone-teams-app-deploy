@@ -89,6 +89,7 @@ func (s *pdbDelegatedOperatorExecutorTemplateTest) TestMetadataLabels() {
 			"overrideMetadataLabels",
 			map[string]string{
 				"delegatedOperatorExecutorSettings.enabled":                          "true",
+				"delegatedOperatorExecutorSettings.labels.color":                     "blue",
 				"delegatedOperatorExecutorSettings.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable": "1",
 				"delegatedOperatorExecutorSettings.name":                             "test-service-name",
@@ -99,6 +100,7 @@ func (s *pdbDelegatedOperatorExecutorTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

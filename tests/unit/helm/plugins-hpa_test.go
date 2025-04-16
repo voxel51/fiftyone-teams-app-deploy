@@ -90,6 +90,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataLabels() {
 			map[string]string{
 				"pluginsSettings.autoscaling.enabled": "true",
 				"pluginsSettings.enabled":             "true",
+				"pluginsSettings.labels.color":        "blue",
 				"pluginsSettings.service.name":        "test-service-name",
 			},
 			map[string]string{
@@ -98,6 +99,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

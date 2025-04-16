@@ -251,6 +251,9 @@ Service Account labels
 {{ include "fiftyone-teams-app.commonLabels" . }}
 app.kubernetes.io/name: {{ default (include "fiftyone-teams-app.fullname" .) .Values.serviceAccount.name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.serviceAccount.labels }}
+{{ toYaml . }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -261,6 +264,18 @@ Ingress labels
 app.kubernetes.io/name: {{ include "fiftyone-teams-app.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- with .Values.ingress.labels }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Secret labels
+*/}}
+{{- define "fiftyone-teams-app.secretLabels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+app.kubernetes.io/name: {{ include "fiftyone-teams-app.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.secret.labels }}
 {{ toYaml . }}
 {{- end }}
 {{- end }}

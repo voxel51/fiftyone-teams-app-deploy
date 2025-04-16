@@ -5,7 +5,7 @@ package unit
 
 import (
 	// "encoding/json"
-	// "fmt"
+	"fmt"
 	"path/filepath"
 	// "reflect"
 	"strings"
@@ -86,6 +86,72 @@ func (s *secretsTemplateTest) TestDisabled() {
 				helm.UnmarshalK8SYaml(subT, output, &secret)
 
 				s.Equal(testCase.expected, secret.ObjectMeta.Name, "Name should be set")
+			}
+		})
+	}
+}
+
+func (s *secretsTemplateTest) TestMetadataLabels() {
+	// Get chart info (to later obtain the chart's appVersion)
+	cInfo, err := chartInfo(s.T(), s.chartPath)
+	s.NoError(err)
+
+	// Get appVersion from chart info
+	chartAppVersion, exists := cInfo["appVersion"]
+	s.True(exists, "failed to get app version from chart info")
+
+	// Get version from chart info
+	chartVersion, exists := cInfo["version"]
+	s.True(exists, "failed to get version from chart info")
+
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected map[string]string
+	}{
+		{
+			"defaultValues",
+			nil,
+			map[string]string{
+				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
+				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
+				"app.kubernetes.io/managed-by": "Helm",
+				"app.kubernetes.io/name":       "fiftyone-test-fiftyone-teams-app",
+				"app.kubernetes.io/instance":   "fiftyone-test",
+			},
+		},
+		{
+			"overrideMetadataLabels",
+			map[string]string{
+				"secret.labels.color": "blue",
+			},
+			map[string]string{
+				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
+				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
+				"app.kubernetes.io/managed-by": "Helm",
+				"app.kubernetes.io/name":       "fiftyone-test-fiftyone-teams-app",
+				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var service corev1.Service
+			helm.UnmarshalK8SYaml(subT, output, &service)
+
+			for key, value := range testCase.expected {
+				foundValue := service.ObjectMeta.Labels[key]
+				s.Equal(value, foundValue, "Labels should contain all set labels.")
 			}
 		})
 	}
