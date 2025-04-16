@@ -891,6 +891,8 @@ secret:
 serviceAccount:
   # -- Service Account annotations. [Reference][annotations].
   annotations: {}
+  # -- Whether to automount the service account's API credentials.
+  automount: true
   # -- Controls whether to create the service account named `serviceAccount.name`.
   create: true
   # -- Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments.

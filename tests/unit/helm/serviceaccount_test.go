@@ -282,3 +282,42 @@ func (s *serviceAccountTemplateTest) TestMetadataLabels() {
 		})
 	}
 }
+
+func (s *serviceAccountTemplateTest) TestAutomountServiceAccountToken() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected bool
+	}{
+		{
+			"defaultValues",
+			nil,
+			true,
+		},
+		{
+			"overrideAutomount",
+			map[string]string{
+				"serviceAccount.automount": "false",
+			},
+			false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var serviceAccount corev1.ServiceAccount
+			helm.UnmarshalK8SYaml(subT, output, &serviceAccount)
+
+			s.Equal(testCase.expected, *serviceAccount.AutomountServiceAccountToken, "Automount Service Account Token should be equal.")
+		})
+	}
+}

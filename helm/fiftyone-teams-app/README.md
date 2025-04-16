@@ -725,6 +725,7 @@ follow
 | secret.labels | object | `{}` | Additional labels for the generated secret. [Reference][labels-and-selectors]. |
 | secret.name | string | `"fiftyone-teams-secrets"` | Name of the secret (existing or to be created) in the namespace `namespace.name`. |
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
+| serviceAccount.automount | bool | `true` | Whether to automount the service account's API credentials. |
 | serviceAccount.create | bool | `true` | Controls whether to create the service account named `serviceAccount.name`. |
 | serviceAccount.labels | object | `{}` | Additional labels for the generated service account. [Reference][labels-and-selectors]. |
 | serviceAccount.name | string | `"fiftyone-teams"` | Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments. [Reference][service-account]. |
