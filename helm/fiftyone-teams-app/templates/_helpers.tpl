@@ -326,6 +326,10 @@ Common Init Containers
   resources:
     {{- toYaml $.resources | nindent 4 }}
   {{- end }}
+  {{- if hasKey $ "containerSecurityContext" }}
+  securityContext:
+    {{- toYaml $.containerSecurityContext | nindent 4 }}
+  {{- end }}
 {{- end }}
 
 {{/*

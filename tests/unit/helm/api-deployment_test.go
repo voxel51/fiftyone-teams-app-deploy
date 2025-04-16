@@ -1643,6 +1643,60 @@ func (s *deploymentApiTemplateTest) TestInitContainerResourceRequirements() {
 	}
 }
 
+func (s *deploymentApiTemplateTest) TestInitContainerSecurityContext() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(securityContext *corev1.SecurityContext)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(securityContext *corev1.SecurityContext) {
+				s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
+				s.Nil(securityContext.Capabilities, "should be nil")
+				s.Nil(securityContext.Privileged, "should be nil")
+				s.Nil(securityContext.ProcMount, "should be nil")
+				s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
+				s.Nil(securityContext.RunAsGroup, "should be nil")
+				s.Nil(securityContext.RunAsNonRoot, "should be nil")
+				s.Nil(securityContext.RunAsUser, "should be nil")
+				s.Nil(securityContext.SeccompProfile, "should be nil")
+				s.Nil(securityContext.SELinuxOptions, "should be nil")
+				s.Nil(securityContext.WindowsOptions, "should be nil")
+			},
+		},
+		{
+			"overrideSecurityContext",
+			map[string]string{
+				"apiSettings.initContainers.containerSecurityContext.runAsGroup": "3000",
+				"apiSettings.initContainers.containerSecurityContext.runAsUser":  "1000",
+			},
+			func(securityContext *corev1.SecurityContext) {
+				s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
+				s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].SecurityContext)
+		})
+	}
+}
+
 func (s *deploymentApiTemplateTest) TestAffinity() {
 	testCases := []struct {
 		name     string
