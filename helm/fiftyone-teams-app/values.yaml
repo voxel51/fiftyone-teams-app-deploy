@@ -43,6 +43,11 @@ apiSettings:
   # -- Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors].
   labels: {}
 
+  # -- Number of pods in the `teams-api` deployment's ReplicaSet.
+  # When > 1, you must also configure volumes, volumeMounts and set
+  # `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`.
+  # For more information see [the documentation][configure-ha-teams-api].
+  replicaCount: 1
   # Instead of setting default resources, we require the user define them
   # This enables running on resource constrained environments
   # (like Minikube). To set resources, uncomment the following
