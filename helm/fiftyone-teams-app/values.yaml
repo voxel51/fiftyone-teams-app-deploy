@@ -86,6 +86,8 @@ apiSettings:
   # -- Affinity and anti-affinity for `teams-api`. [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext: {}
     # -- Whether to enable init containers for `teams-api`. [Reference][init-containers].
     enabled: true
     image:
@@ -121,7 +123,7 @@ apiSettings:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
-  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext``
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
   # -- Container security configuration for `teams-api`. [Reference][container-security-context].
   securityContext: {}
   # -- Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations].
@@ -231,6 +233,8 @@ appSettings:
   # -- Affinity and anti-affinity for `fiftyone-app`. [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext: {}
     # -- Whether to enable init containers for `fiftyone-app`. [Reference][init-containers].
     enabled: true
     image:
@@ -266,7 +270,7 @@ appSettings:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].
   podSecurityContext: {}
-  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
   # -- Container security configuration for `fiftyone-app`. [Reference][container-security-context].
   securityContext: {}
   # -- Allow the k8s scheduler to schedule `fiftyone-app` pods with matching taints. [Reference][taints-and-tolerations].
@@ -365,6 +369,8 @@ casSettings:
   # -- Affinity and anti-affinity for `teams-cas`. [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `teams-cas` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext: {}
     # -- Whether to enable init containers for `teams-cas`. [Reference][init-containers].
     enabled: true
     image:
@@ -400,7 +406,7 @@ casSettings:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context].
   podSecurityContext: {}
-  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
   # -- Container security configuration for `teams-cas`. [Reference][container-security-context].
   securityContext: {}
   # -- Allow the k8s scheduler to schedule `teams-cas` pods with matching taints. [Reference][taints-and-tolerations].
@@ -815,6 +821,8 @@ pluginsSettings:
   # -- Affinity and anti-affinity for `teams-plugins`. [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext: {}
     # -- Whether to enable init containers for `teams-plugins`. [Reference][init-containers].
     enabled: true
     image:
@@ -1016,6 +1024,8 @@ teamsAppSettings:
   # -- Affinity and anti-affinity for `teams-app`.  [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `teams-app` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext: {}
     # -- Whether to enable init containers for `teams-app`.  [Reference][init-containers].
     enabled: true
     image:
