@@ -107,7 +107,7 @@ PyTorch's
 by execing into the container and running
 
 ```shell
-$ docker compose exec teams-do \
+$ docker compose exec teams-do-with-gpu \
     python -c 'import torch; print(torch.cuda.is_available())'
 True
 ```
