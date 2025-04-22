@@ -475,11 +475,11 @@ follow
 | apiSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | apiSettings.image.repository | string | `"voxel51/fiftyone-teams-api"` | Container image for the `teams-api`. |
 | apiSettings.image.tag | string | `""` | Image tag for `teams-api`. Defaults to the chart version. |
-| apiSettings.initContainers.containerSecurityContext | object | `{}` | Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context]. |
+| apiSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false}` | Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context]. |
 | apiSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-api`. [Reference][init-containers]. |
-| apiSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
+| apiSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for `teams-api`. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-api`. [Reference][annotations]. |
@@ -519,11 +519,11 @@ follow
 | appSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | appSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for `fiftyone-app`. |
 | appSettings.image.tag | string | `""` | Image tag for `fiftyone-app`. Defaults to the chart version. |
-| appSettings.initContainers.containerSecurityContext | object | `{}` | Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context]. |
+| appSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false}` | Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context]. |
 | appSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `fiftyone-app`. [Reference][init-containers]. |
-| appSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
+| appSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for `fiftyone-app`. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for `fiftyone-app`. [Reference][annotations]. |
@@ -559,11 +559,11 @@ follow
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for `teams-cas`. |
 | casSettings.image.tag | string | `""` | Image tag for `teams-cas`. Defaults to the chart version. |
-| casSettings.initContainers.containerSecurityContext | object | `{}` | Container security configuration for `teams-cas` `initContainers`. [Reference][container-security-context]. |
+| casSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false}` | Container security configuration for `teams-cas` `initContainers`. [Reference][container-security-context]. |
 | casSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-cas`. [Reference][init-containers]. |
-| casSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
+| casSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for `teams-cas`. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-cas`. [Reference][annotations]. |
@@ -691,11 +691,11 @@ follow
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for `teams-plugins`. |
 | pluginsSettings.image.tag | string | `""` | Image tag for `teams-plugins`. Defaults to the chart version. |
-| pluginsSettings.initContainers.containerSecurityContext | object | `{}` | Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context]. |
+| pluginsSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false}` | Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context]. |
 | pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-plugins`. [Reference][init-containers]. |
-| pluginsSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
+| pluginsSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for `teams-plugins`. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for `teams-plugins` pods. [Reference][annotations]. |
@@ -753,11 +753,11 @@ follow
 | teamsAppSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy]. |
 | teamsAppSettings.image.repository | string | `"voxel51/fiftyone-teams-app"` | Container image for `teams-app`. |
 | teamsAppSettings.image.tag | string | `""` | Image tag for `teams-app`.  Defaults to the chart version. |
-| teamsAppSettings.initContainers.containerSecurityContext | object | `{}` | Container security configuration for `teams-app` `initContainers`. [Reference][container-security-context]. |
+| teamsAppSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false}` | Container security configuration for `teams-app` `initContainers`. [Reference][container-security-context]. |
 | teamsAppSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-app`.  [Reference][init-containers]. |
-| teamsAppSettings.initContainers.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
+| teamsAppSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for `teams-app`.  [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for `teams-app` pods. [Reference][annotations]. |
