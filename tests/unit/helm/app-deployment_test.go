@@ -1554,8 +1554,17 @@ func (s *deploymentAppTemplateTest) TestInitContainerResourceRequirements() {
 			"defaultValues",
 			nil,
 			func(resourceRequirements corev1.ResourceRequirements) {
-				s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
-				s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
+				resourceExpected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("10m"),
+						"memory": resource.MustParse("128Mi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("10m"),
+						"memory": resource.MustParse("128Mi"),
+					},
+				}
+				s.Equal(resourceExpected, resourceRequirements, "should be equal")
 				s.Nil(resourceRequirements.Claims, "should be nil")
 			},
 		},
@@ -1612,7 +1621,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerSecurityContext() {
 			"defaultValues",
 			nil,
 			func(securityContext *corev1.SecurityContext) {
-				s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
+				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
 				s.Nil(securityContext.Capabilities, "should be nil")
 				s.Nil(securityContext.Privileged, "should be nil")
 				s.Nil(securityContext.ProcMount, "should be nil")
@@ -1632,6 +1641,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerSecurityContext() {
 				"appSettings.initContainers.containerSecurityContext.runAsUser":  "1000",
 			},
 			func(securityContext *corev1.SecurityContext) {
+				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
 				s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
 				s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
 			},
