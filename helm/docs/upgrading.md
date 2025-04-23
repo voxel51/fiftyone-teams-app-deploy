@@ -102,9 +102,9 @@ A minimal example `values.yaml` may be found
 #### FiftyOne Enterprise v2.8+ `initContainer` Changes
 
 FiftyOne Enterprise v2.8.0 introduces numerous changes to the default settings
-for each system's `initContainers`.
+for each component's `initContainers`.
 
-1. `initContainers` will get, by default, the container security context
+1. `initContainers` default to the container security context
    shown below in order to comply with kubernetes security best practices.
    This configuration prevents privilege escalation and running any
    initialization processes as root.
@@ -116,8 +116,8 @@ for each system's `initContainers`.
         runAsUser: 1000  # Runs the init processes as UID 1000
     ```
 
-1. `initContainers` will get, be default, the resources shown below.
-   These initialization processes are designed to be small and lightweight
+1. `initContainers` default to the resources shown below.
+   These initialization processes are lightweight
    and can therefore set small resource requests and limits instead of using
    a cluster's defaults.
 
