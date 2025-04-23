@@ -18,7 +18,7 @@
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
-    - [FiftyOne Enterprise v2.8+ InitContainer Changes](#fiftyone-enterprise-v28-initcontainer-changes)
+    - [FiftyOne Enterprise v2.8+ `initContainer` Changes](#fiftyone-enterprise-v28-initcontainer-changes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
     - [FiftyOne Enterprise v2.5+ Delegated Operator Changes](#fiftyone-enterprise-v25-delegated-operator-changes)
     - [FiftyOne Enterprise v2.2+ Delegated Operator Changes](#fiftyone-enterprise-v22-delegated-operator-changes)
@@ -99,7 +99,7 @@ A minimal example `values.yaml` may be found
    fiftyone migrate --info
    ```
 
-#### FiftyOne Enterprise v2.8+ InitContainer Changes
+#### FiftyOne Enterprise v2.8+ `initContainer` Changes
 
 FiftyOne Enterprise v2.8.0 introduces numerous changes to the default settings
 for each system's `initContainers`.
