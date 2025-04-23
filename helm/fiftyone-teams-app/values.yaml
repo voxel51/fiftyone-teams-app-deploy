@@ -89,6 +89,8 @@ apiSettings:
     # -- Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
       allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `teams-api`. [Reference][init-containers].
     enabled: true
     image:
@@ -233,6 +235,8 @@ appSettings:
     # -- Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
       allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `fiftyone-app`. [Reference][init-containers].
     enabled: true
     image:
@@ -366,6 +370,8 @@ casSettings:
     # -- Container security configuration for `teams-cas` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
       allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `teams-cas`. [Reference][init-containers].
     enabled: true
     image:
@@ -815,6 +821,8 @@ pluginsSettings:
     # -- Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
       allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `teams-plugins`. [Reference][init-containers].
     enabled: true
     image:
@@ -1015,6 +1023,8 @@ teamsAppSettings:
     # -- Container security configuration for `teams-app` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
       allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `teams-app`.  [Reference][init-containers].
     enabled: true
     image:

@@ -18,6 +18,7 @@
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.8+ InitContainer Changes](#fiftyone-enterprise-v28-initcontainer-changes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
     - [FiftyOne Enterprise v2.5+ Delegated Operator Changes](#fiftyone-enterprise-v25-delegated-operator-changes)
     - [FiftyOne Enterprise v2.2+ Delegated Operator Changes](#fiftyone-enterprise-v22-delegated-operator-changes)
@@ -97,6 +98,38 @@ A minimal example `values.yaml` may be found
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.8+ InitContainer Changes
+
+FiftyOne Enterprise v2.8.0 introduces numerous changes to the default settings
+for each system's `initContainers`.
+
+1. `initContainers` will get, by default, the container security context
+   shown below in order to comply with kubernetes security best practices.
+   This configuration prevents privilege escalation and running any
+   initialization processes as root.
+
+    ```yaml
+      containerSecurityContext:
+        allowPrivilegeEscalation: false  # Disables privilege escalation
+        runAsNonRoot: true  # Disables running as the `root` user
+        runAsUser: 1000  # Runs the init processes as UID 1000
+    ```
+
+1. `initContainers` will get, be default, the resources shown below.
+   These initialization processes are designed to be small and lightweight
+   and can therefore set small resource requests and limits instead of using
+   a cluster's defaults.
+
+   ```yaml
+      resources:
+        limits:
+          cpu: 10m
+          memory: 128Mi
+        requests:
+          cpu: 10m
+          memory: 128Mi
+    ```
 
 #### FiftyOne Enterprise v2.7+ Delegated Operator Changes
 
