@@ -1978,8 +1978,8 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerSecurityContext() {
 				s.Nil(securityContext.ProcMount, "should be nil")
 				s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
 				s.Nil(securityContext.RunAsGroup, "should be nil")
-				s.Nil(securityContext.RunAsNonRoot, "should be nil")
-				s.Nil(securityContext.RunAsUser, "should be nil")
+				s.Equal(true, *securityContext.RunAsNonRoot, "RunAsNonRoot should be equal")
+				s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
 				s.Nil(securityContext.SeccompProfile, "should be nil")
 				s.Nil(securityContext.SELinuxOptions, "should be nil")
 				s.Nil(securityContext.WindowsOptions, "should be nil")
@@ -1990,12 +1990,13 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerSecurityContext() {
 			map[string]string{
 				"pluginsSettings.enabled": "true",
 				"pluginsSettings.initContainers.containerSecurityContext.runAsGroup": "3000",
-				"pluginsSettings.initContainers.containerSecurityContext.runAsUser":  "1000",
+				"pluginsSettings.initContainers.containerSecurityContext.runAsUser":  "1001",
 			},
 			func(securityContext *corev1.SecurityContext) {
 				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
 				s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
-				s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
+				s.Equal(true, *securityContext.RunAsNonRoot, "RunAsNonRoot should be equal")
+				s.Equal(int64(1001), *securityContext.RunAsUser, "runAsUser should be 1001")
 			},
 		},
 	}
