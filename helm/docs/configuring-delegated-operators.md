@@ -339,6 +339,28 @@ delegatedOperatorDeployments:
           emptyDir: {}
 ```
 
+After this migration, you will have two delegated operators on FiftyOne:
+`builtin` and `teams-do`.
+`builtin` currently has no resources allocated to it and can be safely
+dropped via:
+
+```python
+# Import the FiftyOne Operators Orchestrator
+import fiftyone.operators.orchestrator as foo
+orc_svc = foo.OrchestratorService()
+
+# List the current operators
+for orc in orc_svc.list():
+    print("{} \"{}\" {}".format(orc.instance_id, orc.description, orc.id))
+
+# Delete the builtin operator
+orc_svc.delete(id='builtin')
+
+# Verify there is no longer a `builtin`
+for orc in orc_svc.list():
+    print("{} \"{}\" {}".format(orc.instance_id, orc.description, orc.id))
+```
+
 ## Prior to v2.7.0
 
 This option can be added to any of the three existing
