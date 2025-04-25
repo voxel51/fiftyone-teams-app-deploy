@@ -269,7 +269,6 @@ A version 2.6.0 values file contained:
 delegatedOperatorExecutorSettings:
   enabled: true
   env:
-    FIFTYONE_PLUGINS_CACHE_ENABLED: true
     FIFTYONE_PLUGINS_DIR: /opt/plugins
   image:
     repository: my-internal-repo/fiftyone-teams-cv-full
@@ -310,7 +309,6 @@ delegatedOperatorDeployments:
   deployments:
     teamsDo:
       env:
-        FIFTYONE_PLUGINS_CACHE_ENABLED: true
         FIFTYONE_PLUGINS_DIR: /opt/plugins
       image:
         repository: my-internal-repo/fiftyone-teams-cv-full

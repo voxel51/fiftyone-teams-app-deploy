@@ -33,9 +33,7 @@ To enable this mode
 - In `values.yaml`, set the path for a PVC
   mounted to the `teams-api` and `fiftyone-app` deployments, and enable
   plugins caching
-  - `apiSettings.env.FIFTYONE_PLUGINS_CACHE_ENABLED: true`
   - `apiSettings.env.FIFTYONE_PLUGINS_DIR: /path/to/pvc`
-  - `appSettings.env.FIFTYONE_PLUGINS_CACHE_ENABLED: true`
   - `appSettings.env.FIFTYONE_PLUGINS_DIR: /path/to/pvc`
 
 ## Dedicated Plugins
@@ -52,9 +50,7 @@ To enable this mode
   - `pluginsSettings.enabled: true`
   - the path for a PVC mounted to the `teams-api` and `teams-plugins`
     deployments, and enable plugins caching
-    - `apiSettings.env.FIFTYONE_PLUGINS_CACHE_ENABLED: true`
     - `apiSettings.env.FIFTYONE_PLUGINS_DIR: /path/to/pvc`
-    - `pluginsSettings.env.FIFTYONE_PLUGINS_CACHE_ENABLED: true`
     - `pluginsSettings.env.FIFTYONE_PLUGINS_DIR: /path/to/pvc`
 - If you are
   [using a proxy](./configuring-proxies.md),

@@ -140,7 +140,6 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
-      FIFTYONE_PLUGINS_CACHE_ENABLED: true
       FIFTYONE_PLUGINS_DIR: /opt/plugins
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
@@ -168,7 +167,6 @@ services:
       FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
-      FIFTYONE_PLUGINS_CACHE_ENABLED: true
       FIFTYONE_PLUGINS_DIR: /opt/plugins
     restart: always
     volumes:
