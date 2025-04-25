@@ -299,7 +299,7 @@ func (s *serviceAccountTemplateTest) TestAutomountServiceAccountToken() {
 			map[string]string{
 				"serviceAccount.automount": "false",
 			},
-			false,
+			true, // We currently don't allow for the overriding of AutomountServiceAccountToken. `initContainers` use them to lookup namespaces.
 		},
 	}
 
