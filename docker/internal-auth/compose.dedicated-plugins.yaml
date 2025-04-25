@@ -9,7 +9,6 @@ services:
 
   teams-api:
     environment:
-      FIFTYONE_PLUGINS_CACHE_ENABLED: true
       FIFTYONE_PLUGINS_DIR: /opt/plugins
     extends:
       file: ../common-services.yaml
