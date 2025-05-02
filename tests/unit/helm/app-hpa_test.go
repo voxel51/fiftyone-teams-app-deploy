@@ -81,6 +81,7 @@ func (s *horizontalPodAutoscalerAppTemplateTest) TestMetadataLabels() {
 			"overrideMetadataLabels",
 			map[string]string{
 				"appSettings.autoscaling.enabled": "true",
+				"appSettings.labels.color":        "blue",
 				"appSettings.service.name":        "test-service-name",
 			},
 			map[string]string{
@@ -89,6 +90,7 @@ func (s *horizontalPodAutoscalerAppTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

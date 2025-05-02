@@ -72,8 +72,13 @@ spec:
       initContainers:
         {{-
           include "fiftyone-teams-app.commonInitContainers"
-          (dict "repository" .Values.pluginsSettings.initContainers.image.repository "tag" .Values.pluginsSettings.initContainers.image.tag "casServiceName" (include "teams-cas.name" .) )
-          | nindent 8
+          (
+            dict "casServiceName" (include "teams-cas.name" .)
+            "containerSecurityContext" .Values.pluginsSettings.initContainers.containerSecurityContext
+            "repository" .Values.pluginsSettings.initContainers.image.repository
+            "resources" .Values.pluginsSettings.initContainers.resources
+            "tag" .Values.pluginsSettings.initContainers.image.tag
+          ) | nindent 8
         }}
       {{- end }}
       {{- with .Values.pluginsSettings.nodeSelector }}

@@ -269,7 +269,6 @@ A version 2.6.0 values file contained:
 delegatedOperatorExecutorSettings:
   enabled: true
   env:
-    FIFTYONE_PLUGINS_CACHE_ENABLED: true
     FIFTYONE_PLUGINS_DIR: /opt/plugins
   image:
     repository: my-internal-repo/fiftyone-teams-cv-full
@@ -310,7 +309,6 @@ delegatedOperatorDeployments:
   deployments:
     teamsDo:
       env:
-        FIFTYONE_PLUGINS_CACHE_ENABLED: true
         FIFTYONE_PLUGINS_DIR: /opt/plugins
       image:
         repository: my-internal-repo/fiftyone-teams-cv-full
@@ -339,6 +337,28 @@ delegatedOperatorDeployments:
             readOnly: true
         - name: tmpdir
           emptyDir: {}
+```
+
+After this migration, you will have two delegated operators on FiftyOne:
+`builtin` and `teams-do`.
+`builtin` currently has no resources allocated to it and can be safely
+dropped via:
+
+```python
+# Import the FiftyOne Operators Orchestrator
+import fiftyone.operators.orchestrator as foo
+orc_svc = foo.OrchestratorService()
+
+# List the current operators
+for orc in orc_svc.list():
+    print("{} \"{}\" {}".format(orc.instance_id, orc.description, orc.id))
+
+# Delete the builtin operator
+orc_svc.delete(id='builtin')
+
+# Verify there is no longer a `builtin`
+for orc in orc_svc.list():
+    print("{} \"{}\" {}".format(orc.instance_id, orc.description, orc.id))
 ```
 
 ## Prior to v2.7.0

@@ -24,5 +24,5 @@ set of custom permissions may be used as of FiftyOne Teams v2.6.0:
 * `clusterMonitor@admin`
 * `read@admin`
 * `readWrite@cas`
-* `admin@fiftyone`
+* `dbAdmin@fiftyone`
 * `readWrite@fiftyone`

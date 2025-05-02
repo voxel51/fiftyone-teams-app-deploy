@@ -131,7 +131,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Delegated Operator Executor Combined labels
 
-TODO: Deprecated in v2.7.2. Remove as part
+TODO: Deprecated in v2.7.0. Remove as part
 of a future release after deprecation is
 finished.
 */}}
@@ -251,6 +251,9 @@ Service Account labels
 {{ include "fiftyone-teams-app.commonLabels" . }}
 app.kubernetes.io/name: {{ default (include "fiftyone-teams-app.fullname" .) .Values.serviceAccount.name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.serviceAccount.labels }}
+{{ toYaml . }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -261,6 +264,18 @@ Ingress labels
 app.kubernetes.io/name: {{ include "fiftyone-teams-app.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- with .Values.ingress.labels }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Secret labels
+*/}}
+{{- define "fiftyone-teams-app.secretLabels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+app.kubernetes.io/name: {{ include "fiftyone-teams-app.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.secret.labels }}
 {{ toYaml . }}
 {{- end }}
 {{- end }}
@@ -307,12 +322,20 @@ Common Init Containers
     - 'sh'
     - '-c'
     - "until wget -qO /dev/null {{ $.casServiceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local/cas/api; do echo waiting for cas; sleep 2; done"
+  {{- if hasKey $ "resources" }}
+  resources:
+    {{- toYaml $.resources | nindent 4 }}
+  {{- end }}
+  {{- if hasKey $ "containerSecurityContext" }}
+  securityContext:
+    {{- toYaml $.containerSecurityContext | nindent 4 }}
+  {{- end }}
 {{- end }}
 
 {{/*
 Create a merged list of environment variables for delegated-operator-executor
 
-TODO: Deprecated in v2.7.2. Remove as part
+TODO: Deprecated in v2.7.0. Remove as part
 of a future release after deprecation is
 finished.
 */}}

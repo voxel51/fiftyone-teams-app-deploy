@@ -248,7 +248,8 @@ func (s *serviceAccountTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				"serviceAccount.name": "test-service-account-name",
+				"serviceAccount.name":         "test-service-account-name",
+				"serviceAccount.labels.color": "blue",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -256,6 +257,7 @@ func (s *serviceAccountTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-account-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}
@@ -277,6 +279,45 @@ func (s *serviceAccountTemplateTest) TestMetadataLabels() {
 				foundValue := serviceAccount.ObjectMeta.Labels[key]
 				s.Equal(value, foundValue, "Labels should contain all set labels.")
 			}
+		})
+	}
+}
+
+func (s *serviceAccountTemplateTest) TestAutomountServiceAccountToken() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected bool
+	}{
+		{
+			"defaultValues",
+			nil,
+			true,
+		},
+		{
+			"overrideAutomount",
+			map[string]string{
+				"serviceAccount.automount": "false",
+			},
+			true, // We currently don't allow for the overriding of AutomountServiceAccountToken. `initContainers` use them to lookup namespaces.
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var serviceAccount corev1.ServiceAccount
+			helm.UnmarshalK8SYaml(subT, output, &serviceAccount)
+
+			s.Equal(testCase.expected, *serviceAccount.AutomountServiceAccountToken, "Automount Service Account Token should be equal.")
 		})
 	}
 }

@@ -9,6 +9,9 @@ metadata:
   namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "fiftyone-app.labels" . | nindent 4 }}
+    {{- with .Values.appSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   type: {{ .Values.appSettings.service.type }}
   ports:

@@ -143,6 +143,7 @@ func (s *servicePluginsTemplateTest) TestMetadataLabels() {
 			"overrideMetadataLabels",
 			map[string]string{
 				"pluginsSettings.enabled":      "true",
+				"pluginsSettings.labels.color": "blue",
 				"pluginsSettings.service.name": "test-service-name",
 			},
 			map[string]string{
@@ -151,6 +152,7 @@ func (s *servicePluginsTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

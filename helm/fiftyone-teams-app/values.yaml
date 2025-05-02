@@ -40,13 +40,18 @@ apiSettings:
     repository: voxel51/fiftyone-teams-api
     # -- Image tag for `teams-api`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `teams-api` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors].
   labels: {}
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # -- Number of pods in the `teams-api` deployment's ReplicaSet.
+  # When > 1, you must also configure volumes, volumeMounts and set
+  # `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`.
+  # For more information see [the documentation][configure-ha-teams-api].
+  replicaCount: 1
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-api`. [Reference][resources].
   resources:
     limits: {}
@@ -81,6 +86,11 @@ apiSettings:
   # -- Affinity and anti-affinity for `teams-api`. [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `teams-api`. [Reference][init-containers].
     enabled: true
     image:
@@ -88,13 +98,31 @@ apiSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-api`. [Reference][init-containers].
       tag: stable-glibc
+    # -- Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources].
+    resources:
+      limits:
+        cpu: 10m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 128Mi
   # -- nodeSelector for `teams-api`. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for `teams-api`. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `teams-api`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
-  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext``
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
   # -- Container security configuration for `teams-api`. [Reference][container-security-context].
   securityContext: {}
   # -- Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations].
@@ -160,16 +188,16 @@ appSettings:
     repository: voxel51/fiftyone-app
     # -- Image tag for `fiftyone-app`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `fiftyone-app` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the `fiftyone-app` deployment's ReplicaSet.
   # Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `fiftyone-app`. [Reference][resources].
   resources:
     limits: {}
@@ -204,6 +232,11 @@ appSettings:
   # -- Affinity and anti-affinity for `fiftyone-app`. [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `fiftyone-app`. [Reference][init-containers].
     enabled: true
     image:
@@ -211,13 +244,31 @@ appSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `fiftyone-app`. [Reference][init-containers].
       tag: stable-glibc
+    # -- Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources].
+    resources:
+      limits:
+        cpu: 10m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 128Mi
   # -- nodeSelector for `fiftyone-app`. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for `fiftyone-app`. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `fiftyone-app`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].
   podSecurityContext: {}
-  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
   # -- Container security configuration for `fiftyone-app`. [Reference][container-security-context].
   securityContext: {}
   # -- Allow the k8s scheduler to schedule `fiftyone-app` pods with matching taints. [Reference][taints-and-tolerations].
@@ -273,15 +324,15 @@ casSettings:
     repository: voxel51/fiftyone-teams-cas
     # -- Image tag for `teams-cas`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `teams-cas` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].
   replicaCount: 2
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-cas`. [Reference][resources].
   resources:
     limits: {}
@@ -316,6 +367,11 @@ casSettings:
   # -- Affinity and anti-affinity for `teams-cas`. [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `teams-cas` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `teams-cas`. [Reference][init-containers].
     enabled: true
     image:
@@ -323,13 +379,31 @@ casSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-cas`. [Reference][init-containers].
       tag: stable-glibc
+    # -- Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources].
+    resources:
+      limits:
+        cpu: 10m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 128Mi
   # -- nodeSelector for `teams-cas`. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for pods for `teams-cas`. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `teams-cas`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context].
   podSecurityContext: {}
-  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
   # -- Container security configuration for `teams-cas`. [Reference][container-security-context].
   securityContext: {}
   # -- Allow the k8s scheduler to schedule `teams-cas` pods with matching taints. [Reference][taints-and-tolerations].
@@ -377,11 +451,11 @@ delegatedOperatorExecutorSettings:
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
-    # -- Container image for delegated-operator-executor.
+    # -- Container image for `delegated-operator-executor`.
     repository: voxel51/fiftyone-teams-cv-full
-    # -- Image tag for delegated-operator-executor. Defaults to the chart version.
+    # -- Image tag for `delegated-operator-executor`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors].
   labels: {}
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-do`. [Reference][probes].
@@ -395,11 +469,11 @@ delegatedOperatorExecutorSettings:
   #  max concurrent delegated operators, which defaults to 3.
   replicaCount: 3
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # -- Container resource requests and limits for delegated-operator-executor. [Reference][resources].
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
+  # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
   resources:
     limits: {}
     #   cpu: 2
@@ -408,18 +482,28 @@ delegatedOperatorExecutorSettings:
     #   cpu: 500m
     #   memory: 1Gi
 
-  # -- Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity].
+  # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
   affinity: {}
   # -- Deployment name
   name: "teams-do"
-  # -- nodeSelector for delegated-operator-executor. [Reference][node-selector].
+  # -- nodeSelector for `delegated-operator-executor`. [Reference][node-selector].
   nodeSelector: {}
-  # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
+  # -- Annotations for `delegated-operator-executor` pods. [Reference][annotations].
   podAnnotations: {}
-  # -- Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context].
+  # -- Pod Disruption Budget for pods for `delegated-operator-executor`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `delegated-operator-executor`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
+  # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
-  # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
+  # -- Container security configuration for `delegated-operator-executor`. [Reference][container-security-context].
   readiness:
     # -- Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].
     failureThreshold: 5
@@ -442,7 +526,7 @@ delegatedOperatorExecutorSettings:
   topologySpreadConstraints: []
   # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
   volumeMounts: []
-  # -- Volumes for delegated-operator-executor. [Reference][volumes].
+  # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
   volumes: []
 
 # FiftyOne Enterprise Delegated Operator Executor (teams-do) configurations.
@@ -485,11 +569,11 @@ delegatedOperatorDeployments:
       # -- Instruct when the kubelet should pull (download) the specified image.
       # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
       pullPolicy: Always
-      # -- Container image for delegated-operator-executor.
+      # -- Container image for `delegated-operator-executor`.
       repository: voxel51/fiftyone-teams-cv-full
-      # -- Image tag for delegated-operator-executor. Defaults to the chart version.
+      # -- Image tag for `delegated-operator-executor`. Defaults to the chart version.
       tag: ""
-    # -- Additional labels for the `delegated-operator-executor` deployment. [Reference][labels-and-selectors].
+    # -- Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors].
     labels: {}
     liveness:
       # -- Number of times to retry the liveness probe for the `teams-do`. [Reference][probes].
@@ -503,11 +587,11 @@ delegatedOperatorDeployments:
     #  max concurrent delegated operators, which defaults to 3.
     replicaCount: 3
 
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # -- Container resource requests and limits for delegated-operator-executor. [Reference][resources].
+    # Instead of setting default resources, we require the user define them
+    # This enables running on resource constrained environments
+    # (like Minikube). To set resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
+    # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
     resources:
       limits: {}
       #   cpu: 2
@@ -516,16 +600,25 @@ delegatedOperatorDeployments:
       #   cpu: 500m
       #   memory: 1Gi
 
-    # -- Affinity and anti-affinity for delegated-operator-executor. [Reference][affinity].
+    # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
     affinity: {}
-    # -- nodeSelector for delegated-operator-executor. [Reference][node-selector].
+    # -- nodeSelector for `delegated-operator-executor`. [Reference][node-selector].
     nodeSelector: {}
     # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
     podAnnotations: {}
-    # -- Pod-level security attributes and common container settings for delegated-operator-executor. [Reference][security-context].
+    podDisruptionBudget:
+      # -- Whether a pod disruption budget is enabled for `teams-plugins`.
+      enabled: false
+      # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+      # Either integers or percentages supported.
+      # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+      # If both are set, `minAvailable` will be preferred.
+      minAvailable: ""
+      # maxUnavailable: ""
+    # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
     podSecurityContext: {}
     # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
-    # -- Container security configuration for delegated-operator-executor. [Reference][container-security-context].
+    # -- Container security configuration for `delegated-operator-executor`. [Reference][container-security-context].
     readiness:
       # -- Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].
       failureThreshold: 5
@@ -548,7 +641,7 @@ delegatedOperatorDeployments:
     tolerations: []
     # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
     volumeMounts: []
-    # -- Volumes for delegated-operator-executor. [Reference][volumes].
+    # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
     volumes: []
 
   # -- Additional deployments to configure. Each template
@@ -681,16 +774,16 @@ pluginsSettings:
     repository: voxel51/fiftyone-app
     # -- Image tag for `teams-plugins`. Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `teams-plugins` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors].
   labels: {}
   # -- Number of pods in the `teams-plugins` deployment's ReplicaSet.
   # Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-plugins`. [Reference][resources].
   resources:
     limits: {}
@@ -725,6 +818,11 @@ pluginsSettings:
   # -- Affinity and anti-affinity for `teams-plugins`. [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `teams-plugins`. [Reference][init-containers].
     enabled: true
     image:
@@ -732,10 +830,28 @@ pluginsSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-plugins`. [Reference][init-containers].
       tag: stable-glibc
+    # -- Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources].
+    resources:
+      limits:
+        cpu: 10m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 128Mi
   # -- nodeSelector for `teams-plugins`. [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for `teams-plugins` pods. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `teams-plugins`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].
   podSecurityContext: {}
   # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
@@ -773,6 +889,8 @@ secret:
     # This is used for inter-service authentication and for the SuperUser to
     #  authenticate at the CAS UI to configure the Central Authentication Service.
     fiftyoneAuthSecret: ""
+  # -- Additional labels for the generated secret. [Reference][labels-and-selectors].
+  labels: {}
 
 serviceAccount:
   # -- Service Account annotations. [Reference][annotations].
@@ -782,6 +900,8 @@ serviceAccount:
   # -- Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments.
   # [Reference][service-account].
   name: "fiftyone-teams"
+  # -- Additional labels for the generated service account. [Reference][labels-and-selectors].
+  labels: {}
 
 # FiftyOne Enterprise App (teams-app) configurations
 teamsAppSettings:
@@ -813,7 +933,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.7.2
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.8.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
@@ -847,7 +967,7 @@ teamsAppSettings:
     repository: voxel51/fiftyone-teams-app
     # -- Image tag for `teams-app`.  Defaults to the chart version.
     tag: ""
-  # -- Additional labels for the `teams-app` deployment. [Reference][labels-and-selectors].
+  # -- Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors].
   labels: {}
   # -- Overrides the `FIFTYONE_API_URI` environment variable. When set
   # `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance
@@ -860,10 +980,10 @@ teamsAppSettings:
   # Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
 
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Instead of setting default resources, we require the user define them
+  # This enables running on resource constrained environments
+  # (like Minikube). To set resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-app`.  [Reference][resources].
   resources:
     limits: {}
@@ -898,6 +1018,11 @@ teamsAppSettings:
   # -- Affinity and anti-affinity for `teams-app`.  [Reference][affinity].
   affinity: {}
   initContainers:
+    # -- Container security configuration for `teams-app` `initContainers`. [Reference][container-security-context].
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
     # -- Whether to enable init containers for `teams-app`.  [Reference][init-containers].
     enabled: true
     image:
@@ -905,10 +1030,28 @@ teamsAppSettings:
       repository: docker.io/busybox
       # -- Init container images tags for `teams-app`.  [Reference][init-containers].
       tag: stable-glibc
+    # -- Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources].
+    resources:
+      limits:
+        cpu: 10m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 128Mi
   # -- nodeSelector for `teams-app`.  [Reference][node-selector].
   nodeSelector: {}
   # -- Annotations for `teams-app` pods. [Reference][annotations].
   podAnnotations: {}
+  # -- Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget].
+  podDisruptionBudget:
+    # -- Whether a pod disruption budget is enabled for `teams-app`.
+    enabled: false
+    # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
+    # Either integers or percentages supported.
+    # `maxUnavailable` is also supported, however, only one setting can be used at a time.
+    # If both are set, `minAvailable` will be preferred.
+    minAvailable: ""
+    # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context].
   podSecurityContext: {}
   # TODO: Consider renaming `securityContext` to `containerSecurityContext`

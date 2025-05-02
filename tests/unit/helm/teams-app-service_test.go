@@ -120,6 +120,7 @@ func (s *serviceTeamsAppTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
+				"teamsAppSettings.labels.color": "blue",
 				// Unlike teams-api, fiftyone-app, and teams-plugins, setting `teamsAppSettings.service.name`
 				// does not affect the label `app.kubernetes.io/name` for teams-app.
 				// See note in _helpers.tpl.
@@ -131,6 +132,7 @@ func (s *serviceTeamsAppTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "fiftyone-teams-app",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}

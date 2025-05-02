@@ -1,0 +1,24 @@
+{{- if .Values.appSettings.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "fiftyone-app.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: {{ include "fiftyone-app.name" . }}
+    {{- include "fiftyone-app.labels" . | nindent 4 }}
+    {{- with .Values.appSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.appSettings.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.appSettings.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.appSettings.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.appSettings.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  {{- fail "You must set either 'minAvailable' or 'maxUnavailable' for the PodDisruptionBudget." }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "fiftyone-app.selectorLabels" . | nindent 6 }}
+{{- end }}

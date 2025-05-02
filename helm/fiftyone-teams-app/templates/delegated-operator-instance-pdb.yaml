@@ -1,0 +1,35 @@
+{{- $baseTpl := .Values.delegatedOperatorDeployments.template }}
+{{- range $k, $v := .Values.delegatedOperatorDeployments.deployments }}
+{{- $name := kebabcase $k }}
+{{- $labelContext := (merge (dict "name" $name) $) }}
+
+{{- $pdbCtx := deepCopy ($baseTpl.podDisruptionBudget | default dict) }}
+{{- range $key, $val := ($v.podDisruptionBudget | default dict) }}
+{{- $_ := set $pdbCtx $key $val }}
+{{- end }}
+
+{{- if $pdbCtx.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.namespace.name }}
+  labels:
+    {{- include "delegated-operator-deployments.labels" $labelContext | nindent 4 }}
+    {{- with (merge (dict) ($v.labels | default dict) ($baseTpl.labels)) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if $pdbCtx.minAvailable }}
+  minAvailable: {{ $pdbCtx.minAvailable }}
+  {{- else if $pdbCtx.maxUnavailable }}
+  maxUnavailable: {{ $pdbCtx.maxUnavailable }}
+  {{- else }}
+  {{- fail "You must set either 'minAvailable' or 'maxUnavailable' for the PodDisruptionBudget." }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 6 }}
+---
+{{- end }}
+{{- end }}

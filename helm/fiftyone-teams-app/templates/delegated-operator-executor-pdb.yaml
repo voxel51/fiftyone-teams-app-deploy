@@ -1,0 +1,23 @@
+{{- if and .Values.delegatedOperatorExecutorSettings.enabled .Values.delegatedOperatorExecutorSettings.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "delegated-operator-executor.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "delegated-operator-executor.labels" . | nindent 4 }}
+    {{- with .Values.delegatedOperatorExecutorSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.delegatedOperatorExecutorSettings.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.delegatedOperatorExecutorSettings.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  {{- fail "You must set either 'minAvailable' or 'maxUnavailable' for the PodDisruptionBudget." }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "delegated-operator-executor.selectorLabels" . | nindent 6 }}
+{{- end }}

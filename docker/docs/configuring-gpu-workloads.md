@@ -65,7 +65,7 @@ services:
       service: teams-do-common
 
   teams-do-with-gpu:
-    image: voxel51/fiftyone-teams-cv-full:v2.7.2
+    image: voxel51/fiftyone-teams-cv-full:v2.8.0
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
     command: >
@@ -78,7 +78,6 @@ services:
       FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
-      FIFTYONE_PLUGINS_CACHE_ENABLED: true
       FIFTYONE_PLUGINS_DIR: /opt/plugins
     restart: always
     volumes:
@@ -107,7 +106,7 @@ PyTorch's
 by execing into the container and running
 
 ```shell
-$ docker compose exec teams-do \
+$ docker compose exec teams-do-with-gpu \
     python -c 'import torch; print(torch.cuda.is_available())'
 True
 ```

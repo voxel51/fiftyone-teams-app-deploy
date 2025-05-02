@@ -65,9 +65,17 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataLabels() {
 			nil,
 		},
 		{
+			"defaultValuesPluginsEnabled",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			nil,
+		},
+		{
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
 				"pluginsSettings.autoscaling.enabled": "true",
+				"pluginsSettings.enabled":             "true",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -81,6 +89,8 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataLabels() {
 			"overrideMetadataLabels",
 			map[string]string{
 				"pluginsSettings.autoscaling.enabled": "true",
+				"pluginsSettings.enabled":             "true",
+				"pluginsSettings.labels.color":        "blue",
 				"pluginsSettings.service.name":        "test-service-name",
 			},
 			map[string]string{
@@ -89,6 +99,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
+				"color":                        "blue",
 			},
 		},
 	}
@@ -137,8 +148,16 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataName() {
 			"",
 		},
 		{
+			"defaultValuesPluginsEnabled",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			"",
+		},
+		{
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
 			},
 			"teams-plugins",
@@ -146,6 +165,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataName() {
 		{
 			"overrideMetadataName",
 			map[string]string{
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
 				"pluginsSettings.service.name":        "test-service-name",
 			},
@@ -195,8 +215,16 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataNamespace() {
 			"",
 		},
 		{
+			"defaultValuesPluginsEnabled",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			"",
+		},
+		{
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
 			},
 			"fiftyone-teams",
@@ -204,6 +232,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetadataNamespace() {
 		{
 			"overrideNamespaceName",
 			map[string]string{
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
 				"namespace.name":                      "test-namespace-name",
 			},
@@ -261,6 +290,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestScaleTargetRef() {
 		{
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
 			},
 			func(ref autoscalingv2.CrossVersionObjectReference) {
@@ -278,6 +308,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestScaleTargetRef() {
 		{
 			"overrideServiceName",
 			map[string]string{
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
 				"pluginsSettings.service.name":        "test-service-name",
 			},
@@ -336,8 +367,16 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMaxReplicas() {
 			0,
 		},
 		{
+			"defaultValuesPluginsEnabled",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			0,
+		},
+		{
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
 			},
 			20,
@@ -345,6 +384,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMaxReplicas() {
 		{
 			"overrideMaxReplicas",
 			map[string]string{
+				"pluginsSettings.enabled":                 "true",
 				"pluginsSettings.autoscaling.enabled":     "true",
 				"pluginsSettings.autoscaling.maxReplicas": "19",
 			},
@@ -394,8 +434,16 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMinReplicas() {
 			0,
 		},
 		{
+			"defaultValuesPluginsEnabled",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			0,
+		},
+		{
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
+				"pluginsSettings.enabled":             "true",
 				"pluginsSettings.autoscaling.enabled": "true",
 			},
 			2,
@@ -403,6 +451,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMinReplicas() {
 		{
 			"overrideMinReplicas",
 			map[string]string{
+				"pluginsSettings.enabled":                 "true",
 				"pluginsSettings.autoscaling.enabled":     "true",
 				"pluginsSettings.autoscaling.minReplicas": "3",
 			},
@@ -456,6 +505,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetrics() {
 			"defaultValuesPluginsHpaEnabled",
 			map[string]string{
 				"pluginsSettings.autoscaling.enabled": "true",
+				"pluginsSettings.enabled":             "true",
 			},
 			func(metrics []autoscalingv2.MetricSpec) {
 				expectedJSON := `[
@@ -492,6 +542,7 @@ func (s *horizontalPodAutoscalerPluginsTemplateTest) TestMetrics() {
 				"pluginsSettings.autoscaling.enabled":                           "true",
 				"pluginsSettings.autoscaling.targetCPUUtilizationPercentage":    "99",
 				"pluginsSettings.autoscaling.targetMemoryUtilizationPercentage": "98",
+				"pluginsSettings.enabled":                                       "true",
 			},
 			func(metrics []autoscalingv2.MetricSpec) {
 				expectedJSON := `[

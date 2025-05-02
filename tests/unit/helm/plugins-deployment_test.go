@@ -1890,6 +1890,135 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerCommand() {
 	}
 }
 
+func (s *deploymentPluginsTemplateTest) TestInitContainerResourceRequirements() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(resourceRequirements corev1.ResourceRequirements)
+	}{
+		{
+			"defaultValues",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			func(resourceRequirements corev1.ResourceRequirements) {
+				resourceExpected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("10m"),
+						"memory": resource.MustParse("128Mi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("10m"),
+						"memory": resource.MustParse("128Mi"),
+					},
+				}
+				s.Equal(resourceExpected, resourceRequirements, "should be equal")
+				s.Nil(resourceRequirements.Claims, "should be nil")
+			},
+		},
+		{
+			"overrideResources",
+			map[string]string{
+				"pluginsSettings.enabled":                                  "true",
+				"pluginsSettings.initContainers.resources.limits.cpu":      "1",
+				"pluginsSettings.initContainers.resources.limits.memory":   "1Gi",
+				"pluginsSettings.initContainers.resources.requests.cpu":    "500m",
+				"pluginsSettings.initContainers.resources.requests.memory": "512Mi",
+			},
+			func(resourceRequirements corev1.ResourceRequirements) {
+				resourceExpected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("1"),
+						"memory": resource.MustParse("1Gi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("500m"),
+						"memory": resource.MustParse("512Mi"),
+					},
+				}
+				s.Equal(resourceExpected, resourceRequirements, "should be equal")
+				s.Nil(resourceRequirements.Claims, "should be nil")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].Resources)
+		})
+	}
+}
+
+func (s *deploymentPluginsTemplateTest) TestInitContainerSecurityContext() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(securityContext *corev1.SecurityContext)
+	}{
+		{
+			"defaultValues",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+			},
+			func(securityContext *corev1.SecurityContext) {
+				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
+				s.Nil(securityContext.Capabilities, "should be nil")
+				s.Nil(securityContext.Privileged, "should be nil")
+				s.Nil(securityContext.ProcMount, "should be nil")
+				s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
+				s.Nil(securityContext.RunAsGroup, "should be nil")
+				s.Equal(true, *securityContext.RunAsNonRoot, "RunAsNonRoot should be equal")
+				s.Equal(int64(1000), *securityContext.RunAsUser, "runAsUser should be 1000")
+				s.Nil(securityContext.SeccompProfile, "should be nil")
+				s.Nil(securityContext.SELinuxOptions, "should be nil")
+				s.Nil(securityContext.WindowsOptions, "should be nil")
+			},
+		},
+		{
+			"overrideSecurityContext",
+			map[string]string{
+				"pluginsSettings.enabled": "true",
+				"pluginsSettings.initContainers.containerSecurityContext.runAsGroup": "3000",
+				"pluginsSettings.initContainers.containerSecurityContext.runAsUser":  "1001",
+			},
+			func(securityContext *corev1.SecurityContext) {
+				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
+				s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
+				s.Equal(true, *securityContext.RunAsNonRoot, "RunAsNonRoot should be equal")
+				s.Equal(int64(1001), *securityContext.RunAsUser, "runAsUser should be 1001")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].SecurityContext)
+		})
+	}
+}
+
 func (s *deploymentPluginsTemplateTest) TestAffinity() {
 	testCases := []struct {
 		name     string

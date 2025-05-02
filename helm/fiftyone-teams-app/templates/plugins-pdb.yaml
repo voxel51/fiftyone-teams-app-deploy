@@ -1,0 +1,23 @@
+{{- if and .Values.pluginsSettings.enabled .Values.pluginsSettings.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "teams-plugins.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "teams-plugins.labels" . | nindent 4 }}
+    {{- with .Values.pluginsSettings.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.pluginsSettings.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.pluginsSettings.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.pluginsSettings.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.pluginsSettings.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  {{- fail "You must set either 'minAvailable' or 'maxUnavailable' for the PodDisruptionBudget." }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "teams-plugins.selectorLabels" . | nindent 6 }}
+{{- end }}

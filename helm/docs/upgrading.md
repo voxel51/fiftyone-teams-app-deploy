@@ -18,6 +18,7 @@
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.8+ `initContainer` Changes](#fiftyone-enterprise-v28-initcontainer-changes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
     - [FiftyOne Enterprise v2.5+ Delegated Operator Changes](#fiftyone-enterprise-v25-delegated-operator-changes)
     - [FiftyOne Enterprise v2.2+ Delegated Operator Changes](#fiftyone-enterprise-v22-delegated-operator-changes)
@@ -78,9 +79,9 @@ A minimal example `values.yaml` may be found
 
 ### From FiftyOne Enterprise Version 2.0.0 or Higher
 
-1. [Upgrade to FiftyOne Enterprise version 2.7.2](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise version 2.8.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
-   version 2.7.2
+   version 2.8.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
@@ -92,11 +93,43 @@ A minimal example `values.yaml` may be found
    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
    ```
 
-1. To ensure that all datasets are now at version 1.4.1, run
+1. To ensure that all datasets are now at version 1.5.0, run
 
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.8+ `initContainer` Changes
+
+FiftyOne Enterprise v2.8.0 introduces numerous changes to the default settings
+for each component's `initContainers`.
+
+1. `initContainers` default to the container security context
+   shown below in order to comply with kubernetes security best practices.
+   This configuration prevents privilege escalation and running any
+   initialization processes as root.
+
+    ```yaml
+      containerSecurityContext:
+        allowPrivilegeEscalation: false  # Disables privilege escalation
+        runAsNonRoot: true  # Disables running as the `root` user
+        runAsUser: 1000  # Runs the init processes as UID 1000
+    ```
+
+1. `initContainers` default to the resources shown below.
+   These initialization processes are lightweight
+   and can therefore set small resource requests and limits instead of using
+   a cluster's defaults.
+
+   ```yaml
+      resources:
+        limits:
+          cpu: 10m
+          memory: 128Mi
+        requests:
+          cpu: 10m
+          memory: 128Mi
+    ```
 
 #### FiftyOne Enterprise v2.7+ Delegated Operator Changes
 
@@ -172,7 +205,7 @@ Additionally,
 Kubernetes [`initContainers`][init-containers]
 were added in Version 2.2.0 to enforce the order of pod startup.
 The image and tag are customizable.
-Any image supporting `nslookup`, such as `docker.io/busybox`, are applicable
+Any image supporting `wget`, such as `docker.io/busybox`, are applicable
 replacements.
 
 For a full list of settings, please refer to the
@@ -195,7 +228,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.2 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.8.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -235,24 +268,24 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Enterprise version 2.7.2](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.7.2
+1. [Upgrade to FiftyOne Enterprise version 2.8.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.8.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. Upgrade all the datasets
 
-    > **NOTE**: Any FiftyOne SDK less than 2.7.2 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.8.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.7.2` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.8.0` is recommended before migrating
     > your database.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.4.1, run
+1. To ensure that all datasets are now at version 1.5.0, run
 
     ```shell
     fiftyone migrate --info
@@ -260,7 +293,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.2 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.8.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -279,7 +312,7 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.2 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.8.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -319,24 +352,24 @@ For a full list of settings, please refer to the
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Enterprise version 2.7.2](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.7.2
+1. [Upgrade to FiftyOne Enterprise version 2.8.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.8.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. Upgrade all the datasets
 
-    > **NOTE**: Any FiftyOne SDK less than 2.7.2 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.8.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.7.2` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.8.0` is recommended before migrating
     > your database.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.4.1, run
+1. To ensure that all datasets are now at version 1.5.0, run
 
     ```shell
     fiftyone migrate --info
@@ -361,14 +394,14 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.2 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.8.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.7.2 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.8.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -407,10 +440,10 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Enterprise v2.7.2](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise v2.8.0](#upgrading-from-previous-versions)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.7.2`
-1. Upgrade your FiftyOne SDKs to version 2.7.2
+    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.8.0`
+1. Upgrade your FiftyOne SDKs to version 2.8.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to
@@ -422,7 +455,7 @@ For a full list of settings, please refer to the
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.4.1, run
+1. To ensure that all datasets are now at version 1.5.0, run
 
     ```shell
     fiftyone migrate --info

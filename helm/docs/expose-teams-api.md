@@ -155,5 +155,40 @@ For more information, see
     {"status":"available"}
     ```
 
+## Advanced Configuration
+
+The server has appropriate default settings for most deployments. However,
+there are some server configurations that you may want to change with advice
+from your Customer Success team, if you experience timeout or networking issues
+when connecting through the exposed API server. Any of the below configurations
+can be set in the `values.yaml` file under the `apiSettings` section.
+
+```yaml
+apiSettings:
+  env:
+    # -- How long to hold a TCP connection open (sec). Defaults to 120.
+    FIFTYONE_TEAMS_API_KEEP_ALIVE_TIMEOUT: 120
+
+    # -- How big a request header may be (bytes). Defaults to 8192 bytes, max
+    # is 16384 bytes.
+    FIFTYONE_TEAMS_API_REQUEST_MAX_HEADER_SIZE: 8192
+
+    # -- How big a request may be (bytes). Defaults to 100 megabytes.
+    FIFTYONE_TEAMS_API_REQUEST_MAX_SIZE: 100000000
+
+    # -- How long a request can take to arrive (sec). Defaults to 600.
+    FIFTYONE_TEAMS_API_REQUEST_TIMEOUT: 600
+
+    # -- How long a response can take to process (sec). Defaults to 600.
+    FIFTYONE_TEAMS_API_RESPONSE_TIMEOUT: 600
+
+    # -- Maximum size for incoming websocket messages (bytes). Defaults to 16 MiB.
+    FIFTYONE_TEAMS_API_WEBSOCKET_MAX_SIZE: 16777216
+
+    # -- Connection is closed when Pong is not received after ping_timeout seconds.
+    # Defaults to 600.
+    FIFTYONE_TEAMS_API_WEBSOCKET_PING_TIMEOUT: 600
+```
+
 <!-- Reference links -->
 [nginx-docs]: https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
