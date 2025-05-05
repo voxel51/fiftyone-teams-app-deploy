@@ -12,18 +12,27 @@ help:
 
 dependencies: asdf
 
-asdf:  ## Update plugins, add plugins, install plugins, set local, reshim
-	@echo "Updating asdf plugins..."
-	@asdf plugin update --all >/dev/null 2>&1 || true
-
-	@echo "Adding asdf plugins..."
-	@cut -d" " -f1 .tool-versions | xargs -I{} asdf plugin add {} >/dev/null 2>&1 || true
-
+asdf: asdf-plugins-update  ## Add plugins, update plugins, install plugins, and reshim
 	@echo "Installing asdf tools..."
 	@cat .tool-versions | xargs -I{} bash -c 'asdf install {}'
 
-	@echo "Setting local package versions..."
-	@cat .tool-versions | xargs -I{} bash -c 'asdf set {}'
+	@echo "Reshimming.."
+	@asdf reshim
+
+asdf-plugins-add:  ## Add plugins
+	@echo "Adding asdf plugins..."
+	@cut -d" " -f1 .tool-versions | xargs -I{} asdf plugin add {} >/dev/null 2>&1 || true
+
+asdf-plugins-update: asdf-plugins-add  ## Update asdf plugins
+	@echo "Updating asdf plugins..."
+	@asdf plugin update --all >/dev/null 2>&1 || true
+
+asdf-latest: asdf-plugins-update  ## Update tool versions to latest. Be aware of breaking changes
+	@echo "Setting local package versions to latest..."
+	@cut -d" " -f1 .tool-versions | xargs -I{} bash -c 'asdf set {} latest'
+
+	@echo "Installing latest asdf tools..."
+	@cat .tool-versions | xargs -I{} bash -c 'asdf install {}'
 
 	@echo "Reshimming.."
 	@asdf reshim
@@ -282,3 +291,8 @@ get-image-versions-dev:  ## display the latest internal image matching version s
 
 get-image-versions-rc:  ## display the latest internal image matching version string
 	./utils/get-image-versions.sh "${VERSION}" rc
+
+go-update:  ## update test go packages
+	@cd tests; \
+	go get -u ./... \
+	go get -t -u ./... \
