@@ -11,9 +11,6 @@ repos:
           - --allow-multiple-document
         # We exclude helm template files since in raw form, they are not valid yaml
         exclude: helm/fiftyone-teams-app/templates
-      - id: detect-aws-credentials
-        args:
-          - --allow-missing-credentials
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: pretty-format-json
@@ -26,7 +23,6 @@ repos:
           - go
           - go-mod
           - go-sum
-          - makefile
   - repo: https://github.com/norwoodj/helm-docs
     rev: v1.14.2
     hooks:
@@ -38,12 +34,12 @@ repos:
           # A base filename makes it relative to each chart directory found
           - --template-files=README.md.gotmpl
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.43.0
+    rev: v0.44.0
     hooks:
       - id: markdownlint
       - id: markdownlint-fix
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         exclude: helm/local-self-signed-example/cert-manger-crds|tests/go.sum
@@ -52,7 +48,7 @@ repos:
           # fiftyone.management as fom
           - fom
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.35.1
+    rev: v1.37.1
     hooks:
       - id: yamllint
         entry: yamllint --config-file .yamllint.yaml
@@ -71,7 +67,7 @@ repos:
           - helm/README.md
           - CONTRIBUTING.md
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.25
+    rev: v0.1.29
     hooks:
       - id: helmlint
   - repo: https://github.com/Yelp/detect-secrets
@@ -87,7 +83,7 @@ repos:
       - id: go-fmt
       - id: go-mod-tidy
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.6
+    rev: v1.7.7
     hooks:
       - id: actionlint
   - repo: https://github.com/syntaqx/git-hooks
@@ -100,7 +96,7 @@ repos:
           - --write
           - --simplify
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v4.0.0
+    rev: v4.1.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
