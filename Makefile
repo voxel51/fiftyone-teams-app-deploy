@@ -294,5 +294,5 @@ get-image-versions-rc:  ## display the latest internal image matching version st
 
 go-update:  ## update test go packages
 	@cd tests; \
-	go get -u ./... \
-	go get -t -u ./... \
+	go mod tidy; \
+	go get -u -t ./...
