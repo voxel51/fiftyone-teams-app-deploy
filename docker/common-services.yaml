@@ -1,7 +1,7 @@
 ---
 services:
   fiftyone-app-common:
-    image: voxel51/fiftyone-app:v2.8.1
+    image: voxel51/fiftyone-app:v2.8.2
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -30,7 +30,7 @@ services:
     restart: always
 
   teams-api-common:
-    image: voxel51/fiftyone-teams-api:v2.8.1
+    image: voxel51/fiftyone-teams-api:v2.8.2
     environment:
       CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -57,13 +57,13 @@ services:
     restart: always
 
   teams-app-common:
-    image: voxel51/fiftyone-teams-app:v2.8.1
+    image: voxel51/fiftyone-teams-app:v2.8.2
     environment:
       API_URL: ${API_URL}
       APP_USE_HTTPS: ${APP_USE_HTTPS:-true}
       FIFTYONE_API_URI: ${FIFTYONE_API_URI:-"Please contact your Admin for an API URI"}
       FIFTYONE_APP_ALLOW_MEDIA_EXPORT: ${FIFTYONE_APP_ALLOW_MEDIA_EXPORT:-true}
-      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.8.1
+      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.8.2
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
@@ -92,7 +92,7 @@ services:
     restart: always
 
   teams-cas-common:
-    image: voxel51/fiftyone-teams-cas:v2.8.1
+    image: voxel51/fiftyone-teams-cas:v2.8.2
     environment:
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
@@ -127,7 +127,7 @@ services:
         read_only: true
 
   teams-plugins-common:
-    image: voxel51/fiftyone-app:v2.8.1
+    image: voxel51/fiftyone-app:v2.8.2
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -154,7 +154,7 @@ services:
     restart: always
 
   teams-do-common:
-    image: voxel51/fiftyone-teams-cv-full:v2.8.1
+    image: voxel51/fiftyone-teams-cv-full:v2.8.2
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
     command: >
