@@ -2223,3 +2223,76 @@ func (s *deploymentAppTemplateTest) TestVolumes() {
 		})
 	}
 }
+
+func (s *deploymentAppTemplateTest) TestDeploymentUpdateStrategy() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(deploymentStrategy appsv1.DeploymentStrategy)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "RollingUpdate"
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+		{
+			"overrideUpdateStrategyType",
+			map[string]string{
+				"appSettings.updateStrategy.type": "Recreate",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "Recreate"
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+		{
+			"overrideUpdateStrategyRollingUpdate",
+			map[string]string{
+				"appSettings.updateStrategy.type":                         "RollingUpdate",
+				"appSettings.updateStrategy.rollingUpdate.maxUnavailable": "5",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "RollingUpdate",
+            "rollingUpdate": {
+              "maxUnavailable": 5
+            }
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Strategy)
+		})
+	}
+}

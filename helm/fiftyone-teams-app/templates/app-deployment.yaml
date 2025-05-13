@@ -16,6 +16,8 @@ spec:
   selector:
     matchLabels:
       {{- include "fiftyone-app.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.appSettings.updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with .Values.appSettings.podAnnotations }}

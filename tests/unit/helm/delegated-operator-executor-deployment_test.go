@@ -2297,3 +2297,99 @@ func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestContainerStartupPr
 		})
 	}
 }
+
+func (s *deploymentDelegatedOperatorExecutorTemplateTest) TestDeploymentUpdateStrategy() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(deploymentStrategy appsv1.DeploymentStrategy)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				s.Empty(deploymentStrategy.Type, "Type should be be empty")
+			},
+		},
+		{
+			"defaultValuesDelegatedOperatorsEnabled",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled": "true",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "RollingUpdate"
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+		{
+			"overrideUpdateStrategyType",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled":             "true",
+				"delegatedOperatorExecutorSettings.updateStrategy.type": "Recreate",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "Recreate"
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+		{
+			"overrideUpdateStrategyRollingUpdate",
+			map[string]string{
+				"delegatedOperatorExecutorSettings.enabled":                                     "true",
+				"delegatedOperatorExecutorSettings.updateStrategy.type":                         "RollingUpdate",
+				"delegatedOperatorExecutorSettings.updateStrategy.rollingUpdate.maxUnavailable": "5",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "RollingUpdate",
+            "rollingUpdate": {
+              "maxUnavailable": 5
+            }
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			var deployment appsv1.Deployment
+
+			if testCase.values == nil {
+
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/delegated-operator-executor-deployment.yaml in chart")
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				testCase.expected(deployment.Spec.Strategy)
+			} else {
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				testCase.expected(deployment.Spec.Strategy)
+			}
+		})
+	}
+}

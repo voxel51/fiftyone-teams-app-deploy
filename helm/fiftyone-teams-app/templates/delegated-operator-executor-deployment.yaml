@@ -15,6 +15,8 @@ spec:
   selector:
     matchLabels:
       {{- include "delegated-operator-executor.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.delegatedOperatorExecutorSettings.updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with .Values.delegatedOperatorExecutorSettings.podAnnotations }}

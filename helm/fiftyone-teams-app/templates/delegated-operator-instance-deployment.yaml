@@ -13,6 +13,7 @@
   )
 }}
 {{- $defaultDescription := printf "Long running operations delegated to %s" $name }}
+{{- $updateStrategy := merge (dict) ($v.updateStrategy|default dict) ($baseTpl.updateStrategy) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -29,6 +30,8 @@ spec:
   selector:
     matchLabels:
       {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 6 }}
+  strategy:
+    {{- toYaml $updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with (merge (dict) ($v.podAnnotations|default dict) ($baseTpl.podAnnotations)) }}

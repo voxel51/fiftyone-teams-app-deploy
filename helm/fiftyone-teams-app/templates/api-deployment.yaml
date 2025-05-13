@@ -20,6 +20,8 @@ spec:
     matchLabels:
       app: {{ include "teams-api.name" . }}
       {{- include "fiftyone-teams-api.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.apiSettings.updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with .Values.apiSettings.podAnnotations }}
