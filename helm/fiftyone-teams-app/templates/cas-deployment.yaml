@@ -14,6 +14,8 @@ spec:
   selector:
     matchLabels:
       {{- include "fiftyone-teams-cas.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.casSettings.updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with .Values.casSettings.podAnnotations }}

@@ -17,6 +17,8 @@ spec:
   selector:
     matchLabels:
       {{- include "teams-plugins.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.pluginsSettings.updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with .Values.pluginsSettings.podAnnotations }}

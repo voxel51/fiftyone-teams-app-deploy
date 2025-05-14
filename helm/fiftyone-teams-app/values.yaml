@@ -127,9 +127,14 @@ apiSettings:
   securityContext: {}
   # -- Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations].
   tolerations: []
-  # -- Control how Pods are spread across your distributed footprint.
+  # -- Control how pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
+  # -- Control how `teams-api` pods are redeployed during an upgrade. [Reference][upgrade-strategies]
+  updateStrategy:
+    type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
   # -- Volume mounts for `teams-api`. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for `teams-api`. [Reference][volumes].
@@ -276,6 +281,11 @@ appSettings:
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the `fiftyone-app` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
+  # -- Control how `fiftyone-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies]
+  updateStrategy:
+    type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
   # -- Volume mounts for `fiftyone-app`. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for `fiftyone-app`. [Reference][volumes].
@@ -411,6 +421,11 @@ casSettings:
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the `teams-cas` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
+  # -- Control how `teams-cas` pods are redeployed during an upgrade. [Reference][upgrade-strategies]
+  updateStrategy:
+    type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
   # -- Volume mounts for `teams-cas`. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for `teams-cas`. [Reference][volumes].
@@ -524,6 +539,11 @@ delegatedOperatorExecutorSettings:
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the `teams-do` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
+  # -- Control how `teams-do` pods are redeployed during an upgrade. [Reference][upgrade-strategies]
+  updateStrategy:
+    type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
   # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
@@ -637,6 +657,11 @@ delegatedOperatorDeployments:
     # -- Control how Pods are spread across your distributed footprint.
     # Label selectors will be defaulted to those of the `teams-do` deployment(s). [Reference][topology-spread-constraints].
     topologySpreadConstraints: []
+    # -- Control how `teams-do` pods are redeployed during an upgrade. [Reference][upgrade-strategies]
+    updateStrategy:
+      type: RollingUpdate
+      # rollingUpdate:
+      #   maxUnavailable: 1
     # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
     tolerations: []
     # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
@@ -862,6 +887,11 @@ pluginsSettings:
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the `teams-plugins` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
+  # -- Control how `teams-plugins` pods are redeployed during an upgrade. [Reference][upgrade-strategies]
+  updateStrategy:
+    type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
   # -- Volume mounts for `teams-plugins` pods. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for `teams-plugins`. [Reference][volumes].
@@ -1062,6 +1092,11 @@ teamsAppSettings:
   # -- Control how Pods are spread across your distributed footprint.
   # Label selectors will be defaulted to those of the `teams-app` deployment. [Reference][topology-spread-constraints].
   topologySpreadConstraints: []
+  # -- Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies]
+  updateStrategy:
+    type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
   # -- Volume mounts for `teams-app` pods. [Reference][volumes].
   volumeMounts: []
   # -- Volumes for `teams-app` pods. [Reference][volumes].
