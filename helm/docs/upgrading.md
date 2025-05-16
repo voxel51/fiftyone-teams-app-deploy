@@ -17,6 +17,7 @@
 <!-- toc -->
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
+  - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
     - [FiftyOne Enterprise v2.8+ `initContainer` Changes](#fiftyone-enterprise-v28-initcontainer-changes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
@@ -76,6 +77,43 @@ A minimal example `values.yaml` may be found
     > ```shell
     > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
     > ```
+
+### A Note On Database Migrations
+
+The environment variable `FIFTYONE_DATABASE_ADMIN`
+controls whether the database may be migrated.
+This is a safety check to prevent automatic database
+upgrades that will break other users' SDK connections.
+When false (or unset), either an error will occur
+
+```shell
+$ fiftyone migrate --all
+Traceback (most recent call last):
+...
+OSError: Cannot migrate database from v0.22.0 to v0.22.3 when database_admin=False.
+```
+
+or no action will be taken:
+
+```shell
+$ fiftyone migrate --info
+FiftyOne Enterprise version: 0.14.4
+FiftyOne compatibility version: 0.22.3
+Other compatible versions: >=0.19,<0.23
+Database version: 0.21.2
+dataset     version
+----------  ---------
+quickstart  0.22.0
+$ fiftyone migrate --all
+$ fiftyone migrate --info
+FiftyOne Enterprise version: 0.14.4
+FiftyOne compatibility version: 0.23.0
+Other compatible versions: >=0.19,<0.23
+Database version: 0.21.2
+dataset     version
+----------  ---------
+quickstart  0.21.2
+```
 
 ### From FiftyOne Enterprise Version 2.0.0 or Higher
 
