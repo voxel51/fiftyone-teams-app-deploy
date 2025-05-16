@@ -1189,7 +1189,7 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
-				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
 			},
 		},
 	}
@@ -1275,7 +1275,7 @@ func (s *deploymentAppTemplateTest) TestContainerStartupProbe() {
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
-				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
 			},
 		},
 	}
