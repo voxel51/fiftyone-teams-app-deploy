@@ -147,7 +147,7 @@ FiftyOne Enterprise v2.7.0 deprecated the
 This has been removed in v2.9.0.
 
 Please refer to
-[the delegated operator documentation](./configuring-delegated-operators.md#v270)
+[the delegated operator documentation](./configuring-delegated-operators.md#migrating-from-delegatedoperatorexecutorsettings-to-delegatedoperatordeployments)
 for migrating to the new setting.
 
 #### FiftyOne Enterprise v2.8+ `initContainer` Changes
