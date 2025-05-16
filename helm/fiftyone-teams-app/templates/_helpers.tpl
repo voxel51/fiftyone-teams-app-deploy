@@ -24,17 +24,6 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Create a default name for the delegated operator executor service
-*/}}
-{{- define "delegated-operator-executor.name" -}}
-{{- if .Values.delegatedOperatorExecutorSettings.name }}
-{{- .Values.delegatedOperatorExecutorSettings.name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-"teams-do"
-{{- end }}
-{{- end }}
-
-{{/*
 Create a default name for the fiftyone app service
 */}}
 {{- define "fiftyone-app.name" -}}
@@ -109,35 +98,10 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 
 {{/*
 Delegated Operator Executor Selector labels
-
-TODO: Deprecated in v2.7.0. Remove as part
-of a future release after deprecation is
-finished.
-*/}}
-{{- define "delegated-operator-executor.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "delegated-operator-executor.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Delegated Operator Executor Selector labels
 */}}
 {{- define "delegated-operator-deployments.selectorLabels" -}}
 app.kubernetes.io/name: {{ .name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-
-{{/*
-Delegated Operator Executor Combined labels
-
-TODO: Deprecated in v2.7.0. Remove as part
-of a future release after deprecation is
-finished.
-*/}}
-{{- define "delegated-operator-executor.labels" -}}
-{{ include "fiftyone-teams-app.commonLabels" . }}
-{{ include "delegated-operator-executor.selectorLabels" . }}
 {{- end }}
 
 {{/*
@@ -331,47 +295,6 @@ Common Init Containers
     {{- toYaml $.containerSecurityContext | nindent 4 }}
   {{- end }}
 {{- end }}
-
-{{/*
-Create a merged list of environment variables for delegated-operator-executor
-
-TODO: Deprecated in v2.7.0. Remove as part
-of a future release after deprecation is
-finished.
-*/}}
-{{- define "delegated-operator-executor.env-vars-list" -}}
-{{- $secretName := .Values.secret.name }}
-- name: API_URL
-  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
-- name: FIFTYONE_DATABASE_ADMIN
-  value: "false"
-- name: FIFTYONE_DATABASE_NAME
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneDatabaseName
-- name: FIFTYONE_DATABASE_URI
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: mongodbConnectionString
-- name: FIFTYONE_ENCRYPTION_KEY
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: encryptionKey
-{{- range $key, $val := .Values.delegatedOperatorExecutorSettings.env }}
-- name: {{ $key }}
-  value: {{ $val | quote }}
-{{- end }}
-{{- range $key, $val := .Values.delegatedOperatorExecutorSettings.secretEnv }}
-- name: {{ $key }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ $val.secretName }}
-      key: {{ $val.secretKey }}
-{{- end }}
-{{- end -}}
 
 {{/*
 Create a merged list of environment variables for delegated-operator-executor
@@ -645,15 +568,3 @@ Create a merged list of environment variables for fiftyone-teams-app
       key: {{ $val.secretKey }}
 {{- end }}
 {{- end -}}
-
-{{/*
-Enforces that we can't have both
-.Values.delegatedOperatorExecutorSettings.enabled and
-.Values.delegatedOperatorDeployments enabled.
-*/}}
-{{- define "fiftyone-teams-app.teams-do-deprecation-validation" -}}
-{{- $invalid := and (.Values.delegatedOperatorExecutorSettings.enabled) (gt (len .Values.delegatedOperatorDeployments.deployments) 0) }}
-{{- if $invalid }}
-{{- fail "Both delegatedOperatorExecutorSettings.enabled and delegatedOperatorDeployments configured. Please use one or the other" }}
-{{- end }}
-{{- end }}

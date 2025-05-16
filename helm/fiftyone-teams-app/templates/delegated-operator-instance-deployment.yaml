@@ -1,4 +1,3 @@
-{{- template "fiftyone-teams-app.teams-do-deprecation-validation" . }}
 {{- $baseTpl := .Values.delegatedOperatorDeployments.template }}
 {{- range $k, $v := .Values.delegatedOperatorDeployments.deployments }}
 {{- $name := kebabcase $k }}
