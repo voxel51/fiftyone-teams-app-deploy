@@ -991,6 +991,8 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "fiftyone-app"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1000,7 +1002,7 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"appSettings.service.shortname": "test-service-shortname",
 			},
@@ -1009,7 +1011,31 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+			},
+		},
+		{
+			"overrideLivenessSettings",
+			map[string]string{
+				"appSettings.liveness.failureThreshold": "10",
+				"appSettings.liveness.periodSeconds":    "20",
+				"appSettings.liveness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "fiftyone-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1114,6 +1140,8 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "fiftyone-app"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1123,7 +1151,7 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"appSettings.service.shortname": "test-service-shortname",
 			},
@@ -1132,12 +1160,36 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
 				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+			},
+		},
+		{
+			"overrideReadinessSettings",
+			map[string]string{
+				"appSettings.readiness.failureThreshold": "10",
+				"appSettings.readiness.periodSeconds":    "20",
+				"appSettings.readiness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "fiftyone-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 			},
 		},
 	}
@@ -1185,25 +1237,45 @@ func (s *deploymentAppTemplateTest) TestContainerStartupProbe() {
 			},
 		},
 		{
-			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
-				"appSettings.service.shortname":                "test-service-shortname",
-				"appSettings.service.startup.failureThreshold": "10",
-				"appSettings.service.startup.periodSeconds":    "10",
+				"appSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "tcpSocket": {
             "port": "test-service-shortname"
           },
-          "failureThreshold": 10,
-          "periodSeconds": 10,
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
 				s.NoError(err)
 				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideReadinessSettings",
+			map[string]string{
+				"appSettings.startup.failureThreshold": "10",
+				"appSettings.startup.periodSeconds":    "20",
+				"appSettings.startup.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "fiftyone-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
 			},
 		},
 	}
