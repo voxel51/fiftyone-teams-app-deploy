@@ -1176,6 +1176,8 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
             "path": "/api/hello",
             "port": "teams-app"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1185,7 +1187,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"teamsAppSettings.service.shortname": "test-service-shortname",
 			},
@@ -1195,7 +1197,32 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerLivenessProbe() {
             "path": "/api/hello",
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+			},
+		},
+		{
+			"overrideLivenessSettings",
+			map[string]string{
+				"teamsAppSettings.liveness.failureThreshold": "10",
+				"teamsAppSettings.liveness.periodSeconds":    "20",
+				"teamsAppSettings.liveness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/api/hello",
+            "port": "teams-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1301,6 +1328,8 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
             "path": "/api/hello",
             "port": "teams-app"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1310,7 +1339,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"teamsAppSettings.service.shortname": "test-service-shortname",
 			},
@@ -1320,7 +1349,32 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerReadinessProbe() {
             "path": "/api/hello",
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+			},
+		},
+		{
+			"overrideReadinessSettings",
+			map[string]string{
+				"teamsAppSettings.readiness.failureThreshold": "10",
+				"teamsAppSettings.readiness.periodSeconds":    "20",
+				"teamsAppSettings.readiness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/api/hello",
+            "port": "teams-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1374,11 +1428,9 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerStartupProbe() {
 			},
 		},
 		{
-			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
-				"teamsAppSettings.service.shortname":                "test-service-shortname",
-				"teamsAppSettings.service.startup.failureThreshold": "10",
-				"teamsAppSettings.service.startup.periodSeconds":    "10",
+				"teamsAppSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -1386,9 +1438,32 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerStartupProbe() {
             "path": "/api/hello",
             "port": "test-service-shortname"
           },
-          "failureThreshold": 10,
-          "periodSeconds": 10,
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideReadinessSettings",
+			map[string]string{
+				"teamsAppSettings.startup.failureThreshold": "10",
+				"teamsAppSettings.startup.periodSeconds":    "20",
+				"teamsAppSettings.startup.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/api/hello",
+            "port": "teams-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
