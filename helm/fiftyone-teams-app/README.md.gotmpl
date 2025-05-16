@@ -27,35 +27,13 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
-### Version 2.0+ License File Requirement
+### Version 2.9+ Delegated Operator Changes
 
-FiftyOne Enterprise v2.0 introduces a new requirement for a license file.
-This license file should be obtained from your Customer Success Team
-before upgrading to FiftyOne Enterprise 2.0 or beyond.
+<!-- Differs from docker-compose docs -->
 
+FiftyOne Enterprise v2.9 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
-for steps on how to add your license file.
-
-### Version 2.2+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
-### Version 2.5+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
-### Version 2.7+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v29-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
 ### Version 2.9+ Installation Changes
@@ -70,14 +48,36 @@ appSettings:
     FIFTYONE_DATABASE_ADMIN: true
 ```
 
-### Version 2.9+ Delegated Operator Changes
+### Version 2.7+ Delegated Operator Changes
 
-<!-- Differs from docker-compose docs -->
-
-FiftyOne Enterprise v2.9 introduces some changes to delegated operators.
+FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
 Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v29-delegated-operator-changes)
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
+
+### Version 2.5+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.2+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.0+ License File Requirement
+
+FiftyOne Enterprise v2.0 introduces a new requirement for a license file.
+This license file should be obtained from your Customer Success Team
+before upgrading to FiftyOne Enterprise 2.0 or beyond.
+
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
+for steps on how to add your license file.
 
 ## Table of Contents
 
