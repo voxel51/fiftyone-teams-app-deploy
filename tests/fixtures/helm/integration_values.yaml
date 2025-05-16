@@ -17,9 +17,7 @@ apiSettings:
       initialDelaySeconds: 15
 appSettings:
   env:
-    # Only set to true during the initial installation or during a database upgrade
-    # FIFTYONE_DATABASE_ADMIN: false
-    FIFTYONE_DATABASE_ADMIN: true
+    FIFTYONE_DATABASE_ADMIN: false
     # For local development without TLS certs, set `APP_USE_HTTPS=false` to
     # prohibit the app from setting Redirect URL protocol to `https`.
     # Must be set in both `appSettings.env` and `teamsAppSettings.env`.

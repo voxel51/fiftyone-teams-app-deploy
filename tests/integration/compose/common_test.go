@@ -14,8 +14,7 @@ import (
 const (
 	legacyAuthEnvFixtureFilePath   = "../../fixtures/docker/integration_legacy_auth.env"
 	internalAuthFixtureEnvFilePath = "../../fixtures/docker/integration_internal_auth.env"
-	// Override FIFTYONE_DATABASE_ADMIN to true (until we can override via environment variable)
-	overrideFile = "../../tests/fixtures/docker/compose.override.yaml"
+	overrideFile                   = "../../tests/fixtures/docker/compose.override.yaml"
 	// To run the containers on macOS arm64, we need to set the platform
 	darwinOverrideFile        = "../../tests/fixtures/docker/compose.override.darwin.yaml"
 	darwinOverrideFilePlugins = "../../tests/fixtures/docker/compose.override.darwin_plugins.yaml"
