@@ -58,6 +58,18 @@ Please refer to the
 [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
 for steps on how to upgrade your delegated operators.
 
+### Version 2.9+ Installation Changes
+
+FiftyOne Enterprise v2.9 no longer requires that operators set the
+following `FIFTYONE_DATABASE_ADMIN` variable while doing an initial installation:
+
+```yaml
+# Required prior to 2.9.0
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: true
+```
+
 ## Table of Contents
 
 <!-- toc -->
@@ -66,7 +78,7 @@ for steps on how to upgrade your delegated operators.
   - [Kubernetes/Kubectl](#kuberneteskubectl)
   - [Helm](#helm)
 - [Usage](#usage)
-- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
@@ -183,28 +195,7 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
-## Initial Installation vs. Upgrades
-
-Upgrades are more frequent than new installations.
-The chart's default behavior supports upgrades and the `values.yaml` contains
-
-```yaml
-appSettings:
-  env:
-    FIFTYONE_DATABASE_ADMIN: false
-```
-
-When performing an initial installation,
-in your `values.yaml`, set
-
-```yaml
-appSettings:
-  env:
-    FIFTYONE_DATABASE_ADMIN: true
-```
-
-After the initial installation, we recommend either commenting
-this environment variable or changing the value to `false`.
+## Upgrades
 
 When performing an upgrade, please review
 [Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
