@@ -1174,6 +1174,8 @@ func (s *deploymentPluginsTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "teams-plugins"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1183,7 +1185,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"pluginsSettings.enabled":           "true",
 				"pluginsSettings.service.shortname": "test-service-shortname",
@@ -1193,7 +1195,32 @@ func (s *deploymentPluginsTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+			},
+		},
+		{
+			"overrideLivenessSettings",
+			map[string]string{
+				"pluginsSettings.enabled":                   "true",
+				"pluginsSettings.liveness.failureThreshold": "10",
+				"pluginsSettings.liveness.periodSeconds":    "20",
+				"pluginsSettings.liveness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "teams-plugins"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1343,6 +1370,8 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "teams-plugins"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1352,7 +1381,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"pluginsSettings.enabled":           "true",
 				"pluginsSettings.service.shortname": "test-service-shortname",
@@ -1362,7 +1391,32 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+			},
+		},
+		{
+			"overridReadinessSettings",
+			map[string]string{
+				"pluginsSettings.enabled":                    "true",
+				"pluginsSettings.readiness.failureThreshold": "10",
+				"pluginsSettings.readiness.periodSeconds":    "20",
+				"pluginsSettings.readiness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "teams-plugins"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1437,21 +1491,42 @@ func (s *deploymentPluginsTemplateTest) TestContainerStartupProbe() {
 			},
 		},
 		{
-			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
-				"pluginsSettings.enabled":                          "true",
-				"pluginsSettings.service.shortname":                "test-service-shortname",
-				"pluginsSettings.service.startup.failureThreshold": "10",
-				"pluginsSettings.service.startup.periodSeconds":    "10",
+				"pluginsSettings.enabled":           "true",
+				"pluginsSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "tcpSocket": {
             "port": "test-service-shortname"
           },
-          "failureThreshold": 10,
-          "periodSeconds": 10,
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overridReadinessSettings",
+			map[string]string{
+				"pluginsSettings.enabled":                  "true",
+				"pluginsSettings.startup.failureThreshold": "10",
+				"pluginsSettings.startup.periodSeconds":    "20",
+				"pluginsSettings.startup.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "teams-plugins"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)

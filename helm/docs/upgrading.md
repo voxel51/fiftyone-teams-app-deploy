@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.9+ Startup Probe Changes](#fiftyone-enterprise-v29-startup-probe-changes)
     - [FiftyOne Enterprise v2.9+ Delegated Operator Changes](#fiftyone-enterprise-v29-delegated-operator-changes)
     - [FiftyOne Enterprise v2.8+ `initContainer` Changes](#fiftyone-enterprise-v28-initcontainer-changes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
@@ -137,6 +138,34 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.9+ Startup Probe Changes
+
+<!-- Differs from docker-compose docs -->
+
+In `v2.9.0`, the `values.yaml` location of startup probe settings
+moved from `<settings>.service.startup` to `<settings>.startup` section.
+
+If your `values.yaml` contains
+
+```yaml
+appSettings:
+  service:
+    startup:
+      failureThreshold: 10
+      periodSeconds: 15
+```
+
+move `appSettings.service.startup` to `appSettings.startup`
+
+```yaml
+appSettings:
+  startup:
+    failureThreshold: 10
+    periodSeconds: 15
+```
+
+Repeat for each occurrence of `<settings>.service.startup` to `<settings>.startup`.
 
 #### FiftyOne Enterprise v2.9+ Delegated Operator Changes
 

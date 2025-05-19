@@ -1027,6 +1027,8 @@ func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
             "path": "/health/",
             "port": "teams-api"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1036,7 +1038,7 @@ func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"apiSettings.service.shortname": "test-service-shortname",
 			},
@@ -1046,7 +1048,32 @@ func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
             "path": "/health/",
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+			},
+		},
+		{
+			"overrideLivenessSettings",
+			map[string]string{
+				"apiSettings.liveness.failureThreshold": "10",
+				"apiSettings.liveness.periodSeconds":    "20",
+				"apiSettings.liveness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/health/",
+            "port": "teams-api"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1152,6 +1179,8 @@ func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
             "path": "/health/",
             "port": "teams-api"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1161,7 +1190,7 @@ func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"apiSettings.service.shortname": "test-service-shortname",
 			},
@@ -1171,7 +1200,32 @@ func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
             "path": "/health/",
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+			},
+		},
+		{
+			"overrideReadinessSettings",
+			map[string]string{
+				"apiSettings.readiness.failureThreshold": "10",
+				"apiSettings.readiness.periodSeconds":    "20",
+				"apiSettings.readiness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/health/",
+            "port": "teams-api"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1214,7 +1268,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "path": "/health/",
             "port": "teams-api"
           },
-          "failureThreshold": 10,
+          "failureThreshold": 5,
           "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
@@ -1225,11 +1279,9 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
 			},
 		},
 		{
-			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
-				"apiSettings.service.shortname":                "test-service-shortname",
-				"apiSettings.service.startup.failureThreshold": "15",
-				"apiSettings.service.startup.periodSeconds":    "10",
+				"apiSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -1237,9 +1289,32 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "path": "/health/",
             "port": "test-service-shortname"
           },
-          "failureThreshold": 15,
-          "periodSeconds": 10,
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideStartupSettings",
+			map[string]string{
+				"apiSettings.startup.failureThreshold": "10",
+				"apiSettings.startup.periodSeconds":    "20",
+				"apiSettings.startup.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/health/",
+            "port": "teams-api"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)

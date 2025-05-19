@@ -27,6 +27,13 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.9+ Startup Probe Changes
+
+FiftyOne Enterprise v2.9 introduces some changes to startup probe configuration.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v29-startup-probe-changes)
+for steps on how to upgrade your startup probe configurations.
+
 ### Version 2.9+ Delegated Operator Changes
 
 <!-- Differs from docker-compose docs -->
@@ -481,12 +488,18 @@ follow
 | apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors]. |
+| apiSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-api`. [Reference][probes]. |
+| apiSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-api`. [Reference][probes]. |
+| apiSettings.liveness.timeoutSeconds | int | `5` | Number of seconds after which the liveness probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for `teams-api`. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-api`. [Reference][annotations]. |
 | apiSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget]. |
 | apiSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-api`. |
 | apiSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
+| apiSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-api`. [Reference][probes]. |
+| apiSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes]. |
+| apiSettings.readiness.timeoutSeconds | int | `5` | Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.replicaCount | int | `1` | Number of pods in the `teams-api` deployment's ReplicaSet. When > 1, you must also configure volumes, volumeMounts and set `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`. For more information see [the documentation][configure-ha-teams-api]. |
 | apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
 | apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-api` containers. |
@@ -497,9 +510,10 @@ follow
 | apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for `teams-api`. |
 | apiSettings.service.port | int | `80` | Service port for `teams-api`. |
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for `teams-api`. [Reference][ports]. |
-| apiSettings.service.startup.failureThreshold | int | `10` | Number of times to retry the startup probe for the `teams-api`. [Reference][probes]. |
-| apiSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for `teams-api`. [Reference][service-type]. |
+| apiSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-api`. [Reference][probes]. |
+| apiSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes]. |
+| apiSettings.startup.timeoutSeconds | int | `5` | Number of seconds after which the startup probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations]. |
 | apiSettings.topologySpreadConstraints | list | `[]` | Control how pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints]. |
 | apiSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-api` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
@@ -526,12 +540,18 @@ follow
 | appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors]. |
+| appSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes]. |
+| appSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `fiftyone-app`. [Reference][probes]. |
+| appSettings.liveness.timeoutSeconds | int | `5` | Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for `fiftyone-app`. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for `fiftyone-app`. [Reference][annotations]. |
 | appSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget]. |
 | appSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `fiftyone-app`. |
 | appSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | appSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context]. |
+| appSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `fiftyone-app`. [Reference][probes]. |
+| appSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `fiftyone-app`. [Reference][probes]. |
+| appSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.replicaCount | int | `2` | Number of pods in the `fiftyone-app` deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | appSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
 | appSettings.secretEnv | object | `{}` | Secret variables to be passed to the `fiftyone-app` containers. |
@@ -542,9 +562,10 @@ follow
 | appSettings.service.nodePort | int | `nil` | Service nodePort set only when `appSettings.service.type: NodePort` for `fiftyone-app`. |
 | appSettings.service.port | int | `80` | Service port. |
 | appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for `fiftyone-app`. [Reference][ports]. |
-| appSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes]. |
-| appSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for `fiftyone-app`. [Reference][service-type]. |
+| appSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes]. |
+| appSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes]. |
+| appSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `fiftyone-app` pods with matching taints. [Reference][taints-and-tolerations]. |
 | appSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `fiftyone-app` deployment. [Reference][topology-spread-constraints]. |
 | appSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `fiftyone-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
@@ -567,12 +588,18 @@ follow
 | casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors]. |
+| casSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes]. |
+| casSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-cas`. [Reference][probes]. |
+| casSettings.liveness.timeoutSeconds | int | `5` | Timeout for the liveness probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for `teams-cas`. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-cas`. [Reference][annotations]. |
 | casSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget]. |
 | casSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-cas`. |
 | casSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context]. |
+| casSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-cas`. [Reference][probes]. |
+| casSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-cas`. [Reference][probes]. |
+| casSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.replicaCount | int | `2` | Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment]. |
 | casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
 | casSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-cas` containers. |
@@ -583,9 +610,10 @@ follow
 | casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for `teams-cas`. |
 | casSettings.service.port | int | `80` | Service port. |
 | casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for `teams-cas`. [Reference][ports]. |
-| casSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-cas`. [Reference][probes]. |
-| casSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes]. |
 | casSettings.service.type | string | `"ClusterIP"` | Service type for `teams-cas`. [Reference][service-type]. |
+| casSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-cas`. [Reference][probes]. |
+| casSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes]. |
+| casSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-cas` pods with matching taints. [Reference][taints-and-tolerations]. |
 | casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-cas` deployment. [Reference][topology-spread-constraints]. |
 | casSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-cas` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
@@ -611,13 +639,13 @@ follow
 | delegatedOperatorDeployments.template.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
 | delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
-| delegatedOperatorDeployments.template.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
 | delegatedOperatorDeployments.template.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `delegated-operator-executor`. [Reference][resources]. |
 | delegatedOperatorDeployments.template.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
+| delegatedOperatorDeployments.template.securityContext | object | `{}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorDeployments.template.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the `teams-do`. [Reference][probes]. |
@@ -666,12 +694,18 @@ follow
 | pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors]. |
+| pluginsSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.liveness.timeoutSeconds | int | `5` | Timeout for the liveness probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for `teams-plugins`. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for `teams-plugins` pods. [Reference][annotations]. |
 | pluginsSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget]. |
 | pluginsSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
 | pluginsSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | pluginsSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context]. |
+| pluginsSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.replicaCount | int | `2` | Number of pods in the `teams-plugins` deployment's ReplicaSet. Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | pluginsSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-plugins`. [Reference][resources]. |
 | pluginsSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-plugins` containers. |
@@ -682,9 +716,10 @@ follow
 | pluginsSettings.service.nodePort | int | `nil` | Service nodePort set only when `pluginsSettings.service.type: NodePort` for `teams-plugins`. |
 | pluginsSettings.service.port | int | `80` | Service port. |
 | pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for `teams-plugins`. [Reference][ports]. |
-| pluginsSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes]. |
-| pluginsSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for `teams-plugins`. [Reference][service-type]. |
+| pluginsSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-plugins` pods with matching taints. [Reference][taints-and-tolerations]. |
 | pluginsSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-plugins` deployment. [Reference][topology-spread-constraints]. |
 | pluginsSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-plugins` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
@@ -728,12 +763,18 @@ follow
 | teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors]. |
+| teamsAppSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.liveness.timeoutSeconds | int | `5` | Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for `teams-app`.  [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for `teams-app` pods. [Reference][annotations]. |
 | teamsAppSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget]. |
 | teamsAppSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-app`. |
 | teamsAppSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | teamsAppSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context]. |
+| teamsAppSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes]. |
 | teamsAppSettings.replicaCount | int | `2` | Number of pods in the `teams-app` deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-app`.  [Reference][resources]. |
 | teamsAppSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-app` containers. |
@@ -744,9 +785,10 @@ follow
 | teamsAppSettings.service.nodePort | int | `nil` | Service nodePort set only when `teamsAppSettings.service.type: NodePort` for `teams-app`. |
 | teamsAppSettings.service.port | int | `80` | Service port. |
 | teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for `teams-app`.  [Reference][ports]. |
-| teamsAppSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-app`.  [Reference][probes]. |
-| teamsAppSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for `teams-app`.  [Reference][service-type]. |
+| teamsAppSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `fiftyone-app`. [Reference][probes]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-app` pods with matching taints. [Reference][taints-and-tolerations]. |
 | teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-app` deployment. [Reference][topology-spread-constraints]. |
 | teamsAppSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
