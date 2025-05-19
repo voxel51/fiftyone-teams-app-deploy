@@ -27,6 +27,13 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.9+ Startup Probe Changes
+
+FiftyOne Enterprise v2.9 introduces some changes to startup probe configuration.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v29-startup-probe-changes)
+for steps on how to upgrade your startup probe configurations.
+
 ### Version 2.9+ Delegated Operator Changes
 
 <!-- Differs from docker-compose docs -->
