@@ -143,10 +143,10 @@ quickstart  0.21.2
 
 <!-- Differs from docker-compose docs -->
 
-FiftyOne Enterprise moves the `<settings>.service.startup` values in
-the `values.yaml` to the `<settings>.startup` section.
+In `v2.9.0`, the `values.yaml` location of startup probe settings
+moved from `<settings>.service.startup` to `<settings>.startup` section.
 
-For example, the following v2.8.2 `values.yaml`
+If your `values.yaml` contains
 
 ```yaml
 appSettings:
@@ -156,7 +156,7 @@ appSettings:
       periodSeconds: 15
 ```
 
-would be converted to the following v2.9.0 `values.yaml`
+move `appSettings.service.startup` to `appSettings.startup`
 
 ```yaml
 appSettings:
@@ -164,6 +164,8 @@ appSettings:
     failureThreshold: 10
     periodSeconds: 15
 ```
+
+Repeat for each occurrence of `<settings>.service.startup` to `<settings>.startup`.
 
 #### FiftyOne Enterprise v2.9+ Delegated Operator Changes
 

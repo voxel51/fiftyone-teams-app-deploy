@@ -490,14 +490,13 @@ follow
 | apiSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-api`. |
 | apiSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
-| apiSettings.readiness | object | `{"failureThreshold":5,"periodSeconds":15,"timeoutSeconds":5}` | Container security configuration for `teams-api`. [Reference][container-security-context]. |
 | apiSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-api`. [Reference][probes]. |
 | apiSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes]. |
 | apiSettings.readiness.timeoutSeconds | int | `5` | Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.replicaCount | int | `1` | Number of pods in the `teams-api` deployment's ReplicaSet. When > 1, you must also configure volumes, volumeMounts and set `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`. For more information see [the documentation][configure-ha-teams-api]. |
 | apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
 | apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-api` containers. |
-| apiSettings.securityContext | object | `{}` |  |
+| apiSettings.securityContext | object | `{}` | Container security configuration for `teams-api`. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for `teams-api`. [Reference][annotations]. |
 | apiSettings.service.containerPort | int | `8000` | Service container port for `teams-api`. |
 | apiSettings.service.name | string | `"teams-api"` | Service name. |
@@ -633,13 +632,13 @@ follow
 | delegatedOperatorDeployments.template.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
 | delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
-| delegatedOperatorDeployments.template.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
 | delegatedOperatorDeployments.template.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `delegated-operator-executor`. [Reference][resources]. |
 | delegatedOperatorDeployments.template.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
+| delegatedOperatorDeployments.template.securityContext | object | `{}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorDeployments.template.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the `teams-do`. [Reference][probes]. |

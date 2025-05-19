@@ -124,8 +124,6 @@ apiSettings:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
-  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
-  # -- Container security configuration for `teams-api`. [Reference][container-security-context].
   readiness:
     # -- Number of times to retry the readiness probe for the `teams-api`. [Reference][probes].
     failureThreshold: 5
@@ -133,6 +131,8 @@ apiSettings:
     periodSeconds: 15
     # -- Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes].
     timeoutSeconds: 5
+  # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
+  # -- Container security configuration for `teams-api`. [Reference][container-security-context].
   securityContext: {}
   startup:
     # -- Number of times to retry the startup probe for the `teams-api`. [Reference][probes].
@@ -567,8 +567,6 @@ delegatedOperatorDeployments:
       # maxUnavailable: ""
     # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
     podSecurityContext: {}
-    # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
-    # -- Container security configuration for `delegated-operator-executor`. [Reference][container-security-context].
     readiness:
       # -- Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].
       failureThreshold: 5
@@ -576,6 +574,8 @@ delegatedOperatorDeployments:
       periodSeconds: 30
       # -- Timeout for the readiness probe for the `teams-do`. [Reference][probes].
       timeoutSeconds: 30
+    # TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`
+    # -- Container security configuration for `delegated-operator-executor`. [Reference][container-security-context].
     securityContext: {}
     startup:
       # -- Number of times to retry the startup probe for the `teams-do`. [Reference][probes].
