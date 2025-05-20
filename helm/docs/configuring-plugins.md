@@ -24,7 +24,7 @@ No additional configurations are required.
 Plugins run in the `fiftyone-app` deployment.
 To enable this mode
 
-- [Add Shared Storage for FiftyOne Enterprise Plugins][./plugins-storage]
+- [Add Shared Storage for FiftyOne Enterprise Plugins][plugins-storage]
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-api` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
@@ -40,7 +40,7 @@ To enable this mode
 
 To enable this mode
 
-- [Add Shared Storage for FiftyOne Enterprise Plugins][./plugins-storage]
+- [Add Shared Storage for FiftyOne Enterprise Plugins][plugins-storage]
   - Mount a Persistent Volume Claim (PVC) that provides
     - `ReadWrite` permissions to the `teams-api` deployment
       at the `FIFTYONE_PLUGINS_DIR` path
