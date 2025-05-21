@@ -57,4 +57,4 @@ To enable this mode
   add the `teams-plugins` service name to your `no_proxy` and
   `NO_PROXY` environment variables.
 
-[plugins-storage]: ,/plugins-storage.md
+[plugins-storage]: ./plugins-storage.md
