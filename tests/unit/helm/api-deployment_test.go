@@ -1738,7 +1738,8 @@ func (s *deploymentApiTemplateTest) TestInitContainerSecurityContext() {
 			nil,
 			func(securityContext *corev1.SecurityContext) {
 				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
-				s.Nil(securityContext.Capabilities, "should be nil")
+				s.Empty(securityContext.Capabilities.Add, "Capability.Add should be empty")
+				s.Equal([]corev1.Capability{"ALL"}, securityContext.Capabilities.Drop, "Capability.Drop should be equal")
 				s.Nil(securityContext.Privileged, "should be nil")
 				s.Nil(securityContext.ProcMount, "should be nil")
 				s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
@@ -1753,11 +1754,15 @@ func (s *deploymentApiTemplateTest) TestInitContainerSecurityContext() {
 		{
 			"overrideSecurityContext",
 			map[string]string{
-				"apiSettings.initContainers.containerSecurityContext.runAsGroup": "3000",
-				"apiSettings.initContainers.containerSecurityContext.runAsUser":  "1001",
+				"apiSettings.initContainers.containerSecurityContext.capabilities.add[0]":  "CAP_AUDIT_CONTROL",
+				"apiSettings.initContainers.containerSecurityContext.capabilities.drop[0]": "CAP_AUDIT_READ",
+				"apiSettings.initContainers.containerSecurityContext.runAsGroup":           "3000",
+				"apiSettings.initContainers.containerSecurityContext.runAsUser":            "1001",
 			},
 			func(securityContext *corev1.SecurityContext) {
 				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
+				s.Equal([]corev1.Capability{"CAP_AUDIT_CONTROL"}, securityContext.Capabilities.Add, "Capability.Add should be equal")
+				s.Equal([]corev1.Capability{"CAP_AUDIT_READ"}, securityContext.Capabilities.Drop, "Capability.Drop should be equal")
 				s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
 				s.Equal(true, *securityContext.RunAsNonRoot, "RunAsNonRoot should be equal")
 				s.Equal(int64(1001), *securityContext.RunAsUser, "runAsUser should be 1001")
