@@ -77,7 +77,8 @@ jobs:
 
           echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_ENV}"
 
-      - uses: azure/setup-helm@v4
+      - name: Install Helm
+        uses: azure/setup-helm@v4
         with:
           version: v3.17.3
 
