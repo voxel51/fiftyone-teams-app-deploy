@@ -1,0 +1,38 @@
+---
+name: get-tool-version
+description: Detects the system version from `.tool-versions` and returns the version as a github output
+
+inputs:
+  tool-name:
+    description: 'The tool to create detect'
+    required: false
+    default: 'helm'
+  tool-versions-file:
+    description: 'The path to a .tool-versions file to check'
+    required: false
+    default: '.tool-versions'
+outputs:
+  version:
+    description: "Detected version if a match was found. Otherwise, latest will be returned."
+    value: ${{ steps.detect-version.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - name: Create .${{ inputs.tool-name }}-version File
+      id: detect-version
+      shell: bash
+      run: |
+        # Ensure a .tool-versions file exists
+        if [[ ! -f "${{ inputs.tool-versions-file }}" ]]; then
+          echo "version=latest" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # Find the tool in the file, if it exists
+        if grep --quiet "${{ inputs.tool-name }}" "${{ inputs.tool-versions-file }}"; then
+          version=$(grep -Eo "${{ inputs.tool-name }}[[:space:]].*$" | awk '{ print $2 }')
+          sed -i "/${{ inputs.tool-name }}[[:space:]].*$/d" "${{ inputs.tool-versions-file }}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+        else
+          echo "version=latest" >> "$GITHUB_OUTPUT"
+        fi

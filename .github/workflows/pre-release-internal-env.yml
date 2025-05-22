@@ -77,10 +77,14 @@ jobs:
 
           echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_ENV}"
 
-      - name: Install Helm
-        uses: azure/setup-helm@v4
+      - name: Set helm version (azure/setup-helm doesn't allow for version files)
+        id: helm-version
+        run: |
+          grep -Eo "helm[[:space:]].*$" ".tool-versions" | awk '{ print $2 }' >> "$GITHUB_OUTPUT"
+
+      - uses: azure/setup-helm@v4
         with:
-          version: 'latest'
+          version: ${{ steps.helm-version.outputs.helm-version }}
 
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
