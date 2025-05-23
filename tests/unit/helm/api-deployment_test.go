@@ -1269,7 +1269,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "port": "teams-api"
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1290,7 +1290,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
             "port": "test-service-shortname"
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe

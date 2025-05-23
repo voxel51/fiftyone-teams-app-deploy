@@ -1418,7 +1418,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerStartupProbe() {
             "port": "teams-app"
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1439,7 +1439,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerStartupProbe() {
             "port": "test-service-shortname"
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe

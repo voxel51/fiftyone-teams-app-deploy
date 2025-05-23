@@ -1410,7 +1410,7 @@ func (s *deploymentCasTemplateTest) TestContainerStartupProbe() {
             "port": "teams-cas"
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1431,7 +1431,7 @@ func (s *deploymentCasTemplateTest) TestContainerStartupProbe() {
             "port": "test-service-shortname"
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe

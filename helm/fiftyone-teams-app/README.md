@@ -512,7 +512,7 @@ follow
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for `teams-api`. [Reference][ports]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for `teams-api`. [Reference][service-type]. |
 | apiSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-api`. [Reference][probes]. |
-| apiSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes]. |
+| apiSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes]. |
 | apiSettings.startup.timeoutSeconds | int | `5` | Number of seconds after which the startup probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations]. |
 | apiSettings.topologySpreadConstraints | list | `[]` | Control how pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints]. |
@@ -564,7 +564,7 @@ follow
 | appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for `fiftyone-app`. [Reference][ports]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for `fiftyone-app`. [Reference][service-type]. |
 | appSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes]. |
-| appSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes]. |
+| appSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes]. |
 | appSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `fiftyone-app` pods with matching taints. [Reference][taints-and-tolerations]. |
 | appSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `fiftyone-app` deployment. [Reference][topology-spread-constraints]. |
@@ -612,7 +612,7 @@ follow
 | casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for `teams-cas`. [Reference][ports]. |
 | casSettings.service.type | string | `"ClusterIP"` | Service type for `teams-cas`. [Reference][service-type]. |
 | casSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-cas`. [Reference][probes]. |
-| casSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes]. |
+| casSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes]. |
 | casSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-cas` pods with matching taints. [Reference][taints-and-tolerations]. |
 | casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-cas` deployment. [Reference][topology-spread-constraints]. |
@@ -718,7 +718,7 @@ follow
 | pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for `teams-plugins`. [Reference][ports]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for `teams-plugins`. [Reference][service-type]. |
 | pluginsSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes]. |
-| pluginsSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-plugins` pods with matching taints. [Reference][taints-and-tolerations]. |
 | pluginsSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-plugins` deployment. [Reference][topology-spread-constraints]. |
@@ -787,7 +787,7 @@ follow
 | teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for `teams-app`.  [Reference][ports]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for `teams-app`.  [Reference][service-type]. |
 | teamsAppSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-app`.  [Reference][probes]. |
-| teamsAppSettings.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes]. |
 | teamsAppSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `fiftyone-app`. [Reference][probes]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-app` pods with matching taints. [Reference][taints-and-tolerations]. |
 | teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-app` deployment. [Reference][topology-spread-constraints]. |
