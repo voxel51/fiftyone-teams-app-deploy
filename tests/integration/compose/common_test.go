@@ -4,6 +4,8 @@
 package integration
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -41,4 +43,31 @@ func validate_endpoint(t *testing.T, url string, expectedBody string, expectedSt
 func get_logs(t *testing.T, dockerOptions *docker.Options, container string) string {
 	output := docker.RunDockerComposeAndGetStdOut(t, dockerOptions, "logs", container)
 	return output
+}
+
+func checkContainerLogsWithRetries(subT *testing.T, dockerOptions *docker.Options, container string, tc string, expected string) {
+	maxRetries := 6
+	retryDelay := 2 * time.Second
+
+	var log string
+
+	for i := 0; i < maxRetries; i++ {
+		log = get_logs(subT, dockerOptions, container)
+		if strings.Contains(log, expected) {
+			// Log entry found, proceed to next container
+			break
+		}
+
+		// Log entry not found, wait before retrying
+		if i < maxRetries-1 {
+			time.Sleep(retryDelay)
+		}
+	}
+
+	// Final assertion
+	subT.Run(fmt.Sprintf("%s - %s", tc, container), func(t *testing.T) {
+		if !strings.Contains(log, expected) {
+			t.Errorf("%s - %s - log should contain matching entry:\n\t%s", tc, container, expected)
+		}
+	})
 }

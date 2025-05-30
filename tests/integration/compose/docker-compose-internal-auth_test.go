@@ -339,7 +339,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					validate_endpoint(subT, expected.url, expected.responsePayload, expected.httpResponseCode)
 				}
 				// Validate log output is expected
-				s.Contains(get_logs(subT, dockerOptions, expected.name), expected.log, fmt.Sprintf("%s - %s - log should contain matching entry", testCase.name, expected.name))
+				checkContainerLogsWithRetries(subT, dockerOptions, expected.name, testCase.name, expected.log)
 			}
 		})
 	}
