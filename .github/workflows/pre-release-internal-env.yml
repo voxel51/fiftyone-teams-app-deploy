@@ -80,7 +80,7 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
-          version: v3.17.3  # TODO: AS-701 set to `latest` once `helm registry login ...` works again
+          version: latest
 
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
