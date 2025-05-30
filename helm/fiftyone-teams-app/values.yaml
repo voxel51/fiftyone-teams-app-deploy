@@ -1,4 +1,5 @@
 ---
+# Remove before merging
 # FiftyOne Enterprise API (`teams-api`)
 apiSettings:
   # -- Controls whether `teams-api` is added to the chart's ingress.
