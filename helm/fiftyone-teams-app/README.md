@@ -486,7 +486,7 @@ follow
 | apiSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-api`. [Reference][init-containers]. |
-| apiSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
+| apiSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors]. |
 | apiSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-api`. [Reference][probes]. |
 | apiSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-api`. [Reference][probes]. |
@@ -538,7 +538,7 @@ follow
 | appSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `fiftyone-app`. [Reference][init-containers]. |
-| appSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
+| appSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors]. |
 | appSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `fiftyone-app`. [Reference][probes]. |
@@ -586,7 +586,7 @@ follow
 | casSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-cas`. [Reference][init-containers]. |
-| casSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
+| casSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors]. |
 | casSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-cas`. [Reference][probes]. |
@@ -692,7 +692,7 @@ follow
 | pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-plugins`. [Reference][init-containers]. |
-| pluginsSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
+| pluginsSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors]. |
 | pluginsSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-plugins`. [Reference][probes]. |
@@ -761,7 +761,7 @@ follow
 | teamsAppSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-app`.  [Reference][init-containers]. |
-| teamsAppSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
+| teamsAppSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors]. |
 | teamsAppSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes]. |
 | teamsAppSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-app`.  [Reference][probes]. |

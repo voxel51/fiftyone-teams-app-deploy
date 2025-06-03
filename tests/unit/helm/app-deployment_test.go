@@ -1628,12 +1628,14 @@ func (s *deploymentAppTemplateTest) TestInitContainerResourceRequirements() {
 			func(resourceRequirements corev1.ResourceRequirements) {
 				resourceExpected := corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
-						"cpu":    resource.MustParse("10m"),
-						"memory": resource.MustParse("128Mi"),
+						"cpu":               resource.MustParse("10m"),
+						"ephemeral-storage": resource.MustParse("64Mi"),
+						"memory":            resource.MustParse("128Mi"),
 					},
 					Requests: corev1.ResourceList{
-						"cpu":    resource.MustParse("10m"),
-						"memory": resource.MustParse("128Mi"),
+						"cpu":               resource.MustParse("10m"),
+						"ephemeral-storage": resource.MustParse("64Mi"),
+						"memory":            resource.MustParse("128Mi"),
 					},
 				}
 				s.Equal(resourceExpected, resourceRequirements, "should be equal")
@@ -1643,20 +1645,24 @@ func (s *deploymentAppTemplateTest) TestInitContainerResourceRequirements() {
 		{
 			"overrideResources",
 			map[string]string{
-				"appSettings.initContainers.resources.limits.cpu":      "1",
-				"appSettings.initContainers.resources.limits.memory":   "1Gi",
-				"appSettings.initContainers.resources.requests.cpu":    "500m",
-				"appSettings.initContainers.resources.requests.memory": "512Mi",
+				"appSettings.initContainers.resources.limits.cpu":                 "1",
+				"appSettings.initContainers.resources.limits.ephemeral-storage":   "1Gi",
+				"appSettings.initContainers.resources.limits.memory":              "1Gi",
+				"appSettings.initContainers.resources.requests.cpu":               "500m",
+				"appSettings.initContainers.resources.requests.ephemeral-storage": "512Mi",
+				"appSettings.initContainers.resources.requests.memory":            "512Mi",
 			},
 			func(resourceRequirements corev1.ResourceRequirements) {
 				resourceExpected := corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
-						"cpu":    resource.MustParse("1"),
-						"memory": resource.MustParse("1Gi"),
+						"cpu":               resource.MustParse("1"),
+						"ephemeral-storage": resource.MustParse("1Gi"),
+						"memory":            resource.MustParse("1Gi"),
 					},
 					Requests: corev1.ResourceList{
-						"cpu":    resource.MustParse("500m"),
-						"memory": resource.MustParse("512Mi"),
+						"cpu":               resource.MustParse("500m"),
+						"ephemeral-storage": resource.MustParse("512Mi"),
+						"memory":            resource.MustParse("512Mi"),
 					},
 				}
 				s.Equal(resourceExpected, resourceRequirements, "should be equal")
