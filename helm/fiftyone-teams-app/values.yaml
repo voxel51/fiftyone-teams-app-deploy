@@ -99,9 +99,11 @@ apiSettings:
     resources:
       limits:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
       requests:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-api`. [Reference][probes].
@@ -268,9 +270,11 @@ appSettings:
     resources:
       limits:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
       requests:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes].
@@ -426,9 +430,11 @@ casSettings:
     resources:
       limits:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
       requests:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes].
@@ -792,9 +798,11 @@ pluginsSettings:
     resources:
       limits:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
       requests:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes].
@@ -1015,9 +1023,11 @@ teamsAppSettings:
     resources:
       limits:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
       requests:
         cpu: 10m
+        ephemeral-storage: 64Mi
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes].
