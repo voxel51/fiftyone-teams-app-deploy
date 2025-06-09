@@ -124,8 +124,6 @@ func (s *ingressTemplateTest) TestApiVersion() {
 	}
 }
 
-// TODO: Unit Test with different k8s versions
-// Given kubernetes version > 1.18-0, when ingress.className is not "" and `ingress.annotations` does not have key `"kubernetes.io/ingress.class"`, then set values.ingress.annotations `"kubernetes.io/ingress.class": {{ .Values.ingress.className }}`
 func (s *ingressTemplateTest) TestMetadataAnnotations() {
 	testCases := []struct {
 		name     string
@@ -317,8 +315,6 @@ func (s *ingressTemplateTest) TestMetadataNamespace() {
 	}
 }
 
-// TODO: Unit Test with different k8s versions
-// Given kubernetes version <1.18-0, when ingress.className is set, then `spec` should not contain `ingressClassName`
 func (s *ingressTemplateTest) TestIngressClassName() {
 	testCases := []struct {
 		name     string
@@ -437,8 +433,6 @@ func (s *ingressTemplateTest) TestTls() {
 	}
 }
 
-// TODO: Resume here.  Add test cases to cover all of the variants of the rules
-// TODO: Test k8s versions when 1.18-0 and 1.19-0
 func (s *ingressTemplateTest) TestRules() {
 	testCases := []struct {
 		name     string
