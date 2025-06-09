@@ -1,15 +1,11 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "fiftyone-teams-app.fullname" . -}}
-{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+{{- if .Values.ingress.className }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
   {{- end }}
 {{- end }}
-{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1
-{{- else -}}
-apiVersion: networking.k8s.io/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}
@@ -21,7 +17,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
   defaultBackend:
@@ -45,53 +41,32 @@ spec:
           {{- if and .Values.ingress.paths (gt (len .Values.ingress.paths) 1) }}
           {{- range .Values.ingress.paths }}
           - path: {{ .path }}
-            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
             pathType: {{ .pathType }}
-            {{- end }}
             backend:
-              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
                 name: {{ .serviceName }}
                 port:
                   number: {{ .servicePort }}
-              {{- else }}
-              serviceName: {{ .serviceName }}
-              servicePort: {{ .servicePort }}
-              {{- end }}
           {{- end }}
           {{- else }}
           - path: {{ .Values.ingress.teamsApp.path }}
-            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
             pathType: {{ .Values.ingress.teamsApp.pathType }}
-            {{- end }}
             backend:
-              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
                 name: {{ include "teams-app.name" . }}
                 port:
                   number: {{ .Values.teamsAppSettings.service.port }}
-              {{- else }}
-              serviceName: {{ include "teams-app.name" . }}
-              servicePort: {{ .Values.teamsAppSettings.service.port }}
-              {{- end }}
           {{- end }}
     {{- if .Values.apiSettings.dnsName }}
     - host: {{ .Values.apiSettings.dnsName | quote }}
       http:
         paths:
           - path: {{ .Values.ingress.api.path }}
-            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
             pathType: {{ .Values.ingress.api.pathType }}
-            {{- end }}
             backend:
-              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
                 name: {{ include "teams-api.name" . }}
                 port:
                   number: {{ .Values.apiSettings.service.port }}
-              {{- else }}
-              serviceName: {{ include "teams-api.name" . }}
-              servicePort: {{ .Values.apiSettings.service.port }}
-              {{- end }}
     {{- end }}
 {{- end }}
