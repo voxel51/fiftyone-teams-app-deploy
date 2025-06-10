@@ -649,7 +649,7 @@ ingress:
     pathType: ImplementationSpecific
 
   # -- Name of the ingress class.  When empty, a default Ingress class should be defined.
-  # When not empty and Kubernetes version is >1.18.0, this value will be the Ingress class name.
+  # When not empty, this value will be the Ingress class name.
   # [Reference][ingress-default-ingress-class]
   className: ""
   # -- Controls whether to create the ingress. When `false`, uses a pre-existing ingress.
