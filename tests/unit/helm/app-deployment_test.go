@@ -991,6 +991,8 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "fiftyone-app"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1000,7 +1002,7 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"appSettings.service.shortname": "test-service-shortname",
 			},
@@ -1009,7 +1011,31 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
           "tcpSocket": {
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+			},
+		},
+		{
+			"overrideLivenessSettings",
+			map[string]string{
+				"appSettings.liveness.failureThreshold": "10",
+				"appSettings.liveness.periodSeconds":    "20",
+				"appSettings.liveness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "fiftyone-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1114,6 +1140,8 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "fiftyone-app"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1123,7 +1151,7 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"appSettings.service.shortname": "test-service-shortname",
 			},
@@ -1132,7 +1160,31 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
           "tcpSocket": {
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+			},
+		},
+		{
+			"overrideReadinessSettings",
+			map[string]string{
+				"appSettings.readiness.failureThreshold": "10",
+				"appSettings.readiness.periodSeconds":    "20",
+				"appSettings.readiness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "fiftyone-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1175,7 +1227,7 @@ func (s *deploymentAppTemplateTest) TestContainerStartupProbe() {
             "port": "fiftyone-app"
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1185,20 +1237,40 @@ func (s *deploymentAppTemplateTest) TestContainerStartupProbe() {
 			},
 		},
 		{
-			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
-				"appSettings.service.shortname":                "test-service-shortname",
-				"appSettings.service.startup.failureThreshold": "10",
-				"appSettings.service.startup.periodSeconds":    "10",
+				"appSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
           "tcpSocket": {
             "port": "test-service-shortname"
           },
-          "failureThreshold": 10,
-          "periodSeconds": 10,
+          "failureThreshold": 5,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideReadinessSettings",
+			map[string]string{
+				"appSettings.startup.failureThreshold": "10",
+				"appSettings.startup.periodSeconds":    "20",
+				"appSettings.startup.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "tcpSocket": {
+            "port": "fiftyone-app"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1556,12 +1628,14 @@ func (s *deploymentAppTemplateTest) TestInitContainerResourceRequirements() {
 			func(resourceRequirements corev1.ResourceRequirements) {
 				resourceExpected := corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
-						"cpu":    resource.MustParse("10m"),
-						"memory": resource.MustParse("128Mi"),
+						"cpu":               resource.MustParse("10m"),
+						"ephemeral-storage": resource.MustParse("64Mi"),
+						"memory":            resource.MustParse("128Mi"),
 					},
 					Requests: corev1.ResourceList{
-						"cpu":    resource.MustParse("10m"),
-						"memory": resource.MustParse("128Mi"),
+						"cpu":               resource.MustParse("10m"),
+						"ephemeral-storage": resource.MustParse("64Mi"),
+						"memory":            resource.MustParse("128Mi"),
 					},
 				}
 				s.Equal(resourceExpected, resourceRequirements, "should be equal")
@@ -1571,20 +1645,24 @@ func (s *deploymentAppTemplateTest) TestInitContainerResourceRequirements() {
 		{
 			"overrideResources",
 			map[string]string{
-				"appSettings.initContainers.resources.limits.cpu":      "1",
-				"appSettings.initContainers.resources.limits.memory":   "1Gi",
-				"appSettings.initContainers.resources.requests.cpu":    "500m",
-				"appSettings.initContainers.resources.requests.memory": "512Mi",
+				"appSettings.initContainers.resources.limits.cpu":                 "1",
+				"appSettings.initContainers.resources.limits.ephemeral-storage":   "1Gi",
+				"appSettings.initContainers.resources.limits.memory":              "1Gi",
+				"appSettings.initContainers.resources.requests.cpu":               "500m",
+				"appSettings.initContainers.resources.requests.ephemeral-storage": "512Mi",
+				"appSettings.initContainers.resources.requests.memory":            "512Mi",
 			},
 			func(resourceRequirements corev1.ResourceRequirements) {
 				resourceExpected := corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
-						"cpu":    resource.MustParse("1"),
-						"memory": resource.MustParse("1Gi"),
+						"cpu":               resource.MustParse("1"),
+						"ephemeral-storage": resource.MustParse("1Gi"),
+						"memory":            resource.MustParse("1Gi"),
 					},
 					Requests: corev1.ResourceList{
-						"cpu":    resource.MustParse("500m"),
-						"memory": resource.MustParse("512Mi"),
+						"cpu":               resource.MustParse("500m"),
+						"ephemeral-storage": resource.MustParse("512Mi"),
+						"memory":            resource.MustParse("512Mi"),
 					},
 				}
 				s.Equal(resourceExpected, resourceRequirements, "should be equal")
@@ -1622,7 +1700,8 @@ func (s *deploymentAppTemplateTest) TestInitContainerSecurityContext() {
 			nil,
 			func(securityContext *corev1.SecurityContext) {
 				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
-				s.Nil(securityContext.Capabilities, "should be nil")
+				s.Empty(securityContext.Capabilities.Add, "Capability.Add should be empty")
+				s.Equal([]corev1.Capability{"ALL"}, securityContext.Capabilities.Drop, "Capability.Drop should be equal")
 				s.Nil(securityContext.Privileged, "should be nil")
 				s.Nil(securityContext.ProcMount, "should be nil")
 				s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
@@ -1637,11 +1716,15 @@ func (s *deploymentAppTemplateTest) TestInitContainerSecurityContext() {
 		{
 			"overrideSecurityContext",
 			map[string]string{
-				"appSettings.initContainers.containerSecurityContext.runAsGroup": "3000",
-				"appSettings.initContainers.containerSecurityContext.runAsUser":  "1001",
+				"appSettings.initContainers.containerSecurityContext.capabilities.add[0]":  "CAP_AUDIT_CONTROL",
+				"appSettings.initContainers.containerSecurityContext.capabilities.drop[0]": "CAP_AUDIT_READ",
+				"appSettings.initContainers.containerSecurityContext.runAsGroup":           "3000",
+				"appSettings.initContainers.containerSecurityContext.runAsUser":            "1001",
 			},
 			func(securityContext *corev1.SecurityContext) {
 				s.Equal(false, *securityContext.AllowPrivilegeEscalation, "AllowPrivilegeEscalation should be equal")
+				s.Equal([]corev1.Capability{"CAP_AUDIT_CONTROL"}, securityContext.Capabilities.Add, "Capability.Add should be equal")
+				s.Equal([]corev1.Capability{"CAP_AUDIT_READ"}, securityContext.Capabilities.Drop, "Capability.Drop should be equal")
 				s.Equal(int64(3000), *securityContext.RunAsGroup, "runAsGroup should be 3000")
 				s.Equal(true, *securityContext.RunAsNonRoot, "RunAsNonRoot should be equal")
 				s.Equal(int64(1001), *securityContext.RunAsUser, "runAsUser should be 1001")
@@ -2220,6 +2303,79 @@ func (s *deploymentAppTemplateTest) TestVolumes() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Template.Spec.Volumes)
+		})
+	}
+}
+
+func (s *deploymentAppTemplateTest) TestDeploymentUpdateStrategy() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(deploymentStrategy appsv1.DeploymentStrategy)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "RollingUpdate"
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+		{
+			"overrideUpdateStrategyType",
+			map[string]string{
+				"appSettings.updateStrategy.type": "Recreate",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "Recreate"
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+		{
+			"overrideUpdateStrategyRollingUpdate",
+			map[string]string{
+				"appSettings.updateStrategy.type":                         "RollingUpdate",
+				"appSettings.updateStrategy.rollingUpdate.maxUnavailable": "5",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "RollingUpdate",
+            "rollingUpdate": {
+              "maxUnavailable": 5
+            }
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Strategy)
 		})
 	}
 }

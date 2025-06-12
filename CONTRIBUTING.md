@@ -244,7 +244,6 @@ It takes a few minutes for the deployments to stabilize as
 we wait for Helm to install MongoDB and cert-managed (for self-signed certificates).
 The fiftyone-teams app installation also takes a few minutes.
 The fiftyone-app will start and upgrade the database
-(because `FIFTYONE_DATABASE_ADMIN: true`)
 and the teams-api will connect to and configure MongoDB.
 
 We use Skaffold "profiles" to control "modules".

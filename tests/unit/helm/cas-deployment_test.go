@@ -1168,6 +1168,8 @@ func (s *deploymentCasTemplateTest) TestContainerLivenessProbe() {
             "path": "/cas/api",
             "port": "teams-cas"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1177,7 +1179,7 @@ func (s *deploymentCasTemplateTest) TestContainerLivenessProbe() {
 			},
 		},
 		{
-			"overrideServiceLivenessShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"casSettings.service.shortname": "test-service-shortname",
 			},
@@ -1187,7 +1189,32 @@ func (s *deploymentCasTemplateTest) TestContainerLivenessProbe() {
             "path": "/cas/api",
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+			},
+		},
+		{
+			"overrideLivenessSettings",
+			map[string]string{
+				"casSettings.liveness.failureThreshold": "10",
+				"casSettings.liveness.periodSeconds":    "20",
+				"casSettings.liveness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/cas/api",
+            "port": "teams-cas"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1293,6 +1320,8 @@ func (s *deploymentCasTemplateTest) TestContainerReadinessProbe() {
             "path": "/cas/api",
             "port": "teams-cas"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1302,7 +1331,7 @@ func (s *deploymentCasTemplateTest) TestContainerReadinessProbe() {
 			},
 		},
 		{
-			"overrideServiceReadinessAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
 				"casSettings.service.shortname": "test-service-shortname",
 			},
@@ -1312,7 +1341,32 @@ func (s *deploymentCasTemplateTest) TestContainerReadinessProbe() {
             "path": "/cas/api",
             "port": "test-service-shortname"
           },
+          "failureThreshold": 5,
+          "periodSeconds": 15,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
+			},
+		},
+		{
+			"overrideReadinessSettings",
+			map[string]string{
+				"casSettings.readiness.failureThreshold": "10",
+				"casSettings.readiness.periodSeconds":    "20",
+				"casSettings.readiness.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/cas/api",
+            "port": "teams-cas"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -1356,7 +1410,7 @@ func (s *deploymentCasTemplateTest) TestContainerStartupProbe() {
             "port": "teams-cas"
           },
           "failureThreshold": 5,
-          "periodSeconds": 15,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
         }`
 				var expectedProbe *corev1.Probe
@@ -1366,11 +1420,9 @@ func (s *deploymentCasTemplateTest) TestContainerStartupProbe() {
 			},
 		},
 		{
-			"overrideServiceStartupFailureThresholdAndPeriodSecondsAndShortName",
+			"overrideServiceShortName",
 			map[string]string{
-				"casSettings.service.shortname":                "test-service-shortname",
-				"casSettings.service.startup.failureThreshold": "10",
-				"casSettings.service.startup.periodSeconds":    "10",
+				"casSettings.service.shortname": "test-service-shortname",
 			},
 			func(probe *corev1.Probe) {
 				expectedProbeJSON := `{
@@ -1378,9 +1430,32 @@ func (s *deploymentCasTemplateTest) TestContainerStartupProbe() {
             "path": "/cas/api",
             "port": "test-service-shortname"
           },
-          "failureThreshold": 10,
-          "periodSeconds": 10,
+          "failureThreshold": 5,
+          "periodSeconds": 30,
           "timeoutSeconds": 5
+        }`
+				var expectedProbe *corev1.Probe
+				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+				s.NoError(err)
+				s.Equal(expectedProbe, probe, "Startup Probes should be equal")
+			},
+		},
+		{
+			"overrideStartupSettings",
+			map[string]string{
+				"casSettings.startup.failureThreshold": "10",
+				"casSettings.startup.periodSeconds":    "20",
+				"casSettings.startup.timeoutSeconds":   "30",
+			},
+			func(probe *corev1.Probe) {
+				expectedProbeJSON := `{
+          "httpGet": {
+            "path": "/cas/api",
+            "port": "teams-cas"
+          },
+          "failureThreshold": 10,
+          "periodSeconds": 20,
+          "timeoutSeconds": 30
         }`
 				var expectedProbe *corev1.Probe
 				err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
@@ -2238,6 +2313,79 @@ func (s *deploymentCasTemplateTest) TestVolumes() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Template.Spec.Volumes)
+		})
+	}
+}
+
+func (s *deploymentCasTemplateTest) TestDeploymentUpdateStrategy() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(deploymentStrategy appsv1.DeploymentStrategy)
+	}{
+		{
+			"defaultValues",
+			nil,
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "RollingUpdate"
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+		{
+			"overrideUpdateStrategyType",
+			map[string]string{
+				"casSettings.updateStrategy.type": "Recreate",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "Recreate"
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+		{
+			"overrideUpdateStrategyRollingUpdate",
+			map[string]string{
+				"casSettings.updateStrategy.type":                         "RollingUpdate",
+				"casSettings.updateStrategy.rollingUpdate.maxUnavailable": "5",
+			},
+			func(deploymentStrategy appsv1.DeploymentStrategy) {
+				expectedJSON := `{
+            "type": "RollingUpdate",
+            "rollingUpdate": {
+              "maxUnavailable": 5
+            }
+          }`
+				var expectedDeploymentStrategy appsv1.DeploymentStrategy
+				err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+				s.NoError(err)
+				s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Strategy)
 		})
 	}
 }

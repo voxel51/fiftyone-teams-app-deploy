@@ -5120,3 +5120,202 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 		})
 	}
 }
+
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateStrategy() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []func(deploymentStrategy appsv1.DeploymentStrategy)
+	}{
+		{
+			"defaultValues",
+			nil,
+			[]func(deploymentStrategy appsv1.DeploymentStrategy){
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					s.Empty(deploymentStrategy.Type, "Type should be be empty")
+				},
+			},
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+			},
+			[]func(deploymentStrategy appsv1.DeploymentStrategy){
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					expectedJSON := `{
+                "type": "RollingUpdate"
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]func(deploymentStrategy appsv1.DeploymentStrategy){
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					expectedJSON := `{
+                "type": "RollingUpdate"
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					expectedJSON := `{
+                "type": "RollingUpdate"
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateStrategyType",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.template.updateStrategy.type":  "Recreate",
+			},
+			[]func(deploymentStrategy appsv1.DeploymentStrategy){
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					expectedJSON := `{
+                "type": "Recreate"
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					expectedJSON := `{
+                "type": "Recreate"
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateStrategyRollingUpdate",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":                           "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                        "nil",
+				"delegatedOperatorDeployments.template.updateStrategy.type":                         "RollingUpdate",
+				"delegatedOperatorDeployments.template.updateStrategy.rollingUpdate.maxUnavailable": "5",
+			},
+			[]func(deploymentStrategy appsv1.DeploymentStrategy){
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					expectedJSON := `{
+                "type": "RollingUpdate",
+                "rollingUpdate": {
+                    "maxUnavailable": 5
+                }
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					expectedJSON := `{
+                "type": "RollingUpdate",
+                "rollingUpdate": {
+                    "maxUnavailable": 5
+                }
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+			},
+		},
+		{
+			"overrideBaseTemplateInstanceStrategy",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDo.unused":                           "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.updateStrategy.type":           "Recreate",
+				"delegatedOperatorDeployments.template.updateStrategy.type":                         "RollingUpdate",
+				"delegatedOperatorDeployments.template.updateStrategy.rollingUpdate.maxUnavailable": "5",
+			},
+			[]func(deploymentStrategy appsv1.DeploymentStrategy){
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					expectedJSON := `{
+                "type": "RollingUpdate",
+                "rollingUpdate": {
+                    "maxUnavailable": 5
+                }
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+				func(deploymentStrategy appsv1.DeploymentStrategy) {
+					// This provides the same behavior as our other "dict-wise" merges. While
+					// the customer can mix styles here, this is consistent with how the other
+					// parameters are handles. Therefore, this is intentional and is a design choice.
+					expectedJSON := `{
+                "type": "Recreate",
+                "rollingUpdate": {
+                    "maxUnavailable": 5
+                }
+            }`
+					var expectedDeploymentStrategy appsv1.DeploymentStrategy
+					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
+					s.NoError(err)
+					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+
+			if testCase.values == nil {
+
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+				var deployment appsv1.Deployment
+
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				testCase.expected[0](deployment.Spec.Strategy)
+			} else {
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "Number of delegated operator instances should match expected number")
+
+				for i, rawOutput := range allRange[1:] {
+					var deployment appsv1.Deployment
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					testCase.expected[i](deployment.Spec.Strategy)
+				}
+			}
+		})
+	}
+}
