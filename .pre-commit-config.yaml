@@ -36,7 +36,6 @@ repos:
     rev: v2.0.0
     hooks:
       - id: helm-schema
-        verbose: true
         files: helm/fiftyone-teams-app/values.yaml
         pass_filenames: false
   - repo: https://github.com/igorshubovych/markdownlint-cli
