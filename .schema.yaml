@@ -1,0 +1,11 @@
+---
+draft: 2020
+
+indent: 4
+
+output: helm/fiftyone-teams-app/values.schema.json
+
+useHelmDocs: false
+
+values:
+  - helm/fiftyone-teams-app/values.yaml
