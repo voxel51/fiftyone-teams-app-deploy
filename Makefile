@@ -48,6 +48,26 @@ hooks:  ## Install git hooks (pre-commit)
 	# Install environments for all available hooks now (rather than when they are first executed)
 	@pre-commit install --install-hooks
 
+helm-plugins-diff:  ## Installs the helm diff plugin
+	@echo "Checking if helm-diff plugin is installed..."
+	@if helm plugin list | grep -qE '^\s*diff\s'; then \
+		echo "helm-diff is already installed."; \
+	else \
+		echo "Installing helm-diff plugin..."; \
+		helm plugin install https://github.com/databus23/helm-diff; \
+	fi
+
+helm-plugins-schema:  ## Installs the helm schema plugin
+	@echo "Checking if helm-schema plugin is installed..."
+	@if helm plugin list | grep -qE '^\s*schema\s'; then \
+		echo "helm-schema is already installed."; \
+	else \
+		echo "Installing helm-schema plugin..."; \
+		helm plugin install https://github.com/losisin/helm-values-schema-json; \
+	fi
+
+helm-plugins:  helm-plugins-diff helm-plugins-schema  ## Install the helm plugins we use
+
 pre-commit:  ## Run pre-commit against all files
 	@pre-commit run -a
 

@@ -32,6 +32,12 @@
         make asdf
         ```
 
+    1. Additionally, install the `helm` plugins we use:
+
+        ```shell
+        make helm-plugins
+        ```
+
 ## Quickstart to Skaffold in Minikube
 
 1. Auth with gcloud for the project `computer-vision-team`
