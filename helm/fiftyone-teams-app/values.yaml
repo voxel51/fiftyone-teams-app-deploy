@@ -118,7 +118,7 @@ apiSettings:
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable: 1
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
@@ -264,7 +264,7 @@ appSettings:
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable: 1
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].
   podSecurityContext: {}
@@ -399,7 +399,7 @@ casSettings:
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable: 1
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context].
   podSecurityContext: {}
@@ -498,7 +498,7 @@ delegatedOperatorExecutorSettings:
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable: 1
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
   podSecurityContext: {}
@@ -613,7 +613,7 @@ delegatedOperatorDeployments:
       # Either integers or percentages supported.
       # `maxUnavailable` is also supported, however, only one setting can be used at a time.
       # If both are set, `minAvailable` will be preferred.
-      minAvailable: ""
+      minAvailable: 1
       # maxUnavailable: ""
     # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
     podSecurityContext: {}
@@ -850,7 +850,7 @@ pluginsSettings:
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable: 1
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].
   podSecurityContext: {}
@@ -1050,7 +1050,7 @@ teamsAppSettings:
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable: 1
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context].
   podSecurityContext: {}

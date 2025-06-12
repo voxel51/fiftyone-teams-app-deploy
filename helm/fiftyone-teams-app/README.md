@@ -181,7 +181,7 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 ```
 
 A minimal example `values.yaml` may be found
-[here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+[in the repository](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
 ## Initial Installation vs. Upgrades
 
@@ -483,9 +483,9 @@ follow
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for `teams-api`. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-api`. [Reference][annotations]. |
-| apiSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget]. |
+| apiSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":1}` | Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget]. |
 | apiSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-api`. |
-| apiSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| apiSettings.podDisruptionBudget.minAvailable | int | `1` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
 | apiSettings.replicaCount | int | `1` | Number of pods in the `teams-api` deployment's ReplicaSet. When > 1, you must also configure volumes, volumeMounts and set `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`. For more information see [the documentation][configure-ha-teams-api]. |
 | apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
@@ -527,9 +527,9 @@ follow
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for `fiftyone-app`. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for `fiftyone-app`. [Reference][annotations]. |
-| appSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget]. |
+| appSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":1}` | Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget]. |
 | appSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `fiftyone-app`. |
-| appSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| appSettings.podDisruptionBudget.minAvailable | int | `1` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | appSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context]. |
 | appSettings.replicaCount | int | `2` | Number of pods in the `fiftyone-app` deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | appSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
@@ -567,9 +567,9 @@ follow
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for `teams-cas`. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-cas`. [Reference][annotations]. |
-| casSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget]. |
+| casSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":1}` | Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget]. |
 | casSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-cas`. |
-| casSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| casSettings.podDisruptionBudget.minAvailable | int | `1` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context]. |
 | casSettings.replicaCount | int | `2` | Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment]. |
 | casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
@@ -589,7 +589,7 @@ follow
 | casSettings.volumeMounts | list | `[]` | Volume mounts for `teams-cas`. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for `teams-cas`. [Reference][volumes]. |
 | delegatedOperatorDeployments.deployments | object | `{}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
-| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":""},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
+| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":1},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
 | delegatedOperatorDeployments.template.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
 | delegatedOperatorDeployments.template.description | string | `""` | A description for the delegated operator instance. This is unused in the template context. Each operator should either set their own description or, optionally, use the default. If unset at the operator context, it will be defaulted to `Long running operations delegated to $name` where `$name` is the name of the Deployment object. |
@@ -606,7 +606,7 @@ follow
 | delegatedOperatorDeployments.template.nodeSelector | object | `{}` | nodeSelector for `delegated-operator-executor`. [Reference][node-selector]. |
 | delegatedOperatorDeployments.template.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
 | delegatedOperatorDeployments.template.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
-| delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable | int | `1` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
 | delegatedOperatorDeployments.template.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
@@ -638,9 +638,9 @@ follow
 | delegatedOperatorExecutorSettings.name | string | `"teams-do"` | Deployment name |
 | delegatedOperatorExecutorSettings.nodeSelector | object | `{}` | nodeSelector for `delegated-operator-executor`. [Reference][node-selector]. |
 | delegatedOperatorExecutorSettings.podAnnotations | object | `{}` | Annotations for `delegated-operator-executor` pods. [Reference][annotations]. |
-| delegatedOperatorExecutorSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `delegated-operator-executor`. [Reference][pod-disruption-budget]. |
+| delegatedOperatorExecutorSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":1}` | Pod Disruption Budget for pods for `delegated-operator-executor`. [Reference][pod-disruption-budget]. |
 | delegatedOperatorExecutorSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `delegated-operator-executor`. |
-| delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable | int | `1` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | delegatedOperatorExecutorSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
 | delegatedOperatorExecutorSettings.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorExecutorSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
@@ -699,9 +699,9 @@ follow
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for `teams-plugins`. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for `teams-plugins` pods. [Reference][annotations]. |
-| pluginsSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget]. |
+| pluginsSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":1}` | Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget]. |
 | pluginsSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
-| pluginsSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| pluginsSettings.podDisruptionBudget.minAvailable | int | `1` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | pluginsSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context]. |
 | pluginsSettings.replicaCount | int | `2` | Number of pods in the `teams-plugins` deployment's ReplicaSet. Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | pluginsSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-plugins`. [Reference][resources]. |
@@ -760,9 +760,9 @@ follow
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for `teams-app`.  [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for `teams-app` pods. [Reference][annotations]. |
-| teamsAppSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget]. |
+| teamsAppSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":1}` | Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget]. |
 | teamsAppSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-app`. |
-| teamsAppSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
+| teamsAppSettings.podDisruptionBudget.minAvailable | int | `1` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | teamsAppSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context]. |
 | teamsAppSettings.replicaCount | int | `2` | Number of pods in the `teams-app` deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-app`.  [Reference][resources]. |
