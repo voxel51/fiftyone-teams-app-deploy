@@ -1,6 +1,5 @@
 ---
 # FiftyOne Enterprise API (`teams-api`)
-
 apiSettings:
   # -- Controls whether `teams-api` is added to the chart's ingress.
   # When an empty string, a rule for `teams-api` is not added to the chart managed ingress.
