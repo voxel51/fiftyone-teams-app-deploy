@@ -22,5 +22,5 @@ jobs:
       - name: install asdf & tools
         uses: asdf-vm/actions/install@v4.0.0
       - name: Install helm plugins
-        run: helm plugin add schema
+        run: make helm-plugins
       - uses: pre-commit/action@v3.0.1
