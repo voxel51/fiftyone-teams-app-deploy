@@ -65,6 +65,17 @@
                                 "allowPrivilegeEscalation": {
                                     "type": "boolean"
                                 },
+                                "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                        "drop": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
                                 "runAsNonRoot": {
                                     "type": "boolean"
                                 },
@@ -100,6 +111,9 @@
                                         "cpu": {
                                             "type": "string"
                                         },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
                                         "memory": {
                                             "type": "string"
                                         }
@@ -109,6 +123,9 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
                                             "type": "string"
                                         },
                                         "memory": {
@@ -123,6 +140,23 @@
                 "labels": {
                     "description": "Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors].",
                     "type": "object"
+                },
+                "liveness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the liveness probe for the `teams-api`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the liveness probe for `teams-api`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Number of seconds after which the liveness probe times out for the `teams-api`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "nodeSelector": {
                     "description": "nodeSelector for `teams-api`. [Reference][node-selector].",
@@ -149,6 +183,23 @@
                 "podSecurityContext": {
                     "description": "Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].",
                     "type": "object"
+                },
+                "readiness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the readiness probe for the `teams-api`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "replicaCount": {
                     "description": "Number of pods in the `teams-api` deployment's ReplicaSet. When \u003e 1, you must also configure volumes, volumeMounts and set `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`. For more information see [the documentation][configure-ha-teams-api].",
@@ -201,22 +252,26 @@
                             "description": "Port name (maximum length is 15 characters) for `teams-api`. [Reference][ports].",
                             "type": "string"
                         },
-                        "startup": {
-                            "type": "object",
-                            "properties": {
-                                "failureThreshold": {
-                                    "description": "Number of times to retry the startup probe for the `teams-api`. [Reference][probes].",
-                                    "type": "integer"
-                                },
-                                "periodSeconds": {
-                                    "description": "How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes].",
-                                    "type": "integer"
-                                }
-                            }
-                        },
                         "type": {
                             "description": "Service type for `teams-api`. [Reference][service-type].",
                             "type": "string"
+                        }
+                    }
+                },
+                "startup": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the startup probe for the `teams-api`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Number of seconds after which the startup probe times out for the `teams-api`. [Reference][probes].",
+                            "type": "integer"
                         }
                     }
                 },
@@ -225,8 +280,17 @@
                     "type": "array"
                 },
                 "topologySpreadConstraints": {
-                    "description": "Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints].",
+                    "description": "Control how pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints].",
                     "type": "array"
+                },
+                "updateStrategy": {
+                    "description": "Control how `teams-api` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "volumeMounts": {
                     "description": "Volume mounts for `teams-api`. [Reference][volumes].",
@@ -290,7 +354,7 @@
                             "type": "boolean"
                         },
                         "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
-                            "description": "Set the media cache size (in bytes) for the local FiftyOne App processes. The default value is 32 GiB. `-1` is disabled.",
+                            "description": "Set the media cache size (in bytes) for the local FiftyOne App processes. When not set, the app's default value is 32 GiB. `-1` disables the media cache garbage collection (and cache size is unlimited).",
                             "type": "integer"
                         },
                         "FIFTYONE_SIGNED_URL_EXPIRATION": {
@@ -325,6 +389,17 @@
                             "properties": {
                                 "allowPrivilegeEscalation": {
                                     "type": "boolean"
+                                },
+                                "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                        "drop": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
                                 },
                                 "runAsNonRoot": {
                                     "type": "boolean"
@@ -361,6 +436,9 @@
                                         "cpu": {
                                             "type": "string"
                                         },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
                                         "memory": {
                                             "type": "string"
                                         }
@@ -370,6 +448,9 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
                                             "type": "string"
                                         },
                                         "memory": {
@@ -384,6 +465,23 @@
                 "labels": {
                     "description": "Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors].",
                     "type": "object"
+                },
+                "liveness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the liveness probe for `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "nodeSelector": {
                     "description": "nodeSelector for `fiftyone-app`. [Reference][node-selector].",
@@ -410,6 +508,23 @@
                 "podSecurityContext": {
                     "description": "Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].",
                     "type": "object"
+                },
+                "readiness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the readiness probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the readiness probe for `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "replicaCount": {
                     "description": "Number of pods in the `fiftyone-app` deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].",
@@ -462,22 +577,26 @@
                             "description": "Port name (maximum length is 15 characters) for `fiftyone-app`. [Reference][ports].",
                             "type": "string"
                         },
-                        "startup": {
-                            "type": "object",
-                            "properties": {
-                                "failureThreshold": {
-                                    "description": "Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes].",
-                                    "type": "integer"
-                                },
-                                "periodSeconds": {
-                                    "description": "How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes].",
-                                    "type": "integer"
-                                }
-                            }
-                        },
                         "type": {
                             "description": "Service type for `fiftyone-app`. [Reference][service-type].",
                             "type": "string"
+                        }
+                    }
+                },
+                "startup": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the startup probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
                         }
                     }
                 },
@@ -488,6 +607,15 @@
                 "topologySpreadConstraints": {
                     "description": "Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `fiftyone-app` deployment. [Reference][topology-spread-constraints].",
                     "type": "array"
+                },
+                "updateStrategy": {
+                    "description": "Control how `fiftyone-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "volumeMounts": {
                     "description": "Volume mounts for `fiftyone-app`. [Reference][volumes].",
@@ -566,6 +694,17 @@
                                 "allowPrivilegeEscalation": {
                                     "type": "boolean"
                                 },
+                                "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                        "drop": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
                                 "runAsNonRoot": {
                                     "type": "boolean"
                                 },
@@ -601,6 +740,9 @@
                                         "cpu": {
                                             "type": "string"
                                         },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
                                         "memory": {
                                             "type": "string"
                                         }
@@ -610,6 +752,9 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
                                             "type": "string"
                                         },
                                         "memory": {
@@ -624,6 +769,23 @@
                 "labels": {
                     "description": "Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors].",
                     "type": "object"
+                },
+                "liveness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the liveness probe for `teams-cas`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the liveness probe for the `teams-cas`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "nodeSelector": {
                     "description": "nodeSelector for `teams-cas`. [Reference][node-selector].",
@@ -650,6 +812,23 @@
                 "podSecurityContext": {
                     "description": "Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context].",
                     "type": "object"
+                },
+                "readiness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the readiness probe for the `teams-cas`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the readiness probe for `teams-cas`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the readiness probe for the `teams-cas`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "replicaCount": {
                     "description": "Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].",
@@ -702,22 +881,26 @@
                             "description": "Port name (maximum length is 15 characters) for `teams-cas`. [Reference][ports].",
                             "type": "string"
                         },
-                        "startup": {
-                            "type": "object",
-                            "properties": {
-                                "failureThreshold": {
-                                    "description": "Number of times to retry the startup probe for the `teams-cas`. [Reference][probes].",
-                                    "type": "integer"
-                                },
-                                "periodSeconds": {
-                                    "description": "How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes].",
-                                    "type": "integer"
-                                }
-                            }
-                        },
                         "type": {
                             "description": "Service type for `teams-cas`. [Reference][service-type].",
                             "type": "string"
+                        }
+                    }
+                },
+                "startup": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the startup probe for the `teams-cas`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the startup probe for the `teams-cas`. [Reference][probes].",
+                            "type": "integer"
                         }
                     }
                 },
@@ -728,6 +911,15 @@
                 "topologySpreadConstraints": {
                     "description": "Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-cas` deployment. [Reference][topology-spread-constraints].",
                     "type": "array"
+                },
+                "updateStrategy": {
+                    "description": "Control how `teams-cas` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "volumeMounts": {
                     "description": "Volume mounts for `teams-cas`. [Reference][volumes].",
@@ -774,7 +966,7 @@
                                     "type": "boolean"
                                 },
                                 "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
-                                    "description": "Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled.",
+                                    "description": "Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. When not set, the app's default value is 32 GiB. `-1` disables the media cache garbage collection (and cache size is unlimited).",
                                     "type": "integer"
                                 }
                             }
@@ -843,7 +1035,6 @@
                             "type": "object"
                         },
                         "readiness": {
-                            "description": "Container security configuration for `delegated-operator-executor`. [Reference][container-security-context].",
                             "type": "object",
                             "properties": {
                                 "failureThreshold": {
@@ -881,6 +1072,7 @@
                             "type": "object"
                         },
                         "securityContext": {
+                            "description": "Container security configuration for `delegated-operator-executor`. [Reference][container-security-context].",
                             "type": "object"
                         },
                         "startup": {
@@ -907,6 +1099,15 @@
                         "topologySpreadConstraints": {
                             "description": "Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-do` deployment(s). [Reference][topology-spread-constraints].",
                             "type": "array"
+                        },
+                        "updateStrategy": {
+                            "description": "Control how `teams-do` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                }
+                            }
                         },
                         "volumeMounts": {
                             "description": "Volume mounts for delegated-operator-executor pods. [Reference][volumes].",
@@ -1127,7 +1328,7 @@
                     }
                 },
                 "className": {
-                    "description": "Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty and Kubernetes version is \u003e1.18.0, this value will be the Ingress class name. [Reference][ingress-default-ingress-class]",
+                    "description": "Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty, this value will be the Ingress class name. [Reference][ingress-default-ingress-class]",
                     "type": "string"
                 },
                 "enabled": {
@@ -1237,7 +1438,7 @@
                             "type": "boolean"
                         },
                         "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
-                            "description": "Set the media cache size (in bytes) for the local FiftyOne Plugins processes. The default value is 32 GiB. `-1` is disabled.",
+                            "description": "Set the media cache size (in bytes) for the local FiftyOne Plugins processes. When not set, the app's default value is 32 GiB. `-1` disables the media cache garbage collection (and cache size is unlimited).",
                             "type": "integer"
                         }
                     }
@@ -1268,6 +1469,17 @@
                             "properties": {
                                 "allowPrivilegeEscalation": {
                                     "type": "boolean"
+                                },
+                                "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                        "drop": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
                                 },
                                 "runAsNonRoot": {
                                     "type": "boolean"
@@ -1304,6 +1516,9 @@
                                         "cpu": {
                                             "type": "string"
                                         },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
                                         "memory": {
                                             "type": "string"
                                         }
@@ -1313,6 +1528,9 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
                                             "type": "string"
                                         },
                                         "memory": {
@@ -1327,6 +1545,23 @@
                 "labels": {
                     "description": "Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors].",
                     "type": "object"
+                },
+                "liveness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the liveness probe for `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the liveness probe for the `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "nodeSelector": {
                     "description": "nodeSelector for `teams-plugins`. [Reference][node-selector].",
@@ -1353,6 +1588,23 @@
                 "podSecurityContext": {
                     "description": "Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].",
                     "type": "object"
+                },
+                "readiness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the readiness probe for the `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the readiness probe for `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the readiness probe for the `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "replicaCount": {
                     "description": "Number of pods in the `teams-plugins` deployment's ReplicaSet. Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].",
@@ -1405,22 +1657,26 @@
                             "description": "Port name (maximum length is 15 characters) for `teams-plugins`. [Reference][ports].",
                             "type": "string"
                         },
-                        "startup": {
-                            "type": "object",
-                            "properties": {
-                                "failureThreshold": {
-                                    "description": "Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes].",
-                                    "type": "integer"
-                                },
-                                "periodSeconds": {
-                                    "description": "How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes].",
-                                    "type": "integer"
-                                }
-                            }
-                        },
                         "type": {
                             "description": "Service type for `teams-plugins`. [Reference][service-type].",
                             "type": "string"
+                        }
+                    }
+                },
+                "startup": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the startup probe for the `teams-plugins`. [Reference][probes].",
+                            "type": "integer"
                         }
                     }
                 },
@@ -1431,6 +1687,15 @@
                 "topologySpreadConstraints": {
                     "description": "Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-plugins` deployment. [Reference][topology-spread-constraints].",
                     "type": "array"
+                },
+                "updateStrategy": {
+                    "description": "Control how `teams-plugins` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "volumeMounts": {
                     "description": "Volume mounts for `teams-plugins` pods. [Reference][volumes].",
@@ -1613,6 +1878,17 @@
                                 "allowPrivilegeEscalation": {
                                     "type": "boolean"
                                 },
+                                "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                        "drop": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
                                 "runAsNonRoot": {
                                     "type": "boolean"
                                 },
@@ -1648,6 +1924,9 @@
                                         "cpu": {
                                             "type": "string"
                                         },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
                                         "memory": {
                                             "type": "string"
                                         }
@@ -1657,6 +1936,9 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
                                             "type": "string"
                                         },
                                         "memory": {
@@ -1671,6 +1953,23 @@
                 "labels": {
                     "description": "Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors].",
                     "type": "object"
+                },
+                "liveness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the liveness probe for `teams-app`.  [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "nodeSelector": {
                     "description": "nodeSelector for `teams-app`.  [Reference][node-selector].",
@@ -1697,6 +1996,23 @@
                 "podSecurityContext": {
                     "description": "Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context].",
                     "type": "object"
+                },
+                "readiness": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the readiness probe for the `teams-app`.  [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the readiness probe for `teams-app`.  [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
+                        }
+                    }
                 },
                 "replicaCount": {
                     "description": "Number of pods in the `teams-app` deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].",
@@ -1749,22 +2065,26 @@
                             "description": "Port name (maximum length is 15 characters) for `teams-app`.  [Reference][ports].",
                             "type": "string"
                         },
-                        "startup": {
-                            "type": "object",
-                            "properties": {
-                                "failureThreshold": {
-                                    "description": "Number of times to retry the startup probe for the `teams-app`.  [Reference][probes].",
-                                    "type": "integer"
-                                },
-                                "periodSeconds": {
-                                    "description": "How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes].",
-                                    "type": "integer"
-                                }
-                            }
-                        },
                         "type": {
                             "description": "Service type for `teams-app`.  [Reference][service-type].",
                             "type": "string"
+                        }
+                    }
+                },
+                "startup": {
+                    "type": "object",
+                    "properties": {
+                        "failureThreshold": {
+                            "description": "Number of times to retry the startup probe for the `teams-app`.  [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "periodSeconds": {
+                            "description": "How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes].",
+                            "type": "integer"
+                        },
+                        "timeoutSeconds": {
+                            "description": "Timeout for the startup probe for the `fiftyone-app`. [Reference][probes].",
+                            "type": "integer"
                         }
                     }
                 },
@@ -1775,6 +2095,15 @@
                 "topologySpreadConstraints": {
                     "description": "Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-app` deployment. [Reference][topology-spread-constraints].",
                     "type": "array"
+                },
+                "updateStrategy": {
+                    "description": "Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "volumeMounts": {
                     "description": "Volume mounts for `teams-app` pods. [Reference][volumes].",
