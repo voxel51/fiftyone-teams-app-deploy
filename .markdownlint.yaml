@@ -4,3 +4,11 @@ default: true
 MD013:  # Line Length
   code_blocks: false
   tables: false
+
+# MD059/descriptive-link-text Link text should be descriptive
+# This rule marks things like:
+# `Example nginx configurations can be found [here](../)`
+# as errors.
+# The context comes before the link so this seems
+# like a fair rule to disable.
+MD059: false
