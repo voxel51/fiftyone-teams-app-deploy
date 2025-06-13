@@ -44,6 +44,8 @@ repos:
           - --add-schema-reference
           - --skip-auto-generation=additionalProperties,required
           - --append-newline
+          # This breaks type annotations
+          # - --helm-docs-compatibility-mode
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.45.0

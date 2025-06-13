@@ -68,6 +68,9 @@ apiSettings:
     containerPort: 8000
     # -- Service name.
     name: teams-api
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `apiSettings.service.type: NodePort` for `teams-api`.
     nodePort:
     # -- Service port for `teams-api`.
@@ -139,11 +142,14 @@ apiSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `teams-api`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: 1
+    minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
@@ -257,6 +263,9 @@ appSettings:
     containerPort: 5151
     # -- Service name.
     name: fiftyone-app
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `appSettings.service.type: NodePort` for `fiftyone-app`.
     nodePort:
     # -- Service port.
@@ -328,11 +337,14 @@ appSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `fiftyone-app`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: 1
+    minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].
   podSecurityContext: {}
@@ -435,6 +447,9 @@ casSettings:
     containerPort: 3000
     # -- Service name.
     name: teams-cas
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `casSettings.service.type: NodePort` for `teams-cas`.
     nodePort:
     # -- Service port.
@@ -506,11 +521,14 @@ casSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `teams-cas`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: 1
+    minAvailable:
     # maxUnavailable: ""
   readiness:
     # -- Number of times to retry the readiness probe for the `teams-cas`. [Reference][probes].
@@ -626,11 +644,14 @@ delegatedOperatorDeployments:
     podDisruptionBudget:
       # -- Whether a pod disruption budget is enabled for `teams-plugins`.
       enabled: false
+      # @schema
+      # type: ["integer", "string", "number", "null"]
+      # @schema
       # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
       # Either integers or percentages supported.
       # `maxUnavailable` is also supported, however, only one setting can be used at a time.
       # If both are set, `minAvailable` will be preferred.
-      minAvailable: 1
+      minAvailable:
       # maxUnavailable: ""
     # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
     podSecurityContext: {}
@@ -821,6 +842,9 @@ pluginsSettings:
     containerPort: 5151
     # -- Service name.
     name: teams-plugins
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `pluginsSettings.service.type: NodePort` for `teams-plugins`.
     nodePort:
     # -- Service port.
@@ -892,11 +916,14 @@ pluginsSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `teams-plugins`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: 1
+    minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].
   podSecurityContext: {}
@@ -1064,6 +1091,9 @@ teamsAppSettings:
     containerPort: 3000
     # -- Service name.
     name: teams-app
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `teamsAppSettings.service.type: NodePort` for `teams-app`.
     nodePort:
     # -- Service port.
@@ -1135,11 +1165,14 @@ teamsAppSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `teams-app`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: 1
+    minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context].
   podSecurityContext: {}
