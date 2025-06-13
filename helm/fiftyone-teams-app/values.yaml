@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=values.schema.json
 # FiftyOne Enterprise API (`teams-api`)
 apiSettings:
   # -- Controls whether `teams-api` is added to the chart's ingress.
@@ -98,12 +99,30 @@ apiSettings:
     # -- Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-api`. [Reference][probes].
@@ -269,12 +288,30 @@ appSettings:
     # -- Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes].
@@ -429,12 +466,30 @@ casSettings:
     # -- Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes].
@@ -797,12 +852,30 @@ pluginsSettings:
     # -- Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes].
@@ -1022,12 +1095,30 @@ teamsAppSettings:
     # -- Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes].

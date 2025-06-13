@@ -34,12 +34,17 @@ repos:
           - --chart-search-root=helm/fiftyone-teams-app
           # A base filename makes it relative to each chart directory found
           - --template-files=README.md.gotmpl
-  - repo: https://github.com/losisin/helm-values-schema-json
-    rev: v2.0.0
+  - repo: https://github.com/dadav/helm-schema
+    rev: 0.18.1
     hooks:
       - id: helm-schema
-        files: helm/fiftyone-teams-app/values.yaml
-        pass_filenames: false
+        args:
+          - --chart-search-root=./helm/fiftyone-teams-app
+          - --no-dependencies
+          - --add-schema-reference
+          - --skip-auto-generation=additionalProperties,required
+          - --append-newline
+
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.45.0
     hooks:
