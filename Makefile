@@ -68,6 +68,14 @@ helm-plugins-schema:  ## Installs the helm schema plugin
 
 helm-plugins:  helm-plugins-diff helm-plugins-schema  ## Install the helm plugins we use
 
+helm-schema: ## Generates the `values.schema.json` using `helm schema`
+	@helm schema \
+		--chart-search-root=./helm/fiftyone-teams-app \
+		--no-dependencies \
+		--add-schema-reference \
+		--skip-auto-generation=additionalProperties,required \
+		--append-newline
+
 pre-commit:  ## Run pre-commit against all files
 	@pre-commit run -a
 

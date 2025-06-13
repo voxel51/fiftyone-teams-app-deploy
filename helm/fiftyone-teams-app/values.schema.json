@@ -38,14 +38,20 @@
               "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
               "required": [],
               "title": "FIFTYONE_INTERNAL_SERVICE",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "GRAPHQL_DEFAULT_LIMIT": {
               "default": 10,
               "description": "Default number of returned items when listing in GraphQL queries.\nCan be overridden in the request.",
               "required": [],
               "title": "GRAPHQL_DEFAULT_LIMIT",
-              "type": "integer"
+              "type": [
+                "string",
+                "integer"
+              ]
             },
             "LOGGING_LEVEL": {
               "default": "INFO",
@@ -64,9 +70,18 @@
             "pullPolicy": {
               "default": "Always",
               "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
               "required": [],
-              "title": "pullPolicy",
-              "type": "string"
+              "title": "pullPolicy"
             },
             "repository": {
               "default": "voxel51/fiftyone-teams-api",
@@ -129,7 +144,10 @@
                   "default": 1000,
                   "required": [],
                   "title": "runAsUser",
-                  "type": "integer"
+                  "type": [
+                    "string",
+                    "integer"
+                  ]
                 }
               },
               "required": [],
@@ -359,11 +377,11 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": 1,
+          "default": "1",
           "description": "Number of pods in the `teams-api` deployment's ReplicaSet.\nWhen \u003e 1, you must also configure volumes, volumeMounts and set\n`apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`.\nFor more information see [the documentation][configure-ha-teams-api].",
+          "minimum": 1,
           "required": [],
-          "title": "replicaCount",
-          "type": "integer"
+          "title": "replicaCount"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-api`. [Reference][resources].",
@@ -602,35 +620,50 @@
               "description": "Controls whether the client is allowed to trigger database migrations.\n[Reference][fiftyone-config].",
               "required": [],
               "title": "FIFTYONE_DATABASE_ADMIN",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_INTERNAL_SERVICE": {
               "default": true,
               "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
               "required": [],
               "title": "FIFTYONE_INTERNAL_SERVICE",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_MEDIA_CACHE_APP_IMAGES": {
               "default": false,
               "description": "Controls whether cloud media images will be downloaded and added to\nthe local cache upon viewing media in the app.",
               "required": [],
               "title": "FIFTYONE_MEDIA_CACHE_APP_IMAGES",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
               "default": -1,
               "description": "Set the media cache size (in bytes) for the local FiftyOne App processes.\nWhen not set, the app's default value is 32 GiB.\n`-1` disables the media cache garbage collection (and cache size is unlimited).",
               "required": [],
               "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-              "type": "integer"
+              "type": [
+                "string",
+                "integer"
+              ]
             },
             "FIFTYONE_SIGNED_URL_EXPIRATION": {
               "default": 24,
               "description": "Set the time-to-live for signed URLs generated by the application in hours",
               "required": [],
               "title": "FIFTYONE_SIGNED_URL_EXPIRATION",
-              "type": "integer"
+              "type": [
+                "string",
+                "integer"
+              ]
             }
           },
           "required": [],
@@ -642,9 +675,18 @@
             "pullPolicy": {
               "default": "Always",
               "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
               "required": [],
-              "title": "pullPolicy",
-              "type": "string"
+              "title": "pullPolicy"
             },
             "repository": {
               "default": "voxel51/fiftyone-app",
@@ -937,11 +979,11 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": 2,
+          "default": "2",
           "description": "Number of pods in the `fiftyone-app` deployment's ReplicaSet.\nIgnored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].",
+          "minimum": 1,
           "required": [],
-          "title": "replicaCount",
-          "type": "integer"
+          "title": "replicaCount"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `fiftyone-app`. [Reference][resources].",
@@ -1185,9 +1227,18 @@
             "pullPolicy": {
               "default": "Always",
               "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
               "required": [],
-              "title": "pullPolicy",
-              "type": "string"
+              "title": "pullPolicy"
             },
             "repository": {
               "default": "voxel51/fiftyone-teams-cas",
@@ -1480,11 +1531,11 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": 2,
+          "default": "2",
           "description": "Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].",
+          "minimum": 1,
           "required": [],
-          "title": "replicaCount",
-          "type": "integer"
+          "title": "replicaCount"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-cas`. [Reference][resources].",
@@ -1704,14 +1755,20 @@
                   "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
                   "required": [],
                   "title": "FIFTYONE_INTERNAL_SERVICE",
-                  "type": "boolean"
+                  "type": [
+                    "string",
+                    "boolean"
+                  ]
                 },
                 "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
                   "default": -1,
                   "description": "Set the media cache size (in bytes) for the local FiftyOne Delegated\nOperator Executor processes.\nWhen not set, the app's default value is 32 GiB.\n`-1` disables the media cache garbage collection (and cache size is unlimited).",
                   "required": [],
                   "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-                  "type": "integer"
+                  "type": [
+                    "string",
+                    "integer"
+                  ]
                 }
               },
               "required": [],
@@ -1723,9 +1780,18 @@
                 "pullPolicy": {
                   "default": "Always",
                   "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "Always",
+                        "IfNotPresent",
+                        "Never"
+                      ],
+                      "required": []
+                    }
+                  ],
                   "required": [],
-                  "title": "pullPolicy",
-                  "type": "string"
+                  "title": "pullPolicy"
                 },
                 "repository": {
                   "default": "voxel51/fiftyone-teams-cv-full",
@@ -1853,11 +1919,11 @@
               "type": "object"
             },
             "replicaCount": {
-              "default": 3,
+              "default": "3",
               "description": "Number of pods in the delegated-operator-executor deployment's ReplicaSet.\nThis should not exceed the value set in the deployment's license file for\n max concurrent delegated operators, which defaults to 3.",
+              "minimum": 1,
               "required": [],
-              "title": "replicaCount",
-              "type": "integer"
+              "title": "replicaCount"
             },
             "resources": {
               "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `delegated-operator-executor`. [Reference][resources].",
@@ -2246,21 +2312,30 @@
               "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
               "required": [],
               "title": "FIFTYONE_INTERNAL_SERVICE",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_MEDIA_CACHE_APP_IMAGES": {
               "default": false,
               "description": "Controls whether cloud media images will be downloaded and added to\nthe local cache upon viewing media in the app.",
               "required": [],
               "title": "FIFTYONE_MEDIA_CACHE_APP_IMAGES",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
               "default": -1,
               "description": "Set the media cache size (in bytes) for the local FiftyOne Plugins processes.\nWhen not set, the app's default value is 32 GiB.\n`-1` disables the media cache garbage collection (and cache size is unlimited).",
               "required": [],
               "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-              "type": "integer"
+              "type": [
+                "string",
+                "integer"
+              ]
             }
           },
           "required": [],
@@ -2272,9 +2347,18 @@
             "pullPolicy": {
               "default": "Always",
               "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
               "required": [],
-              "title": "pullPolicy",
-              "type": "string"
+              "title": "pullPolicy"
             },
             "repository": {
               "default": "voxel51/fiftyone-app",
@@ -2567,11 +2651,11 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": 2,
+          "default": "2",
           "description": "Number of pods in the `teams-plugins` deployment's ReplicaSet.\nIgnored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].",
+          "minimum": 1,
           "required": [],
-          "title": "replicaCount",
-          "type": "integer"
+          "title": "replicaCount"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-plugins`. [Reference][resources].",
@@ -2920,35 +3004,50 @@
               "description": "Controls the protocol of the `teams-app`.  Configure your ingress to match.\nWhen `true`, uses the https protocol.\nWhen `false`, uses the http protocol.",
               "required": [],
               "title": "APP_USE_HTTPS",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_APP_ALLOW_MEDIA_EXPORT": {
               "default": true,
               "description": "When `false`, disables media export options",
               "required": [],
               "title": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED": {
               "default": true,
               "description": "Controls whether anonymous analytics are captured for the\napplication. Set to false to opt-out of anonymous analytics.",
               "required": [],
               "title": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE": {
               "default": true,
               "description": "Controls whether Query Performance mode is enabled by default for\nevery dataset for the teams application. Set to false to set default mode to off.",
               "required": [],
               "title": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE": {
               "default": true,
               "description": "Controls whether Query Performance mode is enabled for the\napplication. Set to false to disable Query Performance mode for entire application.",
               "required": [],
               "title": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
               "default": "2.9.0",
@@ -2969,7 +3068,10 @@
               "description": "Disable duplicate atom/selector key checking that generated false-positive errors.\n[Reference][recoil-env].",
               "required": [],
               "title": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
-              "type": "boolean"
+              "type": [
+                "string",
+                "boolean"
+              ]
             }
           },
           "required": [],
@@ -2988,9 +3090,18 @@
             "pullPolicy": {
               "default": "Always",
               "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
               "required": [],
-              "title": "pullPolicy",
-              "type": "string"
+              "title": "pullPolicy"
             },
             "repository": {
               "default": "voxel51/fiftyone-teams-app",
@@ -3283,11 +3394,11 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": 2,
+          "default": "2",
           "description": "Number of pods in the `teams-app` deployment's ReplicaSet.\nIgnored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].",
+          "minimum": 1,
           "required": [],
-          "title": "replicaCount",
-          "type": "integer"
+          "title": "replicaCount"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-app`.  [Reference][resources].",
