@@ -377,11 +377,12 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": "1",
+          "default": 1,
           "description": "Number of pods in the `teams-api` deployment's ReplicaSet.\nWhen \u003e 1, you must also configure volumes, volumeMounts and set\n`apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`.\nFor more information see [the documentation][configure-ha-teams-api].",
           "minimum": 1,
           "required": [],
-          "title": "replicaCount"
+          "title": "replicaCount",
+          "type": "integer"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-api`. [Reference][resources].",
@@ -979,11 +980,12 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": "2",
+          "default": 2,
           "description": "Number of pods in the `fiftyone-app` deployment's ReplicaSet.\nIgnored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].",
           "minimum": 1,
           "required": [],
-          "title": "replicaCount"
+          "title": "replicaCount",
+          "type": "integer"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `fiftyone-app`. [Reference][resources].",
@@ -1531,11 +1533,12 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": "2",
+          "default": 2,
           "description": "Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].",
           "minimum": 1,
           "required": [],
-          "title": "replicaCount"
+          "title": "replicaCount",
+          "type": "integer"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-cas`. [Reference][resources].",
@@ -1919,11 +1922,12 @@
               "type": "object"
             },
             "replicaCount": {
-              "default": "3",
+              "default": 3,
               "description": "Number of pods in the delegated-operator-executor deployment's ReplicaSet.\nThis should not exceed the value set in the deployment's license file for\n max concurrent delegated operators, which defaults to 3.",
               "minimum": 1,
               "required": [],
-              "title": "replicaCount"
+              "title": "replicaCount",
+              "type": "integer"
             },
             "resources": {
               "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `delegated-operator-executor`. [Reference][resources].",
@@ -2651,11 +2655,12 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": "2",
+          "default": 2,
           "description": "Number of pods in the `teams-plugins` deployment's ReplicaSet.\nIgnored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].",
           "minimum": 1,
           "required": [],
-          "title": "replicaCount"
+          "title": "replicaCount",
+          "type": "integer"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-plugins`. [Reference][resources].",
@@ -3394,11 +3399,12 @@
           "type": "object"
         },
         "replicaCount": {
-          "default": "2",
+          "default": 2,
           "description": "Number of pods in the `teams-app` deployment's ReplicaSet.\nIgnored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].",
           "minimum": 1,
           "required": [],
-          "title": "replicaCount"
+          "title": "replicaCount",
+          "type": "integer"
         },
         "resources": {
           "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-app`.  [Reference][resources].",

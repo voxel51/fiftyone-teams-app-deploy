@@ -56,6 +56,7 @@ apiSettings:
 
   # @schema
   # minimum: 1
+  # type: integer
   # @schema
   # -- Number of pods in the `teams-api` deployment's ReplicaSet.
   # When > 1, you must also configure volumes, volumeMounts and set
@@ -277,6 +278,7 @@ appSettings:
   labels: {}
   # @schema
   # minimum: 1
+  # type: integer
   # @schema
   # -- Number of pods in the `fiftyone-app` deployment's ReplicaSet.
   # Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].
@@ -469,6 +471,7 @@ casSettings:
   labels: {}
   # @schema
   # minimum: 1
+  # type: integer
   # @schema
   # -- Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].
   replicaCount: 2
@@ -675,6 +678,7 @@ delegatedOperatorDeployments:
 
     # @schema
     # minimum: 1
+    # type: integer
     # @schema
     # -- Number of pods in the delegated-operator-executor deployment's ReplicaSet.
     # This should not exceed the value set in the deployment's license file for
@@ -893,6 +897,7 @@ pluginsSettings:
   labels: {}
   # @schema
   # minimum: 1
+  # type: integer
   # @schema
   # -- Number of pods in the `teams-plugins` deployment's ReplicaSet.
   # Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].
@@ -1167,6 +1172,7 @@ teamsAppSettings:
 
   # @schema
   # minimum: 1
+  # type: integer
   # @schema
   # -- Number of pods in the `teams-app` deployment's ReplicaSet.
   # Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].
