@@ -161,14 +161,24 @@ The FiftyOne Enterprise App is exposed on port `3000`.
 The FiftyOne Enterprise CAS is exposed on port `3030`.
 
 Configure an SSL endpoint (like a Load Balancer, Nginx Proxy, or similar)
-to route traffic to the appropriate endpoints. An example Nginx configuration
-for path-based routing can be found
-[here](./example-nginx-path-routing.conf).
-Example Nginx configurations for hostname-based routing can be found
-[here](./example-nginx-site.conf)
-for FiftyOne Enterprise App and FiftyOne Enterprise CAS services, and
-[here](./example-nginx-api.conf)
-for the FiftyOne Enterprise API service.
+to route traffic to the appropriate endpoints.
+
+FiftyOne Enterprise can be routed via two main patterns:
+
+1. Path-Based Routing:
+   In this pattern, all services
+   (including the FiftyOne Enterprise App, CAS, and API)
+   are hosted behind a single DNS endpoint.
+   Voxel51 providdes an
+   [example nginx configuration](./example-nginx-path-routing.conf)
+   for this pattern.
+
+1. Hostname-Based Routing:
+   A pattern where the FiftyOne Enterprise API has a separate DNS
+   name to separate API traffic from other FiftyOne Enterprise Applications.
+   Voxel51 provides separate Nginx configurations for:
+    1. [FiftyOne Enterprise App and FiftyOne Enterprise CAS services](./example-nginx-site.conf)
+    1. [FiftyOne Enterprise API service](./example-nginx-api.conf).
 
 ## Upgrades
 
@@ -475,7 +485,7 @@ follow
 | `FIFTYONE_APP_PRIVACY_URL`                   | Privacy URL used in App                                                                                                                                                                                                                                                        | No                        |
 | `FIFTYONE_APP_IMPRINT_URL`                   | Imprint URL used in App                                                                                                                                                                                                                                                        | No                        |
 | `FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION` | The recommended fiftyone SDK version. This will be displayed in install modal (i.e. `pip install ... fiftyone==0.11.0`)                                                                                                                                                        | No                        |
-| `FIFTYONE_APP_THEME`                         | The default theme configuration for your FiftyOne Enterprise application as described [here](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                                              | No                        |
+| `FIFTYONE_APP_THEME`                         | The default theme configuration for your FiftyOne Enterprise application as described [in our documentation](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                              | No                        |
 | `FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE`     | Controls whether Query Performance mode is enabled by default for every dataset for the application. Set to false to set default mode to off.                                                                                                                                  | No                        |
 | `FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE`      | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application.                                                                                                                                 | No                        |
 | `FIFTYONE_API_URI`                           | The URI to be displayed in the `Install FiftyOne` Modal and `API Keys` configuration screens                                                                                                                                                                                   | No                        |
