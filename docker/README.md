@@ -150,7 +150,7 @@ You can override the default image used by any service in `compose.override.yaml
 ```
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.8.2
+    image: voxel51/fiftyone-app-torch:v2.10.0
 ```
 
 ## Step 4: Initial Deployment
