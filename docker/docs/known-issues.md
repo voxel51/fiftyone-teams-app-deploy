@@ -32,3 +32,51 @@ configure an SMTP connection.
 
 [internal-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#internal-mode
 [legacy-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#legacy-mode
+
+## Delegated Operators: Troubleshooting
+
+### 🧠 Handling `DataLoader worker exited unexpectedly` Errors
+
+This error often occurs when using Torch-based models that rely on `torch.multiprocessing`, which utilizes **shared memory (`/dev/shm`)** to exchange data between processes.
+
+If the available shared memory is insufficient, plugins running these models may fail with:
+
+"code"
+DataLoader worker exited unexpectedly
+"code"
+
+This can happen in:
+
+- The **plugin container** (e.g., `teams-plugins`)
+- The **delegated operator container** (e.g., `teams-do`)
+
+---
+
+### 🛠️ Solution: Increase Shared Memory Allocation
+
+To resolve this, increase the shared memory (`shm_size`) available to the affected service.
+
+For example, in `compose.delegated-operators.yaml`:
+
+"code"
+services:
+  teams-do:
+    extends:
+      file: ../common-services.yaml
+      service: teams-do-common
+    shm_size: '512m'
+"code"
+
+> 🔁 You can adjust the value based on your workload (e.g., `'1g'` for larger models).
+
+If you’re using shared plugins (i.e., plugins running inside `fiftyone-app`), you may need to apply the same `shm_size` setting to that service instead.
+
+---
+
+### 🔎 Tip
+
+To verify shared memory usage and limits inside a container, run:
+
+"code"
+docker exec -it <container_name> df -h /dev/shm
+"code"
