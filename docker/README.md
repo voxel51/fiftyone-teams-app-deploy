@@ -47,7 +47,7 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 <!-- tocstop -->
 
-## ✅ Prerequisites
+## Prerequisites
 
 - Docker and Docker Compose installed
 - License file from Voxel51
@@ -60,7 +60,7 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
   because we require Aggregations.
 
 
-## 🛂 Step 1: Prepare License File
+## Step 1: Prepare License File
 
 > Required for **v2.0+**
 
@@ -78,7 +78,7 @@ mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 > picked up immediately, you may need to restart the `teams-cas` and
 > `teams-api` services.
 
-## 🔐 Step 2: Choose Authentication Mode
+## Step 2: Choose Authentication Mode
 
 FiftyOne Enterprise offers two authentication modes:
 
@@ -94,7 +94,7 @@ Navigate into the appropriate directory:
 cd legacy-auth       # or internal-auth
 ```
 
-## ⚙️ Step 3: Configure Environment
+## Step 3: Configure Environment
 
 ### 1. Copy the template `.env` file:
 
@@ -153,7 +153,7 @@ services:
     image: voxel51/fiftyone-app-torch:v2.8.2
 ```
 
-## 🚀 Step 4: Initial Deployment
+## Step 4: Initial Deployment
 
 ### 1. Enable Database Admin mode
 
@@ -202,7 +202,7 @@ curl -Iv http://localhost:3000/api/hello
 # Expected: HTTP/1.1 200 OK
 ```
 
-## 🌐 Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
+## Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
 
 Next, you will need to place a **reverse proxy or SSL endpoint** in front of your FiftyOne 
 Enterprise services. This can be a tool like:
@@ -255,7 +255,7 @@ teams-app and teams-api are routed using different subdomain or hostname:
 - To validate your deployments api connection, see [Validating Your Deployment](../docs/validating-deployment.md)
 
 
-## 🧩 Step 6: Configuring FiftyOne Enterprise Plugins
+## Step 6: Configuring FiftyOne Enterprise Plugins
 
 FiftyOne Enterprise supports three plugin modes: **Builtin**, **Shared**, and **Dedicated**. Each offers different 
 trade-offs in isolation, flexibility, and resource management.
@@ -325,7 +325,7 @@ docker compose \
 - To manage and deploy plugins via the UI, go to:  
   `https://<your-domain>/settings/plugins`
 
-## ⚙️ Step 7: Configuring FiftyOne Enterprise Delegated Operators
+## Step 7: Configuring FiftyOne Enterprise Delegated Operators
 
 Delegated Operators allow FiftyOne Enterprise to offload plugin execution to **worker containers**, enabling 
 scalable and reliable long-running operations.
@@ -381,7 +381,7 @@ You can base them on `voxel51/fiftyone-app`, and include:
 - Internal SDKs or models
 
 
-## 🔐 Step 8: Configuring Authentication (CAS)
+## Step 8: Configuring Authentication (CAS)
 
 
 FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in v1.6. This enables centralized 
@@ -476,9 +476,7 @@ After disabling `FIFTYONE_DATABASE_ADMIN`, refer to:
 
 for complete guidance on upgrading from previous versions
 
----
-## 🐞 Known Issues
----
+## Known Issues
 
 For a list of common issues and their solutions, refer to the  
 [📄 Known Issues documentation](./docs/known-issues.md).
