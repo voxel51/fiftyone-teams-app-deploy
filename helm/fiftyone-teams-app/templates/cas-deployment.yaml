@@ -14,6 +14,8 @@ spec:
   selector:
     matchLabels:
       {{- include "fiftyone-teams-cas.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.casSettings.updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with .Values.casSettings.podAnnotations }}
@@ -49,19 +51,23 @@ spec:
             httpGet:
               path: /cas/api
               port: {{ .Values.casSettings.service.shortname }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.casSettings.liveness.failureThreshold }}
+            periodSeconds: {{ .Values.casSettings.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.casSettings.liveness.timeoutSeconds }}
           readinessProbe:
             httpGet:
               path: /cas/api
               port: {{ .Values.casSettings.service.shortname }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.casSettings.readiness.failureThreshold }}
+            periodSeconds: {{ .Values.casSettings.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.casSettings.readiness.timeoutSeconds }}
           startupProbe:
             httpGet:
               path: /cas/api
               port: {{ .Values.casSettings.service.shortname }}
-            failureThreshold: {{ .Values.casSettings.service.startup.failureThreshold }}
-            periodSeconds: {{ .Values.casSettings.service.startup.periodSeconds }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.casSettings.startup.failureThreshold }}
+            periodSeconds: {{ .Values.casSettings.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.casSettings.startup.timeoutSeconds }}
           resources:
             {{- toYaml .Values.casSettings.resources | nindent 12 }}
           volumeMounts:

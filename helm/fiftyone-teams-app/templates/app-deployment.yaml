@@ -16,6 +16,8 @@ spec:
   selector:
     matchLabels:
       {{- include "fiftyone-app.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.appSettings.updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with .Values.appSettings.podAnnotations }}
@@ -50,17 +52,21 @@ spec:
           livenessProbe:
             tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.appSettings.liveness.failureThreshold }}
+            periodSeconds: {{ .Values.appSettings.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.appSettings.liveness.timeoutSeconds }}
           readinessProbe:
             tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.appSettings.readiness.failureThreshold }}
+            periodSeconds: {{ .Values.appSettings.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.appSettings.readiness.timeoutSeconds }}
           startupProbe:
             tcpSocket:
               port: {{ .Values.appSettings.service.shortname }}
-            failureThreshold: {{ .Values.appSettings.service.startup.failureThreshold }}
-            periodSeconds: {{ .Values.appSettings.service.startup.periodSeconds }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.appSettings.startup.failureThreshold }}
+            periodSeconds: {{ .Values.appSettings.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.appSettings.startup.timeoutSeconds }}
           resources:
             {{- toYaml .Values.appSettings.resources | nindent 12 }}
           {{- with .Values.appSettings.volumeMounts }}

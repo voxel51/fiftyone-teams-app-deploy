@@ -5,18 +5,5 @@
         https://helm.fiftyone.ai for details.
 {{ end }}
 
-{{- if (semverCompare "<1.28-0" .Capabilities.KubeVersion.GitVersion) }}
-[WARN]  You are running an older version of kubernetes!
-        Currently supported versions of Kubernetes are described at the following link:
-        https://kubernetes.io/releases/
-{{ end }}
-
-{{- if .Values.delegatedOperatorExecutorSettings.enabled }}
-[WARN]  You are using delegatedOperatorExecutorSettings.enabled, which
-        has been deprecated in v2.7.0 and marked for deletion in 2.9.0.
-        This is being replaced by delegatedOperatorDeployments.deployments to allow
-        for greater flexibility within your environment.
-{{- end }}
-
 Visit the following URL to access your FiftyOne Enterprise application:
   http{{ if $.Values.ingress.tlsEnabled }}s{{ end }}://{{ .Values.teamsAppSettings.dnsName }}

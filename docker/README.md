@@ -26,6 +26,33 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.9+ Installation Changes
+
+FiftyOne Enterprise v2.9 no longer requires that operators set the
+following `FIFTYONE_DATABASE_ADMIN` variable while doing an initial installation:
+
+```yaml
+# Required prior to 2.9.1
+services:
+  fiftyone-app:
+    environment:
+      FIFTYONE_DATABASE_ADMIN: true
+```
+
+### Version 2.5+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](./docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.2+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](./docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
 ### Version 2.0+ License File Requirement
 
 FiftyOne Enterprise v2.0 introduces a new requirement for a license file.
@@ -36,27 +63,13 @@ Please refer to the
 [upgrade documentation](./docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
 for steps on how to add your license file.
 
-### Version 2.2+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](./docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
-### Version 2.5+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](./docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
 ## Table of Contents
 
 <!-- toc -->
 
 - [Requirements](#requirements)
 - [Usage](#usage)
-- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [Upgrades](#upgrades)
 - [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
@@ -133,15 +146,6 @@ To deploy FiftyOne Enterprise:
        table.
     1. Create a `compose.override.yaml` with any configuration overrides for
        this deployment
-        1. For the first installation, set
-
-            ```yaml
-            services:
-              fiftyone-app:
-                environment:
-                  FIFTYONE_DATABASE_ADMIN: true
-            ```
-
 1. Make sure you have put your Voxel51-provided FiftyOne Enterprise license in the
    local directory identified by the `LOCAL_LICENSE_FILE_DIR` configured in
    your `.env` file.
@@ -150,28 +154,6 @@ To deploy FiftyOne Enterprise:
 
         ```shell
         docker compose up -d
-        ```
-
-1. After the successful installation, and logging into FiftyOne Enterprise
-    1. In `compose.override.yaml`, remove the `FIFTYONE_DATABASE_ADMIN` override
-
-        ```yaml
-        services:
-          fiftyone-app:
-            environment:
-              # FIFTYONE_DATABASE_ADMIN: true
-        ```
-
-        > **NOTE**: This example shows commenting this line,
-        > however you may remove the line.
-
-        or set it to `false` like in
-
-        ```yaml
-        services:
-          fiftyone-app:
-            environment:
-              FIFTYONE_DATABASE_ADMIN: false
         ```
 
 The FiftyOne Enterprise API is exposed on port `8000`.
@@ -188,55 +170,7 @@ for FiftyOne Enterprise App and FiftyOne Enterprise CAS services, and
 [here](./example-nginx-api.conf)
 for the FiftyOne Enterprise API service.
 
-## Initial Installation vs. Upgrades
-
-When performing an initial installation, in `compose.override.yaml` set
-`services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: true`.
-When performing a FiftyOne Enterprise upgrade, set
-`services.fiftyone-app.environment.FIFTYONE_DATABASE_ADMIN: false`.
-See
-[Upgrading From Previous Versions](./docs/upgrading.md)
-
-The environment variable `FIFTYONE_DATABASE_ADMIN`
-controls whether the database may be migrated.
-This is a safety check to prevent automatic database
-upgrades that will break other users' SDK connections.
-When false (or unset), either an error will occur
-
-```shell
-$ fiftyone migrate --all
-Traceback (most recent call last):
-...
-OSError: Cannot migrate database from v0.22.0 to v0.22.3 when database_admin=False.
-```
-
-or no action will be taken:
-
-```shell
-$ fiftyone migrate --info
-FiftyOne Enterprise version: 0.14.4
-
-FiftyOne compatibility version: 0.22.3
-Other compatible versions: >=0.19,<0.23
-
-Database version: 0.21.2
-
-dataset     version
-----------  ---------
-quickstart  0.22.0
-$ fiftyone migrate --all
-$ fiftyone migrate --info
-FiftyOne Enterprise version: 0.14.4
-
-FiftyOne compatibility version: 0.23.0
-Other compatible versions: >=0.19,<0.23
-
-Database version: 0.21.2
-
-dataset     version
-----------  ---------
-quickstart  0.21.2
-```
+## Upgrades
 
 When performing an upgrade, please review
 [Upgrading From Previous Versions](./docs/upgrading.md)
@@ -499,7 +433,7 @@ might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.8.2
+    image: voxel51/fiftyone-app-torch:v2.9.1
 ```
 
 For more information, see the docs for

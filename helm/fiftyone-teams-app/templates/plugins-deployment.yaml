@@ -17,6 +17,8 @@ spec:
   selector:
     matchLabels:
       {{- include "teams-plugins.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.pluginsSettings.updateStrategy | nindent 4 }}
   template:
     metadata:
       {{- with .Values.pluginsSettings.podAnnotations }}
@@ -51,17 +53,21 @@ spec:
           livenessProbe:
             tcpSocket:
               port: {{ .Values.pluginsSettings.service.shortname }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.pluginsSettings.liveness.failureThreshold }}
+            periodSeconds: {{ .Values.pluginsSettings.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.pluginsSettings.liveness.timeoutSeconds }}
           readinessProbe:
             tcpSocket:
               port: {{ .Values.pluginsSettings.service.shortname }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.pluginsSettings.readiness.failureThreshold }}
+            periodSeconds: {{ .Values.pluginsSettings.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.pluginsSettings.readiness.timeoutSeconds }}
           startupProbe:
             tcpSocket:
               port: {{ .Values.pluginsSettings.service.shortname }}
-            failureThreshold: {{ .Values.pluginsSettings.service.startup.failureThreshold }}
-            periodSeconds: {{ .Values.pluginsSettings.service.startup.periodSeconds }}
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.pluginsSettings.startup.failureThreshold }}
+            periodSeconds: {{ .Values.pluginsSettings.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.pluginsSettings.startup.timeoutSeconds }}
           resources:
             {{- toYaml .Values.pluginsSettings.resources | nindent 12 }}
           {{- with .Values.pluginsSettings.volumeMounts }}

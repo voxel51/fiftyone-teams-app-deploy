@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.8.2](https://img.shields.io/badge/Version-2.8.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.8.2](https://img.shields.io/badge/AppVersion-v2.8.2-informational?style=flat-square)
+![Version: 2.9.1](https://img.shields.io/badge/Version-2.9.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.9.1](https://img.shields.io/badge/AppVersion-v2.9.1-informational?style=flat-square)
 
 FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
@@ -27,6 +27,55 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.9+ Startup Probe Changes
+
+FiftyOne Enterprise v2.9 introduces some changes to startup probe configuration.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v29-startup-probe-changes)
+for steps on how to upgrade your startup probe configurations.
+
+### Version 2.9+ Delegated Operator Changes
+
+<!-- Differs from docker-compose docs -->
+
+FiftyOne Enterprise v2.9 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v29-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.9+ Installation Changes
+
+FiftyOne Enterprise v2.9 no longer requires that operators set the
+following `FIFTYONE_DATABASE_ADMIN` variable while doing an initial installation:
+
+```yaml
+# Required prior to 2.9.1
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: true
+```
+
+### Version 2.7+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.5+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.2+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
 ### Version 2.0+ License File Requirement
 
 FiftyOne Enterprise v2.0 introduces a new requirement for a license file.
@@ -37,27 +86,6 @@ Please refer to the
 [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
 for steps on how to add your license file.
 
-### Version 2.2+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
-### Version 2.5+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
-### Version 2.7+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
 ## Table of Contents
 
 <!-- toc -->
@@ -66,7 +94,7 @@ for steps on how to upgrade your delegated operators.
   - [Kubernetes/Kubectl](#kuberneteskubectl)
   - [Helm](#helm)
 - [Usage](#usage)
-- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
@@ -94,7 +122,7 @@ Helm and Kubectl must be installed and configured on your machine.
 
 The following kubernetes/kubectl versions are required:
 
-Kubernetes: `>=1.18-0`
+Kubernetes: `>=1.30-0`
 
 However, it is recommended to use a
 [supported kubernetes version](https://kubernetes.io/releases/).
@@ -183,28 +211,7 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
-## Initial Installation vs. Upgrades
-
-Upgrades are more frequent than new installations.
-The chart's default behavior supports upgrades and the `values.yaml` contains
-
-```yaml
-appSettings:
-  env:
-    FIFTYONE_DATABASE_ADMIN: false
-```
-
-When performing an initial installation,
-in your `values.yaml`, set
-
-```yaml
-appSettings:
-  env:
-    FIFTYONE_DATABASE_ADMIN: true
-```
-
-After the initial installation, we recommend either commenting
-this environment variable or changing the value to `false`.
+## Upgrades
 
 When performing an upgrade, please review
 [Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
@@ -475,18 +482,24 @@ follow
 | apiSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | apiSettings.image.repository | string | `"voxel51/fiftyone-teams-api"` | Container image for the `teams-api`. |
 | apiSettings.image.tag | string | `""` | Image tag for `teams-api`. Defaults to the chart version. |
-| apiSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context]. |
+| apiSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context]. |
 | apiSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-api`. [Reference][init-containers]. |
 | apiSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-api`. [Reference][init-containers]. |
-| apiSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
+| apiSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources]. |
 | apiSettings.labels | object | `{}` | Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors]. |
+| apiSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-api`. [Reference][probes]. |
+| apiSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-api`. [Reference][probes]. |
+| apiSettings.liveness.timeoutSeconds | int | `5` | Number of seconds after which the liveness probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.nodeSelector | object | `{}` | nodeSelector for `teams-api`. [Reference][node-selector]. |
 | apiSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-api`. [Reference][annotations]. |
 | apiSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget]. |
 | apiSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-api`. |
 | apiSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
+| apiSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-api`. [Reference][probes]. |
+| apiSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes]. |
+| apiSettings.readiness.timeoutSeconds | int | `5` | Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.replicaCount | int | `1` | Number of pods in the `teams-api` deployment's ReplicaSet. When > 1, you must also configure volumes, volumeMounts and set `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`. For more information see [the documentation][configure-ha-teams-api]. |
 | apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
 | apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-api` containers. |
@@ -497,11 +510,13 @@ follow
 | apiSettings.service.nodePort | int | `nil` | Service nodePort set only when `apiSettings.service.type: NodePort` for `teams-api`. |
 | apiSettings.service.port | int | `80` | Service port for `teams-api`. |
 | apiSettings.service.shortname | string | `"teams-api"` | Port name (maximum length is 15 characters) for `teams-api`. [Reference][ports]. |
-| apiSettings.service.startup.failureThreshold | int | `10` | Number of times to retry the startup probe for the `teams-api`. [Reference][probes]. |
-| apiSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes]. |
 | apiSettings.service.type | string | `"ClusterIP"` | Service type for `teams-api`. [Reference][service-type]. |
+| apiSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-api`. [Reference][probes]. |
+| apiSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes]. |
+| apiSettings.startup.timeoutSeconds | int | `5` | Number of seconds after which the startup probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations]. |
-| apiSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints]. |
+| apiSettings.topologySpreadConstraints | list | `[]` | Control how pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints]. |
+| apiSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-api` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | apiSettings.volumeMounts | list | `[]` | Volume mounts for `teams-api`. [Reference][volumes]. |
 | apiSettings.volumes | list | `[]` | Volumes for `teams-api`. [Reference][volumes]. |
 | appSettings.affinity | object | `{}` | Affinity and anti-affinity for `fiftyone-app`. [Reference][affinity]. |
@@ -514,23 +529,29 @@ follow
 | appSettings.env.FIFTYONE_DATABASE_ADMIN | bool | `false` | Controls whether the client is allowed to trigger database migrations. [Reference][fiftyone-config]. |
 | appSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | appSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
-| appSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne App processes. The default value is 32 GiB. `-1` is disabled. |
+| appSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne App processes. When not set, the app's default value is 32 GiB. `-1` disables the media cache garbage collection (and cache size is unlimited). |
 | appSettings.env.FIFTYONE_SIGNED_URL_EXPIRATION | int | `24` | Set the time-to-live for signed URLs generated by the application in hours |
 | appSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | appSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for `fiftyone-app`. |
 | appSettings.image.tag | string | `""` | Image tag for `fiftyone-app`. Defaults to the chart version. |
-| appSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context]. |
+| appSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context]. |
 | appSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `fiftyone-app`. [Reference][init-containers]. |
 | appSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `fiftyone-app`. [Reference][init-containers]. |
-| appSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
+| appSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources]. |
 | appSettings.labels | object | `{}` | Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors]. |
+| appSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes]. |
+| appSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `fiftyone-app`. [Reference][probes]. |
+| appSettings.liveness.timeoutSeconds | int | `5` | Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.nodeSelector | object | `{}` | nodeSelector for `fiftyone-app`. [Reference][node-selector]. |
 | appSettings.podAnnotations | object | `{}` | Annotations for pods for `fiftyone-app`. [Reference][annotations]. |
 | appSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget]. |
 | appSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `fiftyone-app`. |
 | appSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | appSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context]. |
+| appSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `fiftyone-app`. [Reference][probes]. |
+| appSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `fiftyone-app`. [Reference][probes]. |
+| appSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.replicaCount | int | `2` | Number of pods in the `fiftyone-app` deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | appSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
 | appSettings.secretEnv | object | `{}` | Secret variables to be passed to the `fiftyone-app` containers. |
@@ -541,11 +562,13 @@ follow
 | appSettings.service.nodePort | int | `nil` | Service nodePort set only when `appSettings.service.type: NodePort` for `fiftyone-app`. |
 | appSettings.service.port | int | `80` | Service port. |
 | appSettings.service.shortname | string | `"fiftyone-app"` | Port name (maximum length is 15 characters) for `fiftyone-app`. [Reference][ports]. |
-| appSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes]. |
-| appSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes]. |
 | appSettings.service.type | string | `"ClusterIP"` | Service type for `fiftyone-app`. [Reference][service-type]. |
+| appSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes]. |
+| appSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes]. |
+| appSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `fiftyone-app` pods with matching taints. [Reference][taints-and-tolerations]. |
 | appSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `fiftyone-app` deployment. [Reference][topology-spread-constraints]. |
+| appSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `fiftyone-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | appSettings.volumeMounts | list | `[]` | Volume mounts for `fiftyone-app`. [Reference][volumes]. |
 | appSettings.volumes | list | `[]` | Volumes for `fiftyone-app`. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-cas`. [Reference][affinity]. |
@@ -559,18 +582,24 @@ follow
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for `teams-cas`. |
 | casSettings.image.tag | string | `""` | Image tag for `teams-cas`. Defaults to the chart version. |
-| casSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `teams-cas` `initContainers`. [Reference][container-security-context]. |
+| casSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `teams-cas` `initContainers`. [Reference][container-security-context]. |
 | casSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-cas`. [Reference][init-containers]. |
 | casSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-cas`. [Reference][init-containers]. |
-| casSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
+| casSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources]. |
 | casSettings.labels | object | `{}` | Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors]. |
+| casSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes]. |
+| casSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-cas`. [Reference][probes]. |
+| casSettings.liveness.timeoutSeconds | int | `5` | Timeout for the liveness probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.nodeSelector | object | `{}` | nodeSelector for `teams-cas`. [Reference][node-selector]. |
 | casSettings.podAnnotations | object | `{}` | Annotations for pods for `teams-cas`. [Reference][annotations]. |
 | casSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget]. |
 | casSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-cas`. |
 | casSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | casSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context]. |
+| casSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-cas`. [Reference][probes]. |
+| casSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-cas`. [Reference][probes]. |
+| casSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.replicaCount | int | `2` | Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment]. |
 | casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
 | casSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-cas` containers. |
@@ -581,21 +610,23 @@ follow
 | casSettings.service.nodePort | int | `nil` | Service nodePort set only when `casSettings.service.type: NodePort` for `teams-cas`. |
 | casSettings.service.port | int | `80` | Service port. |
 | casSettings.service.shortname | string | `"teams-cas"` | Port name (maximum length is 15 characters) for `teams-cas`. [Reference][ports]. |
-| casSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-cas`. [Reference][probes]. |
-| casSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes]. |
 | casSettings.service.type | string | `"ClusterIP"` | Service type for `teams-cas`. [Reference][service-type]. |
+| casSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-cas`. [Reference][probes]. |
+| casSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes]. |
+| casSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-cas` pods with matching taints. [Reference][taints-and-tolerations]. |
 | casSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-cas` deployment. [Reference][topology-spread-constraints]. |
+| casSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-cas` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for `teams-cas`. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for `teams-cas`. [Reference][volumes]. |
 | delegatedOperatorDeployments.deployments | object | `{}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
-| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":""},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
+| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":""},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"updateStrategy":{"type":"RollingUpdate"},"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
 | delegatedOperatorDeployments.template.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
 | delegatedOperatorDeployments.template.description | string | `""` | A description for the delegated operator instance. This is unused in the template context. Each operator should either set their own description or, optionally, use the default. If unset at the operator context, it will be defaulted to `Long running operations delegated to $name` where `$name` is the name of the Deployment object. |
 | delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
 | delegatedOperatorDeployments.template.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
-| delegatedOperatorDeployments.template.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
+| delegatedOperatorDeployments.template.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. When not set, the app's default value is 32 GiB. `-1` disables the media cache garbage collection (and cache size is unlimited). |
 | delegatedOperatorDeployments.template.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | delegatedOperatorDeployments.template.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for `delegated-operator-executor`. |
 | delegatedOperatorDeployments.template.image.tag | string | `""` | Image tag for `delegated-operator-executor`. Defaults to the chart version. |
@@ -608,60 +639,26 @@ follow
 | delegatedOperatorDeployments.template.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
 | delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
-| delegatedOperatorDeployments.template.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
 | delegatedOperatorDeployments.template.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `delegated-operator-executor`. [Reference][resources]. |
 | delegatedOperatorDeployments.template.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
+| delegatedOperatorDeployments.template.securityContext | object | `{}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
 | delegatedOperatorDeployments.template.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
 | delegatedOperatorDeployments.template.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-do` deployment(s). [Reference][topology-spread-constraints]. |
+| delegatedOperatorDeployments.template.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-do` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | delegatedOperatorDeployments.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorDeployments.template.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
-| delegatedOperatorExecutorSettings.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
-| delegatedOperatorExecutorSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
-| delegatedOperatorExecutorSettings.enabled | bool | `false` | Controls whether to create a dedicated `teams-do` deployment. Disabled by default, meaning delegated operations will not be executed without an external executor system. |
-| delegatedOperatorExecutorSettings.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH | string | `""` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `""` means log upload is disabled. |
-| delegatedOperatorExecutorSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
-| delegatedOperatorExecutorSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Delegated Operator Executor processes. The default value is 32 GiB. `-1` is disabled. |
-| delegatedOperatorExecutorSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
-| delegatedOperatorExecutorSettings.image.repository | string | `"voxel51/fiftyone-teams-cv-full"` | Container image for `delegated-operator-executor`. |
-| delegatedOperatorExecutorSettings.image.tag | string | `""` | Image tag for `delegated-operator-executor`. Defaults to the chart version. |
-| delegatedOperatorExecutorSettings.labels | object | `{}` | Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors]. |
-| delegatedOperatorExecutorSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.liveness.timeoutSeconds | int | `30` | Timeout for the liveness probe for the `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.name | string | `"teams-do"` | Deployment name |
-| delegatedOperatorExecutorSettings.nodeSelector | object | `{}` | nodeSelector for `delegated-operator-executor`. [Reference][node-selector]. |
-| delegatedOperatorExecutorSettings.podAnnotations | object | `{}` | Annotations for `delegated-operator-executor` pods. [Reference][annotations]. |
-| delegatedOperatorExecutorSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `delegated-operator-executor`. [Reference][pod-disruption-budget]. |
-| delegatedOperatorExecutorSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `delegated-operator-executor`. |
-| delegatedOperatorExecutorSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
-| delegatedOperatorExecutorSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
-| delegatedOperatorExecutorSettings.readiness | object | `{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30}` | Container security configuration for `delegated-operator-executor`. [Reference][container-security-context]. |
-| delegatedOperatorExecutorSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.replicaCount | int | `3` | Number of pods in the delegated-operator-executor deployment's ReplicaSet. This should not exceed the value set in the deployment's license file for  max concurrent delegated operators, which defaults to 3. |
-| delegatedOperatorExecutorSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `delegated-operator-executor`. [Reference][resources]. |
-| delegatedOperatorExecutorSettings.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
-| delegatedOperatorExecutorSettings.securityContext | object | `{}` |  |
-| delegatedOperatorExecutorSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.startup.timeoutSeconds | int | `30` | Timeout for the startup probe for the `teams-do`. [Reference][probes]. |
-| delegatedOperatorExecutorSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
-| delegatedOperatorExecutorSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-do` deployment. [Reference][topology-spread-constraints]. |
-| delegatedOperatorExecutorSettings.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
-| delegatedOperatorExecutorSettings.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
-| ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty and Kubernetes version is >1.18.0, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
+| ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
 | ingress.enabled | bool | `true` | Controls whether to create the ingress. When `false`, uses a pre-existing ingress. [Reference][ingress]. |
 | ingress.labels | object | `{}` | Additional labels for the ingress. [Reference][labels-and-selectors]. |
 | ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
@@ -687,22 +684,28 @@ follow
 | pluginsSettings.enabled | bool | `false` | Controls whether to create a dedicated `teams-plugins` deployment. |
 | pluginsSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
-| pluginsSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Plugins processes. The default value is 32 GiB. `-1` is disabled. |
+| pluginsSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Plugins processes. When not set, the app's default value is 32 GiB. `-1` disables the media cache garbage collection (and cache size is unlimited). |
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for `teams-plugins`. |
 | pluginsSettings.image.tag | string | `""` | Image tag for `teams-plugins`. Defaults to the chart version. |
-| pluginsSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context]. |
+| pluginsSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context]. |
 | pluginsSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-plugins`. [Reference][init-containers]. |
 | pluginsSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-plugins`. [Reference][init-containers]. |
-| pluginsSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
+| pluginsSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources]. |
 | pluginsSettings.labels | object | `{}` | Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors]. |
+| pluginsSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.liveness.timeoutSeconds | int | `5` | Timeout for the liveness probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.nodeSelector | object | `{}` | nodeSelector for `teams-plugins`. [Reference][node-selector]. |
 | pluginsSettings.podAnnotations | object | `{}` | Annotations for `teams-plugins` pods. [Reference][annotations]. |
 | pluginsSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget]. |
 | pluginsSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
 | pluginsSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | pluginsSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context]. |
+| pluginsSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.replicaCount | int | `2` | Number of pods in the `teams-plugins` deployment's ReplicaSet. Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | pluginsSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-plugins`. [Reference][resources]. |
 | pluginsSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-plugins` containers. |
@@ -713,11 +716,13 @@ follow
 | pluginsSettings.service.nodePort | int | `nil` | Service nodePort set only when `pluginsSettings.service.type: NodePort` for `teams-plugins`. |
 | pluginsSettings.service.port | int | `80` | Service port. |
 | pluginsSettings.service.shortname | string | `"teams-plugins"` | Port name (maximum length is 15 characters) for `teams-plugins`. [Reference][ports]. |
-| pluginsSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes]. |
-| pluginsSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.service.type | string | `"ClusterIP"` | Service type for `teams-plugins`. [Reference][service-type]. |
+| pluginsSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes]. |
+| pluginsSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-plugins` pods with matching taints. [Reference][taints-and-tolerations]. |
 | pluginsSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-plugins` deployment. [Reference][topology-spread-constraints]. |
+| pluginsSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-plugins` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | pluginsSettings.volumeMounts | list | `[]` | Volume mounts for `teams-plugins` pods. [Reference][volumes]. |
 | pluginsSettings.volumes | list | `[]` | Volumes for `teams-plugins`. [Reference][volumes]. |
 | secret.create | bool | `true` | Controls whether to create the secret named `secret.name`. |
@@ -745,25 +750,31 @@ follow
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off. |
 | teamsAppSettings.env.FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application. |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.8.2"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.9.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
 | teamsAppSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy]. |
 | teamsAppSettings.image.repository | string | `"voxel51/fiftyone-teams-app"` | Container image for `teams-app`. |
 | teamsAppSettings.image.tag | string | `""` | Image tag for `teams-app`.  Defaults to the chart version. |
-| teamsAppSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `teams-app` `initContainers`. [Reference][container-security-context]. |
+| teamsAppSettings.initContainers.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `teams-app` `initContainers`. [Reference][container-security-context]. |
 | teamsAppSettings.initContainers.enabled | bool | `true` | Whether to enable init containers for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.repository | string | `"docker.io/busybox"` | Init container images repositories for `teams-app`.  [Reference][init-containers]. |
 | teamsAppSettings.initContainers.image.tag | string | `"stable-glibc"` | Init container images tags for `teams-app`.  [Reference][init-containers]. |
-| teamsAppSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
+| teamsAppSettings.initContainers.resources | object | `{"limits":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"},"requests":{"cpu":"10m","ephemeral-storage":"64Mi","memory":"128Mi"}}` | Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources]. |
 | teamsAppSettings.labels | object | `{}` | Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors]. |
+| teamsAppSettings.liveness.failureThreshold | int | `5` | Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.liveness.periodSeconds | int | `15` | How often (in seconds) to perform the liveness probe for `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.liveness.timeoutSeconds | int | `5` | Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes]. |
 | teamsAppSettings.nodeSelector | object | `{}` | nodeSelector for `teams-app`.  [Reference][node-selector]. |
 | teamsAppSettings.podAnnotations | object | `{}` | Annotations for `teams-app` pods. [Reference][annotations]. |
 | teamsAppSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":""}` | Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget]. |
 | teamsAppSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-app`. |
 | teamsAppSettings.podDisruptionBudget.minAvailable | string | `""` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | teamsAppSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context]. |
+| teamsAppSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes]. |
 | teamsAppSettings.replicaCount | int | `2` | Number of pods in the `teams-app` deployment's ReplicaSet. Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment]. |
 | teamsAppSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-app`.  [Reference][resources]. |
 | teamsAppSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-app` containers. |
@@ -774,11 +785,13 @@ follow
 | teamsAppSettings.service.nodePort | int | `nil` | Service nodePort set only when `teamsAppSettings.service.type: NodePort` for `teams-app`. |
 | teamsAppSettings.service.port | int | `80` | Service port. |
 | teamsAppSettings.service.shortname | string | `"teams-app"` | Port name (maximum length is 15 characters) for `teams-app`.  [Reference][ports]. |
-| teamsAppSettings.service.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-app`.  [Reference][probes]. |
-| teamsAppSettings.service.startup.periodSeconds | int | `15` | How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes]. |
 | teamsAppSettings.service.type | string | `"ClusterIP"` | Service type for `teams-app`.  [Reference][service-type]. |
+| teamsAppSettings.startup.failureThreshold | int | `5` | Number of times to retry the startup probe for the `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.startup.periodSeconds | int | `30` | How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes]. |
+| teamsAppSettings.startup.timeoutSeconds | int | `5` | Timeout for the startup probe for the `fiftyone-app`. [Reference][probes]. |
 | teamsAppSettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `teams-app` pods with matching taints. [Reference][taints-and-tolerations]. |
 | teamsAppSettings.topologySpreadConstraints | list | `[]` | Control how Pods are spread across your distributed footprint. Label selectors will be defaulted to those of the `teams-app` deployment. [Reference][topology-spread-constraints]. |
+| teamsAppSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
 
@@ -789,6 +802,8 @@ follow
 [configure-ha-teams-api]: #highly-available-fiftyone-teams-api-deployments
 [container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/#storage-credentials-and-fiftyone_encryption_key
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
 [image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
@@ -810,6 +825,5 @@ follow
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+[upgrade-strategies]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/#storage-credentials-and-fiftyone_encryption_key
-[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html

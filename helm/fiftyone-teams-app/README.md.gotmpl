@@ -27,6 +27,55 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.9+ Startup Probe Changes
+
+FiftyOne Enterprise v2.9 introduces some changes to startup probe configuration.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v29-startup-probe-changes)
+for steps on how to upgrade your startup probe configurations.
+
+### Version 2.9+ Delegated Operator Changes
+
+<!-- Differs from docker-compose docs -->
+
+FiftyOne Enterprise v2.9 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v29-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.9+ Installation Changes
+
+FiftyOne Enterprise v2.9 no longer requires that operators set the
+following `FIFTYONE_DATABASE_ADMIN` variable while doing an initial installation:
+
+```yaml
+# Required prior to 2.9.1
+appSettings:
+  env:
+    FIFTYONE_DATABASE_ADMIN: true
+```
+
+### Version 2.7+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.5+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
+### Version 2.2+ Delegated Operator Changes
+
+FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
+for steps on how to upgrade your delegated operators.
+
 ### Version 2.0+ License File Requirement
 
 FiftyOne Enterprise v2.0 introduces a new requirement for a license file.
@@ -37,27 +86,6 @@ Please refer to the
 [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#from-fiftyone-enterprise-versions-160-to-171)
 for steps on how to add your license file.
 
-### Version 2.2+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.2 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v22-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
-### Version 2.5+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.5 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v25-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
-### Version 2.7+ Delegated Operator Changes
-
-FiftyOne Enterprise v2.7 introduces some changes to delegated operators.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v27-delegated-operator-changes)
-for steps on how to upgrade your delegated operators.
-
 ## Table of Contents
 
 <!-- toc -->
@@ -66,7 +94,7 @@ for steps on how to upgrade your delegated operators.
   - [Kubernetes/Kubectl](#kuberneteskubectl)
   - [Helm](#helm)
 - [Usage](#usage)
-- [Initial Installation vs. Upgrades](#initial-installation-vs-upgrades)
+- [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
@@ -183,32 +211,10 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 A minimal example `values.yaml` may be found
 [here](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
 
-## Initial Installation vs. Upgrades
-
-Upgrades are more frequent than new installations.
-The chart's default behavior supports upgrades and the `values.yaml` contains
-
-```yaml
-appSettings:
-  env:
-    FIFTYONE_DATABASE_ADMIN: false
-```
-
-When performing an initial installation,
-in your `values.yaml`, set
-
-```yaml
-appSettings:
-  env:
-    FIFTYONE_DATABASE_ADMIN: true
-```
-
-After the initial installation, we recommend either commenting
-this environment variable or changing the value to `false`.
+## Upgrades
 
 When performing an upgrade, please review
 [Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
-
 
 ## Advanced Configuration
 
@@ -479,6 +485,8 @@ follow
 [configure-ha-teams-api]: #highly-available-fiftyone-teams-api-deployments
 [container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
+[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/#storage-credentials-and-fiftyone_encryption_key
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
 [image-pull-secrets]: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 [ingress-default-ingress-class]: https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class
@@ -500,6 +508,5 @@ follow
 [service-type]: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 [taints-and-tolerations]: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 [topology-spread-constraints]: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+[upgrade-strategies]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 [volumes]: https://kubernetes.io/docs/concepts/storage/volumes/
-[fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/#storage-credentials-and-fiftyone_encryption_key
-[fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
