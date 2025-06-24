@@ -45,6 +45,8 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 - [Advanced Configuration](#advanced-configuration)
 - [Environment Variables](#environment-variables)
 
+<!-- tocstop -->
+
 ## ✅ Prerequisites
 
 - Docker and Docker Compose installed
