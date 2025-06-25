@@ -3055,7 +3055,7 @@
               ]
             },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
-              "default": "2.9.0",
+              "default": "2.10.0",
               "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==0.11.0`).",
               "required": [],
               "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
