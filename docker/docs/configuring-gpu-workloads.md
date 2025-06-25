@@ -66,8 +66,6 @@ services:
 
   teams-do-with-gpu:
     image: voxel51/fiftyone-teams-cv-full:v2.10.0
-    deploy:
-      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
     command: >
       /bin/sh -c "fiftyone delegated launch -t remote  -n 'teams-do-with-gpu'"
     environment:
@@ -83,6 +81,7 @@ services:
     volumes:
       - plugins-vol:/opt/plugins:ro
     deploy:
+      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
       resources:
         reservations:
           devices:
