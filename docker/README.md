@@ -32,7 +32,7 @@ FiftyOne Enterprise v2.9 no longer requires that operators set the
 following `FIFTYONE_DATABASE_ADMIN` variable while doing an initial installation:
 
 ```yaml
-# Required prior to 2.9.0
+# Required prior to 2.9
 services:
   fiftyone-app:
     environment:
@@ -443,7 +443,7 @@ might look like:
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.9.0
+    image: voxel51/fiftyone-app-torch:v2.10.0
 ```
 
 For more information, see the docs for
