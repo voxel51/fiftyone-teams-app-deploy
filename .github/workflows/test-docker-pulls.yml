@@ -27,7 +27,7 @@ jobs:
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
-        uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302
+        uses: asdf-vm/actions/install@v4.0.0
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:

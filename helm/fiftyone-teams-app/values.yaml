@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=values.schema.json
 # FiftyOne Enterprise API (`teams-api`)
 apiSettings:
   # -- Controls whether `teams-api` is added to the chart's ingress.
@@ -15,10 +16,16 @@ apiSettings:
     # When "development", debug mode is enabled and the default logging level is "DEBUG".
     # Can be overridden by setting `apiSettings.env.LOGGING_LEVEL`.
     FIFTYONE_ENV: production
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`
     # -- Whether the SDK is running in an internal service context.
     # When running in FiftyOne Enterprise, set to `true`.
     FIFTYONE_INTERNAL_SERVICE: true
+    # @schema
+    # type: ["string", "integer"]
+    # @schema
     # -- Default number of returned items when listing in GraphQL queries.
     # Can be overridden in the request.
     GRAPHQL_DEFAULT_LIMIT: 10
@@ -33,6 +40,10 @@ apiSettings:
   #     secretKey: the-key-in-the-secret
 
   image:
+    # @schema
+    # oneOf:
+    #   - enum: ["Always", "IfNotPresent", "Never"]
+    # @schema
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
@@ -43,6 +54,10 @@ apiSettings:
   # -- Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors].
   labels: {}
 
+  # @schema
+  # minimum: 1
+  # type: integer
+  # @schema
   # -- Number of pods in the `teams-api` deployment's ReplicaSet.
   # When > 1, you must also configure volumes, volumeMounts and set
   # `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`.
@@ -67,6 +82,9 @@ apiSettings:
     containerPort: 8000
     # -- Service name.
     name: teams-api
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `apiSettings.service.type: NodePort` for `teams-api`.
     nodePort:
     # -- Service port for `teams-api`.
@@ -87,6 +105,9 @@ apiSettings:
       capabilities:
         drop: [ALL]
       runAsNonRoot: true
+      # @schema
+      # type: ["string", "integer"]
+      # @schema
       runAsUser: 1000
     # -- Whether to enable init containers for `teams-api`. [Reference][init-containers].
     enabled: true
@@ -98,12 +119,30 @@ apiSettings:
     # -- Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-api`. [Reference][probes].
@@ -120,11 +159,14 @@ apiSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `teams-api`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
@@ -177,18 +219,33 @@ appSettings:
   deploymentAnnotations: {}
   # Environment Variables are passed to the `fiftyone-app` containers
   env:
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Controls whether the client is allowed to trigger database migrations.
     # [Reference][fiftyone-config].
     FIFTYONE_DATABASE_ADMIN: false
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Controls whether cloud media images will be downloaded and added to
     # the local cache upon viewing media in the app.
     FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
+    # @schema
+    # type: ["string", "integer"]
+    # @schema
     # -- Set the media cache size (in bytes) for the local FiftyOne App processes.
     # When not set, the app's default value is 32 GiB.
     # `-1` disables the media cache garbage collection (and cache size is unlimited).
     FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+    # @schema
+    # type: ["string", "integer"]
+    # @schema
     # -- Set the time-to-live for signed URLs generated by the application in hours
     FIFTYONE_SIGNED_URL_EXPIRATION: 24
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`
     # -- Whether the SDK is running in an internal service context.
     # When running in FiftyOne Enterprise, set to `true`.
@@ -206,6 +263,10 @@ appSettings:
   #     secretKey: the-key-in-the-secret
 
   image:
+    # @schema
+    # oneOf:
+    #   - enum: ["Always", "IfNotPresent", "Never"]
+    # @schema
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
@@ -215,6 +276,10 @@ appSettings:
     tag: ""
   # -- Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors].
   labels: {}
+  # @schema
+  # minimum: 1
+  # type: integer
+  # @schema
   # -- Number of pods in the `fiftyone-app` deployment's ReplicaSet.
   # Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
@@ -238,6 +303,9 @@ appSettings:
     containerPort: 5151
     # -- Service name.
     name: fiftyone-app
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `appSettings.service.type: NodePort` for `fiftyone-app`.
     nodePort:
     # -- Service port.
@@ -269,12 +337,30 @@ appSettings:
     # -- Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes].
@@ -291,11 +377,14 @@ appSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `fiftyone-app`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].
   podSecurityContext: {}
@@ -367,6 +456,10 @@ casSettings:
   #     secretKey: the-key-in-the-secret
 
   image:
+    # @schema
+    # oneOf:
+    #   - enum: ["Always", "IfNotPresent", "Never"]
+    # @schema
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
@@ -376,6 +469,10 @@ casSettings:
     tag: ""
   # -- Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors].
   labels: {}
+  # @schema
+  # minimum: 1
+  # type: integer
+  # @schema
   # -- Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].
   replicaCount: 2
 
@@ -398,6 +495,9 @@ casSettings:
     containerPort: 3000
     # -- Service name.
     name: teams-cas
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `casSettings.service.type: NodePort` for `teams-cas`.
     nodePort:
     # -- Service port.
@@ -429,12 +529,30 @@ casSettings:
     # -- Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes].
@@ -451,11 +569,14 @@ casSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `teams-cas`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable:
     # maxUnavailable: ""
   readiness:
     # -- Number of times to retry the readiness probe for the `teams-cas`. [Reference][probes].
@@ -502,11 +623,17 @@ delegatedOperatorDeployments:
       # use for storing logs generated by delegated operation runs, one file
       # per job. The default `""` means log upload is disabled.
       FIFTYONE_DELEGATED_OPERATION_LOG_PATH: ""
+      # @schema
+      # type: ["string", "integer"]
+      # @schema
       # -- Set the media cache size (in bytes) for the local FiftyOne Delegated
       # Operator Executor processes.
       # When not set, the app's default value is 32 GiB.
       # `-1` disables the media cache garbage collection (and cache size is unlimited).
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      # @schema
+      # type: ["string", "boolean"]
+      # @schema
       # TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`
       # -- Whether the SDK is running in an internal service context.
       # When running in FiftyOne Enterprise, set to `true`.
@@ -528,6 +655,10 @@ delegatedOperatorDeployments:
     #     secretKey: the-key-in-the-secret
 
     image:
+      # @schema
+      # oneOf:
+      #   - enum: ["Always", "IfNotPresent", "Never"]
+      # @schema
       # -- Instruct when the kubelet should pull (download) the specified image.
       # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
       pullPolicy: Always
@@ -544,6 +675,11 @@ delegatedOperatorDeployments:
       periodSeconds: 30
       # -- Timeout for the liveness probe for the `teams-do`. [Reference][probes].
       timeoutSeconds: 30
+
+    # @schema
+    # minimum: 1
+    # type: integer
+    # @schema
     # -- Number of pods in the delegated-operator-executor deployment's ReplicaSet.
     # This should not exceed the value set in the deployment's license file for
     #  max concurrent delegated operators, which defaults to 3.
@@ -571,11 +707,14 @@ delegatedOperatorDeployments:
     podDisruptionBudget:
       # -- Whether a pod disruption budget is enabled for `teams-plugins`.
       enabled: false
+      # @schema
+      # type: ["integer", "string", "number", "null"]
+      # @schema
       # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
       # Either integers or percentages supported.
       # `maxUnavailable` is also supported, however, only one setting can be used at a time.
       # If both are set, `minAvailable` will be preferred.
-      minAvailable: ""
+      minAvailable:
       # maxUnavailable: ""
     # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
     podSecurityContext: {}
@@ -715,13 +854,22 @@ pluginsSettings:
     targetMemoryUtilizationPercentage: 80
   # Environment Variables are passed to the `teams-plugins` containers.
   env:
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Controls whether cloud media images will be downloaded and added to
     # the local cache upon viewing media in the app.
     FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
+    # @schema
+    # type: ["string", "integer"]
+    # @schema
     # -- Set the media cache size (in bytes) for the local FiftyOne Plugins processes.
     # When not set, the app's default value is 32 GiB.
     # `-1` disables the media cache garbage collection (and cache size is unlimited).
     FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`
     # -- Whether the SDK is running in an internal service context.
     # When running in FiftyOne Enterprise, set to `true`.
@@ -734,6 +882,10 @@ pluginsSettings:
   #     secretKey: the-key-in-the-secret
 
   image:
+    # @schema
+    # oneOf:
+    #   - enum: ["Always", "IfNotPresent", "Never"]
+    # @schema
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
     pullPolicy: Always
@@ -743,6 +895,10 @@ pluginsSettings:
     tag: ""
   # -- Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors].
   labels: {}
+  # @schema
+  # minimum: 1
+  # type: integer
+  # @schema
   # -- Number of pods in the `teams-plugins` deployment's ReplicaSet.
   # Ignored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
@@ -766,6 +922,9 @@ pluginsSettings:
     containerPort: 5151
     # -- Service name.
     name: teams-plugins
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `pluginsSettings.service.type: NodePort` for `teams-plugins`.
     nodePort:
     # -- Service port.
@@ -797,12 +956,30 @@ pluginsSettings:
     # -- Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes].
@@ -819,11 +996,14 @@ pluginsSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `teams-plugins`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].
   podSecurityContext: {}
@@ -917,10 +1097,16 @@ teamsAppSettings:
   deploymentAnnotations: {}
   # Environment Variables are passed to the `teams-app` containers.
   env:
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Controls the protocol of the `teams-app`.  Configure your ingress to match.
     # When `true`, uses the https protocol.
     # When `false`, uses the http protocol.
     APP_USE_HTTPS: true
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- When `false`, disables media export options
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
@@ -932,15 +1118,27 @@ teamsAppSettings:
     # `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app).
     # `always-light`: Sets light theme on each refresh (overrides user theme changes in the app).
     FIFTYONE_APP_THEME: dark
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Disable duplicate atom/selector key checking that generated false-positive errors.
     # [Reference][recoil-env].
     RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Controls whether anonymous analytics are captured for the
     # application. Set to false to opt-out of anonymous analytics.
     FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: true
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Controls whether Query Performance mode is enabled by default for
     # every dataset for the teams application. Set to false to set default mode to off.
     FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE: true
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Controls whether Query Performance mode is enabled for the
     # application. Set to false to disable Query Performance mode for entire application.
     FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE: true
@@ -952,6 +1150,10 @@ teamsAppSettings:
   #     secretKey: the-key-in-the-secret
 
   image:
+    # @schema
+    # oneOf:
+    #   - enum: ["Always", "IfNotPresent", "Never"]
+    # @schema
     # -- Instruct when the kubelet should pull (download) the specified image.
     # One of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy].
     pullPolicy: Always
@@ -968,6 +1170,10 @@ teamsAppSettings:
   # uses the teamsAppSettings.dnsName
   fiftyoneApiOverride: ""
 
+  # @schema
+  # minimum: 1
+  # type: integer
+  # @schema
   # -- Number of pods in the `teams-app` deployment's ReplicaSet.
   # Ignored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].
   replicaCount: 2
@@ -991,6 +1197,9 @@ teamsAppSettings:
     containerPort: 3000
     # -- Service name.
     name: teams-app
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
     # -- (int) Service nodePort set only when `teamsAppSettings.service.type: NodePort` for `teams-app`.
     nodePort:
     # -- Service port.
@@ -1022,12 +1231,30 @@ teamsAppSettings:
     # -- Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources].
     resources:
       limits:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
       requests:
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         cpu: 10m
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         ephemeral-storage: 64Mi
+        # @schema
+        # type: ["string", "integer", "number"]
+        # @schema
         memory: 128Mi
   liveness:
     # -- Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes].
@@ -1044,11 +1271,14 @@ teamsAppSettings:
   podDisruptionBudget:
     # -- Whether a pod disruption budget is enabled for `teams-app`.
     enabled: false
+    # @schema
+    # type: ["integer", "string", "number", "null"]
+    # @schema
     # -- Sets the minimum available or maximum unavailable replicas for the deployment object.
     # Either integers or percentages supported.
     # `maxUnavailable` is also supported, however, only one setting can be used at a time.
     # If both are set, `minAvailable` will be preferred.
-    minAvailable: ""
+    minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context].
   podSecurityContext: {}

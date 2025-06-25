@@ -101,7 +101,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "[INFO] Starting worker",
+					log:              "Starting worker",
 				},
 				{
 					name:             "teams-app",
@@ -123,7 +123,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 200,
-					log:              "[INFO] Running on http://0.0.0.0:5151",
+					log:              "Running on http://0.0.0.0:5151",
 				},
 			},
 		},
@@ -138,7 +138,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "[INFO] Starting worker",
+					log:              "Starting worker",
 				},
 				{
 					name:             "teams-app",
@@ -160,7 +160,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 200,
-					log:              "[INFO] Running on http://0.0.0.0:5151",
+					log:              "Running on http://0.0.0.0:5151",
 				},
 			},
 		},
@@ -175,7 +175,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "[INFO] Starting worker",
+					log:              "Starting worker",
 				},
 				{
 					name:             "teams-app",
@@ -197,14 +197,14 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "[INFO] Running on http://0.0.0.0:5151",
+					log:              "Running on http://0.0.0.0:5151",
 				},
 				{
 					name:             "teams-plugins",
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "[INFO] Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
+					log:              "Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
 				},
 			},
 		},
@@ -219,7 +219,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "[INFO] Starting worker",
+					log:              "Starting worker",
 				},
 				{
 					name:             "teams-app",
@@ -241,7 +241,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "[INFO] Running on http://0.0.0.0:5151",
+					log:              "Running on http://0.0.0.0:5151",
 				},
 				{
 					name:             "teams-do",
