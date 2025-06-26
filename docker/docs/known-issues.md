@@ -41,9 +41,9 @@ This error often occurs when using Torch-based models that rely on `torch.multip
 
 If the available shared memory is insufficient, plugins running these models may fail with:
 
-"code"
+```txt
 DataLoader worker exited unexpectedly
-"code"
+```
 
 This can happen in:
 
