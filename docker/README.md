@@ -57,7 +57,7 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
   - If using MongoDB Community or Enterprise we recommend a minimum of 4vCPU and 16GB of RAM. Large datasets and 
   complex samples may require additional resources.
   - If using Atlas we recommend starting on at least a M40 cluster tier - you can then use utilization metrics to 
-  make scaling decisions (up or down). Please note that we do not   support MongoDB Atlas Serverless instances 
+  make scaling decisions (up or down). Please note that we do not support MongoDB Atlas Serverless instances 
   because we require Aggregations.
 
 
