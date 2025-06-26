@@ -124,6 +124,7 @@ FiftyOne Enterprise offers two authentication modes:
 - `internal-auth` → Choose this mode when in an airgapped deployment - aigapped
   deployments will not require network egress to external services.
 
+<a id="-choose-your-mode">
 ### 👉 Choose your mode
 
 Navigate into the appropriate directory:
