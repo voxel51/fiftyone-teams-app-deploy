@@ -25,9 +25,9 @@ Supported locations are network-mounted filesystems and cloud storage folders.
 - Network-mounted filesystem
   - Set the environment variable `FIFTYONE_SNAPSHOTS_ARCHIVE_PATH` to the
     mounted filesystem path in these containers
-    - `fiftyone-api`
+    - `teams-api`
     - `teams-app`
-  - Mount the filesystem to the `fiftyone-api` container
+  - Mount the filesystem to the `teams-api` container
     (`teams-app` does not need this despite the variable set above).
     For an example, see
     [legacy-auth/compose.plugins.yaml](../legacy-auth/compose.plugins.yaml).
@@ -36,11 +36,11 @@ Supported locations are network-mounted filesystems and cloud storage folders.
     cloud storage path (for example
     `gs://my-voxel51-bucket/dev-deployment-snapshot-archives/`)
     in these containers
-    - `fiftyone-api`
+    - `teams-api`
     - `teams-app`
   - Ensure the
     [cloud credentials](https://docs.voxel51.com/enterprise/installation.html#cloud-credentials)
-    loaded in the `fiftyone-api` container have full edit capabilities to
+    loaded in the `teams-api` container have full edit capabilities to
     this bucket
 
 See the

@@ -77,6 +77,6 @@ If you’re using shared plugins (i.e., plugins running inside `fiftyone-app`), 
 
 To verify shared memory usage and limits inside a container, run:
 
-"code"
+```bash
 docker exec -it <container_name> df -h /dev/shm
-"code"
+```
