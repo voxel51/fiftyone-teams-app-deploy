@@ -419,12 +419,12 @@ to avoid breaking active SDK sessions or deployments.
 
 Before running your upgraded containers, set the following override:
 
-"code"
+```yaml
 services:
   fiftyone-app:
     environment:
       FIFTYONE_DATABASE_ADMIN: false
-"code"
+```
 
 > This ensures that **no automatic migrations** will occur when the container starts.
 
