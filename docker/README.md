@@ -52,7 +52,8 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 - Docker and Docker Compose are installed
 - License file from Voxel51
 - Docker Hub credentials from Voxel51
-- MongoDB instance available. FiftyOne Teams is compatible with MongoDB Community, Enterprise, or Atlas Editions.
+- MongoDB instance available. 
+  - FiftyOne Teams is compatible with MongoDB Community, Enterprise, or Atlas Editions.
   - If using MongoDB Community or Enterprise we recommend a minimum of 4vCPU and 16GB of RAM. Large datasets and 
   complex samples may require additional resources.
   - If using Atlas we recommend starting on at least a M40 cluster tier - you can then use utilization metrics to 
