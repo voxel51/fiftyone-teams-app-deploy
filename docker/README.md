@@ -49,7 +49,7 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Prerequisites
 
-- Docker and Docker Compose installed
+- Docker and Docker Compose are installed
 - License file from Voxel51
 - Docker Hub credentials from Voxel51
 - MongoDB instance available. FiftyOne Teams is compatible with MongoDB Community, Enterprise, or Atlas Editions.
