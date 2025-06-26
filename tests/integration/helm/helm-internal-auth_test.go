@@ -86,7 +86,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "[INFO] Starting worker",
+					log:              "Starting worker",
 				},
 				{
 					name:             "teams-app",
@@ -101,7 +101,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 200,
-					log:              "[INFO] Running on http://0.0.0.0:5151",
+					log:              "Running on http://0.0.0.0:5151",
 				},
 			},
 		},
@@ -163,7 +163,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "[INFO] Starting worker",
+					log:              "Starting worker",
 				},
 				{
 					name:             "teams-app",
@@ -185,7 +185,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 200,
-					log:              "[INFO] Running on http://0.0.0.0:5151",
+					log:              "Running on http://0.0.0.0:5151",
 				},
 			},
 		},
@@ -241,7 +241,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "[INFO] Starting worker",
+					log:              "Starting worker",
 				},
 				{
 					name:             "teams-app",
@@ -255,7 +255,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "[INFO] Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
+					log:              "Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
 				},
 				{
 					name:             "teams-do",
@@ -270,7 +270,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 200,
-					log:              "[INFO] Running on http://0.0.0.0:5151",
+					log:              "Running on http://0.0.0.0:5151",
 				},
 			},
 		},

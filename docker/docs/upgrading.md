@@ -359,8 +359,7 @@ Additionally,
 
 1. Update your web server routes to include routing
    `/cas/*` traffic to the `teams-cas` service.
-   Example nginx configurations can be found
-   [here](../)
+   Please see our [example nginx configurations](../) for more information.
 1. [Upgrade to FiftyOne Enterprise v2.10.0](#upgrading-from-previous-versions)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).

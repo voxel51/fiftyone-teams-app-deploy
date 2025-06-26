@@ -44,8 +44,8 @@ the
 [Helm Chart](https://github.com/voxel51/fiftyone-teams-app-deploy)
 and update your deployment accordingly.
 
-A minimal example `values.yaml` may be found
-[here](../values.yaml).
+Voxel51 provides a
+[minimum example `values.yaml`](../values.yaml).
 
 1. Edit the `values.yaml` file
 1. To upgrade an existing helm installation
