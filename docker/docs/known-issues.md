@@ -58,14 +58,14 @@ To resolve this, increase the shared memory (`shm_size`) available to the affect
 
 For example, in `compose.delegated-operators.yaml`:
 
-"code"
+```yaml
 services:
   teams-do:
     extends:
       file: ../common-services.yaml
       service: teams-do-common
     shm_size: '512m'
-"code"
+```
 
 > 🔁 You can adjust the value based on your workload (e.g., `'1g'` for larger models).
 
