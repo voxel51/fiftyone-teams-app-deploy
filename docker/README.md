@@ -36,7 +36,7 @@ regarding FiftyOne Enterprise.
 - [Prerequisites](#prerequisites)
 - [Step 1: Prepare License File](#step-1-prepare-license-file)
 - [Step 2: Choose Authentication Mode](#step-2-choose-authentication-mode)
-  - [👉 Choose your mode](#%F0%9F%91%89-choose-your-mode)
+  - [:point_right: Choose your mode](#point_right-choose-your-mode)
 - [Step 3: Configure Environment](#step-3-configure-environment)
   - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
   - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
@@ -124,9 +124,7 @@ FiftyOne Enterprise offers two authentication modes:
 - `internal-auth` → Choose this mode when in an airgapped deployment - aigapped
   deployments will not require network egress to external services.
 
-<a id="👉-choose-your-mode"></a>
-
-### 👉 Choose your mode
+### :point_right: Choose your mode
 
 Navigate into the appropriate directory:
 
