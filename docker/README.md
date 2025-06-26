@@ -62,9 +62,9 @@ regarding FiftyOne Enterprise.
   - [:page_facing_up: Optional: Upload Run Logs](#page_facing_up-optional-upload-run-logs)
   - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
-- [Step 8: Configuring Authentication (CAS)](#step-8-configuring-authentication-cas)
+- [Step 8: Identity Provider (IdP) and Authentication (CAS)](#step-8-identity-provider-idp-and-authentication-cas)
+  - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
-  - [:information_source: Notes](#information_source-notes)
 - [Upgrades](#upgrades)
   - [:no_entry_sign: Disable Automatic Migrations](#no_entry_sign-disable-automatic-migrations)
   - [:hammer_and_wrench: What Happens If You Migrate with database admin False?](#hammer_and_wrench-what-happens-if-you-migrate-with-database-admin-false)
@@ -346,13 +346,13 @@ Use this mode when:
 
 #### Enable dedicated plugin mode
 
-- Ensure your `.env` file includes the following:
+1. Ensure your `.env` file includes the following:
 
 ```shell
 FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151
 ```
 
-- Use `compose.dedicated-plugins.yaml` (instead of `compose.yaml`)
+1. Use `compose.dedicated-plugins.yaml` (instead of `compose.yaml`)
 
 ```shell
 docker compose \
@@ -361,8 +361,8 @@ docker compose \
   up -d
 ```
 
-- Optional: If using a [proxy server](./docs/configuring-proxies.md), ensure the
-  plugin service is excluded from proxying.
+1. Optional: If using a [proxy server](./docs/configuring-proxies.md), ensure
+   the plugin service is excluded from proxying.
 
 > 🔧 This prevents traffic from being routed incorrectly through your proxy for
 > internal plugin calls.
@@ -435,7 +435,17 @@ and deploy **custom plugin images**. You can base them on
 - ML libraries (e.g. PyTorch, OpenCV)
 - Internal SDKs or models
 
-## Step 8: Configuring Authentication (CAS)
+## Step 8: Identity Provider (IdP) and Authentication (CAS)
+
+### :information_source: IdP configuration
+
+You can refer to the following docs to set up your Identity Provider with
+FiftyOne.
+
+- [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
+  includes information on configuring CAS.
+- To set up authentication for internal-auth mode: Refer to the
+  [Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode).
 
 FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in
 v1.6. This enables centralized login, roles, and user management.
@@ -454,13 +464,6 @@ v1.6. This enables centralized login, roles, and user management.
 1. Use `docker compose` from within the `legacy-auth`/`internal-auth` directory
    to bring up services.
 1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
-
-### :information_source: Notes
-
-- [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
-  includes information on configuring CAS.
-- To set up authentication for internal-auth mode: Refer to the
-  [Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode).
 
 ## Upgrades
 
