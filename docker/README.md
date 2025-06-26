@@ -3,7 +3,8 @@
 <div align="center">
 <p align="center">
 
-<img alt="Voxel51 Logo" src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
+<img alt="Voxel51 Logo" src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px">
+&nbsp;
 <img alt="Voxel51 FiftyOne" src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
 
 </p>
@@ -15,51 +16,87 @@
 # FiftyOne Enterprise: Docker Deployment Guide
 
 FiftyOne Enterprise is the enterprise version of the open source
-[FiftyOne](https://github.com/voxel51/fiftyone)
-project.
+[FiftyOne](https://github.com/voxel51/fiftyone) project.
 
-The FiftyOne Enterprise Docker Compose files are the recommended way to
-install and configure FiftyOne Enterprise on Docker.
+The FiftyOne Enterprise Docker Compose files are the recommended way to install
+and configure FiftyOne Enterprise on Docker.
 
-
-This guide walks you through the steps for installing FiftyOne Enterprise 
-using Docker Compose. It also includes advanced configuration, environment variables, 
-and upgrade considerations. This page assumes general knowledge of FiftyOne Enterprise and how to use it.
-Please contact Voxel51 for more information regarding FiftyOne Enterprise.
+This guide walks you through the steps for installing FiftyOne Enterprise using
+Docker Compose. It also includes advanced configuration, environment variables,
+and upgrade considerations. This page assumes general knowledge of FiftyOne
+Enterprise and how to use it. Please contact Voxel51 for more information
+regarding FiftyOne Enterprise.
 
 ## Table of Contents
+
+<!-- markdownlint-disable link-fragments -->
 
 <!-- toc -->
 
 - [Prerequisites](#prerequisites)
 - [Step 1: Prepare License File](#step-1-prepare-license-file)
 - [Step 2: Choose Authentication Mode](#step-2-choose-authentication-mode)
+  - [👉 Choose your mode](#%F0%9F%91%89-choose-your-mode)
 - [Step 3: Configure Environment](#step-3-configure-environment)
+  - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
+  - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
+  - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
+  - [📦 Official Docker Images](#%F0%9F%93%A6-official-docker-images)
 - [Step 4: Initial Deployment](#step-4-initial-deployment)
-- [Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#step-5-ssl-reverse-proxy)
-- [Step 6: Configuring FiftyOne Enterprise Plugins](#step-6-configuring-plugins)
-- [Step 7: Configuring FiftyOne Enterprise Delegated Operators](#step-7-delegated-operators)
-- [Step 8: Configuring Authentication (CAS)](#configuring-auth)
+  - [1. Enable Database Admin mode](#1-enable-database-admin-mode)
+  - [2. Launch the application](#2-launch-the-application)
+- [Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#step-5-configure-ssl--reverse-proxy-nginx--load-balancer)
+  - [🧭 Routing Overview (Path-Based Proxy)](#%F0%9F%A7%AD-routing-overview-path-based-proxy)
+  - [📁 Nginx Configuration Options](#%F0%9F%93%81-nginx-configuration-options)
+    - [🔹 1. **Path-Based Routing**](#%F0%9F%94%B9-1-path-based-routing)
+    - [🔹 2. **Hostname-Based Routing**](#%F0%9F%94%B9-2-hostname-based-routing)
+  - [📄 Notes](#%F0%9F%93%84-notes)
+- [Step 6: Configuring FiftyOne Enterprise Plugins](#step-6-configuring-fiftyone-enterprise-plugins)
+  - [🔹 1. Builtin Plugins Only (Default)](#%F0%9F%94%B9-1-builtin-plugins-only-default)
+  - [🔹 2. Shared Plugins (Custom Plugins in `fiftyone-app`)](#%F0%9F%94%B9-2-shared-plugins-custom-plugins-in-fiftyone-app)
+    - [Enable shared plugin mode](#enable-shared-plugin-mode)
+  - [🔹 3. RECOMMENDED: Dedicated Plugins (Isolated `teams-plugins` Service)](#%F0%9F%94%B9-3-recommended-dedicated-plugins-isolated-teams-plugins-service)
+    - [Enable dedicated plugin mode](#enable-dedicated-plugin-mode)
+  - [📌 Notes](#%F0%9F%93%8C-notes)
+- [Step 7: Configuring FiftyOne Enterprise Delegated Operators](#step-7-configuring-fiftyone-enterprise-delegated-operators)
+  - [🔧 Enabling Delegated Operator Mode](#%F0%9F%94%A7-enabling-delegated-operator-mode)
+    - [Example: Enable on top of **Dedicated Plugins** mode](#example-enable-on-top-of-dedicated-plugins-mode)
+  - [📄 Optional: Upload Run Logs](#%F0%9F%93%84-optional-upload-run-logs)
+  - [🖥️ GPU-Enabled Workloads](#%F0%9F%96%A5%EF%B8%8F-gpu-enabled-workloads)
+  - [🧱 Custom Plugin Images](#%F0%9F%A7%B1-custom-plugin-images)
+- [Step 8: Configuring Authentication (CAS)](#step-8-configuring-authentication-cas)
+  - [🛠️ Optional: CAS Customization Instructions](#%F0%9F%9B%A0%EF%B8%8F-optional-cas-customization-instructions)
+  - [ℹ️ Notes](#%E2%84%B9%EF%B8%8F-notes)
 - [Upgrades](#upgrades)
+  - [🚫 Disable Automatic Migrations](#%F0%9F%9A%AB-disable-automatic-migrations)
+  - [🛠️ What Happens If You Migrate with database admin False?](#%F0%9F%9B%A0%EF%B8%8F-what-happens-if-you-migrate-with-database-admin-false)
+  - [📚 Next Steps](#%F0%9F%93%9A-next-steps)
 - [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
+  - [Snapshot Archival](#snapshot-archival)
+  - [Static Banner Configuration](#static-banner-configuration)
+  - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
 - [Environment Variables](#environment-variables)
 
 <!-- tocstop -->
+
+<!-- markdownlint-enable link-fragments -->
 
 ## Prerequisites
 
 - Docker and Docker Compose are installed
 - License file from Voxel51
 - Docker Hub credentials from Voxel51
-- MongoDB instance available. 
-  - FiftyOne Teams is compatible with MongoDB Community, Enterprise, or Atlas Editions.
-  - If using MongoDB Community or Enterprise we recommend a minimum of 4vCPU and 16GB of RAM. Large datasets and 
-  complex samples may require additional resources.
-  - If using Atlas we recommend starting on at least a M40 cluster tier - you can then use utilization metrics to 
-  make scaling decisions (up or down). Please note that we do not support MongoDB Atlas Serverless instances 
-  because we require Aggregations.
-
+- MongoDB instance available.
+  - FiftyOne Teams is compatible with MongoDB Community, Enterprise, or Atlas
+    Editions.
+  - If using MongoDB Community or Enterprise we recommend a minimum of 4vCPU and
+    16GB of RAM. Large datasets and complex samples may require additional
+    resources.
+  - If using Atlas we recommend starting on at least a M40 cluster tier - you
+    can then use utilization metrics to make scaling decisions (up or down).
+    Please note that we do not support MongoDB Atlas Serverless instances
+    because we require Aggregations.
 
 ## Step 1: Prepare License File
 
@@ -74,18 +111,18 @@ mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
 mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 ```
 
-> [!TIP]
-> When rotating the license, to ensure that the new license values are
-> picked up immediately, you may need to restart the `teams-cas` and
-> `teams-api` services.
+> [!TIP] When rotating the license, to ensure that the new license values are
+> picked up immediately, you may need to restart the `teams-cas` and `teams-api`
+> services.
 
 ## Step 2: Choose Authentication Mode
 
 FiftyOne Enterprise offers two authentication modes:
 
-- `legacy-auth` → Choose this mode if using Auth0 for user authentication and authorization.
-- `internal-auth` → Choose this mode when in an airgapped deployment - aigapped deployments 
-will not require network egress to external services.
+- `legacy-auth` → Choose this mode if using Auth0 for user authentication and
+  authorization.
+- `internal-auth` → Choose this mode when in an airgapped deployment - aigapped
+  deployments will not require network egress to external services.
 
 ### 👉 Choose your mode
 
@@ -97,9 +134,9 @@ cd legacy-auth       # or internal-auth
 
 ## Step 3: Configure Environment
 
-### 1. Copy the template `.env` file:
+### 1. Copy the template `.env` file
 
-```
+```bash
 cp env.template .env
 ```
 
@@ -108,33 +145,36 @@ cp env.template .env
 At minimum, configure:
 
 - `BASE_URL` / `AUTH0_BASE_URL` - Your WebApp URL
-- `FIFTYONE_API_URI` - Your API URL (can be the same as webApp URL if using path-based routing)
+- `FIFTYONE_API_URI` - Your API URL (can be the same as webApp URL if using
+  path-based routing)
 - `FIFTYONE_DATABASE_URI` – Your MongoDB connection URI
 - `FIFTYONE_ENCRYPTION_KEY` – Used to encrypt storage credentials
 
 > 🔑 To generate a key:
 
-```
+```bash
 from cryptography.fernet import Fernet
 print(Fernet.generate_key().decode())
 ```
 
 - `LOCAL_LICENSE_FILE_DIR` – Path where the license is mounted
 - `FIFTYONE_AUTH_SECRET` – Shared secret for CAS and App auth
-- Any other variables noted in the `.env.template` or listed in the [Environment Variables](#environment-variables) section
+- Any other variables noted in the `.env.template` or listed in the
+  [Environment Variables](#environment-variables) section
 
-### 3. Create a `compose.override.yaml` to override configuration.
+### 3. Create a `compose.override.yaml` to override configuration
 
-```
+```yaml
 services:
   fiftyone-app:
     environment:
-      FIFTYONE_DATABASE_ADMIN: true  # Only for first install
+      FIFTYONE_DATABASE_ADMIN: true # Only for first install
 ```
 
 ### 📦 Official Docker Images
 
-Voxel51 publishes the following private FiftyOne Enterprise images to Docker Hub:
+Voxel51 publishes the following private FiftyOne Enterprise images to Docker
+Hub:
 
 - `voxel51/fiftyone-app`
 - `voxel51/fiftyone-app-gpt`
@@ -144,11 +184,13 @@ Voxel51 publishes the following private FiftyOne Enterprise images to Docker Hub
 - `voxel51/fiftyone-teams-cas`
 - `voxel51/fiftyone-teams-cv-full` ← full CV/ML environment
 
-> 🔐 For access, contact your Voxel51 support team to obtain Docker Hub credentials.
+> 🔐 For access, contact your Voxel51 support team to obtain Docker Hub
+> credentials.
 
-You can override the default image used by any service in `compose.override.yaml`. For example:
+You can override the default image used by any service in
+`compose.override.yaml`. For example:
 
-```
+```yaml
 services:
   fiftyone-app:
     image: voxel51/fiftyone-app-torch:v2.10.0
@@ -160,7 +202,7 @@ services:
 
 In `compose.override.yaml`, make sure:
 
-```
+```yaml
 services:
   fiftyone-app:
     environment:
@@ -173,7 +215,7 @@ services:
 
 In the same directory:
 
-```
+```shell
 docker compose up -d
 ```
 
@@ -183,16 +225,15 @@ This will start the following containers:
 - `fiftyone-teams-api` (API) → default port `8000`
 - `fiftyone-teams-cas` (Auth) → default port `3030`
 
-
 You can ensure that all your containers are up and healthy through:
 
-```
+```shell
 docker compose ps
 ```
 
 For HTTP-based health checks, run the following `curl` commands:
 
-```
+```shell
 curl -Iv http://localhost:3030/cas/api
 # Expected: HTTP/1.1 200 OK
 
@@ -205,8 +246,8 @@ curl -Iv http://localhost:3000/api/hello
 
 ## Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
 
-Next, you will need to place a **reverse proxy or SSL endpoint** in front of your FiftyOne 
-Enterprise services. This can be a tool like:
+Next, you will need to place a **reverse proxy or SSL endpoint** in front of
+your FiftyOne Enterprise services. This can be a tool like:
 
 - **Nginx**
 - **HAProxy**
@@ -220,66 +261,74 @@ These proxies will:
 
 ### 🧭 Routing Overview (Path-Based Proxy)
 
-| Path              | Proxied To       | Description                          |
-|-------------------|------------------|--------------------------------------|
-| `/`               | `teams-app`      | Main web UI                          |
-| `/cas`            | `teams-cas`      | Central Authentication Service (CAS) |
-| `/graphql/v1`     | `teams-api`      | GraphQL API endpoint                 |
-| `/file`           | `teams-api`      | File import handling                 |
-| `/_pymongo`       | `teams-api`      | MongoDB requests via SDK             |
-| `/health`         | `teams-api`      | Health check endpoint                |
+| Path          | Proxied To  | Description                          |
+| ------------- | ----------- | ------------------------------------ |
+| `/`           | `teams-app` | Main web UI                          |
+| `/cas`        | `teams-cas` | Central Authentication Service (CAS) |
+| `/graphql/v1` | `teams-api` | GraphQL API endpoint                 |
+| `/file`       | `teams-api` | File import handling                 |
+| `/_pymongo`   | `teams-api` | MongoDB requests via SDK             |
+| `/health`     | `teams-api` | Health check endpoint                |
 
 ### 📁 Nginx Configuration Options
 
 Voxel51 provides example Nginx configs for two routing strategies:
 
 #### 🔹 1. **Path-Based Routing**
+
 All services are routed based on URL path:
 
-📄 Full configuration here: [`example-nginx-path-routing.conf`](./example-nginx-path-routing.conf)
+📄 Full configuration here:
+[`example-nginx-path-routing.conf`](./example-nginx-path-routing.conf)
 
 #### 🔹 2. **Hostname-Based Routing**
+
 teams-app and teams-api are routed using different subdomain or hostname:
 
 - `fiftyone.your-company.com` → App
 - `fiftyone-api.your-company.com` → API
 
 📄 Full configuration here:
+
 - [`example-nginx-site.conf`](./example-nginx-site.conf) (App + CAS)
 - [`example-nginx-api.conf`](./example-nginx-api.conf) (API)
 
+### 📄 Notes
 
-### 📌 Notes
-
-- FiftyOne Enterprise supports routing traffic through proxy servers. Please refer to the 
-[proxy configuration documentation](./docs/configuring-proxies.md) for information on how to configure proxies.
-- To validate your deployments api connection, see [Validating Your Deployment](../docs/validating-deployment.md)
-
+- FiftyOne Enterprise supports routing traffic through proxy servers. Please
+  refer to the
+  [proxy configuration documentation](./docs/configuring-proxies.md) for
+  information on how to configure proxies.
+- To validate your deployments api connection, see
+  [Validating Your Deployment](../docs/validating-deployment.md)
 
 ## Step 6: Configuring FiftyOne Enterprise Plugins
 
-FiftyOne Enterprise supports three plugin modes: **Builtin**, **Shared**, and **Dedicated**. Each offers different 
-trade-offs in isolation, flexibility, and resource management.
+FiftyOne Enterprise supports three plugin modes: **Builtin**, **Shared**, and
+**Dedicated**. Each offers different trade-offs in isolation, flexibility, and
+resource management.
 
 ### 🔹 1. Builtin Plugins Only (Default)
 
-This is the default configuration. It enables only the plugins shipped with the platform.
+This is the default configuration. It enables only the plugins shipped with the
+platform.
 
 ✅ No additional configuration needed.
 
 ### 🔹 2. Shared Plugins (Custom Plugins in `fiftyone-app`)
 
-Custom plugins are run **within the same container** as the app (`fiftyone-app`). Use this if:
+Custom plugins are run **within the same container** as the app
+(`fiftyone-app`). Use this if:
 
 - You want to quickly prototype plugins
 - You’re okay with shared resource usage between app and plugins
 
-#### Enable shared plugin mode:
+#### Enable shared plugin mode
 
 1. Use `compose.plugins.yaml` (instead of `compose.yaml`)
 2. This mounts a shared volume for plugins across services
 
-```
+```shell
 docker compose \
   -f compose.plugins.yaml \
   -f compose.override.yaml \
@@ -290,7 +339,8 @@ docker compose \
 
 ### 🔹 3. RECOMMENDED: Dedicated Plugins (Isolated `teams-plugins` Service)
 
-Custom plugins are run in a **separate `teams-plugins` container**, isolated from the app and API services.
+Custom plugins are run in a **separate `teams-plugins` container**, isolated
+from the app and API services.
 
 Use this mode when:
 
@@ -298,48 +348,52 @@ Use this mode when:
 - You are running many or complex plugins
 - You need to manage plugin memory or compute separately
 
-#### Enable dedicated plugin mode:
+#### Enable dedicated plugin mode
 
 1. Ensure your `.env` file includes the following:
 
-```
+```shell
 FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151
 ```
 
 2. Use `compose.dedicated-plugins.yaml` (instead of `compose.yaml`)
 
-```
+```shell
 docker compose \
   -f compose.dedicated-plugins.yaml \
   -f compose.override.yaml \
   up -d
 ```
 
-3. Optional: If using a [proxy server](./docs/configuring-proxies.md), ensure the plugin service is excluded from proxying.
+3. Optional: If using a [proxy server](./docs/configuring-proxies.md), ensure
+   the plugin service is excluded from proxying.
 
-> 🔧 This prevents traffic from being routed incorrectly through your proxy for internal plugin calls.
+> 🔧 This prevents traffic from being routed incorrectly through your proxy for
+> internal plugin calls.
 
 ### 📌 Notes
 
 - All plugin modes require persistent storage (volumes) for plugin files.
 - For multi-node deployments, ensure that the volume is available on all nodes.
-- To manage and deploy plugins via the UI, go to:  
+- To manage and deploy plugins via the UI, go to:
   `https://<your-domain>/settings/plugins`
 
 ## Step 7: Configuring FiftyOne Enterprise Delegated Operators
 
-Delegated Operators allow FiftyOne Enterprise to offload plugin execution to **worker containers**, enabling 
-scalable and reliable long-running operations.
+Delegated Operators allow FiftyOne Enterprise to offload plugin execution to
+**worker containers**, enabling scalable and reliable long-running operations.
 
-🧩 This feature is **compatible with all three plugin modes**: Builtin, Shared, and Dedicated.
+🧩 This feature is **compatible with all three plugin modes**: Builtin, Shared,
+and Dedicated.
 
 ### 🔧 Enabling Delegated Operator Mode
 
-To launch worker containers, include `compose.delegated-operators.yaml` alongside your existing plugin mode.
+To launch worker containers, include `compose.delegated-operators.yaml`
+alongside your existing plugin mode.
 
 #### Example: Enable on top of **Dedicated Plugins** mode
 
-```
+```shell
 docker compose \
   -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
@@ -347,46 +401,48 @@ docker compose \
   up -d
 ```
 
-> 📁 This will start a `teams-delegated-operator` service and attach it to the shared plugin volume.
+> 📁 This will start a `teams-delegated-operator` service and attach it to the
+> shared plugin volume.
 
 ### 📄 Optional: Upload Run Logs
 
 You can enable **log uploads** for delegated operation runs by setting:
 
-```
+```shell
 FIFTYONE_DELEGATED_OPERATION_LOG_PATH=/mnt/shared/logs
 ```
 
 Logs will be stored in the format:
 
-```
+```shell
 /mnt/shared/logs/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log
 ```
 
-This is useful for auditing, debugging, or monitoring delegated operator executions in shared storage or cloud buckets.
+This is useful for auditing, debugging, or monitoring delegated operator
+executions in shared storage or cloud buckets.
 
 ### 🖥️ GPU-Enabled Workloads
 
-FiftyOne services like Delegated Operators can be scheduled on **GPU-enabled hardware** for more efficient computation.
+FiftyOne services like Delegated Operators can be scheduled on **GPU-enabled
+hardware** for more efficient computation.
 
-To setup containers with GPU resources, see the  
+To setup containers with GPU resources, see the
 [configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
 
 ### 🧱 Custom Plugin Images
 
-If your delegated operators or plugins require **custom dependencies**, build and deploy **custom plugin images**. 
-You can base them on `voxel51/fiftyone-app`, and include:
+If your delegated operators or plugins require **custom dependencies**, build
+and deploy **custom plugin images**. You can base them on
+`voxel51/fiftyone-app`, and include:
 
 - Custom Python packages
 - ML libraries (e.g. PyTorch, OpenCV)
 - Internal SDKs or models
 
-
 ## Step 8: Configuring Authentication (CAS)
 
-
-FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in v1.6. This enables centralized 
-login, roles, and user management.
+FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in
+v1.6. This enables centralized login, roles, and user management.
 
 ### 🛠️ Optional: CAS Customization Instructions
 
@@ -399,21 +455,21 @@ login, roles, and user management.
    - `CAS_DEBUG`
    - `CAS_DEFAULT_USER_ROLE`
 1. Update `compose.override.yaml` with any needed `teams-cas` service changes.
-1. Use `docker compose` from within the `legacy-auth`/`internal-auth` directory to bring up services.
+1. Use `docker compose` from within the `legacy-auth`/`internal-auth` directory
+   to bring up services.
 1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
 
 ### ℹ️ Notes
 
-- [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication) 
-includes information on configuring CAS.
-- To set up authentication for internal-auth mode: Refer to the 
-[Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode).
-
+- [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
+  includes information on configuring CAS.
+- To set up authentication for internal-auth mode: Refer to the
+  [Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode).
 
 ## Upgrades
 
-When upgrading FiftyOne Enterprise, you must explicitly **prevent automatic database migrations** 
-to avoid breaking active SDK sessions or deployments.
+When upgrading FiftyOne Enterprise, you must explicitly **prevent automatic
+database migrations** to avoid breaking active SDK sessions or deployments.
 
 ### 🚫 Disable Automatic Migrations
 
@@ -426,13 +482,16 @@ services:
       FIFTYONE_DATABASE_ADMIN: false
 ```
 
-> This ensures that **no automatic migrations** will occur when the container starts.
+> This ensures that **no automatic migrations** will occur when the container
+> starts.
 
-The environment variable `FIFTYONE_DATABASE_ADMIN` acts as a safeguard to prevent the database from being modified automatically.
+The environment variable `FIFTYONE_DATABASE_ADMIN` acts as a safeguard to
+prevent the database from being modified automatically.
 
 ### 🛠️ What Happens If You Migrate with database admin False?
 
-If `FIFTYONE_DATABASE_ADMIN=false` is set, and a migration attempt is made via CLI:
+If `FIFTYONE_DATABASE_ADMIN=false` is set, and a migration attempt is made via
+CLI:
 
 ```shell
 $ fiftyone migrate --all
@@ -479,12 +538,11 @@ for complete guidance on upgrading from previous versions
 
 ## Known Issues
 
-For a list of common issues and their solutions, refer to the  
+For a list of common issues and their solutions, refer to the
 [📄 Known Issues documentation](./docs/known-issues.md).
 
-If you encounter a new issue, please open a ticket on the  
+If you encounter a new issue, please open a ticket on the
 [📬 GitHub Issues page](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
-
 
 ## Advanced Configuration
 
@@ -492,8 +550,8 @@ If you encounter a new issue, please open a ticket on the
 
 Since version v1.5, FiftyOne Enterprise supports
 [archiving snapshots](https://docs.voxel51.com/enterprise/dataset_versioning.html#snapshot-archival)
-to cold storage locations to prevent filling up the MongoDB database.
-Supported locations are network mounted filesystems and cloud storage folders.
+to cold storage locations to prevent filling up the MongoDB database. Supported
+locations are network mounted filesystems and cloud storage folders.
 
 Please refer to the
 [snapshot archival configuration documentation](./docs/configuring-snapshot-archival.md)
@@ -530,12 +588,11 @@ services:
 
 ### Terms of Service, Privacy, and Imprint URLs
 
-FiftyOne Enterprise v2.6 introduces the ability to override
-the Terms of Service, Privacy, and Imprint (optional) links
-if required in the App.
+FiftyOne Enterprise v2.6 introduces the ability to override the Terms of
+Service, Privacy, and Imprint (optional) links if required in the App.
 
-Configure the URLs by setting the following environment variables in
-your `compose.override.yaml`.
+Configure the URLs by setting the following environment variables in your
+`compose.override.yaml`.
 
 Terms of Service URL is configured with `FIFTYONE_APP_TERMS_URL`.
 
@@ -554,11 +611,10 @@ services:
       FIFTYONE_APP_IMPRINT_URL: https://abc.com/imprint
 ```
 
-
 ## Environment Variables
 
 | Variable                                     | Purpose                                                                                                                                                                                                                                                                        | Required                  |
-|----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- |
 | `API_BIND_ADDRESS`                           | The host address that `fiftyone-teams-api` should bind to; `127.0.0.1` is appropriate for this in most cases                                                                                                                                                                   | Yes                       |
 | `API_BIND_PORT`                              | The host port that `fiftyone-teams-api` should bind to; the default is `8000`                                                                                                                                                                                                  | Yes                       |
 | `API_LOGGING_LEVEL`                          | Logging Level for `teams-api` service                                                                                                                                                                                                                                          | Yes                       |
@@ -609,5 +665,3 @@ services:
 | `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
 
 <!-- Reference Links -->
-[internal-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#internal-mode
-[legacy-auth-mode]: https://docs.voxel51.com/teams/pluggable_auth.html#legacy-mode
