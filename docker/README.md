@@ -29,48 +29,46 @@ regarding FiftyOne Enterprise.
 
 ## Table of Contents
 
-<!-- markdownlint-disable link-fragments -->
-
 <!-- toc -->
 
-- [Prerequisites](#prerequisites)
-- [Step 1: Prepare License File](#step-1-prepare-license-file)
-- [Step 2: Choose Authentication Mode](#step-2-choose-authentication-mode)
-  - [👉 Choose your mode](#%F0%9F%91%89-choose-your-mode)
-- [Step 3: Configure Environment](#step-3-configure-environment)
+- [:white_check_mark: Prerequisites](#white_check_mark-prerequisites)
+- [:closed_lock_with_key: Step 1: Prepare License File](#closed_lock_with_key-step-1-prepare-license-file)
+- [:file_folder: Step 2: Choose Authentication Mode](#file_folder-step-2-choose-authentication-mode)
+  - [:point_right: Choose your mode](#point_right-choose-your-mode)
+- [:gear: Step 3: Configure Environment](#gear-step-3-configure-environment)
   - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
   - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
   - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
-  - [📦 Official Docker Images](#%F0%9F%93%A6-official-docker-images)
-- [Step 4: Initial Deployment](#step-4-initial-deployment)
+  - [:package: Official Docker Images](#package-official-docker-images)
+- [:rocket: Step 4: Initial Deployment](#rocket-step-4-initial-deployment)
   - [1. Enable Database Admin mode](#1-enable-database-admin-mode)
   - [2. Launch the application](#2-launch-the-application)
-- [Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#step-5-configure-ssl--reverse-proxy-nginx--load-balancer)
-  - [🧭 Routing Overview (Path-Based Proxy)](#%F0%9F%A7%AD-routing-overview-path-based-proxy)
-  - [📁 Nginx Configuration Options](#%F0%9F%93%81-nginx-configuration-options)
-    - [🔹 1. **Path-Based Routing**](#%F0%9F%94%B9-1-path-based-routing)
-    - [🔹 2. **Hostname-Based Routing**](#%F0%9F%94%B9-2-hostname-based-routing)
-  - [📄 Notes](#%F0%9F%93%84-notes)
-- [Step 6: Configuring FiftyOne Enterprise Plugins](#step-6-configuring-fiftyone-enterprise-plugins)
-  - [🔹 1. Builtin Plugins Only (Default)](#%F0%9F%94%B9-1-builtin-plugins-only-default)
-  - [🔹 2. Shared Plugins (Custom Plugins in `fiftyone-app`)](#%F0%9F%94%B9-2-shared-plugins-custom-plugins-in-fiftyone-app)
+- [:globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-5-configure-ssl--reverse-proxy-nginx--load-balancer)
+  - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
+  - [:open_file_folder: Nginx Configuration Options](#open_file_folder-nginx-configuration-options)
+    - [:small_blue_diamond: 1. **Path-Based Routing**](#small_blue_diamond-1-path-based-routing)
+    - [:small_blue_diamond: 2. **Hostname-Based Routing**](#small_blue_diamond-2-hostname-based-routing)
+  - [:page_facing_up: Notes](#page_facing_up-notes)
+- [:jigsaw: Step 6: Configuring FiftyOne Enterprise Plugins](#jigsaw-step-6-configuring-fiftyone-enterprise-plugins)
+  - [:small_blue_diamond: 1. Builtin Plugins Only (Default)](#small_blue_diamond-1-builtin-plugins-only-default)
+  - [:small_blue_diamond: 2. Shared Plugins](#small_blue_diamond-2-shared-plugins)
     - [Enable shared plugin mode](#enable-shared-plugin-mode)
-  - [🔹 3. RECOMMENDED: Dedicated Plugins (Isolated `teams-plugins` Service)](#%F0%9F%94%B9-3-recommended-dedicated-plugins-isolated-teams-plugins-service)
+  - [:small_blue_diamond: 3. RECOMMENDED: Dedicated Plugins](#small_blue_diamond-3-recommended-dedicated-plugins)
     - [Enable dedicated plugin mode](#enable-dedicated-plugin-mode)
-  - [📌 Notes](#%F0%9F%93%8C-notes)
-- [Step 7: Configuring FiftyOne Enterprise Delegated Operators](#step-7-configuring-fiftyone-enterprise-delegated-operators)
-  - [🔧 Enabling Delegated Operator Mode](#%F0%9F%94%A7-enabling-delegated-operator-mode)
+  - [:pushpin: Notes](#pushpin-notes)
+- [:gear: Step 7: Configuring FiftyOne Enterprise Delegated Operators](#gear-step-7-configuring-fiftyone-enterprise-delegated-operators)
+  - [:wrench: Enabling Delegated Operator Mode](#wrench-enabling-delegated-operator-mode)
     - [Example: Enable on top of **Dedicated Plugins** mode](#example-enable-on-top-of-dedicated-plugins-mode)
-  - [📄 Optional: Upload Run Logs](#%F0%9F%93%84-optional-upload-run-logs)
-  - [🖥️ GPU-Enabled Workloads](#%F0%9F%96%A5%EF%B8%8F-gpu-enabled-workloads)
-  - [🧱 Custom Plugin Images](#%F0%9F%A7%B1-custom-plugin-images)
+  - [:page_facing_up: Optional: Upload Run Logs](#page_facing_up-optional-upload-run-logs)
+  - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
+  - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
 - [Step 8: Configuring Authentication (CAS)](#step-8-configuring-authentication-cas)
-  - [🛠️ Optional: CAS Customization Instructions](#%F0%9F%9B%A0%EF%B8%8F-optional-cas-customization-instructions)
-  - [ℹ️ Notes](#%E2%84%B9%EF%B8%8F-notes)
+  - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
+  - [:information_source: Notes](#information_source-notes)
 - [Upgrades](#upgrades)
-  - [🚫 Disable Automatic Migrations](#%F0%9F%9A%AB-disable-automatic-migrations)
-  - [🛠️ What Happens If You Migrate with database admin False?](#%F0%9F%9B%A0%EF%B8%8F-what-happens-if-you-migrate-with-database-admin-false)
-  - [📚 Next Steps](#%F0%9F%93%9A-next-steps)
+  - [:no_entry_sign: Disable Automatic Migrations](#no_entry_sign-disable-automatic-migrations)
+  - [:hammer_and_wrench: What Happens If You Migrate with database admin False?](#hammer_and_wrench-what-happens-if-you-migrate-with-database-admin-false)
+  - [:books: Next Steps](#books-next-steps)
 - [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
   - [Snapshot Archival](#snapshot-archival)
@@ -80,9 +78,7 @@ regarding FiftyOne Enterprise.
 
 <!-- tocstop -->
 
-<!-- markdownlint-enable link-fragments -->
-
-## Prerequisites
+## :white_check_mark: Prerequisites
 
 - Docker and Docker Compose are installed
 - License file from Voxel51
@@ -98,7 +94,7 @@ regarding FiftyOne Enterprise.
     Please note that we do not support MongoDB Atlas Serverless instances
     because we require Aggregations.
 
-## Step 1: Prepare License File
+## :closed_lock_with_key: Step 1: Prepare License File
 
 > Required for **v2.0+**
 
@@ -115,7 +111,7 @@ mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
-## Step 2: Choose Authentication Mode
+## :file_folder: Step 2: Choose Authentication Mode
 
 FiftyOne Enterprise offers two authentication modes:
 
@@ -124,7 +120,7 @@ FiftyOne Enterprise offers two authentication modes:
 - `internal-auth` → Choose this mode when in an airgapped deployment - aigapped
   deployments will not require network egress to external services.
 
-### 👉 Choose your mode
+### :point_right: Choose your mode
 
 Navigate into the appropriate directory:
 
@@ -132,7 +128,7 @@ Navigate into the appropriate directory:
 cd legacy-auth       # or internal-auth
 ```
 
-## Step 3: Configure Environment
+## :gear: Step 3: Configure Environment
 
 ### 1. Copy the template `.env` file
 
@@ -150,7 +146,7 @@ At minimum, configure:
 - `FIFTYONE_DATABASE_URI` – Your MongoDB connection URI
 - `FIFTYONE_ENCRYPTION_KEY` – Used to encrypt storage credentials
 
-> 🔑 To generate a key:
+> :key: To generate a key:
 
 ```bash
 from cryptography.fernet import Fernet
@@ -171,7 +167,7 @@ services:
       FIFTYONE_DATABASE_ADMIN: true # Only for first install
 ```
 
-### 📦 Official Docker Images
+### :package: Official Docker Images
 
 Voxel51 publishes the following private FiftyOne Enterprise images to Docker
 Hub:
@@ -184,8 +180,8 @@ Hub:
 - `voxel51/fiftyone-teams-cas`
 - `voxel51/fiftyone-teams-cv-full` ← full CV/ML environment
 
-> 🔐 For access, contact your Voxel51 support team to obtain Docker Hub
-> credentials.
+> :closed_lock_with_key: For access, contact your Voxel51 support team to obtain
+> Docker Hub credentials.
 
 You can override the default image used by any service in
 `compose.override.yaml`. For example:
@@ -196,7 +192,7 @@ services:
     image: voxel51/fiftyone-app-torch:v2.10.0
 ```
 
-## Step 4: Initial Deployment
+## :rocket: Step 4: Initial Deployment
 
 ### 1. Enable Database Admin mode
 
@@ -244,7 +240,7 @@ curl -Iv http://localhost:3000/api/hello
 # Expected: HTTP/1.1 200 OK
 ```
 
-## Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
+## :globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
 
 Next, you will need to place a **reverse proxy or SSL endpoint** in front of
 your FiftyOne Enterprise services. This can be a tool like:
@@ -259,7 +255,7 @@ These proxies will:
 - Terminate HTTPS/SSL (if using TLS)
 - Optionally apply authentication headers, logging, or load balancing
 
-### 🧭 Routing Overview (Path-Based Proxy)
+### :compass: Routing Overview (Path-Based Proxy)
 
 | Path          | Proxied To  | Description                          |
 | ------------- | ----------- | ------------------------------------ |
@@ -270,30 +266,30 @@ These proxies will:
 | `/_pymongo`   | `teams-api` | MongoDB requests via SDK             |
 | `/health`     | `teams-api` | Health check endpoint                |
 
-### 📁 Nginx Configuration Options
+### :open_file_folder: Nginx Configuration Options
 
 Voxel51 provides example Nginx configs for two routing strategies:
 
-#### 🔹 1. **Path-Based Routing**
+#### :small_blue_diamond: 1. **Path-Based Routing**
 
 All services are routed based on URL path:
 
-📄 Full configuration here:
+:page_facing_up: Full configuration here:
 [`example-nginx-path-routing.conf`](./example-nginx-path-routing.conf)
 
-#### 🔹 2. **Hostname-Based Routing**
+#### :small_blue_diamond: 2. **Hostname-Based Routing**
 
 teams-app and teams-api are routed using different subdomain or hostname:
 
 - `fiftyone.your-company.com` → App
 - `fiftyone-api.your-company.com` → API
 
-📄 Full configuration here:
+:page_facing_up: Full configuration here:
 
 - [`example-nginx-site.conf`](./example-nginx-site.conf) (App + CAS)
 - [`example-nginx-api.conf`](./example-nginx-api.conf) (API)
 
-### 📄 Notes
+### :page_facing_up: Notes
 
 - FiftyOne Enterprise supports routing traffic through proxy servers. Please
   refer to the
@@ -302,20 +298,20 @@ teams-app and teams-api are routed using different subdomain or hostname:
 - To validate your deployments api connection, see
   [Validating Your Deployment](../docs/validating-deployment.md)
 
-## Step 6: Configuring FiftyOne Enterprise Plugins
+## :jigsaw: Step 6: Configuring FiftyOne Enterprise Plugins
 
 FiftyOne Enterprise supports three plugin modes: **Builtin**, **Shared**, and
 **Dedicated**. Each offers different trade-offs in isolation, flexibility, and
 resource management.
 
-### 🔹 1. Builtin Plugins Only (Default)
+### :small_blue_diamond: 1. Builtin Plugins Only (Default)
 
 This is the default configuration. It enables only the plugins shipped with the
 platform.
 
-✅ No additional configuration needed.
+:white_check_mark: No additional configuration needed.
 
-### 🔹 2. Shared Plugins (Custom Plugins in `fiftyone-app`)
+### :small_blue_diamond: 2. Shared Plugins
 
 Custom plugins are run **within the same container** as the app
 (`fiftyone-app`). Use this if:
@@ -337,7 +333,7 @@ docker compose \
 
 > 📁 Plugins will run inside the `fiftyone-app` container.
 
-### 🔹 3. RECOMMENDED: Dedicated Plugins (Isolated `teams-plugins` Service)
+### :small_blue_diamond: 3. RECOMMENDED: Dedicated Plugins
 
 Custom plugins are run in a **separate `teams-plugins` container**, isolated
 from the app and API services.
@@ -350,13 +346,13 @@ Use this mode when:
 
 #### Enable dedicated plugin mode
 
-1. Ensure your `.env` file includes the following:
+- Ensure your `.env` file includes the following:
 
 ```shell
 FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151
 ```
 
-2. Use `compose.dedicated-plugins.yaml` (instead of `compose.yaml`)
+- Use `compose.dedicated-plugins.yaml` (instead of `compose.yaml`)
 
 ```shell
 docker compose \
@@ -365,28 +361,28 @@ docker compose \
   up -d
 ```
 
-3. Optional: If using a [proxy server](./docs/configuring-proxies.md), ensure
-   the plugin service is excluded from proxying.
+- Optional: If using a [proxy server](./docs/configuring-proxies.md), ensure the
+  plugin service is excluded from proxying.
 
 > 🔧 This prevents traffic from being routed incorrectly through your proxy for
 > internal plugin calls.
 
-### 📌 Notes
+### :pushpin: Notes
 
 - All plugin modes require persistent storage (volumes) for plugin files.
 - For multi-node deployments, ensure that the volume is available on all nodes.
 - To manage and deploy plugins via the UI, go to:
   `https://<your-domain>/settings/plugins`
 
-## Step 7: Configuring FiftyOne Enterprise Delegated Operators
+## :gear: Step 7: Configuring FiftyOne Enterprise Delegated Operators
 
 Delegated Operators allow FiftyOne Enterprise to offload plugin execution to
 **worker containers**, enabling scalable and reliable long-running operations.
 
-🧩 This feature is **compatible with all three plugin modes**: Builtin, Shared,
-and Dedicated.
+:jigsaw: This feature is **compatible with all three plugin modes**: Builtin,
+Shared, and Dedicated.
 
-### 🔧 Enabling Delegated Operator Mode
+### :wrench: Enabling Delegated Operator Mode
 
 To launch worker containers, include `compose.delegated-operators.yaml`
 alongside your existing plugin mode.
@@ -401,10 +397,10 @@ docker compose \
   up -d
 ```
 
-> 📁 This will start a `teams-delegated-operator` service and attach it to the
-> shared plugin volume.
+> :open_file_folder: This will start a `teams-delegated-operator` service and
+> attach it to the shared plugin volume.
 
-### 📄 Optional: Upload Run Logs
+### :page_facing_up: Optional: Upload Run Logs
 
 You can enable **log uploads** for delegated operation runs by setting:
 
@@ -421,7 +417,7 @@ Logs will be stored in the format:
 This is useful for auditing, debugging, or monitoring delegated operator
 executions in shared storage or cloud buckets.
 
-### 🖥️ GPU-Enabled Workloads
+### :desktop_computer: GPU-Enabled Workloads
 
 FiftyOne services like Delegated Operators can be scheduled on **GPU-enabled
 hardware** for more efficient computation.
@@ -429,7 +425,7 @@ hardware** for more efficient computation.
 To setup containers with GPU resources, see the
 [configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
 
-### 🧱 Custom Plugin Images
+### :bricks: Custom Plugin Images
 
 If your delegated operators or plugins require **custom dependencies**, build
 and deploy **custom plugin images**. You can base them on
@@ -444,7 +440,7 @@ and deploy **custom plugin images**. You can base them on
 FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in
 v1.6. This enables centralized login, roles, and user management.
 
-### 🛠️ Optional: CAS Customization Instructions
+### :hammer_and_wrench: Optional: CAS Customization Instructions
 
 1. Update required CAS variables in `.env`:
    - `FIFTYONE_AUTH_SECRET`
@@ -459,7 +455,7 @@ v1.6. This enables centralized login, roles, and user management.
    to bring up services.
 1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
 
-### ℹ️ Notes
+### :information_source: Notes
 
 - [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
   includes information on configuring CAS.
@@ -471,7 +467,7 @@ v1.6. This enables centralized login, roles, and user management.
 When upgrading FiftyOne Enterprise, you must explicitly **prevent automatic
 database migrations** to avoid breaking active SDK sessions or deployments.
 
-### 🚫 Disable Automatic Migrations
+### :no_entry_sign: Disable Automatic Migrations
 
 Before running your upgraded containers, set the following override:
 
@@ -488,7 +484,7 @@ services:
 The environment variable `FIFTYONE_DATABASE_ADMIN` acts as a safeguard to
 prevent the database from being modified automatically.
 
-### 🛠️ What Happens If You Migrate with database admin False?
+### :hammer_and_wrench: What Happens If You Migrate with database admin False?
 
 If `FIFTYONE_DATABASE_ADMIN=false` is set, and a migration attempt is made via
 CLI:
@@ -528,7 +524,7 @@ dataset     version
 quickstart  0.21.2
 ```
 
-### 📚 Next Steps
+### :books: Next Steps
 
 After disabling `FIFTYONE_DATABASE_ADMIN`, refer to:
 
@@ -539,10 +535,10 @@ for complete guidance on upgrading from previous versions
 ## Known Issues
 
 For a list of common issues and their solutions, refer to the
-[📄 Known Issues documentation](./docs/known-issues.md).
+[:page_facing_up: Known Issues documentation](./docs/known-issues.md).
 
 If you encounter a new issue, please open a ticket on the
-[📬 GitHub Issues page](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
+[:mailbox_with_mail: GitHub Issues page](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
 
 ## Advanced Configuration
 
