@@ -397,9 +397,9 @@ login, roles, and user management.
    - `CAS_DATABASE_NAME` (⚠️ Must be unique per deployment)
    - `CAS_DEBUG`
    - `CAS_DEFAULT_USER_ROLE`
-2. Update `compose.override.yaml` with any needed `teams-cas` service changes.
-3. Use `docker compose` from within the `legacy-auth`/`internal-auth` directory to bring up services.
-4. Ensure your proxy (e.g., Nginx) forwards `/cas` to the CAS service port.
+1. Update `compose.override.yaml` with any needed `teams-cas` service changes.
+1. Use `docker compose` from within the `legacy-auth`/`internal-auth` directory to bring up services.
+1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
 
 ### ℹ️ Notes
 
