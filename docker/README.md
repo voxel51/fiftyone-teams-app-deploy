@@ -125,6 +125,7 @@ FiftyOne Enterprise offers two authentication modes:
   deployments will not require network egress to external services.
 
 <a id="👉-choose-your-mode">
+
 ### 👉 Choose your mode
 
 Navigate into the appropriate directory:
