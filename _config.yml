@@ -1,0 +1,7 @@
+description: Documentation for FiftyOne Enterprise Kubernetes Deployments
+markdown: kramdown
+plugins:
+  - jemoji
+  - jekyll-remote-theme
+remote_theme: pages-themes/primer@v0.6.0
+title: FiftyOne Enterprise Helm Chart Documentation
