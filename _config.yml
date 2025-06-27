@@ -1,5 +1,6 @@
-theme: minima
-title: FiftyOne Enterprise Helm Chart Documentation
 description: Documentation for FiftyOne Enterprise Kubernetes Deployments
+markdown: kramdown
 plugins:
   - jemoji
+theme: minima
+title: FiftyOne Enterprise Helm Chart Documentation

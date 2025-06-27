@@ -303,7 +303,6 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  gemoji
   github-pages (~> 232)
   jemoji
 
