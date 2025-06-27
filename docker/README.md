@@ -307,6 +307,11 @@ FiftyOne Enterprise supports three plugin modes: **Builtin**, **Shared**, and
 **Dedicated**. Each offers different trade-offs in isolation, flexibility, and
 resource management.
 
+> :warning: To run core FiftyOne methods like computing embeddings, you will
+> need to update your plugin image to contain torch. You can use one of the
+> images we publish like `voxel51/fiftyone-app-torch` or
+> `voxel51/fiftyone-teams-cv-full`.
+
 ### :small_blue_diamond: 1. Builtin Plugins Only (Default)
 
 This is the default configuration. It enables only the plugins shipped with the

@@ -36,7 +36,7 @@ connection.
 
 ## Delegated Operators: Troubleshooting
 
-### 🧠 Handling `DataLoader worker exited unexpectedly` Errors
+### :brain: Handling `DataLoader worker exited unexpectedly` Errors
 
 This error often occurs when using Torch-based models that rely on
 `torch.multiprocessing`, which utilizes **shared memory (`/dev/shm`)** to
@@ -56,7 +56,7 @@ This can happen in:
 
 ---
 
-### 🛠️ Solution: Increase Shared Memory Allocation
+### :hammer_and_wrench: Solution: Increase Shared Memory Allocation
 
 To resolve this, increase the shared memory (`shm_size`) available to the
 affected service.
@@ -72,18 +72,33 @@ services:
     shm_size: "512m"
 ```
 
-> 🔁 You can adjust the value based on your workload (e.g., `'1g'` for larger
-> models).
+> :repeat: You can adjust the value based on your workload (e.g., `'1g'` for
+> larger models).
 
 If you’re using shared plugins (i.e., plugins running inside `fiftyone-app`),
 you may need to apply the same `shm_size` setting to that service instead.
 
 ---
 
-### 🔎 Tip
+### :mag_right: Tip
 
 To verify shared memory usage and limits inside a container, run:
 
 ```bash
 docker exec -it <container_name> df -h /dev/shm
 ```
+
+### :brain: Handling `torch not found` Errors
+
+When trying to run any torch model like `clip-vit-base32-torch` in your
+`teams-plugin` or `teams-do` containers, you need to ensure that `torch` is
+installed on your system. Otherwise you might see errors like -
+
+```shell
+The requested operation requires that 'torch' is installed on your machine.
+```
+
+### :hammer_and_wrench: Solution: Update the docker image used in your containers
+
+To address this issue you can use one of the images we publish that contains
+torch like `voxel51/fiftyone-app-torch` or `voxel51/fiftyone-teams-cv-full`.
