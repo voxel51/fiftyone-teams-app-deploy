@@ -83,20 +83,3 @@ To verify shared memory usage and limits inside a container, run:
 ```bash
 docker exec -it <container_name> df -h /dev/shm
 ```
-
----
-
-### :brain: Handling `torch not found` Errors
-
-When trying to run any torch model like `clip-vit-base32-torch` in your
-`teams-plugin` or `teams-do` containers, you need to ensure that `torch` is
-installed on your system. Otherwise you might see errors like -
-
-```shell
-The requested operation requires that 'torch' is installed on your machine.
-```
-
-### :hammer_and_wrench: Solution: Update the docker image used in your containers
-
-To address this issue you can use one of the images we publish that contains
-torch like `voxel51/fiftyone-app-torch` or `voxel51/fiftyone-teams-cv-full`.
