@@ -48,7 +48,7 @@ regarding FiftyOne Enterprise.
   - [:open_file_folder: Nginx Configuration Options](#open_file_folder-nginx-configuration-options)
     - [:small_blue_diamond: 1. **Path-Based Routing**](#small_blue_diamond-1-path-based-routing)
     - [:small_blue_diamond: 2. **Hostname-Based Routing**](#small_blue_diamond-2-hostname-based-routing)
-  - [:page_facing_up: Notes](#page_facing_up-notes)
+  - [:memo: Notes](#memo-notes)
 - [:jigsaw: Step 6: Configuring FiftyOne Enterprise Plugins](#jigsaw-step-6-configuring-fiftyone-enterprise-plugins)
   - [:small_blue_diamond: 1. Builtin Plugins Only (Default)](#small_blue_diamond-1-builtin-plugins-only-default)
   - [:small_blue_diamond: 2. Shared Plugins](#small_blue_diamond-2-shared-plugins)
@@ -292,7 +292,7 @@ teams-app and teams-api are routed using different subdomain or hostname:
 - [`example-nginx-site.conf`](./example-nginx-site.conf) (App + CAS)
 - [`example-nginx-api.conf`](./example-nginx-api.conf) (API)
 
-### :page_facing_up: Notes
+### :memo: Notes
 
 - FiftyOne Enterprise supports routing traffic through proxy servers. Please
   refer to the
