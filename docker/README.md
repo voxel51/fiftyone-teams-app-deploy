@@ -93,6 +93,9 @@ regarding FiftyOne Enterprise.
     can then use utilization metrics to make scaling decisions (up or down).
     Please note that we do not support MongoDB Atlas Serverless instances
     because we require Aggregations.
+- For resource requirements on a VM that will be hosting your docker deployment,
+  we recommend starting with 8vCPU/32GB RAM, monitoring usage and scaling
+  accordingly.
 
 ## :closed_lock_with_key: Step 1: Prepare License File
 
