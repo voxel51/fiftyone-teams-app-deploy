@@ -54,8 +54,6 @@ This can happen in:
 - The **plugin container** (e.g., `teams-plugins`)
 - The **delegated operator container** (e.g., `teams-do`)
 
----
-
 ### :hammer_and_wrench: Solution: Increase Shared Memory Allocation
 
 To resolve this, increase the shared memory (`shm_size`) available to the
@@ -78,8 +76,6 @@ services:
 If you’re using shared plugins (i.e., plugins running inside `fiftyone-app`),
 you may need to apply the same `shm_size` setting to that service instead.
 
----
-
 ### :mag_right: Tip
 
 To verify shared memory usage and limits inside a container, run:
@@ -87,6 +83,8 @@ To verify shared memory usage and limits inside a container, run:
 ```bash
 docker exec -it <container_name> df -h /dev/shm
 ```
+
+---
 
 ### :brain: Handling `torch not found` Errors
 
