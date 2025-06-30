@@ -178,7 +178,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			"teams-plugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app:v2.10.0",
+			"voxel51/fiftyone-app-torch:v2.10.0",
 		},
 		{
 			"delegatedOperationsTeamsDo",
