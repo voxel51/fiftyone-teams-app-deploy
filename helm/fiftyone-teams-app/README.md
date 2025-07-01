@@ -474,7 +474,7 @@ follow
 |-----|------|---------|-------------|
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
 | apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
-| apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. |
+| apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api` to generate the `EXTERNAL_API_URL` environment variable for configuring external orchestrators. |
 | apiSettings.env.FIFTYONE_ENV | string | `"production"` | Controls FiftyOne GraphQL verbosity. When "production", debug mode is disabled and the default logging level is "INFO". When "development", debug mode is enabled and the default logging level is "DEBUG". Can be overridden by setting `apiSettings.env.LOGGING_LEVEL`. |
 | apiSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | apiSettings.env.GRAPHQL_DEFAULT_LIMIT | int | `10` | Default number of returned items when listing in GraphQL queries. Can be overridden in the request. |

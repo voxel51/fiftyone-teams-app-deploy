@@ -438,6 +438,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "http://teams-cas:80/cas/api"
           },
           {
+            "name": "EXTERNAL_API_URL",
+            "value": ""
+          },
+          {
             "name": "FIFTYONE_AUTH_SECRET",
             "valueFrom": {
               "secretKeyRef": {
@@ -517,6 +521,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "CAS_BASE_URL",
             "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "EXTERNAL_API_URL",
+            "value": ""
           },
           {
             "name": "FIFTYONE_AUTH_SECRET",
@@ -614,6 +622,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "http://teams-cas:80/cas/api"
           },
           {
+            "name": "EXTERNAL_API_URL",
+            "value": ""
+          },
+          {
             "name": "FIFTYONE_AUTH_SECRET",
             "valueFrom": {
               "secretKeyRef": {
@@ -706,6 +718,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "http://teams-cas:80/cas/api"
           },
           {
+          "name": "EXTERNAL_API_URL",
+          "value": ""
+          },
+          {
             "name": "FIFTYONE_AUTH_SECRET",
             "valueFrom": {
               "secretKeyRef": {
@@ -784,6 +800,94 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "CAS_BASE_URL",
             "value": "http://teams-cas-override:8000/cas/api"
+          },
+          {
+            "name": "EXTERNAL_API_URL",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_AUTH_SECRET",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneAuthSecret"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "MONGO_DEFAULT_DB",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENV",
+            "value": "production"
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+          {
+            "name": "GRAPHQL_DEFAULT_LIMIT",
+            "value": "10"
+          },
+          {
+            "name": "LOGGING_LEVEL",
+            "value": "INFO"
+          }
+        ]`
+				var expectedEnvVars []corev1.EnvVar
+				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+				s.NoError(err)
+				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+			},
+		},
+		{
+			"overrideExternalApiUrl",
+			map[string]string{
+				"apiSettings.dnsName":      "external-api-url:443",
+				"teamsAppSettings.dnsName": "external-app-url:443",
+			},
+			func(envVars []corev1.EnvVar) {
+				expectedEnvVarJSON := `[
+          {
+            "name": "CAS_BASE_URL",
+            "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "EXTERNAL_API_URL",
+            "value": "https://external-api-url:443"
           },
           {
             "name": "FIFTYONE_AUTH_SECRET",
