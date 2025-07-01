@@ -337,9 +337,7 @@ Create a merged list of environment variables for fiftyone-teams-api
 */}}
 {{- define "fiftyone-teams-api.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
-- name: CAS_BASE_URL
-  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name (float64 .Values.casSettings.service.port) | quote }}
-- name: EXTERNAL_API_URL
+- name: API_EXTERNAL_URL
 {{- if .Values.apiSettings.dnsName }}
   value: {{ printf "https://%s" .Values.apiSettings.dnsName | quote}}
 {{- else if .Values.teamsAppSettings.dnsName }}
@@ -347,6 +345,8 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- else }}
   value: ""
 {{- end }}
+- name: CAS_BASE_URL
+  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name (float64 .Values.casSettings.service.port) | quote }}
 - name: FIFTYONE_AUTH_SECRET
   valueFrom:
     secretKeyRef:
