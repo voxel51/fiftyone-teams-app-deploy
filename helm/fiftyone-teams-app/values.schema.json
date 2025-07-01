@@ -1,0 +1,3584 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "apiSettings": {
+      "description": "yaml-language-server: $schema=values.schema.json\nFiftyOne Enterprise API (`teams-api`)",
+      "properties": {
+        "affinity": {
+          "description": "Affinity and anti-affinity for `teams-api`. [Reference][affinity].",
+          "required": [],
+          "title": "affinity",
+          "type": "object"
+        },
+        "deploymentAnnotations": {
+          "description": "Annotations for the `teams-api` deployment. [Reference][annotations].",
+          "required": [],
+          "title": "deploymentAnnotations",
+          "type": "object"
+        },
+        "dnsName": {
+          "default": "",
+          "description": "Controls whether `teams-api` is added to the chart's ingress.\nWhen an empty string, a rule for `teams-api` is not added to the chart managed ingress.\nWhen not an empty string, becomes the value to the `host` in the ingress' rule and\nset `ingress.api` too.",
+          "required": [],
+          "title": "dnsName",
+          "type": "string"
+        },
+        "env": {
+          "description": "Environment Variables are passed to the `teams-api` containers",
+          "properties": {
+            "FIFTYONE_ENV": {
+              "default": "production",
+              "description": "Controls FiftyOne GraphQL verbosity.\nWhen \"production\", debug mode is disabled and the default logging level is \"INFO\".\nWhen \"development\", debug mode is enabled and the default logging level is \"DEBUG\".\nCan be overridden by setting `apiSettings.env.LOGGING_LEVEL`.",
+              "required": [],
+              "title": "FIFTYONE_ENV",
+              "type": "string"
+            },
+            "FIFTYONE_INTERNAL_SERVICE": {
+              "default": true,
+              "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
+              "required": [],
+              "title": "FIFTYONE_INTERNAL_SERVICE",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "GRAPHQL_DEFAULT_LIMIT": {
+              "default": 10,
+              "description": "Default number of returned items when listing in GraphQL queries.\nCan be overridden in the request.",
+              "required": [],
+              "title": "GRAPHQL_DEFAULT_LIMIT",
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "LOGGING_LEVEL": {
+              "default": "INFO",
+              "description": "Logging level. Overrides the value of `FIFTYONE_ENV`.\nCan be one of \"DEBUG\", \"INFO\", \"WARN\", \"ERROR\", or \"CRITICAL\".",
+              "required": [],
+              "title": "LOGGING_LEVEL",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "env",
+          "type": "object"
+        },
+        "image": {
+          "properties": {
+            "pullPolicy": {
+              "default": "Always",
+              "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
+              "required": [],
+              "title": "pullPolicy"
+            },
+            "repository": {
+              "default": "voxel51/fiftyone-teams-api",
+              "description": "Container image for the `teams-api`.",
+              "required": [],
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "",
+              "description": "Image tag for `teams-api`. Defaults to the chart version.",
+              "required": [],
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "initContainers": {
+          "properties": {
+            "containerSecurityContext": {
+              "description": "Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context].",
+              "properties": {
+                "allowPrivilegeEscalation": {
+                  "default": false,
+                  "required": [],
+                  "title": "allowPrivilegeEscalation",
+                  "type": "boolean"
+                },
+                "capabilities": {
+                  "properties": {
+                    "drop": {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "required": [],
+                            "type": "string"
+                          }
+                        ],
+                        "required": []
+                      },
+                      "required": [],
+                      "title": "drop",
+                      "type": "array"
+                    }
+                  },
+                  "required": [],
+                  "title": "capabilities",
+                  "type": "object"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "required": [],
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 1000,
+                  "required": [],
+                  "title": "runAsUser",
+                  "type": [
+                    "string",
+                    "integer"
+                  ]
+                }
+              },
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Whether to enable init containers for `teams-api`. [Reference][init-containers].",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "image": {
+              "properties": {
+                "repository": {
+                  "default": "docker.io/busybox",
+                  "description": "Init container images repositories for `teams-api`. [Reference][init-containers].",
+                  "required": [],
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "stable-glibc",
+                  "description": "Init container images tags for `teams-api`. [Reference][init-containers].",
+                  "required": [],
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "image",
+              "type": "object"
+            },
+            "resources": {
+              "description": "Container resource requests and limits for the `teams-api` `initContainers`. [Reference][resources].",
+              "properties": {
+                "limits": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "limits",
+                  "type": "object"
+                },
+                "requests": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "requests",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "initContainers",
+          "type": "object"
+        },
+        "labels": {
+          "description": "Additional labels for the `teams-api` related objects. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "liveness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the liveness probe for the `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the liveness probe for `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Number of seconds after which the liveness probe times out for the `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "liveness",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "description": "nodeSelector for `teams-api`. [Reference][node-selector].",
+          "required": [],
+          "title": "nodeSelector",
+          "type": "object"
+        },
+        "podAnnotations": {
+          "description": "Annotations for pods for `teams-api`. [Reference][annotations].",
+          "required": [],
+          "title": "podAnnotations",
+          "type": "object"
+        },
+        "podDisruptionBudget": {
+          "description": "Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget].",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Whether a pod disruption budget is enabled for `teams-api`.",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "minAvailable": {
+              "default": "",
+              "description": "Sets the minimum available or maximum unavailable replicas for the deployment object.\nEither integers or percentages supported.\n`maxUnavailable` is also supported, however, only one setting can be used at a time.\nIf both are set, `minAvailable` will be preferred.",
+              "required": [],
+              "title": "minAvailable",
+              "type": [
+                "integer",
+                "string",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [],
+          "title": "podDisruptionBudget",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "description": "Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].",
+          "required": [],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "readiness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the readiness probe for the `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "readiness",
+          "type": "object"
+        },
+        "replicaCount": {
+          "default": 1,
+          "description": "Number of pods in the `teams-api` deployment's ReplicaSet.\nWhen \u003e 1, you must also configure volumes, volumeMounts and set\n`apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`.\nFor more information see [the documentation][configure-ha-teams-api].",
+          "minimum": 1,
+          "required": [],
+          "title": "replicaCount",
+          "type": "integer"
+        },
+        "resources": {
+          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-api`. [Reference][resources].",
+          "properties": {
+            "limits": {
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "description": "  cpu: 2\n  memory: 6Gi",
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "secretEnv": {
+          "description": "Secret variables to be passed to the `teams-api` containers.",
+          "required": [],
+          "title": "secretEnv",
+          "type": "object"
+        },
+        "securityContext": {
+          "description": "TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`\nContainer security configuration for `teams-api`. [Reference][container-security-context].",
+          "required": [],
+          "title": "securityContext",
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "annotations": {
+              "description": "Service annotations for `teams-api`. [Reference][annotations].",
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "containerPort": {
+              "default": 8000,
+              "description": "Service container port for `teams-api`.",
+              "required": [],
+              "title": "containerPort",
+              "type": "integer"
+            },
+            "name": {
+              "default": "teams-api",
+              "description": "Service name.",
+              "required": [],
+              "title": "name",
+              "type": "string"
+            },
+            "nodePort": {
+              "default": "",
+              "description": "(int) Service nodePort set only when `apiSettings.service.type: NodePort` for `teams-api`.",
+              "required": [],
+              "title": "nodePort",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "port": {
+              "default": 80,
+              "description": "Service port for `teams-api`.",
+              "required": [],
+              "title": "port",
+              "type": "integer"
+            },
+            "shortname": {
+              "default": "teams-api",
+              "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `teams-api`. [Reference][ports].",
+              "required": [],
+              "title": "shortname",
+              "type": "string"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "description": "Service type for `teams-api`. [Reference][service-type].",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "service",
+          "type": "object"
+        },
+        "startup": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the startup probe for the `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 30,
+              "description": "How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Number of seconds after which the startup probe times out for the `teams-api`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "startup",
+          "type": "object"
+        },
+        "tolerations": {
+          "description": "Allow the k8s scheduler to schedule pods with matching taints for `teams-api`. [Reference][taints-and-tolerations].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "tolerations",
+          "type": "array"
+        },
+        "topologySpreadConstraints": {
+          "description": "Control how pods are spread across your distributed footprint.\nLabel selectors will be defaulted to those of the `teams-api` deployment. [Reference][topology-spread-constraints].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "topologySpreadConstraints",
+          "type": "array"
+        },
+        "updateStrategy": {
+          "description": "Control how `teams-api` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+          "properties": {
+            "type": {
+              "default": "RollingUpdate",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "updateStrategy",
+          "type": "object"
+        },
+        "volumeMounts": {
+          "description": "Volume mounts for `teams-api`. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumeMounts",
+          "type": "array"
+        },
+        "volumes": {
+          "description": "Volumes for `teams-api`. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumes",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "apiSettings",
+      "type": "object"
+    },
+    "appSettings": {
+      "description": "FiftyOne App (`fiftyone-app`) configurations",
+      "properties": {
+        "affinity": {
+          "description": "Affinity and anti-affinity for `fiftyone-app`. [Reference][affinity].",
+          "required": [],
+          "title": "affinity",
+          "type": "object"
+        },
+        "autoscaling": {
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Controls horizontal pod autoscaling for `fiftyone-app`. [Reference][autoscaling].",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "maxReplicas": {
+              "default": 20,
+              "description": "Maximum replicas for horizontal pod autoscaling for `fiftyone-app`.",
+              "required": [],
+              "title": "maxReplicas",
+              "type": "integer"
+            },
+            "minReplicas": {
+              "default": 2,
+              "description": "Minimum Replicas for horizontal pod autoscaling for `fiftyone-app`.",
+              "required": [],
+              "title": "minReplicas",
+              "type": "integer"
+            },
+            "targetCPUUtilizationPercentage": {
+              "default": 80,
+              "description": "Percent CPU utilization for autoscaling for `fiftyone-app`.",
+              "required": [],
+              "title": "targetCPUUtilizationPercentage",
+              "type": "integer"
+            },
+            "targetMemoryUtilizationPercentage": {
+              "default": 80,
+              "description": "Percent memory utilization for autoscaling for `fiftyone-app`.",
+              "required": [],
+              "title": "targetMemoryUtilizationPercentage",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "autoscaling",
+          "type": "object"
+        },
+        "deploymentAnnotations": {
+          "description": "Annotations for the `fiftyone-app` deployment. [Reference][annotations].",
+          "required": [],
+          "title": "deploymentAnnotations",
+          "type": "object"
+        },
+        "env": {
+          "description": "Environment Variables are passed to the `fiftyone-app` containers",
+          "properties": {
+            "FIFTYONE_DATABASE_ADMIN": {
+              "default": false,
+              "description": "Controls whether the client is allowed to trigger database migrations.\n[Reference][fiftyone-config].",
+              "required": [],
+              "title": "FIFTYONE_DATABASE_ADMIN",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_INTERNAL_SERVICE": {
+              "default": true,
+              "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
+              "required": [],
+              "title": "FIFTYONE_INTERNAL_SERVICE",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_MEDIA_CACHE_APP_IMAGES": {
+              "default": false,
+              "description": "Controls whether cloud media images will be downloaded and added to\nthe local cache upon viewing media in the app.",
+              "required": [],
+              "title": "FIFTYONE_MEDIA_CACHE_APP_IMAGES",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
+              "default": -1,
+              "description": "Set the media cache size (in bytes) for the local FiftyOne App processes.\nWhen not set, the app's default value is 32 GiB.\n`-1` disables the media cache garbage collection (and cache size is unlimited).",
+              "required": [],
+              "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "FIFTYONE_SIGNED_URL_EXPIRATION": {
+              "default": 24,
+              "description": "Set the time-to-live for signed URLs generated by the application in hours",
+              "required": [],
+              "title": "FIFTYONE_SIGNED_URL_EXPIRATION",
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "required": [],
+          "title": "env",
+          "type": "object"
+        },
+        "image": {
+          "properties": {
+            "pullPolicy": {
+              "default": "Always",
+              "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
+              "required": [],
+              "title": "pullPolicy"
+            },
+            "repository": {
+              "default": "voxel51/fiftyone-app",
+              "description": "Container image for `fiftyone-app`.",
+              "required": [],
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "",
+              "description": "Image tag for `fiftyone-app`. Defaults to the chart version.",
+              "required": [],
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "initContainers": {
+          "properties": {
+            "containerSecurityContext": {
+              "description": "Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context].",
+              "properties": {
+                "allowPrivilegeEscalation": {
+                  "default": false,
+                  "required": [],
+                  "title": "allowPrivilegeEscalation",
+                  "type": "boolean"
+                },
+                "capabilities": {
+                  "properties": {
+                    "drop": {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "required": [],
+                            "type": "string"
+                          }
+                        ],
+                        "required": []
+                      },
+                      "required": [],
+                      "title": "drop",
+                      "type": "array"
+                    }
+                  },
+                  "required": [],
+                  "title": "capabilities",
+                  "type": "object"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "required": [],
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 1000,
+                  "required": [],
+                  "title": "runAsUser",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Whether to enable init containers for `fiftyone-app`. [Reference][init-containers].",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "image": {
+              "properties": {
+                "repository": {
+                  "default": "docker.io/busybox",
+                  "description": "Init container images repositories for `fiftyone-app`. [Reference][init-containers].",
+                  "required": [],
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "stable-glibc",
+                  "description": "Init container images tags for `fiftyone-app`. [Reference][init-containers].",
+                  "required": [],
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "image",
+              "type": "object"
+            },
+            "resources": {
+              "description": "Container resource requests and limits for the `fiftyone-app` `initContainers`. [Reference][resources].",
+              "properties": {
+                "limits": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "limits",
+                  "type": "object"
+                },
+                "requests": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "requests",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "initContainers",
+          "type": "object"
+        },
+        "labels": {
+          "description": "Additional labels for the `fiftyone-app` related objects. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "liveness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the liveness probe for `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "liveness",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "description": "nodeSelector for `fiftyone-app`. [Reference][node-selector].",
+          "required": [],
+          "title": "nodeSelector",
+          "type": "object"
+        },
+        "podAnnotations": {
+          "description": "Annotations for pods for `fiftyone-app`. [Reference][annotations].",
+          "required": [],
+          "title": "podAnnotations",
+          "type": "object"
+        },
+        "podDisruptionBudget": {
+          "description": "Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget].",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Whether a pod disruption budget is enabled for `fiftyone-app`.",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "minAvailable": {
+              "default": "",
+              "description": "Sets the minimum available or maximum unavailable replicas for the deployment object.\nEither integers or percentages supported.\n`maxUnavailable` is also supported, however, only one setting can be used at a time.\nIf both are set, `minAvailable` will be preferred.",
+              "required": [],
+              "title": "minAvailable",
+              "type": [
+                "integer",
+                "string",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [],
+          "title": "podDisruptionBudget",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "description": "Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].",
+          "required": [],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "readiness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the readiness probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the readiness probe for `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "readiness",
+          "type": "object"
+        },
+        "replicaCount": {
+          "default": 2,
+          "description": "Number of pods in the `fiftyone-app` deployment's ReplicaSet.\nIgnored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].",
+          "minimum": 1,
+          "required": [],
+          "title": "replicaCount",
+          "type": "integer"
+        },
+        "resources": {
+          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `fiftyone-app`. [Reference][resources].",
+          "properties": {
+            "limits": {
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "description": "  cpu: 2\n  memory: 6Gi",
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "secretEnv": {
+          "description": "Secret variables to be passed to the `fiftyone-app` containers.",
+          "required": [],
+          "title": "secretEnv",
+          "type": "object"
+        },
+        "securityContext": {
+          "description": "TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`\nContainer security configuration for `fiftyone-app`. [Reference][container-security-context].",
+          "required": [],
+          "title": "securityContext",
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "annotations": {
+              "description": "Service annotations for `fiftyone-app`. [Reference][annotations].",
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "containerPort": {
+              "default": 5151,
+              "description": "Service container port for `fiftyone-app`.",
+              "required": [],
+              "title": "containerPort",
+              "type": "integer"
+            },
+            "name": {
+              "default": "fiftyone-app",
+              "description": "Service name.",
+              "required": [],
+              "title": "name",
+              "type": "string"
+            },
+            "nodePort": {
+              "default": "",
+              "description": "(int) Service nodePort set only when `appSettings.service.type: NodePort` for `fiftyone-app`.",
+              "required": [],
+              "title": "nodePort",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "port": {
+              "default": 80,
+              "description": "Service port.",
+              "required": [],
+              "title": "port",
+              "type": "integer"
+            },
+            "shortname": {
+              "default": "fiftyone-app",
+              "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `fiftyone-app`. [Reference][ports].",
+              "required": [],
+              "title": "shortname",
+              "type": "string"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "description": "Service type for `fiftyone-app`. [Reference][service-type].",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "service",
+          "type": "object"
+        },
+        "startup": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 30,
+              "description": "How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the startup probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "startup",
+          "type": "object"
+        },
+        "tolerations": {
+          "description": "Allow the k8s scheduler to schedule `fiftyone-app` pods with matching taints. [Reference][taints-and-tolerations].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "tolerations",
+          "type": "array"
+        },
+        "topologySpreadConstraints": {
+          "description": "Control how Pods are spread across your distributed footprint.\nLabel selectors will be defaulted to those of the `fiftyone-app` deployment. [Reference][topology-spread-constraints].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "topologySpreadConstraints",
+          "type": "array"
+        },
+        "updateStrategy": {
+          "description": "Control how `fiftyone-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+          "properties": {
+            "type": {
+              "default": "RollingUpdate",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "updateStrategy",
+          "type": "object"
+        },
+        "volumeMounts": {
+          "description": "Volume mounts for `fiftyone-app`. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumeMounts",
+          "type": "array"
+        },
+        "volumes": {
+          "description": "Volumes for `fiftyone-app`. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumes",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "appSettings",
+      "type": "object"
+    },
+    "casSettings": {
+      "description": "Central Authentication Service (`teams-cas`) configurations",
+      "properties": {
+        "affinity": {
+          "description": "Affinity and anti-affinity for `teams-cas`. [Reference][affinity].",
+          "required": [],
+          "title": "affinity",
+          "type": "object"
+        },
+        "deploymentAnnotations": {
+          "description": "Annotations for the `teams-cas` deployment. [Reference][annotations].",
+          "required": [],
+          "title": "deploymentAnnotations",
+          "type": "object"
+        },
+        "enable_invitations": {
+          "default": true,
+          "description": "Allow ADMINs to invite users by email\nNOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal`",
+          "required": [],
+          "title": "enable_invitations",
+          "type": "boolean"
+        },
+        "env": {
+          "description": "Environment Variables are passed to the `teams-cas` containers",
+          "properties": {
+            "CAS_DATABASE_NAME": {
+              "default": "cas",
+              "description": "Provide the name for the CAS database.\nWhen multiple deployments use the same database instance,\nset `CAS_DATABASE_NAME` to a unique value for each deployment.",
+              "required": [],
+              "title": "CAS_DATABASE_NAME",
+              "type": "string"
+            },
+            "CAS_DEFAULT_USER_ROLE": {
+              "default": "GUEST",
+              "description": "Set the default user role for new users\nOne of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN`",
+              "required": [],
+              "title": "CAS_DEFAULT_USER_ROLE",
+              "type": "string"
+            },
+            "CAS_MONGODB_URI_KEY": {
+              "default": "mongodbConnectionString",
+              "description": "The key from `secret.fiftyone.name` that contains the CAS MongoDB\nConnection String.",
+              "required": [],
+              "title": "CAS_MONGODB_URI_KEY",
+              "type": "string"
+            },
+            "DEBUG": {
+              "default": "cas:*,-cas:*:debug",
+              "description": "Set the log level for CAS\nexamples:\n`DEBUG: cas:*` - shows all CAS logs\n`DEBUG: cas:*:info` - shows all CAS INFO logs\n`DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs",
+              "required": [],
+              "title": "DEBUG",
+              "type": "string"
+            },
+            "FIFTYONE_AUTH_MODE": {
+              "default": "legacy",
+              "description": "Configure Authentication Mode.\nOne of `legacy` or `internal`",
+              "required": [],
+              "title": "FIFTYONE_AUTH_MODE",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "env",
+          "type": "object"
+        },
+        "image": {
+          "properties": {
+            "pullPolicy": {
+              "default": "Always",
+              "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
+              "required": [],
+              "title": "pullPolicy"
+            },
+            "repository": {
+              "default": "voxel51/fiftyone-teams-cas",
+              "description": "Container image for `teams-cas`.",
+              "required": [],
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "",
+              "description": "Image tag for `teams-cas`. Defaults to the chart version.",
+              "required": [],
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "initContainers": {
+          "properties": {
+            "containerSecurityContext": {
+              "description": "Container security configuration for `teams-cas` `initContainers`. [Reference][container-security-context].",
+              "properties": {
+                "allowPrivilegeEscalation": {
+                  "default": false,
+                  "required": [],
+                  "title": "allowPrivilegeEscalation",
+                  "type": "boolean"
+                },
+                "capabilities": {
+                  "properties": {
+                    "drop": {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "required": [],
+                            "type": "string"
+                          }
+                        ],
+                        "required": []
+                      },
+                      "required": [],
+                      "title": "drop",
+                      "type": "array"
+                    }
+                  },
+                  "required": [],
+                  "title": "capabilities",
+                  "type": "object"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "required": [],
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 1000,
+                  "required": [],
+                  "title": "runAsUser",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Whether to enable init containers for `teams-cas`. [Reference][init-containers].",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "image": {
+              "properties": {
+                "repository": {
+                  "default": "docker.io/busybox",
+                  "description": "Init container images repositories for `teams-cas`. [Reference][init-containers].",
+                  "required": [],
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "stable-glibc",
+                  "description": "Init container images tags for `teams-cas`. [Reference][init-containers].",
+                  "required": [],
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "image",
+              "type": "object"
+            },
+            "resources": {
+              "description": "Container resource requests and limits for the `teams-cas` `initContainers`. [Reference][resources].",
+              "properties": {
+                "limits": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "limits",
+                  "type": "object"
+                },
+                "requests": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "requests",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "initContainers",
+          "type": "object"
+        },
+        "labels": {
+          "description": "Additional labels for the `teams-cas` related objects. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "liveness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the liveness probe for `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the liveness probe for the `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "liveness",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "description": "nodeSelector for `teams-cas`. [Reference][node-selector].",
+          "required": [],
+          "title": "nodeSelector",
+          "type": "object"
+        },
+        "podAnnotations": {
+          "description": "Annotations for pods for `teams-cas`. [Reference][annotations].",
+          "required": [],
+          "title": "podAnnotations",
+          "type": "object"
+        },
+        "podDisruptionBudget": {
+          "description": "Pod Disruption Budget for pods for `teams-cas`. [Reference][pod-disruption-budget].",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Whether a pod disruption budget is enabled for `teams-cas`.",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "minAvailable": {
+              "default": "",
+              "description": "Sets the minimum available or maximum unavailable replicas for the deployment object.\nEither integers or percentages supported.\n`maxUnavailable` is also supported, however, only one setting can be used at a time.\nIf both are set, `minAvailable` will be preferred.",
+              "required": [],
+              "title": "minAvailable",
+              "type": [
+                "integer",
+                "string",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [],
+          "title": "podDisruptionBudget",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "description": "Pod-level security attributes and common container settings for `teams-cas`. [Reference][security-context].",
+          "required": [],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "readiness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the readiness probe for the `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the readiness probe for `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the readiness probe for the `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "readiness",
+          "type": "object"
+        },
+        "replicaCount": {
+          "default": 2,
+          "description": "Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].",
+          "minimum": 1,
+          "required": [],
+          "title": "replicaCount",
+          "type": "integer"
+        },
+        "resources": {
+          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-cas`. [Reference][resources].",
+          "properties": {
+            "limits": {
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "description": "  cpu: 2\n  memory: 6Gi",
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "secretEnv": {
+          "description": "Secret variables to be passed to the `teams-cas` containers.",
+          "required": [],
+          "title": "secretEnv",
+          "type": "object"
+        },
+        "securityContext": {
+          "description": "TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`\nContainer security configuration for `teams-cas`. [Reference][container-security-context].",
+          "required": [],
+          "title": "securityContext",
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "annotations": {
+              "description": "Service annotations for `teams-cas`. [Reference][annotations].",
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "containerPort": {
+              "default": 3000,
+              "description": "Service container port for `teams-cas`.",
+              "required": [],
+              "title": "containerPort",
+              "type": "integer"
+            },
+            "name": {
+              "default": "teams-cas",
+              "description": "Service name.",
+              "required": [],
+              "title": "name",
+              "type": "string"
+            },
+            "nodePort": {
+              "default": "",
+              "description": "(int) Service nodePort set only when `casSettings.service.type: NodePort` for `teams-cas`.",
+              "required": [],
+              "title": "nodePort",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "port": {
+              "default": 80,
+              "description": "Service port.",
+              "required": [],
+              "title": "port",
+              "type": "integer"
+            },
+            "shortname": {
+              "default": "teams-cas",
+              "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `teams-cas`. [Reference][ports].",
+              "required": [],
+              "title": "shortname",
+              "type": "string"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "description": "Service type for `teams-cas`. [Reference][service-type].",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "service",
+          "type": "object"
+        },
+        "startup": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the startup probe for the `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 30,
+              "description": "How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the startup probe for the `teams-cas`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "startup",
+          "type": "object"
+        },
+        "tolerations": {
+          "description": "Allow the k8s scheduler to schedule `teams-cas` pods with matching taints. [Reference][taints-and-tolerations].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "tolerations",
+          "type": "array"
+        },
+        "topologySpreadConstraints": {
+          "description": "Control how Pods are spread across your distributed footprint.\nLabel selectors will be defaulted to those of the `teams-cas` deployment. [Reference][topology-spread-constraints].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "topologySpreadConstraints",
+          "type": "array"
+        },
+        "updateStrategy": {
+          "description": "Control how `teams-cas` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+          "properties": {
+            "type": {
+              "default": "RollingUpdate",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "updateStrategy",
+          "type": "object"
+        },
+        "volumeMounts": {
+          "description": "Volume mounts for `teams-cas`. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumeMounts",
+          "type": "array"
+        },
+        "volumes": {
+          "description": "Volumes for `teams-cas`. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumes",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "casSettings",
+      "type": "object"
+    },
+    "delegatedOperatorDeployments": {
+      "description": "FiftyOne Enterprise Delegated Operator Executor (teams-do) configurations.",
+      "properties": {
+        "deployments": {
+          "description": "Additional deployments to configure. Each template\nwill use .Values.delegatedOperatorDeployments.template as a base.\nEach template value may be overridden.\nMaps/dictionaries will be merged key-wise, with the deployment instance\ntaking precedence.\nList values will not be merged, but be overridden completely by the\ndeployment instance.",
+          "required": [],
+          "title": "deployments",
+          "type": "object"
+        },
+        "template": {
+          "description": "A common template applied to all deployments. Each deployment can\nthen override individual fields as needed by the operator.",
+          "properties": {
+            "affinity": {
+              "description": "Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].",
+              "required": [],
+              "title": "affinity",
+              "type": "object"
+            },
+            "deploymentAnnotations": {
+              "description": "Annotations for the `teams-do` deployment. [Reference][annotations].",
+              "required": [],
+              "title": "deploymentAnnotations",
+              "type": "object"
+            },
+            "description": {
+              "default": "",
+              "description": "A description for the delegated operator instance. This is unused\nin the template context. Each operator should either set their own\ndescription or, optionally, use the default. If unset at the\noperator context, it will be defaulted to\n`Long running operations delegated to $name` where `$name` is the name\nof the Deployment object.",
+              "required": [],
+              "title": "description",
+              "type": "string"
+            },
+            "env": {
+              "description": "Environment Variables are passed to the delegated-operator-executor containers.",
+              "properties": {
+                "FIFTYONE_DELEGATED_OPERATION_LOG_PATH": {
+                  "default": "",
+                  "description": "Full path to a network-mounted file system or a cloud storage path to\nuse for storing logs generated by delegated operation runs, one file\nper job. The default `\"\"` means log upload is disabled.",
+                  "required": [],
+                  "title": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+                  "type": "string"
+                },
+                "FIFTYONE_INTERNAL_SERVICE": {
+                  "default": true,
+                  "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
+                  "required": [],
+                  "title": "FIFTYONE_INTERNAL_SERVICE",
+                  "type": [
+                    "string",
+                    "boolean"
+                  ]
+                },
+                "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
+                  "default": -1,
+                  "description": "Set the media cache size (in bytes) for the local FiftyOne Delegated\nOperator Executor processes.\nWhen not set, the app's default value is 32 GiB.\n`-1` disables the media cache garbage collection (and cache size is unlimited).",
+                  "required": [],
+                  "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+                  "type": [
+                    "string",
+                    "integer"
+                  ]
+                }
+              },
+              "required": [],
+              "title": "env",
+              "type": "object"
+            },
+            "image": {
+              "properties": {
+                "pullPolicy": {
+                  "default": "Always",
+                  "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "Always",
+                        "IfNotPresent",
+                        "Never"
+                      ],
+                      "required": []
+                    }
+                  ],
+                  "required": [],
+                  "title": "pullPolicy"
+                },
+                "repository": {
+                  "default": "voxel51/fiftyone-teams-cv-full",
+                  "description": "Container image for `delegated-operator-executor`.",
+                  "required": [],
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "",
+                  "description": "Image tag for `delegated-operator-executor`. Defaults to the chart version.",
+                  "required": [],
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "image",
+              "type": "object"
+            },
+            "labels": {
+              "description": "Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors].",
+              "required": [],
+              "title": "labels",
+              "type": "object"
+            },
+            "liveness": {
+              "properties": {
+                "failureThreshold": {
+                  "default": 5,
+                  "description": "Number of times to retry the liveness probe for the `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "failureThreshold",
+                  "type": "integer"
+                },
+                "periodSeconds": {
+                  "default": 30,
+                  "description": "How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "periodSeconds",
+                  "type": "integer"
+                },
+                "timeoutSeconds": {
+                  "default": 30,
+                  "description": "Timeout for the liveness probe for the `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "timeoutSeconds",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "liveness",
+              "type": "object"
+            },
+            "nodeSelector": {
+              "description": "nodeSelector for `delegated-operator-executor`. [Reference][node-selector].",
+              "required": [],
+              "title": "nodeSelector",
+              "type": "object"
+            },
+            "podAnnotations": {
+              "description": "Annotations for delegated-operator-executor pods. [Reference][annotations].",
+              "required": [],
+              "title": "podAnnotations",
+              "type": "object"
+            },
+            "podDisruptionBudget": {
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "description": "Whether a pod disruption budget is enabled for `teams-plugins`.",
+                  "required": [],
+                  "title": "enabled",
+                  "type": "boolean"
+                },
+                "minAvailable": {
+                  "default": "",
+                  "description": "Sets the minimum available or maximum unavailable replicas for the deployment object.\nEither integers or percentages supported.\n`maxUnavailable` is also supported, however, only one setting can be used at a time.\nIf both are set, `minAvailable` will be preferred.",
+                  "required": [],
+                  "title": "minAvailable",
+                  "type": [
+                    "integer",
+                    "string",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "required": [],
+              "title": "podDisruptionBudget",
+              "type": "object"
+            },
+            "podSecurityContext": {
+              "description": "Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].",
+              "required": [],
+              "title": "podSecurityContext",
+              "type": "object"
+            },
+            "readiness": {
+              "properties": {
+                "failureThreshold": {
+                  "default": 5,
+                  "description": "Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "failureThreshold",
+                  "type": "integer"
+                },
+                "periodSeconds": {
+                  "default": 30,
+                  "description": "How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "periodSeconds",
+                  "type": "integer"
+                },
+                "timeoutSeconds": {
+                  "default": 30,
+                  "description": "Timeout for the readiness probe for the `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "timeoutSeconds",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "readiness",
+              "type": "object"
+            },
+            "replicaCount": {
+              "default": 3,
+              "description": "Number of pods in the delegated-operator-executor deployment's ReplicaSet.\nThis should not exceed the value set in the deployment's license file for\n max concurrent delegated operators, which defaults to 3.",
+              "minimum": 1,
+              "required": [],
+              "title": "replicaCount",
+              "type": "integer"
+            },
+            "resources": {
+              "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `delegated-operator-executor`. [Reference][resources].",
+              "properties": {
+                "limits": {
+                  "required": [],
+                  "title": "limits",
+                  "type": "object"
+                },
+                "requests": {
+                  "description": "  cpu: 2\n  memory: 6Gi",
+                  "required": [],
+                  "title": "requests",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            },
+            "secretEnv": {
+              "description": "Secret variables to be passed to the delegated-operator-executor containers.",
+              "required": [],
+              "title": "secretEnv",
+              "type": "object"
+            },
+            "securityContext": {
+              "description": "TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`\nContainer security configuration for `delegated-operator-executor`. [Reference][container-security-context].",
+              "required": [],
+              "title": "securityContext",
+              "type": "object"
+            },
+            "startup": {
+              "properties": {
+                "failureThreshold": {
+                  "default": 5,
+                  "description": "Number of times to retry the startup probe for the `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "failureThreshold",
+                  "type": "integer"
+                },
+                "periodSeconds": {
+                  "default": 30,
+                  "description": "How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "periodSeconds",
+                  "type": "integer"
+                },
+                "timeoutSeconds": {
+                  "default": 30,
+                  "description": "Timeout for the startup probe for the `teams-do`. [Reference][probes].",
+                  "required": [],
+                  "title": "timeoutSeconds",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "startup",
+              "type": "object"
+            },
+            "tolerations": {
+              "description": "Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "tolerations",
+              "type": "array"
+            },
+            "topologySpreadConstraints": {
+              "description": "Control how Pods are spread across your distributed footprint.\nLabel selectors will be defaulted to those of the `teams-do` deployment(s). [Reference][topology-spread-constraints].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "topologySpreadConstraints",
+              "type": "array"
+            },
+            "updateStrategy": {
+              "description": "Control how `teams-do` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+              "properties": {
+                "type": {
+                  "default": "RollingUpdate",
+                  "required": [],
+                  "title": "type",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "updateStrategy",
+              "type": "object"
+            },
+            "volumeMounts": {
+              "description": "Volume mounts for delegated-operator-executor pods. [Reference][volumes].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "volumeMounts",
+              "type": "array"
+            },
+            "volumes": {
+              "description": "Volumes for `delegated-operator-executor`. [Reference][volumes].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "volumes",
+              "type": "array"
+            }
+          },
+          "required": [],
+          "title": "template",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "delegatedOperatorDeployments",
+      "type": "object"
+    },
+    "fiftyoneLicenseSecrets": {
+      "description": "List of secrets for FiftyOne Enterprise Licenses (one per org)",
+      "items": {
+        "anyOf": [
+          {
+            "required": [],
+            "type": "string"
+          }
+        ],
+        "required": []
+      },
+      "required": [],
+      "title": "fiftyoneLicenseSecrets",
+      "type": "array"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "Container image registry keys. [Reference][image-pull-secrets].",
+      "items": {
+        "required": []
+      },
+      "required": [],
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "properties": {
+        "annotations": {
+          "description": "Ingress annotations. [Reference][annotations].",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "api": {
+          "description": "The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty.\n[Reference][ingress-rules].",
+          "properties": {
+            "path": {
+              "default": "/*",
+              "required": [],
+              "title": "path",
+              "type": "string"
+            },
+            "pathType": {
+              "default": "ImplementationSpecific",
+              "required": [],
+              "title": "pathType",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "api",
+          "type": "object"
+        },
+        "className": {
+          "default": "",
+          "description": "Name of the ingress class.  When empty, a default Ingress class should be defined.\nWhen not empty, this value will be the Ingress class name.\n[Reference][ingress-default-ingress-class]",
+          "required": [],
+          "title": "className",
+          "type": "string"
+        },
+        "enabled": {
+          "default": true,
+          "description": "Controls whether to create the ingress. When `false`, uses a pre-existing ingress.\n[Reference][ingress].",
+          "required": [],
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "labels": {
+          "description": "Additional labels for the ingress. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "paths": {
+          "description": "Additional ingress rules for the host `teamsAppSettings.dnsName` for\nthe chart managed ingress (when `ingress.enabled: true`).\n[Reference][ingress-rules].",
+          "items": {
+            "anyOf": [
+              {
+                "properties": {
+                  "path": {
+                    "default": "/cas",
+                    "required": [],
+                    "title": "path",
+                    "type": "string"
+                  },
+                  "pathType": {
+                    "default": "Prefix",
+                    "description": "Ingress path type",
+                    "required": [],
+                    "title": "pathType",
+                    "type": "string"
+                  },
+                  "serviceName": {
+                    "default": "teams-cas",
+                    "description": "Ingress path service name",
+                    "required": [],
+                    "title": "serviceName",
+                    "type": "string"
+                  },
+                  "servicePort": {
+                    "default": 80,
+                    "description": "(int) Ingress path service port",
+                    "required": [],
+                    "title": "servicePort",
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "path": {
+                    "default": "/*",
+                    "required": [],
+                    "title": "path",
+                    "type": "string"
+                  },
+                  "pathType": {
+                    "default": "ImplementationSpecific",
+                    "description": "Ingress path type",
+                    "required": [],
+                    "title": "pathType",
+                    "type": "string"
+                  },
+                  "serviceName": {
+                    "default": "teams-app",
+                    "description": "Ingress path service name",
+                    "required": [],
+                    "title": "serviceName",
+                    "type": "string"
+                  },
+                  "servicePort": {
+                    "default": 80,
+                    "description": "(int) Ingress path service port",
+                    "required": [],
+                    "title": "servicePort",
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "required": [],
+          "title": "paths",
+          "type": "array"
+        },
+        "tlsEnabled": {
+          "default": true,
+          "description": "Controls whether the chart managed ingress contains a `spec.tls` stanza.",
+          "required": [],
+          "title": "tlsEnabled",
+          "type": "boolean"
+        },
+        "tlsSecretName": {
+          "default": "fiftyone-teams-tls-secret",
+          "description": "Name of secret containing TLS certificate for `teams-app`.\nCertificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`.\nWhen `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`.",
+          "required": [],
+          "title": "tlsSecretName",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "ingress",
+      "type": "object"
+    },
+    "namespace": {
+      "properties": {
+        "create": {
+          "default": false,
+          "description": "Controls whether to create the namespace.\nWhen `false`, the namespace must already exists.",
+          "required": [],
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "fiftyone-teams",
+          "description": "The namespace name used for chart resources.",
+          "required": [],
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "namespace",
+      "type": "object"
+    },
+    "pluginsSettings": {
+      "description": "FiftyOne Enterprise Plugins (teams-plugins) configurations. [Reference][fiftyone-plugins].",
+      "properties": {
+        "affinity": {
+          "description": "Affinity and anti-affinity for `teams-plugins`. [Reference][affinity].",
+          "required": [],
+          "title": "affinity",
+          "type": "object"
+        },
+        "autoscaling": {
+          "description": "[Reference][autoscaling].",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Controls horizontal pod autoscaling for `teams-plugins`. [Reference][autoscaling].",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "maxReplicas": {
+              "default": 20,
+              "description": "Maximum replicas for horizontal pod autoscaling for `teams-plugins`.",
+              "required": [],
+              "title": "maxReplicas",
+              "type": "integer"
+            },
+            "minReplicas": {
+              "default": 2,
+              "description": "Minimum Replicas for horizontal pod autoscaling for `teams-plugins`.",
+              "required": [],
+              "title": "minReplicas",
+              "type": "integer"
+            },
+            "targetCPUUtilizationPercentage": {
+              "default": 80,
+              "description": "Percent CPU utilization for autoscaling for `teams-plugins`.",
+              "required": [],
+              "title": "targetCPUUtilizationPercentage",
+              "type": "integer"
+            },
+            "targetMemoryUtilizationPercentage": {
+              "default": 80,
+              "description": "Percent memory utilization for autoscaling for `teams-plugins`.",
+              "required": [],
+              "title": "targetMemoryUtilizationPercentage",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "autoscaling",
+          "type": "object"
+        },
+        "deploymentAnnotations": {
+          "description": "Annotations for the `teams-plugins` deployment. [Reference][annotations].",
+          "required": [],
+          "title": "deploymentAnnotations",
+          "type": "object"
+        },
+        "enabled": {
+          "default": false,
+          "description": "Controls whether to create a dedicated `teams-plugins` deployment.",
+          "required": [],
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "env": {
+          "description": "Environment Variables are passed to the `teams-plugins` containers.",
+          "properties": {
+            "FIFTYONE_INTERNAL_SERVICE": {
+              "default": true,
+              "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
+              "required": [],
+              "title": "FIFTYONE_INTERNAL_SERVICE",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_MEDIA_CACHE_APP_IMAGES": {
+              "default": false,
+              "description": "Controls whether cloud media images will be downloaded and added to\nthe local cache upon viewing media in the app.",
+              "required": [],
+              "title": "FIFTYONE_MEDIA_CACHE_APP_IMAGES",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
+              "default": -1,
+              "description": "Set the media cache size (in bytes) for the local FiftyOne Plugins processes.\nWhen not set, the app's default value is 32 GiB.\n`-1` disables the media cache garbage collection (and cache size is unlimited).",
+              "required": [],
+              "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "required": [],
+          "title": "env",
+          "type": "object"
+        },
+        "image": {
+          "properties": {
+            "pullPolicy": {
+              "default": "Always",
+              "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
+              "required": [],
+              "title": "pullPolicy"
+            },
+            "repository": {
+              "default": "voxel51/fiftyone-app",
+              "description": "Container image for `teams-plugins`.",
+              "required": [],
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "",
+              "description": "Image tag for `teams-plugins`. Defaults to the chart version.",
+              "required": [],
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "initContainers": {
+          "properties": {
+            "containerSecurityContext": {
+              "description": "Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context].",
+              "properties": {
+                "allowPrivilegeEscalation": {
+                  "default": false,
+                  "required": [],
+                  "title": "allowPrivilegeEscalation",
+                  "type": "boolean"
+                },
+                "capabilities": {
+                  "properties": {
+                    "drop": {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "required": [],
+                            "type": "string"
+                          }
+                        ],
+                        "required": []
+                      },
+                      "required": [],
+                      "title": "drop",
+                      "type": "array"
+                    }
+                  },
+                  "required": [],
+                  "title": "capabilities",
+                  "type": "object"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "required": [],
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 1000,
+                  "required": [],
+                  "title": "runAsUser",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Whether to enable init containers for `teams-plugins`. [Reference][init-containers].",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "image": {
+              "properties": {
+                "repository": {
+                  "default": "docker.io/busybox",
+                  "description": "Init container images repositories for `teams-plugins`. [Reference][init-containers].",
+                  "required": [],
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "stable-glibc",
+                  "description": "Init container images tags for `teams-plugins`. [Reference][init-containers].",
+                  "required": [],
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "image",
+              "type": "object"
+            },
+            "resources": {
+              "description": "Container resource requests and limits for the `teams-plugins` `initContainers`. [Reference][resources].",
+              "properties": {
+                "limits": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "limits",
+                  "type": "object"
+                },
+                "requests": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "requests",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "initContainers",
+          "type": "object"
+        },
+        "labels": {
+          "description": "Additional labels for the `teams-plugins` related objects. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "liveness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the liveness probe for `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the liveness probe for the `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "liveness",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "description": "nodeSelector for `teams-plugins`. [Reference][node-selector].",
+          "required": [],
+          "title": "nodeSelector",
+          "type": "object"
+        },
+        "podAnnotations": {
+          "description": "Annotations for `teams-plugins` pods. [Reference][annotations].",
+          "required": [],
+          "title": "podAnnotations",
+          "type": "object"
+        },
+        "podDisruptionBudget": {
+          "description": "Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget].",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Whether a pod disruption budget is enabled for `teams-plugins`.",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "minAvailable": {
+              "default": "",
+              "description": "Sets the minimum available or maximum unavailable replicas for the deployment object.\nEither integers or percentages supported.\n`maxUnavailable` is also supported, however, only one setting can be used at a time.\nIf both are set, `minAvailable` will be preferred.",
+              "required": [],
+              "title": "minAvailable",
+              "type": [
+                "integer",
+                "string",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [],
+          "title": "podDisruptionBudget",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "description": "Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].",
+          "required": [],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "readiness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the readiness probe for the `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the readiness probe for `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the readiness probe for the `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "readiness",
+          "type": "object"
+        },
+        "replicaCount": {
+          "default": 2,
+          "description": "Number of pods in the `teams-plugins` deployment's ReplicaSet.\nIgnored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].",
+          "minimum": 1,
+          "required": [],
+          "title": "replicaCount",
+          "type": "integer"
+        },
+        "resources": {
+          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-plugins`. [Reference][resources].",
+          "properties": {
+            "limits": {
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "description": "  cpu: 2\n  memory: 6Gi",
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "secretEnv": {
+          "description": "Secret variables to be passed to the `teams-plugins` containers.",
+          "required": [],
+          "title": "secretEnv",
+          "type": "object"
+        },
+        "securityContext": {
+          "description": "TODO: Kevin/topher - Consider renaming `securityContext` to `containerSecurityContext`\nContainer security configuration for `teams-plugins`. [Reference][container-security-context].",
+          "required": [],
+          "title": "securityContext",
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "annotations": {
+              "description": "Service annotations for `teams-plugins`. [Reference][annotations].",
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "containerPort": {
+              "default": 5151,
+              "description": "Service container port for `teams-plugins`.",
+              "required": [],
+              "title": "containerPort",
+              "type": "integer"
+            },
+            "name": {
+              "default": "teams-plugins",
+              "description": "Service name.",
+              "required": [],
+              "title": "name",
+              "type": "string"
+            },
+            "nodePort": {
+              "default": "",
+              "description": "(int) Service nodePort set only when `pluginsSettings.service.type: NodePort` for `teams-plugins`.",
+              "required": [],
+              "title": "nodePort",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "port": {
+              "default": 80,
+              "description": "Service port.",
+              "required": [],
+              "title": "port",
+              "type": "integer"
+            },
+            "shortname": {
+              "default": "teams-plugins",
+              "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `teams-plugins`. [Reference][ports].",
+              "required": [],
+              "title": "shortname",
+              "type": "string"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "description": "Service type for `teams-plugins`. [Reference][service-type].",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "service",
+          "type": "object"
+        },
+        "startup": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 30,
+              "description": "How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the startup probe for the `teams-plugins`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "startup",
+          "type": "object"
+        },
+        "tolerations": {
+          "description": "Allow the k8s scheduler to schedule `teams-plugins` pods with matching taints. [Reference][taints-and-tolerations].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "tolerations",
+          "type": "array"
+        },
+        "topologySpreadConstraints": {
+          "description": "Control how Pods are spread across your distributed footprint.\nLabel selectors will be defaulted to those of the `teams-plugins` deployment. [Reference][topology-spread-constraints].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "topologySpreadConstraints",
+          "type": "array"
+        },
+        "updateStrategy": {
+          "description": "Control how `teams-plugins` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+          "properties": {
+            "type": {
+              "default": "RollingUpdate",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "updateStrategy",
+          "type": "object"
+        },
+        "volumeMounts": {
+          "description": "Volume mounts for `teams-plugins` pods. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumeMounts",
+          "type": "array"
+        },
+        "volumes": {
+          "description": "Volumes for `teams-plugins`. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumes",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "pluginsSettings",
+      "type": "object"
+    },
+    "secret": {
+      "properties": {
+        "create": {
+          "default": true,
+          "description": "Controls whether to create the secret named `secret.name`.",
+          "required": [],
+          "title": "create",
+          "type": "boolean"
+        },
+        "fiftyone": {
+          "properties": {
+            "cookieSecret": {
+              "default": "",
+              "description": "A randomly generated string for cookie encryption.\nTo generate, run `openssl rand -hex 32`.",
+              "required": [],
+              "title": "cookieSecret",
+              "type": "string"
+            },
+            "encryptionKey": {
+              "default": "",
+              "description": "Encryption key for storage credentials. [Reference][fiftyone-encryption-key].",
+              "required": [],
+              "title": "encryptionKey",
+              "type": "string"
+            },
+            "fiftyoneAuthSecret": {
+              "default": "",
+              "description": "A randomly generated string for CAS Authentication.\nThis can be any string you care to use generated by any mechanism you\n  prefer.\nThis is used for inter-service authentication and for the SuperUser to\n authenticate at the CAS UI to configure the Central Authentication Service.",
+              "required": [],
+              "title": "fiftyoneAuthSecret",
+              "type": "string"
+            },
+            "fiftyoneDatabaseName": {
+              "default": "",
+              "description": "MongoDB Database Name for FiftyOne Enterprise.",
+              "required": [],
+              "title": "fiftyoneDatabaseName",
+              "type": "string"
+            },
+            "mongodbConnectionString": {
+              "default": "",
+              "description": "MongoDB Connection String. [Reference][mongodb-connection-string].",
+              "required": [],
+              "title": "mongodbConnectionString",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "fiftyone",
+          "type": "object"
+        },
+        "labels": {
+          "description": "Additional labels for the generated secret. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "name": {
+          "default": "fiftyone-teams-secrets",
+          "description": "Name of the secret (existing or to be created) in the namespace `namespace.name`.",
+          "required": [],
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "secret",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "annotations": {
+          "description": "Service Account annotations. [Reference][annotations].",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "create": {
+          "default": true,
+          "description": "Controls whether to create the service account named `serviceAccount.name`.",
+          "required": [],
+          "title": "create",
+          "type": "boolean"
+        },
+        "labels": {
+          "description": "Additional labels for the generated service account. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "name": {
+          "default": "fiftyone-teams",
+          "description": "Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments.\n[Reference][service-account].",
+          "required": [],
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "teamsAppSettings": {
+      "description": "FiftyOne Enterprise App (teams-app) configurations",
+      "properties": {
+        "affinity": {
+          "description": "Affinity and anti-affinity for `teams-app`.  [Reference][affinity].",
+          "required": [],
+          "title": "affinity",
+          "type": "object"
+        },
+        "autoscaling": {
+          "description": "[Reference][autoscaling].",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Controls horizontal pod autoscaling for `teams-app`.  [Reference][autoscaling].",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "maxReplicas": {
+              "default": 5,
+              "description": "Maximum Replicas for horizontal autoscaling for `teams-app`.",
+              "required": [],
+              "title": "maxReplicas",
+              "type": "integer"
+            },
+            "minReplicas": {
+              "default": 2,
+              "description": "Minimum Replicas for horizontal autoscaling for `teams-app`.",
+              "required": [],
+              "title": "minReplicas",
+              "type": "integer"
+            },
+            "targetCPUUtilizationPercentage": {
+              "default": 80,
+              "description": "Percent CPU utilization for autoscaling for `teams-app`.",
+              "required": [],
+              "title": "targetCPUUtilizationPercentage",
+              "type": "integer"
+            },
+            "targetMemoryUtilizationPercentage": {
+              "default": 80,
+              "description": "Percent memory utilization for autoscaling for `teams-app`.",
+              "required": [],
+              "title": "targetMemoryUtilizationPercentage",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "autoscaling",
+          "type": "object"
+        },
+        "deploymentAnnotations": {
+          "description": "Annotations for the `teams-app` `Deployment`. [Reference][annotations].",
+          "required": [],
+          "title": "deploymentAnnotations",
+          "type": "object"
+        },
+        "dnsName": {
+          "default": "",
+          "description": "DNS Name for the `teams-app` service.\nUsed in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`)",
+          "required": [],
+          "title": "dnsName",
+          "type": "string"
+        },
+        "env": {
+          "description": "Environment Variables are passed to the `teams-app` containers.",
+          "properties": {
+            "APP_USE_HTTPS": {
+              "default": true,
+              "description": "Controls the protocol of the `teams-app`.  Configure your ingress to match.\nWhen `true`, uses the https protocol.\nWhen `false`, uses the http protocol.",
+              "required": [],
+              "title": "APP_USE_HTTPS",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_APP_ALLOW_MEDIA_EXPORT": {
+              "default": true,
+              "description": "When `false`, disables media export options",
+              "required": [],
+              "title": "FIFTYONE_APP_ALLOW_MEDIA_EXPORT",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED": {
+              "default": true,
+              "description": "Controls whether anonymous analytics are captured for the\napplication. Set to false to opt-out of anonymous analytics.",
+              "required": [],
+              "title": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE": {
+              "default": true,
+              "description": "Controls whether Query Performance mode is enabled by default for\nevery dataset for the teams application. Set to false to set default mode to off.",
+              "required": [],
+              "title": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE": {
+              "default": true,
+              "description": "Controls whether Query Performance mode is enabled for the\napplication. Set to false to disable Query Performance mode for entire application.",
+              "required": [],
+              "title": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
+              "default": "2.10.0",
+              "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==0.11.0`).",
+              "required": [],
+              "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
+              "type": "string"
+            },
+            "FIFTYONE_APP_THEME": {
+              "default": "dark",
+              "description": "The default theme configuration.\n`dark`: Theme will be dark when user visits for the first time.\n`light`: Theme will be light theme when user visits for the first time.\n`always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app).\n`always-light`: Sets light theme on each refresh (overrides user theme changes in the app).",
+              "required": [],
+              "title": "FIFTYONE_APP_THEME",
+              "type": "string"
+            },
+            "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED": {
+              "default": false,
+              "description": "Disable duplicate atom/selector key checking that generated false-positive errors.\n[Reference][recoil-env].",
+              "required": [],
+              "title": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            }
+          },
+          "required": [],
+          "title": "env",
+          "type": "object"
+        },
+        "fiftyoneApiOverride": {
+          "default": "",
+          "description": "Overrides the `FIFTYONE_API_URI` environment variable. When set\n`FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance\nfor connecting to the FiftyOne Enterprise API.\n`FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or\nuses the teamsAppSettings.dnsName",
+          "required": [],
+          "title": "fiftyoneApiOverride",
+          "type": "string"
+        },
+        "image": {
+          "properties": {
+            "pullPolicy": {
+              "default": "Always",
+              "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
+              "required": [],
+              "title": "pullPolicy"
+            },
+            "repository": {
+              "default": "voxel51/fiftyone-teams-app",
+              "description": "Container image for `teams-app`.",
+              "required": [],
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "",
+              "description": "Image tag for `teams-app`.  Defaults to the chart version.",
+              "required": [],
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "initContainers": {
+          "properties": {
+            "containerSecurityContext": {
+              "description": "Container security configuration for `teams-app` `initContainers`. [Reference][container-security-context].",
+              "properties": {
+                "allowPrivilegeEscalation": {
+                  "default": false,
+                  "required": [],
+                  "title": "allowPrivilegeEscalation",
+                  "type": "boolean"
+                },
+                "capabilities": {
+                  "properties": {
+                    "drop": {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "required": [],
+                            "type": "string"
+                          }
+                        ],
+                        "required": []
+                      },
+                      "required": [],
+                      "title": "drop",
+                      "type": "array"
+                    }
+                  },
+                  "required": [],
+                  "title": "capabilities",
+                  "type": "object"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "required": [],
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 1000,
+                  "required": [],
+                  "title": "runAsUser",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Whether to enable init containers for `teams-app`.  [Reference][init-containers].",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "image": {
+              "properties": {
+                "repository": {
+                  "default": "docker.io/busybox",
+                  "description": "Init container images repositories for `teams-app`.  [Reference][init-containers].",
+                  "required": [],
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "stable-glibc",
+                  "description": "Init container images tags for `teams-app`.  [Reference][init-containers].",
+                  "required": [],
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "image",
+              "type": "object"
+            },
+            "resources": {
+              "description": "Container resource requests and limits for the `teams-app` `initContainers`. [Reference][resources].",
+              "properties": {
+                "limits": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "limits",
+                  "type": "object"
+                },
+                "requests": {
+                  "properties": {
+                    "cpu": {
+                      "default": "10m",
+                      "required": [],
+                      "title": "cpu",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "ephemeral-storage": {
+                      "default": "64Mi",
+                      "required": [],
+                      "title": "ephemeral-storage",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "memory": {
+                      "default": "128Mi",
+                      "required": [],
+                      "title": "memory",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "required": [],
+                  "title": "requests",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "initContainers",
+          "type": "object"
+        },
+        "labels": {
+          "description": "Additional labels for the `teams-app` related objects. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "liveness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the liveness probe for `teams-app`.  [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "liveness",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "description": "nodeSelector for `teams-app`.  [Reference][node-selector].",
+          "required": [],
+          "title": "nodeSelector",
+          "type": "object"
+        },
+        "podAnnotations": {
+          "description": "Annotations for `teams-app` pods. [Reference][annotations].",
+          "required": [],
+          "title": "podAnnotations",
+          "type": "object"
+        },
+        "podDisruptionBudget": {
+          "description": "Pod Disruption Budget for pods for `teams-app`. [Reference][pod-disruption-budget].",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Whether a pod disruption budget is enabled for `teams-app`.",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "minAvailable": {
+              "default": "",
+              "description": "Sets the minimum available or maximum unavailable replicas for the deployment object.\nEither integers or percentages supported.\n`maxUnavailable` is also supported, however, only one setting can be used at a time.\nIf both are set, `minAvailable` will be preferred.",
+              "required": [],
+              "title": "minAvailable",
+              "type": [
+                "integer",
+                "string",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [],
+          "title": "podDisruptionBudget",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "description": "Pod-level security attributes and common container settings for `teams-app`.  [Reference][security-context].",
+          "required": [],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "readiness": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the readiness probe for the `teams-app`.  [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 15,
+              "description": "How often (in seconds) to perform the readiness probe for `teams-app`.  [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "readiness",
+          "type": "object"
+        },
+        "replicaCount": {
+          "default": 2,
+          "description": "Number of pods in the `teams-app` deployment's ReplicaSet.\nIgnored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].",
+          "minimum": 1,
+          "required": [],
+          "title": "replicaCount",
+          "type": "integer"
+        },
+        "resources": {
+          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `teams-app`.  [Reference][resources].",
+          "properties": {
+            "limits": {
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "description": "  cpu: 1\n  memory: 2Gi",
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "secretEnv": {
+          "description": "Secret variables to be passed to the `teams-app` containers.",
+          "required": [],
+          "title": "secretEnv",
+          "type": "object"
+        },
+        "securityContext": {
+          "description": "TODO: Consider renaming `securityContext` to `containerSecurityContext`\nContainer security configuration for `teams-app`.  [Reference][container-security-context].",
+          "required": [],
+          "title": "securityContext",
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "annotations": {
+              "description": "Service annotations for `teams-app`.  [Reference][annotations].",
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "containerPort": {
+              "default": 3000,
+              "description": "Service container port for `teams-app`.",
+              "required": [],
+              "title": "containerPort",
+              "type": "integer"
+            },
+            "name": {
+              "default": "teams-app",
+              "description": "Service name.",
+              "required": [],
+              "title": "name",
+              "type": "string"
+            },
+            "nodePort": {
+              "default": "",
+              "description": "(int) Service nodePort set only when `teamsAppSettings.service.type: NodePort` for `teams-app`.",
+              "required": [],
+              "title": "nodePort",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "port": {
+              "default": 80,
+              "description": "Service port.",
+              "required": [],
+              "title": "port",
+              "type": "integer"
+            },
+            "shortname": {
+              "default": "teams-app",
+              "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `teams-app`.  [Reference][ports].",
+              "required": [],
+              "title": "shortname",
+              "type": "string"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "description": "Service type for `teams-app`.  [Reference][service-type].",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "service",
+          "type": "object"
+        },
+        "startup": {
+          "properties": {
+            "failureThreshold": {
+              "default": 5,
+              "description": "Number of times to retry the startup probe for the `teams-app`.  [Reference][probes].",
+              "required": [],
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 30,
+              "description": "How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes].",
+              "required": [],
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Timeout for the startup probe for the `fiftyone-app`. [Reference][probes].",
+              "required": [],
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "startup",
+          "type": "object"
+        },
+        "tolerations": {
+          "description": "Allow the k8s scheduler to schedule `teams-app` pods with matching taints. [Reference][taints-and-tolerations].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "tolerations",
+          "type": "array"
+        },
+        "topologySpreadConstraints": {
+          "description": "Control how Pods are spread across your distributed footprint.\nLabel selectors will be defaulted to those of the `teams-app` deployment. [Reference][topology-spread-constraints].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "topologySpreadConstraints",
+          "type": "array"
+        },
+        "updateStrategy": {
+          "description": "Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies]",
+          "properties": {
+            "type": {
+              "default": "RollingUpdate",
+              "required": [],
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "updateStrategy",
+          "type": "object"
+        },
+        "volumeMounts": {
+          "description": "Volume mounts for `teams-app` pods. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumeMounts",
+          "type": "array"
+        },
+        "volumes": {
+          "description": "Volumes for `teams-app` pods. [Reference][volumes].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "volumes",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "teamsAppSettings",
+      "type": "object"
+    }
+  },
+  "required": [],
+  "type": "object"
+}

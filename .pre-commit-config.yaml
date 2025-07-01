@@ -14,6 +14,8 @@ repos:
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: pretty-format-json
+        # Ignore generated files
+        exclude: ^helm/fiftyone-teams-app/values.schema.json
       - id: trailing-whitespace
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.5
@@ -30,11 +32,23 @@ repos:
         args:
           # Make the tool search for charts only under the `helm/fiftyone-teams-app` directory
           - --chart-search-root=helm/fiftyone-teams-app
-
           # A base filename makes it relative to each chart directory found
           - --template-files=README.md.gotmpl
+  - repo: https://github.com/dadav/helm-schema
+    rev: 0.18.1
+    hooks:
+      - id: helm-schema
+        args:
+          - --chart-search-root=./helm/fiftyone-teams-app
+          - --no-dependencies
+          - --add-schema-reference
+          - --skip-auto-generation=additionalProperties,required
+          - --append-newline
+          # This breaks type annotations
+          # - --helm-docs-compatibility-mode
+
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.44.0
+    rev: v0.45.0
     hooks:
       - id: markdownlint
       - id: markdownlint-fix
@@ -96,7 +110,7 @@ repos:
           - --write
           - --simplify
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v4.1.0
+    rev: v4.2.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
