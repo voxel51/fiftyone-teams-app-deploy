@@ -88,10 +88,10 @@ tag (found at the top of the test file).
       -timeout=30s \
       -v \
       -tags unit \
-      plugins-service_test.go \
+      api-deployment_test.go \
       common_test.go \
       chartInfo.go \
-      -testify.m '^(TestMetadataLabels|)$'
+      -testify.m '^(TestContainerEnv|)$'
     ```
 
     > **Note:** Include the files `common_test.go` and `chartInfo.go`
