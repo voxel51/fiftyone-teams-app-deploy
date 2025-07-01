@@ -18,7 +18,7 @@
         },
         "dnsName": {
           "default": "",
-          "description": "Controls whether `teams-api` is added to the chart's ingress.\nWhen an empty string, a rule for `teams-api` is not added to the chart managed ingress.\nWhen not an empty string, becomes the value to the `host` in the ingress' rule and\nset `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api`\nto generate the `EXTERNAL_API_URL` environment variable for configuring external orchestrators.",
+          "description": "Controls whether `teams-api` is added to the chart's ingress.\nWhen an empty string, a rule for `teams-api` is not added to the chart managed ingress.\nWhen not an empty string, becomes the value to the `host` in the ingress' rule and\nset `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api`\nto generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators.",
           "required": [],
           "title": "dnsName",
           "type": "string"
