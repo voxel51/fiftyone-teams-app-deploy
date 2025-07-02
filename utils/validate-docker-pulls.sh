@@ -32,7 +32,7 @@ VALUES_YAML="${GIT_ROOT}/helm/fiftyone-teams-app/values.yaml"
 print_usage() {
   local package
   package=$(basename "$0")
-  echo "$package - Validate docker pulls for all default images."
+  echo "$package - Validate docker images exist for all default images."
   echo " "
   echo "$package [options]"
   echo " "
@@ -86,7 +86,7 @@ check_requirements() {
 docker_pull() {
   local image="$1"
 
-  if ! docker pull "${image}"; then
+  if ! docker manifest inspect "${image}"; then
     return 1
   fi
 
@@ -147,10 +147,10 @@ set -e
 
 for idx in "${!rcs[@]}"; do
   if [[ ${rcs[$idx]} -ne 0 ]]; then
-    log_error "Could not pull ${expected_images_with_tag[$idx]}!"
+    log_error "Could not validate ${expected_images_with_tag[$idx]}!"
     exit_code=1
   else
-    log_info "Pulled ${expected_images_with_tag[$idx]} successfully."
+    log_info "Validated ${expected_images_with_tag[$idx]} successfully."
   fi
 done
 
