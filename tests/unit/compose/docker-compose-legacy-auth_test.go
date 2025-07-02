@@ -27,7 +27,7 @@ const (
 var legacyAuthComposeFile = filepath.Join(dockerLegacyAuthDir, "compose.yaml")
 var legacyAuthComposePluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.plugins.yaml")
 var legacyAuthComposeDedicatedPluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.dedicated-plugins.yaml")
-var legacyAuthComposeDelegatedOperationsFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.yaml")
+var legacyAuthComposeDelegatedOperationsFile = filepath.Join(dockerLegacyAuthDir, "compose.delegated-operators.yaml")
 var legacyAuthEnvTemplateFilePath = filepath.Join(dockerLegacyAuthDir, "env.template")
 
 type commonServicesLegacyAuthDockerComposeTest struct {
@@ -258,6 +258,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -338,6 +339,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -419,6 +421,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -500,6 +503,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",

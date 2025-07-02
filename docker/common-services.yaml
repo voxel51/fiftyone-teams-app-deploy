@@ -34,6 +34,7 @@ services:
   teams-api-common:
     image: voxel51/fiftyone-teams-api:v2.11.0
     environment:
+      API_EXTERNAL_URL: ${FIFTYONE_API_URI}
       CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
