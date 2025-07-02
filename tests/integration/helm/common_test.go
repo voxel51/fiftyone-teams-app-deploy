@@ -88,7 +88,7 @@ spec:
             storage: {{ .Capacity }}
 `
 	nfsExportPath      = "/ephemeral-integration-tests/plugins"
-	nfsExportServer    = "nfs-server.us-east5-a.c.computer-vision-team.internal"
+	nfsExportServer    = "voxel51-dev-nfs-server.us-east5-a.c.computer-vision-team.internal"
 	pvCapacity         = "100Mi"
 	pvStorageClassName = "\"\""
 	// License File Secret
