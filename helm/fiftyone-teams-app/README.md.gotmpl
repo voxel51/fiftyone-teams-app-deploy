@@ -49,7 +49,7 @@ FiftyOne Enterprise v2.9 no longer requires that operators set the
 following `FIFTYONE_DATABASE_ADMIN` variable while doing an initial installation:
 
 ```yaml
-# Required prior to 2.10.1
+# Required prior to 2.8.0
 appSettings:
   env:
     FIFTYONE_DATABASE_ADMIN: true
