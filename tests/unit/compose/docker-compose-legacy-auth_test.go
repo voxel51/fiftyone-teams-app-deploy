@@ -237,6 +237,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -286,8 +288,6 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
-				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
-				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -316,6 +316,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -365,8 +367,6 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
-				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
-				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -395,6 +395,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -446,8 +448,6 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
-				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
-				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
@@ -476,6 +476,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -527,8 +529,6 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
-				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
-				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
 			},
 		},
 		{
