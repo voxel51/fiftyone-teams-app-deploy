@@ -526,6 +526,8 @@ follow
 | appSettings.autoscaling.targetCPUUtilizationPercentage | int | `80` | Percent CPU utilization for autoscaling for `fiftyone-app`. |
 | appSettings.autoscaling.targetMemoryUtilizationPercentage | int | `80` | Percent memory utilization for autoscaling for `fiftyone-app`. |
 | appSettings.deploymentAnnotations | object | `{}` | Annotations for the `fiftyone-app` deployment. [Reference][annotations]. |
+| appSettings.env.FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off. |
+| appSettings.env.FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application. |
 | appSettings.env.FIFTYONE_DATABASE_ADMIN | bool | `false` | Controls whether the client is allowed to trigger database migrations. [Reference][fiftyone-config]. |
 | appSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | appSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
@@ -748,8 +750,6 @@ follow
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the `teams-app`.  Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
-| teamsAppSettings.env.FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled by default for every dataset for the teams application. Set to false to set default mode to off. |
-| teamsAppSettings.env.FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE | bool | `true` | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application. |
 | teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.10.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
