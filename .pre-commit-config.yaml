@@ -81,7 +81,7 @@ repos:
           - helm/README.md
           - CONTRIBUTING.md
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.29
+    rev: v0.1.30
     hooks:
       - id: helmlint
   - repo: https://github.com/Yelp/detect-secrets
