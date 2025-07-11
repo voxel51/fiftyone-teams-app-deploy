@@ -122,7 +122,7 @@ Helm and Kubectl must be installed and configured on your machine.
 
 The following kubernetes/kubectl versions are required:
 
-Kubernetes: `>=1.30-0`
+Kubernetes: `>=1.31-0`
 
 However, it is recommended to use a
 [supported kubernetes version](https://kubernetes.io/releases/).
