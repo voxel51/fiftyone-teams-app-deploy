@@ -110,6 +110,8 @@ repos:
           - --diff
           - --write
           - --simplify
+          - --case-indent
+          - --indent=2
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.2.0
     hooks:
