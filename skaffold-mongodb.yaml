@@ -10,7 +10,7 @@ deploy:
     releases:
       - name: mongodb
         remoteChart: bitnami/mongodb
-        version: 14.4.0
+        version: 16.5.29
         createNamespace: true
         namespace: fiftyone-teams
         overrides:
@@ -20,7 +20,7 @@ deploy:
             # because MongoDB doesn't provide Debian ARM64 packages/binaries.
             # However, MongoDB provided images supports arm64.
             repository: mongo
-            tag: "6.0.12-jammy"  # mongodb.fiftyone.ai is version `6.0.11`
+            tag: "8"  # We say we support versions 6 - 8, let's use the entire 8.x range.
             pullPolicy: IfNotPresent
           # architecture: standalone  # default is `standalone`. May also be `replicaset`.
 
