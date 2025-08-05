@@ -45,6 +45,7 @@
             },
             "FIFTYONE_LOGGING_FORMAT": {
               "default": "json",
+              "description": "The format to use for log messages.\nCan be one of `json` or `text`.",
               "required": [],
               "title": "FIFTYONE_LOGGING_FORMAT",
               "type": "string"
