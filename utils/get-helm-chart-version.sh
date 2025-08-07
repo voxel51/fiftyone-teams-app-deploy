@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Looks up the version of a dependent GAR artifact from
+# either the commit SHA or helm Chart.yaml version.
+# There are no inputs.
+# All echos happen to STDERR.
+# Result is the found version which can be captured with STDOUT.
+
 set -o pipefail
 set -eu
 
