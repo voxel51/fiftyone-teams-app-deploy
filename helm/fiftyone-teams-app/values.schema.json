@@ -43,6 +43,13 @@
                 "boolean"
               ]
             },
+            "FIFTYONE_LOGGING_FORMAT": {
+              "default": "text",
+              "description": "The format to use for log messages.\nCan be one of `json` or `text`.",
+              "required": [],
+              "title": "FIFTYONE_LOGGING_FORMAT",
+              "type": "string"
+            },
             "GRAPHQL_DEFAULT_LIMIT": {
               "default": 10,
               "description": "Default number of returned items when listing in GraphQL queries.\nCan be overridden in the request.",

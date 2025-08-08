@@ -32,6 +32,9 @@ apiSettings:
     # -- Logging level. Overrides the value of `FIFTYONE_ENV`.
     # Can be one of "DEBUG", "INFO", "WARN", "ERROR", or "CRITICAL".
     LOGGING_LEVEL: INFO
+    # -- The format to use for log messages.
+    # Can be one of `json` or `text`.
+    FIFTYONE_LOGGING_FORMAT: text
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
