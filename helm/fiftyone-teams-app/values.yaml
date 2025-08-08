@@ -34,7 +34,7 @@ apiSettings:
     LOGGING_LEVEL: INFO
     # -- The format to use for log messages.
     # Can be one of `json` or `text`.
-    FIFTYONE_LOGGING_FORMAT: json
+    FIFTYONE_LOGGING_FORMAT: text
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}

@@ -492,7 +492,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
-            "value": "json"
+            "value": "text"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
@@ -577,7 +577,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
-            "value": "json"
+            "value": "text"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
@@ -676,7 +676,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
-            "value": "json"
+            "value": "text"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
@@ -772,7 +772,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
-            "value": "json"
+            "value": "text"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
@@ -856,7 +856,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
-            "value": "json"
+            "value": "text"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
