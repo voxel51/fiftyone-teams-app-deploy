@@ -258,6 +258,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -339,6 +340,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{internalAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -420,6 +422,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
