@@ -84,7 +84,7 @@ regarding FiftyOne Enterprise.
 - License file from Voxel51
 - Docker Hub credentials from Voxel51
 - MongoDB instance available.
-  - FiftyOne Teams is compatible with MongoDB Community, Enterprise, or Atlas
+  - FiftyOne Enterprise is compatible with MongoDB Community, Enterprise, or Atlas
     Editions.
   - If using MongoDB Community or Enterprise we recommend a minimum of 4vCPU and
     16GB of RAM. Large datasets and complex samples may require additional
@@ -93,6 +93,7 @@ regarding FiftyOne Enterprise.
     can then use utilization metrics to make scaling decisions (up or down).
     Please note that we do not support MongoDB Atlas Serverless instances
     because we require Aggregations.
+  - A FiftyOne Enterprise deployment requires two separate databases in your MongoDB instance that are automatically created on startup (defaulting to [`fiftyone`](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/17c11828f3e3d02cc7eb32543d26ba3e61ebfe77/docker/internal-auth/env.template#L52) and [`fiftyone-cas`](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/17c11828f3e3d02cc7eb32543d26ba3e61ebfe77/docker/internal-auth/env.template#L64))
 - For resource requirements on a VM that will be hosting your docker deployment,
   we recommend starting with 8vCPU/32GB RAM, monitoring usage and scaling
   accordingly.
