@@ -90,7 +90,7 @@ quickstart  0.21.2
    FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
    ```
 
-1. To ensure that all datasets are now at version 1.7.0, run
+1. To ensure that all datasets are now at version 1.8.0, run
 
    ```shell
    fiftyone migrate --info
@@ -205,7 +205,7 @@ Additionally,
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.7.0, run
+1. To ensure that all datasets are now at version 1.8.0, run
 
     ```shell
     fiftyone migrate --info
@@ -297,7 +297,7 @@ Additionally,
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
     ```
 
-1. To ensure that all datasets are now at version 1.7.0, run
+1. To ensure that all datasets are now at version 1.8.0, run
 
     ```shell
     fiftyone migrate --info
@@ -371,7 +371,7 @@ Additionally,
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to
       `Account > Install FiftyOne`
-1. Confirm that datasets have been migrated to version 1.7.0
+1. Confirm that datasets have been migrated to version 1.8.0
 
     ```shell
     fiftyone migrate --info
