@@ -433,7 +433,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			nil,
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
-
           {
             "name": "API_EXTERNAL_URL",
             "value": ""
@@ -524,7 +523,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
-             "name": "API_EXTERNAL_URL",
+            "name": "API_EXTERNAL_URL",
             "value": ""
           },
           {
@@ -627,7 +626,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
-             "name": "API_EXTERNAL_URL",
+            "name": "API_EXTERNAL_URL",
             "value": ""
           },
           {
@@ -727,8 +726,8 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
-          "name": "API_EXTERNAL_URL",
-          "value": ""
+          	"name": "API_EXTERNAL_URL",
+          	"value": ""
           },
           {
             "name": "CAS_BASE_URL",
@@ -815,14 +814,13 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
-             "name": "API_EXTERNAL_URL",
+            "name": "API_EXTERNAL_URL",
             "value": ""
           },
           {
             "name": "CAS_BASE_URL",
             "value": "http://teams-cas-override:8000/cas/api"
           },
-
           {
             "name": "FIFTYONE_AUTH_SECRET",
             "valueFrom": {
