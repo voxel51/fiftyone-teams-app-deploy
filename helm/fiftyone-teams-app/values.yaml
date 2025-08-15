@@ -223,6 +223,18 @@ appSettings:
     # @schema
     # type: ["string", "boolean"]
     # @schema
+    # -- Controls whether Query Performance mode is enabled by default for
+    # every dataset for the teams application. Set to false to set default mode to off.
+    FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE: true
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
+    # -- Controls whether Query Performance mode is enabled for the
+    # application. Set to false to disable Query Performance mode for entire application.
+    FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE: true
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Controls whether the client is allowed to trigger database migrations.
     # [Reference][fiftyone-config].
     FIFTYONE_DATABASE_ADMIN: false
@@ -1112,7 +1124,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.10.0
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.10.2
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
@@ -1131,18 +1143,6 @@ teamsAppSettings:
     # -- Controls whether anonymous analytics are captured for the
     # application. Set to false to opt-out of anonymous analytics.
     FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: true
-    # @schema
-    # type: ["string", "boolean"]
-    # @schema
-    # -- Controls whether Query Performance mode is enabled by default for
-    # every dataset for the teams application. Set to false to set default mode to off.
-    FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE: true
-    # @schema
-    # type: ["string", "boolean"]
-    # @schema
-    # -- Controls whether Query Performance mode is enabled for the
-    # application. Set to false to disable Query Performance mode for entire application.
-    FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE: true
 
   # -- Secret variables to be passed to the `teams-app` containers.
   secretEnv: {}

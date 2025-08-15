@@ -464,6 +464,14 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_ADMIN",
             "value": "false"
           },
@@ -538,6 +546,14 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_DATABASE_ADMIN",
@@ -630,6 +646,14 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_ADMIN",
             "value": "false"
           },
@@ -717,6 +741,14 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_ADMIN",
             "value": "false"
           },
@@ -790,6 +822,14 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
+            "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_DATABASE_ADMIN",

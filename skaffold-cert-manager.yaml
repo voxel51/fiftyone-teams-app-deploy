@@ -47,6 +47,6 @@ deploy:
     releases:
       - name: cert-manager
         remoteChart: jetstack/cert-manager
-        version: 1.13.3
+        version: 1.18.2
         createNamespace: true
         namespace: cert-manager

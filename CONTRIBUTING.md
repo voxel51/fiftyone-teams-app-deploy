@@ -70,6 +70,18 @@
     make license-secret-internal
     ```
 
+1. Install or update the required helm repositories
+
+    ```shell
+    make helm-repos
+    ```
+
+    or
+
+    ```shell
+    make helm-repo-update
+    ```
+
 1. Run skaffold
 
     ```shell
