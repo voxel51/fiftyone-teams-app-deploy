@@ -81,13 +81,14 @@ repos:
           - helm/README.md
           - CONTRIBUTING.md
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.29
+    rev: v0.1.30
     hooks:
       - id: helmlint
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:
       - id: detect-secrets
+        exclude: '^helm/local-self-signed-example/cert-manger-crds/crd-.*.yaml'
         args:
           - --exclude-secrets
           - '(password|REPLACEME|fiftyone-teams-tls-secret|3-9XjJ-gUV?vp\^e\(WUk>LD&lAjh7yEji|btv8BiFCaPIayWU3IU3a_Lm_EMIIk-t6H_yN1ORV45o=|5b32118032bfd50b64b3cc7c0e0821f4e84f63ad517a9687ac2b6ce6ab261976|aGM4\?s&t-n;\!\*U96oA#bdo,\+JU\)ac1T7|test-*|/api/proxy/fiftyone-teams|/opt/plugins|fiftyone-license|LICENSE_KEY_FILE_PATHS)'
@@ -109,6 +110,8 @@ repos:
           - --diff
           - --write
           - --simplify
+          - --case-indent
+          - --indent=2
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.2.0
     hooks:
