@@ -20,7 +20,7 @@ jobs:
       helm-integration-required: ${{ steps.filter.outputs.helm-integration }}
       helm-unit-required: ${{ steps.filter.outputs.helm-unit }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v3
         id: filter
         with:
