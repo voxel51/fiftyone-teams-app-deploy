@@ -875,6 +875,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "true"
           },
           {
+            "name": "FIFTYONE_LOGGING_FORMAT",
+            "value": "text"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
