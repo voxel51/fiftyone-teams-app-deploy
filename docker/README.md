@@ -62,6 +62,7 @@ regarding FiftyOne Enterprise.
   - [:page_facing_up: Optional: Upload Run Logs](#page_facing_up-optional-upload-run-logs)
   - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
+  - [:on: On-Demand Delegated Operator Executors](#on-on-demand-delegated-operator-executors)
 - [Step 8: Identity Provider (IdP) and Authentication (CAS)](#step-8-identity-provider-idp-and-authentication-cas)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
@@ -437,6 +438,12 @@ and deploy **custom plugin images**. You can base them on
 - Custom Python packages
 - ML libraries (e.g. PyTorch, OpenCV)
 - Internal SDKs or models
+
+### :on: On-Demand Delegated Operator Executors
+
+FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
+executors for Databricks and Anyscale. Please refer to the
+[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md)
 
 ## Step 8: Identity Provider (IdP) and Authentication (CAS)
 
