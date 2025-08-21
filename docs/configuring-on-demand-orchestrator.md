@@ -13,7 +13,7 @@
 ---
 
 As of FiftyOne Enterprise v2.11.0, delegated operations can be run on-demand
-in select external compute solutions, or orchestrators.
+in select external compute platforms (orchestrators).
 
 This is the list of supported orchestrators and their configuration guides:
 

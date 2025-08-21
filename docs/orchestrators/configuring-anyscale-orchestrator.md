@@ -39,14 +39,14 @@ to include FiftyOne and, optionally, any custom operators.
     ```dockerfile
     FROM anyscale/ray:2.46.0-slim-py312
 
-    ARG FO_PYPI_TOKEN
-    ARG FO_VERSION
+    ARG FIFTYONE_ENTERPRISE_PYPI_TOKEN
+    ARG FIFTYONE_ENTERPRISE_VERSION
 
     # Install system level packages here
 
     # Install fiftyone
-    RUN pip install fiftyone==${FO_VERSION} \
-      --index-url https://${FO_PYPI_TOKEN}@pypi.dev.fiftyone.ai/simple/ \
+    RUN pip install fiftyone==${FIFTYONE_ENTERPRISE_VERSION} \
+      --index-url https://${FIFTYONE_ENTERPRISE_PYPI_TOKEN}@pypi.dev.fiftyone.ai/simple/ \
       --extra-index-url "https://pypi.org/simple"
 
     # Install extra python packages here.
@@ -59,8 +59,8 @@ to include FiftyOne and, optionally, any custom operators.
     ```commandline
     docker build  . \
           -t fiftyone-anyscale-example \
-          --build-arg FIFTYONE_ENTERPRISE_VERSION=2.10 \
-          --build-arg FIFTYONE_ENTERPRISE_INDEX_URL=abc123
+          --build-arg FIFTYONE_ENTERPRISE_VERSION=2.11 \
+          --build-arg FIFTYONE_ENTERPRISE_PYPI_TOKEN=abc123
     ```
 
 1. Push Container Image to an
@@ -105,7 +105,7 @@ Optionally, if you have an existing Secret that already has the credentials
 you’d like to use, you can provide the name of that Secret and it will be used
 instead of creating a new one. Examples of both options are included below.
 
-Example snippet using the Management SDK to register a Databricks orchestrator:
+Example snippet using the Management SDK to register an Anyscale orchestrator:
 
 ```python
 import fiftyone.management as fom
@@ -198,7 +198,7 @@ in Anyscale.
 
 ## Additional Considerations
 
-Your Databricks service account will need the following permissions for your
+Your Anyscale service account will need the following permissions for your
 cloud storage platform of choice:
 
 - Storage Bucket Viewer

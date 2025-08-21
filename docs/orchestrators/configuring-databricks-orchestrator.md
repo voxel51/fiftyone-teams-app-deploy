@@ -52,7 +52,7 @@ w = WorkspaceClient()
 DBFS_PATH = "/FileStore/my_project/requirements.txt"
 
 PYTHON_DEPENDENCIES = [
-   "fiftyone==2.10.0",  # use your FiftyOne version here
+   "fiftyone==2.11.0",  # use your FiftyOne version here
    "ultralytics",
    "torch",
    "transformers",
@@ -288,10 +288,10 @@ REGISTRATION_POOL_ID = ""
 ENV_VARS = {
    "FIFTYONE_DATABASE_NAME": "\"fiftyone\"",
    "FIFTYONE_INTERNAL_SERVICE": "1",
-   "FIFTYONE_DATABASE_URI": "{{secrets/your-scope/FIFTYONE_DATABASE_URI_DEMO}}",
-   "FIFTYONE_ENCRYPTION_KEY": "{{secrets/your-scope/FIFTYONE_ENCRYPTION_KEY_DEMO}}",
+   "FIFTYONE_DATABASE_URI": "{{secrets/your-scope/FIFTYONE_DATABASE_URI}}",
+   "FIFTYONE_ENCRYPTION_KEY": "{{secrets/your-scope/FIFTYONE_ENCRYPTION_KEY}}",
    "API_URL": "",
-   "PIP_EXTRA_INDEX_URL": "{{secrets/your-scope/FIFTYONE_PYPI_URL_DEMO}}",
+   "PIP_EXTRA_INDEX_URL": "{{secrets/your-scope/FIFTYONE_PYPI_URL}}",
    "FIFTYONE_PLUGINS_DIR": "\"/Workspace/your-plugin-dir/plugins\"",
    "FIFTYONE_PLUGINS_CACHE_ENABLED": "true",
 }
@@ -477,7 +477,7 @@ parameter. Here is an example:
 ```python
 import fiftyone.management as fom
 fom.register_orchestrator(
-   instace_id="your-orchestrator-name",
+   instance_id="your-orchestrator-name",
    description="Your orchestrator description",
    environment=fom.OrchestratorEnvironment.DATABRICKS,
    config={
@@ -544,7 +544,7 @@ rotated regularly.
 
 In order to rotate your Databricks credentials in FiftyOne:
 
-1. Regenerate credentials through Databricks UI or SDK SDK
+1. Regenerate credentials through Databricks UI or SDK
 1. Update the credentials in FiftyOne using the following FOM commands:
 
 ```python
