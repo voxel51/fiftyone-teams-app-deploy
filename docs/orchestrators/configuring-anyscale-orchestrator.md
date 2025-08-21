@@ -21,7 +21,7 @@ delegated operations on-demand.
 ## Compute Config
 
 Define and manage the machines, scaling, and other configurations for computer
-resources [pdirectly in Anyscale](https://docs.anyscale.com/configuration/compute/overview/).
+resources [directly in Anyscale](https://docs.anyscale.com/configuration/compute/overview/).
 
 ## Dependency Management
 
@@ -34,7 +34,8 @@ to include FiftyOne and, optionally, any custom operators.
 1. Determine base for Container Image using one of the following options:
    - An [Anyscale base image](https://docs.anyscale.com/reference/anyscale-base-images)
    - A custom image meeting the [requirements](https://docs.anyscale.com/configuration/dependency-management/image-requirement)
-1. Add fiftyone Python package to the Container Image (_see following example Dockfile_)
+1. Add the FiftyOne Python package to the Container Image
+   (_see following example Dockerfile_)
 
     ```dockerfile
     FROM anyscale/ray:2.46.0-slim-py312
@@ -174,11 +175,12 @@ orchestrator.
 ## Refresh Orchestrator Operators
 
 Before you can do this step make sure you’ve added the optional dependency
-`anyscale` into your Fiftyone API deployment as well as the environment
-variable `API_EXTERNAL_URL` which will be used to tell your Anyscale workers
-where to talk to Fiftyone. The external URL can be found under
-`/settings/api_keys` in the UI. The API must be exposed outside of the internal
-network ([helm](../../helm/docs/expose-teams-api.md) / [docker](../../docker/docs/expose-teams-api.md)).
+`anyscale` into your FiftyOne API deployment, and set the environment
+variable `API_EXTERNAL_URL` (the external Teams API base URL) used by Anyscale
+workers to talk back to FiftyOne during registration/refresh. The external URL
+can be found under `/settings/api_keys` in the UI. The API must be exposed
+outside of the internal network
+([helm](../../helm/docs/expose-teams-api.md) / [docker](../../docker/docs/expose-teams-api.md)).
 
 This step is only required if you’ve added a plugin directory with custom
 plugins to your Anyscale environment.

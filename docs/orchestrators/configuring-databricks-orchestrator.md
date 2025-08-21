@@ -439,7 +439,7 @@ import fiftyone.management as fom
 fom.register_orchestrator(
     instance_id="your-orchestrator-name",
     description="Your orchestrator description",
-    environment="databricks",
+    environment=fom.OrchestratorEnvironment.DATABRICKS,
     config={
         fom.OrchestratorEnvironment.DATABRICKS: {  # config
             "jobId": "your-job-id",

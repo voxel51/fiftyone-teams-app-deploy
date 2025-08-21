@@ -31,7 +31,7 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
 executors for Databricks and Anyscale. Please refer to the
-[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md)
+[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
 
 ### Version 2.9+ Startup Probe Changes
 
