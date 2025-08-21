@@ -32,9 +32,15 @@ for execution, on-demand.
 
 Databricks executors need to define the dependencies necessary for executing a
 delegated operation. The below script will create a requirements.txt file
-with the minimum required dependencies for running builtin operations. If you
-have custom operators that require additional dependencies you will add them
-here. Save your ``DBFS_PATH`` for later as it will be used when creating your
+with the minimum required dependencies for running builtin operations. 
+
+- If you have custom operators that require additional dependencies you will
+add them here.
+- Some zoo models require additional packages. You can check the requirements
+for any zoo model in the [fiftyone documentation](https://docs.voxel51.com/model_zoo/models.html):
+find the model, then look under `Requirements` > `Packages`.
+
+Save your ``DBFS_PATH`` for later as it will be used when creating your
 job configuration. The script will also create the file in your Databricks
 account using the Databricks SDK. Alternatively you can create this manually in
 the UI.
