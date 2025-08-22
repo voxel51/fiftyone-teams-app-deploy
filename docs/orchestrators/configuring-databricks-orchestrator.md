@@ -32,7 +32,7 @@ for execution, on-demand.
 
 Databricks executors need to define the dependencies necessary for executing a
 delegated operation. The below script will create a requirements.txt file
-with the minimum required dependencies for running builtin operations. 
+with the minimum required dependencies for running builtin operations.
 
 - If you have custom operators that require additional dependencies you will
 add them here.
