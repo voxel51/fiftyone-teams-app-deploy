@@ -221,6 +221,10 @@ Additionally:
 - Make sure your API service has the environment variable `API_EXTERNAL_URL`
   set to your API_URI since this will be used to set the API endpoint in your
   Anyscale workers
+- Due to a limitation discovered in the connection between Anyscale and
+  MongoDB Atlas, using more than 4 parallel processes can lead to connection
+  issues. The environment variable ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` is set
+  to ``4`` in your job config to avoid this issue.
 
 ## Credential Expiration and Rotation
 
