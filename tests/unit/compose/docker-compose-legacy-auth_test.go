@@ -27,7 +27,7 @@ const (
 var legacyAuthComposeFile = filepath.Join(dockerLegacyAuthDir, "compose.yaml")
 var legacyAuthComposePluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.plugins.yaml")
 var legacyAuthComposeDedicatedPluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.dedicated-plugins.yaml")
-var legacyAuthComposeDelegatedOperationsFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.yaml")
+var legacyAuthComposeDelegatedOperationsFile = filepath.Join(dockerLegacyAuthDir, "compose.delegated-operators.yaml")
 var legacyAuthEnvTemplateFilePath = filepath.Join(dockerLegacyAuthDir, "env.template")
 
 type commonServicesLegacyAuthDockerComposeTest struct {
@@ -150,42 +150,42 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 			"fiftyone-app",
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app:v2.10.2",
+			"voxel51/fiftyone-app:v2.11.0",
 		},
 		{
 			"defaultTeamsApi",
 			"teams-api",
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-api:v2.10.2",
+			"voxel51/fiftyone-teams-api:v2.11.0",
 		},
 		{
 			"defaultTeamsApp",
 			"teams-app",
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-app:v2.10.2",
+			"voxel51/fiftyone-teams-app:v2.11.0",
 		},
 		{
 			"defaultTeamsCas",
 			"teams-cas",
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-cas:v2.10.2",
+			"voxel51/fiftyone-teams-cas:v2.11.0",
 		},
 		{
 			"dedicatedPluginsTeamsPlugins",
 			"teams-plugins",
 			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-app-torch:v2.10.2",
+			"voxel51/fiftyone-app-torch:v2.11.0",
 		},
 		{
 			"delegatedOperationsTeamsDo",
 			"teams-do",
 			[]string{legacyAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-teams-cv-full:v2.10.2",
+			"voxel51/fiftyone-teams-cv-full:v2.11.0",
 		},
 	}
 
@@ -258,6 +258,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -265,6 +266,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
+				"FIFTYONE_LOGGING_FORMAT=text",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
 				"MONGO_DEFAULT_DB=fiftyone",
@@ -280,7 +282,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"APP_USE_HTTPS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
-				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.10.2",
+				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.11.0",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
@@ -337,6 +339,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -344,6 +347,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
+				"FIFTYONE_LOGGING_FORMAT=text",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
 				"MONGO_DEFAULT_DB=fiftyone",
@@ -359,7 +363,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"APP_USE_HTTPS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
-				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.10.2",
+				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.11.0",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
@@ -417,6 +421,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -424,6 +429,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
+				"FIFTYONE_LOGGING_FORMAT=text",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
@@ -440,7 +446,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"APP_USE_HTTPS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
-				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.10.2",
+				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.11.0",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
@@ -497,6 +503,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
@@ -504,6 +511,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
+				"FIFTYONE_LOGGING_FORMAT=text",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
@@ -520,7 +528,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"APP_USE_HTTPS=true",
 				"FIFTYONE_API_URI=https://example-api.fiftyone.ai",
 				"FIFTYONE_APP_ALLOW_MEDIA_EXPORT=true",
-				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.10.2",
+				"FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION=2.11.0",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
