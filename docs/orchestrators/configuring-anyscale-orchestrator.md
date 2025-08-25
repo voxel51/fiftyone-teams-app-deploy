@@ -57,6 +57,9 @@ find the model, then look under `Requirements` > `Packages`.
     # Install extra python packages here.
 
     # Install custom operators here.
+
+    # If MongoDB Atlas, set max process pool workers to avoid connection issues
+    ENV FIFTYONE_MAX_PROCESS_POOL_WORKERS=4
     ```
 
 1. Build and tag the Container Image (_see following example command_)
@@ -223,8 +226,9 @@ Additionally:
   Anyscale workers
 - Due to a limitation discovered in the connection between Anyscale and
   MongoDB Atlas, using more than 4 parallel processes can lead to connection
-  issues. The environment variable ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` is set
-  to ``4`` in your job config to avoid this issue.
+  issues. We recommend setting the environment variable
+  ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``4`` in your created docker image
+  to avoid this issue, if you are using MongoDB Atlas.
 
 ## Credential Expiration and Rotation
 

@@ -555,7 +555,7 @@ Additionally:
   MongoDB Atlas, using more than 4 parallel processes can lead to connection
   issues. We recommend setting the environment variable
   ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``4`` in your job config to avoid
-  this issue.
+  this issue, if you are using MongoDB Atlas.
 
 ### Credential Expiration and Rotation
 
