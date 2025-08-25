@@ -5,7 +5,8 @@ apiSettings:
   # -- Controls whether `teams-api` is added to the chart's ingress.
   # When an empty string, a rule for `teams-api` is not added to the chart managed ingress.
   # When not an empty string, becomes the value to the `host` in the ingress' rule and
-  # set `ingress.api` too.
+  # set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api`
+  # to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators.
   dnsName: ""
   # -- Annotations for the `teams-api` deployment. [Reference][annotations].
   deploymentAnnotations: {}
