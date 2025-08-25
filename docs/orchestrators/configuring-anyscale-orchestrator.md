@@ -219,8 +219,8 @@ cloud storage platform of choice:
 
 Additionally:
 
-- “Anyscale” is not automatically built into the API image so you’ll need to
-  add it as an extra dependency
+- `anyscale` SDK is not automatically built into the API image so you’ll need
+  to add it as an extra dependency
 - Make sure your API service has the environment variable `API_EXTERNAL_URL`
   set to your API_URI since this will be used to set the API endpoint in your
   Anyscale workers

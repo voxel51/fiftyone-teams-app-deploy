@@ -549,7 +549,7 @@ cloud storage platform of choice:
 
 Additionally:
 
-- “databricks-sdk” is not automatically built into the API image so you’ll need
+- `databricks-sdk` is not automatically built into the API image so you’ll need
   to add it as an extra dependency
 - Due to a limitation discovered in the connection between Databricks and
   MongoDB Atlas, using more than 4 parallel processes can lead to connection
