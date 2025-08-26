@@ -37,7 +37,7 @@ with the minimum required dependencies for running builtin operations.
 - If you have custom operators that require additional dependencies you will
 add them here.
 - Some zoo models require additional packages. You can check the requirements
-for any zoo model in the [fiftyone documentation](https://docs.voxel51.com/model_zoo/models.html):
+for any zoo model in the [FiftyOne documentation](https://docs.voxel51.com/model_zoo/models.html):
 find the model, then look under `Requirements` > `Packages`.
 
 Save your ``DBFS_PATH`` for later as it will be used when creating your
@@ -272,11 +272,14 @@ use workers from your instance pool, dependencies from your
 [requirements.txt](#create-requirementstxt), and have the required environment
 variables including the [secrets you created](#create-databricks-secrets).
 
+Note: you can change `max_concurrent_runs` to limit how many jobs can run at
+once; this should likely match the deployment's delegated operations capacity.
+
 Once you’ve created your job, note the Job ID, Execution Task ID and
 [Optional Registration Task ID](#optional-registration-instance-pool) (not
 necessary if you’ve removed it), we will use these when registering your
 endpoint in FiftyOne. Note: You can remove the optional registration task and
-registration task cluster below if you are okay with on demand registration
+registration task cluster below if you are okay with on-demand registration
 happening in your execution cluster.
 
 ```python
@@ -300,6 +303,7 @@ ENV_VARS = {
    "PIP_EXTRA_INDEX_URL": "{{secrets/your-scope/FIFTYONE_PYPI_URL}}",
    "FIFTYONE_PLUGINS_DIR": "\"/Workspace/your-plugin-dir/plugins\"",
    "FIFTYONE_PLUGINS_CACHE_ENABLED": "true",
+   "FIFTYONE_MAX_PROCESS_POOL_WORKERS": "4",
 }
 
 demo_job = Job.from_dict(
@@ -542,6 +546,16 @@ cloud storage platform of choice:
   [cloud storage logging](https://docs.voxel51.com/enterprise/plugins.html#logs)
 - Blob sign permission, if the plugin uses signed URLs and your cloud platform
   requires additional permissions.
+
+Additionally:
+
+- `databricks-sdk` is not automatically built into the API image so you’ll need
+  to add it as an extra dependency
+- Due to a limitation discovered in the connection between Databricks and
+  MongoDB Atlas, using more than 4 parallel processes can lead to connection
+  issues. We recommend setting the environment variable
+  ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``4`` in your job config to avoid
+  this issue, if you are using MongoDB Atlas.
 
 ### Credential Expiration and Rotation
 

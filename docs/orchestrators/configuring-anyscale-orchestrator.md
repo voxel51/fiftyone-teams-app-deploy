@@ -57,6 +57,9 @@ find the model, then look under `Requirements` > `Packages`.
     # Install extra python packages here.
 
     # Install custom operators here.
+
+    # If MongoDB Atlas, set max process pool workers to avoid connection issues
+    ENV FIFTYONE_MAX_PROCESS_POOL_WORKERS=4
     ```
 
 1. Build and tag the Container Image (_see following example command_)
@@ -216,11 +219,17 @@ cloud storage platform of choice:
 
 Additionally:
 
-- “Anyscale” is not automatically built into the API image so you’ll need to
-  add it as an extra dependency
+- `anyscale` SDK is not automatically built into the API image so you’ll need
+  to add it as an extra dependency
 - Make sure your API service has the environment variable `API_EXTERNAL_URL`
   set to your API_URI since this will be used to set the API endpoint in your
-  Anyscale workers
+  Anyscale workers. Note: the provided deployment resources in this repo
+  already include this environment variable.
+- Due to a limitation discovered in the connection between Anyscale and
+  MongoDB Atlas, using more than 4 parallel processes can lead to connection
+  issues. We recommend setting the environment variable
+  ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``4`` in your created docker image
+  to avoid this issue, if you are using MongoDB Atlas.
 
 ## Credential Expiration and Rotation
 
