@@ -556,6 +556,9 @@ Additionally:
   issues. We recommend setting the environment variable
   ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``4`` in your job config to avoid
   this issue, if you are using MongoDB Atlas.
+- If you still experience connection issues or database-stored cloud
+  credentials are not being found, you should set
+  ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``0`` to disable multiprocessing.
 
 ### Credential Expiration and Rotation
 
