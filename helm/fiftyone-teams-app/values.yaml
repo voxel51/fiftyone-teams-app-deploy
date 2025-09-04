@@ -5,7 +5,8 @@ apiSettings:
   # -- Controls whether `teams-api` is added to the chart's ingress.
   # When an empty string, a rule for `teams-api` is not added to the chart managed ingress.
   # When not an empty string, becomes the value to the `host` in the ingress' rule and
-  # set `ingress.api` too.
+  # set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api`
+  # to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators.
   dnsName: ""
   # -- Annotations for the `teams-api` deployment. [Reference][annotations].
   deploymentAnnotations: {}
@@ -32,6 +33,9 @@ apiSettings:
     # -- Logging level. Overrides the value of `FIFTYONE_ENV`.
     # Can be one of "DEBUG", "INFO", "WARN", "ERROR", or "CRITICAL".
     LOGGING_LEVEL: INFO
+    # -- The format to use for log messages.
+    # Can be one of `json` or `text`.
+    FIFTYONE_LOGGING_FORMAT: text
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
@@ -1123,7 +1127,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.10.2
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.11.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
