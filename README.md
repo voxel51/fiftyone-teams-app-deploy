@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.10.2](https://img.shields.io/badge/Version-2.10.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.10.2](https://img.shields.io/badge/AppVersion-v2.10.2-informational?style=flat-square)
+![Version: 2.11.0](https://img.shields.io/badge/Version-2.11.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.11.0](https://img.shields.io/badge/AppVersion-v2.11.0-informational?style=flat-square)
 
 FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
@@ -26,6 +26,12 @@ This page assumes general knowledge of FiftyOne Enterprise and how to use it.
 Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
+
+### Version 2.11+ On-Demand Delegated Operator Executors
+
+FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
+executors for Databricks and Anyscale. Please refer to the
+[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
 
 ### Version 2.9+ Startup Probe Changes
 
@@ -474,9 +480,10 @@ follow
 |-----|------|---------|-------------|
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
 | apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
-| apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. |
+| apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api` to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators. |
 | apiSettings.env.FIFTYONE_ENV | string | `"production"` | Controls FiftyOne GraphQL verbosity. When "production", debug mode is disabled and the default logging level is "INFO". When "development", debug mode is enabled and the default logging level is "DEBUG". Can be overridden by setting `apiSettings.env.LOGGING_LEVEL`. |
 | apiSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
+| apiSettings.env.FIFTYONE_LOGGING_FORMAT | string | `"text"` | The format to use for log messages. Can be one of `json` or `text`. |
 | apiSettings.env.GRAPHQL_DEFAULT_LIMIT | int | `10` | Default number of returned items when listing in GraphQL queries. Can be overridden in the request. |
 | apiSettings.env.LOGGING_LEVEL | string | `"INFO"` | Logging level. Overrides the value of `FIFTYONE_ENV`. Can be one of "DEBUG", "INFO", "WARN", "ERROR", or "CRITICAL". |
 | apiSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
@@ -750,7 +757,7 @@ follow
 | teamsAppSettings.env.APP_USE_HTTPS | bool | `true` | Controls the protocol of the `teams-app`.  Configure your ingress to match. When `true`, uses the https protocol. When `false`, uses the http protocol. |
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.10.2"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.11.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
