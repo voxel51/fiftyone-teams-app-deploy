@@ -99,8 +99,8 @@ FiftyOne configuration.
 When registering your orchestrator with FiftyOne, you will need to supply
 credential information, which is stored as a
 [FiftyOne Secret](https://docs.voxel51.com/enterprise/secrets.html). The
-``secrets`` parameter to
-[``fom.register_orchestrator()``](https://docs.voxel51.com/enterprise/management_sdk.html#fiftyone.management.orchestrator.register_orchestrator)
+`secrets` parameter to
+[`fom.register_orchestrator()`](https://docs.voxel51.com/enterprise/management_sdk.html#fiftyone.management.orchestrator.register_orchestrator)
 takes a top level key that must match your orchestrator environment. The
 object that follows has key and value pairs that are specific to the
 credentials needed to access your orchestrator.
@@ -228,11 +228,11 @@ Additionally:
 - Due to a limitation discovered in the connection between Anyscale and
   MongoDB Atlas, using more than 4 parallel processes can lead to connection
   issues. We recommend setting the environment variable
-  ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``4`` in your created docker image
+  `FIFTYONE_MAX_PROCESS_POOL_WORKERS` to `4` in your created docker image
   to avoid this issue, if you are using MongoDB Atlas.
 - If you still experience connection issues or database-stored cloud
   credentials are not being found, you should set
-  ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``0`` to disable multiprocessing.
+  `FIFTYONE_MAX_PROCESS_POOL_WORKERS` to `0` to disable multiprocessing.
 
 ## Credential Expiration and Rotation
 

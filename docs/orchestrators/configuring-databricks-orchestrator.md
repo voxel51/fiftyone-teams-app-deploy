@@ -40,7 +40,7 @@ add them here.
 for any zoo model in the [FiftyOne documentation](https://docs.voxel51.com/model_zoo/models.html):
 find the model, then look under `Requirements` > `Packages`.
 
-Save your ``DBFS_PATH`` for later as it will be used when creating your
+Save your `DBFS_PATH` for later as it will be used when creating your
 job configuration. The script will also create the file in your Databricks
 account using the Databricks SDK. Alternatively you can create this manually in
 the UI.
@@ -90,7 +90,7 @@ correspond to your FiftyOne deployment. These secrets are: Mongo database URI,
 FiftyOne encryption key, and FiftyOne pypi url. To follow security best
 practices, the code below will create secrets in Databricks. Keep the path of
 these secrets with the scope you create, which should look something like:
-``secrets/your-scope/FIFTYONE_DATABASE_URI``. We will use these secrets when
+`secrets/your-scope/FIFTYONE_DATABASE_URI`. We will use these secrets when
 creating the job config environment variables.
 
 ```python
@@ -254,7 +254,7 @@ custom plugins. There are many ways to set this up, but here are some examples:
 - Give shared volume access to your Databricks
 
 Regardless of your chosen solution, save the absolute file path to be used in
-the ``FIFTYONE_PLUGINS_DIR`` environment variable when setting up your job
+the `FIFTYONE_PLUGINS_DIR` environment variable when setting up your job
 config. Read more about configuring plugins for
 [helm](../helm/docs/configuring-plugins.md) and
 [docker](../docker/docs/configuring-plugins.md).
@@ -400,7 +400,7 @@ the jobs you created above and keep the following fields for providing to
 FiftyOne:
 
 - Host
-  - The URL you view your account at eg: ``https://1290481.3.gcp.databricks.com/``
+  - The URL you view your account at eg: `https://1290481.3.gcp.databricks.com/`
 - Account Id
   - Account drop down (top right)
   - Manage account
@@ -420,16 +420,16 @@ FiftyOne:
 To register your orchestrator with FiftyOne, you can use the
 [FiftyOne Management SDK](https://docs.voxel51.com/enterprise/management_sdk.html#module-fiftyone.management.orchestrator).
 You will need to supply the environment you want to run your
-orchestrator (``fom.OrchestratorEnvironment.DATABRICKS``), and then the
+orchestrator (`fom.OrchestratorEnvironment.DATABRICKS`), and then the
 configuration and credential information needed to access that runner. To use
-the FiftyOne Management SDK, you will also need an ``API_URI`` set in the
+the FiftyOne Management SDK, you will also need an `API_URI` set in the
 environment or FiftyOne configuration.
 
 When registering your orchestrator with FiftyOne, you will need to supply
 credential information, which is stored as a
 [FiftyOne Secret](https://docs.voxel51.com/enterprise/secrets.html). The
-``secrets`` parameter to
-[``fom.register_orchestrator()``](https://docs.voxel51.com/enterprise/management_sdk.html#fiftyone.management.orchestrator.register_orchestrator)
+`secrets` parameter to
+[`fom.register_orchestrator()`](https://docs.voxel51.com/enterprise/management_sdk.html#fiftyone.management.orchestrator.register_orchestrator)
 takes a top level key that must match your orchestrator environment. The
 object that follows has key and value pairs that are specific to the
 credentials needed to access your orchestrator.
@@ -469,19 +469,19 @@ fom.register_orchestrator(
 ```
 
 This will register a new orchestrator with the identifier
-``your-orchestrator-name``.
+`your-orchestrator-name`.
 
 Additionally, it will save four new Secrets, one each for
-``host, accountId, clientId, clientSecret``. Those new secrets will have the
+`host, accountId, clientId, clientSecret`. Those new secrets will have the
 following names, respectively:
 
-``HOST_YOUR_ORCHESTRATOR_NAME``
-``ACCOUNT_ID_YOUR_ORCHESTRATOR_NAME``
-``CLIENT_ID_YOUR_ORCHESTRATOR_NAME``
-``CLIENT_SECRET_YOUR_ORCHESTRATOR_NAME``
+`HOST_YOUR_ORCHESTRATOR_NAME`
+`ACCOUNT_ID_YOUR_ORCHESTRATOR_NAME`
+`CLIENT_ID_YOUR_ORCHESTRATOR_NAME`
+`CLIENT_SECRET_YOUR_ORCHESTRATOR_NAME`
 
 As noted above, if you already had Secrets saved with values you would like to
-use, these names could be supplied in place of the values in the ``secrets``
+use, these names could be supplied in place of the values in the `secrets`
 parameter. Here is an example:
 
 ```python
@@ -554,11 +554,11 @@ Additionally:
 - Due to a limitation discovered in the connection between Databricks and
   MongoDB Atlas, using more than 4 parallel processes can lead to connection
   issues. We recommend setting the environment variable
-  ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``4`` in your job config to avoid
+  `FIFTYONE_MAX_PROCESS_POOL_WORKERS` to `4` in your job config to avoid
   this issue, if you are using MongoDB Atlas.
 - If you still experience connection issues or database-stored cloud
   credentials are not being found, you should set
-  ``FIFTYONE_MAX_PROCESS_POOL_WORKERS`` to ``0`` to disable multiprocessing.
+  `FIFTYONE_MAX_PROCESS_POOL_WORKERS` to `0` to disable multiprocessing.
 
 ### Credential Expiration and Rotation
 
