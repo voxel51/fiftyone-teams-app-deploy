@@ -112,7 +112,7 @@ jobs:
         working-directory: "helm"
 
       - name: Trigger Internal Chart Build
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.WD_HCI_FG_PAT }}
           script: |
