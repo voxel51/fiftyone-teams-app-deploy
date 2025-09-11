@@ -102,7 +102,7 @@ teamsAppSettings:
 #   env:
 #     # Set FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE to override the `Install FiftyOne`
 #     # bash command in the `Settings > Install FiftyOne` modal
-#     FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.11.0
+#     FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.11.1
 
 # ingress:
 #   annotations:
