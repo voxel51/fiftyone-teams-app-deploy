@@ -58,7 +58,7 @@ w = WorkspaceClient()
 DBFS_PATH = "/FileStore/my_project/requirements.txt"
 
 PYTHON_DEPENDENCIES = [
-   "fiftyone==2.11.1",  # use your FiftyOne version here
+   "fiftyone==2.11.2",  # use your FiftyOne version here
    "ultralytics",
    "torch",
    "transformers",
