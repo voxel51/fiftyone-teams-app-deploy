@@ -118,6 +118,9 @@ for steps on how to add your license file.
   - [Text Similarity](#text-similarity)
   - [Workload Identity Federation](#workload-identity-federation)
 - [Validating](#validating)
+- [Health Checks And Monitoring](#health-checks-and-monitoring)
+  - [Basic Health Assessment](#basic-health-assessment)
+  - [Troubleshooting Unhealthy Pods](#troubleshooting-unhealthy-pods)
 - [Values](#values)
 
 <!-- tocstop -->
@@ -517,6 +520,59 @@ for more information.
 After deploying FiftyOne Enterprise and configuring authentication, please
 follow
 [validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
+
+## Health Checks And Monitoring
+
+[Liveness and readiness probes][probes]
+are used to monitor each service deployed with FiftyOne Enterprise.
+
+### Basic Health Assessment
+
+Pods will report ready (`1/1`, `2/2`, etc.) in the output of `kubectl get pods`:
+
+```shell
+kubectl get pods
+```
+
+Expected output for a healthy deployment:
+
+```shell
+fiftyone-app-fbcf6666d-crt6z      1/1     Running                  0          5h3m
+fiftyone-app-fbcf6666d-wt9w6      1/1     Running                  0          102m
+teams-api-64fbf96c96-2tgm9        1/1     Running                  0          5h3m
+teams-api-64fbf96c96-b7jz5        1/1     Running                  0          5h3m
+teams-api-64fbf96c96-m2dnk        1/1     Running                  0          5h3m
+teams-app-fbdd4849f-bwmvt         1/1     Running                  0          116m
+teams-app-fbdd4849f-skgb7         1/1     Running                  0          5h3m
+teams-cas-68f95d68f-9dglm         1/1     Running                  0          5h3m
+teams-cas-68f95d68f-fmq5g         1/1     Running                  0          41m
+```
+
+Note that number of pods and pod names may vary per deployment.
+
+### Troubleshooting Unhealthy Pods
+
+If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
+
+1. **Get detailed pod information**:
+
+   ```shell
+   kubectl describe pod <pod-name>
+   ```
+
+2. **Check application logs**:
+
+   ```shell
+   kubectl logs <pod-name>
+   # For previous container instance logs
+   kubectl logs <pod-name> --previous
+   ```
+
+3. **Check events for issues**:
+
+   ```shell
+   kubectl get events --sort-by='.lastTimestamp'
+   ```
 
 ## Values
 

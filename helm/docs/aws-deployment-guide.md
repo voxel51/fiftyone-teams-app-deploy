@@ -158,7 +158,7 @@ deployment of FiftyOne Enterprise.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the ... |
+| HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the [Health Checks And Monitoring](../fiftyone-teams-app/README.md#health-checks-and-monitoring) section. |
 
 ### Backup and Recovery
 
