@@ -14,6 +14,9 @@ deploy:
         createNamespace: true
         namespace: fiftyone-teams
         overrides:
+          global:
+            security:
+              allowInsecureImages: true
           image:
             # Bitnami charts only support bitnami container images.
             # The bitnami/mongo images are Debian with arch linux/amd64 only (linux/arm64 is not provided)
@@ -47,3 +50,5 @@ deploy:
           # {"error":"IllegalOperation: Attempted to create a lock file on a read-only directory: /data/db"}
           volumePermissions:
             enabled: true
+            image:
+              repository: bitnamilegacy/os-shell
