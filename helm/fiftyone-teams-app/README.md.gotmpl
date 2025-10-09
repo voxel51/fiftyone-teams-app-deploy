@@ -100,6 +100,7 @@ for steps on how to add your license file.
 - [Technical Requirements](#technical-requirements)
   - [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
   - [Helm](#helm)
+- [Estimated Completion Time](#estimated-completion-time)
 - [Usage](#usage)
 - [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
@@ -182,6 +183,10 @@ Helm version >= 3.14 is required.
 Please refer to the
 [helm installation documentation](https://helm.sh/docs/intro/install/)
 for steps on installing helm.
+
+## Estimated Completion Time
+
+The estimated time to deploy FiftyOne Enterprise is approximately 2 hours.
 
 ## Usage
 

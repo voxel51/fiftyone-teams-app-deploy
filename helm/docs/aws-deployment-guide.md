@@ -100,7 +100,7 @@ deployment of FiftyOne Enterprise.
 | INT-001 | Introductory material must contain use cases for the software. | This is covered in the ...|
 | INT-002 | Introductory material contains an overview of a typical customer deployment, including lists of all resources that are set up when the deployment is complete. | This is covered in the ... |
 | INT-003 | Introductory material contains a description of all deployment options discussed in the user guide (e.g. single-AZ, multi-AZ or multi-region), if applicable. | This is covered in the ... |
-| INT-004 | Introductory material contains the expected amount of time to complete the deployment. | Approximately 2 hours. |
+| INT-004 | Introductory material contains the expected amount of time to complete the deployment. | This is covered in the [estimated completion time](../README.md#estimated-completion-time) section. |
 | INT-005 | Introductory material contains the regions supported. | There is no limitation on region supported for this service. |
 
 ### Prerequisites and Requirements
