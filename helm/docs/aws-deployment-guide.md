@@ -25,6 +25,15 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Introduction](#introduction)
   - [Prerequisites and Requirements](#prerequisites-and-requirements)
   - [Architecture Diagrams](#architecture-diagrams)
+  - [Security](#security)
+  - [Costs](#costs)
+  - [Sizing](#sizing)
+  - [Deployment Assets](#deployment-assets)
+  - [Health Check](#health-check)
+  - [Backup and Recovery](#backup-and-recovery)
+  - [Routine Maintenance](#routine-maintenance)
+  - [Emergency Maintenance](#emergency-maintenance)
+  - [Support](#support)
 
 <!-- tocstop -->
 
@@ -110,3 +119,73 @@ deployment of FiftyOne Enterprise.
 | ARCH-004 | Architecture diagrams use official AWS Architecture Icons. | This is covered in the ... |
 | ARCH-005 | Network diagrams demonstrate virtual private clouds (VPCs) and subnets. | This is covered in the ... |
 | ARCH-006 | Architecture diagrams show integration points, including third-party assets/APIs and on-premises/hybrid assets. | This is covered in the ... |
+
+### Security
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | This is covered in the ... |
+| DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the ... |
+| DSEC-004 | The deployment guide clearly documents any public resources (e.g. Amazon S3 buckets with bucket policies allowing public access). | The deployment guide is not using public resources. |
+| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the ... |
+| DSEC-007 | The deployment guide provides clear instruction on maintaining any stored secrets such as database credentials stored in AWS Secrets Manager. | This is covered in the ... |
+| DSEC-008 | The deployment guide includes details on where customer sensitive data are stored | This is covered in the ... |
+| DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) |This is covered in the ... |
+| DSEC-010 | For deployments involving more than a single element, include network configuration (for example, VPCs, subnets, security groups, network access control lists (network ACLs), and route tables) in the deployment guide. | This is covered in the ... |
+| DSEC-011 | The solution must support the ability for the customer to disable Instance Metadata Service Version 1 (IMDSv1). | AWS EKS does not offer direct control over the Instance Metadata Service (IMDS). To mitigate risk linked with IMDS we are using the least privilege principle with a specific role for task execution and specific security group and VPC to control network access to EKS pods. |
+
+### Costs
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| CST-001 | The deployment guide includes a list of billable services and guidance on whether each service is mandatory or optional. | This is covered in the ... |
+| CST-002 | The deployment guide includes the cost model and licensing costs. | This is covered in the ... |
+
+### Sizing
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| SIZ-001 | Either provide scripts to provision required resources or provide guidance for type and size selection for resources. | This is covered in the ... |
+
+### Deployment Assets
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| DAS-001 | The deployment guide provides step-by-step instructions for deploying the workload on AWS according to the typical deployment architecture. | This is covered in the ... |
+| DAS-004 | The deployment guide contains prescriptive guidance for testing and troubleshooting. | This is covered in the ... |
+
+### Health Check
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the ... |
+
+### Backup and Recovery
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| BAR-001 | Identify the data stores and the configurations to be backed up. If any of the data stores are proprietary, provide step-by-step instructions for backup and recovery. | This is covered in the ... |
+
+### Routine Maintenance
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| RM-001 | The deployment guide provides step-by-step instructions for rotating programmatic system credentials and cryptographic keys. | This is covered in the ... |
+| RM-002 | The deployment guide provides prescriptive guidance for software patches and upgrades. | This is covered in the ... |
+| RM-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the ... |
+| RM-004 | The deployment guide provides prescriptive guidance on managing AWS service limits. | This is covered in the ... |
+
+### Emergency Maintenance
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| EMER-001 | The deployment guide provides step-by-step instructions on handling fault conditions. | This is covered in the ... |
+| EMER-002 | The deployment guide provides step-by-step instructions on how to recover the software. | This is covered in the ... |
+
+### Support
+
+| Req Code | Requirement Description | Content |
+|----------|------------------------|---------|
+| SUP-001 | The deployment guide provides details on how to receive support. | This is covered in the ... |
+| SUP-002 | The deployment guide provides details on technical support tiers. | This is covered in the ... |
+| SUP-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the ... |
