@@ -12,9 +12,11 @@ set -eu
 version=""
 chart_ver=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
 
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
 # Note: Sending echos to STDERR so that users can easily use
 # the STDOUT for other, more interesting automations.
-if [[ ${TEAMS_DEPLOYER_BRANCH} == "main" ]]; then
+if [[ ${CURRENT_BRANCH} == "main" ]]; then
   # Get the most recent <x.x.x> version from GAR
   pattern="${chart_ver}"
   echo "Look for version \"${pattern}\" in us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env" >&2
