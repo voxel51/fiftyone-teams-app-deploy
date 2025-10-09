@@ -35,7 +35,7 @@
             },
             "FIFTYONE_DO_EXPIRATION_MINUTES": {
               "default": "",
-              "description": "The amount of time in minutes that a delegated operation can run before being automatically terminated.\nOverrides \"FIFTYONE_DO_EXPIRATION_DAYS\" if provided.",
+              "description": "(int) The amount of time in minutes that a delegated operation can run before being automatically terminated.\nOverrides \"FIFTYONE_DO_EXPIRATION_DAYS\" if provided.",
               "required": [],
               "title": "FIFTYONE_DO_EXPIRATION_MINUTES",
               "type": [
