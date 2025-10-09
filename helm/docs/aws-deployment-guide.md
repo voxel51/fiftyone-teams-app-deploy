@@ -171,9 +171,9 @@ deployment of FiftyOne Enterprise.
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
 | RM-001 | The deployment guide provides step-by-step instructions for rotating programmatic system credentials and cryptographic keys. | This is covered in the ... |
-| RM-002 | The deployment guide provides prescriptive guidance for software patches and upgrades. | This is covered in the ... |
-| RM-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the ... |
-| RM-004 | The deployment guide provides prescriptive guidance on managing AWS service limits. | This is covered in the ... |
+| RM-002 | The deployment guide provides prescriptive guidance for software patches and upgrades. | This is covered in the [upgrades](../fiftyone-teams-app/README.md#upgrades) section. |
+| RM-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [usage](../fiftyone-teams-app/README.md#usage) section. |
+| RM-004 | The deployment guide provides prescriptive guidance on managing AWS service limits. | AWS service limits do not apply to FiftyOne Enterprise. |
 
 ### Emergency Maintenance
 
