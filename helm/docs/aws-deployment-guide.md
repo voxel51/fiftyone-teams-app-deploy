@@ -124,10 +124,10 @@ deployment of FiftyOne Enterprise.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | This is covered in the ... |
-| DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the ... |
+| DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | FiftyOne Enterprise does not require AWS Account root privileges. |
+| DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the [workload identity with AWS](./configure-workload-identity-federation.md#workload-identity-with-aws) section. |
 | DSEC-004 | The deployment guide clearly documents any public resources (e.g. Amazon S3 buckets with bucket policies allowing public access). | The deployment guide is not using public resources. |
-| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the ... |
+| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the [workload identity with AWS](./configure-workload-identity-federation.md#workload-identity-with-aws) section. |
 | DSEC-007 | The deployment guide provides clear instruction on maintaining any stored secrets such as database credentials stored in AWS Secrets Manager. | This is covered in the ... |
 | DSEC-008 | The deployment guide includes details on where customer sensitive data are stored | This is covered in the ... |
 | DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) |This is covered in the ... |
@@ -145,7 +145,7 @@ deployment of FiftyOne Enterprise.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| SIZ-001 | Either provide scripts to provision required resources or provide guidance for type and size selection for resources. | This is covered in the ... |
+| SIZ-001 | Either provide scripts to provision required resources or provide guidance for type and size selection for resources. | This is covered in the [usage](../fiftyone-teams-app/README.md#usage) section. |
 
 ### Deployment Assets
 
