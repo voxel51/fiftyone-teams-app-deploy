@@ -100,7 +100,7 @@ deployment of FiftyOne Enterprise.
 | INT-001 | Introductory material must contain use cases for the software. | This is covered in the ...|
 | INT-002 | Introductory material contains an overview of a typical customer deployment, including lists of all resources that are set up when the deployment is complete. | This is covered in the ... |
 | INT-003 | Introductory material contains a description of all deployment options discussed in the user guide (e.g. single-AZ, multi-AZ or multi-region), if applicable. | This is covered in the ... |
-| INT-004 | Introductory material contains the expected amount of time to complete the deployment. | This is covered in the [estimated completion time](../README.md#estimated-completion-time) section. |
+| INT-004 | Introductory material contains the expected amount of time to complete the deployment. | This is covered in the [estimated completion time](../fiftyone-teams-app/README.md#estimated-completion-time) section. |
 | INT-005 | Introductory material contains the regions supported. | There is no limitation on region supported for this service. |
 
 ### Prerequisites and Requirements
@@ -109,7 +109,7 @@ deployment of FiftyOne Enterprise.
 |----------|------------------------|---------|
 | PRQ-001 | All technical prerequisites and requirements to complete the deployment process are listed (e.g. required OS, database type and storage requirements). | This is covered in the [Technical Requirements](#technical-requirements) section. |
 | PRQ-002 | The deployment guide lists all prerequisite skills or specialized knowledge (for example, familiarity with AWS, specific AWS services, or a scripting or programming language). |  This is covered in the [Prerequisites Skills and Knowledge](#prerequisites-and-requirements) section. |
-| PRQ-003 | The deployment guide lists the environment configuration that is needed for the deployment (e.g. an AWS account, a specific operating system, licensing, DNS). | This is covered ... |
+| PRQ-003 | The deployment guide lists the environment configuration that is needed for the deployment (e.g. an AWS account, a specific operating system, licensing, DNS). | This is covered in the [values](../fiftyone-teams-app/README.md#values) section. |
 
 ### Architecture Diagrams
 
