@@ -96,8 +96,9 @@ for steps on how to add your license file.
 
 <!-- toc -->
 
-- [Requirements](#requirements)
-  - [Kubernetes/Kubectl](#kuberneteskubectl)
+- [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge)
+- [Technical Requirements](#technical-requirements)
+  - [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
   - [Helm](#helm)
 - [Usage](#usage)
 - [Upgrades](#upgrades)
@@ -120,12 +121,50 @@ for steps on how to add your license file.
 
 <!-- tocstop -->
 
-## Requirements
+## Prerequisites Skills and Knowledge
 
-Helm and Kubectl must be installed and configured on your machine.
+The following prerequisites skills & knowledge
+are required for a successful and properly secured
+deployment of FiftyOne Enterprise.
 
-### Kubernetes/Kubectl
+1. A knowledge of kubernetes.
 
+1. A knowledge of installing helm charts to deploy kubernetes applications.
+
+1. A knowledge MongoDB.
+
+1. A knowledge of DNS and the ability to generate, modify, and delete DNS records.
+
+1. A knowledge of TLS/SSL and the ability to generate TLS/SSL certificates.
+
+1. (optional) A knowledge of network file systems (NFS).
+
+## Technical Requirements
+
+The following technical requirements
+are required for a successful and properly secured
+deployment of FiftyOne Enterprise.
+
+1. [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
+
+1. [Helm](#helm)
+
+1. A MongoDB Database that meets FiftyOne's
+   [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+
+1. A DNS record or records for ingress.
+
+1. A TLS/SSL certificate or certificates for HTTPS ingress.
+
+1. (optional) An NFS server or `ReadWriteMany` compatible storage medium for
+   [delegated operators](#builtin-delegated-operator-orchestrator),
+   [plugins](#plugins),
+   and
+   [API high-availability](#highly-available-fiftyone-teams-api-deployments)
+
+### Kubernetes Cluster And Kubectl
+
+A kubernetes cluster and `kubectl` installation are required.
 The following kubernetes/kubectl versions are required:
 
 Kubernetes: `>=1.31-0`

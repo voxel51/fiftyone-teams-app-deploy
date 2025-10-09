@@ -22,6 +22,9 @@ workload identity federation.
 - [Workload Identity With GCP](#workload-identity-with-gcp)
   - [Via `gcloud` CLI](#via-gcloud-cli)
   - [Via `terraform`](#via-terraform)
+- [Workload Identity With AWS](#workload-identity-with-aws)
+  - [Via AWS CLI](#via-aws-cli)
+  - [Via Terraform](#via-terraform)
 - [References](#references)
 
 <!-- tocstop -->
@@ -189,6 +192,237 @@ To configure workload identity via the `terraform`:
             iam.gke.io/gcp-service-account: IAM_SA_NAME@IAM_SA_PROJECT_ID.iam.gserviceaccount.com
     ```
 
+## Workload Identity With AWS
+
+For bare-minimum access, FiftyOne Enterprise needs the following permissions
+for your media bucket(s) in AWS:
+
+- `iam:GetRole`
+- `s3:GetBucketLocation`
+- `s3:ListBucket`
+- `s3:ListBucketMultipartUploads`
+- `s3:GetObject`
+- `s3:PutObject`
+- `s3:DeleteObject`
+- `s3:AbortMultipartUpload`
+- `s3:ListMultipartUploadParts`
+- `s3:CreateMultipartUpload`
+- `s3:CompleteMultipartUpload`
+
+### Via AWS CLI
+
+To configure workload identity via the AWS CLI:
+
+1. Create a custom IAM policy for FiftyOne Enterprise:
+
+    ```bash
+    cat <<EOF >fiftyone-enterprise-policy.json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "FiftyOneEnterpriseS3Access",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetBucketLocation",
+                    "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads"
+                ],
+                "Resource": "arn:aws:s3:::MEDIA_BUCKET_NAME"
+            },
+            {
+                "Sid": "FiftyOneEnterpriseS3ObjectAccess",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:DeleteObject",
+                    "s3:AbortMultipartUpload",
+                    "s3:ListMultipartUploadParts",
+                    "s3:CreateMultipartUpload",
+                    "s3:CompleteMultipartUpload"
+                ],
+                "Resource": "arn:aws:s3:::MEDIA_BUCKET_NAME/*"
+            },
+            {
+                "Sid": "FiftyOneEnterpriseIAMAccess",
+                "Effect": "Allow",
+                "Action": [
+                    "iam:GetRole"
+                ],
+                "Resource": "arn:aws:iam::AWS_ACCOUNT_ID:role/FIFTYONE_IAM_ROLE_NAME"
+            }
+        ]
+    }
+    EOF
+
+    aws iam create-policy \
+        --policy-name "Voxel51FiftyOneEnterpriseCustomPolicy" \
+        --policy-document file://fiftyone-enterprise-policy.json \
+        --description "Bare Minimum FiftyOne Enterprise IAM Policy"
+    ```
+
+1. Create a trust policy for workload identity
+   (IRSA - IAM Roles for Service Accounts):
+
+    ```bash
+    cat <<EOF >fiftyone-trust-policy.json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Federated": "arn:aws:iam::AWS_ACCOUNT_ID:oidc-provider/oidc.eks.AWS_REGION.amazonaws.com/id/EKS_OIDC_PROVIDER_ID"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                    "StringEquals": {
+                        "oidc.eks.AWS_REGION.amazonaws.com/id/EKS_OIDC_PROVIDER_ID:sub": "system:serviceaccount:FIFTYONE_NAMESPACE:FIFTYONE_SERVICEACCOUNT_NAME",
+                        "oidc.eks.AWS_REGION.amazonaws.com/id/EKS_OIDC_PROVIDER_ID:aud": "sts.amazonaws.com"
+                    }
+                }
+            }
+        ]
+    }
+    EOF
+    ```
+
+1. Create a new IAM Role for FiftyOne Enterprise:
+
+    ```bash
+    aws iam create-role \
+        --role-name "FIFTYONE_IAM_ROLE_NAME" \
+        --assume-role-policy-document file://fiftyone-trust-policy.json \
+        --description "FiftyOne Enterprise Service Role for EKS Workload Identity"
+    ```
+
+1. Attach the custom policy to the IAM role:
+
+    ```bash
+    aws iam attach-role-policy \
+        --role-name "FIFTYONE_IAM_ROLE_NAME" \
+        --policy-arn "arn:aws:iam::AWS_ACCOUNT_ID:policy/Voxel51FiftyOneEnterpriseCustomPolicy"
+    ```
+
+1. Add the Kubernetes ServiceAccount annotations via your `values.yaml` file
+   so that EKS sees the link between the service accounts:
+
+    ```yaml
+    serviceAccount:
+        annotations:
+            eks.amazonaws.com/role-arn: arn:aws:iam::AWS_ACCOUNT_ID:role/FIFTYONE_IAM_ROLE_NAME
+    ```
+
+### Via Terraform
+
+To configure workload identity via Terraform:
+
+1. Create a custom IAM policy for FiftyOne Enterprise:
+
+    ```hcl
+    resource "aws_iam_policy" "voxel51_custom_policy" {
+        name        = "Voxel51FiftyOneEnterpriseCustomPolicy"
+        description = "Bare Minimum FiftyOne Enterprise IAM Policy"
+
+        policy = jsonencode({
+            Version = "2012-10-17"
+            Statement = [
+                {
+                    Sid    = "FiftyOneEnterpriseS3Access"
+                    Effect = "Allow"
+                    Action = [
+                        "s3:GetBucketLocation",
+                        "s3:ListBucket",
+                        "s3:ListBucketMultipartUploads"
+                    ]
+                    Resource = "arn:aws:s3:::${S3_BUCKET_NAME}"
+                },
+                {
+                    Sid    = "FiftyOneEnterpriseS3ObjectAccess"
+                    Effect = "Allow"
+                    Action = [
+                        "s3:GetObject",
+                        "s3:PutObject",
+                        "s3:DeleteObject",
+                        "s3:AbortMultipartUpload",
+                        "s3:ListMultipartUploadParts",
+                        "s3:CreateMultipartUpload",
+                        "s3:CompleteMultipartUpload"
+                    ]
+                    Resource = "arn:aws:s3:::${S3_BUCKET_NAME}/*"
+                },
+                {
+                    Sid    = "FiftyOneEnterpriseIAMAccess"
+                    Effect = "Allow"
+                    Action = [
+                        "iam:GetRole"
+                    ]
+                    Resource = aws_iam_role.voxel51_service_role.arn
+                }
+            ]
+        })
+    }
+    ```
+
+1. Create the trust policy data source:
+
+    ```hcl
+    data "aws_iam_policy_document" "voxel51_assume_role_policy" {
+        statement {
+            effect = "Allow"
+
+            principals {
+                type        = "Federated"
+                identifiers = ["arn:aws:iam::${AWS_ACCOUNT_ID}:oidc-provider/${EKS_OIDC_PROVIDER}"]
+            }
+
+            actions = ["sts:AssumeRoleWithWebIdentity"]
+
+            condition {
+                test     = "StringEquals"
+                variable = "${EKS_OIDC_PROVIDER}:sub"
+                values   = ["system:serviceaccount:${FIFTYONE_NAMESPACE}:${FIFTYONE_SERVICEACCOUNT_NAME}"]
+            }
+
+            condition {
+                test     = "StringEquals"
+                variable = "${EKS_OIDC_PROVIDER}:aud"
+                values   = ["sts.amazonaws.com"]
+            }
+        }
+    }
+    ```
+
+1. Create the IAM Role for FiftyOne Enterprise:
+
+    ```hcl
+    resource "aws_iam_role" "voxel51_custom_role" {
+        name               = Voxel51FiftyOneEnterpriseCustomRole
+        description        = "Voxel51 FiftyOne Enterpise Custom Role"
+        assume_role_policy = data.aws_iam_policy_document.voxel51_assume_role_policy.json
+    }
+    ```
+
+1. Attach the custom policy to the IAM role:
+
+    ```hcl
+    resource "aws_iam_role_policy_attachment" "voxel51_custom_policy_attachment" {
+        role       = aws_iam_role.voxel51_service_role.name
+        policy_arn = aws_iam_policy.voxel51_custom_policy.arn
+    }
+    ```
+
+1. Add the Kubernetes ServiceAccount annotations via your `values.yaml` file
+   so that EKS sees the link between the service accounts:
+
+    ```yaml
+    serviceAccount:
+        annotations:
+            eks.amazonaws.com/role-arn: IAM_ROLE_ARN
+    ```
+
 ## References
 
 - [How To: GKE Workload Identity Federation](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity)
+- [IAM Roles For Service Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
