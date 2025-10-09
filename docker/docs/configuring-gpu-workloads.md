@@ -65,7 +65,7 @@ services:
       service: teams-do-common
 
   teams-do-with-gpu:
-    image: voxel51/fiftyone-teams-cv-full:v2.11.2
+    image: voxel51/fiftyone-teams-cv-full:v2.12.0
     command: >
       /bin/sh -c "fiftyone delegated launch -t remote  -n 'teams-do-with-gpu'"
     environment:
