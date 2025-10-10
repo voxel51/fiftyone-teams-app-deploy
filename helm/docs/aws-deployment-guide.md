@@ -230,6 +230,13 @@ section for questions related to managing and rotating your license.
 
 ## Support
 
+Support can be received by reaching out directly to your Customer Success (CS)
+representative.
+
+Please see the
+[pricing page](https://voxel51.com/pricing)
+for questions related to support tiers and pricing.
+
 ## AWS FTR Summary
 
 ### Introduction
@@ -335,8 +342,8 @@ section for questions related to managing and rotating your license.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| SUP-001 | The deployment guide provides details on how to receive support. | This is covered in the ... |
-| SUP-002 | The deployment guide provides details on technical support tiers. | This is covered in the ... |
+| SUP-001 | The deployment guide provides details on how to receive support. | This is covered in the [Support](#support) section. |
+| SUP-002 | The deployment guide provides details on technical support tiers. | This is covered in the [Support](#support) section. |
 | SUP-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [License Management](#license-management) section. |
 
 <!-- Reference Links -->
