@@ -562,6 +562,11 @@ section to proceed with the `helm` installation.
 ### Creating a DNS Record To Point To Your Load Balancer
 
 ```shell
+DNS_NAME=$(
+   kubectl get ingress <your-ingress-name> \
+   -n <your-namespace> \
+   -o jsonpath='{.spec.rules[0].host}'
+)
 ALB_DNS_NAME=$(
    kubectl get ingress <your-ingress-name> \
    -n <your-namespace> \
@@ -574,9 +579,41 @@ HOSTED_ZONE=$(
 )
 
 echo -e "Inputs for CloudFormation:"
+echo -e "   DNS Name: $DNS_NAME"
 echo -e "   ALB DNS Name: $ALB_DNS_NAME"
 echo -e "   Hosted Zone ID: $HOSTED_ZONE"
 ```
+
+We will now create a DNS record alias via
+[CloudFormation][aws-cf].
+
+In the below, please change `AWS_REGION` to the actual region you would
+like to deploy in (e.g., `us-east-1`).
+
+1. Navigate to <https://AWS_REGION.console.aws.amazon.com/cloudformation/home>
+
+1. Select `Create stack` on the right-hand menu > `With new resources`
+
+1. `Choose an existing template` > `Upload A Template File` > `Choose File`
+
+   1. Upload the
+      [Route53 Stack Template](../../cloudformation/route53-stack.yml).
+
+1. Click `Next`
+
+1. Enter a descriptive stack name, e.g. `FiftyoneEnterpriseRoute53`
+
+1. Fill out each parameter for your environment's needs and select `Next`.
+
+   1. The `DnsName` should match what was configured on the `Ingress` controller
+      by the `teamsAppSettings.dnsName` parameter.
+
+1. Configure the stack options for your environment's needs and select `Next`.
+
+1. Review the stack and select `Submit`.
+
+CloudFormation will go deploy an AWS Route53 DNS name in your hosted zone.
+You can now navigate to
 
 ## AWS FTR Summary
 
