@@ -111,6 +111,7 @@ for steps on how to add your license file.
   - [Highly Available FiftyOne `teams-api` Deployments](#highly-available-fiftyone-teams-api-deployments)
   - [Plugins](#plugins)
   - [Proxies](#proxies)
+  - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Snapshot Archival](#snapshot-archival)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Static Banner Configuration](#static-banner-configuration)
@@ -383,6 +384,18 @@ FiftyOne Enterprise supports routing traffic through proxy servers.
 Please refer to the
 [proxy configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md)
 for information on how to configure proxies.
+
+### Secrets And Sensitive Data
+
+FiftyOne Enterprise supports
+[configuring secrets](https://docs.voxel51.com/enterprise/secrets.html#adding-secrets)
+for the deployment to use.
+
+Please see
+[Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+and
+[adding secrets](https://docs.voxel51.com/enterprise/secrets.html#adding-secrets)
+for questions regarding storage and encryption.
 
 ### Snapshot Archival
 

@@ -19,13 +19,18 @@ This is the summary of FiftyOne Enterprise FTR based on the
 
 <!-- toc -->
 
-- [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge)
-- [Technical Requirements](#technical-requirements)
+- [Prerequisites and Requirements](#prerequisites-and-requirements)
+  - [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge)
+  - [Technical Requirements](#technical-requirements)
+- [Security](#security)
+  - [Princple Of Least Privilege](#princple-of-least-privilege)
+  - [Public Resources](#public-resources)
+  - [Root Privileges](#root-privileges)
 - [AWS FTR Summary](#aws-ftr-summary)
   - [Introduction](#introduction)
-  - [Prerequisites and Requirements](#prerequisites-and-requirements)
+  - [Prerequisites and Requirements](#prerequisites-and-requirements-1)
   - [Architecture Diagrams](#architecture-diagrams)
-  - [Security](#security)
+  - [Security](#security-1)
   - [Costs](#costs)
   - [Sizing](#sizing)
   - [Deployment Assets](#deployment-assets)
@@ -37,7 +42,9 @@ This is the summary of FiftyOne Enterprise FTR based on the
 
 <!-- tocstop -->
 
-## Prerequisites Skills and Knowledge
+## Prerequisites and Requirements
+
+### Prerequisites Skills and Knowledge
 
 The following prerequisites skills & knowledge
 are required for a successful and properly secured
@@ -65,7 +72,7 @@ deployment of FiftyOne Enterprise.
    `ReadWriteMany`-compatible storage medium such as
    [AWS EFS][aws-efs].
 
-## Technical Requirements
+### Technical Requirements
 
 The following technical requirements
 are required for a successful and properly secured
@@ -100,6 +107,26 @@ deployment of FiftyOne Enterprise.
    and
    [API high-availability](../fiftyone-teams-app/README.md#highly-available-fiftyone-teams-api-deployments)
 
+## Security
+
+### Princple Of Least Privilege
+
+When deploying FiftyOne Enterprise, Voxel51 recommends following the principle
+of least privilege.
+The minimum privileges needed for the FiftyOne Enterprise application are
+listed in the
+[workload identity with AWS](./configure-workload-identity-federation.md#workload-identity-with-aws)
+section.
+
+### Public Resources
+
+FiftyOne Enterprise does not require or create any public resources.
+Customers may use a public or private DNS record to access resources.
+
+### Root Privileges
+
+FiftyOne Enterprise does not require AWS Account root privileges.
+
 ## AWS FTR Summary
 
 ### Introduction
@@ -112,6 +139,7 @@ deployment of FiftyOne Enterprise.
 | INT-004 | Introductory material contains the expected amount of time to complete the deployment. | This is covered in the [estimated completion time](../fiftyone-teams-app/README.md#estimated-completion-time) section. |
 | INT-005 | Introductory material contains the regions supported. | There is no limitation on region supported for this service. |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Prerequisites and Requirements
 
 | Req Code | Requirement Description | Content |
@@ -129,14 +157,15 @@ deployment of FiftyOne Enterprise.
 | ARCH-005 | Network diagrams demonstrate virtual private clouds (VPCs) and subnets. | This is covered in the ... |
 | ARCH-006 | Architecture diagrams show integration points, including third-party assets/APIs and on-premises/hybrid assets. | This is covered in the ... |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Security
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | FiftyOne Enterprise does not require AWS Account root privileges. |
-| DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the [workload identity with AWS](./configure-workload-identity-federation.md#workload-identity-with-aws) section. |
-| DSEC-004 | The deployment guide clearly documents any public resources (e.g. Amazon S3 buckets with bucket policies allowing public access). | The deployment guide is not using public resources. |
-| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the [workload identity with AWS](./configure-workload-identity-federation.md#workload-identity-with-aws) section. |
+| DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | Thiis is covered in the [Root Privileges](#root-privileges) section. |
+| DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
+| DSEC-004 | The deployment guide clearly documents any public resources (e.g. Amazon S3 buckets with bucket policies allowing public access). | This is covered in the [Public Resources](#public-resources) section. |
+| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. |This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
 | DSEC-007 | The deployment guide provides clear instruction on maintaining any stored secrets such as database credentials stored in AWS Secrets Manager. | This is covered in the ... |
 | DSEC-008 | The deployment guide includes details on where customer sensitive data are stored | This is covered in the ... |
 | DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) |This is covered in the ... |
