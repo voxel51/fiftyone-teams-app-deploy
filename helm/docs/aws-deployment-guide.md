@@ -613,7 +613,7 @@ like to deploy in (e.g., `us-east-1`).
 1. Review the stack and select `Submit`.
 
 CloudFormation will go deploy an AWS Route53 DNS name in your hosted zone.
-You can now navigate to
+You can now navigate to your DNS name in a browser.
 
 ## AWS FTR Summary
 
