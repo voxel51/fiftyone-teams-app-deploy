@@ -41,6 +41,7 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [License Management](#license-management)
   - [AWS Service Limits](#aws-service-limits)
 - [Emergency Maintenance](#emergency-maintenance)
+  - [Fault Conditions](#fault-conditions)
 - [Support](#support)
 - [Deploying](#deploying)
 - [AWS FTR Summary](#aws-ftr-summary)
@@ -260,6 +261,13 @@ AWS service limits do not apply to FiftyOne Enterprise.
 
 ## Emergency Maintenance
 
+### Fault Conditions
+
+Please refer to the
+[Troubleshooting Unhealthy Pods](../fiftyone-teams-app/README.md#troubleshooting-unhealthy-pods)
+section for questions related to handling fault conditions and performing
+a root cause analysis.
+
 ## Support
 
 Support can be received by reaching out directly to your Customer Success (CS)
@@ -369,8 +377,8 @@ for questions related to support tiers and pricing.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| EMER-001 | The deployment guide provides step-by-step instructions on handling fault conditions. | This is covered in the ... |
-| EMER-002 | The deployment guide provides step-by-step instructions on how to recover the software. | This is covered in the ... |
+| EMER-001 | The deployment guide provides step-by-step instructions on handling fault conditions. | This is covered in the [Fault Conditions](#fault-conditions) section. |
+| EMER-002 | The deployment guide provides step-by-step instructions on how to recover the software. | This is covered in the [Backup and Recovery](#backup-and-recovery) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Support
