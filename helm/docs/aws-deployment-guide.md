@@ -26,6 +26,8 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Princple Of Least Privilege](#princple-of-least-privilege)
   - [Public Resources](#public-resources)
   - [Root Privileges](#root-privileges)
+  - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
+  - [Instance Metadata Service Version 1](#instance-metadata-service-version-1)
 - [AWS FTR Summary](#aws-ftr-summary)
   - [Introduction](#introduction)
   - [Prerequisites and Requirements](#prerequisites-and-requirements-1)
@@ -127,6 +129,21 @@ Customers may use a public or private DNS record to access resources.
 
 FiftyOne Enterprise does not require AWS Account root privileges.
 
+### Secrets And Sensitive Data
+
+Please refer to the
+[Secrets And Sensitive Data](../fiftyone-teams-app/README.md#secrets-and-sensitive-data)
+for questions relating to database credentials, cookie secrets, and other
+sensitive data related to FiftyOne Enterprise.
+
+### Instance Metadata Service Version 1
+
+AWS EKS does not offer direct control over the
+Instance Metadata Service (IMDS).
+To mitigate risk linked with IMDS we are using the least privilege
+principle with a specific role for task execution and specific
+security group and VPC to control network access to EKS pods.
+
 ## AWS FTR Summary
 
 ### Introduction
@@ -165,12 +182,12 @@ FiftyOne Enterprise does not require AWS Account root privileges.
 | DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | Thiis is covered in the [Root Privileges](#root-privileges) section. |
 | DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
 | DSEC-004 | The deployment guide clearly documents any public resources (e.g. Amazon S3 buckets with bucket policies allowing public access). | This is covered in the [Public Resources](#public-resources) section. |
-| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. |This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
-| DSEC-007 | The deployment guide provides clear instruction on maintaining any stored secrets such as database credentials stored in AWS Secrets Manager. | This is covered in the ... |
-| DSEC-008 | The deployment guide includes details on where customer sensitive data are stored | This is covered in the ... |
-| DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) |This is covered in the ... |
+| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
+| DSEC-007 | The deployment guide provides clear instruction on maintaining any stored secrets such as database credentials stored in AWS Secrets Manager. | This is covered in the [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
+| DSEC-008 | The deployment guide includes details on where customer sensitive data are stored | This is covered in the [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
+| DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) | This is covered in the ... |
 | DSEC-010 | For deployments involving more than a single element, include network configuration (for example, VPCs, subnets, security groups, network access control lists (network ACLs), and route tables) in the deployment guide. | This is covered in the ... |
-| DSEC-011 | The solution must support the ability for the customer to disable Instance Metadata Service Version 1 (IMDSv1). | AWS EKS does not offer direct control over the Instance Metadata Service (IMDS). To mitigate risk linked with IMDS we are using the least privilege principle with a specific role for task execution and specific security group and VPC to control network access to EKS pods. |
+| DSEC-011 | The solution must support the ability for the customer to disable Instance Metadata Service Version 1 (IMDSv1). | This is covered in the [Instance Metadata Service Version 1](#instance-metadata-service-version-1) section. |
 
 ### Costs
 
