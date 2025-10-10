@@ -15,7 +15,7 @@
 # Deployment Guide (Customer-Deployed Foundational Technical Review)
 
 This is the summary of FiftyOne Enterprise FTR based on the
-[AWS guidelines](https://apn-checklists.s3.amazonaws.com/foundational/customer-deployed/customer-deployed/C0hfGvKGP.html).
+[AWS guidelines][aws-ftr].
 
 <!-- toc -->
 
@@ -44,23 +44,23 @@ are required for a successful and properly secured
 deployment of FiftyOne Enterprise.
 
 1. A knowledge of kubernetes and
-   [AWS EKS](https://aws.amazon.com/pm/eks/).
+   [AWS EKS][aws-eks].
 
 1. A knowledge of installing helm charts to deploy kubernetes applications.
 
 1. A knowledge MongoDB.
 
 1. A knowledge of
-   [AWS Route53](https://aws.amazon.com/route53/)
+   [AWS Route53][aws-route-53]
    and the ability to generate, modify, and delete DNS records.
 
 1. A knowledge of
-   [AWS ACM](https://aws.amazon.com/certificate-manager/)
+   [AWS ACM][aws-acm]
    and the ability to generate TLS/SSL certificates.
 
 1. (optional) A knowledge of network file systems (NFS) or another
    `ReadWriteMany`-compatible storage medium such as
-   [AWS EFS](https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html).
+   [AWS EFS][aws-efs].
 
 ## Technical Requirements
 
@@ -72,12 +72,12 @@ deployment of FiftyOne Enterprise.
    [kubernetes version requirements](../fiftyone-teams-app/README.md#kubernetes-cluster-and-kubectl)
 
 1. An installation of
-   [`helm`](https://helm.sh/)
+   [`helm`][helm-sh]
    that matches the
    [`helm` version requirements](../fiftyone-teams-app/README.md#helm).
 
 1. A
-   [`MongoDB` Database](https://www.mongodb.com/)
+   [`MongoDB` Database][mongodb-com]
    that meets FiftyOne Enterprise's
    [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
 
@@ -189,3 +189,12 @@ deployment of FiftyOne Enterprise.
 | SUP-001 | The deployment guide provides details on how to receive support. | This is covered in the ... |
 | SUP-002 | The deployment guide provides details on technical support tiers. | This is covered in the ... |
 | SUP-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the ... |
+
+<!-- Reference Links -->
+[aws-acm]: https://aws.amazon.com/certificate-manager/
+[aws-efs]: https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html
+[aws-eks]: https://aws.amazon.com/pm/eks/
+[aws-ftr]: https://apn-checklists.s3.amazonaws.com/foundational/customer-deployed/customer-deployed/C0hfGvKGP.html
+[aws-route-53]: https://aws.amazon.com/route53/
+[helm-sh]: https://helm.sh/
+[mongodb-com]: https://www.mongodb.com/
