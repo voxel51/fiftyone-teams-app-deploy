@@ -19,6 +19,7 @@ This is the summary of FiftyOne Enterprise FTR based on the
 
 <!-- toc -->
 
+- [Introduction](#introduction)
 - [Prerequisites and Requirements](#prerequisites-and-requirements)
   - [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge)
   - [Technical Requirements](#technical-requirements)
@@ -33,7 +34,6 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Billable Services](#billable-services)
 - [License Model](#license-model)
 - [Sizing](#sizing)
-- [Deployment Assets](#deployment-assets)
 - [Health Checks](#health-checks)
 - [Backup and Recovery](#backup-and-recovery)
 - [Routine Maintenance](#routine-maintenance)
@@ -42,14 +42,15 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [AWS Service Limits](#aws-service-limits)
 - [Emergency Maintenance](#emergency-maintenance)
 - [Support](#support)
+- [Deploying](#deploying)
 - [AWS FTR Summary](#aws-ftr-summary)
-  - [Introduction](#introduction)
+  - [Introduction](#introduction-1)
   - [Prerequisites and Requirements](#prerequisites-and-requirements-1)
   - [Architecture Diagrams](#architecture-diagrams)
   - [Security](#security-1)
   - [Costs](#costs-1)
   - [Sizing](#sizing-1)
-  - [Deployment Assets](#deployment-assets-1)
+  - [Deployment Assets](#deployment-assets)
   - [Health Checks](#health-checks-1)
   - [Backup and Recovery](#backup-and-recovery-1)
   - [Routine Maintenance](#routine-maintenance-1)
@@ -57,6 +58,15 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Support](#support-1)
 
 <!-- tocstop -->
+
+## Introduction
+
+FiftyOne Enterprise is the enterprise version of the open source
+[FiftyOne](https://github.com/voxel51/fiftyone)
+project.
+
+For use cases, overviews, and demonstrations, please see the
+[FiftyOne product page][voxel51-com-fiftyone].
 
 ## Prerequisites and Requirements
 
@@ -196,8 +206,6 @@ Please refer to the
 [Sizing](../fiftyone-teams-app/README.md#sizing)
 section for questions related to resource sizing.
 
-## Deployment Assets
-
 ## Health Checks
 
 Please refer to the
@@ -247,13 +255,16 @@ Please see the
 [Voxel51 Pricing Model][voxel51-com-pricing]
 for questions related to support tiers and pricing.
 
+## Deploying
+
 ## AWS FTR Summary
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Introduction
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| INT-001 | Introductory material must contain use cases for the software. | This is covered in the ...|
+| INT-001 | Introductory material must contain use cases for the software. | This is covered in the [Introduction](#introduction) section. |
 | INT-002 | Introductory material contains an overview of a typical customer deployment, including lists of all resources that are set up when the deployment is complete. | This is covered in the ... |
 | INT-003 | Introductory material contains a description of all deployment options discussed in the user guide (e.g. single-AZ, multi-AZ or multi-region), if applicable. | This is covered in the ... |
 | INT-004 | Introductory material contains the expected amount of time to complete the deployment. | This is covered in the [estimated completion time](../fiftyone-teams-app/README.md#estimated-completion-time) section. |
@@ -312,7 +323,7 @@ for questions related to support tiers and pricing.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| DAS-001 | The deployment guide provides step-by-step instructions for deploying the workload on AWS according to the typical deployment architecture. | This is covered in the ... |
+| DAS-001 | The deployment guide provides step-by-step instructions for deploying the workload on AWS according to the typical deployment architecture. | This is covered in the [Deploying](#deploying) section. |
 | DAS-004 | The deployment guide contains prescriptive guidance for testing and troubleshooting. | This is covered in the [Health Checks](#health-checks) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
@@ -367,4 +378,5 @@ for questions related to support tiers and pricing.
 [aws-s3]: https://aws.amazon.com/pm/serv-s3/
 [helm-sh]: https://helm.sh/
 [mongodb-com]: https://www.mongodb.com/
+[voxel51-com-fiftyone]: https://voxel51.com/fiftyone
 [voxel51-com-pricing]: https://voxel51.com/pricing
