@@ -183,7 +183,7 @@ The billable services that are **optional** to run FiftyOne Enterpise are:
 ## Health Checks
 
 Please refer to the
-[Backup and Recovery](../fiftyone-teams-app/README.md#health-checks-and-monitoring)
+[Health Checks And Monitoring](../fiftyone-teams-app/README.md#health-checks-and-monitoring)
 section for questions related to health checks related to your
 FiftyOne Enterpise application.
 
