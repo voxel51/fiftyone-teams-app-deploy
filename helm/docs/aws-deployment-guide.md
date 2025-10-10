@@ -68,6 +68,9 @@ project.
 For use cases, overviews, and demonstrations, please see the
 [FiftyOne product page][voxel51-com-fiftyone].
 
+Please note that there is no limitation on region supported for
+FiftyOne Enterprise.
+
 ## Prerequisites and Requirements
 
 ### Prerequisites Skills and Knowledge
@@ -268,7 +271,7 @@ for questions related to support tiers and pricing.
 | INT-002 | Introductory material contains an overview of a typical customer deployment, including lists of all resources that are set up when the deployment is complete. | This is covered in the ... |
 | INT-003 | Introductory material contains a description of all deployment options discussed in the user guide (e.g. single-AZ, multi-AZ or multi-region), if applicable. | This is covered in the ... |
 | INT-004 | Introductory material contains the expected amount of time to complete the deployment. | This is covered in the [estimated completion time](../fiftyone-teams-app/README.md#estimated-completion-time) section. |
-| INT-005 | Introductory material contains the regions supported. | There is no limitation on region supported for this service. |
+| INT-005 | Introductory material contains the regions supported. | This is covered in the [Introduction](#introduction) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Prerequisites and Requirements
