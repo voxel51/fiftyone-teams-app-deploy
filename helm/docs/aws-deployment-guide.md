@@ -30,7 +30,7 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Instance Metadata Service Version 1](#instance-metadata-service-version-1)
 - [Costs](#costs)
   - [Billable Services](#billable-services)
-  - [License Model](#license-model)
+- [License Model](#license-model)
 - [Sizing](#sizing)
 - [Deployment Assets](#deployment-assets)
 - [Health Checks](#health-checks)
@@ -174,7 +174,11 @@ The billable services that are **optional** to run FiftyOne Enterpise are:
 
 1. [AWS EC2][aws-ec2]
 
-### License Model
+## License Model
+
+Please refer to the
+[Voxel51 Pricing Model](https://voxel51.com/pricing)
+for all questions related to licensing and pricing.
 
 ## Sizing
 
@@ -251,7 +255,7 @@ FiftyOne Enterpise application.
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
 | CST-001 | The deployment guide includes a list of billable services and guidance on whether each service is mandatory or optional. | This is covered in the [Billable Services](#billable-services) section. |
-| CST-002 | The deployment guide includes the cost model and licensing costs. | This is covered in the ... |
+| CST-002 | The deployment guide includes the cost model and licensing costs. | This is covered in the [License Model](#license-model) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Sizing
