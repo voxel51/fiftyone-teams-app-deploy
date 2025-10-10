@@ -104,6 +104,7 @@ for steps on how to add your license file.
 - [Usage](#usage)
 - [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
+  - [Backup And Recovery](#backup-and-recovery)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [FiftyOne Enterprise Authenticated API](#fiftyone-enterprise-authenticated-api)
@@ -271,6 +272,17 @@ When performing an upgrade, please review
 [Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
 
 ## Advanced Configuration
+
+### Backup And Recovery
+
+FiftyOne Enterprise data is stored in a MongoDB instance.
+It is recommended to periodically backup the MongoDB instance
+according to
+[MongoDB best practices](https://www.mongodb.com/docs/manual/tutorial/backup-and-restore-tools/).
+
+If needed, it is recommended to restore the most-recent backup
+according to
+[MongoDB best practices](https://www.mongodb.com/docs/manual/tutorial/backup-and-restore-tools/).
 
 ### Builtin Delegated Operator Orchestrator
 

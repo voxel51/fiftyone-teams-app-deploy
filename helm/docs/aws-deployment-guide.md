@@ -32,6 +32,9 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Billable Services](#billable-services)
   - [License Model](#license-model)
 - [Sizing](#sizing)
+- [Deployment Assets](#deployment-assets)
+- [Health Check](#health-check)
+- [Backup and Recovery](#backup-and-recovery)
 - [AWS FTR Summary](#aws-ftr-summary)
   - [Introduction](#introduction)
   - [Prerequisites and Requirements](#prerequisites-and-requirements-1)
@@ -39,9 +42,9 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Security](#security-1)
   - [Costs](#costs-1)
   - [Sizing](#sizing-1)
-  - [Deployment Assets](#deployment-assets)
-  - [Health Check](#health-check)
-  - [Backup and Recovery](#backup-and-recovery)
+  - [Deployment Assets](#deployment-assets-1)
+  - [Health Check](#health-check-1)
+  - [Backup and Recovery](#backup-and-recovery-1)
   - [Routine Maintenance](#routine-maintenance)
   - [Emergency Maintenance](#emergency-maintenance)
   - [Support](#support)
@@ -137,8 +140,8 @@ FiftyOne Enterprise does not require AWS Account root privileges.
 
 Please refer to the
 [Secrets And Sensitive Data](../fiftyone-teams-app/README.md#secrets-and-sensitive-data)
-for questions relating to database credentials, cookie secrets, and other
-sensitive data related to FiftyOne Enterprise.
+section for questions related to database credentials, cookie secrets,
+and other sensitive data related to FiftyOne Enterprise.
 
 ### Instance Metadata Service Version 1
 
@@ -171,6 +174,17 @@ The billable services that are **optional** to run FiftyOne Enterpise are:
 ### License Model
 
 ## Sizing
+
+## Deployment Assets
+
+## Health Check
+
+## Backup and Recovery
+
+Please refer to the
+[Backup and Recovery](../fiftyone-teams-app/README.md#backup-and-recovery)
+section for questions related to backing up and restoring your
+FiftyOne Enterpise application.
 
 ## AWS FTR Summary
 
@@ -232,6 +246,7 @@ The billable services that are **optional** to run FiftyOne Enterpise are:
 |----------|------------------------|---------|
 | SIZ-001 | Either provide scripts to provision required resources or provide guidance for type and size selection for resources. | This is covered in the [usage](../fiftyone-teams-app/README.md#usage) section. |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Deployment Assets
 
 | Req Code | Requirement Description | Content |
@@ -239,17 +254,19 @@ The billable services that are **optional** to run FiftyOne Enterpise are:
 | DAS-001 | The deployment guide provides step-by-step instructions for deploying the workload on AWS according to the typical deployment architecture. | This is covered in the ... |
 | DAS-004 | The deployment guide contains prescriptive guidance for testing and troubleshooting. | This is covered in the ... |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Health Check
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
 | HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the [Health Checks And Monitoring](../fiftyone-teams-app/README.md#health-checks-and-monitoring) section. |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Backup and Recovery
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| BAR-001 | Identify the data stores and the configurations to be backed up. If any of the data stores are proprietary, provide step-by-step instructions for backup and recovery. | This is covered in the ... |
+| BAR-001 | Identify the data stores and the configurations to be backed up. If any of the data stores are proprietary, provide step-by-step instructions for backup and recovery. | This is covered in the [Backup and Recovery](#backup-and-recovery) section. |
 
 ### Routine Maintenance
 
