@@ -27,6 +27,7 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Public Resources](#public-resources)
   - [Root Privileges](#root-privileges)
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
+  - [Encryption](#encryption)
   - [Instance Metadata Service Version 1](#instance-metadata-service-version-1)
 - [Costs](#costs)
   - [Billable Services](#billable-services)
@@ -146,6 +147,12 @@ Please refer to the
 section for questions related to database credentials, cookie secrets,
 and other sensitive data related to FiftyOne Enterprise.
 
+### Encryption
+
+FiftyOne Enterprise does not enforce any specific encryption on AWS services.
+Voxel51 recommends that customers follow AWS' best practices for
+instances, EKS clusters, and other services.
+
 ### Instance Metadata Service Version 1
 
 AWS EKS does not offer direct control over the
@@ -181,6 +188,11 @@ Please refer to the
 for all questions related to licensing and pricing.
 
 ## Sizing
+
+Please refer to the
+[Health Checks And Monitoring](../fiftyone-teams-app/README.md#health-checks-and-monitoring)
+section for questions related to health checks related to your
+FiftyOne Enterpise application.
 
 ## Deployment Assets
 
@@ -245,7 +257,7 @@ FiftyOne Enterpise application.
 | DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
 | DSEC-007 | The deployment guide provides clear instruction on maintaining any stored secrets such as database credentials stored in AWS Secrets Manager. | This is covered in the [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
 | DSEC-008 | The deployment guide includes details on where customer sensitive data are stored | This is covered in the [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
-| DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) | This is covered in the ... |
+| DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) | This is covered in the [Encryption](#encryption) section. |
 | DSEC-010 | For deployments involving more than a single element, include network configuration (for example, VPCs, subnets, security groups, network access control lists (network ACLs), and route tables) in the deployment guide. | This is covered in the ... |
 | DSEC-011 | The solution must support the ability for the customer to disable Instance Metadata Service Version 1 (IMDSv1). | This is covered in the [Instance Metadata Service Version 1](#instance-metadata-service-version-1) section. |
 
@@ -262,7 +274,7 @@ FiftyOne Enterpise application.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| SIZ-001 | Either provide scripts to provision required resources or provide guidance for type and size selection for resources. | This is covered in the [usage](../fiftyone-teams-app/README.md#usage) section. |
+| SIZ-001 | Either provide scripts to provision required resources or provide guidance for type and size selection for resources. | This is covered in the [Sizing](#sizing) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Deployment Assets
