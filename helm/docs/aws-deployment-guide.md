@@ -116,10 +116,12 @@ The following technical requirements
 are required for a successful and properly secured
 deployment of FiftyOne Enterprise.
 
-1. An
+1. An AWS account.
+
+1. An existing
    [AWS EKS][aws-eks]
    cluster matching the FiftyOne Enterprise
-   [kubernetes version requirements](../fiftyone-teams-app/README.md#kubernetes-cluster-and-kubectl)
+   [kubernetes version requirements](../fiftyone-teams-app/README.md#kubernetes-cluster-and-kubectl).
 
 1. An installation of
    [`helm`][helm-sh]
@@ -131,11 +133,11 @@ deployment of FiftyOne Enterprise.
    that meets FiftyOne Enterprise's
    [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
 
-1. An
+1. Access to create an
    [AWS Route53][aws-route-53]
    record or records for ingress.
 
-1. An
+1. Access to create an
    [AWS ACM][aws-acm]
    certificate or certificates for HTTPS ingress.
 
@@ -277,7 +279,7 @@ for questions related to support tiers and pricing.
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
 | INT-001 | Introductory material must contain use cases for the software. | This is covered in the [Introduction](#introduction) section. |
-| INT-002 | Introductory material contains an overview of a typical customer deployment, including lists of all resources that are set up when the deployment is complete. | This is covered in the ... |
+| INT-002 | Introductory material contains an overview of a typical customer deployment, including lists of all resources that are set up when the deployment is complete. | This is covered in the [Deploying](#deploying) section. |
 | INT-003 | Introductory material contains a description of all deployment options discussed in the user guide (e.g. single-AZ, multi-AZ or multi-region), if applicable. | This is covered in the [Introduction](#introduction) section. |
 | INT-004 | Introductory material contains the expected amount of time to complete the deployment. | This is covered in the [estimated completion time](../fiftyone-teams-app/README.md#estimated-completion-time) section. |
 | INT-005 | Introductory material contains the regions supported. | This is covered in the [Introduction](#introduction) section. |
@@ -288,8 +290,8 @@ for questions related to support tiers and pricing.
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
 | PRQ-001 | All technical prerequisites and requirements to complete the deployment process are listed (e.g. required OS, database type and storage requirements). | This is covered in the [Technical Requirements](#technical-requirements) section. |
-| PRQ-002 | The deployment guide lists all prerequisite skills or specialized knowledge (for example, familiarity with AWS, specific AWS services, or a scripting or programming language). |  This is covered in the [Prerequisites Skills and Knowledge](#prerequisites-and-requirements) section. |
-| PRQ-003 | The deployment guide lists the environment configuration that is needed for the deployment (e.g. an AWS account, a specific operating system, licensing, DNS). | This is covered in the [values](../fiftyone-teams-app/README.md#values) section. |
+| PRQ-002 | The deployment guide lists all prerequisite skills or specialized knowledge (for example, familiarity with AWS, specific AWS services, or a scripting or programming language). |  This is covered in the [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge) section. |
+| PRQ-003 | The deployment guide lists the environment configuration that is needed for the deployment (e.g. an AWS account, a specific operating system, licensing, DNS). | This is covered in the [Technical Requirements](#technical-requirements) section. |
 
 ### Architecture Diagrams
 
