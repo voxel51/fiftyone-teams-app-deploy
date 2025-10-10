@@ -187,7 +187,7 @@ The billable services that are **optional** to run FiftyOne Enterpise are:
 ## License Model
 
 Please refer to the
-[Voxel51 Pricing Model](https://voxel51.com/pricing)
+[Voxel51 Pricing Model][voxel51-com-pricing]
 for all questions related to licensing and pricing.
 
 ## Sizing
@@ -203,6 +203,11 @@ section for questions related to resource sizing.
 Please refer to the
 [Health Checks And Monitoring](../fiftyone-teams-app/README.md#health-checks-and-monitoring)
 section for questions related to health checks related to your
+FiftyOne Enterpise application.
+
+Please refer to the
+[Health Checks And Monitoring](../fiftyone-teams-app/README.md#health-checks-and-monitoring)
+section for questions related to troubleshooting your
 FiftyOne Enterpise application.
 
 ## Backup and Recovery
@@ -239,7 +244,7 @@ Support can be received by reaching out directly to your Customer Success (CS)
 representative.
 
 Please see the
-[pricing page](https://voxel51.com/pricing)
+[Voxel51 Pricing Model][voxel51-com-pricing]
 for questions related to support tiers and pricing.
 
 ## AWS FTR Summary
@@ -308,7 +313,7 @@ for questions related to support tiers and pricing.
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
 | DAS-001 | The deployment guide provides step-by-step instructions for deploying the workload on AWS according to the typical deployment architecture. | This is covered in the ... |
-| DAS-004 | The deployment guide contains prescriptive guidance for testing and troubleshooting. | This is covered in the ... |
+| DAS-004 | The deployment guide contains prescriptive guidance for testing and troubleshooting. | This is covered in the [Health Checks](#health-checks) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Health Checks
@@ -362,3 +367,4 @@ for questions related to support tiers and pricing.
 [aws-s3]: https://aws.amazon.com/pm/serv-s3/
 [helm-sh]: https://helm.sh/
 [mongodb-com]: https://www.mongodb.com/
+[voxel51-com-pricing]: https://voxel51.com/pricing
