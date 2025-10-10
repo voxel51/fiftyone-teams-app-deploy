@@ -486,6 +486,9 @@ delegatedOperatorDeployments:
 fiftyoneLicenseSecrets:
    - fiftyone-license
 
+imagePullSecrets:
+   - name: regcred
+
 ingress:
    annotations:
       alb.ingress.kubernetes.io/target-type: ip
