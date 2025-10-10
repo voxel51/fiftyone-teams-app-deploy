@@ -282,7 +282,7 @@ for questions related to support tiers and pricing.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | Thiis is covered in the [Root Privileges](#root-privileges) section. |
+| DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | This is covered in the [Root Privileges](#root-privileges) section. |
 | DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
 | DSEC-004 | The deployment guide clearly documents any public resources (e.g. Amazon S3 buckets with bucket policies allowing public access). | This is covered in the [Public Resources](#public-resources) section. |
 | DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
