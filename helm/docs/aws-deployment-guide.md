@@ -190,9 +190,8 @@ for all questions related to licensing and pricing.
 ## Sizing
 
 Please refer to the
-[Health Checks And Monitoring](../fiftyone-teams-app/README.md#health-checks-and-monitoring)
-section for questions related to health checks related to your
-FiftyOne Enterpise application.
+[Sizing](../fiftyone-teams-app/README.md#sizing)
+section for questions related to resource sizing.
 
 ## Deployment Assets
 

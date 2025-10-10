@@ -101,6 +101,7 @@ for steps on how to add your license file.
   - [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
   - [Helm](#helm)
 - [Estimated Completion Time](#estimated-completion-time)
+- [Sizing](#sizing)
 - [Usage](#usage)
 - [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
@@ -192,6 +193,23 @@ for steps on installing helm.
 ## Estimated Completion Time
 
 The estimated time to deploy FiftyOne Enterprise is approximately 2 hours.
+
+## Sizing
+
+Voxel51 recommends the following resource sizing:
+
+- MongoDB: 4 CPU, 16GB RAM, 256GB Storage
+- FiftyOne App: 1 CPU, 2GB RAM, 1GB Storage per pod
+- Teams API: 1 CPU, 2GB RAM, 1GB Storage per pod
+- Teams App: 500 mCPU, 512MB RAM, 512MB Storage per pod
+- Teams CAS: 500 mCPU, 512MB RAM, 512MB Storage per pod
+- (optional) Delegated Operators: 1 CPU, 2GB RAM, 1GB Storage per pod
+- (optional) Dedicated Plugins: 1 CPU, 2GB RAM, 1GB Storage per pod
+
+Voxel51 also recommends monitoring resource consumption across
+the applications.
+Resource usage may vary dramatically with operations, use cases,
+and dataset sizes.
 
 ## Usage
 
