@@ -1,0 +1,216 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS EFS file system for FiftyOne Enterprise with access points and security groups'
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID where EFS will be deployed
+
+  SubnetId1:
+    Type: AWS::EC2::Subnet::Id
+    Description: First subnet ID for EFS mount target (recommend private subnet)
+
+  SubnetId2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Second subnet ID for EFS mount target (recommend private subnet in different AZ)
+    Default: ""
+
+  FileSystemName:
+    Type: String
+    Default: fiftyone-shared-storage
+    Description: Name for the EFS file system
+
+  PerformanceMode:
+    Type: String
+    Default: generalPurpose
+    AllowedValues:
+      - generalPurpose
+      - maxIO
+    Description: EFS performance mode
+
+  ThroughputMode:
+    Type: String
+    Default: bursting
+    AllowedValues:
+      - bursting
+      - provisioned
+    Description: EFS throughput mode
+
+  ProvisionedThroughputInMibps:
+    Type: Number
+    Default: 100
+    MinValue: 1
+    MaxValue: 1024
+    Description: Provisioned throughput in MiB/s (only used if ThroughputMode is provisioned)
+
+  AllowedCidrBlock:
+    Type: String
+    Default: 10.0.0.0/8
+    Description: CIDR block allowed to access EFS
+
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues:
+      - development
+      - staging
+      - production
+    Description: Environment name for resource tagging
+
+Conditions:
+  IsProvisionedThroughput: !Equals [!Ref ThroughputMode, provisioned]
+  HasSubnet2: !Not [!Equals [!Ref SubnetId2, ""]]
+
+Resources:
+  # Security Group for EFS
+  EFSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${FileSystemName}-sg'
+      GroupDescription: Security group for EFS file system access
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          CidrIp: !Ref AllowedCidrBlock
+          Description: NFS access from VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic
+      Tags:
+        - Key: Name
+          Value: !Sub '${FileSystemName}-security-group'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Purpose
+          Value: EFS-Access
+
+  # EFS File System
+  EFSFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      FileSystemTags:
+        - Key: Name
+          Value: !Ref FileSystemName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Purpose
+          Value: FiftyOne-Shared-Storage
+      PerformanceMode: !Ref PerformanceMode
+      ThroughputMode: !Ref ThroughputMode
+      ProvisionedThroughputInMibps: !If
+        - IsProvisionedThroughput
+        - !Ref ProvisionedThroughputInMibps
+        - !Ref AWS::NoValue
+      BackupPolicy:
+        Status: ENABLED
+      Encrypted: true
+      FileSystemPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowRootAccess
+            Effect: Allow
+            Principal:
+              AWS: '*'
+            Action:
+              - elasticfilesystem:CreateAccessPoint
+              - elasticfilesystem:ClientMount
+              - elasticfilesystem:ClientWrite
+            Condition:
+              Bool:
+                aws:SecureTransport: true
+
+  # Mount Targets (one per subnet)
+  MountTarget1:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref SubnetId1
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  MountTarget2:
+    Type: AWS::EFS::MountTarget
+    Condition: HasSubnet2
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref SubnetId2
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  # Access Point for FiftyOne Teams API
+  FiftyOneAccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      PosixUser:
+        Uid: 1000
+        Gid: 1000
+      RootDirectory:
+        Path: /fiftyone_teams_app
+        CreationInfo:
+          OwnerUid: 1000
+          OwnerGid: 1000
+          Permissions: '755'
+      AccessPointTags:
+        - Key: Name
+          Value: !Sub '${FileSystemName}-fiftyone-access-point'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Purpose
+          Value: FiftyOne-Teams-App
+
+  # Access Point for Plugins
+  PluginsAccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      PosixUser:
+        Uid: 1000
+        Gid: 1000
+      RootDirectory:
+        Path: /fiftyone_teams_app/plugins
+        CreationInfo:
+          OwnerUid: 1000
+          OwnerGid: 1000
+          Permissions: '755'
+      AccessPointTags:
+        - Key: Name
+          Value: !Sub '${FileSystemName}-plugins-access-point'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Purpose
+          Value: FiftyOne-Plugins
+
+Outputs:
+  FileSystemId:
+    Description: EFS File System ID
+    Value: !Ref EFSFileSystem
+    Export:
+      Name: !Sub '${AWS::StackName}-FileSystemId'
+
+  FileSystemDNS:
+    Description: EFS File System DNS name
+    Value: !Sub '${EFSFileSystem}.efs.${AWS::Region}.amazonaws.com'
+    Export:
+      Name: !Sub '${AWS::StackName}-FileSystemDNS'
+
+  SecurityGroupId:
+    Description: Security Group ID for EFS access
+    Value: !Ref EFSSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-SecurityGroupId'
+
+  FiftyOneAccessPointId:
+    Description: Access Point ID for FiftyOne Teams API
+    Value: !Ref FiftyOneAccessPoint
+    Export:
+      Name: !Sub '${AWS::StackName}-FiftyOneAccessPointId'
+
+  PluginsAccessPointId:
+    Description: Access Point ID for Plugins
+    Value: !Ref PluginsAccessPoint
+    Export:
+      Name: !Sub '${AWS::StackName}-PluginsAccessPointId'

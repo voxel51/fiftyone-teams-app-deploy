@@ -44,6 +44,10 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Fault Conditions](#fault-conditions)
 - [Support](#support)
 - [Deploying](#deploying)
+  - [Creating An EFS And Configure Shared Storage](#creating-an-efs-and-configure-shared-storage)
+  - [Creating a TLS/SSL Certificate](#creating-a-tlsssl-certificate)
+  - [Installing FiftyOne Enterprise](#installing-fiftyone-enterprise)
+  - [Creating a DNS Record To Point To Your Load Balancer](#creating-a-dns-record-to-point-to-your-load-balancer)
 - [AWS FTR Summary](#aws-ftr-summary)
   - [Introduction](#introduction-1)
   - [Prerequisites and Requirements](#prerequisites-and-requirements-1)
@@ -123,6 +127,11 @@ deployment of FiftyOne Enterprise.
    [AWS EKS][aws-eks]
    cluster matching the FiftyOne Enterprise
    [kubernetes version requirements](../fiftyone-teams-app/README.md#kubernetes-cluster-and-kubectl).
+   The cluster needs both the
+   [AWS EFS CSI][aws-efs-csi]
+   and
+   [AWS Load Balancer Controller][aws-elb-ctrl]
+   installed.
 
 1. An installation of
    [`helm`][helm-sh]
@@ -133,6 +142,10 @@ deployment of FiftyOne Enterprise.
    [MongoDB Database][mongodb-com]
    that meets FiftyOne Enterprise's
    [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+
+1. An existing
+   [AWS Route53][aws-route-53]
+   hosted zone.
 
 1. Access to create an
    [AWS Route53][aws-route-53]
@@ -279,6 +292,201 @@ for questions related to support tiers and pricing.
 
 ## Deploying
 
+The following steps will guide you through the steps to setup
+FiftyOne Enterprise with
+[delegated operators](../fiftyone-teams-app/README.md#builtin-delegated-operator-orchestrator)
+and
+[dedicated plugins](../fiftyone-teams-app/README.md#plugins).
+
+Before starting the deployment configuration, please make sure to
+check the [prerequisites and requirements](#prerequisites-and-requirements)
+section.
+
+### Creating An EFS And Configure Shared Storage
+
+We will create EFS via
+[CloudFormation][aws-cf].
+
+In the below, please change `AWS_REGION` to the actual region you would
+like to deploy in (e.g., `us-east-1`).
+
+1. Navigate to <https://AWS_REGION.console.aws.amazon.com/cloudformation/home>
+
+1. Select `Create stack` on the right-hand menu > `With new resources`
+
+1. `Choose an existing template` > `Upload A Template File` > `Choose File`
+
+   1. Upload the
+      [EFS Stack Template](../../cloudformation/efs-stack.yml).
+
+1. Click `Next`
+
+1. Enter a descriptive stack name, e.g. `FiftyoneEnterpriseEFS`
+
+1. Fill out each parameter for your environment's needs and select `Next`.
+
+1. Configure the stack options for your environment's needs and select `Next`.
+
+1. Review the stack and select `Submit`.
+
+CloudFormation will go deploy an EFS store in your region.
+You can now create a `PersistentVolume` and `PersistenVolumeClaims`
+for your deployment.
+
+```yaml
+---
+# FiftyOne Teams App PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: fiftyone-plugins-shared-pv
+spec:
+   capacity:
+      storage: 25Gi
+   volumeMode: Filesystem
+   accessModes:
+      - ReadWriteMany
+      - ReadWriteOnce
+   persistentVolumeReclaimPolicy: Retain
+   storageClassName: efs-sc
+   csi:
+      driver: efs.csi.aws.com
+      volumeHandle: ${EFSFileSystem}::${PluginsAccessPoint}
+---
+# API Shared FileSystem
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: fiftyone-shared-pv
+spec:
+   capacity:
+      storage: 25Gi
+   volumeMode: Filesystem
+   accessModes:
+      - ReadWriteMany
+      - ReadWriteOnce
+   persistentVolumeReclaimPolicy: Retain
+   storageClassName: efs-sc
+   csi:
+      driver: efs.csi.aws.com
+      volumeHandle: ${EFSFileSystem}::${FiftyOneAccessPoint}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+   name: fiftyone-plugins-shared-pvc
+spec:
+   accessModes:
+      - ReadWriteMany
+      - ReadWriteOnce
+   storageClassName: efs-sc
+   volumeName: fiftyone-plugins-shared-pv
+   resources:
+      requests:
+         storage: 25Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+   name: fiftyone-shared-pvc
+spec:
+   accessModes:
+      - ReadWriteMany
+      - ReadWriteOnce
+   storageClassName: efs-sc
+   volumeName: fiftyone-shared-pv
+   resources:
+      requests:
+         storage: 25Gi
+```
+
+After a few seconds, your `PersistentVolumeClaims` should be `Bound`:
+
+```shell
+$ kubectl get pvc
+NAME                            STATUS   VOLUME                         CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+fiftyone-api-cache-shared-pvc   Bound    fiftyone-api-cache-shared-pv   5Gi        RWO,RWX        efs-sc         <unset>                 13s
+fiftyone-plugins-shared-pvc     Bound    fiftyone-plugins-shared-pv     50Gi       RWO,RWX        efs-sc         <unset>                 14s
+```
+
+### Creating a TLS/SSL Certificate
+
+We will create an ACM certificate via
+[CloudFormation][aws-cf].
+
+In the below, please change `AWS_REGION` to the actual region you would
+like to deploy in (e.g., `us-east-1`).
+
+1. Navigate to <https://AWS_REGION.console.aws.amazon.com/cloudformation/home>
+
+1. Select `Create stack` on the right-hand menu > `With new resources`
+
+1. `Choose an existing template` > `Upload A Template File` > `Choose File`
+
+   1. Upload the
+      [EFS Stack Template](../../cloudformation/acm-stack.yml).
+
+1. Click `Next`
+
+1. Enter a descriptive stack name, e.g. `FiftyoneEnterpriseACM`
+
+1. Fill out each parameter for your environment's needs and select `Next`.
+
+1. Configure the stack options for your environment's needs and select `Next`.
+
+1. Review the stack and select `Submit`.
+
+CloudFormation will go deploy an AWS ACM certificate in your region
+and validate it.
+Take note of the ARN of the certificate.
+It will be used on the generated load balancer.
+
+### Installing FiftyOne Enterprise
+
+We will now use
+[`helm`][helm-sh]
+to install FiftyOne Enterprise.
+
+We will need to create a `values.yaml` file which connects AWS to our
+footprint.
+A minimal example is below
+
+```yaml
+apiSettings:
+   replicaCount: 2
+   env:
+      FIFTYONE_PLUGINS_DIR: /opt/shared/plugins
+      FIFTYONE_SHARED_ROOT_DIR: /opt/shared
+   volumes:
+      - name: nfs-shared-vol
+         persistentVolumeClaim:
+         claimName: teams-shared-pvc
+   volumeMounts:
+      - name: nfs-shared-vol
+        mountPath: /opt/shared
+
+ingress:
+   annotations:
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/backend-protocol: HTTP
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: '443'
+      alb.ingress.kubernetes.io/certificate-arn: ${CertificateArn}
+   className: alb
+
+pluginsSettings:
+   enabled: true
+
+delegatedOperatorDeployments: {}
+```
+
+Please refer to the
+[Usage](../fiftyone-teams-app/README.md#usage)
+section to proceed with the `helm` installation.
+
+### Creating a DNS Record To Point To Your Load Balancer
+
 ## AWS FTR Summary
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
@@ -391,10 +599,13 @@ for questions related to support tiers and pricing.
 
 <!-- Reference Links -->
 [aws-acm]: https://aws.amazon.com/certificate-manager/
+[aws-cf]: https://aws.amazon.com/cloudformation/
 [aws-ec2]: https://aws.amazon.com/pm/ec2/
 [aws-efs]: https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html
+[aws-efs-csi]: https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html
 [aws-eks]: https://aws.amazon.com/pm/eks/
 [aws-elb]: https://docs.aws.amazon.com/elasticloadbalancing/
+[aws-elb-ctrl]: https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
 [aws-ftr]: https://apn-checklists.s3.amazonaws.com/foundational/customer-deployed/customer-deployed/C0hfGvKGP.html
 [aws-route-53]: https://aws.amazon.com/route53/
 [aws-s3]: https://aws.amazon.com/pm/serv-s3/

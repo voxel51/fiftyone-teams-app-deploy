@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Simple ACM Certificate with DNS validation for FiftyOne Enterprise'
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: Primary domain name for the certificate (e.g., fiftyone.example.com)
+    AllowedPattern: ^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$
+    ConstraintDescription: Must be a valid domain name
+
+  SubjectAlternativeNames:
+    Type: CommaDelimitedList
+    Description: Additional domain names for the certificate (optional, comma-separated)
+    Default: ""
+
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+    Description: Route 53 Hosted Zone ID for DNS validation (must contain the domain)
+
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues:
+      - development
+      - staging
+      - production
+    Description: Environment name for resource tagging
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Certificate Configuration"
+        Parameters:
+          - DomainName
+          - SubjectAlternativeNames
+      - Label:
+          default: "DNS Validation"
+        Parameters:
+          - HostedZoneId
+      - Label:
+          default: "Tags"
+        Parameters:
+          - Environment
+    ParameterLabels:
+      DomainName:
+        default: "Primary Domain Name"
+      SubjectAlternativeNames:
+        default: "Additional Domain Names (SANs)"
+      HostedZoneId:
+        default: "Route 53 Hosted Zone"
+      Environment:
+        default: "Environment"
+
+Conditions:
+  HasSubjectAlternativeNames: !Not [!Equals [!Select [0, !Ref SubjectAlternativeNames], ""]]
+
+Resources:
+  # ACM Certificate with automatic DNS validation
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      SubjectAlternativeNames: !If
+        - HasSubjectAlternativeNames
+        - !Ref SubjectAlternativeNames
+        - !Ref AWS::NoValue
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+      Tags:
+        - Key: Name
+          Value: !Sub '${DomainName}-certificate'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Purpose
+          Value: FiftyOne-Enterprise-SSL
+        - Key: Domain
+          Value: !Ref DomainName
+
+Outputs:
+  CertificateArn:
+    Description: ARN of the ACM certificate (may still be validating)
+    Value: !Ref Certificate
+    Export:
+      Name: !Sub '${AWS::StackName}-CertificateArn'
+
+  CertificateDomainName:
+    Description: Primary domain name of the certificate
+    Value: !Ref DomainName
+    Export:
+      Name: !Sub '${AWS::StackName}-CertificateDomainName'
+
+  ValidationMethod:
+    Description: Validation method used for the certificate
+    Value: DNS
+    Export:
+      Name: !Sub '${AWS::StackName}-ValidationMethod'
+
+  HostedZoneId:
+    Description: Route 53 Hosted Zone ID used for validation
+    Value: !Ref HostedZoneId
+    Export:
+      Name: !Sub '${AWS::StackName}-HostedZoneId'
