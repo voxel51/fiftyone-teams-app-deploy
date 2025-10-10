@@ -28,13 +28,17 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Root Privileges](#root-privileges)
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Instance Metadata Service Version 1](#instance-metadata-service-version-1)
+- [Costs](#costs)
+  - [Billable Services](#billable-services)
+  - [License Model](#license-model)
+- [Sizing](#sizing)
 - [AWS FTR Summary](#aws-ftr-summary)
   - [Introduction](#introduction)
   - [Prerequisites and Requirements](#prerequisites-and-requirements-1)
   - [Architecture Diagrams](#architecture-diagrams)
   - [Security](#security-1)
-  - [Costs](#costs)
-  - [Sizing](#sizing)
+  - [Costs](#costs-1)
+  - [Sizing](#sizing-1)
   - [Deployment Assets](#deployment-assets)
   - [Health Check](#health-check)
   - [Backup and Recovery](#backup-and-recovery)
@@ -144,6 +148,30 @@ To mitigate risk linked with IMDS we are using the least privilege
 principle with a specific role for task execution and specific
 security group and VPC to control network access to EKS pods.
 
+## Costs
+
+### Billable Services
+
+The billable services that are **mandatory** to run FiftyOne Enterprise are:
+
+1. [AWS EKS][aws-eks]
+
+1. [AWS Route53][aws-route-53]
+
+1. [AWS ACM][aws-acm]
+
+1. [AWS ELB][aws-elb]
+
+The billable services that are **optional** to run FiftyOne Enterpise are:
+
+1. [AWS S3][aws-s3]
+
+1. [AWS EC2][aws-ec2]
+
+### License Model
+
+## Sizing
+
 ## AWS FTR Summary
 
 ### Introduction
@@ -189,13 +217,15 @@ security group and VPC to control network access to EKS pods.
 | DSEC-010 | For deployments involving more than a single element, include network configuration (for example, VPCs, subnets, security groups, network access control lists (network ACLs), and route tables) in the deployment guide. | This is covered in the ... |
 | DSEC-011 | The solution must support the ability for the customer to disable Instance Metadata Service Version 1 (IMDSv1). | This is covered in the [Instance Metadata Service Version 1](#instance-metadata-service-version-1) section. |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Costs
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| CST-001 | The deployment guide includes a list of billable services and guidance on whether each service is mandatory or optional. | This is covered in the ... |
+| CST-001 | The deployment guide includes a list of billable services and guidance on whether each service is mandatory or optional. | This is covered in the [Billable Services](#billable-services) section. |
 | CST-002 | The deployment guide includes the cost model and licensing costs. | This is covered in the ... |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Sizing
 
 | Req Code | Requirement Description | Content |
@@ -247,9 +277,12 @@ security group and VPC to control network access to EKS pods.
 
 <!-- Reference Links -->
 [aws-acm]: https://aws.amazon.com/certificate-manager/
+[aws-ec2]: https://aws.amazon.com/pm/ec2/
 [aws-efs]: https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html
 [aws-eks]: https://aws.amazon.com/pm/eks/
+[aws-elb]: https://docs.aws.amazon.com/elasticloadbalancing/
 [aws-ftr]: https://apn-checklists.s3.amazonaws.com/foundational/customer-deployed/customer-deployed/C0hfGvKGP.html
 [aws-route-53]: https://aws.amazon.com/route53/
+[aws-s3]: https://aws.amazon.com/pm/serv-s3/
 [helm-sh]: https://helm.sh/
 [mongodb-com]: https://www.mongodb.com/
