@@ -561,6 +561,12 @@ section to proceed with the `helm` installation.
 
 ### Creating a DNS Record To Point To Your Load Balancer
 
+We will now create a DNS record alias via
+[CloudFormation][aws-cf].
+
+We first need to fetch the parameters from our deployed
+load balancer:
+
 ```shell
 DNS_NAME=$(
    kubectl get ingress <your-ingress-name> \
@@ -583,9 +589,6 @@ echo -e "   DNS Name: $DNS_NAME"
 echo -e "   ALB DNS Name: $ALB_DNS_NAME"
 echo -e "   Hosted Zone ID: $HOSTED_ZONE"
 ```
-
-We will now create a DNS record alias via
-[CloudFormation][aws-cf].
 
 In the below, please change `AWS_REGION` to the actual region you would
 like to deploy in (e.g., `us-east-1`).
