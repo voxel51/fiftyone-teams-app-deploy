@@ -478,7 +478,33 @@ ingress:
 pluginsSettings:
    enabled: true
 
-delegatedOperatorDeployments: {}
+   env:
+      FIFTYONE_PLUGINS_CACHE_ENABLED: true
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+
+   volumes:
+      - name: nfs-plugins-ro-vol
+        persistentVolumeClaim:
+            claimName: fiftyone-plugins-shared-pvc
+            readOnly: true
+   volumeMounts:
+      - name: nfs-plugins-ro-vol
+        mountPath: /opt/plugins
+
+delegatedOperatorDeployments:
+   template:
+      env:
+         FIFTYONE_PLUGINS_CACHE_ENABLED: true
+         FIFTYONE_PLUGINS_DIR: /opt/plugins
+      volumes:
+         - name: nfs-plugins-ro-vol
+           persistentVolumeClaim:
+               claimName: fiftyone-plugins-shared-pvc
+               readOnly: true
+      volumeMounts:
+         - name: nfs-plugins-ro-vol
+           mountPath: /opt/plugins
+
 ```
 
 Please refer to the
