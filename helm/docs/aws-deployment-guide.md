@@ -33,8 +33,11 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [License Model](#license-model)
 - [Sizing](#sizing)
 - [Deployment Assets](#deployment-assets)
-- [Health Check](#health-check)
+- [Health Checks](#health-checks)
 - [Backup and Recovery](#backup-and-recovery)
+- [Routine Maintenance](#routine-maintenance)
+- [Emergency Maintenance](#emergency-maintenance)
+- [Support](#support)
 - [AWS FTR Summary](#aws-ftr-summary)
   - [Introduction](#introduction)
   - [Prerequisites and Requirements](#prerequisites-and-requirements-1)
@@ -43,11 +46,11 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Costs](#costs-1)
   - [Sizing](#sizing-1)
   - [Deployment Assets](#deployment-assets-1)
-  - [Health Check](#health-check-1)
+  - [Health Check](#health-check)
   - [Backup and Recovery](#backup-and-recovery-1)
-  - [Routine Maintenance](#routine-maintenance)
-  - [Emergency Maintenance](#emergency-maintenance)
-  - [Support](#support)
+  - [Routine Maintenance](#routine-maintenance-1)
+  - [Emergency Maintenance](#emergency-maintenance-1)
+  - [Support](#support-1)
 
 <!-- tocstop -->
 
@@ -177,7 +180,12 @@ The billable services that are **optional** to run FiftyOne Enterpise are:
 
 ## Deployment Assets
 
-## Health Check
+## Health Checks
+
+Please refer to the
+[Backup and Recovery](../fiftyone-teams-app/README.md#health-checks-and-monitoring)
+section for questions related to health checks related to your
+FiftyOne Enterpise application.
 
 ## Backup and Recovery
 
@@ -185,6 +193,12 @@ Please refer to the
 [Backup and Recovery](../fiftyone-teams-app/README.md#backup-and-recovery)
 section for questions related to backing up and restoring your
 FiftyOne Enterpise application.
+
+## Routine Maintenance
+
+## Emergency Maintenance
+
+## Support
 
 ## AWS FTR Summary
 
@@ -259,7 +273,7 @@ FiftyOne Enterpise application.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the [Health Checks And Monitoring](../fiftyone-teams-app/README.md#health-checks-and-monitoring) section. |
+| HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the [Health Checks](../fiftyone-teams-app/README.md#health-checks) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Backup and Recovery
@@ -268,6 +282,7 @@ FiftyOne Enterpise application.
 |----------|------------------------|---------|
 | BAR-001 | Identify the data stores and the configurations to be backed up. If any of the data stores are proprietary, provide step-by-step instructions for backup and recovery. | This is covered in the [Backup and Recovery](#backup-and-recovery) section. |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Routine Maintenance
 
 | Req Code | Requirement Description | Content |
@@ -277,6 +292,7 @@ FiftyOne Enterpise application.
 | RM-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [usage](../fiftyone-teams-app/README.md#usage) section. |
 | RM-004 | The deployment guide provides prescriptive guidance on managing AWS service limits. | AWS service limits do not apply to FiftyOne Enterprise. |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Emergency Maintenance
 
 | Req Code | Requirement Description | Content |
@@ -284,6 +300,7 @@ FiftyOne Enterpise application.
 | EMER-001 | The deployment guide provides step-by-step instructions on handling fault conditions. | This is covered in the ... |
 | EMER-002 | The deployment guide provides step-by-step instructions on how to recover the software. | This is covered in the ... |
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Support
 
 | Req Code | Requirement Description | Content |
