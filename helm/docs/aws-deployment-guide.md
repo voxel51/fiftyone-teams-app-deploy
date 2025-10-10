@@ -561,6 +561,15 @@ section to proceed with the `helm` installation.
 
 ### Creating a DNS Record To Point To Your Load Balancer
 
+```shell
+ALB_DNS_NAME=$(kubectl get ingress <your-ingress-name> -n <your-namespace> -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+HOSTED_ZONE=$(aws elbv2 describe-load-balancers --query "LoadBalancers[?DNSName=='$ALB_DNS_NAME'].CanonicalHostedZoneId" --output text)
+
+echo -e "Inputs for CloudFormation:"
+echo -e "\tALB DNS Name: $ALB_DNS_NAME"
+echo -e "\tHosted Zone ID: $HOSTED_ZONE"
+```
+
 ## AWS FTR Summary
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->

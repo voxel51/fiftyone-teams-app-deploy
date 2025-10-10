@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates a DNS record pointing to an AWS Application Load Balancer'
+
+Parameters:
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+    Description: Route 53 Hosted Zone ID where the DNS record will be created
+
+  ALBDnsName:
+    Type: String
+    Description: DNS name of the Application Load Balancer (e.g., my-alb-123456789.us-east-1.elb.amazonaws.com)
+    AllowedPattern: ^[a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?\.elb\.[a-zA-Z0-9\-]+\.amazonaws\.com$
+    ConstraintDescription: Must be a valid AWS ALB DNS name (ending with .elb.*.amazonaws.com)
+
+  DnsName:
+    Type: String
+    Description: The nice DNS name to create (e.g., app.example.com or fiftyone.company.com)
+    AllowedPattern: ^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$
+    ConstraintDescription: Must be a valid domain name
+
+  ALBHostedZoneId:
+    Type: String
+    Description: Hosted Zone ID of the ALB (region-specific, see https://docs.aws.amazon.com/general/latest/gr/elb.html)
+    Default: ""
+    AllowedPattern: ^[A-Z0-9]{10,20}$|^$
+    ConstraintDescription: Must be a valid AWS hosted zone ID or empty (will auto-detect)
+
+  RecordType:
+    Type: String
+    Default: A
+    AllowedValues:
+      - A
+      - AAAA
+    Description: DNS record type (A for IPv4, AAAA for IPv6)
+
+  TTL:
+    Type: Number
+    Default: 300
+    MinValue: 60
+    MaxValue: 86400
+    Description: Time to Live (TTL) in seconds for the DNS record
+
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues:
+      - development
+      - staging
+      - production
+    Description: Environment name for resource tagging
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "DNS Configuration"
+        Parameters:
+          - HostedZoneId
+          - DnsName
+          - RecordType
+          - TTL
+      - Label:
+          default: "Load Balancer Configuration"
+        Parameters:
+          - ALBDnsName
+          - ALBHostedZoneId
+      - Label:
+          default: "Tags"
+        Parameters:
+          - Environment
+    ParameterLabels:
+      HostedZoneId:
+        default: "Route 53 Hosted Zone"
+      DnsName:
+        default: "DNS Record Name"
+      ALBDnsName:
+        default: "ALB DNS Name"
+      ALBHostedZoneId:
+        default: "ALB Hosted Zone ID"
+      RecordType:
+        default: "Record Type"
+      TTL:
+        default: "TTL (seconds)"
+      Environment:
+        default: "Environment"
+
+Conditions:
+  UseProvidedALBHostedZone: !Not [!Equals [!Ref ALBHostedZoneId, ""]]
+  CreateAliasRecord: !Equals [!Ref RecordType, A]
+
+Resources:
+  DNSRecord:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateAliasRecord
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DnsName
+      Type: A
+      AliasTarget:
+        DNSName: !Ref ALBDnsName
+        HostedZoneId: !If
+          - UseProvidedALBHostedZone
+          - !Ref ALBHostedZoneId
+        EvaluateTargetHealth: true
+
+  DNSRecordAAAA:
+    Type: AWS::Route53::RecordSet
+    Condition: !Equals [!Ref RecordType, AAAA]
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DnsName
+      Type: AAAA
+      AliasTarget:
+        DNSName: !Ref ALBDnsName
+        HostedZoneId: !If
+          - UseProvidedALBHostedZone
+          - !Ref ALBHostedZoneId
+        EvaluateTargetHealth: true
+
+Outputs:
+  DNSRecordName:
+    Description: The DNS record name that was created
+    Value: !Ref DnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-DNSRecordName'
+
+  DNSRecordType:
+    Description: The type of DNS record created
+    Value: !Ref RecordType
+    Export:
+      Name: !Sub '${AWS::StackName}-DNSRecordType'
+
+  TargetALBDnsName:
+    Description: The ALB DNS name this record points to
+    Value: !Ref ALBDnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-TargetALBDnsName'
+
+  HostedZoneId:
+    Description: The Route 53 Hosted Zone where the record was created
+    Value: !Ref HostedZoneId
+    Export:
+      Name: !Sub '${AWS::StackName}-HostedZoneId'
+
+  ALBHostedZoneId:
+    Description: The ALB Hosted Zone ID used for the alias record
+    Value: !If
+      - UseProvidedALBHostedZone
+      - !Ref ALBHostedZoneId
+    Export:
+      Name: !Sub '${AWS::StackName}-ALBHostedZoneId'
+
+  RecordURL:
+    Description: The URL that will resolve to your ALB
+    Value: !Sub 'https://${DnsName}'
+    Export:
+      Name: !Sub '${AWS::StackName}-RecordURL'
