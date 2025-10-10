@@ -37,6 +37,8 @@ This is the summary of FiftyOne Enterprise FTR based on the
 - [Health Checks](#health-checks)
 - [Backup and Recovery](#backup-and-recovery)
 - [Routine Maintenance](#routine-maintenance)
+  - [Upgrades](#upgrades)
+  - [License Management](#license-management)
 - [Emergency Maintenance](#emergency-maintenance)
 - [Support](#support)
 - [AWS FTR Summary](#aws-ftr-summary)
@@ -47,7 +49,7 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Costs](#costs-1)
   - [Sizing](#sizing-1)
   - [Deployment Assets](#deployment-assets-1)
-  - [Health Check](#health-check)
+  - [Health Checks](#health-checks-1)
   - [Backup and Recovery](#backup-and-recovery-1)
   - [Routine Maintenance](#routine-maintenance-1)
   - [Emergency Maintenance](#emergency-maintenance-1)
@@ -211,6 +213,19 @@ FiftyOne Enterpise application.
 
 ## Routine Maintenance
 
+### Upgrades
+
+Please refer to the
+[Upgrades](../fiftyone-teams-app/README.md#upgrades)
+section for questions related to upgrading your
+FiftyOne Enterprise application.
+
+### License Management
+
+Please refer to the
+[Usage](../fiftyone-teams-app/README.md#usage)
+section for questions related to managing and rotating your license.
+
 ## Emergency Maintenance
 
 ## Support
@@ -284,11 +299,11 @@ FiftyOne Enterpise application.
 | DAS-004 | The deployment guide contains prescriptive guidance for testing and troubleshooting. | This is covered in the ... |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
-### Health Check
+### Health Checks
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the [Health Checks](../fiftyone-teams-app/README.md#health-checks) section. |
+| HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the [Health Checks](#health-checks) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Backup and Recovery
@@ -303,8 +318,8 @@ FiftyOne Enterpise application.
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
 | RM-001 | The deployment guide provides step-by-step instructions for rotating programmatic system credentials and cryptographic keys. | This is covered in the ... |
-| RM-002 | The deployment guide provides prescriptive guidance for software patches and upgrades. | This is covered in the [upgrades](../fiftyone-teams-app/README.md#upgrades) section. |
-| RM-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [usage](../fiftyone-teams-app/README.md#usage) section. |
+| RM-002 | The deployment guide provides prescriptive guidance for software patches and upgrades. | This is covered in the [Upgrades](#upgrades) section. |
+| RM-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [License Management](#license-management) section. |
 | RM-004 | The deployment guide provides prescriptive guidance on managing AWS service limits. | AWS service limits do not apply to FiftyOne Enterprise. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
@@ -322,7 +337,7 @@ FiftyOne Enterpise application.
 |----------|------------------------|---------|
 | SUP-001 | The deployment guide provides details on how to receive support. | This is covered in the ... |
 | SUP-002 | The deployment guide provides details on technical support tiers. | This is covered in the ... |
-| SUP-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the ... |
+| SUP-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [License Management](#license-management) section. |
 
 <!-- Reference Links -->
 [aws-acm]: https://aws.amazon.com/certificate-manager/
