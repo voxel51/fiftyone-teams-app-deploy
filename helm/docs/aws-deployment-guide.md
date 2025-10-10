@@ -39,6 +39,7 @@ This is the summary of FiftyOne Enterprise FTR based on the
 - [Routine Maintenance](#routine-maintenance)
   - [Upgrades](#upgrades)
   - [License Management](#license-management)
+  - [AWS Service Limits](#aws-service-limits)
 - [Emergency Maintenance](#emergency-maintenance)
 - [Support](#support)
 - [AWS FTR Summary](#aws-ftr-summary)
@@ -226,6 +227,10 @@ Please refer to the
 [Usage](../fiftyone-teams-app/README.md#usage)
 section for questions related to managing and rotating your license.
 
+### AWS Service Limits
+
+AWS service limits do not apply to FiftyOne Enterprise.
+
 ## Emergency Maintenance
 
 ## Support
@@ -324,10 +329,10 @@ for questions related to support tiers and pricing.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| RM-001 | The deployment guide provides step-by-step instructions for rotating programmatic system credentials and cryptographic keys. | This is covered in the ... |
+| RM-001 | The deployment guide provides step-by-step instructions for rotating programmatic system credentials and cryptographic keys. | [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
 | RM-002 | The deployment guide provides prescriptive guidance for software patches and upgrades. | This is covered in the [Upgrades](#upgrades) section. |
 | RM-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [License Management](#license-management) section. |
-| RM-004 | The deployment guide provides prescriptive guidance on managing AWS service limits. | AWS service limits do not apply to FiftyOne Enterprise. |
+| RM-004 | The deployment guide provides prescriptive guidance on managing AWS service limits. | This is covered in the [AWS Service Limits](#aws-service-limits) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Emergency Maintenance
