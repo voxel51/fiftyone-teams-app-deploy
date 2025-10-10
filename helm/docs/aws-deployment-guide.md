@@ -70,6 +70,15 @@ For use cases, overviews, and demonstrations, please see the
 
 Please note that there is no limitation on region supported for
 FiftyOne Enterprise.
+FiftyOne Enterprise will be installed into an existing
+[AWS EKS][aws-eks]
+cluster via a
+[`helm`][helm-sh]
+chart.
+FiftyOne Enterprise, therefore, supports all of the same regions
+and deployment options (e.g. single-AZ, multi-AZ or multi-region)
+as
+[AWS EKS][aws-eks].
 
 ## Prerequisites and Requirements
 
@@ -269,7 +278,7 @@ for questions related to support tiers and pricing.
 |----------|------------------------|---------|
 | INT-001 | Introductory material must contain use cases for the software. | This is covered in the [Introduction](#introduction) section. |
 | INT-002 | Introductory material contains an overview of a typical customer deployment, including lists of all resources that are set up when the deployment is complete. | This is covered in the ... |
-| INT-003 | Introductory material contains a description of all deployment options discussed in the user guide (e.g. single-AZ, multi-AZ or multi-region), if applicable. | This is covered in the ... |
+| INT-003 | Introductory material contains a description of all deployment options discussed in the user guide (e.g. single-AZ, multi-AZ or multi-region), if applicable. | This is covered in the [Introduction](#introduction) section. |
 | INT-004 | Introductory material contains the expected amount of time to complete the deployment. | This is covered in the [estimated completion time](../fiftyone-teams-app/README.md#estimated-completion-time) section. |
 | INT-005 | Introductory material contains the regions supported. | This is covered in the [Introduction](#introduction) section. |
 
