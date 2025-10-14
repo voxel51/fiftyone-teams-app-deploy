@@ -197,7 +197,6 @@ To configure workload identity via the `terraform`:
 For bare-minimum access, FiftyOne Enterprise needs the following permissions
 for your media bucket(s) in AWS:
 
-- `iam:GetRole`
 - `s3:GetBucketLocation`
 - `s3:ListBucket`
 - `s3:ListBucketMultipartUploads`
@@ -344,14 +343,6 @@ To configure workload identity via Terraform:
                     ]
                     Resource = "arn:aws:s3:::${S3_BUCKET_NAME}/*"
                 },
-                {
-                    Sid    = "FiftyOneEnterpriseIAMAccess"
-                    Effect = "Allow"
-                    Action = [
-                        "iam:GetRole"
-                    ]
-                    Resource = aws_iam_role.voxel51_custom_role.arn
-                }
             ]
         })
     }
