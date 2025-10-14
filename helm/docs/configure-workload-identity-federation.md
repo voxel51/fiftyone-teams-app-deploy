@@ -243,14 +243,6 @@ To configure workload identity via the AWS CLI:
                     "s3:CompleteMultipartUpload"
                 ],
                 "Resource": "arn:aws:s3:::MEDIA_BUCKET_NAME/*"
-            },
-            {
-                "Sid": "FiftyOneEnterpriseIAMAccess",
-                "Effect": "Allow",
-                "Action": [
-                    "iam:GetRole"
-                ],
-                "Resource": "arn:aws:iam::AWS_ACCOUNT_ID:role/FIFTYONE_IAM_ROLE_NAME"
             }
         ]
     }
