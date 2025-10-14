@@ -10,7 +10,7 @@ repos:
         args:
           - --allow-multiple-document
         # We exclude helm template files since in raw form, they are not valid yaml
-        exclude: helm/fiftyone-teams-app/templates
+        exclude: (^helm/fiftyone-teams-app/templates|^cloudformation)
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: pretty-format-json

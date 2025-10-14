@@ -96,12 +96,16 @@ for steps on how to add your license file.
 
 <!-- toc -->
 
-- [Requirements](#requirements)
-  - [Kubernetes/Kubectl](#kuberneteskubectl)
+- [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge)
+- [Technical Requirements](#technical-requirements)
+  - [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
   - [Helm](#helm)
+- [Estimated Completion Time](#estimated-completion-time)
+- [Sizing](#sizing)
 - [Usage](#usage)
 - [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
+  - [Backup And Recovery](#backup-and-recovery)
   - [Builtin Delegated Operator Orchestrator](#builtin-delegated-operator-orchestrator)
   - [Central Authentication Service](#central-authentication-service)
   - [FiftyOne Enterprise Authenticated API](#fiftyone-enterprise-authenticated-api)
@@ -109,6 +113,7 @@ for steps on how to add your license file.
   - [Highly Available FiftyOne `teams-api` Deployments](#highly-available-fiftyone-teams-api-deployments)
   - [Plugins](#plugins)
   - [Proxies](#proxies)
+  - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Snapshot Archival](#snapshot-archival)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Static Banner Configuration](#static-banner-configuration)
@@ -116,16 +121,57 @@ for steps on how to add your license file.
   - [Text Similarity](#text-similarity)
   - [Workload Identity Federation](#workload-identity-federation)
 - [Validating](#validating)
+- [Health Checks And Monitoring](#health-checks-and-monitoring)
+  - [Basic Health Assessment](#basic-health-assessment)
+  - [Troubleshooting Unhealthy Pods](#troubleshooting-unhealthy-pods)
 - [Values](#values)
 
 <!-- tocstop -->
 
-## Requirements
+## Prerequisites Skills and Knowledge
 
-Helm and Kubectl must be installed and configured on your machine.
+The following prerequisites skills & knowledge
+are required for a successful and properly secured
+deployment of FiftyOne Enterprise.
 
-### Kubernetes/Kubectl
+1. A knowledge of kubernetes.
 
+1. A knowledge of installing helm charts to deploy kubernetes applications.
+
+1. A knowledge MongoDB.
+
+1. A knowledge of DNS and the ability to generate, modify, and delete DNS records.
+
+1. A knowledge of TLS/SSL and the ability to generate TLS/SSL certificates.
+
+1. (optional) A knowledge of network file systems (NFS).
+
+## Technical Requirements
+
+The following technical requirements
+are required for a successful and properly secured
+deployment of FiftyOne Enterprise.
+
+1. [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
+
+1. [Helm](#helm)
+
+1. A MongoDB Database that meets FiftyOne's
+   [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+
+1. A DNS record or records for ingress.
+
+1. A TLS/SSL certificate or certificates for HTTPS ingress.
+
+1. (optional) An NFS server or `ReadWriteMany` compatible storage medium for
+   [delegated operators](#builtin-delegated-operator-orchestrator),
+   [plugins](#plugins),
+   and
+   [API high-availability](#highly-available-fiftyone-teams-api-deployments)
+
+### Kubernetes Cluster And Kubectl
+
+A kubernetes cluster and `kubectl` installation are required.
 The following kubernetes/kubectl versions are required:
 
 Kubernetes: `>=1.31-0`
@@ -143,6 +189,27 @@ Helm version >= 3.14 is required.
 Please refer to the
 [helm installation documentation](https://helm.sh/docs/intro/install/)
 for steps on installing helm.
+
+## Estimated Completion Time
+
+The estimated time to deploy FiftyOne Enterprise is approximately 2 hours.
+
+## Sizing
+
+Voxel51 recommends the following resource sizing:
+
+- MongoDB: 4 CPU, 16GB RAM, 256GB Storage
+- FiftyOne App: 1 CPU, 2GB RAM, 1GB Storage per pod
+- Teams API: 1 CPU, 2GB RAM, 1GB Storage per pod
+- Teams App: 500 mCPU, 512MB RAM, 512MB Storage per pod
+- Teams CAS: 500 mCPU, 512MB RAM, 512MB Storage per pod
+- (optional) Delegated Operators: 1 CPU, 2GB RAM, 1GB Storage per pod
+- (optional) Dedicated Plugins: 1 CPU, 2GB RAM, 1GB Storage per pod
+
+Voxel51 also recommends monitoring resource consumption across
+the applications.
+Resource usage may vary dramatically with operations, use cases,
+and dataset sizes.
 
 ## Usage
 
@@ -223,6 +290,17 @@ When performing an upgrade, please review
 [Upgrading From Previous Versions](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md).
 
 ## Advanced Configuration
+
+### Backup And Recovery
+
+FiftyOne Enterprise data is stored in a MongoDB instance.
+It is recommended to periodically backup the MongoDB instance
+according to
+[MongoDB best practices](https://www.mongodb.com/docs/manual/tutorial/backup-and-restore-tools/).
+
+If needed, it is recommended to restore the most-recent backup
+according to
+[MongoDB best practices](https://www.mongodb.com/docs/manual/tutorial/backup-and-restore-tools/).
 
 ### Builtin Delegated Operator Orchestrator
 
@@ -336,6 +414,53 @@ FiftyOne Enterprise supports routing traffic through proxy servers.
 Please refer to the
 [proxy configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-proxies.md)
 for information on how to configure proxies.
+
+### Secrets And Sensitive Data
+
+By default, database credentials, cookie secrets,
+encryption keys, and authentication secrets are stored in a kubernetes secret.
+This is configured by the following settings in `values.yaml`:
+
+```yaml
+secret:
+  # -- Controls whether to create the secret named `secret.name`.
+  create: true
+  # -- Name of the secret (existing or to be created) in the namespace `namespace.name`.
+  name: fiftyone-teams-secrets
+  fiftyone:
+    # -- MongoDB Database Name for FiftyOne Enterprise.
+    fiftyoneDatabaseName: ""
+    # -- MongoDB Connection String. [Reference][mongodb-connection-string].
+    mongodbConnectionString: ""
+
+    # -- A randomly generated string for cookie encryption.
+    # To generate, run `openssl rand -hex 32`.
+    cookieSecret: ""
+    # -- Encryption key for storage credentials. [Reference][fiftyone-encryption-key].
+    encryptionKey: ""
+    # -- A randomly generated string for CAS Authentication.
+    # This can be any string you care to use generated by any mechanism you
+    #   prefer.
+    # This is used for inter-service authentication and for the SuperUser to
+    #  authenticate at the CAS UI to configure the Central Authentication Service.
+    fiftyoneAuthSecret: ""
+  # -- Additional labels for the generated secret. [Reference][labels-and-selectors].
+  labels: {}
+```
+
+These secrets can be created, managed, and updated by an external secret manager
+such as
+[external-secrets][external-secrets-io].
+
+FiftyOne Enterprise supports
+[configuring secrets](https://docs.voxel51.com/enterprise/secrets.html#adding-secrets)
+for the deployment to use.
+
+Please see
+[Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+and
+[adding secrets](https://docs.voxel51.com/enterprise/secrets.html#adding-secrets)
+for questions regarding storage and encryption.
 
 ### Snapshot Archival
 
@@ -473,6 +598,59 @@ for more information.
 After deploying FiftyOne Enterprise and configuring authentication, please
 follow
 [validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
+
+## Health Checks And Monitoring
+
+[Liveness and readiness probes][probes]
+are used to monitor each service deployed with FiftyOne Enterprise.
+
+### Basic Health Assessment
+
+Pods will report ready (`1/1`, `2/2`, etc.) in the output of `kubectl get pods`:
+
+```shell
+kubectl get pods
+```
+
+Expected output for a healthy deployment:
+
+```shell
+fiftyone-app-fbcf6666d-crt6z      1/1     Running                  0          5h3m
+fiftyone-app-fbcf6666d-wt9w6      1/1     Running                  0          102m
+teams-api-64fbf96c96-2tgm9        1/1     Running                  0          5h3m
+teams-api-64fbf96c96-b7jz5        1/1     Running                  0          5h3m
+teams-api-64fbf96c96-m2dnk        1/1     Running                  0          5h3m
+teams-app-fbdd4849f-bwmvt         1/1     Running                  0          116m
+teams-app-fbdd4849f-skgb7         1/1     Running                  0          5h3m
+teams-cas-68f95d68f-9dglm         1/1     Running                  0          5h3m
+teams-cas-68f95d68f-fmq5g         1/1     Running                  0          41m
+```
+
+Note that number of pods and pod names may vary per deployment.
+
+### Troubleshooting Unhealthy Pods
+
+If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
+
+1. **Get detailed pod information**:
+
+   ```shell
+   kubectl describe pod <pod-name>
+   ```
+
+2. **Check application logs**:
+
+   ```shell
+   kubectl logs <pod-name>
+   # For previous container instance logs
+   kubectl logs <pod-name> --previous
+   ```
+
+3. **Check events for issues**:
+
+   ```shell
+   kubectl get events --sort-by='.lastTimestamp'
+   ```
 
 ## Values
 
@@ -811,6 +989,7 @@ follow
 [configure-ha-teams-api]: #highly-available-fiftyone-teams-api-deployments
 [container-security-context]: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+[external-secrets-io]: https://external-secrets.io/latest/
 [fiftyone-config]: https://docs.voxel51.com/user_guide/config.html
 [fiftyone-encryption-key]: https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/fiftyone-teams-app/#storage-credentials-and-fiftyone_encryption_key
 [image-pull-policy]: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
