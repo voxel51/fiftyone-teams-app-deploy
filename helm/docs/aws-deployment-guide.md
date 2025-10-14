@@ -424,7 +424,7 @@ like to deploy in (e.g., `us-east-1`).
 1. `Choose an existing template` > `Upload A Template File` > `Choose File`
 
    1. Upload the
-      [EFS Stack Template](../../cloudformation/acm-stack.yml).
+      [ACM Stack Template](../../cloudformation/acm-stack.yml).
 
 1. Click `Next`
 
