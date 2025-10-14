@@ -340,6 +340,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
    name: fiftyone-plugins-shared-pv
+   namespace: <your-namespace>
 spec:
    capacity:
       storage: 25Gi
@@ -358,6 +359,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
    name: fiftyone-shared-pv
+   namespace: <your-namespace>
 spec:
    capacity:
       storage: 25Gi
@@ -375,6 +377,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
    name: fiftyone-plugins-shared-pvc
+   namespace: <your-namespace>
 spec:
    accessModes:
       - ReadWriteMany
@@ -389,6 +392,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
    name: fiftyone-shared-pvc
+   namespace: <your-namespace>
 spec:
    accessModes:
       - ReadWriteMany
@@ -520,6 +524,9 @@ ingress:
       pathType: Prefix
       serviceName: teams-cas
       servicePort: 80
+
+namespace:
+  name: <your-namespace>
 
 pluginsSettings:
   enabled: true
