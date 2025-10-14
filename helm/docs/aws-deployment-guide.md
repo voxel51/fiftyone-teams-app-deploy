@@ -67,7 +67,7 @@ This is the summary of FiftyOne Enterprise FTR based on the
 ## Introduction
 
 FiftyOne Enterprise is the enterprise version of the open source
-[FiftyOne](https://github.com/voxel51/fiftyone)
+[FiftyOne][github-com-fiftyone]
 project.
 
 For use cases, overviews, and demonstrations, please see the
@@ -141,7 +141,7 @@ deployment of FiftyOne Enterprise.
 1. A
    [MongoDB Database][mongodb-com]
    that meets FiftyOne Enterprise's
-   [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+   [version constraints][docs-voxel51-com-mongo].
 
 1. An existing
    [AWS Route53][aws-route-53]
@@ -764,6 +764,8 @@ You can now navigate to your DNS name in a browser.
 [aws-ftr]: https://apn-checklists.s3.amazonaws.com/foundational/customer-deployed/customer-deployed/C0hfGvKGP.html
 [aws-route-53]: https://aws.amazon.com/route53/
 [aws-s3]: https://aws.amazon.com/pm/serv-s3/
+[docs-voxel51-com-mongo]: https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version
+[github-com-fiftyone]: https://github.com/voxel51/fiftyone
 [helm-sh]: https://helm.sh/
 [mongodb-com]: https://www.mongodb.com/
 [voxel51-com-fiftyone]: https://voxel51.com/fiftyone
