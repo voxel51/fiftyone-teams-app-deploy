@@ -499,6 +499,28 @@ ingress:
     alb.ingress.kubernetes.io/certificate-arn: ${CertificateArn}
   className: alb
 
+  paths:
+    - path: /_pymongo
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /health
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /graphql/v1
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /file
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    - path: /cas
+      pathType: Prefix
+      serviceName: teams-cas
+      servicePort: 80
+
 pluginsSettings:
   enabled: true
   env:
