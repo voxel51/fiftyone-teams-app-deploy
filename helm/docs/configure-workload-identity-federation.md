@@ -311,7 +311,7 @@ To configure workload identity via the AWS CLI:
     ```yaml
     serviceAccount:
         annotations:
-            eks.amazonaws.com/role-arn: arn:aws:iam::AWS_ACCOUNT_ID:role/FIFTYONE_IAM_ROLE_NAME
+            eks.amazonaws.com/role-arn: IAM_ROLE_ARN
     ```
 
 ### Via Terraform
