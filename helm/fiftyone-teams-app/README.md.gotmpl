@@ -138,7 +138,7 @@ deployment of FiftyOne Enterprise.
 
 1. A knowledge of installing helm charts to deploy kubernetes applications.
 
-1. A knowledge MongoDB.
+1. A knowledge of MongoDB.
 
 1. A knowledge of DNS and the ability to generate, modify, and delete DNS records.
 

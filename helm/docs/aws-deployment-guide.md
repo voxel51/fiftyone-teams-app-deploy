@@ -24,7 +24,7 @@ This is the summary of FiftyOne Enterprise FTR based on the
   - [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge)
   - [Technical Requirements](#technical-requirements)
 - [Security](#security)
-  - [Princple Of Least Privilege](#princple-of-least-privilege)
+  - [Principle Of Least Privilege](#principle-of-least-privilege)
   - [Public Resources](#public-resources)
   - [Root Privileges](#root-privileges)
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
@@ -163,7 +163,7 @@ deployment of FiftyOne Enterprise.
 
 ## Security
 
-### Princple Of Least Privilege
+### Principle Of Least Privilege
 
 When deploying FiftyOne Enterprise, Voxel51 recommends following the principle
 of least privilege.
@@ -330,7 +330,7 @@ like to deploy in (e.g., `us-east-1`).
 1. Review the stack and select `Submit`.
 
 CloudFormation will go deploy an EFS store in your region.
-You can now create a `PersistentVolume` and `PersistenVolumeClaims`
+You can now create a `PersistentVolume` and `PersistentVolumeClaims`
 for your deployment.
 
 ```yaml
@@ -464,7 +464,7 @@ apiSettings:
   volumes:
     - name: nfs-shared-vol
       persistentVolumeClaim:
-        claimName: teams-shared-pvc
+        claimName: fiftyone-shared-pvc
   volumeMounts:
     - name: nfs-shared-vol
       mountPath: /opt/shared
@@ -546,7 +546,7 @@ secret:
   fiftyone:
     # These secrets come from your MongoDB implementation
     fiftyoneDatabaseName: fiftyone
-    mongodbConnectionString: mongodb://username:password@somehostname/?authSource=admin
+    mongodbConnectionString: mongodb://<username>:<password>@<hostname>/?authSource=admin
     # This secret is a required random string used to encrypt session cookies.
     # To generate this string, run
     #
@@ -679,9 +679,9 @@ You can now navigate to your DNS name in a browser.
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
 | DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | This is covered in the [Root Privileges](#root-privileges) section. |
-| DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
+| DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the [Principle Of Least Privilege](#principle-of-least-privilege) section. |
 | DSEC-004 | The deployment guide clearly documents any public resources (e.g. Amazon S3 buckets with bucket policies allowing public access). | This is covered in the [Public Resources](#public-resources) section. |
-| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the [Princple Of Least Privilege](#princple-of-least-privilege) section. |
+| DSEC-006 | The deployment guide describes the purpose of each AWS Identity and Access Management (IAM) role and IAM policy the user is instructed to create. | This is covered in the [Principle Of Least Privilege](#principle-of-least-privilege) section. |
 | DSEC-007 | The deployment guide provides clear instruction on maintaining any stored secrets such as database credentials stored in AWS Secrets Manager. | This is covered in the [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
 | DSEC-008 | The deployment guide includes details on where customer sensitive data are stored | This is covered in the [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
 | DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) | This is covered in the [Encryption](#encryption) section. |

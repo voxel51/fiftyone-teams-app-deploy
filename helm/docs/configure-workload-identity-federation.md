@@ -358,7 +358,7 @@ To configure workload identity via Terraform:
                     Action = [
                         "iam:GetRole"
                     ]
-                    Resource = aws_iam_role.voxel51_service_role.arn
+                    Resource = aws_iam_role.voxel51_custom_role.arn
                 }
             ]
         })
@@ -408,7 +408,7 @@ To configure workload identity via Terraform:
 
     ```hcl
     resource "aws_iam_role_policy_attachment" "voxel51_custom_policy_attachment" {
-        role       = aws_iam_role.voxel51_service_role.name
+        role       = aws_iam_role.voxel51_custom_role.name
         policy_arn = aws_iam_policy.voxel51_custom_policy.arn
     }
     ```
