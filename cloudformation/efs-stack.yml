@@ -1,3 +1,4 @@
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS EFS file system for FiftyOne Enterprise with access points and security groups'
 

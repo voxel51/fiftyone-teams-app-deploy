@@ -1,5 +1,6 @@
+---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Simple ACM Certificate with DNS validation for FiftyOne Enterprise'
+Description: 'ACM Certificate with DNS validation for FiftyOne Enterprise'
 
 Parameters:
   DomainName:

@@ -1,5 +1,6 @@
+---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Creates a DNS record pointing to an AWS Application Load Balancer'
+Description: 'Creates a DNS record pointing to the FiftyOne Enterprise Application Load Balancer'
 
 Parameters:
   HostedZoneId:
@@ -9,8 +10,8 @@ Parameters:
   ALBDnsName:
     Type: String
     Description: DNS name of the Application Load Balancer (e.g., my-alb-123456789.us-east-1.elb.amazonaws.com)
-    AllowedPattern: ^[a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?\.elb\.[a-zA-Z0-9\-]+\.amazonaws\.com$
-    ConstraintDescription: Must be a valid AWS ALB DNS name (ending with .elb.*.amazonaws.com)
+    AllowedPattern: ^[a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?\..*\.elb\.amazonaws\.com$
+    ConstraintDescription: Must be a valid AWS ALB DNS name (ending with .elb.amazonaws.com)
 
   DnsName:
     Type: String
@@ -21,9 +22,8 @@ Parameters:
   ALBHostedZoneId:
     Type: String
     Description: Hosted Zone ID of the ALB (region-specific, see https://docs.aws.amazon.com/general/latest/gr/elb.html)
-    Default: ""
-    AllowedPattern: ^[A-Z0-9]{10,20}$|^$
-    ConstraintDescription: Must be a valid AWS hosted zone ID or empty (will auto-detect)
+    AllowedPattern: ^[A-Z0-9]{10,20}$
+    ConstraintDescription: Must be a valid AWS hosted zone ID
 
   RecordType:
     Type: String
@@ -85,8 +85,8 @@ Metadata:
         default: "Environment"
 
 Conditions:
-  UseProvidedALBHostedZone: !Not [!Equals [!Ref ALBHostedZoneId, ""]]
   CreateAliasRecord: !Equals [!Ref RecordType, A]
+  CreateAAAARecord: !Equals [!Ref RecordType, AAAA]
 
 Resources:
   DNSRecord:
@@ -98,23 +98,19 @@ Resources:
       Type: A
       AliasTarget:
         DNSName: !Ref ALBDnsName
-        HostedZoneId: !If
-          - UseProvidedALBHostedZone
-          - !Ref ALBHostedZoneId
+        HostedZoneId: !Ref ALBHostedZoneId
         EvaluateTargetHealth: true
 
   DNSRecordAAAA:
     Type: AWS::Route53::RecordSet
-    Condition: !Equals [!Ref RecordType, AAAA]
+    Condition: CreateAAAARecord
     Properties:
       HostedZoneId: !Ref HostedZoneId
       Name: !Ref DnsName
       Type: AAAA
       AliasTarget:
         DNSName: !Ref ALBDnsName
-        HostedZoneId: !If
-          - UseProvidedALBHostedZone
-          - !Ref ALBHostedZoneId
+        HostedZoneId: !Ref ALBHostedZoneId
         EvaluateTargetHealth: true
 
 Outputs:
@@ -144,9 +140,7 @@ Outputs:
 
   ALBHostedZoneId:
     Description: The ALB Hosted Zone ID used for the alias record
-    Value: !If
-      - UseProvidedALBHostedZone
-      - !Ref ALBHostedZoneId
+    Value: !Ref ALBHostedZoneId
     Export:
       Name: !Sub '${AWS::StackName}-ALBHostedZoneId'
 
