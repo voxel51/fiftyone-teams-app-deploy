@@ -685,7 +685,7 @@ You can now navigate to your DNS name in a browser.
 | DSEC-007 | The deployment guide provides clear instruction on maintaining any stored secrets such as database credentials stored in AWS Secrets Manager. | This is covered in the [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
 | DSEC-008 | The deployment guide includes details on where customer sensitive data are stored | This is covered in the [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
 | DSEC-009 | The deployment guide must explain all data encryption configuration (for example. Amazon Simple Storage Service (Amazon S3) server-side encryption, Amazon Elastic Block Store (Amazon EBS) encryption, and Linux Unified Key Setup (LUKS)) | This is covered in the [Encryption](#encryption) section. |
-| DSEC-010 | For deployments involving more than a single element, include network configuration (for example, VPCs, subnets, security groups, network access control lists (network ACLs), and route tables) in the deployment guide. | This is covered in the ... |
+| DSEC-010 | For deployments involving more than a single element, include network configuration (for example, VPCs, subnets, security groups, network access control lists (network ACLs), and route tables) in the deployment guide. | This is covered in the [Deploying](#deploying) section. |
 | DSEC-011 | The solution must support the ability for the customer to disable Instance Metadata Service Version 1 (IMDSv1). | This is covered in the [Instance Metadata Service Version 1](#instance-metadata-service-version-1) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
