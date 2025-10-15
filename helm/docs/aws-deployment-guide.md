@@ -117,7 +117,7 @@ A knowledge of:
 ### Technical Requirements
 
 The following technical requirements
-are required for a successful and properly secured
+are required for properly secured
 deployment of FiftyOne Enterprise.
 
 1. An AWS account.
