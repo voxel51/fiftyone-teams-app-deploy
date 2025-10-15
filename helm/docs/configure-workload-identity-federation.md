@@ -283,7 +283,7 @@ To configure workload identity via the AWS CLI:
 
     ```bash
     aws iam create-role \
-        --role-name "FIFTYONE_IAM_ROLE_NAME" \
+        --role-name "Voxel51FiftyOneEnterpriseCustomRole" \
         --assume-role-policy-document file://fiftyone-trust-policy.json \
         --description "FiftyOne Enterprise Service Role for EKS Workload Identity"
     ```
@@ -292,7 +292,7 @@ To configure workload identity via the AWS CLI:
 
     ```bash
     aws iam attach-role-policy \
-        --role-name "FIFTYONE_IAM_ROLE_NAME" \
+        --role-name "Voxel51FiftyOneEnterpriseCustomRole" \
         --policy-arn "arn:aws:iam::AWS_ACCOUNT_ID:policy/Voxel51FiftyOneEnterpriseCustomPolicy"
     ```
 
