@@ -197,16 +197,16 @@ To configure workload identity via the `terraform`:
 For bare-minimum access, FiftyOne Enterprise needs the following permissions
 for your media bucket(s) in AWS:
 
+- `s3:AbortMultipartUpload`
+- `s3:CompleteMultipartUpload`
+- `s3:CreateMultipartUpload`
+- `s3:DeleteObject`
 - `s3:GetBucketLocation`
+- `s3:GetObject`
 - `s3:ListBucket`
 - `s3:ListBucketMultipartUploads`
-- `s3:GetObject`
-- `s3:PutObject`
-- `s3:DeleteObject`
-- `s3:AbortMultipartUpload`
 - `s3:ListMultipartUploadParts`
-- `s3:CreateMultipartUpload`
-- `s3:CompleteMultipartUpload`
+- `s3:PutObject`
 
 ### Via AWS CLI
 
@@ -233,13 +233,13 @@ To configure workload identity via the AWS CLI:
                 "Sid": "FiftyOneEnterpriseS3ObjectAccess",
                 "Effect": "Allow",
                 "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject",
-                    "s3:DeleteObject",
                     "s3:AbortMultipartUpload",
-                    "s3:ListMultipartUploadParts",
+                    "s3:CompleteMultipartUpload",
                     "s3:CreateMultipartUpload",
-                    "s3:CompleteMultipartUpload"
+                    "s3:DeleteObject",
+                    "s3:GetObject",
+                    "s3:ListMultipartUploadParts",
+                    "s3:PutObject"
                 ],
                 "Resource": "arn:aws:s3:::MEDIA_BUCKET_NAME/*"
             }
@@ -333,13 +333,13 @@ To configure workload identity via Terraform:
                     Sid    = "FiftyOneEnterpriseS3ObjectAccess"
                     Effect = "Allow"
                     Action = [
-                        "s3:GetObject",
-                        "s3:PutObject",
-                        "s3:DeleteObject",
                         "s3:AbortMultipartUpload",
-                        "s3:ListMultipartUploadParts",
+                        "s3:CompleteMultipartUpload",
                         "s3:CreateMultipartUpload",
-                        "s3:CompleteMultipartUpload"
+                        "s3:DeleteObject",
+                        "s3:GetObject",
+                        "s3:ListMultipartUploadParts",
+                        "s3:PutObject",
                     ]
                     Resource = "arn:aws:s3:::${S3_BUCKET_NAME}/*"
                 },
