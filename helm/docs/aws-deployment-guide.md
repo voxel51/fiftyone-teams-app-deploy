@@ -73,7 +73,7 @@ project.
 For use cases, overviews, and demonstrations, please see the
 [FiftyOne product page][voxel51-com-fiftyone].
 
-Please note that there is no limitation on region supported for
+There is no limitation on region supported for
 FiftyOne Enterprise.
 FiftyOne Enterprise will be installed into an existing
 [AWS EKS][aws-eks]
@@ -90,30 +90,29 @@ as
 ### Prerequisites Skills and Knowledge
 
 The following prerequisites skills & knowledge
-are required for a successful and properly secured
+are required for properly secured
 deployment of FiftyOne Enterprise.
 
-1. A knowledge of kubernetes and
+A knowledge of:
+
+1. Kubernetes and
    [AWS EKS][aws-eks].
 
-1. A knowledge of using
-   [`helm`][helm-sh]
+1. [`helm`][helm-sh]
    to install and deploy kubernetes applications.
 
-1. A knowledge
-  [MongoDB][mongodb-com].
+1. [MongoDB][mongodb-com].
 
-1. A knowledge of
-   [AWS Route53][aws-route-53]
+1. [AWS Route53][aws-route-53]
    and the ability to generate, modify, and delete DNS records.
 
-1. A knowledge of
-   [AWS ACM][aws-acm]
+1. [AWS ACM][aws-acm]
    and the ability to generate TLS/SSL certificates.
 
-1. (optional) A knowledge of network file systems (NFS) or another
+1. Network file systems (NFS) or another
    `ReadWriteMany`-compatible storage medium such as
-   [AWS EFS][aws-efs].
+   [AWS EFS][aws-efs]
+   (optional).
 
 ### Technical Requirements
 
@@ -147,13 +146,13 @@ deployment of FiftyOne Enterprise.
    [AWS Route53][aws-route-53]
    hosted zone.
 
-1. Access to create an
+1. Access to create
    [AWS Route53][aws-route-53]
-   record or records for ingress.
+   record(s) for ingress.
 
-1. Access to create an
+1. Access to create
    [AWS ACM][aws-acm]
-   certificate or certificates for HTTPS ingress.
+   certificate(s) for HTTPS ingress.
 
 1. (optional) An NFS server or `ReadWriteMany` compatible storage medium for
    [delegated operators](../fiftyone-teams-app/README.md#builtin-delegated-operator-orchestrator),
@@ -198,7 +197,7 @@ instances, EKS clusters, and other services.
 
 AWS EKS does not offer direct control over the
 Instance Metadata Service (IMDS).
-To mitigate risk linked with IMDS we are using the least privilege
+To mitigate risk linked with IMDS, we use the least privilege
 principle with a specific role for task execution and specific
 security group and VPC to control network access to EKS pods.
 
@@ -206,7 +205,7 @@ security group and VPC to control network access to EKS pods.
 
 ### Billable Services
 
-The billable services that are **mandatory** to run FiftyOne Enterprise are:
+The **mandatory** billable services to run FiftyOne Enterprise are:
 
 1. [AWS EKS][aws-eks]
 
@@ -216,7 +215,7 @@ The billable services that are **mandatory** to run FiftyOne Enterprise are:
 
 1. [AWS ELB][aws-elb]
 
-The billable services that are **optional** to run FiftyOne Enterpise are:
+The **optional** billable services to run FiftyOne Enterprise are:
 
 1. [AWS S3][aws-s3]
 
@@ -283,8 +282,7 @@ a root cause analysis.
 
 ## Support
 
-Support can be received by reaching out directly to your Customer Success (CS)
-representative.
+For support, contact your Customer Success (CS) representative.
 
 Please see the
 [Voxel51 Pricing Model][voxel51-com-pricing]
@@ -292,15 +290,14 @@ for questions related to support tiers and pricing.
 
 ## Deploying
 
-The following steps will guide you through the steps to setup
-FiftyOne Enterprise with
+The following steps will guide you through the
+FiftyOne Enterprise setup with
 [delegated operators](../fiftyone-teams-app/README.md#builtin-delegated-operator-orchestrator)
 and
 [dedicated plugins](../fiftyone-teams-app/README.md#plugins).
 
-Before starting the deployment configuration, please make sure to
-check the [prerequisites and requirements](#prerequisites-and-requirements)
-section.
+Before starting the deployment configuration, check the
+[prerequisites and requirements](#prerequisites-and-requirements).
 
 ### Creating An EFS And Configure Shared Storage
 
@@ -310,18 +307,18 @@ We will create EFS via
 In the below, please change `AWS_REGION` to the actual region you would
 like to deploy in (e.g., `us-east-1`).
 
-1. Navigate to <https://AWS_REGION.console.aws.amazon.com/cloudformation/home>
+1. Navigate to <https://AWS_REGION.console.aws.amazon.com/cloudformation/home>.
 
-1. Select `Create stack` on the right-hand menu > `With new resources`
+1. Select `Create stack` on the right-hand menu > `With new resources`.
 
-1. `Choose an existing template` > `Upload A Template File` > `Choose File`
+1. `Choose an existing template` > `Upload A Template File` > `Choose File`.
 
    1. Upload the
       [EFS Stack Template](../../cloudformation/efs-stack.yml).
 
-1. Click `Next`
+1. Click `Next`.
 
-1. Enter a descriptive stack name, e.g. `FiftyoneEnterpriseEFS`
+1. Enter a descriptive stack name, e.g. `FiftyoneEnterpriseEFS`.
 
 1. Fill out each parameter for your environment's needs and select `Next`.
 
@@ -329,8 +326,8 @@ like to deploy in (e.g., `us-east-1`).
 
 1. Review the stack and select `Submit`.
 
-CloudFormation will go deploy an EFS store in your region.
-You can now create a `PersistentVolume` and `PersistentVolumeClaims`
+CloudFormation will deploy an EFS store in your region.
+Create a `PersistentVolume` and `PersistentVolumeClaims`
 for your deployment.
 
 ```yaml
@@ -421,24 +418,18 @@ We will create an ACM certificate via
 In the below, please change `AWS_REGION` to the actual region you would
 like to deploy in (e.g., `us-east-1`).
 
-1. Navigate to <https://AWS_REGION.console.aws.amazon.com/cloudformation/home>
+1. Navigate to <https://AWS_REGION.console.aws.amazon.com/cloudformation/home>.
 
-1. Select `Create stack` on the right-hand menu > `With new resources`
+1. Select `Create stack` on the right-hand menu > `With new resources`.
 
-1. `Choose an existing template` > `Upload A Template File` > `Choose File`
+1. `Choose an existing template` > `Upload A Template File` > `Choose File`.
 
    1. Upload the
       [ACM Stack Template](../../cloudformation/acm-stack.yml).
 
-1. Click `Next`
+1. Click `Next`.
 
-1. Enter a descriptive stack name, e.g. `FiftyoneEnterpriseACM`
-
-1. Fill out each parameter for your environment's needs and select `Next`.
-
-1. Configure the stack options for your environment's needs and select `Next`.
-
-1. Review the stack and select `Submit`.
+1. Enter a descriptive stack name, e.g. `FiftyoneEnterpriseACM`.
 
 CloudFormation will go deploy an AWS ACM certificate in your region
 and validate it.
@@ -552,7 +543,7 @@ secret:
     #
     # ```shell
     # openssl rand -hex 32
-    # ````
+    # ```
     #
     cookieSecret:
     # This required key is used to encrypt storage credentials in the database.
