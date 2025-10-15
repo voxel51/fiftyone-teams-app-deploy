@@ -134,7 +134,7 @@ The following prerequisites skills & knowledge
 are required for a successful and properly secured
 deployment of FiftyOne Enterprise.
 
-A knowledge of
+A knowledge of:
 
 1. Kubernetes.
 
