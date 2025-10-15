@@ -134,17 +134,19 @@ The following prerequisites skills & knowledge
 are required for a successful and properly secured
 deployment of FiftyOne Enterprise.
 
-1. A knowledge of kubernetes.
+A knowledge of
 
-1. A knowledge of installing helm charts to deploy kubernetes applications.
+1. Kubernetes.
 
-1. A knowledge of MongoDB.
+1. Installing helm charts to deploy kubernetes applications.
 
-1. A knowledge of DNS and the ability to generate, modify, and delete DNS records.
+1. MongoDB.
 
-1. A knowledge of TLS/SSL and the ability to generate TLS/SSL certificates.
+1. DNS and the ability to generate, modify, and delete DNS records.
 
-1. (optional) A knowledge of network file systems (NFS).
+1. TLS/SSL and the ability to generate TLS/SSL certificates.
+
+1. Network file systems (NFS) (optional).
 
 ## Technical Requirements
 
@@ -208,7 +210,7 @@ Voxel51 recommends the following resource sizing:
 
 Voxel51 also recommends monitoring resource consumption across
 the applications.
-Resource usage may vary dramatically with operations, use cases,
+Resource usage varies dramatically with operations, use cases,
 and dataset sizes.
 
 ## Usage
@@ -293,7 +295,7 @@ When performing an upgrade, please review
 
 ### Backup And Recovery
 
-FiftyOne Enterprise data is stored in a MongoDB instance.
+FiftyOne Enterprise data is stored in MongoDB.
 It is recommended to periodically backup the MongoDB instance
 according to
 [MongoDB best practices](https://www.mongodb.com/docs/manual/tutorial/backup-and-restore-tools/).
@@ -615,6 +617,7 @@ kubectl get pods
 Expected output for a healthy deployment:
 
 ```shell
+NAME                              READY   STATUS                   RESTARTS   AGE
 fiftyone-app-fbcf6666d-crt6z      1/1     Running                  0          5h3m
 fiftyone-app-fbcf6666d-wt9w6      1/1     Running                  0          102m
 teams-api-64fbf96c96-2tgm9        1/1     Running                  0          5h3m
