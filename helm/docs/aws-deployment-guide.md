@@ -668,10 +668,10 @@ You can now navigate to your DNS name in a browser.
 
 | Req Code | Requirement Description | Content |
 |----------|------------------------|---------|
-| ARCH-001 | Architecture diagrams must include all AWS services and resources deployed by the solution and illustrate how the services and resources connect with each other in a typical customer environment. | This is covered in the ... |
-| ARCH-004 | Architecture diagrams use official AWS Architecture Icons. | This is covered in the ... |
-| ARCH-005 | Network diagrams demonstrate virtual private clouds (VPCs) and subnets. | This is covered in the ... |
-| ARCH-006 | Architecture diagrams show integration points, including third-party assets/APIs and on-premises/hybrid assets. | This is covered in the ... |
+| ARCH-001 | Architecture diagrams must include all AWS services and resources deployed by the solution and illustrate how the services and resources connect with each other in a typical customer environment. | This is covered in the attached documentation. |
+| ARCH-004 | Architecture diagrams use official AWS Architecture Icons. | This is covered in the attached documentation. |
+| ARCH-005 | Network diagrams demonstrate virtual private clouds (VPCs) and subnets. | This is covered in the attached documentation. |
+| ARCH-006 | Architecture diagrams show integration points, including third-party assets/APIs and on-premises/hybrid assets. | This is covered in the attached documentation. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Security
