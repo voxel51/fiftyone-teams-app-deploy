@@ -641,7 +641,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
    kubectl describe pod <pod-name>
    ```
 
-2. **Check application logs**:
+1. **Check application logs**:
 
    ```shell
    kubectl logs <pod-name>
@@ -649,7 +649,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
    kubectl logs <pod-name> --previous
    ```
 
-3. **Check events for issues**:
+1. **Check events for issues**:
 
    ```shell
    kubectl get events --sort-by='.lastTimestamp'
