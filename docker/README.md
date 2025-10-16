@@ -84,7 +84,7 @@ regarding FiftyOne Enterprise.
 - [Validating](#validating)
 - [Health Checks And Monitoring](#health-checks-and-monitoring)
   - [Basic Health Assessment](#basic-health-assessment)
-  - [Troubleshooting Unhealthy Pods](#troubleshooting-unhealthy-pods)
+  - [Troubleshooting Unhealthy Containers](#troubleshooting-unhealthy-containers)
 - [Environment Variables](#environment-variables)
 
 <!-- tocstop -->
@@ -611,7 +611,7 @@ according to
 ### Secrets And Sensitive Data
 
 By default, database credentials, cookie secrets,
-encryption keys, and authentication secrets are stored in a kubernetes secret.
+encryption keys, and authentication secrets are stored in environment variables.
 This is configured by the following settings in `.env`:
 
 ```txt
@@ -719,7 +719,7 @@ Users with `Admin` permissions may use the FiftyOne Enterprise UI to manage stor
 credentials by navigating to `https://<DEPOY_URL>/settings/cloud_storage_credentials`.
 
 If added via the UI, storage credentials no longer need to be
-mounted into pods or provided via environment variables.
+mounted into containers or provided via environment variables.
 
 FiftyOne Enterprise continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
@@ -785,9 +785,9 @@ compose-teams-plugins-1   teams-plugins   15 hours ago   Up 15 hours
 
 Note that number of containers and containers names may vary per deployment.
 
-### Troubleshooting Unhealthy Pods
+### Troubleshooting Unhealthy Containers
 
-If containers show unhealthy states (e.g., `restarting`, `exited`):
+If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 
 1. **Get detailed container information**:
 
