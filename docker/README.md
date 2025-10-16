@@ -97,9 +97,7 @@ deployment of FiftyOne Enterprise.
 
 A knowledge of:
 
-1. Kubernetes.
-
-1. Installing helm charts to deploy kubernetes applications.
+1. Docker compose.
 
 1. MongoDB.
 
