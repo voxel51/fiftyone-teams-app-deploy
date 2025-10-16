@@ -614,7 +614,7 @@ By default, database credentials, cookie secrets,
 encryption keys, and authentication secrets are stored in environment variables.
 This is configured by the following settings in `.env`:
 
-```txt
+```dotenv
 # This should be a MongoDB Connection String for your database
 FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin"
 # If you are using a different MongoDB Connection String for your CAS database,
