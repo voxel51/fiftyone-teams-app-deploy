@@ -190,5 +190,42 @@ apiSettings:
     FIFTYONE_TEAMS_API_WEBSOCKET_PING_TIMEOUT: 600
 ```
 
+## Security Best Practices
+
+Voxel51 recommends securing your load balancer or reverse proxy by setting
+[OWASP's recommended HTTP headers][owasp-org-http-headers].
+
+Currently, at this time, FiftyOne Enterprise has been tested and validated
+with following headers:
+
+- [Permissions-Policy][owasp-org-permissions-policy]
+- [Referrer-Policy][owasp-org-referrer-policy]
+- [X-Content-Type-Options][owasp-org-x-content-type-opts]
+- [X-Frame-Options][owasp-org-x-frame-opts]
+
+An example using Google Kubernetes Engine's
+`BackendConfig` configuration can be seen below.
+
+```yaml
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: secure-http-headers
+  namespace: <your-namespace>
+spec:
+  customResponseHeaders:
+    headers:
+    - 'Permissions-Policy: geolocation=(), camera=(), microphone=()'
+    - 'Referrer-Policy: no-referrer'
+    - 'Strict-Transport-Security: max-age=63072000; includeSubDomains; preload'
+    - 'X-Frame-Options: deny'
+    - 'X-Content-Type-Options: nosniff'
+```
+
 <!-- Reference links -->
 [nginx-docs]: https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
+[owasp-org-http-headers]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
+[owasp-org-referrer-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#referrer-policy
+[owasp-org-permissions-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#permissions-policy-formerly-feature-policy
+[owasp-org-x-content-type-opts]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options
+[owasp-org-x-frame-opts]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options
