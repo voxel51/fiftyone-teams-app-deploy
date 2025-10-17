@@ -10,6 +10,19 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
+<!-- toc -->
+
+- [Exposing the Enterprise `teams-api` Service](#exposing-the-enterprise-teams-api-service)
+  - [Host-Based Routing](#host-based-routing)
+  - [Path-Based Routing](#path-based-routing)
+  - [Note For NGINX IngressClass Users](#note-for-nginx-ingressclass-users)
+  - [Configure your SDK](#configure-your-sdk)
+  - [Validation](#validation)
+  - [Advanced Configuration](#advanced-configuration)
+  - [Security Best Practices](#security-best-practices)
+
+<!-- tocstop -->
+
 ---
 
 # Exposing the Enterprise `teams-api` Service
@@ -215,11 +228,11 @@ metadata:
 spec:
   customResponseHeaders:
     headers:
-    - 'Permissions-Policy: geolocation=(), camera=(), microphone=()'
-    - 'Referrer-Policy: no-referrer'
-    - 'Strict-Transport-Security: max-age=63072000; includeSubDomains; preload'
-    - 'X-Frame-Options: deny'
-    - 'X-Content-Type-Options: nosniff'
+      - 'Permissions-Policy: geolocation=(), camera=(), microphone=()'
+      - 'Referrer-Policy: no-referrer'
+      - 'Strict-Transport-Security: max-age=63072000; includeSubDomains; preload'
+      - 'X-Frame-Options: deny'
+      - 'X-Content-Type-Options: nosniff'
 ```
 
 <!-- Reference links -->
