@@ -10,19 +10,6 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
-<!-- toc -->
-
-- [Exposing the Enterprise `teams-api` Service](#exposing-the-enterprise-teams-api-service)
-  - [Host-Based Routing](#host-based-routing)
-  - [Path-Based Routing](#path-based-routing)
-  - [Note For NGINX IngressClass Users](#note-for-nginx-ingressclass-users)
-  - [Configure your SDK](#configure-your-sdk)
-  - [Validation](#validation)
-  - [Advanced Configuration](#advanced-configuration)
-  - [Security Best Practices](#security-best-practices)
-
-<!-- tocstop -->
-
 ---
 
 # Exposing the Enterprise `teams-api` Service
@@ -50,6 +37,20 @@ To expose the `teams-api` service, chose one of these two routing methods
 
 - Host-Based
 - Path-based
+
+## Table of Contents
+
+<!-- toc -->
+
+- [Host-Based Routing](#host-based-routing)
+- [Path-Based Routing](#path-based-routing)
+- [Note For NGINX IngressClass Users](#note-for-nginx-ingressclass-users)
+- [Configure your SDK](#configure-your-sdk)
+- [Validation](#validation)
+- [Advanced Configuration](#advanced-configuration)
+- [Security Best Practices](#security-best-practices)
+
+<!-- tocstop -->
 
 ## Host-Based Routing
 

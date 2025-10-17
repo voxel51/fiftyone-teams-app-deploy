@@ -10,17 +10,6 @@
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
-<!-- toc -->
-
-- [Exposing the `teams-api` Service](#exposing-the-teams-api-service)
-  - [Expose `teams-api` Directly](#expose-teams-api-directly)
-  - [Expose `teams-api` using Nginx and a unique hostname](#expose-teams-api-using-nginx-and-a-unique-hostname)
-  - [Expose `teams-api` Using Path-Based Routing](#expose-teams-api-using-path-based-routing)
-  - [Advanced Configuration](#advanced-configuration)
-  - [Security Best Practices](#security-best-practices)
-
-<!-- tocstop -->
-
 ---
 
 # Exposing the `teams-api` Service
@@ -46,6 +35,18 @@ or setting environment variables, the same credentials must
 be shared with the `fiftyone-app` and `teams-api` containers.
 Voxel51 recommends the use of Database Cloud Storage Credentials,
 which can be configured at `/settings/cloud_storage_credentials`.
+
+## Table of Contents
+
+<!-- toc -->
+
+- [Expose `teams-api` Directly](#expose-teams-api-directly)
+- [Expose `teams-api` using Nginx and a unique hostname](#expose-teams-api-using-nginx-and-a-unique-hostname)
+- [Expose `teams-api` Using Path-Based Routing](#expose-teams-api-using-path-based-routing)
+- [Advanced Configuration](#advanced-configuration)
+- [Security Best Practices](#security-best-practices)
+
+<!-- tocstop -->
 
 ## Expose `teams-api` Directly
 
