@@ -63,6 +63,7 @@ spec:
             {{- if ($v.description | default $defaultDescription) }}
             - -d
             - {{ ($v.description | default $defaultDescription) | quote }}
+            - -m
             {{- end }}
           securityContext:
             {{- toYaml (merge (dict) ($v.securityContext | default dict) ($baseTpl.securityContext)) | nindent 12 }}

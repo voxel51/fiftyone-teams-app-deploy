@@ -26,6 +26,23 @@
         "env": {
           "description": "Environment Variables are passed to the `teams-api` containers",
           "properties": {
+            "FIFTYONE_DO_EXPIRATION_DAYS": {
+              "default": 1,
+              "description": "The amount of time in days that a delegated operation can run before being automatically terminated.\nOverridden by \"FIFTYONE_DO_EXPIRATION_MINUTES\" if provided.",
+              "required": [],
+              "title": "FIFTYONE_DO_EXPIRATION_DAYS",
+              "type": "integer"
+            },
+            "FIFTYONE_DO_EXPIRATION_MINUTES": {
+              "default": "",
+              "description": "(int) The amount of time in minutes that a delegated operation can run before being automatically terminated.\nOverrides \"FIFTYONE_DO_EXPIRATION_DAYS\" if provided.",
+              "required": [],
+              "title": "FIFTYONE_DO_EXPIRATION_MINUTES",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
             "FIFTYONE_ENV": {
               "default": "production",
               "description": "Controls FiftyOne GraphQL verbosity.\nWhen \"production\", debug mode is disabled and the default logging level is \"INFO\".\nWhen \"development\", debug mode is enabled and the default logging level is \"DEBUG\".\nCan be overridden by setting `apiSettings.env.LOGGING_LEVEL`.",
@@ -3062,7 +3079,7 @@
               ]
             },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
-              "default": "2.11.2",
+              "default": "2.12.0",
               "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==0.11.0`).",
               "required": [],
               "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",

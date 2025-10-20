@@ -4937,6 +4937,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do",
 						"-d",
 						"Long running operations delegated to teams-do",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -4959,6 +4960,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do",
 						"-d",
 						"Long running operations delegated to teams-do",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -4972,6 +4974,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do-two",
 						"-d",
 						"Long running operations delegated to teams-do-two",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -4995,6 +4998,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do",
 						"-d",
 						"Long running operations delegated to teams-do",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -5008,6 +5012,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do-two",
 						"-d",
 						"Long running operations delegated to teams-do-two",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -5030,6 +5035,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do",
 						"-d",
 						"Used for non-gpu workloads",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -5043,6 +5049,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do-two",
 						"-d",
 						"Long running operations delegated to teams-do-two",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -5066,6 +5073,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do",
 						"-d",
 						"Used for non-gpu workloads",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
@@ -5079,6 +5087,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"teams-do-two",
 						"-d",
 						"Long running operations delegated to teams-do-two",
+						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
 				},
