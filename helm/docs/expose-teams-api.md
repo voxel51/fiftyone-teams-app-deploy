@@ -214,6 +214,7 @@ with following headers:
 
 - [Permissions-Policy][owasp-org-permissions-policy]
 - [Referrer-Policy][owasp-org-referrer-policy]
+- [Strict-Transport-Security][owasp-org-strict-transport-sec]
 - [X-Content-Type-Options][owasp-org-x-content-type-opts]
 - [X-Frame-Options][owasp-org-x-frame-opts]
 
@@ -239,7 +240,8 @@ spec:
 <!-- Reference links -->
 [nginx-docs]: https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
 [owasp-org-http-headers]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
-[owasp-org-referrer-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#referrer-policy
 [owasp-org-permissions-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#permissions-policy-formerly-feature-policy
+[owasp-org-referrer-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#referrer-policy
+[owasp-org-strict-transport-sec]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#strict-transport-security-hsts
 [owasp-org-x-content-type-opts]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options
 [owasp-org-x-frame-opts]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options
