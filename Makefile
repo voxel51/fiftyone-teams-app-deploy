@@ -147,14 +147,12 @@ run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
 	  --kube-context minikube
 
 license-secret-internal: copy-license-files-skaffold
-	@cp secret-license.template.yaml secret-license.yaml
-	$(eval LICENSE_INTERNAL := $(shell cat internal-license.key | base64))
-	@sed -i "" -e "s/\"\"/${LICENSE_INTERNAL}/" secret-license.yaml
+	@LICENSE_INTERNAL=$$(cat internal-license.key | base64 | tr -d '\n') \
+		yq '.data.license = strenv(LICENSE_INTERNAL)' secret-license.template.yaml > secret-license.yaml
 
 license-secret-legacy: copy-license-files-skaffold
-	@cp secret-license.template.yaml secret-license.yaml
-	$(eval LICENSE_LEGACY := $(shell cat legacy-license.key | base64))
-	@sed -i "" -e "s/\"\"/${LICENSE_LEGACY}/" secret-license.yaml
+	@LICENSE_LEGACY=$$(cat legacy-license.key | base64 | tr -d '\n') \
+		yq '.data.license = strenv(LICENSE_LEGACY)' secret-license.template.yaml > secret-license.yaml
 
 tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
 	sudo minikube tunnel &> /dev/null &
