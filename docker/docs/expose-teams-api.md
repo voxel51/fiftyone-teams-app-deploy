@@ -36,6 +36,18 @@ be shared with the `fiftyone-app` and `teams-api` containers.
 Voxel51 recommends the use of Database Cloud Storage Credentials,
 which can be configured at `/settings/cloud_storage_credentials`.
 
+## Table of Contents
+
+<!-- toc -->
+
+- [Expose `teams-api` Directly](#expose-teams-api-directly)
+- [Expose `teams-api` using Nginx and a unique hostname](#expose-teams-api-using-nginx-and-a-unique-hostname)
+- [Expose `teams-api` Using Path-Based Routing](#expose-teams-api-using-path-based-routing)
+- [Advanced Configuration](#advanced-configuration)
+- [Security Best Practices](#security-best-practices)
+
+<!-- tocstop -->
+
 ## Expose `teams-api` Directly
 
 **NOTE**: This method does not protect your API
@@ -75,11 +87,11 @@ security implications before using this method.
 
 ## Advanced Configuration
 
-The server has appropriate default settings for most deployments. However,
-there are some server configurations that you may want to change with advice
-from your Customer Success team, if you experience timeout or networking issues
-when connecting through the exposed API server. Any of the below configurations
-can be set in the `.env` file.
+The server has appropriate default settings for most deployments.
+However, there are some server configurations that you may want to
+change with advice from your Customer Success team, if you experience
+timeout or networking issues when connecting through the exposed API server.
+Any of the below configurations can be set in the `.env` file.
 
 - `FIFTYONE_TEAMS_API_KEEP_ALIVE_TIMEOUT`: How long to hold a TCP connection
 open (sec). Defaults to 120.
@@ -95,3 +107,49 @@ Defaults to 100 megabytes.
 messages (bytes). Defaults to 16 MiB.
 - `FIFTYONE_TEAMS_API_WEBSOCKET_PING_TIMEOUT`: Connection is closed when Pong
 is not received after ping_timeout seconds. Defaults to 600.
+
+## Security Best Practices
+
+Voxel51 recommends securing your load balancer or reverse proxy by setting
+[OWASP's recommended HTTP headers][owasp-org-http-headers].
+
+Currently, at this time, FiftyOne Enterprise has been tested and validated
+with following headers:
+
+- [Permissions-Policy][owasp-org-permissions-policy]
+- [Referrer-Policy][owasp-org-referrer-policy]
+- [Strict-Transport-Security][owasp-org-strict-transport-sec]
+- [X-Content-Type-Options][owasp-org-x-content-type-opts]
+- [X-Frame-Options][owasp-org-x-frame-opts]
+
+An example `nginx` configuration can be seen below.
+
+```nginx
+server {
+  server_name your-api.server.name;
+
+  proxy_busy_buffers_size   512k;
+  proxy_buffers   4 512k;
+  proxy_buffer_size   256k;
+
+  add_header Permissions-Policy "geolocation=(), camera=(), microphone=()" always;
+  add_header Referrer-Policy "no-referrer" always;
+  add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header X-Frame-Options "deny" always;
+
+  location / {
+   .
+   .
+   .
+  }
+}
+```
+
+<!-- Reference Links -->
+[owasp-org-http-headers]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
+[owasp-org-permissions-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#permissions-policy-formerly-feature-policy
+[owasp-org-referrer-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#referrer-policy
+[owasp-org-strict-transport-sec]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#strict-transport-security-hsts
+[owasp-org-x-content-type-opts]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options
+[owasp-org-x-frame-opts]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options

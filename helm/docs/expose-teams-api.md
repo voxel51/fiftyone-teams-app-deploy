@@ -38,6 +38,20 @@ To expose the `teams-api` service, chose one of these two routing methods
 - Host-Based
 - Path-based
 
+## Table of Contents
+
+<!-- toc -->
+
+- [Host-Based Routing](#host-based-routing)
+- [Path-Based Routing](#path-based-routing)
+- [Note For NGINX IngressClass Users](#note-for-nginx-ingressclass-users)
+- [Configure your SDK](#configure-your-sdk)
+- [Validation](#validation)
+- [Advanced Configuration](#advanced-configuration)
+- [Security Best Practices](#security-best-practices)
+
+<!-- tocstop -->
+
 ## Host-Based Routing
 
 Add a Second Host to the Ingress Controller
@@ -190,5 +204,44 @@ apiSettings:
     FIFTYONE_TEAMS_API_WEBSOCKET_PING_TIMEOUT: 600
 ```
 
+## Security Best Practices
+
+Voxel51 recommends securing your load balancer or reverse proxy by setting
+[OWASP's recommended HTTP headers][owasp-org-http-headers].
+
+Currently, at this time, FiftyOne Enterprise has been tested and validated
+with following headers:
+
+- [Permissions-Policy][owasp-org-permissions-policy]
+- [Referrer-Policy][owasp-org-referrer-policy]
+- [Strict-Transport-Security][owasp-org-strict-transport-sec]
+- [X-Content-Type-Options][owasp-org-x-content-type-opts]
+- [X-Frame-Options][owasp-org-x-frame-opts]
+
+An example using Google Kubernetes Engine's
+`BackendConfig` configuration can be seen below.
+
+```yaml
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: secure-http-headers
+  namespace: <your-namespace>
+spec:
+  customResponseHeaders:
+    headers:
+      - 'Permissions-Policy: geolocation=(), camera=(), microphone=()'
+      - 'Referrer-Policy: no-referrer'
+      - 'Strict-Transport-Security: max-age=63072000; includeSubDomains; preload'
+      - 'X-Frame-Options: deny'
+      - 'X-Content-Type-Options: nosniff'
+```
+
 <!-- Reference links -->
 [nginx-docs]: https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
+[owasp-org-http-headers]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
+[owasp-org-permissions-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#permissions-policy-formerly-feature-policy
+[owasp-org-referrer-policy]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#referrer-policy
+[owasp-org-strict-transport-sec]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#strict-transport-security-hsts
+[owasp-org-x-content-type-opts]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options
+[owasp-org-x-frame-opts]: https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options

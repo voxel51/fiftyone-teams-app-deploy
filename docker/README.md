@@ -31,7 +31,10 @@ regarding FiftyOne Enterprise.
 
 <!-- toc -->
 
-- [:white_check_mark: Prerequisites](#white_check_mark-prerequisites)
+- [:green_book: Prerequisites Skills and Knowledge](#green_book-prerequisites-skills-and-knowledge)
+- [:white_check_mark: Technical Requirements](#white_check_mark-technical-requirements)
+- [:clock10: Estimated Completion Time](#clock10-estimated-completion-time)
+- [:floppy_disk: Sizing](#floppy_disk-sizing)
 - [:closed_lock_with_key: Step 1: Prepare License File](#closed_lock_with_key-step-1-prepare-license-file)
 - [:file_folder: Step 2: Choose Authentication Mode](#file_folder-step-2-choose-authentication-mode)
   - [:point_right: Choose your mode](#point_right-choose-your-mode)
@@ -72,31 +75,70 @@ regarding FiftyOne Enterprise.
   - [:books: Next Steps](#books-next-steps)
 - [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
+  - [Backup And Recovery](#backup-and-recovery)
+  - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
+  - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
   - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
+- [Validating](#validating)
+- [Health Checks And Monitoring](#health-checks-and-monitoring)
+  - [Basic Health Assessment](#basic-health-assessment)
+  - [Troubleshooting Unhealthy Containers](#troubleshooting-unhealthy-containers)
 - [Environment Variables](#environment-variables)
 
 <!-- tocstop -->
 
-## :white_check_mark: Prerequisites
+## :green_book: Prerequisites Skills and Knowledge
 
-- Docker and Docker Compose are installed
-- License file from Voxel51
-- Docker Hub credentials from Voxel51
-- MongoDB instance available.
-  - FiftyOne Teams is compatible with MongoDB Community, Enterprise, or Atlas
-    Editions.
-  - If using MongoDB Community or Enterprise we recommend a minimum of 4vCPU and
-    16GB of RAM. Large datasets and complex samples may require additional
-    resources.
-  - If using Atlas we recommend starting on at least a M40 cluster tier - you
-    can then use utilization metrics to make scaling decisions (up or down).
-    Please note that we do not support MongoDB Atlas Serverless instances
-    because we require Aggregations.
-- For resource requirements on a VM that will be hosting your docker deployment,
-  we recommend starting with 8vCPU/32GB RAM, monitoring usage and scaling
-  accordingly.
+The following prerequisites skills & knowledge
+are required for a successful and properly secured
+deployment of FiftyOne Enterprise.
+
+A knowledge of:
+
+1. Docker compose.
+
+1. MongoDB.
+
+1. DNS and the ability to generate, modify, and delete DNS records.
+
+1. TLS/SSL and the ability to generate TLS/SSL certificates.
+
+## :white_check_mark: Technical Requirements
+
+1. [Docker][docker-install]
+   and
+   [Docker Compose][docker-compose-install]
+   installed.
+
+1. License file from Voxel51.
+
+1. [Docker Hub][docker-hub]
+   credentials from Voxel51.
+
+1. A MongoDB Database that meets FiftyOne's
+  [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+
+1. A DNS record or records for ingress.
+
+1. A TLS/SSL certificate or certificates for HTTPS ingress.
+
+## :clock10: Estimated Completion Time
+
+The estimated time to deploy FiftyOne Enterprise is approximately 2 hours.
+
+## :floppy_disk: Sizing
+
+Voxel51 recommends the following resource sizing:
+
+- MongoDB: 4 CPU, 16GB RAM, 256GB Storage
+- Docker Compose Server: 8 CPU, 32GB RAM, 256GB Storage
+
+Voxel51 also recommends monitoring resource consumption across
+the applications.
+Resource usage varies dramatically with operations, use cases,
+and dataset sizes.
 
 ## :closed_lock_with_key: Step 1: Prepare License File
 
@@ -193,7 +235,7 @@ You can override the default image used by any service in
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.11.2
+    image: voxel51/fiftyone-app-torch:v2.12.0
 ```
 
 ## :rocket: Step 4: Initial Deployment
@@ -555,6 +597,61 @@ If you encounter a new issue, please open a ticket on the
 
 ## Advanced Configuration
 
+### Backup And Recovery
+
+FiftyOne Enterprise data is stored in MongoDB.
+It is recommended to periodically backup the MongoDB instance
+according to
+[MongoDB best practices](https://www.mongodb.com/docs/manual/tutorial/backup-and-restore-tools/).
+
+If needed, it is recommended to restore the most-recent backup
+according to
+[MongoDB best practices](https://www.mongodb.com/docs/manual/tutorial/backup-and-restore-tools/)
+
+### Secrets And Sensitive Data
+
+By default, database credentials, cookie secrets,
+encryption keys, and authentication secrets are stored in environment variables.
+This is configured by the following settings in `.env`:
+
+```dotenv
+# This should be a MongoDB Connection String for your database
+FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin"
+# If you are using a different MongoDB Connection String for your CAS database,
+#  set it here
+# CAS_MONGODB_URI="mongodb://username:password@mongodb-cas-example.fiftyone.ai:27017/?authSource=admin"
+
+# FIFTYONE_AUTH_SECRET is a random string used to authenticate to the CAS service
+# This can be any string you care to use generated by any mechanism you prefer.
+# You could use something like:
+#  `cat /dev/urandom | LC_CTYPE=C tr -cd '[:graph:]' | head -c 32`
+#  to generate this string.
+# This is used for inter-service authentication and for the SuperUser to
+#  authenticate at the CAS UI to configure the Central Authentication Service.
+FIFTYONE_AUTH_SECRET=
+
+# This key is required and is used to encrypt storage credentials in the MongoDB
+#   do NOT lose this key!
+# generate keys by executing the following in python:
+#
+# from cryptography.fernet import Fernet
+# print(Fernet.generate_key().decode())
+#
+FIFTYONE_ENCRYPTION_KEY=
+
+FIFTYONE_DEFAULT_APP_PORT=5151
+```
+
+FiftyOne Enterprise supports
+[configuring secrets](https://docs.voxel51.com/enterprise/secrets.html#adding-secrets)
+for the deployment to use.
+
+Please see
+[Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+and
+[adding secrets](https://docs.voxel51.com/enterprise/secrets.html#adding-secrets)
+for questions regarding storage and encryption.
+
 ### Snapshot Archival
 
 Since version v1.5, FiftyOne Enterprise supports
@@ -595,6 +692,39 @@ services:
       FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
 ```
 
+### Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`
+
+Containers based on the `fiftyone-teams-api` and `fiftyone-app`
+images must include the `FIFTYONE_ENCRYPTION_KEY` variable.
+This key is used to encrypt storage credentials in the MongoDB database.
+
+To generate a value for `FIFTYONE_ENCRYPTION_KEY`, run this
+Python code and add the output to your `.env` file.
+
+```python
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+```
+
+Voxel51 does not have access to this encryption key and cannot reproduce it.
+Please store this key in a safe place.
+If the key is lost, you will need to
+
+1. Schedule an outage window
+    1. Drop the storage credentials collection
+    1. Replace the encryption key
+    1. Add the storage credentials via the UI again.
+
+Users with `Admin` permissions may use the FiftyOne Enterprise UI to manage storage
+credentials by navigating to `https://<DEPOY_URL>/settings/cloud_storage_credentials`.
+
+If added via the UI, storage credentials no longer need to be
+mounted into containers or provided via environment variables.
+
+FiftyOne Enterprise continues to support the use of environment variables to set
+storage credentials in the application context and is providing an alternate
+configuration path.
+
 ### Terms of Service, Privacy, and Imprint URLs
 
 FiftyOne Enterprise v2.6 introduces the ability to override the Terms of
@@ -619,6 +749,57 @@ services:
       FIFTYONE_APP_PRIVACY_URL: https://abc.com/privacy
       FIFTYONE_APP_IMPRINT_URL: https://abc.com/imprint
 ```
+
+## Validating
+
+After deploying FiftyOne Enterprise and configuring authentication, please
+follow
+[validating your deployment](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/validating-deployment.md).
+
+## Health Checks And Monitoring
+
+### Basic Health Assessment
+
+Containers will report their status in the output of `docker compose ps`:
+
+```shell
+docker compose ps --format "table {{.Name}}\t{{.Service}}\t{{.RunningFor}}\t{{.Status}}"
+```
+
+Expected output for a healthy deployment:
+
+```shell
+NAME                      SERVICE         CREATED        STATUS
+compose-fiftyone-app-1    fiftyone-app    15 hours ago   Up 15 hours
+compose-fiftyone-app-2    fiftyone-app    15 hours ago   Up 15 hours
+compose-fiftyone-app-3    fiftyone-app    15 hours ago   Up 15 hours
+compose-teams-api-1       teams-api       15 hours ago   Up 15 hours
+compose-teams-api-2       teams-api       15 hours ago   Up 15 hours
+compose-teams-api-3       teams-api       15 hours ago   Up 15 hours
+compose-teams-app-1       teams-app       15 hours ago   Up 15 hours
+compose-teams-cas-1       teams-cas       15 hours ago   Up 15 hours
+compose-teams-do-1        teams-do        15 hours ago   Up 15 hours
+compose-teams-do-2        teams-do        15 hours ago   Up 15 hours
+compose-teams-plugins-1   teams-plugins   15 hours ago   Up 15 hours
+```
+
+Note that number of containers and containers names may vary per deployment.
+
+### Troubleshooting Unhealthy Containers
+
+If containers show unhealthy states (e.g., `Restarting`, `Exited`):
+
+1. **Get detailed container information**:
+
+   ```shell
+   docker inspect <container-name>
+   ```
+
+1. **Check application logs**:
+
+   ```shell
+   docker compose logs <service-name>
+   ```
 
 ## Environment Variables
 
@@ -658,6 +839,8 @@ services:
 | `FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH` | Full path to a network-mounted file system or a cloud storage path to use for storing logs generated by delegated operation runs, one file per job. The default `null` means log upload is disabled.                                                                           | No                        |
 | `FIFTYONE_DEFAULT_APP_ADDRESS`               | The host address that `fiftyone-app` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                                  | Yes                       |
 | `FIFTYONE_DEFAULT_APP_PORT`                  | The host port that `fiftyone-app` should bind to; the default is `5151`                                                                                                                                                                                                        | Yes                       |
+| `FIFTYONE_DO_EXPIRATION_DAYS`                | The amount of time in days that a delegated operation can run before being automatically terminated. Default is 1 day.                                                                                                                                                         | No                        |
+| `FIFTYONE_DO_EXPIRATION_MINUTES`             | The amount of time in minutes that a delegated operation can run before being automatically terminated. Default is `FIFTYONE_DO_EXPIRATION_DAYS` converted to minutes. If this field is provided it will override `FIFTYONE_DO_EXPIRATION_DAYS`.                               | No                        |
 | `FIFTYONE_ENCRYPTION_KEY`                    | Used to encrypt storage credentials in MongoDB                                                                                                                                                                                                                                 | Yes                       |
 | `FIFTYONE_ENV`                               | GraphQL verbosity for the `fiftyone-teams-api` service; `production` will not log every GraphQL query, any other value will                                                                                                                                                    | No                        |
 | `FIFTYONE_LOGGING_FORMAT`                    | The format to use for log messages; `json` or `text`. The default is `text`.                                                                                                                                                                                                   | No                        |
@@ -675,3 +858,6 @@ services:
 | `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
 
 <!-- Reference Links -->
+[docker-install]: https://docs.docker.com/engine/install/
+[docker-compose-install]: https://docs.docker.com/compose/install/
+[docker-hub]: https://hub.docker.com/

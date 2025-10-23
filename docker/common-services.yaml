@@ -1,7 +1,7 @@
 ---
 services:
   fiftyone-app-common:
-    image: voxel51/fiftyone-app:v2.11.2
+    image: voxel51/fiftyone-app:v2.12.0
     environment:
       API_URL: ${API_URL}
       FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE: ${FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE}
@@ -32,7 +32,7 @@ services:
     restart: always
 
   teams-api-common:
-    image: voxel51/fiftyone-teams-api:v2.11.2
+    image: voxel51/fiftyone-teams-api:v2.12.0
     environment:
       API_EXTERNAL_URL: ${FIFTYONE_API_URI}
       CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
@@ -61,13 +61,13 @@ services:
     restart: always
 
   teams-app-common:
-    image: voxel51/fiftyone-teams-app:v2.11.2
+    image: voxel51/fiftyone-teams-app:v2.12.0
     environment:
       API_URL: ${API_URL}
       APP_USE_HTTPS: ${APP_USE_HTTPS:-true}
       FIFTYONE_API_URI: ${FIFTYONE_API_URI:-"Please contact your Admin for an API URI"}
       FIFTYONE_APP_ALLOW_MEDIA_EXPORT: ${FIFTYONE_APP_ALLOW_MEDIA_EXPORT:-true}
-      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.11.2
+      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.12.0
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
@@ -94,7 +94,7 @@ services:
     restart: always
 
   teams-cas-common:
-    image: voxel51/fiftyone-teams-cas:v2.11.2
+    image: voxel51/fiftyone-teams-cas:v2.12.0
     environment:
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
@@ -129,7 +129,7 @@ services:
         read_only: true
 
   teams-plugins-common:
-    image: voxel51/fiftyone-app-torch:v2.11.2
+    image: voxel51/fiftyone-app-torch:v2.12.0
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -156,11 +156,11 @@ services:
     restart: always
 
   teams-do-common:
-    image: voxel51/fiftyone-teams-cv-full:v2.11.2
+    image: voxel51/fiftyone-teams-cv-full:v2.12.0
     deploy:
       replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
     command: >
-      /bin/sh -c "fiftyone delegated launch -t remote"
+      /bin/sh -c "fiftyone delegated launch -t remote -m"
     environment:
       API_URL: ${API_URL}
       FIFTYONE_DATABASE_ADMIN: false
