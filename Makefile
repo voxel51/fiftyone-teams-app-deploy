@@ -160,7 +160,7 @@ tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
 	sudo minikube tunnel &> /dev/null &
 
 helm-repos:  ## add helm repos for the project
-	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo add mongodb https://mongodb.github.io/helm-charts
 	helm repo add jetstack https://charts.jetstack.io
 
 helm-repo-update:  ## updates the helm repos for the project
