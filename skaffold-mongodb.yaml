@@ -2,6 +2,47 @@
 apiVersion: skaffold/v4beta9
 kind: Config
 metadata:
+  name: mongodb-community-operator-crds
+
+manifests:
+  rawYaml:
+    # CRDs from chart version `v0.13.0`.
+    # When chart's CRDs change, these local files needs to be updated.
+    - helm/local-self-signed-example/mongodb-community-operator-crds/*.yaml
+deploy:
+  kubectl: {}
+
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
+  name: mongodb-community-operator-namespace
+
+manifests:
+  rawYaml:
+    - helm/local-self-signed-example/mongodb-namespace.yaml
+deploy:
+  kubectl: {}
+
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
+  name: mongodb-community-operator-secrets
+
+manifests:
+  rawYaml:
+    - helm/local-self-signed-example/mongodb-password.yaml
+deploy:
+  kubectl: {}
+
+requires:
+  - configs:
+      - mongodb-community-operator-namespace
+---
+apiVersion: skaffold/v4beta9
+kind: Config
+metadata:
   name: mongodb
 
 deploy:
@@ -9,46 +50,37 @@ deploy:
   helm:
     releases:
       - name: mongodb
-        remoteChart: bitnami/mongodb
-        version: 16.5.29
+        remoteChart: mongodb/community-operator
+        version: 0.13.0
         createNamespace: true
-        namespace: fiftyone-teams
+        namespace: fiftyone-teams-mongodb
         overrides:
-          global:
-            security:
-              allowInsecureImages: true
-          image:
-            # Bitnami charts only support bitnami container images.
-            # The bitnami/mongo images are Debian with arch linux/amd64 only (linux/arm64 is not provided)
-            # because MongoDB doesn't provide Debian ARM64 packages/binaries.
-            # However, MongoDB provided images supports arm64.
-            repository: mongo
-            tag: "8"  # We say we support versions 6 - 8, let's use the entire 8.x range.
-            pullPolicy: IfNotPresent
-          # architecture: standalone  # default is `standalone`. May also be `replicaset`.
-
-          # The `auth` key only applies to bitnami container images
-          # auth:
-          #   rootUser: root  # default is `root`
-          #   # This is a randomly generated string
-          #   rootPassword: "3-9XjJ-gUV?vp^e(WUk>LD&lAjh7yEji"
-
-          # Since we use the MongoDB image (https://hub.docker.com/_/mongo) (not the bitnami/mongo image),
-          # we need to set these environment variables for the initial user.
-          # When using the bitnami image, we would instead set `auth.rootUser` and `auth.rootPassword`.
-          extraEnvVars:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              value: root
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              # This is a randomly generated string
-              value: "3-9XjJ-gUV?vp^e(WUk>LD&lAjh7yEji"
-          persistence:
-            mountPath: /data/db
-
-          # Runs an init container that sets the permissions of the persistence volume.
-          # Without this, mongodb errors on start
-          # {"error":"IllegalOperation: Attempted to create a lock file on a read-only directory: /data/db"}
-          volumePermissions:
-            enabled: true
-            image:
-              repository: bitnamilegacy/os-shell
+          community-operator-crds:
+            enabled: false
+          createResource: true
+          resource:
+            name: mongodb-replica-set
+            version: 8.0.0
+            members: 1
+            tls:
+              enabled: false
+            users:
+              - name: root
+                db: admin
+                passwordSecretRef:
+                  name: mongodb-test-root-password
+                scramCredentialsSecretName: fiftyone-teams  # pragma: allowlist secret
+                roles:
+                  - name: clusterAdmin
+                    db: admin
+                  - name: userAdminAnyDatabase
+                    db: admin
+                  - name: readWriteAnyDatabase
+                    db: admin
+                  - name: dbAdminAnyDatabase
+                    db: admin
+requires:
+  - configs:
+      - mongodb-community-operator-crds
+      - mongodb-community-operator-secrets
+      - mongodb-community-operator-namespace
