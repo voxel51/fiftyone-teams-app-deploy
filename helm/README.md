@@ -92,7 +92,7 @@ deployment using these helm charts
 
 - [jetstack/cert-manager](https://github.com/cert-manager/cert-manager)
   - For Let's Encrypt SSL certificates
-- [bitnami/mongodb](https://github.com/bitnami/charts/tree/main/bitnami/mongodb)
+- [mongodb/community-operator](https://github.com/mongodb/helm-charts/tree/main/charts/community-operator)
   - for MongoDB
 - voxel51/fiftyone-teams-app
 
@@ -151,7 +151,7 @@ Update the `values.yaml` file with
   - Set ingress `host` values
 
 Assuming you follow these directions your MongoDB host will be
-`fiftyone-mongodb.fiftyone-mongodb.svc.cluster.local`.
+`fiftyone-teams-mongodb.fiftyone-teams-mongodb.svc.cluster.local`.
 <!-- Please modify this hostname if you modify these instructions. -->
 
 #### Create the Necessary Helm Repos
@@ -159,7 +159,7 @@ Assuming you follow these directions your MongoDB host will be
 Add the Helm repositories
 
 ```shell
-helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add mongodb https://mongodb.github.io/helm-charts
 helm repo add jetstack https://charts.jetstack.io
 helm repo add voxel51 https://helm.fiftyone.ai
 helm repo update
@@ -196,26 +196,9 @@ kubectl apply -f ./cluster-issuer.yaml
 
 #### Install and Configure MongoDB
 
-These instructions deploy a single-node MongoDB instance in your GKE cluster.
-If you would like to deploy MongoDB with a
-replicaset configuration, please refer to the
-[MongoDB Helm Chart](https://github.com/bitnami/charts/tree/master/bitnami/mongodb)
-documentation.
-
-**You will definitely want to edit the `rootUser` and `rootPassword` defined below.**
-
-```shell
-kubectl create namespace fiftyone-mongodb
-kubectl config set-context --current --namespace fiftyone-mongodb
-helm install fiftyone-mongodb \
-  --set auth.rootPassword=<REPLACE_ME> \
-  --set auth.rootUser=admin \
-  --set global.namespaceOverride=fiftyone-mongodb \
-  --set image.tag=4.4 \
-  --set ingress.enabled=true \
-  --set namespaceOverride=fiftyone-mongodb \
-  bitnami/mongodb
-```
+These
+[instructions](https://github.com/mongodb/helm-charts/tree/main/charts/community-operator#deploying-a-mongodb-replica-set)
+can be used to deploy a MongoDB replicaset in your GKE cluster.
 
 Wait until the MongoDB pods are in the `Ready` state before
 beginning the "Install FiftyOne Enterprise App" instructions.
@@ -223,7 +206,7 @@ beginning the "Install FiftyOne Enterprise App" instructions.
 While waiting,
 [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
 
-To determine the state of the `fiftyone-mongodb` pods, run
+To determine the state of the `fiftyone-teams-mongodb` pods, run
 
 ```shell
 kubectl get pods
