@@ -46,6 +46,10 @@
     make auth
     ```
 
+  **NOTE:** You may be required to restart the Docker daemon in order for these
+  changes to be reflected. Watch for ImagePullBackoffs due to missing creds in
+  later steps (e.g., `make dev-keep`)!
+
 1. Install the asdf tools
 
     ```shell
@@ -424,14 +428,6 @@ To run released images from Docker hub, configure minikube and Skaffold
           }
         }
         ```
-
-1. Create the Kubernetes namespace configured in
-   [skaffold.yaml](./skaffold.yaml)
-
-    ```shell
-    export NAMESPACE=fiftyone-teams
-    kubectl create namespace "${NAMESPACE}"
-    ```
 
 1. Create the imagePullSecret named `regcred`
 
