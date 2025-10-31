@@ -307,7 +307,7 @@ according to
 ### Builtin Delegated Operator Orchestrator
 
 FiftyOne Enterprise v2.2 introduces a builtin orchestrator to run
-[Delegated Operations](https://docs.voxel51.com/enterprise/enterprise_plugins.html#delegated-operations),
+[Delegated Operations](https://docs.voxel51.com/enterprise/plugins.html#delegated-operations),
 instead of (or in addition to) configuring your own orchestrator such as Airflow.
 
 For configuring your delegated operators, see
