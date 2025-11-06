@@ -130,17 +130,11 @@ with the FiftyOne distribution by default.
 
 #### Installing the enterprise migration tool
 
-1. Install registry authentication packages:
-
-    ```shell
-    pip install keyring keyrings.google-artifactregistry-auth
-    ```
-
-1. Install package:
+1. Install `fiftyone-migrator` package:
 
     ```shell
     pip install fiftyone-migrator \
-      --extra-index-url=https://us-central1-python.pkg.dev/computer-vision-team/dev-python/simple
+      --extra-index-url=https://${TOKEN}@pypi.fiftyone.ai
     ```
 
 #### Using the enterprise migration tool
