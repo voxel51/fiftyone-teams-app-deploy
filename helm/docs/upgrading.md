@@ -178,7 +178,7 @@ fiftyone-migrator migrate 2.12.0
    required.
 
    ```shell
-   FIFTYONE_DATABASE_ADMIN=true fiftyone-migrator migrate --dry-run
+   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate all
    ```
 
 1. To ensure that all datasets are now at version 1.8.0, run
