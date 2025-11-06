@@ -18,6 +18,7 @@
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
+  - [The Enterprise Migration Tool](#the-enterprise-migration-tool)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
     - [FiftyOne Enterprise v2.9+ Startup Probe Changes](#fiftyone-enterprise-v29-startup-probe-changes)
     - [FiftyOne Enterprise v2.9+ Delegated Operator Changes](#fiftyone-enterprise-v29-delegated-operator-changes)
@@ -115,6 +116,73 @@ Database version: 0.21.2
 dataset     version
 ----------  ---------
 quickstart  0.21.2
+```
+
+### The Enterprise Migration Tool
+
+FiftyOne Enterprise `v2.13.0` introduces a new migration tool which is
+designed specifically for enterprise-only functionality. This tool is very
+similar to the existing `fiftyone migrate` command, but does not come packaged
+with the FiftyOne distribution by default.
+
+#### Installing the enterprise migration tool
+
+1. Install registry authentication packages:
+
+    ```shell
+    pip install keyring keyrings.google-artifactregistry-auth
+    ```
+
+1. Install package:
+
+    ```shell
+    pip install fiftyone-migrator \
+      --extra-index-url=https://us-central1-python.pkg.dev/computer-vision-team/dev-python/simple
+    ```
+
+#### Using the enterprise migration tool
+
+**IMPORTANT**: As with any database migration, Voxel51 **strongly** recommends
+backing up your database prior to migrating. While many precautions are taken
+to mitigate the risk of data corruption, data migration always carries a risk
+of introducing unintended modifications.
+
+The enterprise migration tool allows migrating each of the enterprise services:
+
+- `datasets` - Migrate core datasets; this is equivalent to the existing
+  `fiftyone migrate` command
+- `enterprise` - Migrate enterprise-specific dataset features
+- `cas` - Migrate the Centralized Authentication Service (CAS)
+- `hub` - Migrate the enterprise API
+
+Each of these services can be selectively included or excluded from migration.
+
+```shell
+# Migrate all enterprise services to the most current state
+fiftyone-migrator migrate
+
+# Migrate all enterprise services to a specific version
+fiftyone-migrator migrate 2.13.0
+
+# Migrate specific services
+fiftyone-migrator migrate --include enterprise
+
+# Migrate all-but specific services
+fiftyone-migrator migrate --exclude cas hub
+```
+
+##### Reverting a migration
+
+Migrations are designed to be bidirectional. In the event that you need to
+revert a migration, simply provide the version which you want to restore.
+
+```shell
+# Migrate from v2.12.0 to v2.13.0
+fiftyone-migrator migrate 2.13.0
+
+# Oops, need to revert this migration!
+# Migrate from v2.13.0 to v2.12.0
+fiftyone-migrator migrate 2.12.0
 ```
 
 ### From FiftyOne Enterprise Version 2.0.0 or Higher
