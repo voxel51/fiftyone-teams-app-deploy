@@ -87,9 +87,9 @@ Voxel51 provides a
 ### The Enterprise Migration Tool
 
 FiftyOne Enterprise `v2.13.0` introduces a new migration tool which is
-designed specifically for enterprise-only functionality. This tool is very
-similar to the existing `fiftyone migrate` command, but does not come packaged
-with the FiftyOne distribution by default.
+designed specifically for enterprise-only functionality.
+This tool is very similar to the existing `fiftyone migrate` command,
+but does not come packaged with the FiftyOne distribution by default.
 
 #### Installing the enterprise migration tool
 
@@ -103,9 +103,9 @@ with the FiftyOne distribution by default.
 #### Using the enterprise migration tool
 
 **IMPORTANT**: As with any database migration, Voxel51 **strongly** recommends
-backing up your database prior to migrating. While many precautions are taken
-to mitigate the risk of data corruption, data migration always carries a risk
-of introducing unintended modifications.
+backing up your database prior to migrating.
+While many precautions are taken to mitigate the risk of data corruption,
+data migration always carries a risk of introducing unintended modifications.
 
 The enterprise migration tool allows migrating each of the enterprise services:
 
