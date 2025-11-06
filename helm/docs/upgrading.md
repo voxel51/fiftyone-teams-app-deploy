@@ -175,7 +175,7 @@ fiftyone-migrator migrate 2.12.0
    ```shell
    fiftyone-migrator migrate
    ```
-   
+
 Note that `fiftyone-migrator` implicitly sets `FIFTYONE_DATABASE_ADMIN=true`.
 
 ### From FiftyOne Enterprise Version 2.0.0 to 2.13.0
