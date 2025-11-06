@@ -17,12 +17,12 @@
 <!-- toc -->
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-  - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [The Enterprise Migration Tool](#the-enterprise-migration-tool)
     - [Installing the enterprise migration tool](#installing-the-enterprise-migration-tool)
     - [Using the enterprise migration tool](#using-the-enterprise-migration-tool)
       - [Reverting a migration](#reverting-a-migration)
-  - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+  - [From FiftyOne Enterprise Version 2.13.0 or Higher](#from-fiftyone-enterprise-version-2130-or-higher)
+  - [From FiftyOne Enterprise Version 2.0.0 to 2.13.0](#from-fiftyone-enterprise-version-200-to-2130)
     - [FiftyOne Enterprise v2.9+ Startup Probe Changes](#fiftyone-enterprise-v29-startup-probe-changes)
     - [FiftyOne Enterprise v2.9+ Delegated Operator Changes](#fiftyone-enterprise-v29-delegated-operator-changes)
     - [FiftyOne Enterprise v2.8+ `initContainer` Changes](#fiftyone-enterprise-v28-initcontainer-changes)
@@ -84,49 +84,12 @@ Voxel51 provides a
     > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
     > ```
 
-### A Note On Database Migrations
-
-The environment variable `FIFTYONE_DATABASE_ADMIN`
-controls whether the database may be migrated.
-This is a safety check to prevent automatic database
-upgrades that will break other users' SDK connections.
-When false (or unset), either an error will occur
-
-```shell
-$ fiftyone migrate --all
-Traceback (most recent call last):
-...
-OSError: Cannot migrate database from v0.22.0 to v0.22.3 when database_admin=False.
-```
-
-or no action will be taken:
-
-```shell
-$ fiftyone migrate --info
-FiftyOne Enterprise version: 0.14.4
-FiftyOne compatibility version: 0.22.3
-Other compatible versions: >=0.19,<0.23
-Database version: 0.21.2
-dataset     version
-----------  ---------
-quickstart  0.22.0
-$ fiftyone migrate --all
-$ fiftyone migrate --info
-FiftyOne Enterprise version: 0.14.4
-FiftyOne compatibility version: 0.23.0
-Other compatible versions: >=0.19,<0.23
-Database version: 0.21.2
-dataset     version
-----------  ---------
-quickstart  0.21.2
-```
-
 ### The Enterprise Migration Tool
 
 FiftyOne Enterprise `v2.13.0` introduces a new migration tool which is
-designed specifically for enterprise-only functionality. This tool is very
-similar to the existing `fiftyone migrate` command, but does not come packaged
-with the FiftyOne distribution by default.
+designed specifically for enterprise-only functionality.
+This tool is very similar to the existing `fiftyone migrate` command,
+but does not come packaged with the FiftyOne distribution by default.
 
 #### Installing the enterprise migration tool
 
@@ -140,9 +103,9 @@ with the FiftyOne distribution by default.
 #### Using the enterprise migration tool
 
 **IMPORTANT**: As with any database migration, Voxel51 **strongly** recommends
-backing up your database prior to migrating. While many precautions are taken
-to mitigate the risk of data corruption, data migration always carries a risk
-of introducing unintended modifications.
+backing up your database prior to migrating.
+While many precautions are taken to mitigate the risk of data corruption,
+data migration always carries a risk of introducing unintended modifications.
 
 The enterprise migration tool allows migrating each of the enterprise services:
 
@@ -182,7 +145,27 @@ fiftyone-migrator migrate 2.13.0
 fiftyone-migrator migrate 2.12.0
 ```
 
-### From FiftyOne Enterprise Version 2.0.0 or Higher
+### From FiftyOne Enterprise Version 2.13.0 or Higher
+
+1. [Upgrade to FiftyOne Enterprise version 2.13.0](#upgrading-from-previous-versions)
+
+1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
+   version 2.13.0
+    1. Login to the FiftyOne Enterprise UI
+    1. To obtain the CLI command to install the FiftyOne SDK associated with
+      your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
+
+1. [Upgrade or install](#installing-the-enterprise-migration-tool)
+   the enterprise migration tool
+
+1. Voxel51 recommends that you upgrade all your datasets, but it is not
+   required.
+
+   ```shell
+   FIFTYONE_DATABASE_ADMIN=true fiftyone-migrator migrate
+   ```
+
+### From FiftyOne Enterprise Version 2.0.0 to 2.13.0
 
 1. [Upgrade to FiftyOne Enterprise version 2.13.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
@@ -195,7 +178,7 @@ fiftyone-migrator migrate 2.12.0
    required.
 
    ```shell
-   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate all
    ```
 
 1. To ensure that all datasets are now at version 1.8.0, run
