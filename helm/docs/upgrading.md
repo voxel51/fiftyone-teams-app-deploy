@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [The Enterprise Migration Tool](#the-enterprise-migration-tool)
     - [Installing the enterprise migration tool](#installing-the-enterprise-migration-tool)
+    - [Configuring the enterprise migration tool](#configuring-the-enterprise-migration-tool)
     - [Using the enterprise migration tool](#using-the-enterprise-migration-tool)
       - [Reverting a migration](#reverting-a-migration)
   - [From FiftyOne Enterprise Version 2.13.0 or Higher](#from-fiftyone-enterprise-version-2130-or-higher)
@@ -100,6 +101,16 @@ but does not come packaged with the FiftyOne distribution by default.
       --extra-index-url=https://${TOKEN}@pypi.fiftyone.ai
     ```
 
+#### Configuring the enterprise migration tool
+
+The enterprise migration tool requires the following environment variables
+to be defined:
+
+- `CAS_DATABASE_URI` - The database URI used by CAS
+- `CAS_DATABASE_NAME` - The database name used by CAS
+- `FIFTYONE_DATABASE_URI` - The database URI used by FiftyOne
+- `FIFTYONE_DATABASE_NAME` - The database name used by FiftyOne
+
 #### Using the enterprise migration tool
 
 **IMPORTANT**: As with any database migration, Voxel51 **strongly** recommends
@@ -162,8 +173,10 @@ fiftyone-migrator migrate 2.12.0
    required.
 
    ```shell
-   FIFTYONE_DATABASE_ADMIN=true fiftyone-migrator migrate
+   fiftyone-migrator migrate
    ```
+   
+Note that `fiftyone-migrator` implicitly sets `FIFTYONE_DATABASE_ADMIN=true`.
 
 ### From FiftyOne Enterprise Version 2.0.0 to 2.13.0
 
