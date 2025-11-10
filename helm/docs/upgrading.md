@@ -164,7 +164,7 @@ fiftyone-migrator migrate 2.12.0
    version 2.13.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
-      your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
+       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. [Upgrade or install](#installing-the-enterprise-migration-tool)
    the enterprise migration tool
