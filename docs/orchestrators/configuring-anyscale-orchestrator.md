@@ -182,7 +182,9 @@ orchestrator.
 ## Refresh Orchestrator Operators
 
 Before you can do this step make sure you’ve added the optional dependency
-`anyscale` into your FiftyOne API deployment, and set the environment
+`anyscale` into your FiftyOne API deployment
+([see here for instructions](../custom-plugins.md#custom-plugins-images)),
+and set the environment
 variable `API_EXTERNAL_URL` (the external Teams API base URL) used by Anyscale
 workers to talk back to FiftyOne during registration/refresh. The external URL
 can be found under `/settings/api_keys` in the UI. The API must be exposed
@@ -220,7 +222,8 @@ cloud storage platform of choice:
 Additionally:
 
 - `anyscale` SDK is not automatically built into the API image so you’ll need
-  to add it as an extra dependency
+  to add it as an extra dependency.
+  [See here for instructions](../custom-plugins.md#custom-plugins-images).
 - Make sure your API service has the environment variable `API_EXTERNAL_URL`
   set to your API_URI since this will be used to set the API endpoint in your
   Anyscale workers. Note: the provided deployment resources in this repo

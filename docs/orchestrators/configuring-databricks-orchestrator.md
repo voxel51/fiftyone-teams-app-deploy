@@ -33,6 +33,9 @@ for execution, on-demand.
 Databricks executors need to define the dependencies necessary for executing a
 delegated operation. The below script will create a requirements.txt file
 with the minimum required dependencies for running builtin operations.
+Note: You will most likely experience dependency conflicts between
+FiftyOne and the Databricks base image. Please reach out if you do and we
+can do our best to help resolve these.
 
 - If you have custom operators that require additional dependencies you will
 add them here.
@@ -125,11 +128,12 @@ print("SUCCESS")
 
 Below is the entry point for any FiftyOne Enterprise job that should exist in
 your Databricks file system (DBFS). This is a simple script that allows
-FiftyOne CLI commands to be executed for running Delegated Operators and
-orchestrator registration. Make sure to keep the path where you’ve uploaded
-the script; we will be using that when creating the job config. This can be
-uploaded directly to your Databricks account, or you can use the script in the
-next section to do that using the Databricks SDK.
+the FiftyOne API to send arbitrary [FiftyOne CLI commands](https://docs.voxel51.com/cli/index.html)
+to be executed for running Delegated Operators and orchestrator registration.
+Make sure to keep
+the path where you’ve uploaded the script; we will be using that when creating
+the job config. This can be uploaded directly to your Databricks account, or you
+can use the script in the next section to do that using the Databricks SDK.
 
 ```python
 import subprocess
@@ -189,6 +193,8 @@ with open(LOCAL_FILE_PATH, "rb") as f:
   )
 print("SUCCESS")
 ```
+
+You can read more about the FiftyOne CLI [in our docs](https://docs.voxel51.com/cli/index.html).
 
 ## Create Instance Pool
 
@@ -379,7 +385,7 @@ demo_job = Job.from_dict(
        "parameters": [
            {
                "name": "command",
-               "default": "does not matter",
+               "default": "fiftyone --version",
            },
        ],
    }
@@ -516,7 +522,7 @@ orchestrator.
 
 Before doing this step make sure your FiftyOne API deployment has the optional
 dependency “databricks-sdk”. It is not built into our deployments by default so
-you’ll need to add it.
+you’ll need to add it by following the [instructions here](../custom-plugins.md#custom-plugins-images).
 
 This step is only required if you’ve added a plugin directory with custom
 plugins to your Databricks environment.
@@ -550,7 +556,8 @@ cloud storage platform of choice:
 Additionally:
 
 - `databricks-sdk` is not automatically built into the API image so you’ll need
-  to add it as an extra dependency
+  to add it as an extra dependency.
+  [See here for instructions](../custom-plugins.md#custom-plugins-images).
 - Due to a limitation discovered in the connection between Databricks and
   MongoDB Atlas, using more than 4 parallel processes can lead to connection
   issues. We recommend setting the environment variable
