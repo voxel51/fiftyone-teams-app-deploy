@@ -34,7 +34,7 @@ Databricks executors need to define the dependencies necessary for executing a
 delegated operation. The below script will create a requirements.txt file
 with the minimum required dependencies for running builtin operations.
 Note: You will most likely experience dependency conflicts between
-FiftyOne and the Databricks base image. Please reach out if you do and we
+FiftyOne and the Databricks base image. Please reach out if you do, and we
 can do our best to help resolve these.
 
 - If you have custom operators that require additional dependencies you will
