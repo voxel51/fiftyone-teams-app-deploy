@@ -223,7 +223,8 @@ Additionally:
 
 - `anyscale` SDK is not automatically built into the API image so you’ll need
   to add it as an extra dependency.
-  [See here for instructions](../custom-plugins.md#custom-plugins-images).
+  See the
+  [Custom Plugins Images docs](../custom-plugins.md#custom-plugins-images).
 - Make sure your API service has the environment variable `API_EXTERNAL_URL`
   set to your API_URI since this will be used to set the API endpoint in your
   Anyscale workers. Note: the provided deployment resources in this repo
