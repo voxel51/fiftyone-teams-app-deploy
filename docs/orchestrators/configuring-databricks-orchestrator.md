@@ -33,8 +33,8 @@ for execution, on-demand.
 Databricks executors need to define the dependencies necessary for executing a
 delegated operation. The below script will create a requirements.txt file
 with the minimum required dependencies for running builtin operations.
-> **NOTE**: If you experience dependency conflicts between
-> FiftyOne and the Databricks base image,  please contact your customer
+> **NOTE**: If you experience [dependency conflicts](#dependency-conflicts)
+> between FiftyOne and the Databricks base image,  please contact your customer
 > success representative for assistance in resolving them.
 
 - If you have custom operators that require additional dependencies you will
@@ -591,3 +591,21 @@ fom.update_secret(
    value="<new_credentials>",
 )
 ```
+
+## Common Issues
+
+### Dependency Conflicts
+
+Databricks surfaces dependency conflicts in multiple ways typically
+during the image build or image execution steps of a job. Some
+errors we have seen before as a result of conflicts are:
+
+1. `Could not reach driver of cluster`
+1. `Cannot read the python file`
+1. `Library installation error`
+1. `The requested operation requires that "some-dependency==X" is
+    installed on your machine, but found "some-dependency==Y"`
+
+Conflicts of this nature are often unique to your dependency versions,
+but if you are unable to resolve them please reach out to customer
+success.
