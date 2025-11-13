@@ -600,10 +600,10 @@ Databricks surfaces dependency conflicts in multiple ways typically
 during the image build or image execution steps of a job. Some
 errors we have seen before as a result of conflicts are:
 
-1. `Could not reach driver of cluster`
-1. `Cannot read the python file`
-1. `Library installation error`
-1. `The requested operation requires that "some-dependency==X" is
+- `Could not reach driver of cluster`
+- `Cannot read the python file`
+- `Library installation error`
+- `The requested operation requires that "some-dependency==X" is
     installed on your machine, but found "some-dependency==Y"`
 
 Conflicts of this nature are often unique to your dependency versions,
