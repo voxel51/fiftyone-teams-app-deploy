@@ -77,10 +77,12 @@ spec:
             timeoutSeconds: {{ .Values.apiSettings.startup.timeoutSeconds }}
           resources:
             {{- toYaml .Values.apiSettings.resources | nindent 12 }}
-          {{- with .Values.apiSettings.volumeMounts }}
           volumeMounts:
+            - name: do-targets
+              mountPath: /tmp/do-targets
+            {{- with .Values.apiSettings.volumeMounts }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- end }}
       {{- if .Values.apiSettings.initContainers.enabled }}
       initContainers:
         {{-
@@ -110,7 +112,10 @@ spec:
       topologySpreadConstraints:
         {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.apiSettings.topologySpreadConstraints "selectorLabels" "fiftyone-teams-api.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
-      {{- with .Values.apiSettings.volumes }}
       volumes:
+        - name: do-targets
+          configMap:
+            name: {{ include "fiftyone-teams-app.fullname" . }}-job-manifests
+        {{- with .Values.apiSettings.volumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}

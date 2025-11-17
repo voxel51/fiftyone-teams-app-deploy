@@ -1,0 +1,23 @@
+{{- $allProfiles := include "fiftyone-teams-app.executionProfiles" . | fromYaml -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fiftyone-teams-app.fullname" . }}-k8s-job-manifests
+  labels:
+    {{- include "fiftyone-teams-app.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: job-configs
+data:
+{{- range $jobName, $jobConfig := .Values.delegatedOperatorJobTemplates.jobs }}
+  {{- $backend := $jobConfig.backend | required (printf "Job '%s' must specify a backend" $jobName) -}}
+
+  {{- $profile := dict }}
+  {{- if $jobConfig.profile }}
+  {{- $profile = include "fiftyone-teams-app.getExecutionProfile" (dict "backend" $backend "profile" $jobConfig.profile "root" $) | fromYaml -}}
+  {{- end }}
+
+  {{- if eq $backend "kubernetes" }}
+  {{ $jobName }}.yaml: |
+    {{- include "fiftyone-teams-app.renderKubernetesJob" (dict "name" $jobName "job" $jobConfig "profile" $profile "root" $) | nindent 4 }}
+  {{- end }}
+{{- end }}

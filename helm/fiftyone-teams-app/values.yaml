@@ -796,6 +796,36 @@ delegatedOperatorDeployments:
     #   requests:
     #     nvidia.com/gpu: 1
 
+delegatedOperatorJobTemplates:
+
+  customExecutionProfiles:
+    kubernetes: {}
+
+  # -- On-Demand Delegated Operator Jobs.
+  jobs:
+    # -- Default CPU-only batch job
+    cpu-default:
+      backend: kubernetes
+      backoffLimit: 1
+      policy: ""
+      restartPolicy: Never
+      image:
+        repository: "voxel51/fiftyone-teams-cv-full"
+        tag: ""
+        pullPolicy: "Always"
+      resources: {}
+    # -- Default GPU Job
+    gpu-default:
+      backend: kubernetes
+      profile: "voxel51.com/gke-autopilot"
+      gpu:
+        count: 1
+        type: nvidia-tesla-t4
+      image:
+        repository: "voxel51/fiftyone-teams-cv-full"
+        tag: ""
+        pullPolicy: "Always"
+
 # -- List of secrets for FiftyOne Enterprise Licenses (one per org)
 fiftyoneLicenseSecrets:
   - fiftyone-license
