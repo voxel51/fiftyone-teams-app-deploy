@@ -2113,7 +2113,7 @@
           "properties": {
             "activeDeadlineSeconds": {
               "default": "null",
-              "description": "(optional) Maximum of seconds a job should be able to run. [Reference][affinity].",
+              "description": "(optional) Maximum of seconds a job should be able to run. [Reference][job-termination-and-cleanup].",
               "required": [],
               "title": "activeDeadlineSeconds",
               "type": [
@@ -2129,7 +2129,7 @@
             },
             "backoffLimit": {
               "default": "null",
-              "description": "(optional) Amount of retries for the job to try before being marked as \"Failed\". [Reference][affinity].",
+              "description": "(optional) Amount of retries for the job to try before being marked as \"Failed\". [Reference][job-backoff-failure-policy].",
               "required": [],
               "title": "backoffLimit",
               "type": [
@@ -2139,7 +2139,7 @@
             },
             "completions": {
               "default": "null",
-              "description": "(optional) Number of completions to run before marking the job as \"Completed\". [Reference][affinity].",
+              "description": "(optional) Number of completions to run before marking the job as \"Completed\". [Reference][job-termination-and-cleanup].",
               "required": [],
               "title": "completions",
               "type": [
@@ -2281,7 +2281,7 @@
             },
             "ttlSecondsAfterFinished": {
               "default": "null",
-              "description": "(optional) Number of seconds for a job to sit idle before being automatically removed. [Reference][affinity].",
+              "description": "(optional) Number of seconds for a job to sit idle before being automatically removed. [Reference][job-termination-and-cleanup].",
               "required": [],
               "title": "ttlSecondsAfterFinished",
               "type": [
