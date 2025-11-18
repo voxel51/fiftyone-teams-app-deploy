@@ -1640,7 +1640,16 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 			"defaultValues",
 			nil,
 			func(volumeMounts []corev1.VolumeMount) {
-				s.Nil(volumeMounts, "VolumeMounts should be nil")
+				expectedJSON := `[
+          {
+            "mountPath": "/tmp/do-targets",
+            "name": "do-targets"
+          }
+        ]`
+				var expectedVolumeMounts []corev1.VolumeMount
+				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+				s.NoError(err)
+				s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
 			},
 		},
 		{
@@ -1651,6 +1660,10 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 			},
 			func(volumeMounts []corev1.VolumeMount) {
 				expectedJSON := `[
+          {
+            "mountPath": "/tmp/do-targets",
+            "name": "do-targets"
+          },
           {
             "mountPath": "/test-data-volume",
             "name": "test-volume"
@@ -1672,6 +1685,10 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 			},
 			func(volumeMounts []corev1.VolumeMount) {
 				expectedJSON := `[
+          {
+            "mountPath": "/tmp/do-targets",
+            "name": "do-targets"
+          },
           {
             "mountPath": "/test-data-volume1",
             "name": "test-volume1"
@@ -2460,7 +2477,38 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
 			"defaultValues",
 			nil,
 			func(volumes []corev1.Volume) {
-				s.Nil(volumes, "Volumes should be nil")
+				expectedJSON := fmt.Sprintf(`[
+          {
+            "name": "do-targets",
+            "configMap": {
+              "name": "%s-fiftyone-teams-app-do-templates"
+            }
+          }
+        ]`, s.releaseName)
+				var expectedVolumes []corev1.Volume
+				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+				s.NoError(err)
+				s.Equal(expectedVolumes, volumes, "Volumes should be equal")
+			},
+		},
+		{
+			"overrideConfigmapName",
+			map[string]string{
+				"delegatedOperatorJobTemplates.configMap.name": "test-config-map",
+			},
+			func(volumes []corev1.Volume) {
+				expectedJSON := `[
+          {
+            "name": "do-targets",
+            "configMap": {
+              "name": "test-config-map"
+            }
+          }
+        ]`
+				var expectedVolumes []corev1.Volume
+				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+				s.NoError(err)
+				s.Equal(expectedVolumes, volumes, "Volumes should be equal")
 			},
 		},
 		{
@@ -2470,14 +2518,20 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
 				"apiSettings.volumes[0].hostPath.path": "/test-volume",
 			},
 			func(volumes []corev1.Volume) {
-				expectedJSON := `[
+				expectedJSON := fmt.Sprintf(`[
+          {
+            "name": "do-targets",
+            "configMap": {
+              "name": "%s-fiftyone-teams-app-do-templates"
+            }
+          },
           {
             "name": "test-volume",
             "hostPath": {
               "path": "/test-volume"
             }
           }
-        ]`
+        ]`, s.releaseName)
 				var expectedVolumes []corev1.Volume
 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
 				s.NoError(err)
@@ -2493,7 +2547,13 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
 				"apiSettings.volumes[1].persistentVolumeClaim.claimName": "pvc1",
 			},
 			func(volumes []corev1.Volume) {
-				expectedJSON := `[
+				expectedJSON := fmt.Sprintf(`[
+          {
+            "name": "do-targets",
+            "configMap": {
+              "name": "%s-fiftyone-teams-app-do-templates"
+            }
+          },
           {
             "name": "test-volume1",
             "hostPath": {
@@ -2506,7 +2566,7 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
               "claimName": "pvc1"
             }
           }
-        ]`
+        ]`, s.releaseName)
 				var expectedVolumes []corev1.Volume
 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
 				s.NoError(err)

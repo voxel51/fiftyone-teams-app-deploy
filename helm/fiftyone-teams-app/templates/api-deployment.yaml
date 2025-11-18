@@ -115,7 +115,7 @@ spec:
       volumes:
         - name: do-targets
           configMap:
-            name: {{ include "fiftyone-teams-app.fullname" . }}-job-manifests
+            name: {{ include "delegated-operator-templates.config-map-name" . }}
         {{- with .Values.apiSettings.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

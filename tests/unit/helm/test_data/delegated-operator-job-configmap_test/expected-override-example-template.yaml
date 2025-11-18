@@ -1,0 +1,106 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: override-example-{{ _id }}
+  annotations:
+    annotation-1: annotation-1-value-override
+  labels:
+    helm.sh/chart: fiftyone-teams-app-2.13.0
+    app.kubernetes.io/version: "v2.13.0"
+    app.kubernetes.io/managed-by: Helm
+    app.voxel51.com/delegate-operator-task-id: {{ _id }}
+    app.voxel51.com/delegate-operator-task-type: delegated_operation
+    app.voxel51.com/delegate-operator-template-name: override-example
+    labels-1: label-1-value-override
+spec:
+  backoffLimit: 10
+  ttlSecondsAfterFinished: 20
+  activeDeadlineSeconds: 30
+  completions: 40
+  template:
+    metadata:
+      annotations:
+        pod-annotation-1: pod-annotation-1-value-override
+      labels:
+        helm.sh/chart: fiftyone-teams-app-2.13.0
+        app.kubernetes.io/version: "v2.13.0"
+        app.kubernetes.io/managed-by: Helm
+        app.voxel51.com/delegate-operator-task-id: {{ _id }}
+        app.voxel51.com/delegate-operator-task-type: delegated_operation
+        app.voxel51.com/delegate-operator-template-name: override-example
+        labels-1: label-1-value-override
+    spec:
+      restartPolicy: Never
+      serviceAccountName: fiftyone-teams
+      securityContext:
+        runAsUser: 3000
+      containers:
+        - name: executor
+          image: "eu.gcr.io:v2.13.0"
+          imagePullPolicy: Always
+          command:
+            - {{ _command }}
+          args:
+          {% for arg in _args %}
+            - {{ arg }}
+          {% endfor %}
+          securityContext:
+            runAsGroup: 4000
+          env:
+
+            - name: API_URL
+              value: "http://teams-api:80"
+            - name: FIFTYONE_DATABASE_ADMIN
+              value: "false"
+            - name: FIFTYONE_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: fiftyoneDatabaseName
+            - name: FIFTYONE_DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: mongodbConnectionString
+            - name: FIFTYONE_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: encryptionKey
+            - name: ADDITIONAL_ENV_VAR
+              value: "an-env-var-override"
+            - name: FIFTYONE_DELEGATED_OPERATION_LOG_PATH
+              value: "/tmp/foo-override"
+            - name: FIFTYONE_MEDIA_CACHE_SIZE_BYTES
+              value: "-1"
+            - name: SECRET_ENV
+              valueFrom:
+                secretKeyRef:
+                  name: secret-name-override
+                  key: secret-key-override
+          resources:
+            cpu: 20
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - mountPath: /test-data-volume-override
+              name: test-volume-override
+      nodeSelector:
+        node-selector-1: node-selector-1-value-override
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: hostname
+                operator: NotIn
+                values:
+                - override
+      tolerations:
+        - effect: NoSchedule
+          key: example-key
+          operator: Exists
+      volumes:
+        - hostPath:
+            path: /test-volume-override
+          name: test-volume-override

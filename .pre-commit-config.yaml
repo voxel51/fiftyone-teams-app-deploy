@@ -10,7 +10,7 @@ repos:
         args:
           - --allow-multiple-document
         # We exclude helm template files since in raw form, they are not valid yaml
-        exclude: (^helm/fiftyone-teams-app/templates|^cloudformation)
+        exclude: (^helm/fiftyone-teams-app/templates|^cloudformation|^tests/unit/helm/test_data)
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: pretty-format-json
@@ -60,14 +60,14 @@ repos:
         args:
           - -L
           # fiftyone.management as fom
-          - fom,aks
+          - fom,aks,NotIn
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.37.1
     hooks:
       - id: yamllint
         entry: yamllint --config-file .yamllint.yaml
         # We exclude helm template files since in raw form, they are not valid yaml
-        exclude: helm/fiftyone-teams-app/templates
+        exclude: (^helm/fiftyone-teams-app/templates|^tests/unit/helm/test_data)
   - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
     rev: v1.1.2
     hooks:

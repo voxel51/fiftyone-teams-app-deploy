@@ -797,6 +797,16 @@ delegatedOperatorDeployments:
     #     nvidia.com/gpu: 1
 
 delegatedOperatorJobTemplates:
+  configMap:
+    # -- ConfigMap annotations. [Reference][annotations].
+    annotations: {}
+    # -- Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`.
+    create: true
+    # -- Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.
+    # Defaults to `release-name-fiftyone-teams-app-do-templates`.
+    name: ""
+    # -- Additional labels for the generated service account. [Reference][labels-and-selectors].
+    labels: {}
 
   # -- A common template applied to all deployments. Each deployment can
   # then override individual fields as needed by the operator.

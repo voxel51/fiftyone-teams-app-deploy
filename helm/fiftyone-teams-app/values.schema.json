@@ -2094,6 +2094,39 @@
     },
     "delegatedOperatorJobTemplates": {
       "properties": {
+        "configMap": {
+          "properties": {
+            "annotations": {
+              "description": "ConfigMap annotations. [Reference][annotations].",
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "create": {
+              "default": true,
+              "description": "Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`.",
+              "required": [],
+              "title": "create",
+              "type": "boolean"
+            },
+            "labels": {
+              "description": "Additional labels for the generated service account. [Reference][labels-and-selectors].",
+              "required": [],
+              "title": "labels",
+              "type": "object"
+            },
+            "name": {
+              "default": "",
+              "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.\nDefaults to `release-name-fiftyone-teams-app-do-templates`.",
+              "required": [],
+              "title": "name",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "configMap",
+          "type": "object"
+        },
         "jobs": {
           "description": "On-Demand Delegated Operator Jobs.",
           "properties": {

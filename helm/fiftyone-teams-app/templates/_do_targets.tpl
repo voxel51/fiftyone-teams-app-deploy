@@ -1,10 +1,23 @@
+{{/*
+Create the name of the ConfigMap to use
+*/}}
 {{- define "delegated-operator-templates.config-map-name" }}
-{{- include "fiftyone-teams-app.fullname" . }}-k8s-job-manifests
+{{- if .Values.delegatedOperatorJobTemplates.configMap.name }}
+{{- .Values.delegatedOperatorJobTemplates.configMap.name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := "do-templates" }}
+{{- printf "%s-%s" (include "fiftyone-teams-app.fullname" .) $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
 {{- end }}
 
 {{- define "delegated-operator-templates.config-map-labels" }}
 {{- include "fiftyone-teams-app.commonLabels" . }}
-app.kubernetes.io/component: job-configs
+app.kubernetes.io/name: {{ include "delegated-operator-templates.config-map-name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.voxel51.com/component: do-templates
+{{- with .Values.delegatedOperatorJobTemplates.configMap.labels }}
+{{ toYaml . }}
+{{- end }}
 {{- end }}
 
 {{/*

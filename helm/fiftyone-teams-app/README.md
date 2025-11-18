@@ -846,6 +846,10 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorDeployments.template.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-do` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | delegatedOperatorDeployments.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorDeployments.template.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
+| delegatedOperatorJobTemplates.configMap.annotations | object | `{}` | ConfigMap annotations. [Reference][annotations]. |
+| delegatedOperatorJobTemplates.configMap.create | bool | `true` | Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`. |
+| delegatedOperatorJobTemplates.configMap.labels | object | `{}` | Additional labels for the generated service account. [Reference][labels-and-selectors]. |
+| delegatedOperatorJobTemplates.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates. Defaults to `release-name-fiftyone-teams-app-do-templates`. |
 | delegatedOperatorJobTemplates.jobs | object | `{"cpu-default":{}}` | On-Demand Delegated Operator Jobs. |
 | delegatedOperatorJobTemplates.jobs.cpu-default | object | `{}` | Default CPU-only batch job |
 | delegatedOperatorJobTemplates.template | object | `{"activeDeadlineSeconds":null,"affinity":{},"backoffLimit":null,"completions":null,"containerSecurityContext":{},"env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"jobAnnotations":{},"labels":{},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{},"resources":{"limits":{},"requests":{}},"secretEnv":{},"tolerations":[],"ttlSecondsAfterFinished":null,"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |

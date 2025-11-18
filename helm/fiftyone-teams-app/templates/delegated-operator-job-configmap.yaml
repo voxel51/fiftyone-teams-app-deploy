@@ -1,9 +1,15 @@
+{{- if .Values.delegatedOperatorJobTemplates.configMap.create -}}
 {{- $baseTpl := .Values.delegatedOperatorJobTemplates.template }}
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "delegated-operator-templates.config-map-name" . }}
+  namespace: {{ .Values.namespace.name }}
+  {{- with .Values.delegatedOperatorJobTemplates.configMap.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{- include "delegated-operator-templates.config-map-labels" . | nindent 4 }}
 data:
@@ -124,4 +130,5 @@ data:
           volumes:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+{{- end }}
 {{- end }}
