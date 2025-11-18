@@ -5,15 +5,15 @@ metadata:
   annotations:
     annotation-1: annotation-1-value
   labels:
-    helm.sh/chart: fiftyone-teams-app-2.13.0
-    app.kubernetes.io/version: "v2.13.0"
+    helm.sh/chart: fiftyone-teams-app-{{CHART_VERSION}}
+    app.kubernetes.io/version: "v{{CHART_VERSION}}"
     app.kubernetes.io/managed-by: Helm
     app.voxel51.com/delegate-operator-task-id: {{ _id }}
     app.voxel51.com/delegate-operator-task-type: delegated_operation
     app.voxel51.com/delegate-operator-template-name: override-example-cascading
     labels-1: label-1-value
 spec:
-  backoffLimit: 1
+  backoffLimit: 10
   ttlSecondsAfterFinished: 20
   activeDeadlineSeconds: 30
   completions: 40
@@ -22,8 +22,8 @@ spec:
       annotations:
         pod-annotation-1: pod-annotation-1-value
       labels:
-        helm.sh/chart: fiftyone-teams-app-2.13.0
-        app.kubernetes.io/version: "v2.13.0"
+        helm.sh/chart: fiftyone-teams-app-{{CHART_VERSION}}
+        app.kubernetes.io/version: "v{{CHART_VERSION}}"
         app.kubernetes.io/managed-by: Helm
         app.voxel51.com/delegate-operator-task-id: {{ _id }}
         app.voxel51.com/delegate-operator-task-type: delegated_operation
@@ -36,7 +36,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: executor
-          image: "us.gcr.io:v2.13.0"
+          image: "us.gcr.io:0.0.0"
           imagePullPolicy: Never
           command:
             - {{ _command }}

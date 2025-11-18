@@ -5,8 +5,8 @@ metadata:
   annotations:
     annotation-1: annotation-1-value-override
   labels:
-    helm.sh/chart: fiftyone-teams-app-2.13.0
-    app.kubernetes.io/version: "v2.13.0"
+    helm.sh/chart: fiftyone-teams-app-{{CHART_VERSION}}
+    app.kubernetes.io/version: "v{{CHART_VERSION}}"
     app.kubernetes.io/managed-by: Helm
     app.voxel51.com/delegate-operator-task-id: {{ _id }}
     app.voxel51.com/delegate-operator-task-type: delegated_operation
@@ -22,8 +22,8 @@ spec:
       annotations:
         pod-annotation-1: pod-annotation-1-value-override
       labels:
-        helm.sh/chart: fiftyone-teams-app-2.13.0
-        app.kubernetes.io/version: "v2.13.0"
+        helm.sh/chart: fiftyone-teams-app-{{CHART_VERSION}}
+        app.kubernetes.io/version: "v{{CHART_VERSION}}"
         app.kubernetes.io/managed-by: Helm
         app.voxel51.com/delegate-operator-task-id: {{ _id }}
         app.voxel51.com/delegate-operator-task-type: delegated_operation
@@ -36,7 +36,7 @@ spec:
         runAsUser: 3000
       containers:
         - name: executor
-          image: "eu.gcr.io:v2.13.0"
+          image: "eu.gcr.io:1.1.1"
           imagePullPolicy: Always
           command:
             - {{ _command }}
