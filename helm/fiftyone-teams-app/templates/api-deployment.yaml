@@ -78,8 +78,10 @@ spec:
           resources:
             {{- toYaml .Values.apiSettings.resources | nindent 12 }}
           volumeMounts:
+            {{- if or (.Values.delegatedOperatorJobTemplates.configMap.create) (.Values.delegatedOperatorJobTemplates.configMap.name) }}
             - name: do-targets
               mountPath: /tmp/do-targets
+            {{- end }}
             {{- with .Values.apiSettings.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -113,9 +115,11 @@ spec:
         {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.apiSettings.topologySpreadConstraints "selectorLabels" "fiftyone-teams-api.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if or (.Values.delegatedOperatorJobTemplates.configMap.create) (.Values.delegatedOperatorJobTemplates.configMap.name) }}
         - name: do-targets
           configMap:
             name: {{ include "delegated-operator-templates.config-map-name" . }}
+        {{- end }}
         {{- with .Values.apiSettings.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

@@ -1676,6 +1676,32 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 			},
 		},
 		{
+			"overrideDelegatedOperatorTemplatesConfigMapCreate",
+			map[string]string{
+				"delegatedOperatorJobTemplates.configMap.create": "false",
+				"apiSettings.volumeMounts[0].mountPath":          "/test-data-volume1",
+				"apiSettings.volumeMounts[0].name":               "test-volume1",
+				"apiSettings.volumeMounts[1].mountPath":          "/test-data-volume2",
+				"apiSettings.volumeMounts[1].name":               "test-volume2",
+			},
+			func(volumeMounts []corev1.VolumeMount) {
+				expectedJSON := `[
+          {
+            "mountPath": "/test-data-volume1",
+            "name": "test-volume1"
+          },
+          {
+            "mountPath": "/test-data-volume2",
+            "name": "test-volume2"
+          }
+        ]`
+				var expectedVolumeMounts []corev1.VolumeMount
+				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+				s.NoError(err)
+				s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
+			},
+		},
+		{
 			"overrideVolumeMountsMultiple",
 			map[string]string{
 				"apiSettings.volumeMounts[0].mountPath": "/test-data-volume1",
@@ -2567,6 +2593,36 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
             }
           }
         ]`, s.releaseName)
+				var expectedVolumes []corev1.Volume
+				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+				s.NoError(err)
+				s.Equal(expectedVolumes, volumes, "Volumes should be equal")
+			},
+		},
+		{
+			"overrideDelegatedOperatorTemplatesConfigMapCreate",
+			map[string]string{
+				"delegatedOperatorJobTemplates.configMap.create":         "false",
+				"apiSettings.volumes[0].name":                            "test-volume1",
+				"apiSettings.volumes[0].hostPath.path":                   "/test-volume1",
+				"apiSettings.volumes[1].name":                            "pvc1",
+				"apiSettings.volumes[1].persistentVolumeClaim.claimName": "pvc1",
+			},
+			func(volumes []corev1.Volume) {
+				expectedJSON := `[
+          {
+            "name": "test-volume1",
+            "hostPath": {
+              "path": "/test-volume1"
+            }
+          },
+          {
+            "name": "pvc1",
+            "persistentVolumeClaim": {
+              "claimName": "pvc1"
+            }
+          }
+        ]`
 				var expectedVolumes []corev1.Volume
 				err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
 				s.NoError(err)
