@@ -36,7 +36,7 @@ data:
   {{- $mergedPodAnnotations := merge (deepCopy ($jobConfig.podAnnotations | default dict)) ($baseTpl.podAnnotations | default dict) }}
   {{- $mergedPodSecurityContext := merge (deepCopy ($jobConfig.podSecurityContext | default dict)) ($baseTpl.podSecurityContext | default dict) }}
   {{- $mergedResources := merge (deepCopy ($jobConfig.resources | default dict)) ($baseTpl.resources) }}
-  {{- $mergedTolerations := $jobConfig.toleration | default $baseTpl.tolerations }}
+  {{- $mergedTolerations := $jobConfig.tolerations | default $baseTpl.tolerations }}
   {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts }}
   {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes }}
 

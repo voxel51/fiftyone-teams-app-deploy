@@ -79,9 +79,9 @@ spec:
                   name: secret-name-override
                   key: secret-key-override
           resources:
-            cpu: 20
             limits: {}
-            requests: {}
+            requests:
+              cpu: 20
           volumeMounts:
             - mountPath: /test-data-volume-override
               name: test-volume-override
@@ -97,9 +97,9 @@ spec:
                 values:
                 - override
       tolerations:
-        - effect: NoSchedule
-          key: example-key
-          operator: Exists
+        - effect: Schedule
+          key: example-key-override
+          operator: NotExists
       volumes:
         - hostPath:
             path: /test-volume-override

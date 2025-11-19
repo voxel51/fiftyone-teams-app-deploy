@@ -16,7 +16,8 @@ import (
 	"github.com/noirbizarre/gonja"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/yaml.v3"
+
+	gruntworkTesting "github.com/gruntwork-io/terratest/modules/testing"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -316,19 +317,19 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
-		expected func(data map[string]string)
+		expected func(subT gruntworkTesting.TestingT, data map[string]string)
 	}{
 		{
 			"defaultValues",
 			nil,
-			func(data map[string]string) {
+			func(subT gruntworkTesting.TestingT, data map[string]string) {
 				var expectedJobConfig batchv1.Job
 				var actualJobConfig batchv1.Job
 
 				jinjaArgs := map[string]interface{}{
-					"id":      strings.ToLower(random.UniqueId()),
-					"command": "fiftyone",
-					"args":    []string{"test", "arg1"},
+					"_id":      strings.ToLower(random.UniqueId()),
+					"_command": "fiftyone",
+					"_args":    []string{"test", "arg1"},
 				}
 
 				tests := map[string]string{
@@ -345,11 +346,9 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 					actualJobYaml, err := convertJinjaToYAML(data[actualYamlKey], jinjaArgs)
 					s.NoError(err)
 
-					err = yaml.Unmarshal([]byte(expectedJobYaml), &expectedJobConfig)
-					s.NoError(err)
+					helm.UnmarshalK8SYaml(subT, expectedJobYaml, &expectedJobConfig)
 
-					err = yaml.Unmarshal([]byte(actualJobYaml), &actualJobConfig)
-					s.NoError(err)
+					helm.UnmarshalK8SYaml(subT, actualJobYaml, &actualJobConfig)
 
 					s.Equal(expectedJobConfig, actualJobConfig, "Jobs should be equal")
 				}
@@ -376,7 +375,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.labels.labels-1":                           "label-1-value",
 				"delegatedOperatorJobTemplates.template.podAnnotations.pod-annotation-1":           "pod-annotation-1-value",
 				"delegatedOperatorJobTemplates.template.podSecurityContext.runAsUser":              "1000",
-				"delegatedOperatorJobTemplates.template.resources.cpu":                             "2",
+				"delegatedOperatorJobTemplates.template.resources.requests.cpu":                    "2",
 				"delegatedOperatorJobTemplates.template.secretEnv.SECRET_ENV.secretName":           "secret-name",
 				"delegatedOperatorJobTemplates.template.secretEnv.SECRET_ENV.secretKey":            "secret-key",
 				"delegatedOperatorJobTemplates.template.tolerations[0].key":                        "example-key",
@@ -387,14 +386,14 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.volumes[0].name":                           "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].hostPath.path":                  "/test-volume",
 			},
-			func(data map[string]string) {
+			func(subT gruntworkTesting.TestingT, data map[string]string) {
 				var expectedJobConfig batchv1.Job
 				var actualJobConfig batchv1.Job
 
 				jinjaArgs := map[string]interface{}{
-					"id":      strings.ToLower(random.UniqueId()),
-					"command": "fiftyone",
-					"args":    []string{"test", "arg1"},
+					"_id":      strings.ToLower(random.UniqueId()),
+					"_command": "fiftyone",
+					"_args":    []string{"test", "arg1"},
 				}
 
 				tests := map[string]string{
@@ -411,11 +410,9 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 					actualJobYaml, err := convertJinjaToYAML(data[actualYamlKey], jinjaArgs)
 					s.NoError(err)
 
-					err = yaml.Unmarshal([]byte(expectedJobYaml), &expectedJobConfig)
-					s.NoError(err)
+					helm.UnmarshalK8SYaml(subT, expectedJobYaml, &expectedJobConfig)
 
-					err = yaml.Unmarshal([]byte(actualJobYaml), &actualJobConfig)
-					s.NoError(err)
+					helm.UnmarshalK8SYaml(subT, actualJobYaml, &actualJobConfig)
 
 					s.Equal(expectedJobConfig, actualJobConfig, "Jobs should be equal")
 				}
@@ -443,7 +440,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.labels.labels-1":                           "label-1-value",
 				"delegatedOperatorJobTemplates.template.podAnnotations.pod-annotation-1":           "pod-annotation-1-value",
 				"delegatedOperatorJobTemplates.template.podSecurityContext.runAsUser":              "1000",
-				"delegatedOperatorJobTemplates.template.resources.cpu":                             "2",
+				"delegatedOperatorJobTemplates.template.resources.requests.cpu":                    "2",
 				"delegatedOperatorJobTemplates.template.secretEnv.SECRET_ENV.secretName":           "secret-name",
 				"delegatedOperatorJobTemplates.template.secretEnv.SECRET_ENV.secretKey":            "secret-key",
 				"delegatedOperatorJobTemplates.template.tolerations[0].key":                        "example-key",
@@ -473,7 +470,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.jobs.override-example.labels.labels-1":                           "label-1-value-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.podAnnotations.pod-annotation-1":           "pod-annotation-1-value-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.podSecurityContext.runAsUser":              "3000",
-				"delegatedOperatorJobTemplates.jobs.override-example.resources.cpu":                             "20",
+				"delegatedOperatorJobTemplates.jobs.override-example.resources.requests.cpu":                    "20",
 				"delegatedOperatorJobTemplates.jobs.override-example.secretEnv.SECRET_ENV.secretName":           "secret-name-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.secretEnv.SECRET_ENV.secretKey":            "secret-key-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.tolerations[0].key":                        "example-key-override",
@@ -484,14 +481,14 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.jobs.override-example.volumes[0].name":                           "test-volume-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.volumes[0].hostPath.path":                  "/test-volume-override",
 			},
-			func(data map[string]string) {
+			func(subT gruntworkTesting.TestingT, data map[string]string) {
 				var expectedJobConfig batchv1.Job
 				var actualJobConfig batchv1.Job
 
 				jinjaArgs := map[string]interface{}{
-					"id":      strings.ToLower(random.UniqueId()),
-					"command": "fiftyone",
-					"args":    []string{"test", "arg1"},
+					"_id":      strings.ToLower(random.UniqueId()),
+					"_command": "fiftyone",
+					"_args":    []string{"test", "arg1"},
 				}
 
 				tests := map[string]string{
@@ -509,11 +506,9 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 					actualJobYaml, err := convertJinjaToYAML(data[actualYamlKey], jinjaArgs)
 					s.NoError(err)
 
-					err = yaml.Unmarshal([]byte(expectedJobYaml), &expectedJobConfig)
-					s.NoError(err)
+					helm.UnmarshalK8SYaml(subT, expectedJobYaml, &expectedJobConfig)
 
-					err = yaml.Unmarshal([]byte(actualJobYaml), &actualJobConfig)
-					s.NoError(err)
+					helm.UnmarshalK8SYaml(subT, actualJobYaml, &actualJobConfig)
 
 					s.Equal(expectedJobConfig, actualJobConfig, "Jobs should be equal")
 				}
@@ -541,7 +536,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.labels.labels-1":                           "label-1-value",
 				"delegatedOperatorJobTemplates.template.podAnnotations.pod-annotation-1":           "pod-annotation-1-value",
 				"delegatedOperatorJobTemplates.template.podSecurityContext.runAsUser":              "1000",
-				"delegatedOperatorJobTemplates.template.resources.cpu":                             "2",
+				"delegatedOperatorJobTemplates.template.resources.requests.cpu":                    "2",
 				"delegatedOperatorJobTemplates.template.secretEnv.SECRET_ENV.secretName":           "secret-name",
 				"delegatedOperatorJobTemplates.template.secretEnv.SECRET_ENV.secretKey":            "secret-key",
 				"delegatedOperatorJobTemplates.template.tolerations[0].key":                        "example-key",
@@ -571,7 +566,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.jobs.override-example.labels.labels-1":                           "label-1-value-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.podAnnotations.pod-annotation-1":           "pod-annotation-1-value-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.podSecurityContext.runAsUser":              "3000",
-				"delegatedOperatorJobTemplates.jobs.override-example.resources.cpu":                             "20",
+				"delegatedOperatorJobTemplates.jobs.override-example.resources.requests.cpu":                    "20",
 				"delegatedOperatorJobTemplates.jobs.override-example.secretEnv.SECRET_ENV.secretName":           "secret-name-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.secretEnv.SECRET_ENV.secretKey":            "secret-key-override",
 				"delegatedOperatorJobTemplates.jobs.override-example.tolerations[0].key":                        "example-key-override",
@@ -588,7 +583,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.jobs.override-example-cascading.activeDeadlineSeconds":   "30",
 				"delegatedOperatorJobTemplates.jobs.override-example-cascading.completions":             "40",
 			},
-			func(data map[string]string) {
+			func(subT gruntworkTesting.TestingT, data map[string]string) {
 				var expectedJobConfig batchv1.Job
 				var actualJobConfig batchv1.Job
 
@@ -614,11 +609,9 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 					actualJobYaml, err := convertJinjaToYAML(data[actualYamlKey], jinjaArgs)
 					s.NoError(err)
 
-					err = yaml.Unmarshal([]byte(expectedJobYaml), &expectedJobConfig)
-					s.NoError(err)
+					helm.UnmarshalK8SYaml(subT, expectedJobYaml, &expectedJobConfig)
 
-					err = yaml.Unmarshal([]byte(actualJobYaml), &actualJobConfig)
-					s.NoError(err)
+					helm.UnmarshalK8SYaml(subT, actualJobYaml, &actualJobConfig)
 
 					s.Equal(expectedJobConfig, actualJobConfig, "Jobs should be equal")
 				}
@@ -640,7 +633,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 			var configMap corev1.ConfigMap
 			helm.UnmarshalK8SYaml(subT, output, &configMap)
 
-			testCase.expected(configMap.Data)
+			testCase.expected(subT, configMap.Data)
 		})
 	}
 }
