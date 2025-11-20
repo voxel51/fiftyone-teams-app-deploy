@@ -919,7 +919,10 @@ delegatedOperatorJobTemplates:
     #       nvidia.com/gpu: 1
     #     requests:
     #       nvidia.com/gpu: 1
-    #
+    #     tolerations:
+    #       - key: nvidia.com/gpu
+    #         effect: NoSchedule
+    #         operator: Exists
     # https://aws.amazon.com/blogs/compute/running-gpu-accelerated-kubernetes-workloads-on-p3-and-p2-ec2-instances-with-amazon-eks/
     # gpu-aws-eks-standard:
     #   resources:
@@ -930,6 +933,8 @@ delegatedOperatorJobTemplates:
     #
     # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus
     # gpu-gcp-gke-autopilot:
+    #   env:
+    #     LD_LIBRARY_PATH: /usr/local/nvidia/lib64
     #   resources:
     #     limits:
     #       nvidia.com/gpu: "1"
