@@ -1,0 +1,134 @@
+{{- if .Values.delegatedOperatorJobTemplates.configMap.create -}}
+{{- $baseTpl := .Values.delegatedOperatorJobTemplates.template }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "delegated-operator-templates.config-map-name" . }}
+  namespace: {{ .Values.namespace.name }}
+  {{- with .Values.delegatedOperatorJobTemplates.configMap.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "delegated-operator-templates.config-map-labels" . | nindent 4 }}
+data:
+{{- range $jobName, $jobConfig := .Values.delegatedOperatorJobTemplates.jobs }}
+  {{- /* environment context with better merging for helpers. */ -}}
+  {{- $envContext := dict
+      "secretName" $.Values.secret.name
+      "apiServiceName" $.Values.apiSettings.service.name
+      "apiServicePort" (float64 $.Values.apiSettings.service.port)
+      "env" (merge (deepCopy ($jobConfig.env | default dict)) ($baseTpl.env))
+      "secretEnv" (merge (deepCopy ($jobConfig.secretEnv | default dict)) ($baseTpl.secretEnv))
+  }}
+
+  {{- /* label context for helpers. */ -}}
+  {{- $labelContext := merge (dict "jobTemplateName" $jobName) ($)  }}
+
+  {{- /* merged configurations to make job template simpler */ -}}
+  {{- $mergedAffinity := merge (deepCopy ($jobConfig.affinity | default dict)) ($baseTpl.affinity | default dict) }}
+  {{- $mergedContainerSecurityContext := merge (deepCopy ($jobConfig.containerSecurityContext | default dict)) ($baseTpl.containerSecurityContext | default dict) }}
+  {{- $mergedImage := merge (deepCopy ($jobConfig.image | default dict)) ($baseTpl.image)  }}
+  {{- $mergedJobAnnotations := merge (deepCopy ($jobConfig.jobAnnotations | default dict)) ($baseTpl.jobAnnotations | default dict) }}
+  {{- $mergedLabels := merge (deepCopy ($jobConfig.labels | default dict)) ($baseTpl.labels | default dict) }}
+  {{- $mergedNodeSelector := merge (deepCopy ($jobConfig.nodeSelector | default dict)) ($baseTpl.nodeSelector | default dict) }}
+  {{- $mergedPodAnnotations := merge (deepCopy ($jobConfig.podAnnotations | default dict)) ($baseTpl.podAnnotations | default dict) }}
+  {{- $mergedPodSecurityContext := merge (deepCopy ($jobConfig.podSecurityContext | default dict)) ($baseTpl.podSecurityContext | default dict) }}
+  {{- $mergedResources := merge (deepCopy ($jobConfig.resources | default dict)) ($baseTpl.resources) }}
+  {{- $mergedTolerations := $jobConfig.tolerations | default $baseTpl.tolerations }}
+  {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts }}
+  {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes }}
+
+  {{ $jobName }}.yaml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: {{ $jobName }}-{{ `{{ _id }}` }}
+      {{- with $mergedJobAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "delegated-operator-templates.labels" $labelContext | nindent 8 }}
+        {{- with $mergedLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      backoffLimit: {{ $jobConfig.backoffLimit | default $baseTpl.backoffLimit | default 0 }}
+      {{- if or $jobConfig.ttlSecondsAfterFinished $baseTpl.ttlSecondsAfterFinished }}
+      ttlSecondsAfterFinished: {{ $jobConfig.ttlSecondsAfterFinished | default $baseTpl.ttlSecondsAfterFinished }}
+      {{- end }}
+      {{- if or $jobConfig.activeDeadlineSeconds $baseTpl.activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ $jobConfig.activeDeadlineSeconds | default $baseTpl.activeDeadlineSeconds }}
+      {{- end }}
+      {{- if or $jobConfig.completions $baseTpl.completions }}
+      completions: {{ $jobConfig.completions | default $baseTpl.completions }}
+      {{- end }}
+      {{- if or $jobConfig.parallelism $baseTpl.parallelism }}
+      parallelism: {{ $jobConfig.parallelism | default $baseTpl.parallelism }}
+      {{- end }}
+      template:
+        metadata:
+          {{- with $mergedPodAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          labels:
+            {{- include "delegated-operator-templates.labels" $labelContext | nindent 12 }}
+            {{- with $mergedLabels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+        spec:
+          restartPolicy: {{ $jobConfig.restartPolicy | default $baseTpl.restartPolicy | default "Never" }}
+          serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
+          {{- with $mergedPodSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: executor
+              image: "{{ $mergedImage.repository }}:{{ $mergedImage.tag | default $.Chart.AppVersion }}"
+              imagePullPolicy: {{ $mergedImage.pullPolicy }}
+              command:
+                - {{ `{{ _command }}` }}
+              args:
+              {{ `{% for arg in _args %}` }}
+                - {{ `{{ arg }}` }}
+              {{ `{% endfor %}` }}
+              {{- with $mergedContainerSecurityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              env:
+                {{- include "delegated-operator-deployments.env-vars-list" $envContext | nindent 16 }}
+              {{- with $mergedResources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with $mergedVolumeMounts }}
+              volumeMounts:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+          {{- with $mergedNodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedAffinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedTolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedVolumes }}
+          volumes:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
+{{- end }}
