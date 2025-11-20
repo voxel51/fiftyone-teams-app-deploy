@@ -850,8 +850,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.configMap.create | bool | `true` | Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`. |
 | delegatedOperatorJobTemplates.configMap.labels | object | `{}` | Additional labels for the generated service account. [Reference][labels-and-selectors]. |
 | delegatedOperatorJobTemplates.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates. Defaults to `release-name-fiftyone-teams-app-do-templates`. |
-| delegatedOperatorJobTemplates.jobs | object | `{"cpu-default":{}}` | On-Demand Delegated Operator Jobs. |
-| delegatedOperatorJobTemplates.jobs.cpu-default | object | `{}` | Default CPU-only batch job |
+| delegatedOperatorJobTemplates.jobs | object | `{}` | On-Demand Delegated Operator Jobs. |
 | delegatedOperatorJobTemplates.template | object | `{"activeDeadlineSeconds":null,"affinity":{},"backoffLimit":null,"completions":null,"containerSecurityContext":{},"env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"jobAnnotations":{},"labels":{},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{},"resources":{"limits":{},"requests":{}},"secretEnv":{},"tolerations":[],"ttlSecondsAfterFinished":null,"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorJobTemplates.template.activeDeadlineSeconds | optional | `nil` | Maximum of seconds a job should be able to run. [Reference][job-termination-and-cleanup]. |
 | delegatedOperatorJobTemplates.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |

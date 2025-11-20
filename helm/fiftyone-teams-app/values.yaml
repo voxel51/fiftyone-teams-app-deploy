@@ -895,9 +895,9 @@ delegatedOperatorJobTemplates:
     # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
     volumes: []
   # -- On-Demand Delegated Operator Jobs.
-  jobs:
-    # -- Default CPU-only batch job
-    cpu-default: {}
+  jobs: {}
+    # Default CPU-only batch job
+    # cpu-default: {}
     # GPU Examples Defined Below
     # https://learn.microsoft.com/en-us/azure/aks/use-nvidia-gpu
     # gpu-azure-aks:

@@ -2129,14 +2129,6 @@
         },
         "jobs": {
           "description": "On-Demand Delegated Operator Jobs.",
-          "properties": {
-            "cpu-default": {
-              "description": "Default CPU-only batch job",
-              "required": [],
-              "title": "cpu-default",
-              "type": "object"
-            }
-          },
           "required": [],
           "title": "jobs",
           "type": "object"

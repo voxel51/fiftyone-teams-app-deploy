@@ -323,6 +323,15 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 			"defaultValues",
 			nil,
 			func(subT gruntworkTesting.TestingT, data map[string]string) {
+				s.Empty(data, "Data should be empty")
+			},
+		},
+		{
+			"defaultValuesCpuEnabled",
+			map[string]string{
+				"delegatedOperatorJobTemplates.jobs.cpu-default.unused": "nil",
+			},
+			func(subT gruntworkTesting.TestingT, data map[string]string) {
 				var expectedJobConfig batchv1.Job
 				var actualJobConfig batchv1.Job
 
@@ -385,6 +394,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.volumeMounts[0].name":                      "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].name":                           "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].hostPath.path":                  "/test-volume",
+				"delegatedOperatorJobTemplates.jobs.cpu-default.unused":                            "nil",
 			},
 			func(subT gruntworkTesting.TestingT, data map[string]string) {
 				var expectedJobConfig batchv1.Job
@@ -450,6 +460,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.volumeMounts[0].name":                      "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].name":                           "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].hostPath.path":                  "/test-volume",
+				"delegatedOperatorJobTemplates.jobs.cpu-default.unused":                            "nil",
 
 				// Override All Values From Template
 				"delegatedOperatorJobTemplates.jobs.override-example.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "hostname",
@@ -546,6 +557,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.volumeMounts[0].name":                      "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].name":                           "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].hostPath.path":                  "/test-volume",
+				"delegatedOperatorJobTemplates.jobs.cpu-default.unused":                            "nil",
 
 				// Override All Values From Template
 				"delegatedOperatorJobTemplates.jobs.override-example.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "hostname",
