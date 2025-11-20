@@ -1,7 +1,7 @@
 services:
   fiftyone-app:
     depends_on: [mongodb]
-    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app-torch:${FIFTYONE_APP_VERSION}
+    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:${FIFTYONE_APP_VERSION}
   teams-api:
     depends_on: [mongodb]
     image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api:${FIFTYONE_TEAMS_API_VERSION}

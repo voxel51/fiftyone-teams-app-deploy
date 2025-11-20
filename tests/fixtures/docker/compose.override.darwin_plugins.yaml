@@ -1,3 +1,0 @@
-services:
-  teams-plugins:
-    platform: linux/amd64
