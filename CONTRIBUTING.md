@@ -46,9 +46,10 @@
     make auth
     ```
 
-  **NOTE:** You may be required to restart the Docker daemon in order for these
-  changes to be reflected. Watch for ImagePullBackoffs due to missing creds in
-  later steps (e.g., `make dev-keep`)!
+  **NOTE:** If minikube was already running, you may be required to restart it
+  in order for these changes to be reflected. If you get ImagePullBackoffs due
+  to missing creds in later steps (e.g., `make dev-keep`), try restarting
+  minikube as a first step.
 
 1. Install the asdf tools
 
@@ -86,9 +87,12 @@
     make helm-repo-update
     ```
 
-1. Run skaffold
+1. Create the Namespace and Run skaffold
 
     ```shell
+    export NAMESPACE=fiftyone-teams  # or whatever is in skaffold.env
+    kubectl create namespace "${NAMESPACE}" --context minikube
+
     make dev-keep
     ```
 
@@ -235,6 +239,14 @@ Helm and overrides (`values.yaml`).
 
 The license file contains the secrets.
 Copy the license file for our local dev organization.
+
+First ensure the namespace is created, matching what's defined in
+[skaffold.env](./skaffold.env):
+
+```shell
+export NAMESPACE=fiftyone-teams
+kubectl create namespace "${NAMESPACE}" --context minikube
+```
 
 For legacy CAS mode
 
@@ -428,6 +440,14 @@ To run released images from Docker hub, configure minikube and Skaffold
           }
         }
         ```
+
+1. Create the Kubernetes namespace configured in
+   [skaffold.env](./skaffold.env)
+
+    ```shell
+    export NAMESPACE=fiftyone-teams
+    kubectl create namespace "${NAMESPACE}" --context minikube
+    ```
 
 1. Create the imagePullSecret named `regcred`
 

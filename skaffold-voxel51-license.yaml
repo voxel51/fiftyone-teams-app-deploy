@@ -10,8 +10,4 @@ manifests:
 deploy:
   kubectl:
     defaultNamespace: '{{.FIFTYONE_TEAMS_NAMESPACE | default "fiftyone-teams"}}'
-    hooks:
-      before:
-        - host:
-            command: ["sh", "-c", 'kubectl create namespace ${FIFTYONE_TEAMS_NAMESPACE:-"fiftyone-teams"} || true']
   kubeContext: minikube
