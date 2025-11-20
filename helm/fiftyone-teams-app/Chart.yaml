@@ -6,7 +6,7 @@ description: |
   FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
   The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
 type: application
-version: 2.13.1
-appVersion: "v2.13.1"
+version: 2.14.0
+appVersion: "v2.14.0"
 icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
 kubeVersion: ">=1.31-0"
