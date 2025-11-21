@@ -52,7 +52,7 @@ func (s *apiServiceAccountTemplateTest) TestDisabled() {
 		{
 			"defaultValues",
 			nil,
-			fmt.Sprintf("%s-fiftyone-teams-app-do-management", s.releaseName),
+			fmt.Sprintf("%s-fiftyone-teams-app-teams-api", s.releaseName),
 		},
 		{
 			"overrideServiceAccountName",
@@ -101,7 +101,7 @@ func (s *apiServiceAccountTemplateTest) TestMetadataName() {
 		{
 			"defaultValues",
 			nil,
-			fmt.Sprintf("%s-fiftyone-teams-app-do-management", s.releaseName),
+			fmt.Sprintf("%s-fiftyone-teams-app-teams-api", s.releaseName),
 		},
 		{
 			"overrideName",
@@ -242,9 +242,9 @@ func (s *apiServiceAccountTemplateTest) TestMetadataLabels() {
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 				"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 				"app.kubernetes.io/managed-by": "Helm",
-				"app.kubernetes.io/name":       fmt.Sprintf("%s-fiftyone-teams-app-do-management", s.releaseName),
+				"app.kubernetes.io/name":       fmt.Sprintf("%s-fiftyone-teams-app-teams-api", s.releaseName),
 				"app.kubernetes.io/instance":   "fiftyone-test",
-				"app.voxel51.com/component":    "on-demand-delegated-operators",
+				"app.voxel51.com/component":    "teams-api",
 			},
 		},
 		{
@@ -259,7 +259,7 @@ func (s *apiServiceAccountTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-service-account-name",
 				"app.kubernetes.io/instance":   "fiftyone-test",
-				"app.voxel51.com/component":    "on-demand-delegated-operators",
+				"app.voxel51.com/component":    "teams-api",
 				"color":                        "blue",
 			},
 		},

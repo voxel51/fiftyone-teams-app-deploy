@@ -2408,7 +2408,7 @@ func (s *deploymentApiTemplateTest) TestServiceAccountName() {
 		{
 			"defaultValues",
 			nil,
-			fmt.Sprintf("%s-fiftyone-teams-app-do-management", s.releaseName),
+			fmt.Sprintf("%s-fiftyone-teams-app-teams-api", s.releaseName),
 		},
 		{
 			"overrideServiceAccountName",

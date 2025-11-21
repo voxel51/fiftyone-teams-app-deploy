@@ -56,7 +56,7 @@ func (s *apiRoleBindingTemplateTest) TestDisabled() {
 			fmt.Sprintf("%s-fiftyone-teams-app-do-management", s.releaseName),
 		},
 		{
-			"overrideServiceAccountName",
+			"overrideRbacDisabled",
 			map[string]string{
 				"apiSettings.rbac.create": "false",
 			},
@@ -300,7 +300,7 @@ func (s *apiRoleBindingTemplateTest) TestSubjects() {
 				expectedSubjectsJson := fmt.Sprintf(`[
           {
             "kind": "ServiceAccount",
-            "name": "%s-fiftyone-teams-app-do-management",
+            "name": "%s-fiftyone-teams-app-teams-api",
             "namespace": "fiftyone-teams"
           }
         ]`, s.releaseName)
@@ -319,7 +319,7 @@ func (s *apiRoleBindingTemplateTest) TestSubjects() {
 				expectedSubjectsJson := fmt.Sprintf(`[
           {
             "kind": "ServiceAccount",
-            "name": "%s-fiftyone-teams-app-do-management",
+            "name": "%s-fiftyone-teams-app-teams-api",
             "namespace": "test-namespace-name"
           }
         ]`, s.releaseName)

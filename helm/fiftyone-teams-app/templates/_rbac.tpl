@@ -29,7 +29,7 @@ Create the name of the K8s Job Service Account
 {{- if .Values.apiSettings.rbac.serviceAccount.name }}
 {{- .Values.apiSettings.rbac.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- $name := "do-management" }}
+{{- $name := "teams-api" }}
 {{- printf "%s-%s" (include "fiftyone-teams-app.fullname" .) $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
@@ -67,7 +67,7 @@ Create the labels of the K8s Job Delegation Service Account
 {{- include "fiftyone-teams-app.commonLabels" . }}
 app.kubernetes.io/name: {{ include "rbac-do-templates.service-account-name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.voxel51.com/component: on-demand-delegated-operators
+app.voxel51.com/component: teams-api
 {{- with .Values.apiSettings.rbac.serviceAccount.labels }}
 {{ toYaml . }}
 {{- end }}
