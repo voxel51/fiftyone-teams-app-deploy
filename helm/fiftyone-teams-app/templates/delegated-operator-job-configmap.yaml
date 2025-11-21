@@ -105,7 +105,7 @@ data:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
               env:
-                {{- include "delegated-operator-deployments.env-vars-list" $envContext | nindent 16 }}
+                {{- include "delegated-operator-templates.env-vars-list" $envContext | nindent 16 }}
               {{- with $mergedResources }}
               resources:
                 {{- toYaml . | nindent 16 }}
