@@ -57,7 +57,7 @@ func (s *apiServiceAccountTemplateTest) TestDisabled() {
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.create": "false",
+				"apiSettings.rbac.create": "false",
 			},
 			"",
 		},
@@ -106,7 +106,7 @@ func (s *apiServiceAccountTemplateTest) TestMetadataName() {
 		{
 			"overrideName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.serviceAccount.name": "test-service-account-name",
+				"apiSettings.rbac.serviceAccount.name": "test-service-account-name",
 			},
 			"test-service-account-name",
 		},
@@ -184,7 +184,7 @@ func (s *apiServiceAccountTemplateTest) TestMetadataAnnotations() {
 		{
 			"overrideAnnotations",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.serviceAccount.annotations.annotation-1": "annotation-1-value",
+				"apiSettings.rbac.serviceAccount.annotations.annotation-1": "annotation-1-value",
 			},
 			map[string]string{
 				"annotation-1": "annotation-1-value",
@@ -250,8 +250,8 @@ func (s *apiServiceAccountTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.serviceAccount.name":         "test-service-account-name",
-				"delegatedOperatorJobTemplates.rbac.serviceAccount.labels.color": "blue",
+				"apiSettings.rbac.serviceAccount.name":         "test-service-account-name",
+				"apiSettings.rbac.serviceAccount.labels.color": "blue",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -300,7 +300,7 @@ func (s *apiServiceAccountTemplateTest) TestAutomountServiceAccountToken() {
 		{
 			"overrideAutomount",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.serviceAccount.automount": "false",
+				"apiSettings.rbac.serviceAccount.automount": "false",
 			},
 			true, // We currently don't allow for the overriding of AutomountServiceAccountToken. `initContainers` use them to lookup namespaces.
 		},

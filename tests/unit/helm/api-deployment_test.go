@@ -2413,22 +2413,22 @@ func (s *deploymentApiTemplateTest) TestServiceAccountName() {
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.serviceAccount.name": "test-service-account",
+				"apiSettings.rbac.serviceAccount.name": "test-service-account",
 			},
 			"test-service-account",
 		},
 		{
 			"overrideRbacDisabled",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.create": "false",
+				"apiSettings.rbac.create": "false",
 			},
 			"fiftyone-teams", // should fallback to the original service account
 		},
 		{
 			"overrideRbacDisabledServiceAccountName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.create": "false",
-				"serviceAccount.name":                       "test-service-account",
+				"apiSettings.rbac.create": "false",
+				"serviceAccount.name":     "test-service-account",
 			},
 			"test-service-account",
 		},

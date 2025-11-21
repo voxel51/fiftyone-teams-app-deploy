@@ -2,8 +2,8 @@
 Create the name of the K8s Job Delegation Role
 */}}
 {{- define "rbac-do-templates.role-name" }}
-{{- if .Values.delegatedOperatorJobTemplates.rbac.role.name }}
-{{- .Values.delegatedOperatorJobTemplates.rbac.role.name | trunc 63 | trimSuffix "-" }}
+{{- if .Values.apiSettings.rbac.role.name }}
+{{- .Values.apiSettings.rbac.role.name | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- $name := "do-management" }}
 {{- printf "%s-%s" (include "fiftyone-teams-app.fullname" .) $name | trunc 63 | trimSuffix "-" }}
@@ -14,8 +14,8 @@ Create the name of the K8s Job Delegation Role
 Create the name of the K8s Job Delegation Role Binding
 */}}
 {{- define "rbac-do-templates.role-binding-name" }}
-{{- if .Values.delegatedOperatorJobTemplates.rbac.roleBinding.name }}
-{{- .Values.delegatedOperatorJobTemplates.rbac.roleBinding.name | trunc 63 | trimSuffix "-" }}
+{{- if .Values.apiSettings.rbac.roleBinding.name }}
+{{- .Values.apiSettings.rbac.roleBinding.name | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- $name := "do-management" }}
 {{- printf "%s-%s" (include "fiftyone-teams-app.fullname" .) $name | trunc 63 | trimSuffix "-" }}
@@ -26,8 +26,8 @@ Create the name of the K8s Job Delegation Role Binding
 Create the name of the K8s Job Service Account
 */}}
 {{- define "rbac-do-templates.service-account-name" }}
-{{- if .Values.delegatedOperatorJobTemplates.rbac.serviceAccount.name }}
-{{- .Values.delegatedOperatorJobTemplates.rbac.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- if .Values.apiSettings.rbac.serviceAccount.name }}
+{{- .Values.apiSettings.rbac.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- $name := "do-management" }}
 {{- printf "%s-%s" (include "fiftyone-teams-app.fullname" .) $name | trunc 63 | trimSuffix "-" }}
@@ -42,7 +42,7 @@ Create the labels of the K8s Job Delegation Role
 app.kubernetes.io/name: {{ include "rbac-do-templates.role-name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.voxel51.com/component: on-demand-delegated-operators
-{{- with .Values.delegatedOperatorJobTemplates.rbac.role.labels }}
+{{- with .Values.apiSettings.rbac.role.labels }}
 {{ toYaml . }}
 {{- end }}
 {{- end }}
@@ -55,7 +55,7 @@ Create the labels of the K8s Job Delegation Role Binding
 app.kubernetes.io/name: {{ include "rbac-do-templates.role-binding-name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.voxel51.com/component: on-demand-delegated-operators
-{{- with .Values.delegatedOperatorJobTemplates.rbac.roleBinding.labels }}
+{{- with .Values.apiSettings.rbac.roleBinding.labels }}
 {{ toYaml . }}
 {{- end }}
 {{- end }}
@@ -68,7 +68,7 @@ Create the labels of the K8s Job Delegation Service Account
 app.kubernetes.io/name: {{ include "rbac-do-templates.service-account-name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.voxel51.com/component: on-demand-delegated-operators
-{{- with .Values.delegatedOperatorJobTemplates.rbac.serviceAccount.labels }}
+{{- with .Values.apiSettings.rbac.serviceAccount.labels }}
 {{ toYaml . }}
 {{- end }}
 {{- end }}

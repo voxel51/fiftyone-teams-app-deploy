@@ -58,7 +58,7 @@ func (s *apiRoleTemplateTest) TestDisabled() {
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.create": "false",
+				"apiSettings.rbac.create": "false",
 			},
 			"",
 		},
@@ -107,7 +107,7 @@ func (s *apiRoleTemplateTest) TestMetadataName() {
 		{
 			"overrideName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.role.name": "test-service-account-name",
+				"apiSettings.rbac.role.name": "test-service-account-name",
 			},
 			"test-service-account-name",
 		},
@@ -185,7 +185,7 @@ func (s *apiRoleTemplateTest) TestMetadataAnnotations() {
 		{
 			"overrideAnnotations",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.role.annotations.annotation-1": "annotation-1-value",
+				"apiSettings.rbac.role.annotations.annotation-1": "annotation-1-value",
 			},
 			map[string]string{
 				"annotation-1": "annotation-1-value",
@@ -251,8 +251,8 @@ func (s *apiRoleTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.role.name":         "test-service-account-name",
-				"delegatedOperatorJobTemplates.rbac.role.labels.color": "blue",
+				"apiSettings.rbac.role.name":         "test-service-account-name",
+				"apiSettings.rbac.role.labels.color": "blue",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),

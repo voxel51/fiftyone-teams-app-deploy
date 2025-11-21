@@ -58,7 +58,7 @@ func (s *apiRoleBindingTemplateTest) TestDisabled() {
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.create": "false",
+				"apiSettings.rbac.create": "false",
 			},
 			"",
 		},
@@ -107,7 +107,7 @@ func (s *apiRoleBindingTemplateTest) TestMetadataName() {
 		{
 			"overrideName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.roleBinding.name": "test-role-binding-name",
+				"apiSettings.rbac.roleBinding.name": "test-role-binding-name",
 			},
 			"test-role-binding-name",
 		},
@@ -185,7 +185,7 @@ func (s *apiRoleBindingTemplateTest) TestMetadataAnnotations() {
 		{
 			"overrideAnnotations",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.roleBinding.annotations.annotation-1": "annotation-1-value",
+				"apiSettings.rbac.roleBinding.annotations.annotation-1": "annotation-1-value",
 			},
 			map[string]string{
 				"annotation-1": "annotation-1-value",
@@ -251,8 +251,8 @@ func (s *apiRoleBindingTemplateTest) TestMetadataLabels() {
 		{
 			"overrideMetadataLabels",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.roleBinding.name":         "test-service-account-name",
-				"delegatedOperatorJobTemplates.rbac.roleBinding.labels.color": "blue",
+				"apiSettings.rbac.roleBinding.name":         "test-service-account-name",
+				"apiSettings.rbac.roleBinding.labels.color": "blue",
 			},
 			map[string]string{
 				"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
@@ -332,7 +332,7 @@ func (s *apiRoleBindingTemplateTest) TestSubjects() {
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.serviceAccount.name": "test-service-account-name",
+				"apiSettings.rbac.serviceAccount.name": "test-service-account-name",
 			},
 			func(subjects []rbacv1.Subject) {
 				expectedSubjectsJson := `[
@@ -392,7 +392,7 @@ func (s *apiRoleBindingTemplateTest) TestRoleRef() {
 		{
 			"overrideRoleName",
 			map[string]string{
-				"delegatedOperatorJobTemplates.rbac.role.name": "test-role-name",
+				"apiSettings.rbac.role.name": "test-role-name",
 			},
 			func(roleRef rbacv1.RoleRef) {
 				expectedRoleRefJson := `{

@@ -694,6 +694,19 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | apiSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-api`. |
 | apiSettings.podDisruptionBudget.minAvailable | string | `nil` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
 | apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
+| apiSettings.rbac | object | `{"create":true,"role":{"annotations":{},"labels":{},"name":""},"roleBinding":{"annotations":{},"create":true,"labels":{},"name":""},"serviceAccount":{"annotations":{},"create":true,"labels":{},"name":""}}` | RBAC roles, bindings, and service accounts which will be used to submit on-demand delegated operators to the kubernetes API. If configured, these will be used by the `teams-api` pods. |
+| apiSettings.rbac.create | bool | `true` | Controls whether to create the `Role`, `RoleBinding`, and `ServiceAccount` for on-demand delegated-operator submission. |
+| apiSettings.rbac.role.annotations | object | `{}` | `Role` annotations. [Reference][annotations]. |
+| apiSettings.rbac.role.labels | object | `{}` | Additional labels for the generated `Role`. [Reference][labels-and-selectors]. |
+| apiSettings.rbac.role.name | string | `""` | Name of the `Role` (existing or to be created) in the namespace `namespace.name` used for DO management. Defaults to `release-name-fiftyone-teams-app-do-management`. |
+| apiSettings.rbac.roleBinding.annotations | object | `{}` | `RoleBinding` annotations. [Reference][annotations]. |
+| apiSettings.rbac.roleBinding.create | bool | `true` | Controls whether to create the `RoleBinding` named `apiSettings.rbac.roleBinding.name`. |
+| apiSettings.rbac.roleBinding.labels | object | `{}` | Additional labels for the generated `RoleBinding`. [Reference][labels-and-selectors]. |
+| apiSettings.rbac.roleBinding.name | string | `""` | Name of the `RoleBinding` (existing or to be created) in the namespace `namespace.name` used for DO management. Defaults to `release-name-fiftyone-teams-app-do-management`. |
+| apiSettings.rbac.serviceAccount.annotations | object | `{}` | `ServiceAccount` annotations. [Reference][annotations]. |
+| apiSettings.rbac.serviceAccount.create | bool | `true` | Controls whether to create the `ServiceAccount` named `apiSettings.rbac.serviceAccount.name`. |
+| apiSettings.rbac.serviceAccount.labels | object | `{}` | Additional labels for the generated `ServiceAccount`. [Reference][labels-and-selectors]. |
+| apiSettings.rbac.serviceAccount.name | string | `""` | Name of the `ServiceAccount` (existing or to be created) in the namespace `namespace.name` used for DO management. Defaults to `release-name-fiftyone-teams-app-teams-api`. |
 | apiSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-api`. [Reference][probes]. |
 | apiSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes]. |
 | apiSettings.readiness.timeoutSeconds | int | `5` | Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes]. |
@@ -858,19 +871,6 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.configMap.labels | object | `{}` | Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors]. |
 | delegatedOperatorJobTemplates.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates. Defaults to `release-name-fiftyone-teams-app-do-templates`. |
 | delegatedOperatorJobTemplates.jobs | object | `{}` | On-Demand Delegated Operator Jobs. |
-| delegatedOperatorJobTemplates.rbac | object | `{"create":true,"role":{"annotations":{},"labels":{},"name":""},"roleBinding":{"annotations":{},"create":true,"labels":{},"name":""},"serviceAccount":{"annotations":{},"create":true,"labels":{},"name":""}}` | RBAC roles, bindings, and service accounts which will be used to submit on-demand delegated operators to the kubernetes API. If configured, these will be used by the `teams-api` pods. |
-| delegatedOperatorJobTemplates.rbac.create | bool | `true` | Controls whether to create the `Role`, `RoleBinding`, and `ServiceAccount` for on-demand delegated-operator submission. |
-| delegatedOperatorJobTemplates.rbac.role.annotations | object | `{}` | `Role` annotations. [Reference][annotations]. |
-| delegatedOperatorJobTemplates.rbac.role.labels | object | `{}` | Additional labels for the generated `Role`. [Reference][labels-and-selectors]. |
-| delegatedOperatorJobTemplates.rbac.role.name | string | `""` | Name of the `Role` (existing or to be created) in the namespace `namespace.name` used for DO management. Defaults to `release-name-fiftyone-teams-app-do-management`. |
-| delegatedOperatorJobTemplates.rbac.roleBinding.annotations | object | `{}` | `RoleBinding` annotations. [Reference][annotations]. |
-| delegatedOperatorJobTemplates.rbac.roleBinding.create | bool | `true` | Controls whether to create the `RoleBinding` named `delegatedOperatorJobTemplates.rbac.roleBinding.name`. |
-| delegatedOperatorJobTemplates.rbac.roleBinding.labels | object | `{}` | Additional labels for the generated `RoleBinding`. [Reference][labels-and-selectors]. |
-| delegatedOperatorJobTemplates.rbac.roleBinding.name | string | `""` | Name of the `RoleBinding` (existing or to be created) in the namespace `namespace.name` used for DO management. Defaults to `release-name-fiftyone-teams-app-do-management`. |
-| delegatedOperatorJobTemplates.rbac.serviceAccount.annotations | object | `{}` | `ServiceAccount` annotations. [Reference][annotations]. |
-| delegatedOperatorJobTemplates.rbac.serviceAccount.create | bool | `true` | Controls whether to create the `ServiceAccount` named `delegatedOperatorJobTemplates.rbac.serviceAccount.name`. |
-| delegatedOperatorJobTemplates.rbac.serviceAccount.labels | object | `{}` | Additional labels for the generated `ServiceAccount`. [Reference][labels-and-selectors]. |
-| delegatedOperatorJobTemplates.rbac.serviceAccount.name | string | `""` | Name of the `ServiceAccount` (existing or to be created) in the namespace `namespace.name` used for DO management. Defaults to `release-name-fiftyone-teams-app-do-management`. |
 | delegatedOperatorJobTemplates.template | object | `{"activeDeadlineSeconds":null,"affinity":{},"backoffLimit":null,"completions":null,"containerSecurityContext":{},"env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"jobAnnotations":{},"labels":{},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{},"resources":{"limits":{},"requests":{}},"secretEnv":{},"tolerations":[],"ttlSecondsAfterFinished":null,"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorJobTemplates.template.activeDeadlineSeconds | optional | `nil` | Maximum of seconds a job should be able to run. [Reference][job-termination-and-cleanup]. |
 | delegatedOperatorJobTemplates.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
