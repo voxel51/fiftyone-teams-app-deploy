@@ -43,7 +43,7 @@ deploy:
         chartPath: helm/fiftyone-teams-app
         version: 2.14.0
         createNamespace: true
-        namespace: fiftyone-teams
+        namespace: '{{.FIFTYONE_TEAMS_NAMESPACE | default "fiftyone-teams" }}'
         overrides:
           # FiftyOne Teams API (teams-api)
           apiSettings:
