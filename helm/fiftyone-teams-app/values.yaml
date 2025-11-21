@@ -803,10 +803,48 @@ delegatedOperatorJobTemplates:
     # -- Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`.
     create: true
     # -- Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.
-    # Defaults to `release-name-fiftyone-teams-app-do-templates`.
+    # Defaults to `release-name-fiftyone-teams-app-do-management`.
     name: ""
-    # -- Additional labels for the generated service account. [Reference][labels-and-selectors].
+    # -- Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].
     labels: {}
+
+  # -- RBAC roles, bindings, and service accounts which will be used to
+  # submit on-demand delegated operators to the kubernetes API.
+  # If configured, these will be used by the `teams-api` pods.
+  rbac:
+    # -- Controls whether to create the `Role`, `RoleBinding`,
+    # and `ServiceAccount` for on-demand delegated-operator submission.
+    create: true
+    role:
+      # -- `Role` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Name of the `Role` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-do-management`.
+      name: ""
+      # -- Additional labels for the generated `Role`. [Reference][labels-and-selectors].
+      labels: {}
+    roleBinding:
+      # -- `RoleBinding` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Controls whether to create the `RoleBinding` named
+      # `delegatedOperatorJobTemplates.rbac.roleBinding.name`.
+      create: true
+      # -- Name of the `RoleBinding` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-do-management`.
+      name: ""
+      # -- Additional labels for the generated `RoleBinding`. [Reference][labels-and-selectors].
+      labels: {}
+    serviceAccount:
+      # -- `ServiceAcount` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Controls whether to create the `ServiceAcount` named
+      # `delegatedOperatorJobTemplates.rbac.serviceAccount.name`.
+      create: true
+      # -- Name of the `ServiceAcount` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-do-management`.
+      name: ""
+      # -- Additional labels for the generated `ServiceAcount`. [Reference][labels-and-selectors].
+      labels: {}
 
   # -- A common template applied to all deployments. Each deployment can
   # then override individual fields as needed by the operator.

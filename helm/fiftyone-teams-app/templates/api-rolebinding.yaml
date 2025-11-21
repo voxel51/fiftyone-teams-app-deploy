@@ -1,0 +1,21 @@
+{{- if .Values.delegatedOperatorJobTemplates.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "rbac-do-templates.role-binding-name" . }}
+  namespace: {{ .Values.namespace.name }}
+  {{- with .Values.delegatedOperatorJobTemplates.rbac.roleBinding.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "rbac-do-templates.role-binding-labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "rbac-do-templates.service-account-name" . }}
+    namespace: {{ .Values.namespace.name }}
+roleRef:
+  kind: Role
+  name: {{ include "rbac-do-templates.role-name" . }}
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

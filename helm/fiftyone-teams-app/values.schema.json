@@ -2110,14 +2110,14 @@
               "type": "boolean"
             },
             "labels": {
-              "description": "Additional labels for the generated service account. [Reference][labels-and-selectors].",
+              "description": "Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].",
               "required": [],
               "title": "labels",
               "type": "object"
             },
             "name": {
               "default": "",
-              "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.\nDefaults to `release-name-fiftyone-teams-app-do-templates`.",
+              "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
               "required": [],
               "title": "name",
               "type": "string"
@@ -2131,6 +2131,113 @@
           "description": "On-Demand Delegated Operator Jobs.",
           "required": [],
           "title": "jobs",
+          "type": "object"
+        },
+        "rbac": {
+          "description": "RBAC roles, bindings, and service accounts which will be used to\nsubmit on-demand delegated operators to the kubernetes API.\nIf configured, these will be used by the `teams-api` pods.",
+          "properties": {
+            "create": {
+              "default": true,
+              "description": "Controls whether to create the `Role`, `RoleBinding`,\nand `ServiceAccount` for on-demand delegated-operator submission.",
+              "required": [],
+              "title": "create",
+              "type": "boolean"
+            },
+            "role": {
+              "properties": {
+                "annotations": {
+                  "description": "`Role` annotations. [Reference][annotations].",
+                  "required": [],
+                  "title": "annotations",
+                  "type": "object"
+                },
+                "labels": {
+                  "description": "Additional labels for the generated `Role`. [Reference][labels-and-selectors].",
+                  "required": [],
+                  "title": "labels",
+                  "type": "object"
+                },
+                "name": {
+                  "default": "",
+                  "description": "Name of the `Role` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
+                  "required": [],
+                  "title": "name",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "role",
+              "type": "object"
+            },
+            "roleBinding": {
+              "properties": {
+                "annotations": {
+                  "description": "`RoleBinding` annotations. [Reference][annotations].",
+                  "required": [],
+                  "title": "annotations",
+                  "type": "object"
+                },
+                "create": {
+                  "default": true,
+                  "description": "Controls whether to create the `RoleBinding` named\n`delegatedOperatorJobTemplates.rbac.roleBinding.name`.",
+                  "required": [],
+                  "title": "create",
+                  "type": "boolean"
+                },
+                "labels": {
+                  "description": "Additional labels for the generated `RoleBinding`. [Reference][labels-and-selectors].",
+                  "required": [],
+                  "title": "labels",
+                  "type": "object"
+                },
+                "name": {
+                  "default": "",
+                  "description": "Name of the `RoleBinding` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
+                  "required": [],
+                  "title": "name",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "roleBinding",
+              "type": "object"
+            },
+            "serviceAccount": {
+              "properties": {
+                "annotations": {
+                  "description": "`ServiceAcount` annotations. [Reference][annotations].",
+                  "required": [],
+                  "title": "annotations",
+                  "type": "object"
+                },
+                "create": {
+                  "default": true,
+                  "description": "Controls whether to create the `ServiceAcount` named\n`delegatedOperatorJobTemplates.rbac.serviceAccount.name`.",
+                  "required": [],
+                  "title": "create",
+                  "type": "boolean"
+                },
+                "labels": {
+                  "description": "Additional labels for the generated `ServiceAcount`. [Reference][labels-and-selectors].",
+                  "required": [],
+                  "title": "labels",
+                  "type": "object"
+                },
+                "name": {
+                  "default": "",
+                  "description": "Name of the `ServiceAcount` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
+                  "required": [],
+                  "title": "name",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "serviceAccount",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "rbac",
           "type": "object"
         },
         "template": {

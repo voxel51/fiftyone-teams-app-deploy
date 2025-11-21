@@ -1162,11 +1162,11 @@ func (s *deploymentApiTemplateTest) TestContainerName() {
 			"teams-api",
 		},
 		{
-			"overrideServiceAccountName",
+			"overrideServiceName",
 			map[string]string{
-				"apiSettings.service.name": "test-service-account",
+				"apiSettings.service.name": "test-service",
 			},
-			"test-service-account",
+			"test-service",
 		},
 	}
 
@@ -2408,12 +2408,27 @@ func (s *deploymentApiTemplateTest) TestServiceAccountName() {
 		{
 			"defaultValues",
 			nil,
-			"fiftyone-teams",
+			fmt.Sprintf("%s-fiftyone-teams-app-do-management", s.releaseName),
 		},
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"serviceAccount.name": "test-service-account",
+				"delegatedOperatorJobTemplates.rbac.serviceAccount.name": "test-service-account",
+			},
+			"test-service-account",
+		},
+		{
+			"overrideRbacDisabled",
+			map[string]string{
+				"delegatedOperatorJobTemplates.rbac.create": "false",
+			},
+			"fiftyone-teams", // should fallback to the original service account
+		},
+		{
+			"overrideRbacDisabledServiceAccountName",
+			map[string]string{
+				"delegatedOperatorJobTemplates.rbac.create": "false",
+				"serviceAccount.name":                       "test-service-account",
 			},
 			"test-service-account",
 		},
