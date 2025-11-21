@@ -803,7 +803,7 @@ delegatedOperatorJobTemplates:
     # -- Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`.
     create: true
     # -- Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.
-    # Defaults to `release-name-fiftyone-teams-app-do-management`.
+    # Defaults to `release-name-fiftyone-teams-app-do-templates`.
     name: ""
     # -- Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].
     labels: {}

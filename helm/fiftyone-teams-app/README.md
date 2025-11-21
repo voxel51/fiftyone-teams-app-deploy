@@ -856,7 +856,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.configMap.annotations | object | `{}` | ConfigMap annotations. [Reference][annotations]. |
 | delegatedOperatorJobTemplates.configMap.create | bool | `true` | Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`. |
 | delegatedOperatorJobTemplates.configMap.labels | object | `{}` | Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors]. |
-| delegatedOperatorJobTemplates.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates. Defaults to `release-name-fiftyone-teams-app-do-management`. |
+| delegatedOperatorJobTemplates.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates. Defaults to `release-name-fiftyone-teams-app-do-templates`. |
 | delegatedOperatorJobTemplates.jobs | object | `{}` | On-Demand Delegated Operator Jobs. |
 | delegatedOperatorJobTemplates.rbac | object | `{"create":true,"role":{"annotations":{},"labels":{},"name":""},"roleBinding":{"annotations":{},"create":true,"labels":{},"name":""},"serviceAccount":{"annotations":{},"create":true,"labels":{},"name":""}}` | RBAC roles, bindings, and service accounts which will be used to submit on-demand delegated operators to the kubernetes API. If configured, these will be used by the `teams-api` pods. |
 | delegatedOperatorJobTemplates.rbac.create | bool | `true` | Controls whether to create the `Role`, `RoleBinding`, and `ServiceAccount` for on-demand delegated-operator submission. |

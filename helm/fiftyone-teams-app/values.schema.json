@@ -2117,7 +2117,7 @@
             },
             "name": {
               "default": "",
-              "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
+              "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.\nDefaults to `release-name-fiftyone-teams-app-do-templates`.",
               "required": [],
               "title": "name",
               "type": "string"
