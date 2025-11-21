@@ -835,15 +835,15 @@ delegatedOperatorJobTemplates:
       # -- Additional labels for the generated `RoleBinding`. [Reference][labels-and-selectors].
       labels: {}
     serviceAccount:
-      # -- `ServiceAcount` annotations. [Reference][annotations].
+      # -- `ServiceAccount` annotations. [Reference][annotations].
       annotations: {}
-      # -- Controls whether to create the `ServiceAcount` named
+      # -- Controls whether to create the `ServiceAccount` named
       # `delegatedOperatorJobTemplates.rbac.serviceAccount.name`.
       create: true
-      # -- Name of the `ServiceAcount` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # -- Name of the `ServiceAccount` (existing or to be created) in the namespace `namespace.name` used for DO management.
       # Defaults to `release-name-fiftyone-teams-app-do-management`.
       name: ""
-      # -- Additional labels for the generated `ServiceAcount`. [Reference][labels-and-selectors].
+      # -- Additional labels for the generated `ServiceAccount`. [Reference][labels-and-selectors].
       labels: {}
 
   # -- A common template applied to all deployments. Each deployment can

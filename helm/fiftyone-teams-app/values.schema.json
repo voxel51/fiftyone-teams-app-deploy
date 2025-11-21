@@ -2205,27 +2205,27 @@
             "serviceAccount": {
               "properties": {
                 "annotations": {
-                  "description": "`ServiceAcount` annotations. [Reference][annotations].",
+                  "description": "`ServiceAccount` annotations. [Reference][annotations].",
                   "required": [],
                   "title": "annotations",
                   "type": "object"
                 },
                 "create": {
                   "default": true,
-                  "description": "Controls whether to create the `ServiceAcount` named\n`delegatedOperatorJobTemplates.rbac.serviceAccount.name`.",
+                  "description": "Controls whether to create the `ServiceAccount` named\n`delegatedOperatorJobTemplates.rbac.serviceAccount.name`.",
                   "required": [],
                   "title": "create",
                   "type": "boolean"
                 },
                 "labels": {
-                  "description": "Additional labels for the generated `ServiceAcount`. [Reference][labels-and-selectors].",
+                  "description": "Additional labels for the generated `ServiceAccount`. [Reference][labels-and-selectors].",
                   "required": [],
                   "title": "labels",
                   "type": "object"
                 },
                 "name": {
                   "default": "",
-                  "description": "Name of the `ServiceAcount` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
+                  "description": "Name of the `ServiceAccount` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
                   "required": [],
                   "title": "name",
                   "type": "string"
