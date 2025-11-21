@@ -39,6 +39,8 @@ spec:
               value: "http://teams-api:80"
             - name: FIFTYONE_DATABASE_ADMIN
               value: "false"
+            - name: FIFTYONE_INTERNAL_SERVICE
+              value: "true"
             - name: FIFTYONE_DATABASE_NAME
               valueFrom:
                 secretKeyRef:
