@@ -27,6 +27,13 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.14+ RBAC Changes
+
+FiftyOne Enterprise 2.14+ introduces custom roles and role bindings to allow the
+`teams-api` deployment to create, update, and remove batch jobs and pods for
+kubernetes-based
+[on-demand delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+
 ### Version 2.11+ On-Demand Delegated Operator Executors
 
 FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator

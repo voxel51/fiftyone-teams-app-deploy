@@ -14,7 +14,7 @@ Create the name of the ConfigMap to use
 {{- include "fiftyone-teams-app.commonLabels" . }}
 app.kubernetes.io/name: {{ include "delegated-operator-templates.config-map-name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.voxel51.com/component: do-templates
+app.voxel51.com/component: on-demand-delegated-operators
 {{- with .Values.delegatedOperatorJobTemplates.configMap.labels }}
 {{ toYaml . }}
 {{- end }}
