@@ -39,12 +39,14 @@ data:
   {{- $mergedTolerations := $jobConfig.tolerations | default $baseTpl.tolerations }}
   {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts }}
   {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes }}
+  {{- /* Trunc at 48 for the random ID to be generated via API */ -}}
+  {{- $metadataName := kebabcase $jobName | trunc 48 }}
 
   {{ $jobName }}.yaml: |
     apiVersion: batch/v1
     kind: Job
     metadata:
-      name: {{ $jobName }}-{{ `{{ _id }}` }}
+      name: {{ $metadataName }}-{{ `{{ _id }}` }}
       {{- with $mergedJobAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
