@@ -2411,6 +2411,14 @@ func (s *deploymentApiTemplateTest) TestServiceAccountName() {
 			fmt.Sprintf("%s-fiftyone-teams-app-teams-api", s.releaseName),
 		},
 		{
+			"overrideServiceAccountNameAndRbacDisabled",
+			map[string]string{
+				"apiSettings.rbac.create":              "false",
+				"apiSettings.rbac.serviceAccount.name": "test-service-account",
+			},
+			"test-service-account",
+		},
+		{
 			"overrideServiceAccountName",
 			map[string]string{
 				"apiSettings.rbac.serviceAccount.name": "test-service-account",

@@ -1,5 +1,5 @@
 {{- $serviceAccountName := include "fiftyone-teams-app.serviceAccountName" . }}
-{{- if .Values.apiSettings.rbac.create }}
+{{- if or (.Values.apiSettings.rbac.create) (.Values.apiSettings.rbac.serviceAccount.name) }}
 {{- $serviceAccountName = include "rbac-do-templates.service-account-name" . }}
 {{- end }}
 apiVersion: apps/v1
