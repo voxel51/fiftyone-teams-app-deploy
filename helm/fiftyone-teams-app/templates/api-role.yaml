@@ -2,14 +2,14 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "rbac-do-templates.role-name" . }}
+  name: {{ include "teams-api-rbac.role-name" . }}
   namespace: {{ .Values.namespace.name }}
   {{- with .Values.apiSettings.rbac.role.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    {{- include "rbac-do-templates.role-labels" . | nindent 4 }}
+    {{- include "teams-api-rbac.role-labels" . | nindent 4 }}
 rules:
   - apiGroups: ["batch"]
     resources: ["jobs"]
