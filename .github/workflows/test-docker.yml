@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6.0.0
       - name: install asdf & tools
-        uses: asdf-vm/actions/install@v4.0.0
+        uses: asdf-vm/actions/install@v4.0.1
       - name: Run unit tests
         shell: bash
         run: |
@@ -34,7 +34,7 @@ jobs:
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
-        uses: asdf-vm/actions/install@v4.0.0
+        uses: asdf-vm/actions/install@v4.0.1
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v3
@@ -71,7 +71,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6.0.0
       - name: install asdf & tools
-        uses: asdf-vm/actions/install@v4.0.0
+        uses: asdf-vm/actions/install@v4.0.1
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v3
