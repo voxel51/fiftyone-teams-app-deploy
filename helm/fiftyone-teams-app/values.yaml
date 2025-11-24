@@ -185,7 +185,7 @@ apiSettings:
   podSecurityContext: {}
   # -- RBAC roles, bindings, and service accounts which will be used to
   # submit on-demand delegated operators to the kubernetes API.
-  # If configured, these will be used by the `teams-api` pods.
+  # If `apiSettings.rbac.create=true`, these will be used by the `teams-api` pods.
   rbac:
     # -- Controls whether to create the `Role`, `RoleBinding`,
     # and `ServiceAccount` for on-demand delegated-operator submission.

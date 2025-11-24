@@ -373,7 +373,7 @@
           "type": "object"
         },
         "rbac": {
-          "description": "RBAC roles, bindings, and service accounts which will be used to\nsubmit on-demand delegated operators to the kubernetes API.\nIf configured, these will be used by the `teams-api` pods.",
+          "description": "RBAC roles, bindings, and service accounts which will be used to\nsubmit on-demand delegated operators to the kubernetes API.\nIf `apiSettings.rbac.create=true`, these will be used by the `teams-api` pods.",
           "properties": {
             "create": {
               "default": true,

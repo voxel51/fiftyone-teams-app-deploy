@@ -4,12 +4,10 @@
 package unit
 
 import (
-	// "encoding/json"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
 
-	// "reflect"
 	"strings"
 	"testing"
 
@@ -303,7 +301,7 @@ func (s *apiRoleTemplateTest) TestRules() {
             "resources": ["jobs"],
             "verbs": ["create", "get", "list", "watch", "update", "delete"]
           },
-		  {
+          {
             "apiGroups": [""],
             "resources": ["pods"],
             "verbs": ["get", "list", "watch", "delete"]
