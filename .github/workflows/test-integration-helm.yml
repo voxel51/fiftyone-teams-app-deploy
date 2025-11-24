@@ -19,7 +19,7 @@ jobs:
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
-        uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302
+        uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:

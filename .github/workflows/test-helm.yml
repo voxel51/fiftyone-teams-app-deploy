@@ -12,7 +12,7 @@ jobs:
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: install asdf & tools
-        uses: asdf-vm/actions/install@v4.0.0
+        uses: asdf-vm/actions/install@v4.0.1
       - name: Run unit tests
         shell: bash
         run: |
