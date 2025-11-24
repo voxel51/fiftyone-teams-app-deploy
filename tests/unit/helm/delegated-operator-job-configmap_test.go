@@ -263,7 +263,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "fiftyone-test-fiftyone-teams-app-do-templates",
 				"app.kubernetes.io/instance":   "fiftyone-test",
-				"app.voxel51.com/component":    "do-templates",
+				"app.voxel51.com/component":    "on-demand-delegated-operators",
 			},
 		},
 		{
@@ -278,7 +278,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-config-map",
 				"app.kubernetes.io/instance":   "fiftyone-test",
-				"app.voxel51.com/component":    "do-templates",
+				"app.voxel51.com/component":    "on-demand-delegated-operators",
 				"color":                        "blue",
 			},
 		},
