@@ -897,10 +897,10 @@ delegatedOperatorJobTemplates:
   # -- On-Demand Delegated Operator Jobs.
   jobs: {}
     # Default CPU-only batch job
-    # cpu-default: {}
+    # cpuDefault: {}
     # GPU Examples Defined Below
     # https://learn.microsoft.com/en-us/azure/aks/use-nvidia-gpu
-    # gpu-azure-aks:
+    # gpuAzureAks:
     #   resources:
     #     limits:
     #       nvidia.com/gpu: 1
@@ -913,7 +913,7 @@ delegatedOperatorJobTemplates:
     #       value: gpu
     #
     # https://docs.aws.amazon.com/eks/latest/userguide/auto-accelerated.html
-    # gpu-aws-eks-auto:
+    # gpuAwsEksAuto:
     #   resources:
     #     limits:
     #       nvidia.com/gpu: 1
@@ -929,7 +929,7 @@ delegatedOperatorJobTemplates:
     #       nvidia.com/gpu: 1
     #
     # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus
-    # gpu-gcp-gke-autopilot:
+    # gpuGcpGkeAutopilot:
     #   resources:
     #     limits:
     #       nvidia.com/gpu: "1"
@@ -940,7 +940,7 @@ delegatedOperatorJobTemplates:
     #     cloud.google.com/gke-accelerator-count: "1"
     #
     # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/gpus
-    # gpu-gcp-gke-standard:
+    # gpuGcpGkeStandard:
     #   resources:
     #     limits:
     #       nvidia.com/gpu: "1"

@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.voxel51.com/delegate-operator-task-id: {{ _id }}
     app.voxel51.com/delegate-operator-task-type: delegated_operation
-    app.voxel51.com/delegate-operator-template-name: cpu-default
+    app.voxel51.com/delegate-operator-template-name: cpuDefault
     labels-1: label-1-value
 spec:
   backoffLimit: 1
@@ -27,7 +27,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.voxel51.com/delegate-operator-task-id: {{ _id }}
         app.voxel51.com/delegate-operator-task-type: delegated_operation
-        app.voxel51.com/delegate-operator-template-name: cpu-default
+        app.voxel51.com/delegate-operator-template-name: cpuDefault
         labels-1: label-1-value
     spec:
       restartPolicy: Never
