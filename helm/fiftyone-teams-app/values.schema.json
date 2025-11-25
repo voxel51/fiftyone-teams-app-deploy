@@ -1868,6 +1868,14 @@
       "properties": {
         "deployments": {
           "description": "Additional deployments to configure. Each template\nwill use .Values.delegatedOperatorDeployments.template as a base.\nEach template value may be overridden.\nMaps/dictionaries will be merged key-wise, with the deployment instance\ntaking precedence.\nList values will not be merged, but be overridden completely by the\ndeployment instance.",
+          "properties": {
+            "teamsDo": {
+              "description": "Default (CPU-only) delegated operator runner",
+              "required": [],
+              "title": "teamsDo",
+              "type": "object"
+            }
+          },
           "required": [],
           "title": "deployments",
           "type": "object"

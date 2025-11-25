@@ -27,12 +27,18 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
-### Version 2.14+ RBAC Changes
+### Version 2.14+
+
+#### RBAC Changes
 
 FiftyOne Enterprise 2.14+ introduces custom roles and role bindings to allow the
 `teams-api` deployment to create, update, and remove batch jobs and pods for
 kubernetes-based
 [on-demand delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+
+#### Delegated Operator Changes
+
+FiftyOne Enterprise 2.14+ defaults the `teams-do` delegated operator to on.
 
 ### Version 2.11+ On-Demand Delegated Operator Executors
 
@@ -831,7 +837,8 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | casSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-cas` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for `teams-cas`. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for `teams-cas`. [Reference][volumes]. |
-| delegatedOperatorDeployments.deployments | object | `{}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
+| delegatedOperatorDeployments.deployments | object | `{"teamsDo":{}}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
+| delegatedOperatorDeployments.deployments.teamsDo | object | `{}` | Default (CPU-only) delegated operator runner |
 | delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":null},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"updateStrategy":{"type":"RollingUpdate"},"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
 | delegatedOperatorDeployments.template.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
