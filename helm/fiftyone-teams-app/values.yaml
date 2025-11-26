@@ -819,9 +819,9 @@ delegatedOperatorDeployments:
   # taking precedence.
   # List values will not be merged, but be overridden completely by the
   # deployment instance.
-  deployments: {}
-    # Example: Use values from base template only
-    # teamsDo: {}
+  deployments:
+    # -- Default (CPU-only) delegated operator runner
+    teamsDo: {}
     #
     # Example: Configure Google GKE Autopilot nodes with GPUs and a custom log link path
     # gpuEnabled:
