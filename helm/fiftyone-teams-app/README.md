@@ -219,8 +219,8 @@ Voxel51 recommends the following resource sizing:
 - Teams API: 1 CPU, 2GB RAM, 1GB Storage per pod
 - Teams App: 500 mCPU, 512MB RAM, 512MB Storage per pod
 - Teams CAS: 500 mCPU, 512MB RAM, 512MB Storage per pod
-- (optional) Delegated Operators: 8 CPU, 16GB RAM, 1GB Storage per pod
-- (optional) Dedicated Plugins: 8 CPU, 16GB RAM, 1GB Storage per pod
+- Delegated Operators (optional): 8 CPU, 16GB RAM, 1GB Storage per pod
+- Dedicated Plugins (optional): 8 CPU, 16GB RAM, 1GB Storage per pod
 
 Voxel51 also recommends monitoring resource consumption across
 the applications.
