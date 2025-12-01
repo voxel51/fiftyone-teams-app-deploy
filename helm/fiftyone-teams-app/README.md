@@ -38,7 +38,8 @@ kubernetes-based
 
 #### Delegated Operator Changes
 
-FiftyOne Enterprise 2.14+ defaults the `teams-do` delegated operator to on.
+FiftyOne Enterprise 2.14+ defaults the
+`teams-do-cpu-default` delegated operator to on.
 
 ### Version 2.11+ On-Demand Delegated Operator Executors
 
