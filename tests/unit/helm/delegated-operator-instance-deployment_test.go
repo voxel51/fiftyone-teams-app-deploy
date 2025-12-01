@@ -354,14 +354,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
 		{
 			"defaultValues",
 			nil,
-			[]int32{3},
+			[]int32{1},
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
-			[]int32{3, 3},
+			[]int32{1, 3},
 		},
 		{
 			"overrideBaseTemplateReplicaCount",
@@ -369,7 +369,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 				"delegatedOperatorDeployments.template.replicaCount":         "2",
 			},
-			[]int32{2, 2},
+			[]int32{1, 2},
 		},
 		{
 			"overrideInstanceReplicaCount",
@@ -880,9 +880,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
+		  {
+            "name": "FIFTYONE_MEDIA_CACHE_DIR",
+            "value": "/opt/media_cache"
+          },
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-            "value": "-1"
+            "value": "2147483648"
           }
         ]`
 					var expectedEnvVars []corev1.EnvVar
@@ -943,9 +947,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
+		  {
+            "name": "FIFTYONE_MEDIA_CACHE_DIR",
+            "value": "/opt/media_cache"
+          },
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-            "value": "-1"
+            "value": "2147483648"
           }
         ]`
 					var expectedEnvVars []corev1.EnvVar
@@ -1065,9 +1073,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
+		  {
+            "name": "FIFTYONE_MEDIA_CACHE_DIR",
+            "value": "/opt/media_cache"
+          },
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-            "value": "-1"
+            "value": "2147483648"
           },
           {
             "name": "TEST_KEY",
@@ -1214,8 +1226,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     "value": "true"
                   },
                   {
+                    "name": "FIFTYONE_MEDIA_CACHE_DIR",
+                    "value": "/opt/media_cache"
+                  },
+                  {
                     "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-                    "value": "-1"
+                    "value": "2147483648"
                   },
                   {
                     "name": "TEST_KEY",
@@ -1353,8 +1369,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     "value": "true"
                   },
                   {
+                    "name": "FIFTYONE_MEDIA_CACHE_DIR",
+                    "value": "/opt/media_cache"
+                  },
+                  {
                     "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-                    "value": "-1"
+                    "value": "2147483648"
                   },
                   {
                     "name": "TEST_KEY",
@@ -1874,9 +1894,20 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 			nil,
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
-					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
-					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":               resource.MustParse("8"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":               resource.MustParse("8"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -1887,14 +1918,25 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 			},
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
-					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
-					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":               resource.MustParse("8"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":               resource.MustParse("8"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
 					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -1911,16 +1953,18 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("1"),
-							"memory": resource.MustParse("1Gi"),
+							"cpu":               resource.MustParse("8"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("500m"),
-							"memory": resource.MustParse("512Mi"),
+							"cpu":               resource.MustParse("8"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -1933,8 +1977,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("512Mi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -1954,16 +1998,18 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("3"),
-							"memory": resource.MustParse("3Gi"),
+							"cpu":               resource.MustParse("3"),
+							"memory":            resource.MustParse("3Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("2"),
-							"memory": resource.MustParse("2Gi"),
+							"cpu":               resource.MustParse("2"),
+							"memory":            resource.MustParse("2Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -1976,8 +2022,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("3Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -1997,16 +2043,18 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("3"),
-							"memory": resource.MustParse("3Gi"),
+							"cpu":               resource.MustParse("3"),
+							"memory":            resource.MustParse("3Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("500m"),
-							"memory": resource.MustParse("512Mi"),
+							"cpu":               resource.MustParse("8"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -2019,8 +2067,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("512Mi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -2040,16 +2088,18 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("1"),
-							"memory": resource.MustParse("1Gi"),
+							"cpu":               resource.MustParse("8"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("2"),
-							"memory": resource.MustParse("2Gi"),
+							"cpu":               resource.MustParse("2"),
+							"memory":            resource.MustParse("2Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -2062,8 +2112,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("3Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -2087,16 +2137,18 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("3"),
-							"memory": resource.MustParse("3Gi"),
+							"cpu":               resource.MustParse("3"),
+							"memory":            resource.MustParse("3Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("2"),
-							"memory": resource.MustParse("2Gi"),
+							"cpu":               resource.MustParse("2"),
+							"memory":            resource.MustParse("2Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -2109,8 +2161,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("3Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -2139,8 +2191,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("3Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -2337,7 +2389,20 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 			nil,
 			[]func(volumeMounts []corev1.VolumeMount){
 				func(volumeMounts []corev1.VolumeMount) {
-					s.Nil(volumeMounts, "VolumeMounts should be nil")
+					expectedJSON := `[
+          {
+            "mountPath": "/dev/shm",
+            "name": "shm-vol"
+          },
+		  {
+            "mountPath": "/opt/media_cache",
+            "name": "memory-media-cache-vol"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
 				},
 			},
 		},
@@ -2348,7 +2413,20 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 			},
 			[]func(volumeMounts []corev1.VolumeMount){
 				func(volumeMounts []corev1.VolumeMount) {
-					s.Nil(volumeMounts, "VolumeMounts should be nil")
+					expectedJSON := `[
+          {
+            "mountPath": "/dev/shm",
+            "name": "shm-vol"
+          },
+		  {
+            "mountPath": "/opt/media_cache",
+            "name": "memory-media-cache-vol"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
 				},
 				func(volumeMounts []corev1.VolumeMount) {
 					s.Nil(volumeMounts, "VolumeMounts should be nil")
@@ -2366,8 +2444,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 				func(volumeMounts []corev1.VolumeMount) {
 					expectedJSON := `[
           {
-            "mountPath": "/template-test-data-volume",
-            "name": "template-test-volume"
+            "mountPath": "/dev/shm",
+            "name": "shm-vol"
+          },
+		  {
+            "mountPath": "/opt/media_cache",
+            "name": "memory-media-cache-vol"
           }
         ]`
 					var expectedVolumeMounts []corev1.VolumeMount
@@ -3915,7 +3997,26 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 			nil,
 			[]func(volumes []corev1.Volume){
 				func(volumes []corev1.Volume) {
-					s.Nil(volumes, "Volumes should be nil")
+					expectedJSON := `[
+          {
+            "name": "shm-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2Gi"
+            }
+          },
+          {
+            "name": "memory-media-cache-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2.5Gi"
+            }
+          }
+        ]`
+					var expectedVolumes []corev1.Volume
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+					s.NoError(err)
+					s.Equal(expectedVolumes, volumes, "Volumes should be equal")
 				},
 			},
 		},
@@ -3926,7 +4027,26 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 			},
 			[]func(volumes []corev1.Volume){
 				func(volumes []corev1.Volume) {
-					s.Nil(volumes, "Volumes should be nil")
+					expectedJSON := `[
+          {
+            "name": "shm-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2Gi"
+            }
+          },
+          {
+            "name": "memory-media-cache-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2.5Gi"
+            }
+          }
+        ]`
+					var expectedVolumes []corev1.Volume
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+					s.NoError(err)
+					s.Equal(expectedVolumes, volumes, "Volumes should be equal")
 				},
 				func(volumes []corev1.Volume) {
 					s.Nil(volumes, "Volumes should be nil")
@@ -3946,15 +4066,17 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 				func(volumes []corev1.Volume) {
 					expectedJSON := `[
           {
-            "name": "template-test-volume1",
-            "hostPath": {
-              "path": "/template-test-volume1"
+            "name": "shm-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2Gi"
             }
           },
           {
-            "name": "template-pvc1",
-            "persistentVolumeClaim": {
-              "claimName": "template-pvc1"
+            "name": "memory-media-cache-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2.5Gi"
             }
           }
         ]`
