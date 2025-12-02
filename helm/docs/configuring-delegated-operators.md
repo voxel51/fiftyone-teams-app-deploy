@@ -237,7 +237,7 @@ In the above example (key named `teamsDo`),
 the resulting deployment name would be `teams-do`.
 
 Delegated operators can be added to any of the three existing
-[plugin modes](./confuring-plugins.md).
+[plugin modes](./configuring-plugins.md).
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Built-in Plugins
@@ -524,7 +524,7 @@ for orc in orc_svc.list():
 ## Prior to v2.7.0
 
 This option can be added to any of the three existing
-[plugin modes](./confuring-plugins.md).
+[plugin modes](./configuring-plugins.md).
 If you're using the builtin-operator
 only option, the Persistent Volume Claim should be omitted.
 
