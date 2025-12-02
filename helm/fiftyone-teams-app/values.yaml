@@ -754,11 +754,11 @@ delegatedOperatorDeployments:
     # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
     resources:
       limits: {}
-      #   cpu: 2
-      #   memory: 6Gi
+      #   cpu: 8
+      #   memory: 16Gi
       requests: {}
-      #   cpu: 500m
-      #   memory: 1Gi
+      #   cpu: 8
+      #   memory: 16Gi
 
     # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
     affinity: {}
@@ -820,18 +820,73 @@ delegatedOperatorDeployments:
   # List values will not be merged, but be overridden completely by the
   # deployment instance.
   deployments:
-    # -- Default (CPU-only) delegated operator runner
-    teamsDo: {}
-    #
+    # -- Default (CPU-only) delegated operator runner.
+    # Defaults to an 8vCPU, 16Gi RAM runner.
+    # The deployment is backed with a 2.5Gi in-memory
+    # volume for caching media and an extra 2Gi of shared memory.
+    teamsDoCpuDefault:
+      env:
+        FIFTYONE_MEDIA_CACHE_DIR: /opt/media_cache
+        FIFTYONE_MEDIA_CACHE_SIZE_BYTES: '2147483648'
+      replicaCount: 1
+      resources:
+        limits:
+          cpu: 8
+          ephemeral-storage: 1Gi
+          memory: 16Gi
+        requests:
+          cpu: 8
+          ephemeral-storage: 1Gi
+          memory: 16Gi
+      volumes:
+        - name: shm-vol
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
+        - name: memory-media-cache-vol
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2.5Gi
+      volumeMounts:
+        - name: shm-vol
+          mountPath: /dev/shm
+        - name: memory-media-cache-vol
+          mountPath: /opt/media_cache
+
     # Example: Configure Google GKE Autopilot nodes with GPUs and a custom log link path
     # gpuEnabled:
     #   env:
     #     FIFTYONE_DELEGATED_OPERATION_LOG_PATH: gs://mygpulogs/
+    #     FIFTYONE_MEDIA_CACHE_DIR: /opt/media_cache
     #   nodeSelector:
     #     cloud.google.com/gke-accelerator: nvidia-l4
     #     cloud.google.com/gke-accelerator-count: "1"
-    #   requests:
-    #     nvidia.com/gpu: 1
+    #   replicaCount: 1
+    #   resources:
+    #     limits:
+    #       nvidia.com/gpu: 1
+    #       cpu: 8
+    #       ephemeral-storage: 1Gi
+    #       memory: 16Gi
+    #     requests:
+    #       nvidia.com/gpu: 1
+    #       cpu: 8
+    #       ephemeral-storage: 1Gi
+    #       memory: 16Gi
+    #   volumes:
+    #     - name: shm-vol
+    #       emptyDir:
+    #         medium: Memory
+    #         sizeLimit: 2Gi
+    #     - name: memory-media-cache-vol
+    #       emptyDir:
+    #         medium: Memory
+    #         sizeLimit: 2.5Gi
+    #   volumeMounts:
+    #     - name: shm-vol
+    #       mountPath: /dev/shm
+    #     - name: memory-media-cache-vol
+    #       mountPath: /opt/media_cache
 
 delegatedOperatorJobTemplates:
   configMap:

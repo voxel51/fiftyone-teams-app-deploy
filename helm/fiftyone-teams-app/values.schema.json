@@ -1869,10 +1869,212 @@
         "deployments": {
           "description": "Additional deployments to configure. Each template\nwill use .Values.delegatedOperatorDeployments.template as a base.\nEach template value may be overridden.\nMaps/dictionaries will be merged key-wise, with the deployment instance\ntaking precedence.\nList values will not be merged, but be overridden completely by the\ndeployment instance.",
           "properties": {
-            "teamsDo": {
-              "description": "Default (CPU-only) delegated operator runner",
+            "teamsDoCpuDefault": {
+              "description": "Default (CPU-only) delegated operator runner.\nDefaults to an 8vCPU, 16Gi RAM runner.\nThe deployment is backed with a 2.5Gi in-memory\nvolume for caching media and an extra 2Gi of shared memory.",
+              "properties": {
+                "env": {
+                  "properties": {
+                    "FIFTYONE_MEDIA_CACHE_DIR": {
+                      "default": "/opt/media_cache",
+                      "required": [],
+                      "title": "FIFTYONE_MEDIA_CACHE_DIR",
+                      "type": "string"
+                    },
+                    "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
+                      "default": "2147483648",
+                      "required": [],
+                      "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+                      "type": "string"
+                    }
+                  },
+                  "required": [],
+                  "title": "env",
+                  "type": "object"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "required": [],
+                  "title": "replicaCount",
+                  "type": "integer"
+                },
+                "resources": {
+                  "properties": {
+                    "limits": {
+                      "properties": {
+                        "cpu": {
+                          "default": 8,
+                          "required": [],
+                          "title": "cpu",
+                          "type": "integer"
+                        },
+                        "ephemeral-storage": {
+                          "default": "1Gi",
+                          "required": [],
+                          "title": "ephemeral-storage",
+                          "type": "string"
+                        },
+                        "memory": {
+                          "default": "16Gi",
+                          "required": [],
+                          "title": "memory",
+                          "type": "string"
+                        }
+                      },
+                      "required": [],
+                      "title": "limits",
+                      "type": "object"
+                    },
+                    "requests": {
+                      "properties": {
+                        "cpu": {
+                          "default": 8,
+                          "required": [],
+                          "title": "cpu",
+                          "type": "integer"
+                        },
+                        "ephemeral-storage": {
+                          "default": "1Gi",
+                          "required": [],
+                          "title": "ephemeral-storage",
+                          "type": "string"
+                        },
+                        "memory": {
+                          "default": "16Gi",
+                          "required": [],
+                          "title": "memory",
+                          "type": "string"
+                        }
+                      },
+                      "required": [],
+                      "title": "requests",
+                      "type": "object"
+                    }
+                  },
+                  "required": [],
+                  "title": "resources",
+                  "type": "object"
+                },
+                "volumeMounts": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "mountPath": {
+                            "default": "/dev/shm",
+                            "required": [],
+                            "title": "mountPath",
+                            "type": "string"
+                          },
+                          "name": {
+                            "default": "shm-vol",
+                            "required": [],
+                            "title": "name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "mountPath": {
+                            "default": "/opt/media_cache",
+                            "required": [],
+                            "title": "mountPath",
+                            "type": "string"
+                          },
+                          "name": {
+                            "default": "memory-media-cache-vol",
+                            "required": [],
+                            "title": "name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "required": [],
+                  "title": "volumeMounts",
+                  "type": "array"
+                },
+                "volumes": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "emptyDir": {
+                            "properties": {
+                              "medium": {
+                                "default": "Memory",
+                                "required": [],
+                                "title": "medium",
+                                "type": "string"
+                              },
+                              "sizeLimit": {
+                                "default": "2Gi",
+                                "required": [],
+                                "title": "sizeLimit",
+                                "type": "string"
+                              }
+                            },
+                            "required": [],
+                            "title": "emptyDir",
+                            "type": "object"
+                          },
+                          "name": {
+                            "default": "shm-vol",
+                            "required": [],
+                            "title": "name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "emptyDir": {
+                            "properties": {
+                              "medium": {
+                                "default": "Memory",
+                                "required": [],
+                                "title": "medium",
+                                "type": "string"
+                              },
+                              "sizeLimit": {
+                                "default": "2.5Gi",
+                                "required": [],
+                                "title": "sizeLimit",
+                                "type": "string"
+                              }
+                            },
+                            "required": [],
+                            "title": "emptyDir",
+                            "type": "object"
+                          },
+                          "name": {
+                            "default": "memory-media-cache-vol",
+                            "required": [],
+                            "title": "name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "required": [],
+                  "title": "volumes",
+                  "type": "array"
+                }
+              },
               "required": [],
-              "title": "teamsDo",
+              "title": "teamsDoCpuDefault",
               "type": "object"
             }
           },
@@ -2097,7 +2299,7 @@
                   "type": "object"
                 },
                 "requests": {
-                  "description": "  cpu: 2\n  memory: 6Gi",
+                  "description": "  cpu: 8\n  memory: 16Gi",
                   "required": [],
                   "title": "requests",
                   "type": "object"

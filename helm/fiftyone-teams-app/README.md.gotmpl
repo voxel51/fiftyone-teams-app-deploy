@@ -38,7 +38,8 @@ kubernetes-based
 
 #### Delegated Operator Changes
 
-FiftyOne Enterprise 2.14+ defaults the `teams-do` delegated operator to on.
+FiftyOne Enterprise 2.14+ defaults the
+`teams-do-cpu-default` delegated operator to on.
 
 ### Version 2.11+ On-Demand Delegated Operator Executors
 
@@ -218,8 +219,8 @@ Voxel51 recommends the following resource sizing:
 - Teams API: 1 CPU, 2GB RAM, 1GB Storage per pod
 - Teams App: 500 mCPU, 512MB RAM, 512MB Storage per pod
 - Teams CAS: 500 mCPU, 512MB RAM, 512MB Storage per pod
-- (optional) Delegated Operators: 1 CPU, 2GB RAM, 1GB Storage per pod
-- (optional) Dedicated Plugins: 1 CPU, 2GB RAM, 1GB Storage per pod
+- Delegated Operators (optional): 8 CPU, 16GB RAM, 1GB Storage per pod
+- Dedicated Plugins (optional): 8 CPU, 16GB RAM, 1GB Storage per pod
 
 Voxel51 also recommends monitoring resource consumption across
 the applications.

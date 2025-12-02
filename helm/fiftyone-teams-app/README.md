@@ -38,7 +38,8 @@ kubernetes-based
 
 #### Delegated Operator Changes
 
-FiftyOne Enterprise 2.14+ defaults the `teams-do` delegated operator to on.
+FiftyOne Enterprise 2.14+ defaults the
+`teams-do-cpu-default` delegated operator to on.
 
 ### Version 2.11+ On-Demand Delegated Operator Executors
 
@@ -218,8 +219,8 @@ Voxel51 recommends the following resource sizing:
 - Teams API: 1 CPU, 2GB RAM, 1GB Storage per pod
 - Teams App: 500 mCPU, 512MB RAM, 512MB Storage per pod
 - Teams CAS: 500 mCPU, 512MB RAM, 512MB Storage per pod
-- (optional) Delegated Operators: 1 CPU, 2GB RAM, 1GB Storage per pod
-- (optional) Dedicated Plugins: 1 CPU, 2GB RAM, 1GB Storage per pod
+- Delegated Operators (optional): 8 CPU, 16GB RAM, 1GB Storage per pod
+- Dedicated Plugins (optional): 8 CPU, 16GB RAM, 1GB Storage per pod
 
 Voxel51 also recommends monitoring resource consumption across
 the applications.
@@ -837,8 +838,8 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | casSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-cas` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | casSettings.volumeMounts | list | `[]` | Volume mounts for `teams-cas`. [Reference][volumes]. |
 | casSettings.volumes | list | `[]` | Volumes for `teams-cas`. [Reference][volumes]. |
-| delegatedOperatorDeployments.deployments | object | `{"teamsDo":{}}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
-| delegatedOperatorDeployments.deployments.teamsDo | object | `{}` | Default (CPU-only) delegated operator runner |
+| delegatedOperatorDeployments.deployments | object | `{"teamsDoCpuDefault":{"env":{"FIFTYONE_MEDIA_CACHE_DIR":"/opt/media_cache","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":"2147483648"},"replicaCount":1,"resources":{"limits":{"cpu":8,"ephemeral-storage":"1Gi","memory":"16Gi"},"requests":{"cpu":8,"ephemeral-storage":"1Gi","memory":"16Gi"}},"volumeMounts":[{"mountPath":"/dev/shm","name":"shm-vol"},{"mountPath":"/opt/media_cache","name":"memory-media-cache-vol"}],"volumes":[{"emptyDir":{"medium":"Memory","sizeLimit":"2Gi"},"name":"shm-vol"},{"emptyDir":{"medium":"Memory","sizeLimit":"2.5Gi"},"name":"memory-media-cache-vol"}]}}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
+| delegatedOperatorDeployments.deployments.teamsDoCpuDefault | object | `{"env":{"FIFTYONE_MEDIA_CACHE_DIR":"/opt/media_cache","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":"2147483648"},"replicaCount":1,"resources":{"limits":{"cpu":8,"ephemeral-storage":"1Gi","memory":"16Gi"},"requests":{"cpu":8,"ephemeral-storage":"1Gi","memory":"16Gi"}},"volumeMounts":[{"mountPath":"/dev/shm","name":"shm-vol"},{"mountPath":"/opt/media_cache","name":"memory-media-cache-vol"}],"volumes":[{"emptyDir":{"medium":"Memory","sizeLimit":"2Gi"},"name":"shm-vol"},{"emptyDir":{"medium":"Memory","sizeLimit":"2.5Gi"},"name":"memory-media-cache-vol"}]}` | Default (CPU-only) delegated operator runner. Defaults to an 8vCPU, 16Gi RAM runner. The deployment is backed with a 2.5Gi in-memory volume for caching media and an extra 2Gi of shared memory. |
 | delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":null},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"updateStrategy":{"type":"RollingUpdate"},"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
 | delegatedOperatorDeployments.template.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
