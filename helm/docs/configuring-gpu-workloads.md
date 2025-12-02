@@ -120,6 +120,7 @@ template (`gpu-gcp-gke-autopilot`):
 delegatedOperatorJobTemplates:
   jobs:
     cpu-default: {}  # A CPU Based Job
+    # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/gpus
     gpu-gcp-gke-autopilot:
       nodeSelector:
         cloud.google.com/gke-accelerator: nvidia-l4  # Modify For Your Needs
@@ -135,8 +136,8 @@ delegatedOperatorJobTemplates:
       env:
         [...existing environment variables...]
         LD_LIBRARY_PATH: /usr/local/nvidia/lib64  # Modify For Your Needs
-    # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/gpus
-    gpu-gcp-gke-autopilot:
+    # https://cloud.google.com/kubernetes-engine/docs/how-to/gpus
+    gpu-gcp-gke-standard:
       resources:
         limits:
           cpu: 4             # Modify For Your Needs
