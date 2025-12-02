@@ -45,7 +45,14 @@ casSettings:
     tag: v2.14.0-rc.1
 delegatedOperatorDeployments:
   deployments:
-    teamsDo:
+    teamsDoCpuDefault:
+      image:
+        repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
+        pullPolicy: IfNotPresent
+        tag: v2.14.0rc2
+delegatedOperatorTemplates:
+  jobs:
+    teamsDoCpuDefaultK8s:
       image:
         repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app
         pullPolicy: IfNotPresent
