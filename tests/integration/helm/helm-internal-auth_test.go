@@ -182,7 +182,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					log:              " ✓ Ready in",
 				},
 				{
-					name:             "teams-do",
+					name:             "teams-do-cpu-default",
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
@@ -276,7 +276,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 					log:              "Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
 				},
 				{
-					name:             "teams-do",
+					name:             "teams-do-cpu-default",
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
@@ -403,7 +403,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				checkPodLogsWithRetries(subT, kubectlOptions, pods, testCase.name, expected.name, expected.log)
 
 				// Validate endpoint response
-				// Skip fiftyone-app, teams-plugins, and teams-do because they do not have callable endpoints that return a response payload.
+				// Skip fiftyone-app, teams-plugins, and teams-do-cpu-default because they do not have callable endpoints that return a response payload.
 				if expected.url != "" {
 					// Validate url endpoint response is expected
 					validate_endpoint(subT, expected.url, expected.responsePayload, expected.httpResponseCode)

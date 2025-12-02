@@ -217,7 +217,7 @@ func enforceReady(subT *testing.T, kubectlOptions *k8s.KubectlOptions, vals []se
 
 		// Validate that k8s service is ready (pods are started and in service)
 
-		if expected.name != "teams-do" {
+		if expected.name != "teams-do-cpu-default" {
 			k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
 		}
 	}
