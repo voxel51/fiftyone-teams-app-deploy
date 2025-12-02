@@ -91,7 +91,7 @@ See
 [examples](#examples)
 for more information.
 
-To enable delegated operators, add an object to `delegatedOperatorDeployments.jobs`:
+To enable delegated operators, add an object to `delegatedOperatorJobTemplates.jobs`:
 
 ```yaml
 delegatedOperatorJobTemplates:
@@ -103,7 +103,7 @@ The helm chart will create a `ConfigMap` with an `teamsDoCpuDefaultK8s.yaml` ent
 This entry will be mounted onto the API as a file
 at `/tmp/do-targets/teamsDoCpuDefaultK8s.yaml`.
 Delegated operators can be added to any of the three existing
-[plugin modes](./confuring-plugins.md).
+[plugin modes](./configuring-plugins.md).
 
 ### Built-in Plugins
 
