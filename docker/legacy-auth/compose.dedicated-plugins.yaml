@@ -1,6 +1,9 @@
 ---
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+include:
+  - compose.delegated-operators.yaml
+
 services:
   fiftyone-app:
     extends:

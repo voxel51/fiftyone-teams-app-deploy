@@ -14,6 +14,19 @@
 
 # Configuring FiftyOne Enterprise Delegated Operators
 
+<!-- toc -->
+
+- [v2.14.0+](#v2140)
+- [Prior to v2.14.0](#prior-to-v2140)
+
+<!-- tocstop -->
+
+## v2.14.0+
+
+As of version 2.14.0, delegated operators are enabled by default.
+
+## Prior to v2.14.0
+
 This option may be added to any of the three existing
 [plugin modes](./configuring-plugins.md).
 
