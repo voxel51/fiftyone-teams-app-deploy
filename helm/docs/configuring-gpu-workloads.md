@@ -75,7 +75,7 @@ as a GPU-based delegated operator (`teamsDoWithGpu`):
 delegatedOperatorDeployments:
   deployments:
     teamsDo: {}  # A CPU Based Deployment
-    teamsDoWithGpu:
+    gpuGcpGkeAutopilot:
       nodeSelector:
         cloud.google.com/gke-accelerator: nvidia-l4  # Modify For Your Needs
         cloud.google.com/gke-accelerator-count: "1"  # Modify For Your Needs
@@ -90,10 +90,20 @@ delegatedOperatorDeployments:
       env:
         [...existing environment variables...]
         LD_LIBRARY_PATH: /usr/local/nvidia/lib64  # Modify For Your Needs
+    gpuGcpGkeStandard:
+      resources:
+        limits:
+          cpu: 4        # Modify For Your Needs
+          memory: 12Gi  # Modify For Your Needs
+        requests:
+          cpu: 4             # Modify For Your Needs
+          memory: 12Gi       # Modify For Your Needs
+          nvidia.com/gpu: 1  # Modify For Your Needs
 ```
 
 Upgrade your deployment via `helm upgrade` and wait for the
-`teams-do-with-gpu` pods to be scheduled and deployed.
+`gpu-gcp-gke-autopilot` or the `gpu-gcp-gke-standard`
+pods to be scheduled and deployed.
 
 ### Deploying GPU-enabled On-Demand Jobs
 
@@ -119,9 +129,9 @@ template (`gpu-gcp-gke-autopilot`):
 ```yaml
 delegatedOperatorJobTemplates:
   jobs:
-    cpu-default: {}  # A CPU Based Job
+    cpuDefault: {}  # A CPU Based Job
     # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/gpus
-    gpu-gcp-gke-autopilot:
+    gpuGcpGkeAutopilot:
       nodeSelector:
         cloud.google.com/gke-accelerator: nvidia-l4  # Modify For Your Needs
         cloud.google.com/gke-accelerator-count: "1"  # Modify For Your Needs
@@ -137,7 +147,7 @@ delegatedOperatorJobTemplates:
         [...existing environment variables...]
         LD_LIBRARY_PATH: /usr/local/nvidia/lib64  # Modify For Your Needs
     # https://cloud.google.com/kubernetes-engine/docs/how-to/gpus
-    gpu-gcp-gke-standard:
+    gpuGcpGkeStandard:
       resources:
         limits:
           cpu: 4             # Modify For Your Needs
@@ -183,7 +193,7 @@ as a GPU-based delegated operator (`teamsDoWithGpu`):
 delegatedOperatorDeployments:
   deployments:
     teamsDo: {}  # A CPU Based Deployment
-    teamsDoWithGpu:
+    gpuAzureAks:
       resources:
         limits:
           cpu: 4               # Modify For Your Needs
@@ -201,7 +211,7 @@ delegatedOperatorDeployments:
 ```
 
 Upgrade your deployment via `helm upgrade` and wait for the
-`teams-do-with-gpu` pods to be scheduled and deployed.
+`gpu-azure-aks` pods to be scheduled and deployed.
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Deploying GPU-enabled On-Demand Jobs
@@ -224,8 +234,8 @@ template (`gpu-azure-aks`):
 ```yaml
 delegatedOperatorJobTemplates:
   jobs:
-    cpu-default: {}  # A CPU Based Job
-    gpu-azure-aks:
+    cpuDefault: {}  # A CPU Based Job
+    gpuAzureAks:
       resources:
         limits:
           cpu: 4               # Modify For Your Needs
@@ -273,15 +283,15 @@ Ensure the delegated operator deployment has `resources.requests` set to
 request the desired amount of GPUs from the Kubernetes scheduler.
 
 The below will deploy a CPU-based delegated operator (`teamsDo`) as well
-as GPU-based delegated operators for both EKS auto mode (`teamsDoWithGpuAuto`)
-and standard EKS (`teamsDoWithGpuStandard`):
+as GPU-based delegated operators for both EKS auto mode (`gpuAwsEksAuto`)
+and standard EKS (`gpuAwsEksStandard`):
 
 ```yaml
 delegatedOperatorDeployments:
   deployments:
     teamsDo: {}  # A CPU Based Deployment
     # https://docs.aws.amazon.com/eks/latest/userguide/auto-accelerated.html
-    teamsDoWithGpuAuto:  # For EKS Auto Mode
+    gpuAwsEksAuto:  # For EKS Auto Mode
       resources:
         limits:
           cpu: 4               # Modify For Your Needs
@@ -296,7 +306,7 @@ delegatedOperatorDeployments:
           effect: NoSchedule
           operator: Exists
     # https://aws.amazon.com/blogs/compute/running-gpu-accelerated-kubernetes-workloads-on-p3-and-p2-ec2-instances-with-amazon-eks/
-    teamsDoWithGpuStandard:  # For Standard EKS
+    gpuAwsEksStandard:  # For Standard EKS
       resources:
         limits:
           cpu: 4               # Modify For Your Needs
@@ -331,9 +341,9 @@ templates for both EKS modes:
 ```yaml
 delegatedOperatorJobTemplates:
   jobs:
-    cpu-default: {}  # A CPU Based Job
+    cpuDefault: {}  # A CPU Based Job
     # https://docs.aws.amazon.com/eks/latest/userguide/auto-accelerated.html
-    gpu-aws-eks-auto:  # For EKS Auto Mode
+    gpuAwsEksAuto:  # For EKS Auto Mode
       resources:
         limits:
           cpu: 4               # Modify For Your Needs
@@ -348,7 +358,7 @@ delegatedOperatorJobTemplates:
           effect: NoSchedule
           operator: Exists
     # https://aws.amazon.com/blogs/compute/running-gpu-accelerated-kubernetes-workloads-on-p3-and-p2-ec2-instances-with-amazon-eks/
-    gpu-aws-eks-standard:  # For Standard EKS
+    gpuAwsEksStandard:  # For Standard EKS
       resources:
         limits:
           cpu: 4               # Modify For Your Needs
