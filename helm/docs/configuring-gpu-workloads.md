@@ -35,7 +35,7 @@
 ## Overview
 
 Many machine learning applications utilize GPU hardware for
-ntensive computations.
+intensive computations.
 The FiftyOne Enterprise helm chart allows users to schedule pods on
 GPU-enabled nodes using the `nodeSelector`, `resource`, and `toleration`
 settings for individual services.
@@ -290,10 +290,10 @@ delegatedOperatorDeployments:
           cpu: 4               # Modify For Your Needs
           memory: 12Gi         # Modify For Your Needs
           nvidia.com/gpu: 1    # Modify For Your Needs
-        tolerations:
-          - key: nvidia.com/gpu
-            effect: NoSchedule
-            operator: Exists
+      tolerations:
+        - key: nvidia.com/gpu
+          effect: NoSchedule
+          operator: Exists
     # https://aws.amazon.com/blogs/compute/running-gpu-accelerated-kubernetes-workloads-on-p3-and-p2-ec2-instances-with-amazon-eks/
     teamsDoWithGpuStandard:  # For Standard EKS
       resources:
@@ -342,10 +342,10 @@ delegatedOperatorJobTemplates:
           cpu: 4               # Modify For Your Needs
           memory: 12Gi         # Modify For Your Needs
           nvidia.com/gpu: 1    # Modify For Your Needs
-        tolerations:
-          - key: nvidia.com/gpu
-            effect: NoSchedule
-            operator: Exists
+      tolerations:
+        - key: nvidia.com/gpu
+          effect: NoSchedule
+          operator: Exists
     # https://aws.amazon.com/blogs/compute/running-gpu-accelerated-kubernetes-workloads-on-p3-and-p2-ec2-instances-with-amazon-eks/
     gpu-aws-eks-standard:  # For Standard EKS
       resources:
