@@ -252,8 +252,9 @@ The template can be provided in one of the following ways:
    # ...
    ```
 
-- <a id="b64"></a>**Base64-encoded data URI**: Embed the template's content directly in the config as
-   a base64-encoded string.
+<!-- markdownlint-disable no-inline-html line-length -->
+- <a id="b64"></a>**Base64-encoded data URI**: Embed the template's
+   content directly in the config as a base64-encoded string.
 
    ```python
    import base64
