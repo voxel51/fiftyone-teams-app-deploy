@@ -71,7 +71,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
@@ -80,14 +80,14 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 			},
 			[]map[string]string{
 				map[string]string{
 					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 					"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 					"app.kubernetes.io/managed-by": "Helm",
-					"app.kubernetes.io/name":       "teams-do",
+					"app.kubernetes.io/name":       "teams-do-cpu-default",
 					"app.kubernetes.io/instance":   "fiftyone-test",
 				},
 			},
@@ -95,8 +95,8 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 		{
 			"overrideBaseTemplateEnabledAndInstanceDisabled",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":            "true",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled": "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                      "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled": "false",
 			},
 			nil,
 		},
@@ -106,7 +106,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 				"delegatedOperatorDeployments.template.labels.color":                     "blue",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.color":       "red",
 			},
 			[]map[string]string{
@@ -114,7 +114,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 					"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 					"app.kubernetes.io/managed-by": "Helm",
-					"app.kubernetes.io/name":       "teams-do",
+					"app.kubernetes.io/name":       "teams-do-cpu-default",
 					"app.kubernetes.io/instance":   "fiftyone-test",
 					"color":                        "blue",
 				},
@@ -188,7 +188,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataName() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
@@ -197,33 +197,33 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataName() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 			},
-			[]string{"teams-do"},
+			[]string{"teams-do-cpu-default"},
 		},
 		{
 			"overrideInstancePdbEnabledTemplateDisabled",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":            "false",
-				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":       "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled": "true",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                      "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":                 "1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled": "true",
 			},
-			[]string{"teams-do"},
+			[]string{"teams-do-cpu-default"},
 		},
 
 		{
 			"overrideInstancePdbDisabledTemplateEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":            "true",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled": "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                      "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled": "false",
 			},
 			nil,
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":        "nil",
 			},
 			nil,
 		},
@@ -232,20 +232,20 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataName() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":             "nil",
 			},
-			[]string{"teams-do", "teams-do-two"},
+			[]string{"teams-do-cpu-default", "teams-do-two"},
 		},
 		{
 			"overrideTemplatePdbEnabledInstanceDisabledMultipleInstances",
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":               "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":          "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                         "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":               "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled": "false",
 			},
-			[]string{"teams-do"},
+			[]string{"teams-do-cpu-default"},
 		},
 	}
 
@@ -302,15 +302,15 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":        "nil",
 			},
 			nil,
 		},
@@ -319,7 +319,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 			},
 			[]string{"fiftyone-teams"},
 		},
@@ -328,7 +328,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":             "nil",
 				"namespace.name": "test-namespace-name",
 			},
@@ -339,7 +339,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":               "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":          "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                         "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":               "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled": "false",
 				"namespace.name": "test-namespace-name",
 			},
@@ -400,15 +400,15 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMinAvailableInt() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":        "nil",
 			},
 			nil,
 		},
@@ -417,18 +417,18 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMinAvailableInt() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 			},
 			[]int{1},
 		},
 		{
 			"overrideBaseTemplateAndInstanceMinAvailable",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                 "false",
-				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":            "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled":      "true",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.minAvailable": "5",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":   "true",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                           "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":                      "1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled":      "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.minAvailable": "5",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":             "true",
 			},
 			[]int{5, 1},
 		},
@@ -487,7 +487,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMinAvailablePercent() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
@@ -496,18 +496,18 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMinAvailablePercent() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "10%",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 			},
 			[]string{"10%"},
 		},
 		{
 			"overrideBaseTemplateAndInstanceMinAvailable",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                 "false",
-				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":            "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled":      "true",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.minAvailable": "50%",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":   "true",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                           "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":                      "1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled":      "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.minAvailable": "50%",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":             "true",
 			},
 			[]string{"50%", "1"},
 		},
@@ -566,15 +566,15 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMaxUnavailableInt() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":        "nil",
 			},
 			nil,
 		},
@@ -583,18 +583,18 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMaxUnavailableInt() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":        "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                  "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":        "nil",
 			},
 			[]int{1},
 		},
 		{
 			"overrideBaseTemplateAndInstanceMaxUnavailable",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                   "false",
-				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable":            "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled":        "true",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.maxUnavailable": "5",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":     "true",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                             "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable":                      "1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled":        "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.maxUnavailable": "5",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":               "true",
 			},
 			[]int{5, 1},
 		},
@@ -653,7 +653,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMaxUnavailablePercent() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
@@ -662,18 +662,18 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMaxUnavailablePercent() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":        "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable": "10%",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                  "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":        "nil",
 			},
 			[]string{"10%"},
 		},
 		{
 			"overrideBaseTemplateAndInstanceMaxUnavailable",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                   "false",
-				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable":            "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled":        "true",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.maxUnavailable": "50%",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":     "true",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                             "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable":                      "1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled":        "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.maxUnavailable": "50%",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":               "true",
 			},
 			[]string{"50%", "1"},
 		},
@@ -732,7 +732,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMinAvaiableAndMaxAvailabl
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
@@ -742,20 +742,20 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestMinAvaiableAndMaxAvailabl
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":        "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable": "80%",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":   "10%",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                  "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":        "nil",
 			},
 			[]string{"10%"},
 		},
 		{
 			"overrideBaseTemplateAndInstanceMaxUnavailable",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                   "false",
-				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable":            "10%",
-				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":              "30%",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled":        "true",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.maxUnavailable": "20%",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.minAvailable":   "40%",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":     "true",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                             "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.maxUnavailable":                      "10%",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":                        "30%",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled":        "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.maxUnavailable": "20%",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.minAvailable":   "40%",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled":               "true",
 			},
 			[]string{"40%", "30%"},
 		},
@@ -817,7 +817,7 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestSelectorLabels() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused": "nil",
 			},
 			nil,
 		},
@@ -826,11 +826,11 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestSelectorLabels() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":      "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable": "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":      "nil",
 			},
 			[]map[string]string{
 				map[string]string{
-					"app.kubernetes.io/name":     "teams-do",
+					"app.kubernetes.io/name":     "teams-do-cpu-default",
 					"app.kubernetes.io/instance": "fiftyone-test",
 				},
 			},
@@ -838,8 +838,8 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestSelectorLabels() {
 		{
 			"overrideBaseTemplateEnabledAndInstanceDisabled",
 			map[string]string{
-				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":            "true",
-				"delegatedOperatorDeployments.deployments.teamsDo.podDisruptionBudget.enabled": "false",
+				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":                      "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podDisruptionBudget.enabled": "false",
 			},
 			nil,
 		},
@@ -848,12 +848,12 @@ func (s *pdbDelegatedOperatorInstanceTemplateTest) TestSelectorLabels() {
 			map[string]string{
 				"delegatedOperatorDeployments.template.podDisruptionBudget.enabled":               "true",
 				"delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable":          "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                         "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.unused":               "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.podDisruptionBudget.enabled": "false",
 			},
 			[]map[string]string{
 				map[string]string{
-					"app.kubernetes.io/name":     "teams-do",
+					"app.kubernetes.io/name":     "teams-do-cpu-default",
 					"app.kubernetes.io/instance": "fiftyone-test",
 				},
 			},

@@ -263,7 +263,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "fiftyone-test-fiftyone-teams-app-do-templates",
 				"app.kubernetes.io/instance":   "fiftyone-test",
-				"app.voxel51.com/component":    "do-templates",
+				"app.voxel51.com/component":    "on-demand-delegated-operators",
 			},
 		},
 		{
@@ -278,7 +278,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataLabels() {
 				"app.kubernetes.io/managed-by": "Helm",
 				"app.kubernetes.io/name":       "test-config-map",
 				"app.kubernetes.io/instance":   "fiftyone-test",
-				"app.voxel51.com/component":    "do-templates",
+				"app.voxel51.com/component":    "on-demand-delegated-operators",
 				"color":                        "blue",
 			},
 		},
@@ -329,7 +329,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 		{
 			"defaultValuesCpuEnabled",
 			map[string]string{
-				"delegatedOperatorJobTemplates.jobs.cpu-default.unused": "nil",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
 			},
 			func(subT gruntworkTesting.TestingT, data map[string]string) {
 				var expectedJobConfig batchv1.Job
@@ -342,7 +342,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				}
 
 				tests := map[string]string{
-					"test_data/delegated-operator-job-configmap_test/expected-cpu-default.yaml": "cpu-default.yaml",
+					"test_data/delegated-operator-job-configmap_test/expected-cpu-default.yaml": "cpuDefault.yaml",
 				}
 
 				s.Equal(len(tests), len(data), "Number of test entries should be equal to number of data entries.")
@@ -394,7 +394,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.volumeMounts[0].name":                      "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].name":                           "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].hostPath.path":                  "/test-volume",
-				"delegatedOperatorJobTemplates.jobs.cpu-default.unused":                            "nil",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                             "nil",
 			},
 			func(subT gruntworkTesting.TestingT, data map[string]string) {
 				var expectedJobConfig batchv1.Job
@@ -407,7 +407,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				}
 
 				tests := map[string]string{
-					"test_data/delegated-operator-job-configmap_test/expected-cpu-default-override-template-values.yaml": "cpu-default.yaml",
+					"test_data/delegated-operator-job-configmap_test/expected-cpu-default-override-template-values.yaml": "cpuDefault.yaml",
 				}
 
 				s.Equal(len(tests), len(data), "Number of test entries should be equal to number of data entries.")
@@ -460,7 +460,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.volumeMounts[0].name":                      "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].name":                           "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].hostPath.path":                  "/test-volume",
-				"delegatedOperatorJobTemplates.jobs.cpu-default.unused":                            "nil",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                             "nil",
 
 				// Override All Values From Template
 				"delegatedOperatorJobTemplates.jobs.override-example.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "hostname",
@@ -503,7 +503,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				}
 
 				tests := map[string]string{
-					"test_data/delegated-operator-job-configmap_test/expected-cpu-default-override-template-values.yaml": "cpu-default.yaml",
+					"test_data/delegated-operator-job-configmap_test/expected-cpu-default-override-template-values.yaml": "cpuDefault.yaml",
 					"test_data/delegated-operator-job-configmap_test/expected-override-example-template.yaml":            "override-example.yaml",
 				}
 
@@ -557,7 +557,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				"delegatedOperatorJobTemplates.template.volumeMounts[0].name":                      "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].name":                           "test-volume",
 				"delegatedOperatorJobTemplates.template.volumes[0].hostPath.path":                  "/test-volume",
-				"delegatedOperatorJobTemplates.jobs.cpu-default.unused":                            "nil",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                             "nil",
 
 				// Override All Values From Template
 				"delegatedOperatorJobTemplates.jobs.override-example.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "hostname",
@@ -606,7 +606,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 				}
 
 				tests := map[string]string{
-					"test_data/delegated-operator-job-configmap_test/expected-cpu-default-override-template-values.yaml": "cpu-default.yaml",
+					"test_data/delegated-operator-job-configmap_test/expected-cpu-default-override-template-values.yaml": "cpuDefault.yaml",
 					"test_data/delegated-operator-job-configmap_test/expected-override-example-template.yaml":            "override-example.yaml",
 					"test_data/delegated-operator-job-configmap_test/expected-override-example-cascading-template.yaml":  "override-example-cascading.yaml",
 				}

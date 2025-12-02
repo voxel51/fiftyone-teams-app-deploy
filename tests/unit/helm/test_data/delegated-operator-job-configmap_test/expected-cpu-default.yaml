@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.voxel51.com/delegate-operator-task-id: {{ _id }}
     app.voxel51.com/delegate-operator-task-type: delegated_operation
-    app.voxel51.com/delegate-operator-template-name: cpu-default
+    app.voxel51.com/delegate-operator-template-name: cpuDefault
 spec:
   backoffLimit: 0
   template:
@@ -19,7 +19,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.voxel51.com/delegate-operator-task-id: {{ _id }}
         app.voxel51.com/delegate-operator-task-type: delegated_operation
-        app.voxel51.com/delegate-operator-template-name: cpu-default
+        app.voxel51.com/delegate-operator-template-name: cpuDefault
     spec:
       restartPolicy: Never
       serviceAccountName: fiftyone-teams
@@ -39,6 +39,8 @@ spec:
               value: "http://teams-api:80"
             - name: FIFTYONE_DATABASE_ADMIN
               value: "false"
+            - name: FIFTYONE_INTERNAL_SERVICE
+              value: "true"
             - name: FIFTYONE_DATABASE_NAME
               valueFrom:
                 secretKeyRef:

@@ -183,6 +183,43 @@ apiSettings:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
+  # -- RBAC roles, bindings, and service accounts which will be used to
+  # submit on-demand delegated operators to the kubernetes API.
+  # If `apiSettings.rbac.create=true`, these will be used by the `teams-api` pods.
+  rbac:
+    # -- Controls whether to create the `Role`, `RoleBinding`,
+    # and `ServiceAccount` for on-demand delegated-operator submission.
+    create: true
+    role:
+      # -- `Role` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Name of the `Role` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-do-management`.
+      name: ""
+      # -- Additional labels for the generated `Role`. [Reference][labels-and-selectors].
+      labels: {}
+    roleBinding:
+      # -- `RoleBinding` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Controls whether to create the `RoleBinding` named
+      # `apiSettings.rbac.roleBinding.name`.
+      create: true
+      # -- Name of the `RoleBinding` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-do-management`.
+      name: ""
+      # -- Additional labels for the generated `RoleBinding`. [Reference][labels-and-selectors].
+      labels: {}
+    serviceAccount:
+      # -- `ServiceAccount` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Controls whether to create the `ServiceAccount` named
+      # `apiSettings.rbac.serviceAccount.name`.
+      create: true
+      # -- Name of the `ServiceAccount` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-teams-api`.
+      name: ""
+      # -- Additional labels for the generated `ServiceAccount`. [Reference][labels-and-selectors].
+      labels: {}
   readiness:
     # -- Number of times to retry the readiness probe for the `teams-api`. [Reference][probes].
     failureThreshold: 5
@@ -717,11 +754,11 @@ delegatedOperatorDeployments:
     # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
     resources:
       limits: {}
-      #   cpu: 2
-      #   memory: 6Gi
+      #   cpu: 8
+      #   memory: 16Gi
       requests: {}
-      #   cpu: 500m
-      #   memory: 1Gi
+      #   cpu: 8
+      #   memory: 16Gi
 
     # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
     affinity: {}
@@ -782,19 +819,74 @@ delegatedOperatorDeployments:
   # taking precedence.
   # List values will not be merged, but be overridden completely by the
   # deployment instance.
-  deployments: {}
-    # Example: Use values from base template only
-    # teamsDo: {}
-    #
+  deployments:
+    # -- Default (CPU-only) delegated operator runner.
+    # Defaults to an 8vCPU, 16Gi RAM runner.
+    # The deployment is backed with a 2.5Gi in-memory
+    # volume for caching media and an extra 2Gi of shared memory.
+    teamsDoCpuDefault:
+      env:
+        FIFTYONE_MEDIA_CACHE_DIR: /opt/media_cache
+        FIFTYONE_MEDIA_CACHE_SIZE_BYTES: '2147483648'
+      replicaCount: 1
+      resources:
+        limits:
+          cpu: 8
+          ephemeral-storage: 1Gi
+          memory: 16Gi
+        requests:
+          cpu: 8
+          ephemeral-storage: 1Gi
+          memory: 16Gi
+      volumes:
+        - name: shm-vol
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
+        - name: memory-media-cache-vol
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2.5Gi
+      volumeMounts:
+        - name: shm-vol
+          mountPath: /dev/shm
+        - name: memory-media-cache-vol
+          mountPath: /opt/media_cache
+
     # Example: Configure Google GKE Autopilot nodes with GPUs and a custom log link path
     # gpuEnabled:
     #   env:
     #     FIFTYONE_DELEGATED_OPERATION_LOG_PATH: gs://mygpulogs/
+    #     FIFTYONE_MEDIA_CACHE_DIR: /opt/media_cache
     #   nodeSelector:
     #     cloud.google.com/gke-accelerator: nvidia-l4
     #     cloud.google.com/gke-accelerator-count: "1"
-    #   requests:
-    #     nvidia.com/gpu: 1
+    #   replicaCount: 1
+    #   resources:
+    #     limits:
+    #       nvidia.com/gpu: 1
+    #       cpu: 8
+    #       ephemeral-storage: 1Gi
+    #       memory: 16Gi
+    #     requests:
+    #       nvidia.com/gpu: 1
+    #       cpu: 8
+    #       ephemeral-storage: 1Gi
+    #       memory: 16Gi
+    #   volumes:
+    #     - name: shm-vol
+    #       emptyDir:
+    #         medium: Memory
+    #         sizeLimit: 2Gi
+    #     - name: memory-media-cache-vol
+    #       emptyDir:
+    #         medium: Memory
+    #         sizeLimit: 2.5Gi
+    #   volumeMounts:
+    #     - name: shm-vol
+    #       mountPath: /dev/shm
+    #     - name: memory-media-cache-vol
+    #       mountPath: /opt/media_cache
 
 delegatedOperatorJobTemplates:
   configMap:
@@ -805,7 +897,7 @@ delegatedOperatorJobTemplates:
     # -- Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.
     # Defaults to `release-name-fiftyone-teams-app-do-templates`.
     name: ""
-    # -- Additional labels for the generated service account. [Reference][labels-and-selectors].
+    # -- Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].
     labels: {}
 
   # -- A common template applied to all deployments. Each deployment can
@@ -897,10 +989,10 @@ delegatedOperatorJobTemplates:
   # -- On-Demand Delegated Operator Jobs.
   jobs: {}
     # Default CPU-only batch job
-    # cpu-default: {}
+    # cpuDefault: {}
     # GPU Examples Defined Below
     # https://learn.microsoft.com/en-us/azure/aks/use-nvidia-gpu
-    # gpu-azure-aks:
+    # gpuAzureAks:
     #   resources:
     #     limits:
     #       nvidia.com/gpu: 1
@@ -913,7 +1005,7 @@ delegatedOperatorJobTemplates:
     #       value: gpu
     #
     # https://docs.aws.amazon.com/eks/latest/userguide/auto-accelerated.html
-    # gpu-aws-eks-auto:
+    # gpuAwsEksAuto:
     #   resources:
     #     limits:
     #       nvidia.com/gpu: 1
@@ -933,7 +1025,7 @@ delegatedOperatorJobTemplates:
     #       nvidia.com/gpu: 1
     #
     # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus
-    # gpu-gcp-gke-autopilot:
+    # gpuGcpGkeAutopilot:
     #   env:
     #     LD_LIBRARY_PATH: /usr/local/nvidia/lib64
     #   resources:
@@ -946,7 +1038,7 @@ delegatedOperatorJobTemplates:
     #     cloud.google.com/gke-accelerator-count: "1"
     #
     # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/gpus
-    # gpu-gcp-gke-standard:
+    # gpuGcpGkeStandard:
     #   resources:
     #     limits:
     #       nvidia.com/gpu: "1"
