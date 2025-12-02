@@ -191,7 +191,7 @@ Note that `fiftyone-migrator` implicitly sets `FIFTYONE_DATABASE_ADMIN=true`.
    required.
 
    ```shell
-   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate all
+   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
    ```
 
 1. To ensure that all datasets are now at version 1.8.0, run
