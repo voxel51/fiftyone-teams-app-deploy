@@ -52,13 +52,13 @@ node selectors, tolerations, volumes, and environment variables.
 The template must contain the following variables that are replaced by the API
 at runtime:
 
-| Variable | Description |
-|----------|-------------|
-| `_id` | Task ID |
-| `_name` | Generated job name |
-| `_image` | Container image (only if you prefer setting the image in the orchestrator's configuration, otherwise set the image directly in the template) |
-| `_command` | Command to run |
-| `_args` | Arguments for the command |
+| Variable   | Description                                                                                                                                  |
+|------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `_id`      | Task ID                                                                                                                                      |
+| `_name`    | Generated job name                                                                                                                           |
+| `_image`   | Container image (only if you prefer setting the image in the orchestrator's configuration, otherwise set the image directly in the template) |
+| `_command` | Command to run                                                                                                                               |
+| `_args`    | Arguments for the command                                                                                                                    |
 
 Here is a minimal example template:
 
@@ -114,84 +114,52 @@ delegated operations. This image should include:
 1. FiftyOne Enterprise Python package
 2. Any additional dependencies required by your operators
 3. Custom operators (if not using a plugins directory)
-4. Pushed to a registry accessible by your Kubernetes cluster
+4. Pushed to a container registry accessible by your Kubernetes cluster
 
 ### Required Environment Variables
 
 Your Job template must set the following environment variables for the
 delegated operation to connect back to FiftyOne:
 
-| Variable | Description |
-|----------|-------------|
-| `API_URL` | URL of the FiftyOne Teams API (must be reachable from the pod) |
-| `FIFTYONE_DATABASE_URI` | MongoDB connection URI |
-| `FIFTYONE_ENCRYPTION_KEY` | FiftyOne encryption key |
-| `FIFTYONE_INTERNAL_SERVICE` | Set to `1` |
+| Variable                    | Description                                                    |
+|-----------------------------|----------------------------------------------------------------|
+| `API_URL`                   | URL of the FiftyOne Teams API (must be reachable from the pod) |
+| `FIFTYONE_DATABASE_URI`     | MongoDB connection URI                                         |
+| `FIFTYONE_ENCRYPTION_KEY`   | FiftyOne encryption key                                        |
+| `FIFTYONE_INTERNAL_SERVICE` | Set to `1`                                                     |
 
 For cloud storage access, you will also need to configure the appropriate
 credentials (e.g., `GOOGLE_APPLICATION_CREDENTIALS` for GCP,
 `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` for AWS) or ensure the delegated
-operation pod is using a service account that allows connecting to cloud
+operator pod is using a service account that allows connecting to cloud
 storage.
-
-### Template Storage Options
-
-The template can be provided in one of the following ways:
-
-1. **File path accessible to the API**: Store the template file somewhere the
-   FiftyOne API can read it (local filesystem, mounted volume, etc.) and
-   provide the path. The templates can be mounted to the API pod via configmaps
-   for instance.
-
-   ```python
-   "executionTmplUri": "/path/to/template.yaml.j2"
-   ```
-
-2. **Cloud storage URI**: Store the template in GCS, S3, or other supported
-   storage and provide the URI.
-
-   ```python
-   "executionTmplUri": "gs://my-bucket/templates/job-template.yaml.j2"
-   ```
-
-3. **Base64-encoded data URI**: Embed the template directly in the config as
-   a base64-encoded string.
-
-   ```python
-   import base64
-
-   template = """..."""  # your template here, or read from disk
-   encoded = base64.b64encode(template.encode()).decode()
-   
-   "executionTmplUri": f"data:text/yaml;base64,{encoded}"
-   ```
 
 ## Register Orchestrator in FiftyOne
 
-To register your orchestrator with FiftyOne, you can use the
+To register your orchestrator with FiftyOne, you may use the
 [FiftyOne Management SDK](https://docs.voxel51.com/enterprise/management_sdk.html#module-fiftyone.management.orchestrator).
-You will need to supply the environment you want to run your orchestrator
-(`fom.OrchestratorEnvironment.KUBERNETES`), and then the configuration and
-credential information needed to access that runner. To use the FiftyOne
-Management SDK, you will also need an `API_URI` set in the environment or
-FiftyOne configuration.
+Supply the environment you want to run your orchestrator
+(`fom.OrchestratorEnvironment.KUBERNETES`), the configuration, and
+credential to access that runner. To use the FiftyOne
+Management SDK, set the `API_URI` environment variable or
+FiftyOne configuration variable.
 
-When registering your orchestrator with FiftyOne, you will need to supply
-credential information, which is stored as a
-[FiftyOne Secret](https://docs.voxel51.com/enterprise/secrets.html). The
-`secrets` parameter to
+When registering your orchestrator with FiftyOne, supply the
+credential information stored as a
+[FiftyOne Secret](https://docs.voxel51.com/enterprise/secrets.html).
+The `secrets` parameter to
 [`fom.register_orchestrator()`](https://docs.voxel51.com/enterprise/management_sdk.html#fiftyone.management.orchestrator.register_orchestrator)
-takes a top level key that must match your orchestrator environment. The
-object that follows has key and value pairs that are specific to the
+takes a top-level key that must match your orchestrator environment. The
+object that follows has key and value pairs specific to the
 credentials needed to access your orchestrator.
 
-When supplying one of the values, a new Secret will be created for you that
-securely stores the information provided. These can be managed via the
-Secrets manager.
+When supplying one of the values, a new secret will be created for you that
+securely stores the information provided. These can be managed as
+[FiftyOne Secrets](https://docs.voxel51.com/enterprise/secrets.html).
 
-Optionally, if you have an existing Secret that already has the credentials
-you'd like to use, you can provide the name of that Secret and it will be used
-instead of creating a new one. Examples of both options are included below.
+Optionally, if you have an existing secret containing the credentials,
+provide that secret name, and it will be used
+instead of creating a new one. Examples of both options are below.
 
 Example snippet using the Management SDK to register a Kubernetes orchestrator:
 
@@ -221,14 +189,12 @@ fom.register_orchestrator(
 
 This will register a new orchestrator with the identifier `kubernetes-gpu`.
 
-Additionally, it will save a new Secret for the value supplied in kubeConfig.
-That new secret will have the following name:
+Additionally, it will save a new secret for the value supplied in kubeConfig.
+That new secret will have the name `KUBE_CONFIG_KUBERNETES_GPU`.
 
-`KUBE_CONFIG_KUBERNETES_GPU`
-
-As noted above, if you already had Secrets saved with values you would like to
-use, these names could be supplied in place of the values in the `secrets`
-parameter. Here is an example:
+If you already have a secret with values,
+supply the name in the `secrets` parameter.
+Here is an example:
 
 ```python
 import fiftyone.management as fom
@@ -250,25 +216,61 @@ fom.register_orchestrator(
 )
 ```
 
-In this case, new Secrets will not be created since valid names for existing
-secrets have been provided. Those existing Secrets will be associated with the
-orchestrator.
+In this case, a new secret will not be created.
+The existing secrets will be associated with the orchestrator.
 
 ### Configuration Options
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `image` | No | Container image to use for jobs, generally set in template |
-| `executionTmplUri` | Yes | Path/URI to the Job template or base64 encoded |
-| `registrationTmplUri` | No | Path/URI to a separate template for registration jobs or base64 encoded |
-| `namespace` | No | Kubernetes namespace (can also be set in template or kubeconfig) |
-| `context` | No | Kubeconfig context to use if different from default |
+| Parameter             | Required | Description                                                             |
+|-----------------------|----------|-------------------------------------------------------------------------|
+| `image`               | No       | Container image to use for jobs, generally set in template              |
+| `executionTmplUri`    | Yes      | Path/URI to the Job template or base64 encoded (see [below](#b64))      |
+| `registrationTmplUri` | No       | Path/URI to a separate template for registration jobs or base64 encoded |
+| `namespace`           | No       | Kubernetes namespace (can also be set in template or kubeconfig)        |
+| `context`             | No       | Kubeconfig context to use if different from default                     |
+
+### Template Storage Options
+
+The template can be provided in one of the following ways:
+
+- **File path accessible to the API**: Store the template file somewhere the
+   FiftyOne API can read it (local filesystem, mounted volume, etc.) and
+   provide the path. The templates can be mounted to the API pod via configmaps.
+
+   ```python
+   # ...
+   "executionTmplUri": "/path/to/template.yaml.j2"
+   # ...
+   ```
+
+- **Cloud storage URI**: Store the template in GCS, S3, or other supported
+   storage and provide the URI.
+
+   ```python
+   # ...
+   "executionTmplUri": "gs://my-bucket/templates/job-template.yaml.j2"
+   # ...
+   ```
+
+- <a id="b64"></a>**Base64-encoded data URI**: Embed the template's content directly in the config as
+   a base64-encoded string.
+
+   ```python
+   import base64
+
+   template = """..."""  # your full template as a string here, or loaded from disk
+   encoded = base64.b64encode(template.encode()).decode()
+
+   # ...
+   "executionTmplUri": f"data:text/yaml;base64,{encoded}"
+   # ...
+   ```
 
 ### Secrets Options
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `kubeConfig` | No | Kubeconfig file contents as string. Leave empty for in-cluster auth. |
+| Parameter    | Required | Description                                                          |
+|--------------|----------|----------------------------------------------------------------------|
+| `kubeConfig` | No       | Kubeconfig file contents as string. Leave empty for in-cluster auth. |
 
 ## Separate CPU and GPU Templates
 
@@ -415,7 +417,7 @@ fom.register_orchestrator(
 )
 ```
 
-You can also register a separate CPU-only orchestrator for operations that
+You may also register a separate CPU-only orchestrator for operations that
 do not require GPU:
 
 ```python
@@ -441,15 +443,15 @@ fom.register_orchestrator(
 This step is only required if you've added a plugin directory with custom
 plugins to your Kubernetes environment.
 
-Once your orchestrator is registered in FiftyOne you can now refresh the
-available operators for that environment. To do so, go to any dataset/runs page
-and select your orchestrator on the right hand side.
+Once your orchestrator is registered in FiftyOne you may now refresh the
+available operators for that environment. To do so:
 
-Select the "refresh" button and click "confirm" when prompted. This will kick
-off a job in your Kubernetes cluster that will tell FiftyOne what operators are
-available in that environment. Once you see the job is complete, reload the
-page and verify your "available operators" show the ones that you have
-configured.
+1. Go to any dataset/runs page and select your orchestrator on the right-hand side.
+1. Select the "refresh" button and click "confirm" when prompted.
+    - This will kick off a job in your Kubernetes cluster that will tell
+       FiftyOne what operators are available in that environment.
+1. Once you see the job is complete, reload the page and verify your
+   "available operators" show the ones that you have configured.
 
 In the future, anytime you add new operators to your environment, you will go
 through this same workflow.
@@ -457,7 +459,7 @@ through this same workflow.
 ## Additional Considerations
 
 Your Kubernetes service account (or the credentials in kubeConfig) will need
-appropriate RBAC permissions to create and delete Jobs.
+appropriate RBAC permissions to create and delete jobs.
 
 For cloud storage access, you may need to configure:
 
@@ -471,8 +473,8 @@ For cloud storage access, you may need to configure:
 Additionally:
 
 - The `ttlSecondsAfterFinished` setting in your Job spec controls how long
-  completed Jobs stick around before being cleaned up. A short value (60s)
-  keeps the cluster tidy; a longer value makes debugging easier.
+  completed jobs persist before being cleaned up. A short value (60s)
+  keeps the cluster tidy while a longer value makes debugging easier.
 
 ## Credential Rotation
 
