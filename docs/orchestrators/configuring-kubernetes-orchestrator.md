@@ -102,7 +102,8 @@ spec:
       restartPolicy: Never
 ```
 
-See the [Full Production Template Example](#full-production-template-example)
+See the
+[Full Production Template Example](#full-production-template-example)
 at the end of this document for a complete setup with volumes, security
 contexts, and GCS FUSE.
 
@@ -112,13 +113,13 @@ You need a container image with FiftyOne installed that will run your
 delegated operations. This image should include:
 
 1. FiftyOne Enterprise Python package
-2. Any additional dependencies required by your operators
-3. Custom operators (if not using a plugins directory)
-4. Pushed to a container registry accessible by your Kubernetes cluster
+1. Any additional dependencies required by your operators
+1. Custom operators (if not using a plugins directory)
+1. Pushed to a container registry accessible by your Kubernetes cluster
 
 ### Required Environment Variables
 
-Your Job template must set the following environment variables for the
+Your job template must set the following environment variables for the
 delegated operation to connect back to FiftyOne:
 
 | Variable                    | Description                                                    |
@@ -131,8 +132,7 @@ delegated operation to connect back to FiftyOne:
 For cloud storage access, you will also need to configure the appropriate
 credentials (e.g., `GOOGLE_APPLICATION_CREDENTIALS` for GCP,
 `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` for AWS) or ensure the delegated
-operator pod is using a service account that allows connecting to cloud
-storage.
+operator pod's service account is permitted to cloud storage.
 
 ## Register Orchestrator in FiftyOne
 
