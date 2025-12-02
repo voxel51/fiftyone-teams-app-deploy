@@ -14,6 +14,26 @@
 
 # Databricks On-Demand Orchestrator Setup
 
+<!-- toc -->
+
+- [Introduction](#introduction)
+- [Create requirements.txt](#create-requirementstxt)
+- [Create Databricks secrets](#create-databricks-secrets)
+- [Create Job Entrypoint](#create-job-entrypoint)
+- [Create Instance Pool](#create-instance-pool)
+  - [Optional Registration Instance Pool](#optional-registration-instance-pool)
+- [Setup Plugin Volume](#setup-plugin-volume)
+- [Create Job](#create-job)
+- [Create Service Creds](#create-service-creds)
+- [Register Orchestrator in FiftyOne](#register-orchestrator-in-fiftyone)
+- [Refresh Orchestrator Operators](#refresh-orchestrator-operators)
+- [Additional Considerations](#additional-considerations)
+  - [Credential Expiration and Rotation](#credential-expiration-and-rotation)
+- [Common Issues](#common-issues)
+  - [Dependency Conflicts](#dependency-conflicts)
+
+<!-- tocstop -->
+
 This document provides a step-by-step guide to configuring FiftyOne Enterprise
 to use [Databricks](https://www.databricks.com/) as an orchestrator for running
 delegated operations on-demand.

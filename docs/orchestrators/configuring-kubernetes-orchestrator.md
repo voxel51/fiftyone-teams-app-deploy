@@ -12,6 +12,26 @@
 
 # Kubernetes On-Demand Orchestrator Setup
 
+<!-- toc -->
+
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Kubernetes Credentials](#kubernetes-credentials)
+- [Create Job Template](#create-job-template)
+- [Container Image](#container-image)
+  - [Required Environment Variables](#required-environment-variables)
+- [Register Orchestrator in FiftyOne](#register-orchestrator-in-fiftyone)
+  - [Configuration Options](#configuration-options)
+  - [Template Storage Options](#template-storage-options)
+  - [Secrets Options](#secrets-options)
+- [Separate CPU and GPU Templates](#separate-cpu-and-gpu-templates)
+- [Refresh Orchestrator Operators](#refresh-orchestrator-operators)
+- [Additional Considerations](#additional-considerations)
+- [Credential Rotation](#credential-rotation)
+- [Full Production Template Example](#full-production-template-example)
+
+<!-- tocstop -->
+
 This document provides a step-by-step guide to configuring FiftyOne Enterprise
 to use [Kubernetes](https://kubernetes.io/) as an orchestrator for running
 delegated operations on-demand.
