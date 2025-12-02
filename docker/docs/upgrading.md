@@ -17,8 +17,13 @@
 <!-- toc -->
 
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-  - [A Note On Database Migrations](#a-note-on-database-migrations)
-  - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+  - [The Enterprise Migration Tool](#the-enterprise-migration-tool)
+    - [Installing the enterprise migration tool](#installing-the-enterprise-migration-tool)
+    - [Configuring the enterprise migration tool](#configuring-the-enterprise-migration-tool)
+    - [Using the enterprise migration tool](#using-the-enterprise-migration-tool)
+      - [Reverting a migration](#reverting-a-migration)
+  - [From FiftyOne Enterprise Version 2.13.0 or Higher](#from-fiftyone-enterprise-version-2130-or-higher)
+  - [From FiftyOne Enterprise Version 2.0.0 to 2.13.0](#from-fiftyone-enterprise-version-200-to-2130)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
     - [FiftyOne Enterprise v2.5+ Delegated Operator Changes](#fiftyone-enterprise-v25-delegated-operator-changes)
     - [FiftyOne Enterprise v2.2+ Delegated Operator Changes](#fiftyone-enterprise-v22-delegated-operator-changes)
@@ -39,44 +44,100 @@ If you use custom deployment mechanisms, carefully review the changes in the
 [Docker Compose Files](../)
 and update your deployment accordingly.
 
-### A Note On Database Migrations
+### The Enterprise Migration Tool
 
-The environment variable `FIFTYONE_DATABASE_ADMIN`
-controls whether the database may be migrated.
-This is a safety check to prevent automatic database
-upgrades that will break other users' SDK connections.
-When false (or unset), either an error will occur
+FiftyOne Enterprise `v2.13.0` introduces a new migration tool which is
+designed specifically for enterprise-only functionality.
+This tool is very similar to the existing `fiftyone migrate` command,
+but does not come packaged with the FiftyOne distribution by default.
+
+#### Installing the enterprise migration tool
+
+1. Install `fiftyone-migrator` package:
+
+    ```shell
+    pip install fiftyone-migrator \
+      --extra-index-url=https://${TOKEN}@pypi.fiftyone.ai
+    ```
+
+#### Configuring the enterprise migration tool
+
+The enterprise migration tool requires the following environment variables
+to be defined:
+
+- `CAS_DATABASE_URI` - The database URI used by CAS
+- `CAS_DATABASE_NAME` - The database name used by CAS
+- `FIFTYONE_DATABASE_URI` - The database URI used by FiftyOne
+- `FIFTYONE_DATABASE_NAME` - The database name used by FiftyOne
+
+#### Using the enterprise migration tool
+
+**IMPORTANT**: As with any database migration, Voxel51 **strongly** recommends
+backing up your database prior to migrating.
+While many precautions are taken to mitigate the risk of data corruption,
+data migration always carries a risk of introducing unintended modifications.
+
+The enterprise migration tool allows migrating each of the enterprise services:
+
+- `datasets` - Migrate core datasets; this is equivalent to the existing
+  `fiftyone migrate` command
+- `enterprise` - Migrate enterprise-specific dataset features
+- `cas` - Migrate the Centralized Authentication Service (CAS)
+- `hub` - Migrate the enterprise API
+
+Each of these services can be selectively included or excluded from migration.
 
 ```shell
-$ fiftyone migrate --all
-Traceback (most recent call last):
-...
-OSError: Cannot migrate database from v0.22.0 to v0.22.3 when database_admin=False.
+# Migrate all enterprise services to the most current state
+fiftyone-migrator migrate
+
+# Migrate all enterprise services to a specific version
+fiftyone-migrator migrate 2.13.0
+
+# Migrate specific services
+fiftyone-migrator migrate --include enterprise
+
+# Migrate all-but specific services
+fiftyone-migrator migrate --exclude cas hub
 ```
 
-or no action will be taken:
+##### Reverting a migration
+
+Migrations are designed to be bidirectional. In the event that you need to
+revert a migration, simply provide the version which you want to restore.
 
 ```shell
-$ fiftyone migrate --info
-FiftyOne Enterprise version: 0.14.4
-FiftyOne compatibility version: 0.22.3
-Other compatible versions: >=0.19,<0.23
-Database version: 0.21.2
-dataset     version
-----------  ---------
-quickstart  0.22.0
-$ fiftyone migrate --all
-$ fiftyone migrate --info
-FiftyOne Enterprise version: 0.14.4
-FiftyOne compatibility version: 0.23.0
-Other compatible versions: >=0.19,<0.23
-Database version: 0.21.2
-dataset     version
-----------  ---------
-quickstart  0.21.2
+# Migrate from v2.12.0 to v2.13.0
+fiftyone-migrator migrate 2.13.0
+
+# Oops, need to revert this migration!
+# Migrate from v2.13.0 to v2.12.0
+fiftyone-migrator migrate 2.12.0
 ```
 
-### From FiftyOne Enterprise Version 2.0.0 and Later
+### From FiftyOne Enterprise Version 2.13.0 or Higher
+
+1. [Upgrade to FiftyOne Enterprise version 2.13.0](#upgrading-from-previous-versions)
+
+1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
+   version 2.13.0
+    1. Login to the FiftyOne Enterprise UI
+    1. To obtain the CLI command to install the FiftyOne SDK associated with
+       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
+
+1. [Upgrade or install](#installing-the-enterprise-migration-tool)
+   the enterprise migration tool
+
+1. Voxel51 recommends that you upgrade all your datasets, but it is not
+   required.
+
+   ```shell
+   fiftyone-migrator migrate
+   ```
+
+Note that `fiftyone-migrator` implicitly sets `FIFTYONE_DATABASE_ADMIN=true`.
+
+### From FiftyOne Enterprise Version 2.0.0 to 2.13.0
 
 1. [Upgrade to FiftyOne Enterprise version 2.13.1](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise

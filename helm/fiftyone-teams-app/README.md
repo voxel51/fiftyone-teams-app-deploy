@@ -27,6 +27,11 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.13+ FiftyOne Migration Changes
+
+FiftyOne Enterprise v2.13 introduces the `fiftyone-migrator` utility.
+Please refer to the [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/upgrading.md#the-enterprise-migration-tool).
+
 ### Version 2.11+ On-Demand Delegated Operator Executors
 
 FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
