@@ -17,9 +17,10 @@
 <!-- toc -->
 
 - [v2.14.0+](#v2140)
+- [v2.7.0+](#v270)
+- [Using `delegatedOperatorJobTemplates`](#using-delegatedoperatorjobtemplates)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
-- [v2.7.0+](#v270)
 - [Using `delegatedOperatorDeployments`](#using-delegatedoperatordeployments)
   - [Built-in Plugins](#built-in-plugins-1)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins-1)
@@ -40,6 +41,31 @@ to create on-demand delegated operators utilizing
 
 `delegatedOperatorJobTemplates` enables you to create multiple job
 templates that FiftyOne Enterprise can use to create Kubernetes jobs.
+
+FiftyOne Enterprise 2.14+ defaults the `teams-do-teamsDoCpuDefaultK8s`
+delegated operator to on.
+Configuring the delegated operator has
+[not changed](#using-delegatedoperatordeployments).
+The `teams-do-teamsDoCpuDefaultK8s` deployment can be
+disabled by setting it to `null` in the `values.yaml` file:
+
+```yaml
+delegatedOperatorDeployments:
+  deployments:
+    teamsDoCpuDefault: null
+```
+
+## v2.7.0+
+
+As of version 2.7.0, `delegatedOperatorExecutorSettings`
+has been deprecated in favor of `delegatedOperatorDeployments`.
+`delegatedOperatorExecutorSettings` has been marked for deletion
+for versions released after May 31st, 2025.
+
+`delegatedOperatorDeployments` enables you to deploy multiple instances
+of delegated operators targeting different hardware or use-cases.
+
+## Using `delegatedOperatorJobTemplates`
 
 The values in `delegatedOperatorJobTemplates.template` will be applied to
 every job instance under `delegatedOperatorJobTemplates.jobs`.
@@ -65,17 +91,17 @@ See
 [examples](#examples)
 for more information.
 
-To enable delegated operators, add an object to `delegatedOperatorDeployments.deployments`:
+To enable delegated operators, add an object to `delegatedOperatorDeployments.jobs`:
 
 ```yaml
 delegatedOperatorJobTemplates:
   jobs:
-    cpu-default: {}
+    teamsDoCpuDefaultK8s: {}
 ```
 
-The helm chart will create a `ConfigMap` with an `cpu-default.yaml` entry.
+The helm chart will create a `ConfigMap` with an `teamsDoCpuDefaultK8s.yaml` entry.
 This entry will be mounted onto the API as a file
-at `/tmp/do-targets/cpu-default.yaml`.
+at `/tmp/do-targets/teamsDoCpuDefaultK8s.yaml`.
 Delegated operators can be added to any of the three existing
 [plugin modes](./confuring-plugins.md).
 
@@ -87,7 +113,7 @@ is needed.
 ```yaml
 delegatedOperatorJobTemplates:
   jobs:
-    cpu-default: {}
+    teamsDoCpuDefaultK8s: {}
 ```
 
 ### Shared/Dedicated Plugins
@@ -104,7 +130,7 @@ of these two ways:
     ```yaml
     delegatedOperatorJobTemplates:
       jobs:
-        cpu-default: {}
+        teamsDoCpuDefaultK8s: {}
       template:
         env:
           FIFTYONE_PLUGINS_DIR: /opt/plugins
@@ -123,7 +149,7 @@ of these two ways:
     ```yaml
     delegatedOperatorJobTemplates:
       jobs:
-        cpu-default:
+        teamsDoCpuDefaultK8s:
           env:
             FIFTYONE_PLUGINS_DIR: /opt/plugins
           volumes:
@@ -163,23 +189,13 @@ In `values.yaml`, set the environment variable
     ```yaml
     delegatedOperatorJobTemplates:
       jobs:
-        cpu-default:
+        teamsDoCpuDefaultK8s:
           env:
             FIFTYONE_DELEGATED_OPERATION_LOG_PATH: /your/path
     ```
 
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](../../docs/custom-plugins.md).
-
-## v2.7.0+
-
-As of version 2.7.0, `delegatedOperatorExecutorSettings`
-has been deprecated in favor of `delegatedOperatorDeployments`.
-`delegatedOperatorExecutorSettings` has been marked for deletion
-for versions released after May 31st, 2025.
-
-`delegatedOperatorDeployments` enables you to deploy multiple instances
-of delegated operators targeting different hardware or use-cases.
 
 ## Using `delegatedOperatorDeployments`
 

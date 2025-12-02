@@ -35,6 +35,8 @@ FiftyOne Enterprise 2.14+ introduces custom roles and role bindings to allow the
 `teams-api` deployment to create, update, and remove batch jobs and pods for
 kubernetes-based
 [on-demand delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+An additional service account is now created by the helm chart to utilize these roles
+and is attached to the `teams-api` deployment object.
 
 #### Delegated Operator Changes
 
