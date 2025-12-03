@@ -21,7 +21,7 @@
 - [Using `delegatedOperatorJobTemplates` for on-demand executors](#using-delegatedoperatorjobtemplates-for-on-demand-executors)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
-- [Using `delegatedOperatorDeployments`](#using-delegatedoperatordeployments)
+- [Using `delegatedOperatorDeployments` for always-on executors](#using-delegatedoperatordeployments-for-always-on-executors)
   - [Built-in Plugins](#built-in-plugins-1)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins-1)
 - [Examples](#examples)
@@ -45,7 +45,7 @@ templates that FiftyOne Enterprise can use to create Kubernetes jobs.
 FiftyOne Enterprise 2.14+ deploys the `teams-do-cpu-default`
 delegated operator `Deployment` by default.
 Configuring the delegated operator has
-[not changed](#using-delegatedoperatordeployments).
+[not changed](#using-delegatedoperatordeployments-for-always-on-executors).
 The `teams-do-cpu-default` deployment can be
 disabled by setting it to `null` in the `values.yaml` file:
 
@@ -197,7 +197,7 @@ In `values.yaml`, set the environment variable
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](../../docs/custom-plugins.md).
 
-## Using `delegatedOperatorDeployments`
+## Using `delegatedOperatorDeployments` for always-on executors
 
 The values in `delegatedOperatorDeployments.template` will be applied to
 every deployment instance under `delegatedOperatorDeployments.deployments`.
