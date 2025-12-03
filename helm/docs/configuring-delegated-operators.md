@@ -65,7 +65,7 @@ for versions released after May 31st, 2025.
 `delegatedOperatorDeployments` enables you to deploy multiple instances
 of delegated operators targeting different hardware or use-cases.
 
-## Using `delegatedOperatorJobTemplates`
+## Using `delegatedOperatorJobTemplates` for on-demand executors
 
 The values in `delegatedOperatorJobTemplates.template` will be applied to
 every job instance under `delegatedOperatorJobTemplates.jobs`.
@@ -166,7 +166,7 @@ See
 [Adding Shared Storage for FiftyOne Enterprise Plugins](./plugins-storage.md)
 for configuring persistent volumes and claims.
 
-Optionally, the logs generated during running of a delegated operation may be
+Optionally, the delegated operation run logs may be
 uploaded to a network-mounted file system or cloud storage path
 available to this deployment.
 Logs are uploaded in the format
