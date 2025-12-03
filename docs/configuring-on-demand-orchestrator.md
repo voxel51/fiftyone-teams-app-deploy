@@ -21,3 +21,4 @@ This is the list of supported orchestrators and their configuration guides:
 
 - [Anyscale](./orchestrators/configuring-anyscale-orchestrator.md)
 - [Databricks](./orchestrators/configuring-databricks-orchestrator.md)
+- [Kubernetes](./orchestrators/configuring-kubernetes-orchestrator.md)
