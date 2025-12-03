@@ -18,7 +18,7 @@
 
 - [v2.14.0+](#v2140)
 - [v2.7.0+](#v270)
-- [Using `delegatedOperatorJobTemplates`](#using-delegatedoperatorjobtemplates)
+- [Using `delegatedOperatorJobTemplates` for on-demand executors](#using-delegatedoperatorjobtemplates-for-on-demand-executors)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
 - [Using `delegatedOperatorDeployments`](#using-delegatedoperatordeployments)
@@ -42,8 +42,8 @@ to create on-demand delegated operators utilizing
 `delegatedOperatorJobTemplates` enables you to create multiple job
 templates that FiftyOne Enterprise can use to create Kubernetes jobs.
 
-FiftyOne Enterprise 2.14+ defaults the `teams-do-cpu-default`
-persistent delegated operator to on.
+FiftyOne Enterprise 2.14+ deploys the `teams-do-cpu-default`
+delegated operator `Deployment` by default.
 Configuring the delegated operator has
 [not changed](#using-delegatedoperatordeployments).
 The `teams-do-cpu-default` deployment can be
