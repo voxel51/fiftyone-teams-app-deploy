@@ -35,10 +35,13 @@
 
 ## v2.14.0+
 
+> [!NOTE]
+> `delegatedOperatorJobTemplates` and on-demand kubernetes orchestration
+> are currently in beta and can be used by early adopters.
+
 `delegatedOperatorJobTemplates` was added in version 2.14.0 which allows users
 to create on-demand delegated operators utilizing
 [kubernetes jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/).
-
 `delegatedOperatorJobTemplates` enables you to create multiple job
 templates that FiftyOne Enterprise can use to create Kubernetes jobs.
 
@@ -54,12 +57,15 @@ delegated operator `Deployment` by default.
 Configuring the delegated operator has
 [not changed](#using-delegatedoperatordeployments-for-always-on-executors).
 The `teams-do-cpu-default` deployment can be
-disabled by setting it to `null` in the `values.yaml` file:
+disabled by setting
+`delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled=false`
+in the `values.yaml` file:
 
 ```yaml
 delegatedOperatorDeployments:
   deployments:
-    teamsDoCpuDefault: null
+    teamsDoCpuDefault:
+      enabled: false
 ```
 
 ## v2.7.0+

@@ -38,10 +38,17 @@ kubernetes-based
 An additional service account is now created by the helm chart to utilize these roles
 and is attached to the `teams-api` deployment object.
 
+The
+[on-demand delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+are currently in beta and can be used by early adopters.
+
 #### Delegated Operator Changes
 
 FiftyOne Enterprise 2.14+ defaults the
 `teams-do-cpu-default` delegated operator to on.
+Please see
+[configuring delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+for steps on configuring or disabling it.
 
 ### Version 2.11+ On-Demand Delegated Operator Executors
 
