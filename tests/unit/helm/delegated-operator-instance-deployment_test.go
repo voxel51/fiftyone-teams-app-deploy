@@ -62,15 +62,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDisabled() {
 		{
 			"defaultValuesDODisabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault": "null",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "false",
 			},
 			nil,
 		},
 		{
 			"overrideTeamsDoNull",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault": "null",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "false",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]string{"teams-do-two"},
 		},
@@ -309,8 +309,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 		{
 			"overrideTeamsDoNull",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault": "null",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "false",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 				"namespace.name": "test-namespace-name",
 			},
 			[]string{"test-namespace-name"},
@@ -793,8 +793,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCount() {
 		{
 			"overrideTeamsDoNull",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault": "null",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "false",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]int{1},
 		},
@@ -1851,8 +1851,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerName() {
 		{
 			"overrideTeamsDoNull",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault": "null",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "false",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]string{"teams-do-two"},
 		},
@@ -2957,9 +2957,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets()
 		{
 			"overrideTeamsDoNull",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault": "null",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"imagePullSecrets[0].name":                                   "test-pull-secret",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "false",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"imagePullSecrets[0].name":                                           "test-pull-secret",
 			},
 			[]string{"test-pull-secret"},
 		},
@@ -3758,8 +3758,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestServiceAccountName
 		{
 			"overrideTeamsDoNull",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault": "null",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "false",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 				"serviceAccount.name": "test-service-account",
 			},
 			[]string{"test-service-account"},
@@ -5259,9 +5259,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 		{
 			"overrideTeamsDoNull",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault": "null",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.description":          "Delegated Operator",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "false",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.description":                  "Delegated Operator",
 			},
 			[]func(args []string){
 				func(args []string) {

@@ -1872,6 +1872,12 @@
             "teamsDoCpuDefault": {
               "description": "Default (CPU-only) delegated operator runner.\nDefaults to an 8vCPU, 16Gi RAM runner.\nThe deployment is backed with a 2.5Gi in-memory\nvolume for caching media and an extra 2Gi of shared memory.",
               "properties": {
+                "enabled": {
+                  "default": true,
+                  "required": [],
+                  "title": "enabled",
+                  "type": "boolean"
+                },
                 "env": {
                   "properties": {
                     "FIFTYONE_MEDIA_CACHE_DIR": {

@@ -14,6 +14,9 @@ metadata:
     {{- include "delegated-operator-templates.config-map-labels" . | nindent 4 }}
 data:
 {{- range $jobName, $jobConfig := .Values.delegatedOperatorJobTemplates.jobs }}
+  {{- /* Allows someone to explicitly disable a DO. */ -}}
+  {{- if ne $jobConfig.enabled false }}
+
   {{- /* environment context with better merging for helpers. */ -}}
   {{- $envContext := dict
       "secretName" $.Values.secret.name
@@ -132,5 +135,6 @@ data:
           volumes:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+    {{- end }}
 {{- end }}
 {{- end }}
