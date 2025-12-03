@@ -825,6 +825,7 @@ delegatedOperatorDeployments:
     # The deployment is backed with a 2.5Gi in-memory
     # volume for caching media and an extra 2Gi of shared memory.
     teamsDoCpuDefault:
+      enabled: true
       env:
         FIFTYONE_MEDIA_CACHE_DIR: /opt/media_cache
         FIFTYONE_MEDIA_CACHE_SIZE_BYTES: '2147483648'
@@ -989,10 +990,12 @@ delegatedOperatorJobTemplates:
   # -- On-Demand Delegated Operator Jobs.
   jobs: {}
     # Default CPU-only batch job
-    # cpuDefault: {}
+    # cpuDefault:
+    #   enabled: true
     # GPU Examples Defined Below
     # https://learn.microsoft.com/en-us/azure/aks/use-nvidia-gpu
     # gpuAzureAks:
+    #   enabled: true
     #   resources:
     #     limits:
     #       nvidia.com/gpu: 1
@@ -1006,6 +1009,7 @@ delegatedOperatorJobTemplates:
     #
     # https://docs.aws.amazon.com/eks/latest/userguide/auto-accelerated.html
     # gpuAwsEksAuto:
+    #   enabled: true
     #   resources:
     #     limits:
     #       nvidia.com/gpu: 1
@@ -1013,7 +1017,8 @@ delegatedOperatorJobTemplates:
     #       nvidia.com/gpu: 1
     #
     # https://aws.amazon.com/blogs/compute/running-gpu-accelerated-kubernetes-workloads-on-p3-and-p2-ec2-instances-with-amazon-eks/
-    # gpu-aws-eks-standard:
+    # gpuAwsEksStandard:
+    #   enabled: true
     #   resources:
     #     limits:
     #       nvidia.com/gpu: 1
@@ -1022,6 +1027,9 @@ delegatedOperatorJobTemplates:
     #
     # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus
     # gpuGcpGkeAutopilot:
+    #   enabled: true
+    #   env:
+    #     LD_LIBRARY_PATH: /usr/local/nvidia/lib64
     #   resources:
     #     limits:
     #       nvidia.com/gpu: "1"
@@ -1033,6 +1041,7 @@ delegatedOperatorJobTemplates:
     #
     # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/gpus
     # gpuGcpGkeStandard:
+    #   enabled: true
     #   resources:
     #     limits:
     #       nvidia.com/gpu: "1"
