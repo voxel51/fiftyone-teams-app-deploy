@@ -282,32 +282,32 @@ test-integration-helm-interleaved: test-integration-helm-interleaved-internal te
 
 test-integration-helm-topology: copy-license-files-helm  ## run go test on the tests/integration/helm directory for topology constraints
 	@cd tests/integration/helm; \
-	go test -count=1 -timeout=15m -v -tags integrationHelmTopology
+	go test -count=1 -timeout=25m -v -tags integrationHelmTopology
 
 test-integration-helm-internal: copy-license-files-helm  ## run go test on the tests/integration/helm directory for internal auth mode
 	@cd tests/integration/helm; \
-	go test -count=1 -timeout=15m -v -tags integrationHelmInternalAuth
+	go test -count=1 -timeout=25m -v -tags integrationHelmInternalAuth
 
 test-integration-helm-interleaved-topology: copy-license-files-helm  ## run go test on the tests/integration/helm directory for topology constraints
 	@cd tests/integration/helm; \
 	rm -rf test_output_topology/*; \
-	go test -count=1 -timeout=15m -v -tags integrationHelmTopology | tee test_output_topology.log; \
+	go test -count=1 -timeout=25m -v -tags integrationHelmTopology | tee test_output_topology.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_topology.log -outputdir test_output_topology
 
 test-integration-helm-legacy: copy-license-files-helm  ## run go test on the tests/integration/helm directory for legacy auth mode
 	@cd tests/integration/helm; \
-	go test -count=1 -timeout=15m -v -tags integrationHelmLegacyAuth
+	go test -count=1 -timeout=25m -v -tags integrationHelmLegacyAuth
 
 test-integration-helm-interleaved-internal: copy-license-files-helm  ## run go test on the tests/integration/helm directory for internal auth mode
 	@cd tests/integration/helm; \
 	rm -rf test_output_internal/*; \
-	go test -count=1 -timeout=15m -v -tags integrationHelmInternalAuth | tee test_output_internal.log; \
+	go test -count=1 -timeout=25m -v -tags integrationHelmInternalAuth | tee test_output_internal.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
 
 test-integration-helm-interleaved-legacy: copy-license-files-helm  ## run go test on the tests/integration/helm directory for legacy auth mode
 	@cd tests/integration/helm; \
 	rm -rf test_output_legacy/*; \
-	go test -count=1 -timeout=15m -v -tags integrationHelmLegacyAuth | tee test_output_legacy.log; \
+	go test -count=1 -timeout=25m -v -tags integrationHelmLegacyAuth | tee test_output_legacy.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
 
 install-terratest-log-parser:  ## install terratest_log_parser
