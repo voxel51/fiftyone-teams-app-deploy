@@ -236,12 +236,35 @@ See
 [examples](#examples)
 for more information.
 
-To enable delegated operators, add an object to `delegatedOperatorDeployments.deployments`:
+As of v2.14.0, delegated operators are enabled by default, with a deployment
+called `teamsDoCpuDefault` ("teams-do-cpu-default"). Please see
+[values.yaml](../fiftyone-teams-app/values.yaml)
+for the details of this always-on executor, including the default resource
+`requests`.
+
+To disable this deployment, you must create an entry `teamsDoCpuDefault` key and
+set `enabled: false`. Example:
+
+```yaml
+delegatedOperatorDeployments:
+  deployments:
+    teamsDoCpuDefault:
+      enabled: false
+```
+
+> [!NOTE]
+> By default, the `teamsDoCpuDefault` delegated operator deployment will
+> be enabled alongside other delegated operator deployments defined here.
+
+To enable non-default delegated operators, add an object to
+`delegatedOperatorDeployments.deployments`:
 
 ```yaml
 delegatedOperatorDeployments:
   deployments:
     teamsDo: {}
+    teamsDoCpuDefault:  # Optional. These lines can be omitted if keeping the
+      enabled: false    # default deployment is desired.
 ```
 
 The Kubernetes deployment's name will be generated from `deployments` key-name
@@ -292,6 +315,16 @@ of these two ways:
           - name: plugins-vol
             mountPath: /opt/plugins
     ```
+
+> [!NOTE]
+> As noted in
+> [List Merges](#list-merges),
+> lists (incl. `volumes` and `volumeMounts`) will *not* be inherited by
+> deployment instances that define their own values. This includes the implicit
+> `teamsDoCpuDefault` delegated operator deployment, which has its own required
+> `volumes` and `volumeMounts`. As a result, Shared/Dedicated Plugins will not
+> be available in these deployments using the above technique without additional
+> configuration.
 
 1. Or, per instance:
 
