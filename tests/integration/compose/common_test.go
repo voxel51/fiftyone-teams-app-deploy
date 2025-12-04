@@ -19,6 +19,7 @@ const (
 	overrideFile                   = "../../tests/fixtures/docker/compose.override.yaml"
 	mongodbComposeFile             = "../../tests/fixtures/docker/compose.override.mongodb.yaml"
 	mongodbComposeFilePlugins      = "../../tests/fixtures/docker/compose.override.mongodb_plugins.yaml"
+	mongodbComposeFileDO           = "../../tests/fixtures/docker/compose.override.mongodb_do.yaml"
 )
 
 type serviceValidations struct {
