@@ -90,6 +90,9 @@ delegatedOperatorDeployments:
 > The `teamsDoCpuDefault` delegated operator deployment will
 > be enabled alongside other delegated operator deployments defined here.
 
+For configuring additional delegated operators, see
+[using `delegatedOperatorDeployments` for always-on executors](#using-delegatedoperatordeployments-for-always-on-executors).
+
 ## v2.7.0+
 
 As of version 2.7.0, `delegatedOperatorExecutorSettings`
