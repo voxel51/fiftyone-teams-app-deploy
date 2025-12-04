@@ -821,7 +821,7 @@ delegatedOperatorDeployments:
   # deployment instance.
   deployments:
     # -- Default (CPU-only) delegated operator runner.
-    # Defaults to an 8vCPU, 16Gi RAM runner.
+    # Defaults to an 4vCPU, 16Gi RAM runner.
     # The deployment is backed with a 2.5Gi in-memory
     # volume for caching media and an extra 2Gi of shared memory.
     teamsDoCpuDefault:

@@ -1870,7 +1870,7 @@
           "description": "Additional deployments to configure. Each template\nwill use .Values.delegatedOperatorDeployments.template as a base.\nEach template value may be overridden.\nMaps/dictionaries will be merged key-wise, with the deployment instance\ntaking precedence.\nList values will not be merged, but be overridden completely by the\ndeployment instance.",
           "properties": {
             "teamsDoCpuDefault": {
-              "description": "Default (CPU-only) delegated operator runner.\nDefaults to an 8vCPU, 16Gi RAM runner.\nThe deployment is backed with a 2.5Gi in-memory\nvolume for caching media and an extra 2Gi of shared memory.",
+              "description": "Default (CPU-only) delegated operator runner.\nDefaults to an 4vCPU, 16Gi RAM runner.\nThe deployment is backed with a 2.5Gi in-memory\nvolume for caching media and an extra 2Gi of shared memory.",
               "properties": {
                 "enabled": {
                   "default": false,
