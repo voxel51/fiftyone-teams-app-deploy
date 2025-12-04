@@ -52,21 +52,46 @@ templates that FiftyOne Enterprise can use to create Kubernetes jobs.
 > See
 > [the kubernetes orchestrator docs](../../docs/orchestrators/configuring-kubernetes-orchestrator.md)
 
-FiftyOne Enterprise 2.14+ deploys the `teams-do-cpu-default`
+FiftyOne Enterprise 2.14+ pre-populates a `teams-do-cpu-default`
 delegated operator `Deployment` by default.
 Configuring the delegated operator has
 [not changed](#using-delegatedoperatordeployments-for-always-on-executors).
 The `teams-do-cpu-default` deployment can be
-disabled by setting
-`delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled=false`
+enabled by setting
+`delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled=true`
 in the `values.yaml` file:
 
 ```yaml
 delegatedOperatorDeployments:
   deployments:
     teamsDoCpuDefault:
-      enabled: false
+      enabled: true
 ```
+
+The default deployment has 1 replica with:
+
+- 4vCPUs
+- 16Gi RAM
+- 1Gi Ephemeral Storage
+- A 2Gi Shared memory (`shm`) volume
+- A 2.5Gi in-memory media cache value
+
+Please scale up or down the number of replicas as permitted by your license file.
+
+```yaml
+delegatedOperatorDeployments:
+  deployments:
+    teamsDoCpuDefault:
+      enabled: true
+      replicaCount: <maxConcurrentDelegatedOperatorsFromLicense>
+```
+
+> [!NOTE]
+> The `teamsDoCpuDefault` delegated operator deployment will
+> be enabled alongside other delegated operator deployments defined here.
+
+For configuring additional delegated operators, see
+[using `delegatedOperatorDeployments` for always-on executors](#using-delegatedoperatordeployments-for-always-on-executors).
 
 ## v2.7.0+
 
@@ -235,37 +260,6 @@ For overlapping settings, the following rules apply:
 See
 [examples](#examples)
 for more information.
-
-As of v2.14.0, delegated operators are enabled by default, with a deployment
-called `teamsDoCpuDefault` ("teams-do-cpu-default"). Please see
-[values.yaml](../fiftyone-teams-app/values.yaml)
-for the details of this always-on executor, including the default resource
-`requests`.
-
-To disable this deployment, you must create an entry `teamsDoCpuDefault` key and
-set `enabled: false`. Example:
-
-```yaml
-delegatedOperatorDeployments:
-  deployments:
-    teamsDoCpuDefault:
-      enabled: false
-```
-
-> [!NOTE]
-> By default, the `teamsDoCpuDefault` delegated operator deployment will
-> be enabled alongside other delegated operator deployments defined here.
-
-To enable non-default delegated operators, add an object to
-`delegatedOperatorDeployments.deployments`:
-
-```yaml
-delegatedOperatorDeployments:
-  deployments:
-    teamsDo: {}
-    teamsDoCpuDefault:  # Optional. These lines can be omitted if keeping the
-      enabled: false    # default deployment is desired.
-```
 
 The Kubernetes deployment's name will be generated from `deployments` key-name
 converted to kebab-case.
