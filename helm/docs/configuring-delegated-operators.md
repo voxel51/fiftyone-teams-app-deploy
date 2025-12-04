@@ -78,6 +78,14 @@ The default deployment has 1 replica with:
 
 Please scale up or down the number of replicas as permitted by your license file.
 
+```yaml
+delegatedOperatorDeployments:
+  deployments:
+    teamsDoCpuDefault:
+      enabled: true
+      replicaCount: <maxConcurrentDelegatedOperatorsFromLicense>
+```
+
 > [!NOTE]
 > The `teamsDoCpuDefault` delegated operator deployment will
 > be enabled alongside other delegated operator deployments defined here.
