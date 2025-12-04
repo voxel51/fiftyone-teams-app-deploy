@@ -2036,12 +2036,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":               resource.MustParse("8"),
+							"cpu":               resource.MustParse("4"),
 							"memory":            resource.MustParse("16Gi"),
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":               resource.MustParse("8"),
+							"cpu":               resource.MustParse("4"),
 							"memory":            resource.MustParse("16Gi"),
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
@@ -2074,12 +2074,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":               resource.MustParse("8"),
+							"cpu":               resource.MustParse("4"),
 							"memory":            resource.MustParse("16Gi"),
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":               resource.MustParse("8"),
+							"cpu":               resource.MustParse("4"),
 							"memory":            resource.MustParse("16Gi"),
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
@@ -2108,12 +2108,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":               resource.MustParse("8"),
+							"cpu":               resource.MustParse("4"),
 							"memory":            resource.MustParse("16Gi"),
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":               resource.MustParse("8"),
+							"cpu":               resource.MustParse("4"),
 							"memory":            resource.MustParse("16Gi"),
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
@@ -2205,7 +2205,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":               resource.MustParse("8"),
+							"cpu":               resource.MustParse("4"),
 							"memory":            resource.MustParse("16Gi"),
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
@@ -2246,7 +2246,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":               resource.MustParse("8"),
+							"cpu":               resource.MustParse("4"),
 							"memory":            resource.MustParse("16Gi"),
 							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
