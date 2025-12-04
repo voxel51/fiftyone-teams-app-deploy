@@ -11,9 +11,6 @@ services:
   teams-cas:
     depends_on: [mongodb]
     image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas:${FIFTYONE_TEAMS_CAS_VERSION}
-  teams-do:
-    depends_on: [mongodb]
-    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:${FIFTYONE_APP_VERSION}
   mongodb:
     image: "mongo:8.0.0"
     restart: always
