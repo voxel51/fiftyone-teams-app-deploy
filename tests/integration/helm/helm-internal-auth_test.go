@@ -128,6 +128,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                       "true",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.replicaCount":                                  "1",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
@@ -201,20 +202,22 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
-				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                                                     "/opt/plugins",
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
-				"apiSettings.volumes[0].name":                                                                              "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                                                   "pvc-int-dp-" + suffix,
-				"apiSettings.volumeMounts[0].name":                                                                         "plugins-vol",
-				"apiSettings.volumeMounts[0].mountPath":                                                                    "/opt/plugins",
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                                                       "internal",
-				"casSettings.env.CAS_DATABASE_NAME":                                                                        "cas-int-dp-" + suffix,
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
+				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                                "/opt/plugins",
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                           "fiftyone-teams-secrets", // pragma: allowlist secret
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                            "cookieSecret",           // pragma: allowlist secret
+				"apiSettings.volumes[0].name":                                                         "plugins-vol",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                              "pvc-int-dp-" + suffix,
+				"apiSettings.volumeMounts[0].name":                                                    "plugins-vol",
+				"apiSettings.volumeMounts[0].mountPath":                                               "/opt/plugins",
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                           "fiftyone-teams-secrets", // pragma: allowlist secret
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                            "cookieSecret",           // pragma: allowlist secret
+				"casSettings.env.FIFTYONE_AUTH_MODE":                                                  "internal",
+				"casSettings.env.CAS_DATABASE_NAME":                                                   "cas-int-dp-" + suffix,
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                           "fiftyone-teams-secrets", // pragma: allowlist secret
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                            "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_PLUGINS_DIR": "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                  "true",
+
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.replicaCount":                                  "1",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret

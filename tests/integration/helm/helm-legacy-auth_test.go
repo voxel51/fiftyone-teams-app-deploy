@@ -134,6 +134,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                       "true",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.replicaCount":                                  "1",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
@@ -211,6 +212,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                       "true",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.replicaCount":                                  "1",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
