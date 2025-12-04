@@ -252,7 +252,8 @@ delegatedOperatorDeployments:
       enabled: false
 ```
 
-> [!NOTE] By default, the `teamsDoCpuDefault` delegated operator deployment will
+> [!NOTE]
+> By default, the `teamsDoCpuDefault` delegated operator deployment will
 > be enabled alongside other delegated operator deployments defined here.
 
 To enable non-default delegated operators, add an object to
@@ -315,7 +316,8 @@ of these two ways:
             mountPath: /opt/plugins
     ```
 
-> [!NOTE] As noted in
+> [!NOTE]
+> As noted in
 > [List Merges](#list-merges),
 > lists (incl. `volumes` and `volumeMounts`) will *not* be inherited by
 > deployment instances that define their own values. This includes the implicit
