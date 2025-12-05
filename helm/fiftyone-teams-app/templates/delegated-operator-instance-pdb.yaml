@@ -1,5 +1,7 @@
 {{- $baseTpl := .Values.delegatedOperatorDeployments.template }}
 {{- range $k, $v := .Values.delegatedOperatorDeployments.deployments }}
+{{- /* Allows someone to explicitly disable a DO. */ -}}
+{{- if ne $v.enabled false }}
 {{- $name := kebabcase $k }}
 {{- $labelContext := (merge (dict "name" $name) $) }}
 
@@ -31,5 +33,6 @@ spec:
     matchLabels:
       {{- include "delegated-operator-deployments.selectorLabels" $labelContext | nindent 6 }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}

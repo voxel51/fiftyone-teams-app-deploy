@@ -183,6 +183,43 @@ apiSettings:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
   podSecurityContext: {}
+  # -- RBAC roles, bindings, and service accounts which will be used to
+  # submit on-demand delegated operators to the kubernetes API.
+  # If `apiSettings.rbac.create=true`, these will be used by the `teams-api` pods.
+  rbac:
+    # -- Controls whether to create the `Role`, `RoleBinding`,
+    # and `ServiceAccount` for on-demand delegated-operator submission.
+    create: true
+    role:
+      # -- `Role` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Name of the `Role` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-do-management`.
+      name: ""
+      # -- Additional labels for the generated `Role`. [Reference][labels-and-selectors].
+      labels: {}
+    roleBinding:
+      # -- `RoleBinding` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Controls whether to create the `RoleBinding` named
+      # `apiSettings.rbac.roleBinding.name`.
+      create: true
+      # -- Name of the `RoleBinding` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-do-management`.
+      name: ""
+      # -- Additional labels for the generated `RoleBinding`. [Reference][labels-and-selectors].
+      labels: {}
+    serviceAccount:
+      # -- `ServiceAccount` annotations. [Reference][annotations].
+      annotations: {}
+      # -- Controls whether to create the `ServiceAccount` named
+      # `apiSettings.rbac.serviceAccount.name`.
+      create: true
+      # -- Name of the `ServiceAccount` (existing or to be created) in the namespace `namespace.name` used for DO management.
+      # Defaults to `release-name-fiftyone-teams-app-teams-api`.
+      name: ""
+      # -- Additional labels for the generated `ServiceAccount`. [Reference][labels-and-selectors].
+      labels: {}
   readiness:
     # -- Number of times to retry the readiness probe for the `teams-api`. [Reference][probes].
     failureThreshold: 5
@@ -717,11 +754,11 @@ delegatedOperatorDeployments:
     # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
     resources:
       limits: {}
-      #   cpu: 2
-      #   memory: 6Gi
+      #   cpu: 8
+      #   memory: 16Gi
       requests: {}
-      #   cpu: 500m
-      #   memory: 1Gi
+      #   cpu: 8
+      #   memory: 16Gi
 
     # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
     affinity: {}
@@ -782,20 +819,238 @@ delegatedOperatorDeployments:
   # taking precedence.
   # List values will not be merged, but be overridden completely by the
   # deployment instance.
-  deployments: {}
-    # Example: Use values from base template only
-    # teamsDo: {}
-    #
+  deployments:
+    # -- Default (CPU-only) delegated operator runner.
+    # Defaults to an 4vCPU, 16Gi RAM runner.
+    # The deployment is backed with a 2.5Gi in-memory
+    # volume for caching media and an extra 2Gi of shared memory.
+    teamsDoCpuDefault:
+      enabled: false
+      env:
+        FIFTYONE_MEDIA_CACHE_DIR: /opt/media_cache
+        FIFTYONE_MEDIA_CACHE_SIZE_BYTES: '2147483648'
+      replicaCount: 1
+      resources:
+        limits:
+          cpu: 4
+          ephemeral-storage: 1Gi
+          memory: 16Gi
+        requests:
+          cpu: 4
+          ephemeral-storage: 1Gi
+          memory: 16Gi
+      volumes:
+        - name: shm-vol
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
+        - name: memory-media-cache-vol
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2.5Gi
+      volumeMounts:
+        - name: shm-vol
+          mountPath: /dev/shm
+        - name: memory-media-cache-vol
+          mountPath: /opt/media_cache
+
     # Example: Configure Google GKE Autopilot nodes with GPUs and a custom log link path
     # gpuEnabled:
     #   env:
     #     FIFTYONE_DELEGATED_OPERATION_LOG_PATH: gs://mygpulogs/
+    #     FIFTYONE_MEDIA_CACHE_DIR: /opt/media_cache
     #   nodeSelector:
     #     cloud.google.com/gke-accelerator: nvidia-l4
     #     cloud.google.com/gke-accelerator-count: "1"
-    #   requests:
-    #     nvidia.com/gpu: 1
+    #   replicaCount: 1
+    #   resources:
+    #     limits:
+    #       nvidia.com/gpu: 1
+    #       cpu: 8
+    #       ephemeral-storage: 1Gi
+    #       memory: 16Gi
+    #     requests:
+    #       nvidia.com/gpu: 1
+    #       cpu: 8
+    #       ephemeral-storage: 1Gi
+    #       memory: 16Gi
+    #   volumes:
+    #     - name: shm-vol
+    #       emptyDir:
+    #         medium: Memory
+    #         sizeLimit: 2Gi
+    #     - name: memory-media-cache-vol
+    #       emptyDir:
+    #         medium: Memory
+    #         sizeLimit: 2.5Gi
+    #   volumeMounts:
+    #     - name: shm-vol
+    #       mountPath: /dev/shm
+    #     - name: memory-media-cache-vol
+    #       mountPath: /opt/media_cache
 
+delegatedOperatorJobTemplates:
+  configMap:
+    # -- ConfigMap annotations. [Reference][annotations].
+    annotations: {}
+    # -- Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`.
+    create: true
+    # -- Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.
+    # Defaults to `release-name-fiftyone-teams-app-do-templates`.
+    name: ""
+    # -- Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].
+    labels: {}
+
+  # -- A common template applied to all deployments. Each deployment can
+  # then override individual fields as needed by the operator.
+  template:
+    # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
+    affinity: {}
+    # @schema
+    # type: ["null", "integer"]
+    # @schema
+    # -- (optional) Amount of retries for the job to try before being marked as "Failed". [Reference][job-backoff-failure-policy].
+    backoffLimit: null
+    # @schema
+    # type: ["null", "integer"]
+    # @schema
+    # -- (optional) Number of seconds for a job to sit idle before being automatically removed. [Reference][job-termination-and-cleanup].
+    ttlSecondsAfterFinished: null
+    # @schema
+    # type: ["null", "integer"]
+    # @schema
+    # -- (optional) Maximum of seconds a job should be able to run. [Reference][job-termination-and-cleanup].
+    activeDeadlineSeconds: null
+    # @schema
+    # type: ["null", "integer"]
+    # @schema
+    # -- (optional) Number of completions to run before marking the job as "Completed". [Reference][job-termination-and-cleanup].
+    completions: null
+    # -- Container security configuration for generated delegated-operator containers. [Reference][container-security-context].
+    containerSecurityContext: {}
+    # Environment Variables are passed to the delegated-operator-executor containers.
+    env:
+      # -- Full path to a network-mounted file system or a cloud storage path to
+      # use for storing logs generated by delegated operation runs, one file
+      # per job. The default `""` means log upload is disabled.
+      FIFTYONE_DELEGATED_OPERATION_LOG_PATH: ""
+      # @schema
+      # type: ["string", "integer"]
+      # @schema
+      # -- Set the media cache size (in bytes) for the local FiftyOne Delegated
+      # Operator Executor processes.
+      # When not set, the app's default value is 32 GiB.
+      # `-1` disables the media cache garbage collection (and cache size is unlimited).
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+    image:
+      # @schema
+      # oneOf:
+      #   - enum: ["Always", "IfNotPresent", "Never"]
+      # @schema
+      # -- Instruct when the kubelet should pull (download) the specified image.
+      # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
+      pullPolicy: Always
+      # -- Container image for `delegated-operator-executor`.
+      repository: voxel51/fiftyone-teams-cv-full
+      # -- Image tag for `delegated-operator-executor`. Defaults to the chart version.
+      tag: ""
+    # -- Annotations for the `teams-do` deployment. [Reference][annotations].
+    jobAnnotations: {}
+    # -- nodeSelector for `delegated-operator-executor`. [Reference][node-selector].
+    nodeSelector: {}
+    # -- Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors].
+    labels: {}
+    # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
+    podAnnotations: {}
+    # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
+    podSecurityContext: {}
+    # Instead of setting default resources, we require the user define them
+    # This enables running on resource constrained environments
+    # (like Minikube). To set resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
+    # -- Container resource requests and limits for `delegated-operator-executor`. [Reference][resources].
+    resources:
+      limits: {}
+      #   cpu: 2
+      #   memory: 6Gi
+      requests: {}
+      #   cpu: 500m
+      #   memory: 1Gi
+    # -- Secret variables to be passed to the delegated-operator-executor containers.
+    secretEnv: {}
+    #   ENV_VAR_NAME:
+    #     secretName: the-pre-existing-secret
+    #     secretKey: the-key-in-the-secret
+    # -- Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].
+    tolerations: []
+    # -- Volume mounts for delegated-operator-executor pods. [Reference][volumes].
+    volumeMounts: []
+    # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
+    volumes: []
+  # -- On-Demand Delegated Operator Jobs.
+  jobs: {}
+    # Default CPU-only batch job
+    # cpuDefault:
+    #   enabled: true
+    # GPU Examples Defined Below
+    # https://learn.microsoft.com/en-us/azure/aks/use-nvidia-gpu
+    # gpuAzureAks:
+    #   enabled: true
+    #   resources:
+    #     limits:
+    #       nvidia.com/gpu: 1
+    #     requests:
+    #       nvidia.com/gpu: 1
+    #   tolerations:
+    #     - effect: NoSchedule
+    #       key: sku
+    #       operator: Equal
+    #       value: gpu
+    #
+    # https://docs.aws.amazon.com/eks/latest/userguide/auto-accelerated.html
+    # gpuAwsEksAuto:
+    #   enabled: true
+    #   resources:
+    #     limits:
+    #       nvidia.com/gpu: 1
+    #     requests:
+    #       nvidia.com/gpu: 1
+    #   tolerations:
+    #     - key: nvidia.com/gpu
+    #       effect: NoSchedule
+    #       operator: Exists
+    #
+    # https://aws.amazon.com/blogs/compute/running-gpu-accelerated-kubernetes-workloads-on-p3-and-p2-ec2-instances-with-amazon-eks/
+    # gpuAwsEksStandard:
+    #   enabled: true
+    #   resources:
+    #     limits:
+    #       nvidia.com/gpu: 1
+    #     requests:
+    #       nvidia.com/gpu: 1
+    #
+    # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus
+    # gpuGcpGkeAutopilot:
+    #   enabled: true
+    #   env:
+    #     LD_LIBRARY_PATH: /usr/local/nvidia/lib64
+    #   resources:
+    #     limits:
+    #       nvidia.com/gpu: "1"
+    #     requests:
+    #       nvidia.com/gpu: "1"
+    #   nodeSelector:
+    #     cloud.google.com/gke-accelerator: "nvidia-tesla-t4"
+    #     cloud.google.com/gke-accelerator-count: "1"
+    #
+    # https://docs.cloud.google.com/kubernetes-engine/docs/how-to/gpus
+    # gpuGcpGkeStandard:
+    #   enabled: true
+    #   resources:
+    #     limits:
+    #       nvidia.com/gpu: "1"
+    #     requests:
+    #       nvidia.com/gpu: "1"
 # -- List of secrets for FiftyOne Enterprise Licenses (one per org)
 fiftyoneLicenseSecrets:
   - fiftyone-license
@@ -1136,7 +1391,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.13.1
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.14.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.

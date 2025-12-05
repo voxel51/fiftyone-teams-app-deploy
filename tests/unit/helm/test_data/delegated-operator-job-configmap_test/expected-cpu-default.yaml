@@ -1,0 +1,65 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cpu-default-{{ _id }}
+  labels:
+    helm.sh/chart: fiftyone-teams-app-{{CHART_VERSION}}
+    app.kubernetes.io/version: "v{{CHART_VERSION}}"
+    app.kubernetes.io/managed-by: Helm
+    app.voxel51.com/delegate-operator-task-id: {{ _id }}
+    app.voxel51.com/delegate-operator-task-type: delegated_operation
+    app.voxel51.com/delegate-operator-template-name: cpuDefault
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: fiftyone-teams-app-{{CHART_VERSION}}
+        app.kubernetes.io/version: "v{{CHART_VERSION}}"
+        app.kubernetes.io/managed-by: Helm
+        app.voxel51.com/delegate-operator-task-id: {{ _id }}
+        app.voxel51.com/delegate-operator-task-type: delegated_operation
+        app.voxel51.com/delegate-operator-template-name: cpuDefault
+    spec:
+      restartPolicy: Never
+      serviceAccountName: fiftyone-teams
+      containers:
+        - name: executor
+          image: "voxel51/fiftyone-teams-cv-full:v{{CHART_VERSION}}"
+          imagePullPolicy: Always
+          command:
+            - {{ _command }}
+          args:
+          {% for arg in _args %}
+            - {{ arg }}
+          {% endfor %}
+          env:
+
+            - name: API_URL
+              value: "http://teams-api:80"
+            - name: FIFTYONE_DATABASE_ADMIN
+              value: "false"
+            - name: FIFTYONE_INTERNAL_SERVICE
+              value: "true"
+            - name: FIFTYONE_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: fiftyoneDatabaseName
+            - name: FIFTYONE_DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: mongodbConnectionString
+            - name: FIFTYONE_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: encryptionKey
+            - name: FIFTYONE_DELEGATED_OPERATION_LOG_PATH
+              value: ""
+            - name: FIFTYONE_MEDIA_CACHE_SIZE_BYTES
+              value: "-1"
+          resources:
+            limits: {}
+            requests: {}

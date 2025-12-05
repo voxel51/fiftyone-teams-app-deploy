@@ -1,0 +1,108 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cpu-default-{{ _id }}
+  annotations:
+    annotation-1: annotation-1-value
+  labels:
+    helm.sh/chart: fiftyone-teams-app-{{CHART_VERSION}}
+    app.kubernetes.io/version: "v{{CHART_VERSION}}"
+    app.kubernetes.io/managed-by: Helm
+    app.voxel51.com/delegate-operator-task-id: {{ _id }}
+    app.voxel51.com/delegate-operator-task-type: delegated_operation
+    app.voxel51.com/delegate-operator-template-name: cpuDefault
+    labels-1: label-1-value
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 2
+  activeDeadlineSeconds: 3
+  completions: 4
+  template:
+    metadata:
+      annotations:
+        pod-annotation-1: pod-annotation-1-value
+      labels:
+        helm.sh/chart: fiftyone-teams-app-{{CHART_VERSION}}
+        app.kubernetes.io/version: "v{{CHART_VERSION}}"
+        app.kubernetes.io/managed-by: Helm
+        app.voxel51.com/delegate-operator-task-id: {{ _id }}
+        app.voxel51.com/delegate-operator-task-type: delegated_operation
+        app.voxel51.com/delegate-operator-template-name: cpuDefault
+        labels-1: label-1-value
+    spec:
+      restartPolicy: Never
+      serviceAccountName: fiftyone-teams
+      securityContext:
+        runAsUser: 1000
+      containers:
+        - name: executor
+          image: "us.gcr.io:0.0.0"
+          imagePullPolicy: Never
+          command:
+            - {{ _command }}
+          args:
+          {% for arg in _args %}
+            - {{ arg }}
+          {% endfor %}
+          securityContext:
+            runAsGroup: 2000
+          env:
+
+            - name: API_URL
+              value: "http://teams-api:80"
+            - name: FIFTYONE_DATABASE_ADMIN
+              value: "false"
+            - name: FIFTYONE_INTERNAL_SERVICE
+              value: "true"
+            - name: FIFTYONE_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: fiftyoneDatabaseName
+            - name: FIFTYONE_DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: mongodbConnectionString
+            - name: FIFTYONE_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fiftyone-teams-secrets
+                  key: encryptionKey
+            - name: ADDITIONAL_ENV_VAR
+              value: "an-env-var"
+            - name: FIFTYONE_DELEGATED_OPERATION_LOG_PATH
+              value: "/tmp/foo"
+            - name: FIFTYONE_MEDIA_CACHE_SIZE_BYTES
+              value: "-1"
+            - name: SECRET_ENV
+              valueFrom:
+                secretKeyRef:
+                  name: secret-name
+                  key: secret-key
+          resources:
+            limits: {}
+            requests:
+              cpu: 2
+          volumeMounts:
+            - mountPath: /test-data-volume
+              name: test-volume
+      nodeSelector:
+        node-selector-1: node-selector-1-value
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype
+                operator: In
+                values:
+                - ssd
+      tolerations:
+        - effect: NoSchedule
+          key: example-key
+          operator: Exists
+      volumes:
+        - hostPath:
+            path: /test-volume
+          name: test-volume

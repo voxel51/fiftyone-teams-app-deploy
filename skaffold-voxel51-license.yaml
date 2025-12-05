@@ -9,5 +9,5 @@ manifests:
     - secret-license.yaml
 deploy:
   kubectl:
-    defaultNamespace: fiftyone-teams
+    defaultNamespace: '{{.FIFTYONE_TEAMS_NAMESPACE | default "fiftyone-teams"}}'
   kubeContext: minikube

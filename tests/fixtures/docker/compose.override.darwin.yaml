@@ -1,9 +1,0 @@
-services:
-  fiftyone-app:
-    platform: linux/amd64
-  teams-api:
-    platform: linux/amd64
-  teams-app:
-    platform: linux/amd64
-  teams-cas:
-    platform: linux/amd64

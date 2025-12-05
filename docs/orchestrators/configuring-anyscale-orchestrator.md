@@ -14,6 +14,18 @@
 
 # Anyscale On-Demand Orchestrator Setup
 
+<!-- toc -->
+
+- [Compute Config](#compute-config)
+- [Dependency Management](#dependency-management)
+- [Create Service Creds](#create-service-creds)
+- [Register Orchestrator in FiftyOne](#register-orchestrator-in-fiftyone)
+- [Refresh Orchestrator Operators](#refresh-orchestrator-operators)
+- [Additional Considerations](#additional-considerations)
+- [Credential Expiration and Rotation](#credential-expiration-and-rotation)
+
+<!-- tocstop -->
+
 This document provides a step-by-step guide to configuring FiftyOne Enterprise
 to use [Anyscale](https://www.anyscale.com/) as an orchestrator for running
 delegated operations on-demand.

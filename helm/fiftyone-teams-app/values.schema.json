@@ -372,6 +372,113 @@
           "title": "podSecurityContext",
           "type": "object"
         },
+        "rbac": {
+          "description": "RBAC roles, bindings, and service accounts which will be used to\nsubmit on-demand delegated operators to the kubernetes API.\nIf `apiSettings.rbac.create=true`, these will be used by the `teams-api` pods.",
+          "properties": {
+            "create": {
+              "default": true,
+              "description": "Controls whether to create the `Role`, `RoleBinding`,\nand `ServiceAccount` for on-demand delegated-operator submission.",
+              "required": [],
+              "title": "create",
+              "type": "boolean"
+            },
+            "role": {
+              "properties": {
+                "annotations": {
+                  "description": "`Role` annotations. [Reference][annotations].",
+                  "required": [],
+                  "title": "annotations",
+                  "type": "object"
+                },
+                "labels": {
+                  "description": "Additional labels for the generated `Role`. [Reference][labels-and-selectors].",
+                  "required": [],
+                  "title": "labels",
+                  "type": "object"
+                },
+                "name": {
+                  "default": "",
+                  "description": "Name of the `Role` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
+                  "required": [],
+                  "title": "name",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "role",
+              "type": "object"
+            },
+            "roleBinding": {
+              "properties": {
+                "annotations": {
+                  "description": "`RoleBinding` annotations. [Reference][annotations].",
+                  "required": [],
+                  "title": "annotations",
+                  "type": "object"
+                },
+                "create": {
+                  "default": true,
+                  "description": "Controls whether to create the `RoleBinding` named\n`apiSettings.rbac.roleBinding.name`.",
+                  "required": [],
+                  "title": "create",
+                  "type": "boolean"
+                },
+                "labels": {
+                  "description": "Additional labels for the generated `RoleBinding`. [Reference][labels-and-selectors].",
+                  "required": [],
+                  "title": "labels",
+                  "type": "object"
+                },
+                "name": {
+                  "default": "",
+                  "description": "Name of the `RoleBinding` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
+                  "required": [],
+                  "title": "name",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "roleBinding",
+              "type": "object"
+            },
+            "serviceAccount": {
+              "properties": {
+                "annotations": {
+                  "description": "`ServiceAccount` annotations. [Reference][annotations].",
+                  "required": [],
+                  "title": "annotations",
+                  "type": "object"
+                },
+                "create": {
+                  "default": true,
+                  "description": "Controls whether to create the `ServiceAccount` named\n`apiSettings.rbac.serviceAccount.name`.",
+                  "required": [],
+                  "title": "create",
+                  "type": "boolean"
+                },
+                "labels": {
+                  "description": "Additional labels for the generated `ServiceAccount`. [Reference][labels-and-selectors].",
+                  "required": [],
+                  "title": "labels",
+                  "type": "object"
+                },
+                "name": {
+                  "default": "",
+                  "description": "Name of the `ServiceAccount` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-teams-api`.",
+                  "required": [],
+                  "title": "name",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "serviceAccount",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "rbac",
+          "type": "object"
+        },
         "readiness": {
           "properties": {
             "failureThreshold": {
@@ -1761,6 +1868,222 @@
       "properties": {
         "deployments": {
           "description": "Additional deployments to configure. Each template\nwill use .Values.delegatedOperatorDeployments.template as a base.\nEach template value may be overridden.\nMaps/dictionaries will be merged key-wise, with the deployment instance\ntaking precedence.\nList values will not be merged, but be overridden completely by the\ndeployment instance.",
+          "properties": {
+            "teamsDoCpuDefault": {
+              "description": "Default (CPU-only) delegated operator runner.\nDefaults to an 4vCPU, 16Gi RAM runner.\nThe deployment is backed with a 2.5Gi in-memory\nvolume for caching media and an extra 2Gi of shared memory.",
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "required": [],
+                  "title": "enabled",
+                  "type": "boolean"
+                },
+                "env": {
+                  "properties": {
+                    "FIFTYONE_MEDIA_CACHE_DIR": {
+                      "default": "/opt/media_cache",
+                      "required": [],
+                      "title": "FIFTYONE_MEDIA_CACHE_DIR",
+                      "type": "string"
+                    },
+                    "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
+                      "default": "2147483648",
+                      "required": [],
+                      "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+                      "type": "string"
+                    }
+                  },
+                  "required": [],
+                  "title": "env",
+                  "type": "object"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "required": [],
+                  "title": "replicaCount",
+                  "type": "integer"
+                },
+                "resources": {
+                  "properties": {
+                    "limits": {
+                      "properties": {
+                        "cpu": {
+                          "default": 4,
+                          "required": [],
+                          "title": "cpu",
+                          "type": "integer"
+                        },
+                        "ephemeral-storage": {
+                          "default": "1Gi",
+                          "required": [],
+                          "title": "ephemeral-storage",
+                          "type": "string"
+                        },
+                        "memory": {
+                          "default": "16Gi",
+                          "required": [],
+                          "title": "memory",
+                          "type": "string"
+                        }
+                      },
+                      "required": [],
+                      "title": "limits",
+                      "type": "object"
+                    },
+                    "requests": {
+                      "properties": {
+                        "cpu": {
+                          "default": 4,
+                          "required": [],
+                          "title": "cpu",
+                          "type": "integer"
+                        },
+                        "ephemeral-storage": {
+                          "default": "1Gi",
+                          "required": [],
+                          "title": "ephemeral-storage",
+                          "type": "string"
+                        },
+                        "memory": {
+                          "default": "16Gi",
+                          "required": [],
+                          "title": "memory",
+                          "type": "string"
+                        }
+                      },
+                      "required": [],
+                      "title": "requests",
+                      "type": "object"
+                    }
+                  },
+                  "required": [],
+                  "title": "resources",
+                  "type": "object"
+                },
+                "volumeMounts": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "mountPath": {
+                            "default": "/dev/shm",
+                            "required": [],
+                            "title": "mountPath",
+                            "type": "string"
+                          },
+                          "name": {
+                            "default": "shm-vol",
+                            "required": [],
+                            "title": "name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "mountPath": {
+                            "default": "/opt/media_cache",
+                            "required": [],
+                            "title": "mountPath",
+                            "type": "string"
+                          },
+                          "name": {
+                            "default": "memory-media-cache-vol",
+                            "required": [],
+                            "title": "name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "required": [],
+                  "title": "volumeMounts",
+                  "type": "array"
+                },
+                "volumes": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "emptyDir": {
+                            "properties": {
+                              "medium": {
+                                "default": "Memory",
+                                "required": [],
+                                "title": "medium",
+                                "type": "string"
+                              },
+                              "sizeLimit": {
+                                "default": "2Gi",
+                                "required": [],
+                                "title": "sizeLimit",
+                                "type": "string"
+                              }
+                            },
+                            "required": [],
+                            "title": "emptyDir",
+                            "type": "object"
+                          },
+                          "name": {
+                            "default": "shm-vol",
+                            "required": [],
+                            "title": "name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "emptyDir": {
+                            "properties": {
+                              "medium": {
+                                "default": "Memory",
+                                "required": [],
+                                "title": "medium",
+                                "type": "string"
+                              },
+                              "sizeLimit": {
+                                "default": "2.5Gi",
+                                "required": [],
+                                "title": "sizeLimit",
+                                "type": "string"
+                              }
+                            },
+                            "required": [],
+                            "title": "emptyDir",
+                            "type": "object"
+                          },
+                          "name": {
+                            "default": "memory-media-cache-vol",
+                            "required": [],
+                            "title": "name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "required": [],
+                  "title": "volumes",
+                  "type": "array"
+                }
+              },
+              "required": [],
+              "title": "teamsDoCpuDefault",
+              "type": "object"
+            }
+          },
           "required": [],
           "title": "deployments",
           "type": "object"
@@ -1982,7 +2305,7 @@
                   "type": "object"
                 },
                 "requests": {
-                  "description": "  cpu: 2\n  memory: 6Gi",
+                  "description": "  cpu: 8\n  memory: 16Gi",
                   "required": [],
                   "title": "requests",
                   "type": "object"
@@ -2090,6 +2413,256 @@
       },
       "required": [],
       "title": "delegatedOperatorDeployments",
+      "type": "object"
+    },
+    "delegatedOperatorJobTemplates": {
+      "properties": {
+        "configMap": {
+          "properties": {
+            "annotations": {
+              "description": "ConfigMap annotations. [Reference][annotations].",
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "create": {
+              "default": true,
+              "description": "Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`.",
+              "required": [],
+              "title": "create",
+              "type": "boolean"
+            },
+            "labels": {
+              "description": "Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].",
+              "required": [],
+              "title": "labels",
+              "type": "object"
+            },
+            "name": {
+              "default": "",
+              "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.\nDefaults to `release-name-fiftyone-teams-app-do-templates`.",
+              "required": [],
+              "title": "name",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "configMap",
+          "type": "object"
+        },
+        "jobs": {
+          "description": "On-Demand Delegated Operator Jobs.",
+          "required": [],
+          "title": "jobs",
+          "type": "object"
+        },
+        "template": {
+          "description": "A common template applied to all deployments. Each deployment can\nthen override individual fields as needed by the operator.",
+          "properties": {
+            "activeDeadlineSeconds": {
+              "default": "null",
+              "description": "(optional) Maximum of seconds a job should be able to run. [Reference][job-termination-and-cleanup].",
+              "required": [],
+              "title": "activeDeadlineSeconds",
+              "type": [
+                "null",
+                "integer"
+              ]
+            },
+            "affinity": {
+              "description": "Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].",
+              "required": [],
+              "title": "affinity",
+              "type": "object"
+            },
+            "backoffLimit": {
+              "default": "null",
+              "description": "(optional) Amount of retries for the job to try before being marked as \"Failed\". [Reference][job-backoff-failure-policy].",
+              "required": [],
+              "title": "backoffLimit",
+              "type": [
+                "null",
+                "integer"
+              ]
+            },
+            "completions": {
+              "default": "null",
+              "description": "(optional) Number of completions to run before marking the job as \"Completed\". [Reference][job-termination-and-cleanup].",
+              "required": [],
+              "title": "completions",
+              "type": [
+                "null",
+                "integer"
+              ]
+            },
+            "containerSecurityContext": {
+              "description": "Container security configuration for generated delegated-operator containers. [Reference][container-security-context].",
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
+            "env": {
+              "description": "Environment Variables are passed to the delegated-operator-executor containers.",
+              "properties": {
+                "FIFTYONE_DELEGATED_OPERATION_LOG_PATH": {
+                  "default": "",
+                  "description": "Full path to a network-mounted file system or a cloud storage path to\nuse for storing logs generated by delegated operation runs, one file\nper job. The default `\"\"` means log upload is disabled.",
+                  "required": [],
+                  "title": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+                  "type": "string"
+                },
+                "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
+                  "default": -1,
+                  "description": "Set the media cache size (in bytes) for the local FiftyOne Delegated\nOperator Executor processes.\nWhen not set, the app's default value is 32 GiB.\n`-1` disables the media cache garbage collection (and cache size is unlimited).",
+                  "required": [],
+                  "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+                  "type": [
+                    "string",
+                    "integer"
+                  ]
+                }
+              },
+              "required": [],
+              "title": "env",
+              "type": "object"
+            },
+            "image": {
+              "properties": {
+                "pullPolicy": {
+                  "default": "Always",
+                  "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "Always",
+                        "IfNotPresent",
+                        "Never"
+                      ],
+                      "required": []
+                    }
+                  ],
+                  "required": [],
+                  "title": "pullPolicy"
+                },
+                "repository": {
+                  "default": "voxel51/fiftyone-teams-cv-full",
+                  "description": "Container image for `delegated-operator-executor`.",
+                  "required": [],
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "",
+                  "description": "Image tag for `delegated-operator-executor`. Defaults to the chart version.",
+                  "required": [],
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "image",
+              "type": "object"
+            },
+            "jobAnnotations": {
+              "description": "Annotations for the `teams-do` deployment. [Reference][annotations].",
+              "required": [],
+              "title": "jobAnnotations",
+              "type": "object"
+            },
+            "labels": {
+              "description": "Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors].",
+              "required": [],
+              "title": "labels",
+              "type": "object"
+            },
+            "nodeSelector": {
+              "description": "nodeSelector for `delegated-operator-executor`. [Reference][node-selector].",
+              "required": [],
+              "title": "nodeSelector",
+              "type": "object"
+            },
+            "podAnnotations": {
+              "description": "Annotations for delegated-operator-executor pods. [Reference][annotations].",
+              "required": [],
+              "title": "podAnnotations",
+              "type": "object"
+            },
+            "podSecurityContext": {
+              "description": "Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].",
+              "required": [],
+              "title": "podSecurityContext",
+              "type": "object"
+            },
+            "resources": {
+              "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `delegated-operator-executor`. [Reference][resources].",
+              "properties": {
+                "limits": {
+                  "required": [],
+                  "title": "limits",
+                  "type": "object"
+                },
+                "requests": {
+                  "description": "  cpu: 2\n  memory: 6Gi",
+                  "required": [],
+                  "title": "requests",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            },
+            "secretEnv": {
+              "description": "Secret variables to be passed to the delegated-operator-executor containers.",
+              "required": [],
+              "title": "secretEnv",
+              "type": "object"
+            },
+            "tolerations": {
+              "description": "  ENV_VAR_NAME:\n    secretName: the-pre-existing-secret\n    secretKey: the-key-in-the-secret\nAllow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "tolerations",
+              "type": "array"
+            },
+            "ttlSecondsAfterFinished": {
+              "default": "null",
+              "description": "(optional) Number of seconds for a job to sit idle before being automatically removed. [Reference][job-termination-and-cleanup].",
+              "required": [],
+              "title": "ttlSecondsAfterFinished",
+              "type": [
+                "null",
+                "integer"
+              ]
+            },
+            "volumeMounts": {
+              "description": "Volume mounts for delegated-operator-executor pods. [Reference][volumes].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "volumeMounts",
+              "type": "array"
+            },
+            "volumes": {
+              "description": "Volumes for `delegated-operator-executor`. [Reference][volumes].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "volumes",
+              "type": "array"
+            }
+          },
+          "required": [],
+          "title": "template",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "delegatedOperatorJobTemplates",
       "type": "object"
     },
     "fiftyoneLicenseSecrets": {
@@ -3079,7 +3652,7 @@
               ]
             },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
-              "default": "2.13.1",
+              "default": "2.14.0",
               "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==0.11.0`).",
               "required": [],
               "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",

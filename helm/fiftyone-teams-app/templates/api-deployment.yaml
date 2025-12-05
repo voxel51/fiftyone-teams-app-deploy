@@ -1,3 +1,7 @@
+{{- $serviceAccountName := include "fiftyone-teams-app.serviceAccountName" . }}
+{{- if or (.Values.apiSettings.rbac.create) (.Values.apiSettings.rbac.serviceAccount.name) }}
+{{- $serviceAccountName = include "teams-api-rbac.service-account-name" . }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -39,7 +43,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      serviceAccountName: {{ $serviceAccountName }}
       securityContext:
         {{- toYaml .Values.apiSettings.podSecurityContext | nindent 8 }}
       containers:
@@ -77,10 +81,14 @@ spec:
             timeoutSeconds: {{ .Values.apiSettings.startup.timeoutSeconds }}
           resources:
             {{- toYaml .Values.apiSettings.resources | nindent 12 }}
-          {{- with .Values.apiSettings.volumeMounts }}
           volumeMounts:
+            {{- if or (.Values.delegatedOperatorJobTemplates.configMap.create) (.Values.delegatedOperatorJobTemplates.configMap.name) }}
+            - name: do-targets
+              mountPath: /tmp/do-targets
+            {{- end }}
+            {{- with .Values.apiSettings.volumeMounts }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- end }}
       {{- if .Values.apiSettings.initContainers.enabled }}
       initContainers:
         {{-
@@ -110,7 +118,12 @@ spec:
       topologySpreadConstraints:
         {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.apiSettings.topologySpreadConstraints "selectorLabels" "fiftyone-teams-api.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
-      {{- with .Values.apiSettings.volumes }}
       volumes:
+        {{- if or (.Values.delegatedOperatorJobTemplates.configMap.create) (.Values.delegatedOperatorJobTemplates.configMap.name) }}
+        - name: do-targets
+          configMap:
+            name: {{ include "delegated-operator-templates.config-map-name" . }}
+        {{- end }}
+        {{- with .Values.apiSettings.volumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}

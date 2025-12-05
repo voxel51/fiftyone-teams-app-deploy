@@ -16,18 +16,82 @@
 
 <!-- toc -->
 
+- [v2.14.0+](#v2140)
 - [v2.7.0+](#v270)
-- [Using `delegatedOperatorDeployments`](#using-delegatedoperatordeployments)
+- [Using `delegatedOperatorJobTemplates` for on-demand executors](#using-delegatedoperatorjobtemplates-for-on-demand-executors)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
-  - [Examples](#examples)
-    - [Map Merges](#map-merges)
-    - [List Merges](#list-merges)
+- [Using `delegatedOperatorDeployments` for always-on executors](#using-delegatedoperatordeployments-for-always-on-executors)
+  - [Built-in Plugins](#built-in-plugins-1)
+  - [Shared/Dedicated Plugins](#shareddedicated-plugins-1)
+- [Examples](#examples)
+  - [Map Merges](#map-merges)
+  - [List Merges](#list-merges)
 - [Migrating from `delegatedOperatorExecutorSettings` to `delegatedOperatorDeployments`](#migrating-from-delegatedoperatorexecutorsettings-to-delegatedoperatordeployments)
   - [Example](#example)
 - [Prior to v2.7.0](#prior-to-v270)
 
 <!-- tocstop -->
+
+## v2.14.0+
+
+> [!NOTE]
+> `delegatedOperatorJobTemplates` and on-demand kubernetes orchestration
+> are currently in beta and can be used by early adopters.
+
+`delegatedOperatorJobTemplates` was added in version 2.14.0 which allows users
+to create on-demand delegated operators utilizing
+[kubernetes jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/).
+`delegatedOperatorJobTemplates` enables you to create multiple job
+templates that FiftyOne Enterprise can use to create Kubernetes jobs.
+
+> [!NOTE]
+> Using `delegatedOperatorJobTemplates` and on-demand kubernetes orchestration
+> requires that you install the `kubernetes` python client into your
+> `teams-api` image.
+> See
+> [the kubernetes orchestrator docs](../../docs/orchestrators/configuring-kubernetes-orchestrator.md)
+
+FiftyOne Enterprise 2.14+ pre-populates a `teams-do-cpu-default`
+delegated operator `Deployment` by default.
+Configuring the delegated operator has
+[not changed](#using-delegatedoperatordeployments-for-always-on-executors).
+The `teams-do-cpu-default` deployment can be
+enabled by setting
+`delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled=true`
+in the `values.yaml` file:
+
+```yaml
+delegatedOperatorDeployments:
+  deployments:
+    teamsDoCpuDefault:
+      enabled: true
+```
+
+The default deployment has 1 replica with:
+
+- 4vCPUs
+- 16Gi RAM
+- 1Gi Ephemeral Storage
+- A 2Gi Shared memory (`shm`) volume
+- A 2.5Gi in-memory media cache value
+
+Please scale up or down the number of replicas as permitted by your license file.
+
+```yaml
+delegatedOperatorDeployments:
+  deployments:
+    teamsDoCpuDefault:
+      enabled: true
+      replicaCount: <maxConcurrentDelegatedOperatorsFromLicense>
+```
+
+> [!NOTE]
+> The `teamsDoCpuDefault` delegated operator deployment will
+> be enabled alongside other delegated operator deployments defined here.
+
+For configuring additional delegated operators, see
+[using `delegatedOperatorDeployments` for always-on executors](#using-delegatedoperatordeployments-for-always-on-executors).
 
 ## v2.7.0+
 
@@ -39,7 +103,139 @@ for versions released after May 31st, 2025.
 `delegatedOperatorDeployments` enables you to deploy multiple instances
 of delegated operators targeting different hardware or use-cases.
 
-## Using `delegatedOperatorDeployments`
+## Using `delegatedOperatorJobTemplates` for on-demand executors
+
+The values in `delegatedOperatorJobTemplates.template` will be applied to
+every job instance under `delegatedOperatorJobTemplates.jobs`.
+Per job values set in
+`delegatedOperatorJobTemplates.jobs.<JOB>`
+will override the template.
+
+For overlapping settings, the following rules apply:
+
+1. When the setting is a `map` object, the
+   `delegatedOperatorJobTemplates.template.<SETTING>` will be key-wise merged
+   with `delegatedOperatorJobTemplates.jobs.<JOB>.<SETTING>`.
+   For duplicate setting definitions, the
+   `delegatedOperatorJobTemplates.jobs.<JOB>.<SETTING>` will
+   take precedence.
+
+1. When the setting is a `list` object, the
+   `delegatedOperatorJobTemplates.template.<SETTING>` will be ignored and the
+   `delegatedOperatorJobTemplates.jobs.<JOB>.<SETTING>` will
+   take precedence.
+
+See
+[examples](#examples)
+for more information.
+
+To enable delegated operators, add an object to `delegatedOperatorJobTemplates.jobs`:
+
+```yaml
+delegatedOperatorJobTemplates:
+  jobs:
+    teamsDoCpuDefaultK8s: {}
+```
+
+The helm chart will create a `ConfigMap` with an `teamsDoCpuDefaultK8s.yaml` entry.
+This entry will be mounted onto the API as a file
+at `/tmp/do-targets/teamsDoCpuDefaultK8s.yaml`.
+Delegated operators can be added to any of the three existing
+[plugin modes](./configuring-plugins.md).
+
+### Built-in Plugins
+
+For built-in plugins, no additional configuration
+is needed.
+
+```yaml
+delegatedOperatorJobTemplates:
+  jobs:
+    teamsDoCpuDefaultK8s: {}
+```
+
+### Shared/Dedicated Plugins
+
+For shared/dedicated plugins, mount the plugins'
+`PersistentVolumeClaim` with `Read` access
+at `FIFTYONE_PLUGINS_DIR`.
+
+This can be done by modifying `values.yaml` in one
+of these two ways:
+
+1. The template (applies to all instances):
+
+    ```yaml
+    delegatedOperatorJobTemplates:
+      jobs:
+        teamsDoCpuDefaultK8s: {}
+      template:
+        env:
+          FIFTYONE_PLUGINS_DIR: /opt/plugins
+        volumes:
+          - name: plugins-vol
+            persistentVolumeClaim:
+              claimName: plugins-pvc
+              readOnly: true
+        volumeMounts:
+          - name: plugins-vol
+            mountPath: /opt/plugins
+    ```
+
+1. Or, per instance:
+
+    ```yaml
+    delegatedOperatorJobTemplates:
+      jobs:
+        teamsDoCpuDefaultK8s:
+          env:
+            FIFTYONE_PLUGINS_DIR: /opt/plugins
+          volumes:
+            - name: plugins-vol
+              persistentVolumeClaim:
+                claimName: plugins-pvc
+                readOnly: true
+          volumeMounts:
+            - name: plugins-vol
+              mountPath: /opt/plugins
+    ```
+
+See
+[Adding Shared Storage for FiftyOne Enterprise Plugins](./plugins-storage.md)
+for configuring persistent volumes and claims.
+
+Optionally, the delegated operation run logs may be
+uploaded to a network-mounted file system or cloud storage path
+available to this deployment.
+Logs are uploaded in the format
+`<configured_path>/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log`
+
+In `values.yaml`, set the environment variable
+`FIFTYONE_DELEGATED_OPERATION_LOG_PATH` in either:
+
+1. The template (applies to all instances):
+
+    ```yaml
+    delegatedOperatorJobTemplates:
+      template:
+        env:
+          FIFTYONE_DELEGATED_OPERATION_LOG_PATH: /your/path/
+    ```
+
+1. Or, per instance:
+
+    ```yaml
+    delegatedOperatorJobTemplates:
+      jobs:
+        teamsDoCpuDefaultK8s:
+          env:
+            FIFTYONE_DELEGATED_OPERATION_LOG_PATH: /your/path
+    ```
+
+To use plugins with custom dependencies, build and use
+[Custom Plugins Images](../../docs/custom-plugins.md).
+
+## Using `delegatedOperatorDeployments` for always-on executors
 
 The values in `delegatedOperatorDeployments.template` will be applied to
 every deployment instance under `delegatedOperatorDeployments.deployments`.
@@ -65,22 +261,15 @@ See
 [examples](#examples)
 for more information.
 
-To enable delegated operators, add an object to `delegatedOperatorDeployments.deployments`:
-
-```yaml
-delegatedOperatorDeployments:
-  deployments:
-    teamsDo: {}
-```
-
 The Kubernetes deployment's name will be generated from `deployments` key-name
 converted to kebab-case.
 In the above example (key named `teamsDo`),
 the resulting deployment name would be `teams-do`.
 
 Delegated operators can be added to any of the three existing
-[plugin modes](./confuring-plugins.md).
+[plugin modes](./configuring-plugins.md).
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Built-in Plugins
 
 For built-in plugins, no additional configuration
@@ -92,6 +281,7 @@ delegatedOperatorDeployments:
     teamsDo: {}
 ```
 
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Shared/Dedicated Plugins
 
 For shared/dedicated plugins, mount the plugins'
@@ -119,6 +309,16 @@ of these two ways:
           - name: plugins-vol
             mountPath: /opt/plugins
     ```
+
+> [!NOTE]
+> As noted in
+> [List Merges](#list-merges),
+> lists (incl. `volumes` and `volumeMounts`) will *not* be inherited by
+> deployment instances that define their own values. This includes the implicit
+> `teamsDoCpuDefault` delegated operator deployment, which has its own required
+> `volumes` and `volumeMounts`. As a result, Shared/Dedicated Plugins will not
+> be available in these deployments using the above technique without additional
+> configuration.
 
 1. Or, per instance:
 
@@ -173,11 +373,11 @@ In `values.yaml`, set the environment variable
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](../../docs/custom-plugins.md).
 
-### Examples
+## Examples
 
 See below for examples on how merging templates are applied.
 
-#### Map Merges
+### Map Merges
 
 The following values:
 
@@ -215,7 +415,7 @@ Note that `requests` was merged key-wise.
 Therefore, settings from both the template and instance are included,
 with the instance values taking precedent.
 
-#### List Merges
+### List Merges
 
 The following values:
 
@@ -364,7 +564,7 @@ for orc in orc_svc.list():
 ## Prior to v2.7.0
 
 This option can be added to any of the three existing
-[plugin modes](./confuring-plugins.md).
+[plugin modes](./configuring-plugins.md).
 If you're using the builtin-operator
 only option, the Persistent Volume Claim should be omitted.
 

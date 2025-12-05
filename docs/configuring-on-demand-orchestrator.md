@@ -14,10 +14,11 @@
 
 # Configuring On-Demand Orchestrators
 
-As of FiftyOne Enterprise v2.13.1, delegated operations can be run on-demand
+As of FiftyOne Enterprise v2.11.0, delegated operations can be run on-demand
 in select external compute platforms (orchestrators).
 
 This is the list of supported orchestrators and their configuration guides:
 
 - [Anyscale](./orchestrators/configuring-anyscale-orchestrator.md)
 - [Databricks](./orchestrators/configuring-databricks-orchestrator.md)
+- [Kubernetes](./orchestrators/configuring-kubernetes-orchestrator.md)

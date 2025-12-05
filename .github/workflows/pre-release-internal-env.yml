@@ -98,7 +98,7 @@ jobs:
             helm registry login \
               -u oauth2accesstoken \
               --password-stdin \
-              "https://${GCP_LOCATION}-docker.pkg.dev"
+              "${GCP_LOCATION}-docker.pkg.dev"
 
       - name: Update Charts
         run: |

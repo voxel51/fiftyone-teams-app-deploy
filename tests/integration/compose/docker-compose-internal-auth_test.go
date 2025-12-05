@@ -5,7 +5,6 @@ package integration
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -61,13 +60,6 @@ func TestDockerComposeUpInternalAuth(t *testing.T) {
 	overrideFilesDO = append(overrideFilesDO, internalAuthComposePluginsFile)
 	overrideFilesDO = append(overrideFilesDO, overrideFiles...)
 	overrideFilesDO = append(overrideFilesDO, mongodbComposeFileDO)
-
-	// To run the containers on macOS arm64, we need to set the platform
-	if runtime.GOOS == "darwin" {
-		overrideFiles = append(overrideFiles, darwinOverrideFile)
-		overrideFilesPlugins = append(overrideFilesPlugins, darwinOverrideFile, darwinOverrideFilePlugins)
-		overrideFilesDO = append(overrideFilesDO, darwinOverrideFile, darwinOverrideFileDO)
-	}
 
 	suite.Run(t, &commonServicesInternalAuthDockerComposeUpTest{
 		Suite:           suite.Suite{},

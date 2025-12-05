@@ -135,6 +135,10 @@ if yq -e ".delegatedOperatorDeployments.deployments" "${file}" >/dev/null; then
   yq "$yq_flags" ".delegatedOperatorDeployments.deployments.*.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
 fi
 
+if yq -e ".delegatedOperatorTemplates.jobs" "${file}" >/dev/null; then
+  yq "$yq_flags" ".delegatedOperatorTemplates.jobs.*.image.tag = \"${FIFTYONE_APP_VERSION}\"" "${file}"
+fi
+
 # Remove temporary file if dry-run
 if [[ $DRY_RUN == "true" ]]; then
   cat "${file}"

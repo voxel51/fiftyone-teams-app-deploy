@@ -48,6 +48,73 @@ func TestDeploymentDelegatedOperatorInstanceTemplate(t *testing.T) {
 	})
 }
 
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDisabled() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected []string
+	}{
+		{
+			"defaultValues",
+			nil,
+			nil,
+		},
+		{
+			"defaultValuesDOEnabled",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			[]string{"teams-do-cpu-default"},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]string{"teams-do-two"},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+
+			if testCase.expected == nil {
+				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
+
+				var deployment appsv1.Deployment
+				helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+				s.Empty(deployment.ObjectMeta.Name, "Metadata name should be nil")
+
+			} else {
+
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
+				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
+
+				for i, rawOutput := range allRange[1:] {
+
+					var deployment appsv1.Deployment
+
+					helm.UnmarshalK8SYaml(subT, rawOutput, &deployment)
+
+					s.Equal(testCase.expected[i], deployment.ObjectMeta.Name, "Deployment name should be equal.")
+
+				}
+			}
+		})
+	}
+}
+
 func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 	// Get chart info (to later obtain the chart's appVersion)
 	cInfo, err := chartInfo(s.T(), s.chartPath)
@@ -74,32 +141,24 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]map[string]string{
 				map[string]string{
 					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 					"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 					"app.kubernetes.io/managed-by": "Helm",
-					"app.kubernetes.io/name":       "teams-do",
+					"app.kubernetes.io/name":       "teams-do-cpu-default",
 					"app.kubernetes.io/instance":   "fiftyone-test",
 				},
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]map[string]string{
-				map[string]string{
-					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
-					"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
-					"app.kubernetes.io/managed-by": "Helm",
-					"app.kubernetes.io/name":       "teams-do",
-					"app.kubernetes.io/instance":   "fiftyone-test",
-				},
 				map[string]string{
 					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 					"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
@@ -110,16 +169,24 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 			},
 		},
 		{
-			"overrideName",
+			"multipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoNewName.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]map[string]string{
 				map[string]string{
 					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
 					"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
 					"app.kubernetes.io/managed-by": "Helm",
-					"app.kubernetes.io/name":       "teams-do-new-name",
+					"app.kubernetes.io/name":       "teams-do-cpu-default",
+					"app.kubernetes.io/instance":   "fiftyone-test",
+				},
+				map[string]string{
+					"helm.sh/chart":                fmt.Sprintf("fiftyone-teams-app-%s", chartVersion),
+					"app.kubernetes.io/version":    fmt.Sprintf("%s", chartAppVersion),
+					"app.kubernetes.io/managed-by": "Helm",
+					"app.kubernetes.io/name":       "teams-do-two",
 					"app.kubernetes.io/instance":   "fiftyone-test",
 				},
 			},
@@ -149,6 +216,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 
@@ -180,24 +248,24 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataName() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
-			[]string{"teams-do"},
+			[]string{"teams-do-cpu-default"},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]string{"teams-do-two"},
 		},
 		{
 			"multipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
-			[]string{"teams-do", "teams-do-two"},
-		},
-		{
-			"overrideMetadataName",
-			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoNewName.unused": "nil",
-			},
-			[]string{"teams-do-new-name"},
+			[]string{"teams-do-cpu-default", "teams-do-two"},
 		},
 	}
 
@@ -209,7 +277,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataName() {
 			subT.Parallel()
 
 			options := &helm.Options{SetValues: testCase.values}
-
 			if testCase.expected == nil {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -220,11 +287,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataName() {
 				s.Empty(deployment.ObjectMeta.Name, "Metadata name should be nil")
 
 			} else {
-
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 
@@ -254,22 +321,21 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]string{"fiftyone-teams"},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
-			[]string{"fiftyone-teams", "fiftyone-teams"},
+			[]string{"fiftyone-teams"},
 		},
 		{
 			"overrideNamespaceName",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 				"namespace.name": "test-namespace-name",
 			},
 			[]string{"test-namespace-name"},
@@ -277,8 +343,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 		{
 			"overrideNamespaceNameMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 				"namespace.name": "test-namespace-name",
 			},
 			[]string{"test-namespace-name", "test-namespace-name"},
@@ -304,11 +370,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 				s.Empty(deployment.ObjectMeta.Namespace, "Metadata namespace should be nil")
 
 			} else {
+				options := &helm.Options{SetValues: testCase.values}
 
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 
@@ -338,41 +406,42 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			[]int32{1},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]int32{3},
 		},
 		{
-			"defaultValuesMultipleInstances",
-			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-			},
-			[]int32{3, 3},
-		},
-		{
 			"overrideBaseTemplateReplicaCount",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.replicaCount":         "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.replicaCount":                 "2",
 			},
-			[]int32{2, 2},
+			[]int32{1, 2},
 		},
 		{
 			"overrideInstanceReplicaCount",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.replicaCount":    "2",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.replicaCount": "6",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":      "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.replicaCount": "2",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.replicaCount":        "6",
 			},
 			[]int32{2, 6},
 		},
 		{
 			"overrideBaseTemplateAndInstanceReplicaCount",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.replicaCount":    "2",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.replicaCount": "6",
-				"delegatedOperatorDeployments.template.replicaCount":               "4",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":      "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.replicaCount": "2",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.replicaCount":        "6",
+				"delegatedOperatorDeployments.template.replicaCount":                      "4",
 			},
 			[]int32{2, 6},
 		},
@@ -385,8 +454,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
 			if testCase.expected == nil {
+				options := &helm.Options{SetValues: testCase.values}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
 
@@ -395,10 +464,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
 
 				s.Empty(&deployment.Spec.Replicas, "Replica count should be nil.")
 			} else {
+
+				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -425,7 +497,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]func(constraint []corev1.TopologySpreadConstraint){
 				func(constraint []corev1.TopologySpreadConstraint) {
@@ -434,15 +506,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(constraint []corev1.TopologySpreadConstraint){
-				func(constraint []corev1.TopologySpreadConstraint) {
-					s.Empty(constraint, "Constrains should be empty")
-				},
 				func(constraint []corev1.TopologySpreadConstraint) {
 					s.Empty(constraint, "Constrains should be empty")
 				},
@@ -451,7 +519,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 		{
 			"overrideBaseTemplateTopologyConstraints",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                               "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                    "true",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                            "nil",
 				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
 				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].maxSkew":            "1",
@@ -477,7 +545,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
             "whenUnsatisfiable": "DoNotSchedule",
             "labelSelector": {
               "matchLabels": {
-                "app.kubernetes.io/name": "teams-do",
+                "app.kubernetes.io/name": "teams-do-cpu-default",
                 "app.kubernetes.io/instance": "fiftyone-test"
               }
             }
@@ -517,14 +585,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 		{
 			"overrideInstanceTopologyConstraints",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].maxSkew":            "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].minDomains":         "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeAffinityPolicy": "Ignore",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeTaintsPolicy":   "Ignore",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                       "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                         "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].maxSkew":            "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].minDomains":         "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].nodeAffinityPolicy": "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].nodeTaintsPolicy":   "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                                 "nil",
 			},
 			[]func(constraint []corev1.TopologySpreadConstraint){
 				func(constraint []corev1.TopologySpreadConstraint) {
@@ -542,7 +611,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
             "whenUnsatisfiable": "DoNotSchedule",
             "labelSelector": {
               "matchLabels": {
-                "app.kubernetes.io/name": "teams-do",
+                "app.kubernetes.io/name": "teams-do-cpu-default",
                 "app.kubernetes.io/instance": "fiftyone-test"
               }
             }
@@ -560,21 +629,22 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 		{
 			"overrideBaseTemplateInstanceTopologyConstraints",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].maxSkew":            "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].minDomains":         "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeAffinityPolicy": "Ignore",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeTaintsPolicy":   "Ignore",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                       "nil",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].maxSkew":                       "1",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].minDomains":                    "1",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeAffinityPolicy":            "Honor",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeTaintsPolicy":              "Honor",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                         "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].matchLabelKeys[0]":  "pod-template-hash",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].maxSkew":            "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].minDomains":         "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].nodeAffinityPolicy": "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].nodeTaintsPolicy":   "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].topologyKey":        "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].whenUnsatisfiable":  "DoNotSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                                 "nil",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].matchLabelKeys[0]":                       "pod-template-hash",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].maxSkew":                                 "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].minDomains":                              "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeAffinityPolicy":                      "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeTaintsPolicy":                        "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].topologyKey":                             "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].whenUnsatisfiable":                       "DoNotSchedule",
 			},
 			[]func(constraint []corev1.TopologySpreadConstraint){
 				func(constraint []corev1.TopologySpreadConstraint) {
@@ -592,7 +662,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
             "whenUnsatisfiable": "DoNotSchedule",
             "labelSelector": {
               "matchLabels": {
-                "app.kubernetes.io/name": "teams-do",
+                "app.kubernetes.io/name": "teams-do-cpu-default",
                 "app.kubernetes.io/instance": "fiftyone-test"
               }
             }
@@ -632,23 +702,24 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 		{
 			"overrideBaseTemplateInstanceTopologyConstraintsLabelSelectors",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].maxSkew":                       "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].minDomains":                    "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeAffinityPolicy":            "Ignore",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].nodeTaintsPolicy":              "Ignore",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
-				"delegatedOperatorDeployments.deployments.teamsDo.topologySpreadConstraints[0].labelSelector.matchLabels.app": "instance-label-override",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                                  "nil",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].matchLabelKeys[0]":                        "pod-template-hash",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].maxSkew":                                  "1",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].minDomains":                               "1",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeAffinityPolicy":                       "Honor",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeTaintsPolicy":                         "Honor",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].topologyKey":                              "kubernetes.io/hostname",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].whenUnsatisfiable":                        "DoNotSchedule",
-				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].labelSelector.matchLabels.app":            "template-label-override",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                                    "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].matchLabelKeys[0]":             "pod-template-hash",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].maxSkew":                       "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].minDomains":                    "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].nodeAffinityPolicy":            "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].nodeTaintsPolicy":              "Ignore",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].topologyKey":                   "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].whenUnsatisfiable":             "DoNotSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.topologySpreadConstraints[0].labelSelector.matchLabels.app": "instance-label-override",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                                            "nil",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].matchLabelKeys[0]":                                  "pod-template-hash",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].maxSkew":                                            "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].minDomains":                                         "1",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeAffinityPolicy":                                 "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].nodeTaintsPolicy":                                   "Honor",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].topologyKey":                                        "kubernetes.io/hostname",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].whenUnsatisfiable":                                  "DoNotSchedule",
+				"delegatedOperatorDeployments.template.topologySpreadConstraints[0].labelSelector.matchLabels.app":                      "template-label-override",
 			},
 			[]func(constraint []corev1.TopologySpreadConstraint){
 				func(constraint []corev1.TopologySpreadConstraint) {
@@ -710,9 +781,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
-
 			if testCase.values == nil {
+				options := &helm.Options{SetValues: testCase.values}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
 
@@ -721,10 +791,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 
 				s.Empty(deployment.Spec.Template.Spec.TopologySpreadConstraints, "Topology constraints should be nil")
 			} else {
+
+				options := &helm.Options{SetValues: testCase.values}
+
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -751,17 +825,16 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCount() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]int{1},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
-			[]int{1, 1},
+			[]int{1},
 		},
 	}
 
@@ -783,10 +856,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCount() {
 
 				s.Equal(0, len(deployment.Spec.Template.Spec.Containers), "Container count should be equal.")
 			} else {
+
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -821,7 +896,74 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			[]func(envVars []corev1.EnvVar){
+				func(envVars []corev1.EnvVar) {
+					expectedEnvVarJSON := `[
+          {
+            "name": "API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_ADMIN",
+            "value": "false"
+          },
+          {
+            "name": "FIFTYONE_DATABASE_NAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "fiftyoneDatabaseName"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DATABASE_URI",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "mongodbConnectionString"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_ENCRYPTION_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "fiftyone-teams-secrets",
+                "key": "encryptionKey"
+              }
+            }
+          },
+          {
+            "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_INTERNAL_SERVICE",
+            "value": "true"
+          },
+		  {
+            "name": "FIFTYONE_MEDIA_CACHE_DIR",
+            "value": "/opt/media_cache"
+          },
+          {
+            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
+            "value": "2147483648"
+          }
+        ]`
+					var expectedEnvVars []corev1.EnvVar
+					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
+					s.NoError(err)
+					s.Equal(expectedEnvVars, envVars, "Envs should be equal")
+				},
+			},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(envVars []corev1.EnvVar){
 				func(envVars []corev1.EnvVar) {
@@ -884,8 +1026,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]func(envVars []corev1.EnvVar){
 				func(envVars []corev1.EnvVar) {
@@ -933,9 +1075,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
+		  {
+            "name": "FIFTYONE_MEDIA_CACHE_DIR",
+            "value": "/opt/media_cache"
+          },
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-            "value": "-1"
+            "value": "2147483648"
           }
         ]`
 					var expectedEnvVars []corev1.EnvVar
@@ -1003,7 +1149,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 		{
 			"overrideBaseTemplateEnv",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                             "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                  "true",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                          "nil",
 				"delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":     "gs://template",
 				"delegatedOperatorDeployments.template.env.TEST_KEY":                                  "TEMPLATE_TEST_VALUE",
@@ -1056,9 +1202,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
+		  {
+            "name": "FIFTYONE_MEDIA_CACHE_DIR",
+            "value": "/opt/media_cache"
+          },
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-            "value": "-1"
+            "value": "2147483648"
           },
           {
             "name": "TEST_KEY",
@@ -1152,11 +1302,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 		{
 			"overrideInstanceEnv",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":     "gs://foo.com",
-				"delegatedOperatorDeployments.deployments.teamsDo.env.TEST_KEY":                                  "INSTANCE_TEST_VALUE",
-				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "instance-existing-secret", // pragma: allowlist secret
-				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "instanceAnExistingKey",    // pragma: allowlist secret
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                     "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                       "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":     "gs://foo.com",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.TEST_KEY":                                  "INSTANCE_TEST_VALUE",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "instance-existing-secret", // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "instanceAnExistingKey",    // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                               "nil",
 			},
 			[]func(envVars []corev1.EnvVar){
 				func(envVars []corev1.EnvVar) {
@@ -1205,8 +1356,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     "value": "true"
                   },
                   {
+                    "name": "FIFTYONE_MEDIA_CACHE_DIR",
+                    "value": "/opt/media_cache"
+                  },
+                  {
                     "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-                    "value": "-1"
+                    "value": "2147483648"
                   },
                   {
                     "name": "TEST_KEY",
@@ -1287,15 +1442,16 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 		{
 			"overrideBaseTemplateAndInstanceEnv",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":     "gs://foo.com",
-				"delegatedOperatorDeployments.deployments.teamsDo.env.TEST_KEY":                                  "INSTANCE_TEST_VALUE",
-				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "instance-existing-secret", // pragma: allowlist secret
-				"delegatedOperatorDeployments.deployments.teamsDo.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "instanceAnExistingKey",    // pragma: allowlist secret
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                     "nil",
-				"delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":                "gs://template",
-				"delegatedOperatorDeployments.template.env.TEST_KEY":                                             "TEMPLATE_TEST_VALUE",
-				"delegatedOperatorDeployments.template.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":            "template-existing-secret", // pragma: allowlist secret
-				"delegatedOperatorDeployments.template.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":             "templateAnExistingKey",    // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                       "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":     "gs://foo.com",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.TEST_KEY":                                  "INSTANCE_TEST_VALUE",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "instance-existing-secret", // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "instanceAnExistingKey",    // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                               "nil",
+				"delegatedOperatorDeployments.template.env.FIFTYONE_DELEGATED_OPERATION_LOG_PATH":                          "gs://template",
+				"delegatedOperatorDeployments.template.env.TEST_KEY":                                                       "TEMPLATE_TEST_VALUE",
+				"delegatedOperatorDeployments.template.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                      "template-existing-secret", // pragma: allowlist secret
+				"delegatedOperatorDeployments.template.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                       "templateAnExistingKey",    // pragma: allowlist secret
 			},
 			[]func(envVars []corev1.EnvVar){
 				func(envVars []corev1.EnvVar) {
@@ -1344,8 +1500,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     "value": "true"
                   },
                   {
+                    "name": "FIFTYONE_MEDIA_CACHE_DIR",
+                    "value": "/opt/media_cache"
+                  },
+                  {
                     "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-                    "value": "-1"
+                    "value": "2147483648"
                   },
                   {
                     "name": "TEST_KEY",
@@ -1462,6 +1622,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -1497,15 +1658,22 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			[]string{fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion)},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]string{fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion)},
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]string{
 				fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", chartAppVersion),
@@ -1516,9 +1684,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideBaseTemplateImageTag",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.image.tag":            "testTag",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.image.tag":                    "testTag",
 			},
 			[]string{
 				"voxel51/fiftyone-teams-cv-full:testTag",
@@ -1528,9 +1696,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideBaseTemplateImageRepository",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.image.repository":     "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.image.repository":             "ghcr.io/fiftyone-teams-cv-full",
 			},
 			[]string{
 				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
@@ -1540,10 +1708,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideBaseTemplateImageRepository",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.image.tag":            "testTag",
-				"delegatedOperatorDeployments.template.image.repository":     "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.image.tag":                    "testTag",
+				"delegatedOperatorDeployments.template.image.repository":             "ghcr.io/fiftyone-teams-cv-full",
 			},
 			[]string{
 				"ghcr.io/fiftyone-teams-cv-full:testTag",
@@ -1554,8 +1722,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideInstanceImageTag",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.image.tag":    "foo",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag": "bar",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.tag": "foo",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag":        "bar",
 			},
 			[]string{
 				"voxel51/fiftyone-teams-cv-full:foo",
@@ -1565,8 +1734,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideInstanceImageRepository",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.image.repository":    "ghcr.io/fiftyone-teams-cv-full",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository": "ghcr.io/fiftyone-teams-cv-slim",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":          "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.repository": "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository":        "ghcr.io/fiftyone-teams-cv-slim",
 			},
 			[]string{
 				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
@@ -1576,10 +1746,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideInstanceImageTagAndRepository",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.image.tag":           "foo",
-				"delegatedOperatorDeployments.deployments.teamsDo.image.repository":    "ghcr.io/fiftyone-teams-cv-full",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag":        "bar",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository": "ghcr.io/fiftyone-teams-cv-slim",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":          "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.tag":        "foo",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.repository": "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag":               "bar",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository":        "ghcr.io/fiftyone-teams-cv-slim",
 			},
 			[]string{
 				"ghcr.io/fiftyone-teams-cv-full:foo",
@@ -1590,9 +1761,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideBaseTemplateAndInstanceImageTag",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.image.tag":    "foo",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag": "bar",
-				"delegatedOperatorDeployments.template.image.tag":               "biz",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.tag": "foo",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag":        "bar",
+				"delegatedOperatorDeployments.template.image.tag":                      "biz",
 			},
 			[]string{
 				"voxel51/fiftyone-teams-cv-full:foo",
@@ -1602,9 +1774,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideBaseTemplateAndInstanceImageRepository",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.image.repository":    "ghcr.io/fiftyone-teams-cv-full",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository": "ghcr.io/fiftyone-teams-cv-slim",
-				"delegatedOperatorDeployments.template.image.repository":               "ghcr.io/fiftyone-teams-cv-template",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":          "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.repository": "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository":        "ghcr.io/fiftyone-teams-cv-slim",
+				"delegatedOperatorDeployments.template.image.repository":                      "ghcr.io/fiftyone-teams-cv-template",
 			},
 			[]string{
 				fmt.Sprintf("ghcr.io/fiftyone-teams-cv-full:%s", chartAppVersion),
@@ -1614,12 +1787,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 		{
 			"overrideBaseTemplateAndInstanceImageTagAndRepository",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.image.tag":           "foo",
-				"delegatedOperatorDeployments.deployments.teamsDo.image.repository":    "ghcr.io/fiftyone-teams-cv-full",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag":        "bar",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository": "ghcr.io/fiftyone-teams-cv-slim",
-				"delegatedOperatorDeployments.template.image.tag":                      "biz",
-				"delegatedOperatorDeployments.template.image.repository":               "ghcr.io/fiftyone-teams-cv-template",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":          "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.tag":        "foo",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.repository": "ghcr.io/fiftyone-teams-cv-full",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.tag":               "bar",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.repository":        "ghcr.io/fiftyone-teams-cv-slim",
+				"delegatedOperatorDeployments.template.image.tag":                             "biz",
+				"delegatedOperatorDeployments.template.image.repository":                      "ghcr.io/fiftyone-teams-cv-template",
 			},
 			[]string{
 				"ghcr.io/fiftyone-teams-cv-full:foo",
@@ -1652,6 +1826,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -1678,41 +1853,50 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImagePull
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			[]string{"Always"},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]string{"Always"},
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]string{"Always", "Always"},
 		},
 		{
 			"overrideBaseTemplatePullPolicy",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.image.pullPolicy":     "IfNotPresent",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.image.pullPolicy":             "IfNotPresent",
 			},
 			[]string{"IfNotPresent", "IfNotPresent"},
 		},
 		{
 			"overrideInstancePullPolicy",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.image.pullPolicy":    "Always",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.pullPolicy": "Never",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":          "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.pullPolicy": "Always",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.pullPolicy":        "Never",
 			},
 			[]string{"Always", "Never"},
 		},
 		{
 			"overrideBaseTemplateAndInstancePullPolicy",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.image.pullPolicy":    "Always",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.pullPolicy": "Never",
-				"delegatedOperatorDeployments.template.image.pullPolicy":               "IfNotPresent",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":          "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.image.pullPolicy": "Always",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.image.pullPolicy":        "Never",
+				"delegatedOperatorDeployments.template.image.pullPolicy":                      "IfNotPresent",
 			},
 			[]string{"Always", "Never"},
 		},
@@ -1742,6 +1926,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImagePull
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -1763,22 +1948,29 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerName() {
 		{
 			"defaultValues",
 			nil,
-			nil,
+			[]string{"teams-do-cpu-default"},
 		},
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
-			[]string{"teams-do"},
+			[]string{"teams-do-cpu-default"},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+			},
+			[]string{"teams-do-two"},
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
-			[]string{"teams-do", "teams-do-two"},
+			[]string{"teams-do-cpu-default", "teams-do-two"},
 		},
 		// Names not overridable, so omitting tests
 	}
@@ -1807,6 +1999,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerName() {
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -1837,59 +2030,96 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
-					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
-					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":               resource.MustParse("4"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":               resource.MustParse("4"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
 					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
 					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
+				},
+			},
+		},
+		{
+			"defaultValuesMultipleInstances",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+			},
+			[]func(resourceRequirements corev1.ResourceRequirements){
+				func(resourceRequirements corev1.ResourceRequirements) {
+					resourceExpected := corev1.ResourceRequirements{
+						Limits: corev1.ResourceList{
+							"cpu":               resource.MustParse("4"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
+						},
+						Requests: corev1.ResourceList{
+							"cpu":               resource.MustParse("4"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
+						},
+					}
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
 					s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
 		{
 			"overrideBaseTemplateResources",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":         "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":      "nil",
-				"delegatedOperatorDeployments.template.resources.limits.cpu":      "1",
-				"delegatedOperatorDeployments.template.resources.limits.memory":   "1Gi",
-				"delegatedOperatorDeployments.template.resources.requests.cpu":    "500m",
-				"delegatedOperatorDeployments.template.resources.requests.memory": "512Mi",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.resources.limits.cpu":         "1",
+				"delegatedOperatorDeployments.template.resources.limits.memory":      "1Gi",
+				"delegatedOperatorDeployments.template.resources.requests.cpu":       "500m",
+				"delegatedOperatorDeployments.template.resources.requests.memory":    "512Mi",
 			},
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("1"),
-							"memory": resource.MustParse("1Gi"),
+							"cpu":               resource.MustParse("4"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("500m"),
-							"memory": resource.MustParse("512Mi"),
+							"cpu":               resource.MustParse("4"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -1902,37 +2132,40 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("512Mi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
 		{
 			"overrideInstanceResources",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.cpu":         "3",
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.memory":      "3Gi",
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.cpu":       "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.memory":    "2Gi",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":      "4",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory":   "4Gi",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":    "3",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory": "3Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.limits.cpu":      "3",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.limits.memory":   "3Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.requests.cpu":    "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.requests.memory": "2Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":             "4",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory":          "4Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":           "3",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory":        "3Gi",
 			},
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("3"),
-							"memory": resource.MustParse("3Gi"),
+							"cpu":               resource.MustParse("3"),
+							"memory":            resource.MustParse("3Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("2"),
-							"memory": resource.MustParse("2Gi"),
+							"cpu":               resource.MustParse("2"),
+							"memory":            resource.MustParse("2Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -1945,37 +2178,40 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("3Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
 		{
 			"overrideBaseTemplateAndInstanceResourcesLimits",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.cpu":       "3",
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.memory":    "3Gi",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":    "4",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory": "4Gi",
-				"delegatedOperatorDeployments.template.resources.limits.cpu":                  "1",
-				"delegatedOperatorDeployments.template.resources.limits.memory":               "1Gi",
-				"delegatedOperatorDeployments.template.resources.requests.cpu":                "500m",
-				"delegatedOperatorDeployments.template.resources.requests.memory":             "512Mi",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                 "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.limits.cpu":    "3",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.limits.memory": "3Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":           "4",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory":        "4Gi",
+				"delegatedOperatorDeployments.template.resources.limits.cpu":                         "1",
+				"delegatedOperatorDeployments.template.resources.limits.memory":                      "1Gi",
+				"delegatedOperatorDeployments.template.resources.requests.cpu":                       "500m",
+				"delegatedOperatorDeployments.template.resources.requests.memory":                    "512Mi",
 			},
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("3"),
-							"memory": resource.MustParse("3Gi"),
+							"cpu":               resource.MustParse("3"),
+							"memory":            resource.MustParse("3Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("500m"),
-							"memory": resource.MustParse("512Mi"),
+							"cpu":               resource.MustParse("4"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -1988,37 +2224,40 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("512Mi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
 		{
 			"overrideBaseTemplateAndInstanceResourcesRequests",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.cpu":       "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.memory":    "2Gi",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":    "3",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory": "3Gi",
-				"delegatedOperatorDeployments.template.resources.limits.cpu":                    "1",
-				"delegatedOperatorDeployments.template.resources.limits.memory":                 "1Gi",
-				"delegatedOperatorDeployments.template.resources.requests.cpu":                  "500m",
-				"delegatedOperatorDeployments.template.resources.requests.memory":               "512Mi",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.requests.cpu":    "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.requests.memory": "2Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":           "3",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory":        "3Gi",
+				"delegatedOperatorDeployments.template.resources.limits.cpu":                           "1",
+				"delegatedOperatorDeployments.template.resources.limits.memory":                        "1Gi",
+				"delegatedOperatorDeployments.template.resources.requests.cpu":                         "500m",
+				"delegatedOperatorDeployments.template.resources.requests.memory":                      "512Mi",
 			},
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("1"),
-							"memory": resource.MustParse("1Gi"),
+							"cpu":               resource.MustParse("4"),
+							"memory":            resource.MustParse("16Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("2"),
-							"memory": resource.MustParse("2Gi"),
+							"cpu":               resource.MustParse("2"),
+							"memory":            resource.MustParse("2Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -2031,41 +2270,44 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("3Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
 		{
 			"overrideBaseTemplateAndInstanceResources",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.cpu":         "3",
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.limits.memory":      "3Gi",
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.cpu":       "2",
-				"delegatedOperatorDeployments.deployments.teamsDo.resources.requests.memory":    "2Gi",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":      "4",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory":   "4Gi",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":    "3",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory": "3Gi",
-				"delegatedOperatorDeployments.template.resources.limits.cpu":                    "1",
-				"delegatedOperatorDeployments.template.resources.limits.memory":                 "1Gi",
-				"delegatedOperatorDeployments.template.resources.requests.cpu":                  "500m",
-				"delegatedOperatorDeployments.template.resources.requests.memory":               "512Mi",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.limits.cpu":      "3",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.limits.memory":   "3Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.requests.cpu":    "2",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources.requests.memory": "2Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.cpu":             "4",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.limits.memory":          "4Gi",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.cpu":           "3",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.resources.requests.memory":        "3Gi",
+				"delegatedOperatorDeployments.template.resources.limits.cpu":                           "1",
+				"delegatedOperatorDeployments.template.resources.limits.memory":                        "1Gi",
+				"delegatedOperatorDeployments.template.resources.requests.cpu":                         "500m",
+				"delegatedOperatorDeployments.template.resources.requests.memory":                      "512Mi",
 			},
 			[]func(resourceRequirements corev1.ResourceRequirements){
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
-							"cpu":    resource.MustParse("3"),
-							"memory": resource.MustParse("3Gi"),
+							"cpu":               resource.MustParse("3"),
+							"memory":            resource.MustParse("3Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 						Requests: corev1.ResourceList{
-							"cpu":    resource.MustParse("2"),
-							"memory": resource.MustParse("2Gi"),
+							"cpu":               resource.MustParse("2"),
+							"memory":            resource.MustParse("2Gi"),
+							"ephemeral-storage": resource.MustParse("1Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 				func(resourceRequirements corev1.ResourceRequirements) {
 					resourceExpected := corev1.ResourceRequirements{
@@ -2078,8 +2320,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 							"memory": resource.MustParse("3Gi"),
 						},
 					}
-					s.Equal(resourceExpected, resourceRequirements, "should be equal")
-					s.Nil(resourceRequirements.Claims, "should be nil")
+					s.Equal(resourceExpected, resourceRequirements, "Resources should be equal")
+					s.Nil(resourceRequirements.Claims, "Claims should be nil")
 				},
 			},
 		},
@@ -2091,7 +2333,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 		s.Run(testCase.name, func() {
 			subT := s.T()
 			subT.Parallel()
-
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
 				options := &helm.Options{SetValues: testCase.values}
@@ -2109,6 +2350,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -2138,9 +2380,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 		},
 		{
 			"defaultValuesDOEnabled",
-			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
-			},
+			nil,
 			[]func(securityContext *corev1.SecurityContext){
 				func(securityContext *corev1.SecurityContext) {
 					s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
@@ -2158,25 +2398,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(securityContext *corev1.SecurityContext){
-				func(securityContext *corev1.SecurityContext) {
-					s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
-					s.Nil(securityContext.Capabilities, "should be nil")
-					s.Nil(securityContext.Privileged, "should be nil")
-					s.Nil(securityContext.ProcMount, "should be nil")
-					s.Nil(securityContext.ReadOnlyRootFilesystem, "should be nil")
-					s.Nil(securityContext.RunAsGroup, "should be nil")
-					s.Nil(securityContext.RunAsNonRoot, "should be nil")
-					s.Nil(securityContext.RunAsUser, "should be nil")
-					s.Nil(securityContext.SeccompProfile, "should be nil")
-					s.Nil(securityContext.SELinuxOptions, "should be nil")
-					s.Nil(securityContext.WindowsOptions, "should be nil")
-				},
 				func(securityContext *corev1.SecurityContext) {
 					s.Nil(securityContext.AllowPrivilegeEscalation, "should be nil")
 					s.Nil(securityContext.Capabilities, "should be nil")
@@ -2195,7 +2421,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 		{
 			"overrideBaseTemplateSecurityContext",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":          "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":       "nil",
 				"delegatedOperatorDeployments.template.securityContext.runAsGroup": "3000",
 				"delegatedOperatorDeployments.template.securityContext.runAsUser":  "1000",
@@ -2214,10 +2441,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 		{
 			"overrideInstanceSecurityContext",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.securityContext.runAsGroup":    "4000",
-				"delegatedOperatorDeployments.deployments.teamsDo.securityContext.runAsUser":     "1001",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsGroup": "5000",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsUser":  "1002",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.securityContext.runAsGroup": "4000",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.securityContext.runAsUser":  "1001",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsGroup":        "5000",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsUser":         "1002",
 			},
 			[]func(securityContext *corev1.SecurityContext){
 				func(securityContext *corev1.SecurityContext) {
@@ -2233,10 +2462,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 		{
 			"overrideBaseTemplateInstanceSecurityContext",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.securityContext.runAsGroup":    "4000",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsGroup": "5000",
-				"delegatedOperatorDeployments.template.securityContext.runAsGroup":               "3000",
-				"delegatedOperatorDeployments.template.securityContext.runAsUser":                "1000",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.securityContext.runAsGroup": "4000",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.securityContext.runAsGroup":        "5000",
+				"delegatedOperatorDeployments.template.securityContext.runAsGroup":                      "3000",
+				"delegatedOperatorDeployments.template.securityContext.runAsUser":                       "1000",
 			},
 			[]func(securityContext *corev1.SecurityContext){
 				func(securityContext *corev1.SecurityContext) {
@@ -2270,11 +2501,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
+
 				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -2305,7 +2538,30 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			}, []func(volumeMounts []corev1.VolumeMount){
+				func(volumeMounts []corev1.VolumeMount) {
+					expectedJSON := `[
+          {
+            "mountPath": "/dev/shm",
+            "name": "shm-vol"
+          },
+		  {
+            "mountPath": "/opt/media_cache",
+            "name": "memory-media-cache-vol"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
+				},
+			},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(volumeMounts []corev1.VolumeMount){
 				func(volumeMounts []corev1.VolumeMount) {
@@ -2316,12 +2572,25 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]func(volumeMounts []corev1.VolumeMount){
 				func(volumeMounts []corev1.VolumeMount) {
-					s.Nil(volumeMounts, "VolumeMounts should be nil")
+					expectedJSON := `[
+          {
+            "mountPath": "/dev/shm",
+            "name": "shm-vol"
+          },
+		  {
+            "mountPath": "/opt/media_cache",
+            "name": "memory-media-cache-vol"
+          }
+        ]`
+					var expectedVolumeMounts []corev1.VolumeMount
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumeMounts)
+					s.NoError(err)
+					s.Equal(expectedVolumeMounts, volumeMounts, "Volume Mounts should be equal")
 				},
 				func(volumeMounts []corev1.VolumeMount) {
 					s.Nil(volumeMounts, "VolumeMounts should be nil")
@@ -2331,17 +2600,21 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 		{
 			"overrideBaseTemplateVolumeMounts",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":         "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":      "nil",
-				"delegatedOperatorDeployments.template.volumeMounts[0].mountPath": "/template-test-data-volume",
-				"delegatedOperatorDeployments.template.volumeMounts[0].name":      "template-test-volume",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.volumeMounts[0].mountPath":    "/template-test-data-volume",
+				"delegatedOperatorDeployments.template.volumeMounts[0].name":         "template-test-volume",
 			},
 			[]func(volumeMounts []corev1.VolumeMount){
 				func(volumeMounts []corev1.VolumeMount) {
 					expectedJSON := `[
           {
-            "mountPath": "/template-test-data-volume",
-            "name": "template-test-volume"
+            "mountPath": "/dev/shm",
+            "name": "shm-vol"
+          },
+		  {
+            "mountPath": "/opt/media_cache",
+            "name": "memory-media-cache-vol"
           }
         ]`
 					var expectedVolumeMounts []corev1.VolumeMount
@@ -2366,9 +2639,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 		{
 			"overrideInstanceVolumeMounts",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].mountPath": "/teams-do-test-data-volume",
-				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].name":      "teams-do-test-volume",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                 "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].mountPath": "/teams-do-test-data-volume",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].name":      "teams-do-test-volume",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                           "nil",
 			},
 			[]func(volumeMounts []corev1.VolumeMount){
 				func(volumeMounts []corev1.VolumeMount) {
@@ -2391,11 +2665,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 		{
 			"overrideBaseTemplateInstanceVolumeMounts",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].mountPath": "/teams-do-test-data-volume",
-				"delegatedOperatorDeployments.deployments.teamsDo.volumeMounts[0].name":      "teams-do-test-volume",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                 "nil",
-				"delegatedOperatorDeployments.template.volumeMounts[0].mountPath":            "/template-test-data-volume",
-				"delegatedOperatorDeployments.template.volumeMounts[0].name":                 "template-test-volume",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].mountPath": "/teams-do-test-data-volume",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].name":      "teams-do-test-volume",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                           "nil",
+				"delegatedOperatorDeployments.template.volumeMounts[0].mountPath":                      "/template-test-data-volume",
+				"delegatedOperatorDeployments.template.volumeMounts[0].name":                           "template-test-volume",
 			},
 			[]func(volumeMounts []corev1.VolumeMount){
 				func(volumeMounts []corev1.VolumeMount) {
@@ -2445,11 +2720,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
+
 				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -2458,7 +2735,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 					testCase.expected[i](deployment.Spec.Template.Spec.Containers[0].VolumeMounts)
 				}
 			}
-
 		})
 	}
 }
@@ -2481,7 +2757,18 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			[]func(affinity *corev1.Affinity){
+				func(affinity *corev1.Affinity) {
+					s.Nil(affinity, "should be nil")
+				},
+			},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(affinity *corev1.Affinity){
 				func(affinity *corev1.Affinity) {
@@ -2492,8 +2779,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]func(affinity *corev1.Affinity){
 				func(affinity *corev1.Affinity) {
@@ -2507,8 +2794,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 		{
 			"overrideBaseTemplateAffinity",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                                                                            "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                                                                                                    "nil",
 				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":       "disktype",
 				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":  "In",
 				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]": "ssd",
@@ -2571,14 +2858,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 		{
 			"overrideInstanceAffinity",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                      "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":          "topology.kubernetes.io/zone",
-				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":     "In",
-				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]":    "antarctica-west1",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                   "1",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":       "topology.kubernetes.io/zone",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":  "In",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]": "antarctica-east1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                                                                                           "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                   "1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":       "topology.kubernetes.io/zone",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":  "In",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]": "antarctica-west1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                          "1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":              "topology.kubernetes.io/zone",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":         "In",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]":        "antarctica-east1",
 			},
 			[]func(affinity *corev1.Affinity){
 				func(affinity *corev1.Affinity) {
@@ -2640,17 +2928,18 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 		{
 			"overrideBaseTemplateAndInstanceAffinity",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                      "1",
-				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":          "topology.kubernetes.io/zone",
-				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":     "In",
-				"delegatedOperatorDeployments.deployments.teamsDo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]":    "antarctica-west1",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                   "1",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":       "topology.kubernetes.io/zone",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":  "In",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]": "antarctica-east1",
-				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":               "disktype",
-				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":          "In",
-				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]":         "ssd",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                                                                                           "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                   "1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":       "topology.kubernetes.io/zone",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":  "In",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]": "antarctica-west1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight":                                          "1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].key":              "topology.kubernetes.io/zone",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].operator":         "In",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].preference.matchExpressions[0].values[0]":        "antarctica-east1",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key":                      "disktype",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator":                 "In",
+				"delegatedOperatorDeployments.template.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]":                "ssd",
 			},
 			[]func(affinity *corev1.Affinity){
 				func(affinity *corev1.Affinity) {
@@ -2748,7 +3037,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 			subT := s.T()
 			subT.Parallel()
 
-			// when vars are set outside of the if statement, they aren't accessible from within the conditional
+			options := &helm.Options{SetValues: testCase.values}
 			if testCase.values == nil {
 				options := &helm.Options{SetValues: testCase.values}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -2760,11 +3049,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -2786,29 +3075,36 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets()
 		{
 			"defaultValues",
 			nil,
-			nil,
+			[]string{""},
 		},
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			[]string{""},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]string{""},
 		},
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]string{"", ""},
 		},
 		{
 			"overrideImagePullSecrets",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"imagePullSecrets[0].name":                                   "test-pull-secret",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"imagePullSecrets[0].name":                                           "test-pull-secret",
 			},
 			[]string{"test-pull-secret", "test-pull-secret"},
 		},
@@ -2833,11 +3129,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets()
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
+
 				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -2868,29 +3166,27 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]map[string]string{
 				map[string]string{},
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]map[string]string{
-				map[string]string{},
 				map[string]string{},
 			},
 		},
 		{
 			"overrideBaseTemplateNodeSelector",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":     "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":  "nil",
-				"delegatedOperatorDeployments.template.nodeSelector.disktype": "ssd",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.nodeSelector.disktype":        "ssd",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -2904,8 +3200,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 		{
 			"overrideInstanceNodeSelector",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.nodeSelector.region":      "us-east1",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.nodeSelector.disktype": "pd-standard",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":             "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.nodeSelector.region": "us-east1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.nodeSelector.disktype":      "pd-standard",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -2919,9 +3216,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 		{
 			"overrideBaseTemplateAndInstanceNodeSelector",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.nodeSelector.region":      "us-east1",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.nodeSelector.disktype": "pd-standard",
-				"delegatedOperatorDeployments.template.nodeSelector.disktype":               "ssd",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":             "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.nodeSelector.region": "us-east1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.nodeSelector.disktype":      "pd-standard",
+				"delegatedOperatorDeployments.template.nodeSelector.disktype":                    "ssd",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -2959,6 +3257,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				var deployment appsv1.Deployment
 				helm.UnmarshalK8SYaml(subT, output, &deployment)
@@ -2993,27 +3292,25 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentAnnotati
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]map[string]string{
 				map[string]string{},
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]map[string]string{
-				nil,
-				nil,
+				map[string]string{},
 			},
 		},
 		{
 			"overrideBaseTemplateDeploymentAnnotations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                  "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":       "true",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":               "nil",
 				"delegatedOperatorDeployments.template.deploymentAnnotations.annotation-1": "annotation-1-value",
 			},
@@ -3029,9 +3326,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentAnnotati
 		{
 			"overrideInstanceDeploymentAnnotations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.deploymentAnnotations.teams-do-annotation-1":        "teams-do-annotation-1-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.annotation-1":              "teams-do-two-annotation-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                     "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.deploymentAnnotations.teams-do-annotation-1": "teams-do-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.annotation-1":                 "teams-do-two-annotation-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.teams-do-two-annotation-1":    "teams-do-two-annotation-1-value",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -3046,10 +3344,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentAnnotati
 		{
 			"overrideBaseTemplateAndInstanceDeploymentAnnotations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.deploymentAnnotations.teams-do-annotation":          "teams-do-annotation-1-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.annotation-1":              "teams-do-two-annotation-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
-				"delegatedOperatorDeployments.template.deploymentAnnotations.annotation-1":                            "annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.deploymentAnnotations.teams-do-annotation": "teams-do-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.annotation-1":               "teams-do-two-annotation-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.deploymentAnnotations.teams-do-two-annotation-1":  "teams-do-two-annotation-1-value",
+				"delegatedOperatorDeployments.template.deploymentAnnotations.annotation-1":                             "annotation-1-value",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -3083,10 +3382,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentAnnotati
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
+
 				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 
@@ -3116,34 +3417,34 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
 		{
 			"defaultValues",
 			nil,
-			nil,
+			[]map[string]string{
+				map[string]string{},
+			},
 		},
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]map[string]string{
 				map[string]string{},
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]map[string]string{
-				nil,
-				nil,
+				map[string]string{},
 			},
 		},
 		{
 			"overrideBaseTemplatePodAnnotations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":           "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":        "nil",
-				"delegatedOperatorDeployments.template.podAnnotations.annotation-1": "annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.podAnnotations.annotation-1":  "annotation-1-value",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -3157,9 +3458,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
 		{
 			"overrideInstancePodAnnotations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.podAnnotations.teams-do-annotation-1":        "teams-do-annotation-1-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.annotation-1":              "teams-do-two-annotation-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                              "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podAnnotations.teams-do-annotation-1": "teams-do-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.annotation-1":                 "teams-do-two-annotation-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.teams-do-two-annotation-1":    "teams-do-two-annotation-1-value",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -3174,10 +3476,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
 		{
 			"overrideBaseTemplateAndInstancePodAnnotations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.podAnnotations.teams-do-annotation":          "teams-do-annotation-1-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.annotation-1":              "teams-do-two-annotation-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.teams-do-two-annotation-1": "teams-do-two-annotation-1-value",
-				"delegatedOperatorDeployments.template.podAnnotations.annotation-1":                            "annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                            "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podAnnotations.teams-do-annotation": "teams-do-annotation-1-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.annotation-1":               "teams-do-two-annotation-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podAnnotations.teams-do-two-annotation-1":  "teams-do-two-annotation-1-value",
+				"delegatedOperatorDeployments.template.podAnnotations.annotation-1":                             "annotation-1-value",
 			},
 			[]map[string]string{
 				map[string]string{
@@ -3215,6 +3518,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 
@@ -3253,8 +3557,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
+
 			[]func(podSecurityContext *corev1.PodSecurityContext){
 				func(podSecurityContext *corev1.PodSecurityContext) {
 					s.Nil(podSecurityContext.FSGroup, "should be nil")
@@ -3271,24 +3576,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(podSecurityContext *corev1.PodSecurityContext){
-				func(podSecurityContext *corev1.PodSecurityContext) {
-					s.Nil(podSecurityContext.FSGroup, "should be nil")
-					s.Nil(podSecurityContext.FSGroupChangePolicy, "should be nil")
-					s.Nil(podSecurityContext.RunAsGroup, "should be nil")
-					s.Nil(podSecurityContext.RunAsNonRoot, "should be nil")
-					s.Nil(podSecurityContext.RunAsUser, "should be nil")
-					s.Nil(podSecurityContext.SeccompProfile, "should be nil")
-					s.Nil(podSecurityContext.SELinuxOptions, "should be nil")
-					s.Nil(podSecurityContext.SupplementalGroups, "should be nil")
-					s.Nil(podSecurityContext.Sysctls, "should be nil")
-					s.Nil(podSecurityContext.WindowsOptions, "should be nil")
-				},
 				func(podSecurityContext *corev1.PodSecurityContext) {
 					s.Nil(podSecurityContext.FSGroup, "should be nil")
 					s.Nil(podSecurityContext.FSGroupChangePolicy, "should be nil")
@@ -3306,7 +3598,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext
 		{
 			"overrideBaseTemplateSecurityContext",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":             "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":  "true",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":          "nil",
 				"delegatedOperatorDeployments.template.podSecurityContext.fsGroup":    "2000",
 				"delegatedOperatorDeployments.template.podSecurityContext.runAsGroup": "3000",
@@ -3328,12 +3620,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext
 		{
 			"overrideInstanceSecurityContext",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.fsGroup":       "2001",
-				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.runAsGroup":    "3001",
-				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.runAsUser":     "1001",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.fsGroup":    "2002",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.runAsGroup": "3002",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.runAsUser":  "1002",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                       "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podSecurityContext.fsGroup":    "2001",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podSecurityContext.runAsGroup": "3001",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podSecurityContext.runAsUser":  "1001",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.fsGroup":           "2002",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.runAsGroup":        "3002",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.runAsUser":         "1002",
 			},
 			[]func(podSecurityContext *corev1.PodSecurityContext){
 				func(podSecurityContext *corev1.PodSecurityContext) {
@@ -3351,13 +3644,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext
 		{
 			"overrideBaseTemplateInstanceSecurityContext",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.fsGroup":    "2001",
-				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.runAsGroup": "3001",
-				"delegatedOperatorDeployments.deployments.teamsDo.podSecurityContext.runAsUser":  "1001",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.fsGroup": "2002",
-				"delegatedOperatorDeployments.template.podSecurityContext.fsGroup":               "2000",
-				"delegatedOperatorDeployments.template.podSecurityContext.runAsGroup":            "3000",
-				"delegatedOperatorDeployments.template.podSecurityContext.runAsUser":             "1000",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                       "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podSecurityContext.fsGroup":    "2001",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podSecurityContext.runAsGroup": "3001",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.podSecurityContext.runAsUser":  "1001",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.podSecurityContext.fsGroup":           "2002",
+				"delegatedOperatorDeployments.template.podSecurityContext.fsGroup":                         "2000",
+				"delegatedOperatorDeployments.template.podSecurityContext.runAsGroup":                      "3000",
+				"delegatedOperatorDeployments.template.podSecurityContext.runAsUser":                       "1000",
 			},
 			[]func(podSecurityContext *corev1.PodSecurityContext){
 				func(podSecurityContext *corev1.PodSecurityContext) {
@@ -3398,6 +3692,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -3424,38 +3719,27 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/name":     "teams-do-cpu-default",
 						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/name":     "teams-do-cpu-default",
 						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 				},
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
-				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
-					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
-						"app.kubernetes.io/instance": "fiftyone-test",
-					},
-					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
-						"app.kubernetes.io/instance": "fiftyone-test",
-					},
-				},
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
 						"app.kubernetes.io/name":     "teams-do-two",
@@ -3471,18 +3755,18 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 		{
 			"overrideBaseTemplateLabels",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.labels.myLabel":       "unruly",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.labels.myLabel":               "unruly",
 			},
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/name":     "teams-do-cpu-default",
 						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/name":     "teams-do-cpu-default",
 						"app.kubernetes.io/instance": "fiftyone-test",
 						"myLabel":                    "unruly",
 					},
@@ -3503,18 +3787,19 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 		{
 			"overrideInstanceLabels",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.labels.teams-do-label":        "teams-do-label-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.teams-do-two-label": "teams-do-two-label-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.myLabel":            "very-ruly",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":               "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.labels.teams-do-label": "teams-do-label-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.teams-do-two-label":    "teams-do-two-label-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.myLabel":               "very-ruly",
 			},
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/name":     "teams-do-cpu-default",
 						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/name":     "teams-do-cpu-default",
 						"app.kubernetes.io/instance": "fiftyone-test",
 						"teams-do-label":             "teams-do-label-value",
 					},
@@ -3536,19 +3821,20 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 		{
 			"overrideBaseTemplateAndInstanceLabels",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.labels.teams-do-label":        "teams-do-label-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.teams-do-two-label": "teams-do-two-label-value",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.myLabel":            "very-ruly",
-				"delegatedOperatorDeployments.template.labels.myLabel":                          "unruly",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":               "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.labels.teams-do-label": "teams-do-label-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.teams-do-two-label":    "teams-do-two-label-value",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.labels.myLabel":               "very-ruly",
+				"delegatedOperatorDeployments.template.labels.myLabel":                             "unruly",
 			},
 			[]deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 				deploymentDelegatedOperatorInstanceTemplateLabelsExpected{
 					selectorMatch: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/name":     "teams-do-cpu-default",
 						"app.kubernetes.io/instance": "fiftyone-test",
 					},
 					templateMetadata: map[string]string{
-						"app.kubernetes.io/name":     "teams-do",
+						"app.kubernetes.io/name":     "teams-do-cpu-default",
 						"app.kubernetes.io/instance": "fiftyone-test",
 						"teams-do-label":             "teams-do-label-value",
 						"myLabel":                    "unruly",
@@ -3589,11 +3875,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
+
 				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -3630,23 +3918,22 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestServiceAccountName
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]string{"fiftyone-teams"},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
-			[]string{"fiftyone-teams", "fiftyone-teams"},
+			[]string{"fiftyone-teams"},
 		},
 		{
 			"overrideServiceAccountName",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 				"serviceAccount.name": "test-service-account",
 			},
 			[]string{"test-service-account", "test-service-account"},
@@ -3676,6 +3963,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestServiceAccountName
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -3697,16 +3985,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 		{
 			"defaultValues",
 			nil,
-			[]func(tolerations []corev1.Toleration){
-				func(tolerations []corev1.Toleration) {
-					s.Empty(tolerations, "should not be set")
-				},
-			},
+			nil,
 		},
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]func(tolerations []corev1.Toleration){
 				func(tolerations []corev1.Toleration) {
@@ -3715,15 +3999,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(tolerations []corev1.Toleration){
-				func(tolerations []corev1.Toleration) {
-					s.Nil(tolerations, "should be nil")
-				},
 				func(tolerations []corev1.Toleration) {
 					s.Nil(tolerations, "should be nil")
 				},
@@ -3732,11 +4012,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 		{
 			"overrideBaseTemplateTolerations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":       "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":    "nil",
-				"delegatedOperatorDeployments.template.tolerations[0].key":      "example-key",
-				"delegatedOperatorDeployments.template.tolerations[0].operator": "Exists",
-				"delegatedOperatorDeployments.template.tolerations[0].effect":   "NoSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.tolerations[0].key":           "example-key",
+				"delegatedOperatorDeployments.template.tolerations[0].operator":      "Exists",
+				"delegatedOperatorDeployments.template.tolerations[0].effect":        "NoSchedule",
 			},
 			[]func(tolerations []corev1.Toleration){
 				func(tolerations []corev1.Toleration) {
@@ -3774,10 +4054,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 		{
 			"overrideInstanceTolerations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].key":      "example-key-teams-do",
-				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].operator": "Exists",
-				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].effect":   "PreferNoSchedule",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":               "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                 "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.tolerations[0].key":      "example-key-teams-do",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.tolerations[0].operator": "Exists",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.tolerations[0].effect":   "PreferNoSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                         "nil",
 			},
 			[]func(tolerations []corev1.Toleration){
 				func(tolerations []corev1.Toleration) {
@@ -3803,13 +4084,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 		{
 			"overrideBaseTemplateInstanceTolerations",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].key":      "example-key-teams-do",
-				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].operator": "Exists",
-				"delegatedOperatorDeployments.deployments.teamsDo.tolerations[0].effect":   "PreferNoSchedule",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":               "nil",
-				"delegatedOperatorDeployments.template.tolerations[0].key":                 "example-key",
-				"delegatedOperatorDeployments.template.tolerations[0].operator":            "Exists",
-				"delegatedOperatorDeployments.template.tolerations[0].effect":              "NoSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                 "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.tolerations[0].key":      "example-key-teams-do",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.tolerations[0].operator": "Exists",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.tolerations[0].effect":   "PreferNoSchedule",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                         "nil",
+				"delegatedOperatorDeployments.template.tolerations[0].key":                           "example-key",
+				"delegatedOperatorDeployments.template.tolerations[0].operator":                      "Exists",
+				"delegatedOperatorDeployments.template.tolerations[0].effect":                        "NoSchedule",
 			},
 			[]func(tolerations []corev1.Toleration){
 				func(tolerations []corev1.Toleration) {
@@ -3865,11 +4147,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
+
 				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -3891,33 +4175,44 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 		{
 			"defaultValues",
 			nil,
-			[]func(volumes []corev1.Volume){
-				func(volumes []corev1.Volume) {
-					s.Empty(volumes, "Volumes should be be set")
-				},
-			},
+			nil,
 		},
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]func(volumes []corev1.Volume){
 				func(volumes []corev1.Volume) {
-					s.Nil(volumes, "Volumes should be nil")
+					expectedJSON := `[
+          {
+            "name": "shm-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2Gi"
+            }
+          },
+          {
+            "name": "memory-media-cache-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2.5Gi"
+            }
+          }
+        ]`
+					var expectedVolumes []corev1.Volume
+					err := json.Unmarshal([]byte(expectedJSON), &expectedVolumes)
+					s.NoError(err)
+					s.Equal(expectedVolumes, volumes, "Volumes should be equal")
 				},
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(volumes []corev1.Volume){
-				func(volumes []corev1.Volume) {
-					s.Nil(volumes, "Volumes should be nil")
-				},
 				func(volumes []corev1.Volume) {
 					s.Nil(volumes, "Volumes should be nil")
 				},
@@ -3926,7 +4221,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 		{
 			"overrideBaseTemplateVolumes",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                          "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":               "true",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                       "nil",
 				"delegatedOperatorDeployments.template.volumes[0].name":                            "template-test-volume1",
 				"delegatedOperatorDeployments.template.volumes[0].hostPath.path":                   "/template-test-volume1",
@@ -3937,15 +4232,17 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 				func(volumes []corev1.Volume) {
 					expectedJSON := `[
           {
-            "name": "template-test-volume1",
-            "hostPath": {
-              "path": "/template-test-volume1"
+            "name": "shm-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2Gi"
             }
           },
           {
-            "name": "template-pvc1",
-            "persistentVolumeClaim": {
-              "claimName": "template-pvc1"
+            "name": "memory-media-cache-vol",
+            "emptyDir": {
+              "medium": "Memory",
+			  "sizeLimit": "2.5Gi"
             }
           }
         ]`
@@ -3979,9 +4276,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 		{
 			"overrideInstanceVolumes",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].name":          "teams-do-test-volume1",
-				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].hostPath.path": "/teams-do-test-volume1",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                  "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].name":          "teams-do-test-volume1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].hostPath.path": "/teams-do-test-volume1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                          "nil",
 			},
 			[]func(volumes []corev1.Volume){
 				func(volumes []corev1.Volume) {
@@ -4006,13 +4304,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 		{
 			"overrideBaseTemplateAndInstanceVolumes",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].name":                 "teams-do-test-volume1",
-				"delegatedOperatorDeployments.deployments.teamsDo.volumes[0].hostPath.path":        "/teams-do-test-volume1",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                       "nil",
-				"delegatedOperatorDeployments.template.volumes[0].name":                            "template-test-volume1",
-				"delegatedOperatorDeployments.template.volumes[0].hostPath.path":                   "/template-test-volume1",
-				"delegatedOperatorDeployments.template.volumes[1].name":                            "template-pvc1",
-				"delegatedOperatorDeployments.template.volumes[1].persistentVolumeClaim.claimName": "template-pvc1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].name":          "teams-do-test-volume1",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].hostPath.path": "/teams-do-test-volume1",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                          "nil",
+				"delegatedOperatorDeployments.template.volumes[0].name":                               "template-test-volume1",
+				"delegatedOperatorDeployments.template.volumes[0].hostPath.path":                      "/template-test-volume1",
+				"delegatedOperatorDeployments.template.volumes[1].name":                               "template-pvc1",
+				"delegatedOperatorDeployments.template.volumes[1].persistentVolumeClaim.claimName":    "template-pvc1",
 			},
 			[]func(volumes []corev1.Volume){
 				func(volumes []corev1.Volume) {
@@ -4060,7 +4360,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 			subT := s.T()
 			subT.Parallel()
 
-			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
 				options := &helm.Options{SetValues: testCase.values}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -4072,11 +4371,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
+				// when vars are set outside of the if statement, they aren't accessible from within the conditional
 				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -4108,7 +4409,33 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			[]func(probe *corev1.Probe){
+				func(probe *corev1.Probe) {
+					expectedProbeJSON := `{
+          "exec": {
+              "command": [
+                "sh",
+                "-c",
+                "fiftyone delegated list --limit 1 -o liveness"
+              ]
+          },
+          "failureThreshold": 5,
+          "periodSeconds": 30,
+          "timeoutSeconds": 30
+        }`
+					var expectedProbe *corev1.Probe
+					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
+					s.NoError(err)
+					s.Equal(expectedProbe, probe, "Liveness Probes should be equal")
+				},
+			},
+		},
+		{
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4134,8 +4461,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 		{
 			"defaultValuesMultipleInstances",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4179,11 +4506,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 		{
 			"overrideBaseTemplateLivenessProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":         "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":      "nil",
-				"delegatedOperatorDeployments.template.liveness.failureThreshold": "10",
-				"delegatedOperatorDeployments.template.liveness.periodSeconds":    "10",
-				"delegatedOperatorDeployments.template.liveness.timeoutSeconds":   "10",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.liveness.failureThreshold":    "10",
+				"delegatedOperatorDeployments.template.liveness.periodSeconds":       "10",
+				"delegatedOperatorDeployments.template.liveness.timeoutSeconds":      "10",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4227,12 +4554,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 		{
 			"overrideInstanceLivenessProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.liveness.failureThreshold":    "15",
-				"delegatedOperatorDeployments.deployments.teamsDo.liveness.periodSeconds":       "20",
-				"delegatedOperatorDeployments.deployments.teamsDo.liveness.timeoutSeconds":      "25",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.failureThreshold": "30",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.periodSeconds":    "35",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.timeoutSeconds":   "40",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.liveness.failureThreshold": "15",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.liveness.periodSeconds":    "20",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.liveness.timeoutSeconds":   "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.failureThreshold":        "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.periodSeconds":           "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.timeoutSeconds":          "40",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4276,15 +4604,16 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 		{
 			"overrideBaseTemplateAndInstanceLivenessProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.liveness.failureThreshold":    "15",
-				"delegatedOperatorDeployments.deployments.teamsDo.liveness.periodSeconds":       "20",
-				"delegatedOperatorDeployments.deployments.teamsDo.liveness.timeoutSeconds":      "25",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.failureThreshold": "30",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.periodSeconds":    "35",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.timeoutSeconds":   "40",
-				"delegatedOperatorDeployments.template.liveness.failureThreshold":               "10",
-				"delegatedOperatorDeployments.template.liveness.periodSeconds":                  "10",
-				"delegatedOperatorDeployments.template.liveness.timeoutSeconds":                 "10",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                   "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.liveness.failureThreshold": "15",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.liveness.periodSeconds":    "20",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.liveness.timeoutSeconds":   "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.failureThreshold":        "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.periodSeconds":           "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.liveness.timeoutSeconds":          "40",
+				"delegatedOperatorDeployments.template.liveness.failureThreshold":                      "10",
+				"delegatedOperatorDeployments.template.liveness.periodSeconds":                         "10",
+				"delegatedOperatorDeployments.template.liveness.timeoutSeconds":                        "10",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4345,11 +4674,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
+
 				options := &helm.Options{SetValues: testCase.values}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -4371,17 +4702,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 		{
 			"defaultValues",
 			nil,
-			[]func(probe *corev1.Probe){
-				func(probe *corev1.Probe) {
-					s.Empty(probe, "Readiness probe should not be set.")
-				},
-			},
+			nil,
 		},
 		{
 			"defaultValuesDOEnabled",
-			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
-			},
+			nil,
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
 					expectedProbeJSON := `{
@@ -4404,30 +4729,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(probe *corev1.Probe){
-				func(probe *corev1.Probe) {
-					expectedProbeJSON := `{
-          "exec": {
-              "command": [
-                "sh",
-                "-c",
-                "fiftyone delegated list --limit 1 -o readiness"
-              ]
-          },
-          "failureThreshold": 5,
-          "periodSeconds": 30,
-          "timeoutSeconds": 30
-        }`
-					var expectedProbe *corev1.Probe
-					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
-					s.NoError(err)
-					s.Equal(expectedProbe, probe, "Readiness Probes should be equal")
-				},
 				func(probe *corev1.Probe) {
 					expectedProbeJSON := `{
           "exec": {
@@ -4451,7 +4757,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 		{
 			"overrideBaseTemplateReadinessProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":          "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":       "nil",
 				"delegatedOperatorDeployments.template.readiness.failureThreshold": "10",
 				"delegatedOperatorDeployments.template.readiness.periodSeconds":    "10",
@@ -4499,12 +4806,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 		{
 			"overrideInstanceReadinessProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.readiness.failureThreshold":    "15",
-				"delegatedOperatorDeployments.deployments.teamsDo.readiness.periodSeconds":       "20",
-				"delegatedOperatorDeployments.deployments.teamsDo.readiness.timeoutSeconds":      "25",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.failureThreshold": "30",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.periodSeconds":    "35",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.timeoutSeconds":   "40",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.readiness.failureThreshold": "15",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.readiness.periodSeconds":    "20",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.readiness.timeoutSeconds":   "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.failureThreshold":        "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.periodSeconds":           "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.timeoutSeconds":          "40",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4548,15 +4857,17 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 		{
 			"overrideBaseTemplateAndInstanceReadinessProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.readiness.failureThreshold":    "15",
-				"delegatedOperatorDeployments.deployments.teamsDo.readiness.periodSeconds":       "20",
-				"delegatedOperatorDeployments.deployments.teamsDo.readiness.timeoutSeconds":      "25",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.failureThreshold": "30",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.periodSeconds":    "35",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.timeoutSeconds":   "40",
-				"delegatedOperatorDeployments.template.readiness.failureThreshold":               "10",
-				"delegatedOperatorDeployments.template.readiness.periodSeconds":                  "10",
-				"delegatedOperatorDeployments.template.readiness.timeoutSeconds":                 "10",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.readiness.failureThreshold": "15",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.readiness.periodSeconds":    "20",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.readiness.timeoutSeconds":   "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.failureThreshold":        "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.periodSeconds":           "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.readiness.timeoutSeconds":          "40",
+				"delegatedOperatorDeployments.template.readiness.failureThreshold":                      "10",
+				"delegatedOperatorDeployments.template.readiness.periodSeconds":                         "10",
+				"delegatedOperatorDeployments.template.readiness.timeoutSeconds":                        "10",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4605,7 +4916,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 		s.Run(testCase.name, func() {
 			subT := s.T()
 			subT.Parallel()
-
 			if testCase.values == nil {
 				options := &helm.Options{SetValues: testCase.values}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -4622,6 +4932,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -4651,9 +4962,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 		},
 		{
 			"defaultValuesDOEnabled",
-			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
-			},
+			nil,
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
 					expectedProbeJSON := `{
@@ -4676,30 +4985,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(probe *corev1.Probe){
-				func(probe *corev1.Probe) {
-					expectedProbeJSON := `{
-          "exec": {
-              "command": [
-                "sh",
-                "-c",
-                "fiftyone delegated list --limit 1 -o startup"
-              ]
-          },
-          "failureThreshold": 5,
-          "periodSeconds": 30,
-          "timeoutSeconds": 30
-        }`
-					var expectedProbe *corev1.Probe
-					err := json.Unmarshal([]byte(expectedProbeJSON), &expectedProbe)
-					s.NoError(err)
-					s.Equal(expectedProbe, probe, "startup Probes should be equal")
-				},
 				func(probe *corev1.Probe) {
 					expectedProbeJSON := `{
           "exec": {
@@ -4723,7 +5013,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 		{
 			"overrideBaseTemplateStartupProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":        "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":     "nil",
 				"delegatedOperatorDeployments.template.startup.failureThreshold": "10",
 				"delegatedOperatorDeployments.template.startup.periodSeconds":    "10",
@@ -4771,12 +5062,13 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 		{
 			"overrideInstanceStartupProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.startup.failureThreshold":    "15",
-				"delegatedOperatorDeployments.deployments.teamsDo.startup.periodSeconds":       "20",
-				"delegatedOperatorDeployments.deployments.teamsDo.startup.timeoutSeconds":      "25",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.failureThreshold": "30",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.periodSeconds":    "35",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.timeoutSeconds":   "40",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                  "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.startup.failureThreshold": "15",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.startup.periodSeconds":    "20",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.startup.timeoutSeconds":   "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.failureThreshold":        "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.periodSeconds":           "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.timeoutSeconds":          "40",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4820,15 +5112,17 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 		{
 			"overrideBaseTemplateAndInstanceStartupProbe",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.startup.failureThreshold":    "15",
-				"delegatedOperatorDeployments.deployments.teamsDo.startup.periodSeconds":       "20",
-				"delegatedOperatorDeployments.deployments.teamsDo.startup.timeoutSeconds":      "25",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.failureThreshold": "30",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.periodSeconds":    "35",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.timeoutSeconds":   "40",
-				"delegatedOperatorDeployments.template.startup.failureThreshold":               "10",
-				"delegatedOperatorDeployments.template.startup.periodSeconds":                  "10",
-				"delegatedOperatorDeployments.template.startup.timeoutSeconds":                 "10",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.startup.failureThreshold": "15",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.startup.periodSeconds":    "20",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.startup.timeoutSeconds":   "25",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.failureThreshold":        "30",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.periodSeconds":           "35",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.startup.timeoutSeconds":          "40",
+				"delegatedOperatorDeployments.template.startup.failureThreshold":                      "10",
+				"delegatedOperatorDeployments.template.startup.periodSeconds":                         "10",
+				"delegatedOperatorDeployments.template.startup.timeoutSeconds":                        "10",
 			},
 			[]func(probe *corev1.Probe){
 				func(probe *corev1.Probe) {
@@ -4877,7 +5171,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 		s.Run(testCase.name, func() {
 			subT := s.T()
 			subT.Parallel()
-
 			if testCase.values == nil {
 				options := &helm.Options{SetValues: testCase.values}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -4894,6 +5187,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -4923,9 +5217,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 		},
 		{
 			"defaultValuesDOEnabled",
-			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
-			},
+			nil,
 			[]func(args []string){
 				func(args []string) {
 					expectedArgs := []string{
@@ -4934,9 +5226,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-t",
 						"remote",
 						"-n",
-						"teams-do",
+						"teams-do-cpu-default",
 						"-d",
-						"Long running operations delegated to teams-do",
+						"Long running operations delegated to teams-do-cpu-default",
 						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
@@ -4944,26 +5236,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(args []string){
-				func(args []string) {
-					expectedArgs := []string{
-						"delegated",
-						"launch",
-						"-t",
-						"remote",
-						"-n",
-						"teams-do",
-						"-d",
-						"Long running operations delegated to teams-do",
-						"-m",
-					}
-					s.Equal(expectedArgs, args, "Args should be equal")
-				},
 				func(args []string) {
 					expectedArgs := []string{
 						"delegated",
@@ -4983,9 +5260,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 		{
 			"overrideBaseTemplateDescription", // This should still show the defaults
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.description":          "Delegated Operator",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.description":                  "Delegated Operator",
 			},
 			[]func(args []string){
 				func(args []string) {
@@ -4995,9 +5272,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-t",
 						"remote",
 						"-n",
-						"teams-do",
+						"teams-do-cpu-default",
 						"-d",
-						"Long running operations delegated to teams-do",
+						"Long running operations delegated to teams-do-cpu-default",
 						"-m",
 					}
 					s.Equal(expectedArgs, args, "Args should be equal")
@@ -5021,8 +5298,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 		{
 			"overrideInstanceDescription",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.description": "Used for non-gpu workloads",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":   "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":     "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.description": "Used for non-gpu workloads",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":             "nil",
 			},
 			[]func(args []string){
 				func(args []string) {
@@ -5032,7 +5310,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-t",
 						"remote",
 						"-n",
-						"teams-do",
+						"teams-do-cpu-default",
 						"-d",
 						"Used for non-gpu workloads",
 						"-m",
@@ -5058,9 +5336,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 		{
 			"overrideBaseTemplateInstanceDescription",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.description": "Used for non-gpu workloads",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":   "nil",
-				"delegatedOperatorDeployments.template.description":            "Delegated Operator",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":     "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.description": "Used for non-gpu workloads",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":             "nil",
+				"delegatedOperatorDeployments.template.description":                      "Delegated Operator",
 			},
 			[]func(args []string){
 				func(args []string) {
@@ -5070,7 +5349,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 						"-t",
 						"remote",
 						"-n",
-						"teams-do",
+						"teams-do-cpu-default",
 						"-d",
 						"Used for non-gpu workloads",
 						"-m",
@@ -5118,6 +5397,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
@@ -5148,7 +5428,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateSt
 		{
 			"defaultValuesDOEnabled",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused": "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			[]func(deploymentStrategy appsv1.DeploymentStrategy){
 				func(deploymentStrategy appsv1.DeploymentStrategy) {
@@ -5163,21 +5443,11 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateSt
 			},
 		},
 		{
-			"defaultValuesMultipleInstances",
+			"overrideTeamsDoTwoDynamic", // dynamic because if .enabled is omitted, we assume it's true (backwards compatibility)
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
 			},
 			[]func(deploymentStrategy appsv1.DeploymentStrategy){
-				func(deploymentStrategy appsv1.DeploymentStrategy) {
-					expectedJSON := `{
-                "type": "RollingUpdate"
-            }`
-					var expectedDeploymentStrategy appsv1.DeploymentStrategy
-					err := json.Unmarshal([]byte(expectedJSON), &expectedDeploymentStrategy)
-					s.NoError(err)
-					s.Equal(expectedDeploymentStrategy, deploymentStrategy, "Deployment strategies should be equal")
-				},
 				func(deploymentStrategy appsv1.DeploymentStrategy) {
 					expectedJSON := `{
                 "type": "RollingUpdate"
@@ -5192,9 +5462,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateSt
 		{
 			"overrideBaseTemplateStrategyType",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":    "nil",
-				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused": "nil",
-				"delegatedOperatorDeployments.template.updateStrategy.type":  "Recreate",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":         "nil",
+				"delegatedOperatorDeployments.template.updateStrategy.type":          "Recreate",
 			},
 			[]func(deploymentStrategy appsv1.DeploymentStrategy){
 				func(deploymentStrategy appsv1.DeploymentStrategy) {
@@ -5220,7 +5490,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateSt
 		{
 			"overrideBaseTemplateStrategyRollingUpdate",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                           "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                "true",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.unused":                        "nil",
 				"delegatedOperatorDeployments.template.updateStrategy.type":                         "RollingUpdate",
 				"delegatedOperatorDeployments.template.updateStrategy.rollingUpdate.maxUnavailable": "5",
@@ -5255,7 +5525,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateSt
 		{
 			"overrideBaseTemplateInstanceStrategy",
 			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDo.unused":                           "nil",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                "true",
 				"delegatedOperatorDeployments.deployments.teamsDoTwo.updateStrategy.type":           "Recreate",
 				"delegatedOperatorDeployments.template.updateStrategy.type":                         "RollingUpdate",
 				"delegatedOperatorDeployments.template.updateStrategy.rollingUpdate.maxUnavailable": "5",
@@ -5312,11 +5582,12 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateSt
 
 				testCase.expected[0](deployment.Spec.Strategy)
 			} else {
+
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
-				s.Equal(len(allRange[1:]), len(testCase.expected), "Number of delegated operator instances should match expected number")
+				s.Equal(len(allRange[1:]), len(testCase.expected), "number of deployments should be equal")
 
 				for i, rawOutput := range allRange[1:] {
 					var deployment appsv1.Deployment
