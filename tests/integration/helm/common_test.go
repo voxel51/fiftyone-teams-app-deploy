@@ -217,7 +217,7 @@ func enforceReady(subT *testing.T, kubectlOptions *k8s.KubectlOptions, vals []se
 
 		// Validate that k8s service is ready (pods are started and in service)
 
-		if expected.name != "teams-do" {
+		if expected.name != "teams-do-cpu-default" {
 			k8s.WaitUntilServiceAvailable(subT, kubectlOptions, expected.name, 10, 1*time.Second)
 		}
 	}
@@ -227,7 +227,7 @@ func checkPodLogsWithRetries(subT *testing.T, kubectlOptions *k8s.KubectlOptions
 	// The pods report they're ready before the final log that we sometimes
 	// test. The root issue is that pods report ready before they truly are.
 	// Once that is fixed, this test becomes redundant and isn't required.
-	maxRetries := 15
+	maxRetries := 30
 	retryDelay := 2 * time.Second
 
 	for _, pod := range pods {

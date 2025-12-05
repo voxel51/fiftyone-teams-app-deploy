@@ -81,13 +81,15 @@ casSettings:
   env:
     FIFTYONE_AUTH_MODE: legacy
 
-# delegatedOperatorExecutorSettings:
-#   enabled: true
-#   env:
-#     # Set FIFTYONE_PLUGINS_DIR if you are enabling plugins in the builtin `teams-do`
-#     # delegated operation orchestrator.
-#     # See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#builtin-delegated-operator-orchestrator
-#     FIFTYONE_PLUGINS_DIR: /opt/plugins
+# delegatedOperatorDeployments:
+#   deployments:
+#     teamsDoCpuDefault:
+#       enabled: true
+#       env:
+#         # Set FIFTYONE_PLUGINS_DIR if you are enabling plugins in the builtin `teams-do`
+#         # delegated operation orchestrator.
+#         # See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#builtin-delegated-operator-orchestrator
+#         FIFTYONE_PLUGINS_DIR: /opt/plugins
 
 # pluginsSettings:
 #   enabled: true

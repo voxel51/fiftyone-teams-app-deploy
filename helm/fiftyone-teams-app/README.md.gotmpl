@@ -35,11 +35,20 @@ FiftyOne Enterprise 2.14+ introduces custom roles and role bindings to allow the
 `teams-api` deployment to create, update, and remove batch jobs and pods for
 kubernetes-based
 [on-demand delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+An additional service account is now created by the helm chart to utilize these roles
+and is attached to the `teams-api` deployment object.
+
+The
+[on-demand delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+are currently in beta and can be used by early adopters.
 
 #### Delegated Operator Changes
 
-FiftyOne Enterprise 2.14+ defaults the
-`teams-do-cpu-default` delegated operator to on.
+FiftyOne Enterprise 2.14+ pre-populates a `teams-do-cpu-default`
+delegated operator `Deployment` by default.
+Please see
+[configuring delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+for steps on advanced configuration and enabling it.
 
 ### Version 2.11+ On-Demand Delegated Operator Executors
 

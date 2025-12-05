@@ -172,7 +172,7 @@ To configure workload identity via the `terraform`:
     }
     ```
 
-1. Create an IAM allow policy that gives the FiftyOne Enterprise ServiceAccount
+1. Create an IAM allow policy that gives the FiftyOne Enterprise ServiceAccounts
    access to impersonate the IAM service account:
 
     ```hcl
@@ -181,12 +181,23 @@ To configure workload identity via the `terraform`:
         role               = "roles/iam.workloadIdentityUser"
         member             = "serviceAccount:${IAM_SA_PROJECT_ID}.svc.id.goog[${FIFTYONE_NAMESPACE}/${FIFTYONE_SERVICEACCOUNT_NAME}]"
     }
+
+    resource "google_service_account_iam_member" "voxel51_sa_workload_identity_teams_api" {
+        service_account_id = google_service_account.voxel51_service_account.name
+        role               = "roles/iam.workloadIdentityUser"
+        member             = "serviceAccount:${IAM_SA_PROJECT_ID}.svc.id.goog[${FIFTYONE_NAMESPACE}/${FIFTYONE_SERVICEACCOUNT_NAME_TEAMS_API}]"
+    }
     ```
 
 1. Add the Kubernetes ServiceAccount annotations via your `values.yaml` file
    so that GKE sees the link between the service accounts:
 
     ```yaml
+    apiSettings:
+        rbac:
+            serviceAccount:
+                annotations:
+                    iam.gke.io/gcp-service-account: IAM_SA_NAME@IAM_SA_PROJECT_ID.iam.gserviceaccount.com
     serviceAccount:
         annotations:
             iam.gke.io/gcp-service-account: IAM_SA_NAME@IAM_SA_PROJECT_ID.iam.gserviceaccount.com
@@ -365,7 +376,10 @@ To configure workload identity via Terraform:
             condition {
                 test     = "StringEquals"
                 variable = "${EKS_OIDC_PROVIDER}:sub"
-                values   = ["system:serviceaccount:${FIFTYONE_NAMESPACE}:${FIFTYONE_SERVICEACCOUNT_NAME}"]
+                values   = [
+                    "system:serviceaccount:${FIFTYONE_NAMESPACE}:${FIFTYONE_SERVICEACCOUNT_NAME}",
+                    "system:serviceaccount:${FIFTYONE_NAMESPACE}:${FIFTYONE_SERVICEACCOUNT_NAME_TEAMS_API}",
+                ]
             }
 
             condition {
@@ -400,6 +414,11 @@ To configure workload identity via Terraform:
    so that EKS sees the link between the service accounts:
 
     ```yaml
+    apiSettings:
+        rbac:
+            serviceAccount:
+                annotations:
+                    eks.amazonaws.com/role-arn: IAM_ROLE_ARN
     serviceAccount:
         annotations:
             eks.amazonaws.com/role-arn: IAM_ROLE_ARN

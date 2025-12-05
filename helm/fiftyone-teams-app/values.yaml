@@ -821,22 +821,22 @@ delegatedOperatorDeployments:
   # deployment instance.
   deployments:
     # -- Default (CPU-only) delegated operator runner.
-    # Defaults to an 8vCPU, 16Gi RAM runner.
+    # Defaults to an 4vCPU, 16Gi RAM runner.
     # The deployment is backed with a 2.5Gi in-memory
     # volume for caching media and an extra 2Gi of shared memory.
     teamsDoCpuDefault:
-      enabled: true
+      enabled: false
       env:
         FIFTYONE_MEDIA_CACHE_DIR: /opt/media_cache
         FIFTYONE_MEDIA_CACHE_SIZE_BYTES: '2147483648'
       replicaCount: 1
       resources:
         limits:
-          cpu: 8
+          cpu: 4
           ephemeral-storage: 1Gi
           memory: 16Gi
         requests:
-          cpu: 8
+          cpu: 4
           ephemeral-storage: 1Gi
           memory: 16Gi
       volumes:
@@ -1015,6 +1015,10 @@ delegatedOperatorJobTemplates:
     #       nvidia.com/gpu: 1
     #     requests:
     #       nvidia.com/gpu: 1
+    #   tolerations:
+    #     - key: nvidia.com/gpu
+    #       effect: NoSchedule
+    #       operator: Exists
     #
     # https://aws.amazon.com/blogs/compute/running-gpu-accelerated-kubernetes-workloads-on-p3-and-p2-ec2-instances-with-amazon-eks/
     # gpuAwsEksStandard:
