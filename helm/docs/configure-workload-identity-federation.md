@@ -101,19 +101,27 @@ To configure workload identity via the `gcloud` CLI:
         --role "projects/IAM_SA_PROJECT_ID/roles/Voxel51FiftyOneEnterpriseCustomRole"  # pragma: allowlist secret
     ```
 
-1. Create an IAM allow policy that gives the FiftyOne Enterprise ServiceAccount
+1. Create an IAM allow policy that gives the FiftyOne Enterprise ServiceAccounts
    access to impersonate the IAM service account:
 
     ```shell
     gcloud iam service-accounts add-iam-policy-binding IAM_SA_NAME@IAM_SA_PROJECT_ID.iam.gserviceaccount.com \
         --role roles/iam.workloadIdentityUser \
         --member "serviceAccount:IAM_SA_PROJECT_ID.svc.id.goog[FIFTYONE_NAMESPACE/FIFTYONE_SERVICEACCOUNT_NAME]"
+    gcloud iam service-accounts add-iam-policy-binding IAM_SA_NAME@IAM_SA_PROJECT_ID.iam.gserviceaccount.com \
+        --role roles/iam.workloadIdentityUser \
+        --member "serviceAccount:IAM_SA_PROJECT_ID.svc.id.goog[FIFTYONE_NAMESPACE/FIFTYONE_SERVICEACCOUNT_NAME_TEAMS_API]"
     ```
 
 1. Add the Kubernetes ServiceAccount annotations via your `values.yaml` file
    so that GKE sees the link between the service accounts:
 
     ```yaml
+    apiSettings:
+        rbac:
+            serviceAccount:
+                annotations:
+                    iam.gke.io/gcp-service-account: IAM_SA_NAME@IAM_SA_PROJECT_ID.iam.gserviceaccount.com
     serviceAccount:
         annotations:
             iam.gke.io/gcp-service-account: IAM_SA_NAME@IAM_SA_PROJECT_ID.iam.gserviceaccount.com
@@ -280,7 +288,10 @@ To configure workload identity via the AWS CLI:
                 "Action": "sts:AssumeRoleWithWebIdentity",
                 "Condition": {
                     "StringEquals": {
-                        "oidc.eks.AWS_REGION.amazonaws.com/id/EKS_OIDC_PROVIDER_ID:sub": "system:serviceaccount:FIFTYONE_NAMESPACE:FIFTYONE_SERVICEACCOUNT_NAME",
+                        "oidc.eks.AWS_REGION.amazonaws.com/id/EKS_OIDC_PROVIDER_ID:sub": [
+                            "system:serviceaccount:FIFTYONE_NAMESPACE:FIFTYONE_SERVICEACCOUNT_NAME",
+                            "system:serviceaccount:FIFTYONE_NAMESPACE:FIFTYONE_SERVICEACCOUNT_NAME_TEAMS_API"
+                        ],
                         "oidc.eks.AWS_REGION.amazonaws.com/id/EKS_OIDC_PROVIDER_ID:aud": "sts.amazonaws.com"
                     }
                 }
@@ -311,6 +322,11 @@ To configure workload identity via the AWS CLI:
    so that EKS sees the link between the service accounts:
 
     ```yaml
+    apiSettings:
+        rbac:
+            serviceAccount:
+                annotations:
+                    iam.gke.io/gcp-service-account: IAM_ROLE_ARN
     serviceAccount:
         annotations:
             eks.amazonaws.com/role-arn: IAM_ROLE_ARN

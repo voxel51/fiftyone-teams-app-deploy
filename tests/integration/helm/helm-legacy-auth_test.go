@@ -236,7 +236,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"pluginsSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":   "cookieSecret",           // pragma: allowlist secret
 				"pluginsSettings.volumes[0].name":                                "plugins-vol-ro",
 				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName":     "pv-fiftyone-leg-dp-" + suffix,
-				"pluginsSettings.volumeås[0].persistentVolumeClaim.readOnly":     "true",
+				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":      "true",
 				"pluginsSettings.volumeMounts[0].name":                           "plugins-vol-ro",
 				"pluginsSettings.volumeMounts[0].mountPath":                      "/opt/plugins",
 				"secret.fiftyone.fiftyoneDatabaseName":                           "fiftyone-leg-dp-" + suffix,

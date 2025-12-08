@@ -69,7 +69,8 @@ Also be sure to modify the deployment's `resources.requests` to request
 the desired amount of GPUs from the Kubernetes scheduler.
 
 The below will deploy a CPU-based delegated operator (`teamsDo`) as well
-as a GPU-based delegated operator (`teamsDoWithGpu`):
+as GPU-based delegated operators for both GKE auto-pilot mode
+(`gpuGcpGkeAutopilot`) and standard GKE (`gpuGcpGkeStandard`):
 
 ```yaml
 delegatedOperatorDeployments:
@@ -187,7 +188,7 @@ GPU nodes and `resources.requests` to request the desired amount of GPUs
 from the Kubernetes scheduler.
 
 The below will deploy a CPU-based delegated operator (`teamsDo`) as well
-as a GPU-based delegated operator (`teamsDoWithGpu`):
+as a GPU-based delegated operator (`gpuAzureAks`):
 
 ```yaml
 delegatedOperatorDeployments:
