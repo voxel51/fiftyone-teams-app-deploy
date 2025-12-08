@@ -290,7 +290,7 @@ To configure workload identity via the AWS CLI:
                     "StringEquals": {
                         "oidc.eks.AWS_REGION.amazonaws.com/id/EKS_OIDC_PROVIDER_ID:sub": [
                             "system:serviceaccount:FIFTYONE_NAMESPACE:FIFTYONE_SERVICEACCOUNT_NAME",
-                            "system:serviceaccount:FIFTYONE_NAMESPACE:FIFTYONE_SERVICEACCOUNT_NAME_TEAMS_API",
+                            "system:serviceaccount:FIFTYONE_NAMESPACE:FIFTYONE_SERVICEACCOUNT_NAME_TEAMS_API"
                         ],
                         "oidc.eks.AWS_REGION.amazonaws.com/id/EKS_OIDC_PROVIDER_ID:aud": "sts.amazonaws.com"
                     }
