@@ -370,7 +370,7 @@ func (s *apiRoleBindingTemplateTest) TestRoleRef() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
-		expected func(subjects rbacv1.RoleRef)
+		expected func(roleRef rbacv1.RoleRef)
 	}{
 		{
 			"defaultValues",
