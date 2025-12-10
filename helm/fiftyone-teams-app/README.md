@@ -47,7 +47,7 @@ are currently in beta and can be used by early adopters.
 FiftyOne Enterprise 2.14+ pre-populates a `teams-do-cpu-default`
 delegated operator `Deployment` by default.
 Please see
-[configuring delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+[configuring delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 for steps on advanced configuration and enabling it.
 
 ### Version 2.11+ On-Demand Delegated Operator Executors
