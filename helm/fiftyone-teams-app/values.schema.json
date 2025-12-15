@@ -26,14 +26,14 @@
         "env": {
           "description": "Environment Variables are passed to the `teams-api` containers",
           "properties": {
-           "FIFTYONE_DO_EXPIRATION_MINUTES": {
-              "default": 30,
+            "FIFTYONE_DO_EXPIRATION_MINUTES": {
+              "default": 1,
               "description": "(int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.",
               "required": [],
               "title": "FIFTYONE_DO_EXPIRATION_MINUTES",
               "type": "integer"
             },
-	    "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES": {
+            "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES": {
               "default": "",
               "description": "(int) The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated.\nOverrides \"FIFTYONE_DO_EXPIRATION_DAYS\" if provided.",
               "required": [],

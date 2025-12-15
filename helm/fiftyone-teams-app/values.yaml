@@ -36,15 +36,14 @@ apiSettings:
     # -- The format to use for log messages.
     # Can be one of `json` or `text`.
     FIFTYONE_LOGGING_FORMAT: text
-    # -- The amount of time in days that a delegated operation can run before being automatically terminated.
-    # Overridden by "FIFTYONE_DO_EXPIRATION_MINUTES" if provided.
-    FIFTYONE_DO_EXPIRATION_DAYS: 1
+    # -- (int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.
+    FIFTYONE_DO_EXPIRATION_MINUTES: 1
     # @schema
     # type: ["integer", "null"]
     # @schema
-    # -- (int) The amount of time in minutes that a delegated operation can run before being automatically terminated.
+    # -- (int) The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated.
     # Overrides "FIFTYONE_DO_EXPIRATION_DAYS" if provided.
-    FIFTYONE_DO_EXPIRATION_MINUTES:
+    FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES:
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
