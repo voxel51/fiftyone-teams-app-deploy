@@ -27,7 +27,7 @@
           "description": "Environment Variables are passed to the `teams-api` containers",
           "properties": {
             "FIFTYONE_DO_EXPIRATION_MINUTES": {
-              "default": 1,
+              "default": 30,
               "description": "(int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.",
               "required": [],
               "title": "FIFTYONE_DO_EXPIRATION_MINUTES",
