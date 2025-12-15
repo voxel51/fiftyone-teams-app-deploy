@@ -41,7 +41,7 @@ jobs:
           charts_dir: helm
 
       - name: Upload README artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: helm-fiftyone-ai-readme
           path: helm/fiftyone-teams-app/README.md
