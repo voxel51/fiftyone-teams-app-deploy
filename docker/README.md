@@ -485,7 +485,7 @@ and deploy **custom plugin images**. You can base them on
 
 FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
 executors for Databricks and Anyscale. Please refer to the
-[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
+[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 
 ## Step 8: Identity Provider (IdP) and Authentication (CAS)
 
