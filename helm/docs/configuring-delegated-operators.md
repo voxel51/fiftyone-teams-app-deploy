@@ -39,7 +39,7 @@
 > `delegatedOperatorJobTemplates` and on-demand kubernetes orchestration
 > are currently in beta and can be used by early adopters.
 
-`delegatedOperatorJobTemplates` was added in version 2.14.1 which allows users
+`delegatedOperatorJobTemplates` was added in version 2.14.0 which allows users
 to create on-demand delegated operators utilizing
 [kubernetes jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/).
 `delegatedOperatorJobTemplates` enables you to create multiple job
