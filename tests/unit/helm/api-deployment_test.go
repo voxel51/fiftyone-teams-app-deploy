@@ -803,7 +803,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
 		  {
-			"name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
+			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
 			"value": "30"
 		  },
 		  {
