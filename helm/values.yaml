@@ -80,6 +80,8 @@ appSettings:
 casSettings:
   env:
     FIFTYONE_AUTH_MODE: legacy
+    # Set the name of the Mongo database for CAS if not using the default `cas`
+    # CAS_DATABASE_NAME: your-cas-name
 
 # delegatedOperatorDeployments:
 #   deployments:
