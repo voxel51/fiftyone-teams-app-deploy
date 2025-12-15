@@ -37,7 +37,7 @@ apiSettings:
     # Can be one of `json` or `text`.
     FIFTYONE_LOGGING_FORMAT: text
     # -- (int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.
-    FIFTYONE_DO_EXPIRATION_MINUTES: 1
+    FIFTYONE_DO_EXPIRATION_MINUTES: 30
     # @schema
     # type: ["integer", "null"]
     # @schema
