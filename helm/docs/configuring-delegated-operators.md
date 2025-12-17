@@ -16,8 +16,8 @@
 
 <!-- toc -->
 
-- [v2.14.0+](#v2140)
-- [v2.7.0+](#v270)
+- [v2.14+](#v214)
+- [v2.7+](#v27)
 - [Using `delegatedOperatorJobTemplates` for on-demand executors](#using-delegatedoperatorjobtemplates-for-on-demand-executors)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
@@ -33,7 +33,7 @@
 
 <!-- tocstop -->
 
-## v2.14.0+
+## v2.14+
 
 > [!NOTE]
 > `delegatedOperatorJobTemplates` and on-demand kubernetes orchestration
@@ -93,7 +93,7 @@ delegatedOperatorDeployments:
 For configuring additional delegated operators, see
 [using `delegatedOperatorDeployments` for always-on executors](#using-delegatedoperatordeployments-for-always-on-executors).
 
-## v2.7.0+
+## v2.7+
 
 As of version 2.7.0, `delegatedOperatorExecutorSettings`
 has been deprecated in favor of `delegatedOperatorDeployments`.
