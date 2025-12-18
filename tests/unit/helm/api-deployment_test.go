@@ -486,7 +486,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		   {
+		  {
 			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
 			"value": "1"
 		  },
@@ -588,7 +588,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
 		  {
-			"name": "FIFTYONE_DO_EXPIRATION_",
+			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
 			"value": "1"
 		  },
 		  {
@@ -702,7 +702,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		   {
+		  {
 			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
 			"value": "1"
 		  },
@@ -814,7 +814,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		   {
+		  {
 			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
 			"value": "1"
 		  },
@@ -914,7 +914,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		   {
+		  {
 			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
 			"value": "1"
 		  },
@@ -1014,7 +1014,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		   {
+		  {
 			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
 			"value": "1"
 		  },
