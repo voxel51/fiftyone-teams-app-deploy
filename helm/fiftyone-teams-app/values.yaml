@@ -36,7 +36,11 @@ apiSettings:
     # -- The format to use for log messages.
     # Can be one of `json` or `text`.
     FIFTYONE_LOGGING_FORMAT: text
+    # -- Deprecated use FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES instead. The amount of time in days that an unmonitored delegated operation can
+    # run before being automatically terminated. Overridden by "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES" if provided.
+    FIFTYONE_DO_EXPIRATION_DAYS: 1
     # -- (int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.
+    # If your executor was launched with the "-m" argument or is push based, then it is monitored.
     FIFTYONE_DO_EXPIRATION_MINUTES: 30
     # @schema
     # type: ["integer", "null"]

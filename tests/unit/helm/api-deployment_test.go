@@ -486,6 +486,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+		   {
+			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
+			"value": "1"
+		  },
 		  {
 			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
 			"value": "30"
@@ -494,7 +498,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			"name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
 			"value": ""
 		  },
-          {
+         {
             "name": "FIFTYONE_ENV",
             "value": "production"
           },
@@ -583,6 +587,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+		  {
+			"name": "FIFTYONE_DO_EXPIRATION_",
+			"value": "1"
+		  },
 		  {
 			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
 			"value": "30"
@@ -694,6 +702,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+		   {
+			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
+			"value": "1"
+		  },
 		  {
 			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
 			"value": "30"
@@ -702,7 +714,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			"name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
 			"value": ""
 		  },
-          {
+         {
             "name": "FIFTYONE_ENV",
             "value": "production"
           },
@@ -802,6 +814,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+		   {
+			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
+			"value": "1"
+		  },
 		  {
 			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
 			"value": "30"
@@ -810,7 +826,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			"name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
 			"value": ""
 		  },
-          {
+         {
             "name": "FIFTYONE_ENV",
             "value": "production"
           },
@@ -898,6 +914,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+		   {
+			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
+			"value": "1"
+		  },
 		  {
 			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
 			"value": "30"
@@ -906,7 +926,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			"name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
 			"value": ""
 		  },
-          {
+         {
             "name": "FIFTYONE_ENV",
             "value": "production"
           },
@@ -994,6 +1014,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+		   {
+			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
+			"value": "1"
+		  },
 		  {
 			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
 			"value": "30"
@@ -1002,7 +1026,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			"name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
 			"value": ""
 		  },
-          {
+         {
             "name": "FIFTYONE_ENV",
             "value": "production"
           },
