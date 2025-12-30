@@ -255,17 +255,25 @@ services:
 
 ### 2. Launch the application
 
-In the same directory:
+It is highly reccomended to set up your FiftyOne Enterprise Deployment with Delegated Operation. Delegated Operators allow FiftyOne Enterprise to offload plugin execution to **worker containers**, enabling scalable and reliable long-running operations.
+
+
+To launch worker containers, include `compose.delegated-operators.yaml`in your docker compose commands
 
 ```shell
-docker compose up -d
+docker compose \
+  -f compose.delegated-operators.yaml \
+  -f compose.override.yaml \
+  up -d
 ```
 
 This will start the following containers:
 
+- `fiftyone-app` (UI) → default port `5151`
 - `fiftyone-teams-app` (UI) → default port `3000`
 - `fiftyone-teams-api` (API) → default port `8000`
 - `fiftyone-teams-cas` (Auth) → default port `3030`
+- `fiftyone-teams-do-n` n replica containers where n is the number of VPUs your deployment comes with
 
 You can ensure that all your containers are up and healthy through:
 
@@ -373,6 +381,7 @@ Custom plugins are run **within the same container** as the app
 ```shell
 docker compose \
   -f compose.plugins.yaml \
+  -f compose.delegated-operators.yaml \
   -f compose.override.yaml \
   up -d
 ```
@@ -403,6 +412,7 @@ FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151
 ```shell
 docker compose \
   -f compose.dedicated-plugins.yaml \
+  -f compose.delegated-operators.yaml \
   -f compose.override.yaml \
   up -d
 ```
@@ -420,33 +430,9 @@ docker compose \
 - To manage and deploy plugins via the UI, go to:
   `https://<your-domain>/settings/plugins`
 
-## :gear: Step 7: Configuring FiftyOne Enterprise Delegated Operators
+## :gear: Step 7: Optional: Advanced Delegated Operation Configurations for FiftyOne Enterprise 
 
-Delegated Operators allow FiftyOne Enterprise to offload plugin execution to
-**worker containers**, enabling scalable and reliable long-running operations.
-
-:jigsaw: This feature is **compatible with all three plugin modes**: Builtin,
-Shared, and Dedicated.
-
-### :wrench: Enabling Delegated Operator Mode
-
-To launch worker containers, include `compose.delegated-operators.yaml`
-alongside your existing plugin mode.
-
-#### Example: Enable on top of **Dedicated Plugins** mode
-
-```shell
-docker compose \
-  -f compose.dedicated-plugins.yaml \
-  -f compose.delegated-operators.yaml \
-  -f compose.override.yaml \
-  up -d
-```
-
-> :open_file_folder: This will start a `teams-delegated-operator` service and
-> attach it to the shared plugin volume.
-
-### :page_facing_up: Optional: Upload Run Logs
+### :page_facing_up: Upload Run Logs
 
 You can enable **log uploads** for delegated operation runs by setting:
 
