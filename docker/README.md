@@ -253,7 +253,9 @@ services:
 
 ### 2. Launch the application
 
-It is highly recommended to set up your FiftyOne Enterprise Deployment with Delegated Operation. Delegated Operators allow FiftyOne Enterprise to offload plugin execution to **worker containers**, enabling scalable and reliable long-running operations.
+It is highly recommended to set up your FiftyOne Enterprise Deployment with Delegated Operation.
+Delegated Operators allow FiftyOne Enterprise to offload plugin execution to **worker containers**,
+enabling scalable and reliable long-running operations.
 
 
 To launch worker containers, include `compose.delegated-operators.yaml`in your docker compose commands
