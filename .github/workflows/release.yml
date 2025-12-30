@@ -35,7 +35,14 @@ jobs:
         id: chart_releaser
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          CR_SKIP_EXISTING: true
+          # If there are changes in the `helm/fiftyone-teams-app` directory,
+          # Chart Releaser will try to publish a new chart.
+          # If the `Chart.yaml` hasn't been changed, this will throw an error.
+          # Specifically, you will see a 422 from GitHub.
+          # This is OK - we have opted to use this as opposed to
+          # CR_SKIP_EXISTING: true so that internal charts don't get into
+          # inconsistent states.
+          CR_SKIP_EXISTING: false
         uses: helm/chart-releaser-action@v1.7.0
         with:
           charts_dir: helm
