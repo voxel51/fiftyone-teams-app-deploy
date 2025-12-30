@@ -59,7 +59,7 @@ regarding FiftyOne Enterprise.
   - [:small_blue_diamond: 3. RECOMMENDED: Dedicated Plugins](#small_blue_diamond-3-recommended-dedicated-plugins)
     - [Enable dedicated plugin mode](#enable-dedicated-plugin-mode)
   - [:pushpin: Notes](#pushpin-notes)
-- [:gear: Step 7: Advanced Delegated Operation Configurations for FiftyOne Enterprise](#gear-step-7-advanced-delegated-operation-configurations-for-fiftyone-enterprise-optional)
+- [:gear: Step 7: Advanced Delegated Operations Configuration (Optional)](#gear-step-7-advanced-delegated-operations-configuration-optional)
   - [:page_facing_up: Upload Run Logs](#page_facing_up-upload-run-logs)
   - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
@@ -253,12 +253,13 @@ services:
 
 ### 2. Launch the application
 
-It is highly recommended to set up your FiftyOne Enterprise Deployment with Delegated Operation.
-Delegated Operators allow FiftyOne Enterprise to offload plugin execution to **worker containers**,
-enabling scalable and reliable long-running operations.
+It is highly recommended to set up your FiftyOne Enterprise Deployment with
+Delegated Operation. Delegated Operators allow FiftyOne Enterprise to offload
+plugin execution to **worker containers**,enabling scalable and reliable
+long-running operations.
 
-
-To launch worker containers, include `compose.delegated-operators.yaml`in your docker compose commands
+To launch worker containers, include `compose.delegated-operators.yaml`in your
+docker compose commands
 
 ```shell
 docker compose \
@@ -269,11 +270,11 @@ docker compose \
 
 This will start the following containers:
 
-- `fiftyone-app` (embedded API) → default port 5151
+- `fiftyone-app` (embedded API) → default port `5151`
 - `fiftyone-teams-app` (UI) → default port `3000`
 - `fiftyone-teams-api` (API) → default port `8000`
 - `fiftyone-teams-cas` (Auth) → default port `3030`
-- `fiftyone-teams-do-n` n replica containers where n is the number of VPUs your deployment comes with
+- `fiftyone-teams-do-n` where n is the number of VPUs your in deployment
 
 You can ensure that all your containers are up and healthy through:
 
@@ -430,7 +431,7 @@ docker compose \
 - To manage and deploy plugins via the UI, go to:
   `https://<your-domain>/settings/plugins`
 
-## :gear: Step 7: Advanced Delegated Operation Configurations for FiftyOne Enterprise (Optional)
+## :gear: Step 7: Advanced Delegated Operations Configuration (Optional)
 
 ### :page_facing_up: Upload Run Logs
 
