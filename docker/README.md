@@ -59,10 +59,8 @@ regarding FiftyOne Enterprise.
   - [:small_blue_diamond: 3. RECOMMENDED: Dedicated Plugins](#small_blue_diamond-3-recommended-dedicated-plugins)
     - [Enable dedicated plugin mode](#enable-dedicated-plugin-mode)
   - [:pushpin: Notes](#pushpin-notes)
-- [:gear: Step 7: Configuring FiftyOne Enterprise Delegated Operators](#gear-step-7-configuring-fiftyone-enterprise-delegated-operators)
-  - [:wrench: Enabling Delegated Operator Mode](#wrench-enabling-delegated-operator-mode)
-    - [Example: Enable on top of **Dedicated Plugins** mode](#example-enable-on-top-of-dedicated-plugins-mode)
-  - [:page_facing_up: Optional: Upload Run Logs](#page_facing_up-optional-upload-run-logs)
+- [:gear: Step 7: Advanced Delegated Operation Configurations for FiftyOne Enterprise](#gear-step-7-advanced-delegated-operation-configurations-for-fiftyone-enterprise-optional)
+  - [:page_facing_up: Upload Run Logs](#page_facing_up-upload-run-logs)
   - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
   - [:on: On-Demand Delegated Operator Executors](#on-on-demand-delegated-operator-executors)
@@ -430,7 +428,7 @@ docker compose \
 - To manage and deploy plugins via the UI, go to:
   `https://<your-domain>/settings/plugins`
 
-## :gear: Step 7: Optional: Advanced Delegated Operation Configurations for FiftyOne Enterprise 
+## :gear: Step 7: Advanced Delegated Operation Configurations for FiftyOne Enterprise (Optional)
 
 ### :page_facing_up: Upload Run Logs
 
