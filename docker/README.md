@@ -269,7 +269,7 @@ docker compose \
 
 This will start the following containers:
 
-- `fiftyone-app` (UI) → default port `5151`
+- `fiftyone-app` (embedded API) → default port 5151
 - `fiftyone-teams-app` (UI) → default port `3000`
 - `fiftyone-teams-api` (API) → default port `8000`
 - `fiftyone-teams-cas` (Auth) → default port `3030`
