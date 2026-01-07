@@ -43,6 +43,20 @@
                 "null"
               ]
             },
+            "FIFTYONE_DO_REQUEUE_DELAY_MINUTES": {
+              "default": 30,
+              "description": "The number of minutes an operation can sit in queued before being requeud.\nCan be any positive number.",
+              "required": [],
+              "title": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
+              "type": "integer"
+            },
+            "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS": {
+              "default": 3,
+              "description": "The number of times an operation is requeued before being terminated.\nBelow 0 will never terminate, 0 will immediately terminate, and any positive number requeues that many times.",
+              "required": [],
+              "title": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
+              "type": "integer"
+            },
             "FIFTYONE_ENV": {
               "default": "production",
               "description": "Controls FiftyOne GraphQL verbosity.\nWhen \"production\", debug mode is disabled and the default logging level is \"INFO\".\nWhen \"development\", debug mode is enabled and the default logging level is \"DEBUG\".\nCan be overridden by setting `apiSettings.env.LOGGING_LEVEL`.",

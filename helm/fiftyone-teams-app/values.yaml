@@ -45,6 +45,12 @@ apiSettings:
     # -- (int) The amount of time in minutes that a delegated operation can run before being automatically terminated.
     # Overrides "FIFTYONE_DO_EXPIRATION_DAYS" if provided.
     FIFTYONE_DO_EXPIRATION_MINUTES:
+    # -- The number of minutes an operation can sit in queued before being requeud.
+    # Can be any positive number.
+    FIFTYONE_DO_REQUEUE_DELAY_MINUTES: 30
+    # -- The number of times an operation is requeued before being terminated.
+    # Below 0 will never terminate, 0 will immediately terminate, and any positive number requeues that many times.
+    FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS: 3
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
