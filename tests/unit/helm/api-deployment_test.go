@@ -256,18 +256,18 @@ func (s *deploymentApiTemplateTest) TestTopologySpreadConstraints() {
 			func(constraint []corev1.TopologySpreadConstraint) {
 				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
 				expectedTopologySpreadConstraintJSON := `[
-					{
-					  "maxSkew": 1,
-					  "topologyKey": "kubernetes.io/hostname",
-					  "whenUnsatisfiable": "DoNotSchedule",
-					  "labelSelector": {
-					  	"matchLabels": {
-							"app.kubernetes.io/name": "teams-api",
-							"app.kubernetes.io/instance": "fiftyone-test"
-						}
-					  }
-					}
-				  ]`
+          {
+            "maxSkew": 1,
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {
+              "matchLabels": {
+              "app.kubernetes.io/name": "teams-api",
+              "app.kubernetes.io/instance": "fiftyone-test"
+            }
+            }
+          }
+          ]`
 				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
 				s.NoError(err)
 				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
@@ -495,23 +495,22 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
-			"value": "1"
-		  },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
-			"value": ""
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
-			"value": "30"
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
-			"value": "3"
-		  },
-
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_DAYS",
+            "value": "1"
+          },
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
+            "value": "30"
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
+            "value": "3"
+          },
           {
             "name": "FIFTYONE_ENV",
             "value": "production"
@@ -610,23 +609,22 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
-			"value": "1"
-		  },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
-			"value": ""
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
-			"value": "30"
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
-			"value": "3"
-		  },
-
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_DAYS",
+            "value": "1"
+          },
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
+            "value": "30"
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
+            "value": "3"
+          },
           {
             "name": "FIFTYONE_ENV",
             "value": "production"
@@ -739,23 +737,22 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
-			"value": "1"
-		  },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
-			"value": ""
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
-			"value": "30"
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
-			"value": "3"
-		  },
-
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_DAYS",
+            "value": "1"
+          },
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
+            "value": "30"
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
+            "value": "3"
+          },
           {
             "name": "FIFTYONE_ENV",
             "value": "production"
@@ -813,8 +810,8 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
-          	"name": "API_EXTERNAL_URL",
-          	"value": ""
+            "name": "API_EXTERNAL_URL",
+            "value": ""
           },
           {
             "name": "CAS_BASE_URL",
@@ -865,23 +862,22 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
-			"value": "1"
-		  },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
-			"value": ""
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
-			"value": "30"
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
-			"value": "3"
-		  },
-
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_DAYS",
+            "value": "1"
+          },
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
+            "value": "30"
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
+            "value": "3"
+          },
           {
             "name": "FIFTYONE_ENV",
             "value": "production"
@@ -979,23 +975,22 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
-			"value": "1"
-		  },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
-			"value": ""
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
-			"value": "30"
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
-			"value": "3"
-		  },
-
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_DAYS",
+            "value": "1"
+          },
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
+            "value": "30"
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
+            "value": "3"
+          },
           {
             "name": "FIFTYONE_ENV",
             "value": "production"
@@ -1093,22 +1088,22 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_DAYS",
-			"value": "1"
-		  },
-		  {
-			"name": "FIFTYONE_DO_EXPIRATION_MINUTES",
-			"value": ""
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
-			"value": "30"
-		  },
-		  {
-			"name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
-			"value": "3"
-		  },
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_DAYS",
+            "value": "1"
+          },
+          {
+            "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
+            "value": ""
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
+            "value": "30"
+          },
+          {
+            "name": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
+            "value": "3"
+          },
           {
             "name": "FIFTYONE_ENV",
             "value": "production"

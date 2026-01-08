@@ -52,7 +52,7 @@
             },
             "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS": {
               "default": 3,
-              "description": "The number of times an operation is requeued before being terminated.\nBelow 0 will never terminate, 0 will immediately terminate, and any positive number requeues that many times.",
+              "description": "The number of times an operation is requeued before being terminated.\n`-1` will never terminate. `0` will immediately terminate.",
               "required": [],
               "title": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
               "type": "integer"

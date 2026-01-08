@@ -49,7 +49,7 @@ apiSettings:
     # Can be any positive number.
     FIFTYONE_DO_REQUEUE_DELAY_MINUTES: 30
     # -- The number of times an operation is requeued before being terminated.
-    # Below 0 will never terminate, 0 will immediately terminate, and any positive number requeues that many times.
+    # `-1` will never terminate. `0` will immediately terminate.
     FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS: 3
 
   # -- Secret variables to be passed to the `teams-api` containers.
