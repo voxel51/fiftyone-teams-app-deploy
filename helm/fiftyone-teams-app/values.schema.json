@@ -45,7 +45,7 @@
             },
             "FIFTYONE_DO_REQUEUE_DELAY_MINUTES": {
               "default": 30,
-              "description": "The number of minutes an operation can sit in queued before being requeued.\nCan be any positive number.",
+              "description": "The number of minutes an operation can sit in a queued state before being requeued.\nCan be any positive number.",
               "required": [],
               "title": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
               "type": "integer"
