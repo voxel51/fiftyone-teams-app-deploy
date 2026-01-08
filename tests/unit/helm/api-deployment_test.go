@@ -256,18 +256,18 @@ func (s *deploymentApiTemplateTest) TestTopologySpreadConstraints() {
 			func(constraint []corev1.TopologySpreadConstraint) {
 				var expectedTopologySpreadConstraint []corev1.TopologySpreadConstraint
 				expectedTopologySpreadConstraintJSON := `[
-          {
-            "maxSkew": 1,
-            "topologyKey": "kubernetes.io/hostname",
-            "whenUnsatisfiable": "DoNotSchedule",
-            "labelSelector": {
-              "matchLabels": {
-              "app.kubernetes.io/name": "teams-api",
-              "app.kubernetes.io/instance": "fiftyone-test"
-            }
-            }
-          }
-          ]`
+					{
+					  "maxSkew": 1,
+					  "topologyKey": "kubernetes.io/hostname",
+					  "whenUnsatisfiable": "DoNotSchedule",
+					  "labelSelector": {
+					  	"matchLabels": {
+							"app.kubernetes.io/name": "teams-api",
+							"app.kubernetes.io/instance": "fiftyone-test"
+						}
+					  }
+					}
+				  ]`
 				err := json.Unmarshal([]byte(expectedTopologySpreadConstraintJSON), &expectedTopologySpreadConstraint)
 				s.NoError(err)
 				s.Equal(expectedTopologySpreadConstraint, constraint, "Constraints should be equal")
