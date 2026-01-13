@@ -153,6 +153,12 @@ ingress:
 
 This can cause path-precedence issues for `ingressClassName: nginx` users.
 Therefore, API requests might be routed to the user-facting application (UI).
+This would result in a `404 Client Error` similar to the below:
+
+```txt
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://<your-api-endpoint>/cas/api/auth/session?redirect=%2Fhealth
+```
+
 If you are receiving 404 response codes when interacting with the
 SDK, Voxel51 has seen success with using the `pathType: Prefix` path types:
 
