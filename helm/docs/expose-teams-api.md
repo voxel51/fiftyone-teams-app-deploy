@@ -152,7 +152,7 @@ ingress:
 ```
 
 This can cause path-precedence issues for `ingressClassName: nginx` users.
-Therefore, API requests might be routed to the user-facting application (UI).
+Therefore, API requests might be routed to the user-facing application (UI).
 This would result in a `404 Client Error` similar to the below:
 
 ```txt
