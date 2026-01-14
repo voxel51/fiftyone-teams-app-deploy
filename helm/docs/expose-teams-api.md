@@ -45,6 +45,8 @@ To expose the `teams-api` service, chose one of these two routing methods
 - [Host-Based Routing](#host-based-routing)
 - [Path-Based Routing](#path-based-routing)
 - [Note For NGINX IngressClass Users](#note-for-nginx-ingressclass-users)
+  - [Pathing](#pathing)
+  - [Websockets](#websockets)
 - [Configure your SDK](#configure-your-sdk)
 - [Validation](#validation)
 - [Advanced Configuration](#advanced-configuration)
@@ -127,6 +129,57 @@ To use this chart's ingress object
 > [!NOTE]
 > Voxel51 is not affiliated with Nginx and you should reference the
 > [nginx documentation][nginx-docs] for advanced configuration.
+
+### Pathing
+
+The default values for ingress paths utilize `pathType: ImplementationSpecific`:
+
+```yaml
+# values.yaml
+ingress:
+  api:
+    path: /*
+    pathType: ImplementationSpecific
+  paths:
+    - path: /cas
+      pathType: Prefix
+      serviceName: teams-cas
+      servicePort: 80
+    - path: /*
+      pathType: ImplementationSpecific
+      serviceName: teams-app
+      servicePort: 80
+```
+
+This can cause path-precedence issues for `ingressClassName: nginx` users
+where API requests are incorrectly routed to the user-facing application (UI).
+This would result in a `404 Client Error` similar to the below:
+
+```txt
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://<your-api-endpoint>/cas/api/auth/session?redirect=%2Fhealth
+```
+
+If you receive 404 response codes when interacting with the SDK,
+change `pathType`s to `Prefix`:
+
+```yaml
+# values.yaml
+ingress:
+  api:
+    path: /
+    pathType: Prefix
+  paths:
+    - path: /cas
+      pathType: Prefix
+      serviceName: teams-cas
+      servicePort: 80
+    - path: /
+      pathType: Prefix
+      serviceName: teams-app
+      servicePort: 80
+```
+
+### Websockets
 
 The FiftyOne Enterprise API utilizes websockets for client/server communication
 on a variety of methods.
