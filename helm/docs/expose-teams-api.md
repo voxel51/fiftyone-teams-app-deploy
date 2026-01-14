@@ -159,8 +159,8 @@ This would result in a `404 Client Error` similar to the below:
 requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://<your-api-endpoint>/cas/api/auth/session?redirect=%2Fhealth
 ```
 
-If you are receiving 404 response codes when interacting with the
-SDK, Voxel51 has seen success with using the `pathType: Prefix` path types:
+If you receive 404 response codes when interacting with the SDK,
+change `pathType`s to `Prefix`:
 
 ```yaml
 # values.yaml
