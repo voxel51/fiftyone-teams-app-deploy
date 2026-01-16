@@ -194,7 +194,7 @@ orchestrator.
 ## Refresh Orchestrator Operators
 
 Before you can do this step make sure you’ve added the optional dependency
-`anyscale` into your FiftyOne API deployment
+`anyscale>=0.26.24` into your FiftyOne API deployment
 ([see here for instructions](../custom-plugins.md#custom-plugins-images)),
 and set the environment
 variable `API_EXTERNAL_URL` (the external Teams API base URL) used by Anyscale
