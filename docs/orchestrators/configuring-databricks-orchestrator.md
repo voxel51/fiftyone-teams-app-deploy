@@ -545,8 +545,8 @@ orchestrator.
 ## Refresh Orchestrator Operators
 
 Before doing this step make sure your FiftyOne API deployment has the optional
-dependency “databricks-sdk”. It is not built into our deployments by default so
-you’ll need to add it by following the
+dependency `databricks-sdk>=0.53.0`. It is not built into our deployments
+by default so you’ll need to add it by following the
 [Custom Plugins images docs](../custom-plugins.md#custom-plugins-images).
 
 This step is only required if you’ve added a plugin directory with custom
