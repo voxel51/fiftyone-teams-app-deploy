@@ -1,0 +1,20 @@
+---
+name: Create GitHub Caches for default branch
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  cache-asdf-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.1
+      - name: Cache asdf tools
+        uses: "voxel51/aloha-github-workflows/.github/actions/asdf-install-and-cache@main"
+  cache-pre-commit-repos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.1
+      - name: Cache pre-commit repos
+        uses: "voxel51/aloha-github-workflows/.github/actions/pre-commit-cache@main"
