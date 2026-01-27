@@ -630,7 +630,7 @@ fom.update_secret(
 
 #### Cause
 
-`opencv-python` (and `opencv-python-headless`) version `4.0.13.90` bundles with
+`opencv-python` (and `opencv-python-headless`) version `4.13.0.90` bundles with
 it a build of `libcrypto-1.1.1k`.
 Databricks sets the environment variable `OPENSSL_FORCE_FIPS_MODE="0"` in their
 base image to work around an upstream
@@ -647,7 +647,7 @@ requirements.
 1. The opencv-python library versions can be bounded in your requirements file
 to avoid installing the affected version.
 For example:
-`opencv-python<4.0.13.90`.
+`opencv-python<4.13.0.90`.
 1. If you need/prefer to use the latest version of opencv-python, the best
 known workaround is to remove the `OPENSSL_FORCE_FIPS_MODE` environment
 variable from any process that imports `cv2`, prior to that import (even
