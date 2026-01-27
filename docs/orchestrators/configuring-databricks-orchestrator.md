@@ -30,6 +30,11 @@
 - [Additional Considerations](#additional-considerations)
   - [Credential Expiration and Rotation](#credential-expiration-and-rotation)
 - [Common Issues](#common-issues)
+  - [OpenSSL Error](#openssl-error)
+    - [Symptoms](#symptoms)
+    - [Cause](#cause)
+    - [Solutions](#solutions)
+    - [Further Reading](#further-reading)
   - [Dependency Conflicts](#dependency-conflicts)
 
 <!-- tocstop -->
@@ -614,6 +619,62 @@ fom.update_secret(
 ```
 
 ## Common Issues
+
+### OpenSSL Error
+
+#### Symptoms
+
+- The following message is shown:
+  `crypto/fips/fips.c:154: OpenSSL internal error: FATAL FIPS SELFTEST FAILURE`
+- The Python process crashes (aborts) without a Traceback
+
+#### Cause
+
+`opencv-python` (and `opencv-python-headless`) version `4.0.13.90` bundles with
+it a build of `libcrypto-1.1.1k`.
+Databricks sets the environment variable `OPENSSL_FORCE_FIPS_MODE="0"` in their
+base image to work around an upstream
+[Ubuntu bug](https://bugs.launchpad.net/ubuntu/+source/ca-certificates/+bug/2066990),
+while at the same time, Red Hat’s openssl patches (from which the
+opencv-bundled libcrypto-1.1.1k is built) are affected by a bug which enables
+FIPS mode when the `OPENSSL_FORCE_FIPS_MODE` variable is set to *any value*
+(even `"0"` or `""`).
+This triggers the FIPS SELFTEST routine, which fails due to other unmet
+requirements.
+
+#### Solutions
+
+1. The opencv-python library versions can be bounded in your requirements file
+to avoid installing the affected version.
+For example:
+`opencv-python<4.0.13.90`.
+1. If you need/prefer to use the latest version of opencv-python, the best
+known workaround is to remove the `OPENSSL_FORCE_FIPS_MODE` environment
+variable from any process that imports `cv2`, prior to that import (even
+indirectly via `fiftyone`, `ultralytics`).
+    - **Python**: If you followed this guide and are using a Python file as an
+    entrypoint, the following must be run *before* importing any library that
+    uses OpenCV (including `fiftyone`, `ultralytics`, or `cv2` itself).
+
+        ```python
+        import os
+        if os.getenv("OPENSSL_FORCE_FIPS_MODE") != "1":
+            os.environ.pop("OPENSSL_FORCE_FIPS_MODE", None)
+        ```
+
+    - **Shell**: If you are using a shell entrypoint/wrapper/init script that
+        runs before your Python process, you can use the following:
+
+        ```bash
+        if [[ "$OPENSSL_FORCE_FIPS_MODE" != "1" ]]; then
+            unset OPENSSL_FORCE_FIPS_MODE
+        fi
+        ```
+
+#### Further Reading
+
+Updates on this `python-opencv` issue can be monitored here:
+[import cv2 aborts with OpenSSL internal error: FATAL FIPS SELFTEST FAILURE on OpenSSL 3.0.x [opencv-python 4.13.0.90] #1184](https://github.com/opencv/opencv-python/issues/1184)
 
 ### Dependency Conflicts
 
