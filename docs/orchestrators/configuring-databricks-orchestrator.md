@@ -636,7 +636,7 @@ Databricks sets the environment variable `OPENSSL_FORCE_FIPS_MODE="0"` in their
 base image to work around an upstream
 [Ubuntu bug](https://bugs.launchpad.net/ubuntu/+source/ca-certificates/+bug/2066990),
 while at the same time, Red Hat’s openssl patches (from which the
-opencv-bundled libcrypto-1.1.1k is built) are affected by a bug which enables
+opencv-bundled `libcrypto-1.1.1k` is built) are affected by a bug which enables
 FIPS mode when the `OPENSSL_FORCE_FIPS_MODE` variable is set to *any value*
 (even `"0"` or `""`).
 This triggers the FIPS SELFTEST routine, which fails due to other unmet
@@ -644,11 +644,11 @@ requirements.
 
 #### Solutions
 
-1. The opencv-python library versions can be bounded in your requirements file
+1. The `opencv-python` library versions can be bounded in your requirements file
 to avoid installing the affected version.
 For example:
 `opencv-python<4.13.0.90`.
-1. If you need/prefer to use the latest version of opencv-python, the best
+1. If you need/prefer to use the latest version of `opencv-python`, the best
 known workaround is to remove the `OPENSSL_FORCE_FIPS_MODE` environment
 variable from any process that imports `cv2`, prior to that import (even
 indirectly via `fiftyone`, `ultralytics`).
@@ -666,7 +666,7 @@ indirectly via `fiftyone`, `ultralytics`).
         runs before your Python process, you can use the following:
 
         ```bash
-        if [[ "$OPENSSL_FORCE_FIPS_MODE" != "1" ]]; then
+        if [[ "${OPENSSL_FORCE_FIPS_MODE:-}" != "1" ]]; then
             unset OPENSSL_FORCE_FIPS_MODE
         fi
         ```
