@@ -31,8 +31,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.ORG_DOCKERHUB_USERNAME }}
-          password: ${{ secrets.ORG_DOCKERHUB_TOKEN }}
+          username: ${{ secrets.RO_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.RO_DOCKERHUB_PAT }}
       - name: Test all docker pulls
         shell: bash
         run: |
