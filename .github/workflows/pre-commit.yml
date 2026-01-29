@@ -28,10 +28,21 @@ jobs:
       - name: list files
         shell: bash
         run: |
-          ls .
-          ls aloha-github-workflows
-          ls aloha-github-workflows/actions
-          ls aloha-github-workflows/asdf-install-and-cache
+          echo ""
+          echo "ls -alh ."
+          ls -alh .
+          echo ""
+          echo "ls -alh aloha-github-workflows"
+          ls  -alh aloha-github-workflows
+          echo ""
+          echo "ls -alh aloha-github-workflows/.github/"
+          ls -alh aloha-github-workflows/.github
+          echo ""
+          echo "ls -alh aloha-github-workflows/.github/actions"
+          ls -alh aloha-github-workflows/.github/actions
+          echo ""
+          echo "ls -alh aloha-github-workflows/.github/actions/asdf-install-and-cache"
+          ls -alh aloha-github-workflows/.github/actions/asdf-install-and-cache
       - uses: actions/setup-python@v6.2.0
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
