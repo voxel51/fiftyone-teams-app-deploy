@@ -23,6 +23,15 @@ jobs:
           ref: main
           token: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
           path: aloha-github-workflows
+          sparse-checkout:
+            .github/actions/asdf-install-and-cache
+      - name: list files
+        shell: bash
+        run: |
+          ls .
+          ls aloha-github-workflows
+          ls aloha-github-workflows/actions
+          ls aloha-github-workflows/asdf-install-and-cache
       - uses: actions/setup-python@v6.2.0
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
