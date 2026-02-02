@@ -16,19 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-<<<<<<< HEAD
       - uses: actions/setup-python@v6.2.0
-      - name: install asdf & tools
-        uses: asdf-vm/actions/install@v4.0.1
-||||||| parent of 029f0e1 (feat(workflows): add new workflows for asdf and pre-commit to create cache on merge to main (to speed up installs).)
-      - uses: actions/setup-python@v6.1.0
-      - name: install asdf & tools
-        uses: asdf-vm/actions/install@v4.0.1
-=======
-      - uses: actions/setup-python@v6.1.0
       - name: Install asdf & tools
         uses: "voxel51/aloha-github-workflows/.github/actions/asdf-install-and-cache@main"
->>>>>>> 029f0e1 (feat(workflows): add new workflows for asdf and pre-commit to create cache on merge to main (to speed up installs).)
       - name: Run unit tests
         shell: bash
         run: |
