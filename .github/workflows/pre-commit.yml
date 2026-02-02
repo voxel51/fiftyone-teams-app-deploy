@@ -22,32 +22,32 @@ jobs:
           repository: voxel51/aloha-github-workflows
           ref: main
           token: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
-          path: aloha-github-workflows
-          sparse-checkout:
-            .github/actions/asdf-install-and-cache
-      - name: list files
+          path: ./.github/actions/aloha-github-workflows
+      - name: debug - list files and mutate action step from GH to local clone
         shell: bash
         run: |
-          echo ""
-          echo "ls -alh ."
-          ls -alh .
-          echo ""
-          echo "ls -alh aloha-github-workflows"
-          ls  -alh aloha-github-workflows
-          echo ""
-          echo "ls -alh aloha-github-workflows/.github/"
-          ls -alh aloha-github-workflows/.github
-          echo ""
           echo "ls -alh aloha-github-workflows/.github/actions"
           ls -alh aloha-github-workflows/.github/actions
           echo ""
           echo "ls -alh aloha-github-workflows/.github/actions/asdf-install-and-cache"
           ls -alh aloha-github-workflows/.github/actions/asdf-install-and-cache
+
+          echo ""
+          echo "ls .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml"
+          ls .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
+
+          # replace the private repo composite action to be relative from the repo clone
+          # the replacement path value may need to be updated.
+          sed -i \
+            's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
+            .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
       - uses: actions/setup-python@v6.2.0
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: Install asdf & tools
-        uses: ./aloha-github-workflows/.github/actions/asdf-install-and-cache
+        uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
+        with:
+          action-path: ./.github/actions/aloha-github-workflows/.github/actions/
       - name: Install helm plugins
         run: make helm-plugins
       - uses: pre-commit/action@v3.0.1
