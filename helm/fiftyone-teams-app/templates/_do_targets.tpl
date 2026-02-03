@@ -24,6 +24,11 @@ app.voxel51.com/component: on-demand-delegated-operators
 Create a merged list of environment variables for delegated-operator templates
 */}}
 {{- define "delegated-operator-templates.env-vars-list" }}
+- name: POD_NAME
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: metadata.name
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .apiServiceName .apiServicePort | quote }}
 - name: FIFTYONE_DATABASE_ADMIN
