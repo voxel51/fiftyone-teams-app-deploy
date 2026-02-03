@@ -439,6 +439,15 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_URL",
             "value": "http://teams-api:80"
           },
@@ -511,6 +520,15 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
@@ -598,6 +616,15 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_URL",
             "value": "http://teams-api:80"
           },
@@ -670,6 +697,15 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_URL",
             "value": "http://teams-api:80"
           },
@@ -740,6 +776,15 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
@@ -812,6 +857,15 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_URL",
             "value": "http://teams-api:80"
           },
@@ -882,6 +936,15 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "API_URL",
             "value": "http://teams-api:80"

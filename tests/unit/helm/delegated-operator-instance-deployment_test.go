@@ -902,6 +902,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_URL",
             "value": "http://teams-api:80"
           },
@@ -969,6 +978,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_URL",
             "value": "http://teams-api:80"
           },
@@ -1033,6 +1051,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_URL",
             "value": "http://teams-api:80"
           },
@@ -1091,6 +1118,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				},
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
@@ -1159,6 +1195,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 			[]func(envVars []corev1.EnvVar){
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
@@ -1231,6 +1276,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				},
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "API_URL",
             "value": "http://teams-api:80"
@@ -1313,6 +1367,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
                   {
+                    "name": "POD_NAME",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "apiVersion": "v1",
+                        "fieldPath": "metadata.name"
+                      }
+                    }
+                  },
+                  {
                     "name": "API_URL",
                     "value": "http://teams-api:80"
                   },
@@ -1384,6 +1447,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				},
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
+                  {
+                    "name": "POD_NAME",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "apiVersion": "v1",
+                        "fieldPath": "metadata.name"
+                      }
+                    }
+                  },
                   {
                     "name": "API_URL",
                     "value": "http://teams-api:80"
@@ -1457,6 +1529,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
                   {
+                    "name": "POD_NAME",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "apiVersion": "v1",
+                        "fieldPath": "metadata.name"
+                      }
+                    }
+                  },
+                  {
                     "name": "API_URL",
                     "value": "http://teams-api:80"
                   },
@@ -1528,6 +1609,15 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 				},
 				func(envVars []corev1.EnvVar) {
 					expectedEnvVarJSON := `[
+                  {
+                    "name": "POD_NAME",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "apiVersion": "v1",
+                        "fieldPath": "metadata.name"
+                      }
+                    }
+                  },
                   {
                     "name": "API_URL",
                     "value": "http://teams-api:80"
