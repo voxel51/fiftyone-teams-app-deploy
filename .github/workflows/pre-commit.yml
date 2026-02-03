@@ -26,11 +26,27 @@ jobs:
       - name: debug - list files and mutate action step from GH to local clone
         shell: bash
         run: |
-          echo "ls -alh aloha-github-workflows/.github/actions"
-          ls -alh aloha-github-workflows/.github/actions
+          echo "ls -alh"
+          ls -alh
+
+          echo "ls -alh .github/actions"
+          ls -alh .github/actions
+
           echo ""
-          echo "ls -alh aloha-github-workflows/.github/actions/asdf-install-and-cache"
-          ls -alh aloha-github-workflows/.github/actions/asdf-install-and-cache
+          echo "ls -alh .github/actions/aloha-github-workflows"
+          ls -alh .github/actions/aloha-github-workflows
+
+          echo ""
+          echo "ls .github/actions/aloha-github-workflows/.github/"
+          ls .github/actions/aloha-github-workflows/.github/
+
+          echo ""
+          echo "ls .github/actions/aloha-github-workflows/.github/actions/"
+          ls .github/actions/aloha-github-workflows/.github/actions/
+
+          echo ""
+          echo "ls .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache"
+          ls .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
 
           echo ""
           echo "ls .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml"
@@ -46,8 +62,6 @@ jobs:
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: Install asdf & tools
         uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
-        with:
-          action-path: ./.github/actions/aloha-github-workflows/.github/actions/
       - name: Install helm plugins
         run: make helm-plugins
       - uses: pre-commit/action@v3.0.1
