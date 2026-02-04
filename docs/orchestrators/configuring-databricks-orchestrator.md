@@ -87,7 +87,7 @@ w = WorkspaceClient()
 DBFS_PATH = "/FileStore/my_project/requirements.txt"
 
 PYTHON_DEPENDENCIES = [
-   "fiftyone==2.14.1",  # use your FiftyOne version here
+   "fiftyone==2.15.0",  # use your FiftyOne version here
    "ultralytics",
    "torch",
    "transformers",
@@ -625,36 +625,43 @@ fom.update_secret(
 #### Symptoms
 
 - The following message is shown:
-  `crypto/fips/fips.c:154: OpenSSL internal error: FATAL FIPS SELFTEST FAILURE`
+
+  > ```txt
+  > crypto/fips/fips.c:154: OpenSSL internal error: FATAL FIPS SELFTEST FAILURE
+  > ```
+
 - The Python process crashes (aborts) without a Traceback
 
 #### Cause
 
-`opencv-python` (and `opencv-python-headless`) version `4.13.0.90` bundles with
-it a build of `libcrypto-1.1.1k`.
+`opencv-python` (and `opencv-python-headless`) version `4.13.0.90` bundles
+a build of `libcrypto-1.1.1k`.
 Databricks sets the environment variable `OPENSSL_FORCE_FIPS_MODE="0"` in their
 base image to work around an upstream
-[Ubuntu bug](https://bugs.launchpad.net/ubuntu/+source/ca-certificates/+bug/2066990),
-while at the same time, Red Hat’s openssl patches (from which the
-opencv-bundled `libcrypto-1.1.1k` is built) are affected by a bug which enables
-FIPS mode when the `OPENSSL_FORCE_FIPS_MODE` variable is set to *any value*
-(even `"0"` or `""`).
-This triggers the FIPS SELFTEST routine, which fails due to other unmet
+[Ubuntu bug](https://bugs.launchpad.net/ubuntu/+source/ca-certificates/+bug/2066990).
+Red Hat’s openssl patches (from which the opencv-bundled `libcrypto-1.1.1k` is built)
+are affected by a bug which enables FIPS mode when the `OPENSSL_FORCE_FIPS_MODE`
+variable is set to *any value* (even `"0"` or `""`).
+This triggers the `FIPS SELFTEST` routine, which fails due to other unmet
 requirements.
 
 #### Solutions
 
-1. The `opencv-python` library versions can be bounded in your requirements file
-to avoid installing the affected version.
-For example:
-`opencv-python<4.13.0.90`.
-1. If you need/prefer to use the latest version of `opencv-python`, the best
-known workaround is to remove the `OPENSSL_FORCE_FIPS_MODE` environment
-variable from any process that imports `cv2`, prior to that import (even
-indirectly via `fiftyone`, `ultralytics`).
-    - **Python**: If you followed this guide and are using a Python file as an
-    entrypoint, the following must be run *before* importing any library that
-    uses OpenCV (including `fiftyone`, `ultralytics`, or `cv2` itself).
+1. The `opencv-python` library versions may be bounded in your requirements file
+   to avoid installing the affected version.
+   For example:
+
+      ```txt
+      opencv-python<4.13.0.90
+      ```
+
+1. To use the latest version of `opencv-python`,
+   remove the `OPENSSL_FORCE_FIPS_MODE` environment variable
+   from any process that imports `cv2`, prior to that import (even
+   indirectly via `fiftyone`, `ultralytics`).
+    - **Python**: When following this guide and are using a Python file as an
+      entrypoint, the following must be run *before* importing any library that
+      uses OpenCV (including `fiftyone`, `ultralytics`, or `cv2` itself).
 
         ```python
         import os
@@ -662,32 +669,32 @@ indirectly via `fiftyone`, `ultralytics`).
             os.environ.pop("OPENSSL_FORCE_FIPS_MODE", None)
         ```
 
-    - **Shell**: If you are using a shell entrypoint/wrapper/init script that
-        runs before your Python process, you can use the following:
+    - **Shell**: When using a shell entrypoint/wrapper/init script that
+        runs before your Python process, run the following:
 
-        ```bash
+        ```shell
         if [[ "${OPENSSL_FORCE_FIPS_MODE:-}" != "1" ]]; then
-            unset OPENSSL_FORCE_FIPS_MODE
+          unset OPENSSL_FORCE_FIPS_MODE
         fi
         ```
 
 #### Further Reading
 
-Updates on this `python-opencv` issue can be monitored here:
+Updates on this `python-opencv` issue may be monitored here:
 [import cv2 aborts with OpenSSL internal error: FATAL FIPS SELFTEST FAILURE on OpenSSL 3.0.x [opencv-python 4.13.0.90] #1184](https://github.com/opencv/opencv-python/issues/1184)
 
 ### Dependency Conflicts
 
-Databricks surfaces dependency conflicts in multiple ways typically
-during the image build or image execution steps of a job. Some
-errors we have seen before as a result of conflicts are:
+Databricks surfaces dependency conflicts in multiple ways
+(like during the image build or image execution steps of a job).
 
-- `Could not reach driver of cluster`
-- `Cannot read the python file`
-- `Library installation error`
-- `The requested operation requires that "some-dependency==X" is
-    installed on your machine, but found "some-dependency==Y"`
+Conflicts result in these errors:
 
-Conflicts of this nature are often unique to your dependency versions,
-but if you are unable to resolve them please reach out to customer
-success.
+- > Could not reach driver of cluster
+- > Cannot read the python file
+- > Library installation error
+- > The requested operation requires that "some-dependency==X" is
+  > installed on your machine, but found "some-dependency==Y"
+
+Conflicts of this nature are often unique to your dependency versions.
+If you are unable to resolve them please reach out to customer success.

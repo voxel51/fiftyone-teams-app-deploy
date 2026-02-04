@@ -434,6 +434,15 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_EXTERNAL_URL",
             "value": ""
           },
@@ -530,6 +539,15 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "API_EXTERNAL_URL",
             "value": ""
@@ -642,6 +660,15 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_EXTERNAL_URL",
             "value": ""
           },
@@ -750,6 +777,15 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
           	"name": "API_EXTERNAL_URL",
           	"value": ""
           },
@@ -846,6 +882,15 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "API_EXTERNAL_URL",
             "value": ""
           },
@@ -941,6 +986,15 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "API_EXTERNAL_URL",
             "value": "https://external-api-url:443"

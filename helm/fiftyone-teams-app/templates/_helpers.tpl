@@ -300,6 +300,11 @@ Common Init Containers
 Create a merged list of environment variables for delegated-operator-executor
 */}}
 {{- define "delegated-operator-deployments.env-vars-list" }}
+- name: POD_NAME
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: metadata.name
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .apiServiceName .apiServicePort | quote }}
 - name: FIFTYONE_DATABASE_ADMIN
@@ -337,6 +342,11 @@ Create a merged list of environment variables for fiftyone-teams-api
 */}}
 {{- define "fiftyone-teams-api.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
+- name: POD_NAME
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: metadata.name
 - name: API_EXTERNAL_URL
 {{- if .Values.apiSettings.dnsName }}
   value: {{ printf "https://%s" .Values.apiSettings.dnsName | quote}}
@@ -390,6 +400,11 @@ Create a merged list of environment variables for fiftyone-app
 */}}
 {{- define "fiftyone-app.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
+- name: POD_NAME
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: metadata.name
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: FIFTYONE_AUTH_SECRET
@@ -445,6 +460,11 @@ Create a merged list of environment variables for fiftyone-teams-cas
 */}}
 {{- define "teams-cas.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
+- name: POD_NAME
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: metadata.name
 - name: CAS_MONGODB_URI
   valueFrom:
     secretKeyRef:
@@ -494,6 +514,11 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 */}}
 {{- define "teams-plugins.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
+- name: POD_NAME
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: metadata.name
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: FIFTYONE_AUTH_SECRET
@@ -537,6 +562,11 @@ Create a merged list of environment variables for fiftyone-teams-app
 */}}
 {{- define "fiftyone-teams-app.env-vars-list" -}}
 {{- $secretName := .Values.secret.name }}
+- name: POD_NAME
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: metadata.name
 - name: API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: FIFTYONE_API_URI

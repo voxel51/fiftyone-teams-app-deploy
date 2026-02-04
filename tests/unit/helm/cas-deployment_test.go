@@ -424,6 +424,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "CAS_MONGODB_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -516,6 +525,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "CAS_MONGODB_URI",
             "valueFrom": {
@@ -624,6 +642,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "CAS_MONGODB_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -729,6 +756,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "CAS_MONGODB_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -820,6 +856,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
           {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
+          {
             "name": "CAS_MONGODB_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -910,6 +955,15 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 			},
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
+          {
+            "name": "POD_NAME",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "metadata.name"
+              }
+            }
+          },
           {
             "name": "CAS_MONGODB_URI",
             "valueFrom": {

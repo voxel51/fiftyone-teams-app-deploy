@@ -48,6 +48,11 @@ spec:
             runAsGroup: 4000
           env:
 
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
             - name: API_URL
               value: "http://teams-api:80"
             - name: FIFTYONE_DATABASE_ADMIN
