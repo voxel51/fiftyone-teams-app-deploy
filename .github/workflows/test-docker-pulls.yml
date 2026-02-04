@@ -24,10 +24,26 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6.2.0
+      - name: Checkout voxel51/aloha-github-workflows
+        uses: actions/checkout@v6
+        with:
+          repository: voxel51/aloha-github-workflows
+          ref: main
+          token: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
+          path: ./.github/actions/aloha-github-workflows
+      - name: Set generate-version-file action's path from remote to local
+        # Public repos cannot access private action repo without GitHub Enterprise
+        # Instead, we clone the private workflow directory and update the `asdf-install-and-cache/action.yml`
+        # file's reference to `voxel51/aloha-github-workflows/.github/actions/generate-version-file` with the local path.
+        shell: bash
+        run: |
+          sed -i \
+            's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
+            .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: Install asdf & tools
-        uses: "voxel51/aloha-github-workflows/.github/actions/asdf-install-and-cache@main"
+        uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
