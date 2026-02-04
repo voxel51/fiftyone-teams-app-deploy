@@ -1,7 +1,11 @@
 ---
 name: Tests - Helm
 
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT:
+        required: true
 
 jobs:
   unit-helm:

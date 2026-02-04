@@ -68,6 +68,8 @@ jobs:
     needs: modified-files
     if: ${{ needs.modified-files.outputs.helm-unit-required == 'true' }}
     uses: ./.github/workflows/test-helm.yml
+    secrets:
+      ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
 
   validate-chart-version:
     # Always run check, even if no helm changes.
