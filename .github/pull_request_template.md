@@ -2,6 +2,13 @@
 
 <!-- Explain why you are making this change. Describe the problem. -->
 
+<!-- Please also assign a priority label to the PR. -->
+Review Priority
+
+* [ ] high
+* [ ] medium
+* [ ] low
+
 ## Changes
 
 <!-- Describe the changes. -->

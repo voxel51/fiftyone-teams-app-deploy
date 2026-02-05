@@ -51,21 +51,25 @@ jobs:
     if: ${{ needs.modified-files.outputs.docker-unit-required == 'true' }}
     uses: ./.github/workflows/test-docker.yml
     secrets:
-      REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
       FO_INTERNAL_LICENSE: ${{ secrets.FO_INTERNAL_LICENSE }}
       FO_LEGACY_LICENSE: ${{ secrets.FO_LEGACY_LICENSE }}
+      ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
+      REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
 
   helm-integration:
     needs: modified-files
     if: ${{ needs.modified-files.outputs.helm-integration-required == 'true' }}
     uses: ./.github/workflows/test-integration-helm.yml
     secrets:
+      ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
       REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
 
   helm-unit:
     needs: modified-files
     if: ${{ needs.modified-files.outputs.helm-unit-required == 'true' }}
     uses: ./.github/workflows/test-helm.yml
+    secrets:
+      ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
 
   validate-chart-version:
     # Always run check, even if no helm changes.
