@@ -41,12 +41,12 @@ jobs:
           path: ./.github/actions/aloha-github-workflows
       - name: Set generate-version-file action's path from remote to local
         # Public repos cannot access private action repo without GitHub Enterprise
-        # Instead, we clone the private workflow directory and update the `asdf-install-and-cache/action.yml`
+        # Instead, we clone the private workflow directory and update the `pre-commit-cache/action.yml`
         # file's reference to `voxel51/aloha-github-workflows/.github/actions/generate-version-file` with the local path.
         shell: bash
         run: |
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
-            .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
+            .github/actions/aloha-github-workflows/.github/actions/pre-commit-cache/action.yml
       - name: Cache pre-commit repos
         uses: ./.github/actions/aloha-github-workflows/.github/actions/pre-commit-cache
