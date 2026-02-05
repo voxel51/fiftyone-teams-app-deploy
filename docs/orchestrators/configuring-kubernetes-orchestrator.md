@@ -575,8 +575,6 @@ spec:
             value: "false"
           - name: FIFTYONE_DELEGATED_OPERATION_RUN_LINK_PATH
             value: gs://bucket/name/path
-          - name: FIFTYONE_FEATURE_FLAG_ENABLE_GEN_LABELING
-            value: "true"
           - name: FIFTYONE_MEDIA_CACHE_DIR
             value: /opt/media_cache
           - name: FIFTYONE_MEDIA_CACHE_SIZE_BYTES
