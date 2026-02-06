@@ -42,18 +42,18 @@ apiSettings:
     # -- (int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.
     # If your executor was launched with the "-m" argument or is push based, then it is monitored.
     FIFTYONE_DO_EXPIRATION_MINUTES: 30
-    # @schema
-    # type: ["integer", "null"]
-    # @schema
-    # -- (int) The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated.
-    # Overrides "FIFTYONE_DO_EXPIRATION_DAYS" if provided.
-    FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES:
     # -- The number of minutes an operation can sit in a queued state before being requeued.
     # Can be any positive number.
     FIFTYONE_DO_REQUEUE_DELAY_MINUTES: 30
     # -- The number of times an operation is requeued before being terminated.
     # `-1` will never terminate. `0` will immediately terminate.
     FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS: 3
+    # @schema
+    # type: ["integer", "null"]
+    # @schema
+    # -- (int) The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated.
+    # Overrides "FIFTYONE_DO_EXPIRATION_DAYS" if provided.
+    FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES:
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
