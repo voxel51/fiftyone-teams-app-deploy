@@ -40,7 +40,7 @@ directory:
 
 ```shell
 $ cat /etc/exports
-/exports 10.202.16.0/24(rw,insecure,fsid=0,root_squash,all_squash,no_subtree_check)
+/exports 10.202.10.0/24(rw,insecure,fsid=0,root_squash,all_squash,no_subtree_check)
 /exports/fiftyone_teams_app
 ```
 
