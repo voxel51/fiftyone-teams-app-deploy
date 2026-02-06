@@ -41,7 +41,7 @@ deploy:
     releases:
       - name: fiftyone-teams
         chartPath: helm/fiftyone-teams-app
-        version: 2.15.0
+        version: 2.16.0
         createNamespace: true
         namespace: '{{.FIFTYONE_TEAMS_NAMESPACE | default "fiftyone-teams" }}'
         overrides:

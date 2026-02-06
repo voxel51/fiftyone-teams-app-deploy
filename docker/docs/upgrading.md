@@ -78,9 +78,9 @@ quickstart  0.21.2
 
 ### From FiftyOne Enterprise Version 2.0.0 and Later
 
-1. [Upgrade to FiftyOne Enterprise version 2.15.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise version 2.16.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
-   version 2.15.0
+   version 2.16.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
@@ -191,15 +191,15 @@ Additionally,
    mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
    ```
 
-1. [Upgrade to FiftyOne Enterprise version 2.15.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.15.0
+1. [Upgrade to FiftyOne Enterprise version 2.16.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.16.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE**: Any FiftyOne SDK less than 2.15.0
+    > **NOTE**: Any FiftyOne SDK less than 2.16.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.15.0` is required.
+    > Upgrading to `fiftyone==2.16.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -283,15 +283,15 @@ Additionally,
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Enterprise version 2.15.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.15.0
+1. [Upgrade to FiftyOne Enterprise version 2.16.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.16.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE**: Any FiftyOne SDK less than 2.15.0
+    > **NOTE**: Any FiftyOne SDK less than 2.16.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.15.0` is required.
+    > Upgrading to `fiftyone==2.16.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -364,9 +364,9 @@ Additionally,
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
-    > Enterprise Database at this step until they upgrade to `fiftyone==2.15.0`
+    > Enterprise Database at this step until they upgrade to `fiftyone==2.16.0`
 
-1. Upgrade your FiftyOne SDKs to version 2.15.0
+1. Upgrade your FiftyOne SDKs to version 2.16.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to

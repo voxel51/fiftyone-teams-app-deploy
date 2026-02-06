@@ -40,9 +40,9 @@ directory using a configuration like
 
 ```shell
 $ cat /etc/exports
-/exports 10.202.15.0/24(rw,insecure,fsid=0,root_squash,all_squash,no_subtree_check)
-/exports/fiftyone_teams_app 10.202.15.0/24(rw,insecure,no_root_squash,anonuid=1000,anongid=1000,no_subtree_check)
-/exports/fiftyone_teams_app/plugins 10.202.15.0/24(rw,insecure,no_root_squash,anonuid=1000,anongid=1000,no_subtree_check)
+/exports 10.202.16.0/24(rw,insecure,fsid=0,root_squash,all_squash,no_subtree_check)
+/exports/fiftyone_teams_app 10.202.16.0/24(rw,insecure,no_root_squash,anonuid=1000,anongid=1000,no_subtree_check)
+/exports/fiftyone_teams_app/plugins 10.202.16.0/24(rw,insecure,no_root_squash,anonuid=1000,anongid=1000,no_subtree_check)
 ```
 
 We recommend that you test this export to make sure
