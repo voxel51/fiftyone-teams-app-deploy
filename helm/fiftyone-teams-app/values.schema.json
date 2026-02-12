@@ -28,20 +28,41 @@
           "properties": {
             "FIFTYONE_DO_EXPIRATION_DAYS": {
               "default": 1,
-              "description": "The amount of time in days that a delegated operation can run before being automatically terminated.\nOverridden by \"FIFTYONE_DO_EXPIRATION_MINUTES\" if provided.",
+              "description": "Deprecated use `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` instead. The amount of time in days that an unmonitored delegated operation can\nrun before being automatically terminated. Overridden by `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` if provided.",
               "required": [],
               "title": "FIFTYONE_DO_EXPIRATION_DAYS",
               "type": "integer"
             },
             "FIFTYONE_DO_EXPIRATION_MINUTES": {
-              "default": "",
-              "description": "(int) The amount of time in minutes that a delegated operation can run before being automatically terminated.\nOverrides \"FIFTYONE_DO_EXPIRATION_DAYS\" if provided.",
+              "default": 30,
+              "description": "(int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.\nIf your executor was launched with the `-m` argument or is push based, then it is monitored.",
               "required": [],
               "title": "FIFTYONE_DO_EXPIRATION_MINUTES",
+              "type": "integer"
+            },
+            "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES": {
+              "default": "",
+              "description": "(int) The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated.\nOverrides `FIFTYONE_DO_EXPIRATION_DAYS` if provided.",
+              "required": [],
+              "title": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
               "type": [
                 "integer",
                 "null"
               ]
+            },
+            "FIFTYONE_DO_REQUEUE_DELAY_MINUTES": {
+              "default": 30,
+              "description": "The number of minutes an operation can sit in a queued state before being requeued.\nCan be any positive number.",
+              "required": [],
+              "title": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
+              "type": "integer"
+            },
+            "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS": {
+              "default": 3,
+              "description": "The number of times an operation is requeued before being terminated.\n`-1` will never terminate. `0` will immediately terminate.",
+              "required": [],
+              "title": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
+              "type": "integer"
             },
             "FIFTYONE_ENV": {
               "default": "production",
@@ -3652,7 +3673,7 @@
               ]
             },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
-              "default": "2.15.0",
+              "default": "2.16.0",
               "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==0.11.0`).",
               "required": [],
               "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",

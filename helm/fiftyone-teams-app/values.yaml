@@ -36,15 +36,24 @@ apiSettings:
     # -- The format to use for log messages.
     # Can be one of `json` or `text`.
     FIFTYONE_LOGGING_FORMAT: text
-    # -- The amount of time in days that a delegated operation can run before being automatically terminated.
-    # Overridden by "FIFTYONE_DO_EXPIRATION_MINUTES" if provided.
+    # -- Deprecated use `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` instead. The amount of time in days that an unmonitored delegated operation can
+    # run before being automatically terminated. Overridden by `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` if provided.
     FIFTYONE_DO_EXPIRATION_DAYS: 1
+    # -- (int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.
+    # If your executor was launched with the `-m` argument or is push based, then it is monitored.
+    FIFTYONE_DO_EXPIRATION_MINUTES: 30
+    # -- The number of minutes an operation can sit in a queued state before being requeued.
+    # Can be any positive number.
+    FIFTYONE_DO_REQUEUE_DELAY_MINUTES: 30
+    # -- The number of times an operation is requeued before being terminated.
+    # `-1` will never terminate. `0` will immediately terminate.
+    FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS: 3
     # @schema
     # type: ["integer", "null"]
     # @schema
-    # -- (int) The amount of time in minutes that a delegated operation can run before being automatically terminated.
-    # Overrides "FIFTYONE_DO_EXPIRATION_DAYS" if provided.
-    FIFTYONE_DO_EXPIRATION_MINUTES:
+    # -- (int) The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated.
+    # Overrides `FIFTYONE_DO_EXPIRATION_DAYS` if provided.
+    FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES:
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
@@ -1391,7 +1400,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.15.0
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.16.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
