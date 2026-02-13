@@ -736,10 +736,14 @@ func (s *ingressTemplateTest) TestRules() {
 				"ingress.paths[4].pathType":    "Prefix",
 				"ingress.paths[4].serviceName": "teams-api",
 				"ingress.paths[4].servicePort": "80",
-				"ingress.paths[5].path":        "/",
+				"ingress.paths[5].path":        "/rpc",
 				"ingress.paths[5].pathType":    "Prefix",
-				"ingress.paths[5].serviceName": "teams-app",
+				"ingress.paths[5].serviceName": "teams-api",
 				"ingress.paths[5].servicePort": "80",
+				"ingress.paths[6].path":        "/",
+				"ingress.paths[6].pathType":    "Prefix",
+				"ingress.paths[6].serviceName": "teams-app",
+				"ingress.paths[6].servicePort": "80",
 			},
 			func(tls []networkingv1.IngressRule) {
 				expectedJSON := `[
@@ -797,6 +801,18 @@ func (s *ingressTemplateTest) TestRules() {
                 },
                 {
                   "path": "/file",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-api",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+				{
+                  "path": "/rpc",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {

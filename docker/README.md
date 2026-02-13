@@ -317,6 +317,7 @@ These proxies will:
 | `/`           | `teams-app` | Main web UI                          |
 | `/cas`        | `teams-cas` | Central Authentication Service (CAS) |
 | `/graphql/v1` | `teams-api` | GraphQL API endpoint                 |
+| `/rpc`        | `teams-api` | RPC API endpoint                     |
 | `/file`       | `teams-api` | File import handling                 |
 | `/_pymongo`   | `teams-api` | MongoDB requests via SDK             |
 | `/health`     | `teams-api` | Health check endpoint                |
