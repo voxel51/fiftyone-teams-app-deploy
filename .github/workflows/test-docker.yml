@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Free Disk Space (Ubuntu) # standard runner's 14 GB available disk size isn't enough. Need at least 22 GB free.
+        uses: jlumbroso/free-disk-space@v1.3.1
       - name: Checkout voxel51/aloha-github-workflows
         uses: actions/checkout@v6
         with:
@@ -48,6 +50,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Free Disk Space (Ubuntu) # standard runner's 14 GB available disk size isn't enough. Need at least 22 GB free.
+        uses: jlumbroso/free-disk-space@v1.3.1
       - name: Checkout voxel51/aloha-github-workflows
         uses: actions/checkout@v6
         with:
@@ -103,6 +107,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Free Disk Space (Ubuntu) # standard runner's 14 GB available disk size isn't enough. Need at least 22 GB free.
+        uses: jlumbroso/free-disk-space@v1.3.1
       - name: Checkout voxel51/aloha-github-workflows
         uses: actions/checkout@v6
         with:
