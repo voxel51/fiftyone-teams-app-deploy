@@ -106,6 +106,10 @@ To use this chart's ingress object
               pathType: Prefix
               serviceName: teams-api
               servicePort: 80
+            - path: /rpc
+              pathType: Prefix
+              serviceName: teams-api
+              servicePort: 80
             - path: /file
               pathType: Prefix
               serviceName: teams-api
