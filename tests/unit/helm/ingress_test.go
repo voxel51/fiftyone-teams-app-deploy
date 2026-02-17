@@ -724,26 +724,30 @@ func (s *ingressTemplateTest) TestRules() {
 				"ingress.paths[1].pathType":    "Prefix",
 				"ingress.paths[1].serviceName": "teams-api",
 				"ingress.paths[1].servicePort": "80",
-				"ingress.paths[2].path":        "/health",
+				"ingress.paths[2].path":        "/cloud_credentials",
 				"ingress.paths[2].pathType":    "Prefix",
 				"ingress.paths[2].serviceName": "teams-api",
 				"ingress.paths[2].servicePort": "80",
-				"ingress.paths[3].path":        "/graphql/v1",
+				"ingress.paths[3].path":        "/health",
 				"ingress.paths[3].pathType":    "Prefix",
 				"ingress.paths[3].serviceName": "teams-api",
 				"ingress.paths[3].servicePort": "80",
-				"ingress.paths[4].path":        "/file",
+				"ingress.paths[4].path":        "/graphql/v1",
 				"ingress.paths[4].pathType":    "Prefix",
 				"ingress.paths[4].serviceName": "teams-api",
 				"ingress.paths[4].servicePort": "80",
-				"ingress.paths[5].path":        "/rpc",
+				"ingress.paths[5].path":        "/file",
 				"ingress.paths[5].pathType":    "Prefix",
 				"ingress.paths[5].serviceName": "teams-api",
 				"ingress.paths[5].servicePort": "80",
-				"ingress.paths[6].path":        "/",
+				"ingress.paths[6].path":        "/rpc",
 				"ingress.paths[6].pathType":    "Prefix",
-				"ingress.paths[6].serviceName": "teams-app",
+				"ingress.paths[6].serviceName": "teams-api",
 				"ingress.paths[6].servicePort": "80",
+				"ingress.paths[7].path":        "/",
+				"ingress.paths[7].pathType":    "Prefix",
+				"ingress.paths[7].serviceName": "teams-app",
+				"ingress.paths[7].servicePort": "80",
 			},
 			func(tls []networkingv1.IngressRule) {
 				expectedJSON := `[
@@ -775,6 +779,18 @@ func (s *ingressTemplateTest) TestRules() {
                     }
                   }
                 },
+				{
+                  "path": "/cloud_credentials",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-api",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+			    },
                 {
                   "path": "/health",
                   "pathType": "Prefix",
