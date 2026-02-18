@@ -101,7 +101,7 @@ quickstart  0.21.2
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 
 FiftyOne Enterprise v2.16.0 adds the `/cloud_credentials` endpoints to the `teams-api`.
-If using path-based routing, please update your `ingress.paths` to
+If using path-based routing, please update your Nginx configuration to
 include these endpoints:
 
 ```nginx
@@ -127,7 +127,7 @@ for full details.
 #### FiftyOne Enterprise v2.15+ Additional API Routes
 
 FiftyOne Enterprise v2.15.0 adds the `/rpc` endpoints to the `teams-api`.
-If using path-based routing, please update your `ingress.paths` to
+If using path-based routing, please update your Nginx configuration to
 include these endpoints:
 
 ```nginx
