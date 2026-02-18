@@ -499,6 +499,10 @@ ingress:
       pathType: Prefix
       serviceName: teams-api
       servicePort: 80
+    - path: /cloud_credentials
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
     - path: /health
       pathType: Prefix
       serviceName: teams-api
