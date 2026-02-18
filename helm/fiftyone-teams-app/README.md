@@ -27,6 +27,22 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.16+
+
+#### Additional Cloud Credential HTTP Endpoints
+
+FiftyOne Enterprise 2.16+ introduces new routes for the `teams-api`.
+If using Path-Based routing, please see the new routes in the
+[ingress documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md#path-based-routing).
+
+### Version 2.15+
+
+#### Additional RPC HTTP Endpoints
+
+FiftyOne Enterprise 2.15+ introduces new routes for the `teams-api`.
+If using Path-Based routing, please see the new routes in the
+[ingress documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md#path-based-routing).
+
 ### Version 2.14+
 
 #### RBAC Changes
