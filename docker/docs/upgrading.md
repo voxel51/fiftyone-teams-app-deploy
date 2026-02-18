@@ -100,9 +100,9 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 
-FiftyOne Enterprise v2.16.0 adds the `/cloud_credentials` endpoints to the `teams-api`.
+FiftyOne Enterprise v2.16.0 adds the `/cloud_credentials` endpoint to the `teams-api`.
 If using path-based routing, please update your Nginx configuration to
-include these endpoints:
+include this endpoint:
 
 ```nginx
 server {

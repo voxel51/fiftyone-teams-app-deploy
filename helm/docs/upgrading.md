@@ -143,42 +143,20 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 
-FiftyOne Enterprise v2.16.0 adds the `/cloud_credentials` endpoints to the `teams-api`.
+FiftyOne Enterprise v2.16.0 adds the `/cloud_credentials` endpoint to the `teams-api`.
 If using path-based routing, please update your `ingress.paths` to
-include these endpoints:
+include this endpoint:
 
 ```yaml
 # values.yaml
 ingress:
   paths:
-    - path: /_pymongo
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
+    # existing configuration
     - path: /cloud_credentials
       pathType: Prefix
       serviceName: teams-api
       servicePort: 80
-    - path: /health
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /graphql/v1
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /rpc
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /file
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /cas
-      pathType: Prefix
-      serviceName: teams-cas
-      servicePort: 80
+    # existing configuration
 ```
 
 Please see the
@@ -195,30 +173,12 @@ include these endpoints:
 # values.yaml
 ingress:
   paths:
-    - path: /_pymongo
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /health
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /graphql/v1
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
+    # existing configuration
     - path: /rpc
       pathType: Prefix
       serviceName: teams-api
       servicePort: 80
-    - path: /file
-      pathType: Prefix
-      serviceName: teams-api
-      servicePort: 80
-    - path: /cas
-      pathType: Prefix
-      serviceName: teams-cas
-      servicePort: 80
+    # existing configuration
 ```
 
 Please see the
