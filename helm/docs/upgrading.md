@@ -19,6 +19,8 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
+    - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.9+ Startup Probe Changes](#fiftyone-enterprise-v29-startup-probe-changes)
     - [FiftyOne Enterprise v2.9+ Delegated Operator Changes](#fiftyone-enterprise-v29-delegated-operator-changes)
     - [FiftyOne Enterprise v2.8+ `initContainer` Changes](#fiftyone-enterprise-v28-initcontainer-changes)
@@ -139,12 +141,56 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
+#### FiftyOne Enterprise v2.16+ Additional API Routes
+
+FiftyOne Enterprise v2.16.0 adds the `/cloud_credentials` endpoint to the `teams-api`.
+If using path-based routing, please update your `ingress.paths` to
+include this endpoint:
+
+```yaml
+# values.yaml
+ingress:
+  paths:
+    # existing configuration
+    - path: /cloud_credentials
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    # existing configuration
+```
+
+Please see the
+[ingress documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md#path-based-routing)
+for full details.
+
+#### FiftyOne Enterprise v2.15+ Additional API Routes
+
+FiftyOne Enterprise v2.15.0 adds the `/rpc` endpoints to the `teams-api`.
+If using path-based routing, please update your `ingress.paths` to
+include these endpoints:
+
+```yaml
+# values.yaml
+ingress:
+  paths:
+    # existing configuration
+    - path: /rpc
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    # existing configuration
+```
+
+Please see the
+[ingress documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md#path-based-routing)
+for full details.
+
 #### FiftyOne Enterprise v2.9+ Startup Probe Changes
 
 <!-- Differs from docker-compose docs -->
 
-In `v2.9.0`, the `values.yaml` location of startup probe settings
-moved from `<settings>.service.startup` to `<settings>.startup` section.
+FiftyOne Enterprise v2.9.0 changes the `values.yaml` location of startup probe settings
+from `<settings>.service.startup` to `<settings>.startup` section.
 
 If your `values.yaml` contains
 

@@ -19,6 +19,8 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
+    - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
     - [FiftyOne Enterprise v2.5+ Delegated Operator Changes](#fiftyone-enterprise-v25-delegated-operator-changes)
     - [FiftyOne Enterprise v2.2+ Delegated Operator Changes](#fiftyone-enterprise-v22-delegated-operator-changes)
@@ -95,6 +97,58 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.16+ Additional API Routes
+
+FiftyOne Enterprise v2.16.0 adds the `/cloud_credentials` endpoint to the `teams-api`.
+If using path-based routing, please update your Nginx configuration to
+include this endpoint:
+
+```nginx
+server {
+  server_name your.server.name;
+
+  # existing configuration
+
+  location /cloud_credentials {
+    proxy_pass http://teams-api;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+  }
+
+  # existing configuration
+}
+```
+
+Please see the
+[ingress documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/expose-teams-api.md)
+for full details.
+
+#### FiftyOne Enterprise v2.15+ Additional API Routes
+
+FiftyOne Enterprise v2.15.0 adds the `/rpc` endpoints to the `teams-api`.
+If using path-based routing, please update your Nginx configuration to
+include these endpoints:
+
+```nginx
+server {
+  server_name your.server.name;
+
+  # existing configuration
+
+  location /rpc {
+    proxy_pass http://teams-api;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+  }
+
+  # existing configuration
+}
+```
+
+Please see the
+[ingress documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docker/docs/expose-teams-api.md)
+for full details.
 
 #### FiftyOne Enterprise v2.7+ Delegated Operator Changes
 
