@@ -19,6 +19,8 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
+    - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.9+ Startup Probe Changes](#fiftyone-enterprise-v29-startup-probe-changes)
     - [FiftyOne Enterprise v2.9+ Delegated Operator Changes](#fiftyone-enterprise-v29-delegated-operator-changes)
     - [FiftyOne Enterprise v2.8+ `initContainer` Changes](#fiftyone-enterprise-v28-initcontainer-changes)
@@ -119,9 +121,9 @@ quickstart  0.21.2
 
 ### From FiftyOne Enterprise Version 2.0.0 or Higher
 
-1. [Upgrade to FiftyOne Enterprise version 2.16.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise version 2.16.1](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
-   version 2.16.0
+   version 2.16.1
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
@@ -139,12 +141,56 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
+#### FiftyOne Enterprise v2.16+ Additional API Routes
+
+FiftyOne Enterprise v2.16.0 adds the `/cloud_credentials` endpoint to the `teams-api`.
+If using path-based routing, please update your `ingress.paths` to
+include this endpoint:
+
+```yaml
+# values.yaml
+ingress:
+  paths:
+    # existing configuration
+    - path: /cloud_credentials
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    # existing configuration
+```
+
+Please see the
+[ingress documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md#path-based-routing)
+for full details.
+
+#### FiftyOne Enterprise v2.15+ Additional API Routes
+
+FiftyOne Enterprise v2.15.0 adds the `/rpc` endpoints to the `teams-api`.
+If using path-based routing, please update your `ingress.paths` to
+include these endpoints:
+
+```yaml
+# values.yaml
+ingress:
+  paths:
+    # existing configuration
+    - path: /rpc
+      pathType: Prefix
+      serviceName: teams-api
+      servicePort: 80
+    # existing configuration
+```
+
+Please see the
+[ingress documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/expose-teams-api.md#path-based-routing)
+for full details.
+
 #### FiftyOne Enterprise v2.9+ Startup Probe Changes
 
 <!-- Differs from docker-compose docs -->
 
-In `v2.9.0`, the `values.yaml` location of startup probe settings
-moved from `<settings>.service.startup` to `<settings>.startup` section.
+FiftyOne Enterprise v2.9.0 changes the `values.yaml` location of startup probe settings
+from `<settings>.service.startup` to `<settings>.startup` section.
 
 If your `values.yaml` contains
 
@@ -308,7 +354,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -348,17 +394,17 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Enterprise version 2.16.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.16.0
+1. [Upgrade to FiftyOne Enterprise version 2.16.1](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.16.1
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. Upgrade all the datasets
 
-    > **NOTE**: Any FiftyOne SDK less than 2.16.0 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.16.1 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.16.0` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.16.1` is recommended before migrating
     > your database.
 
     ```shell
@@ -373,7 +419,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -392,7 +438,7 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -432,17 +478,17 @@ For a full list of settings, please refer to the
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Enterprise version 2.16.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.16.0
+1. [Upgrade to FiftyOne Enterprise version 2.16.1](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.16.1
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. Upgrade all the datasets
 
-    > **NOTE**: Any FiftyOne SDK less than 2.16.0 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.16.1 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.16.0` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.16.1` is recommended before migrating
     > your database.
 
     ```shell
@@ -474,14 +520,14 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.16.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -520,10 +566,10 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Enterprise v2.16.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise v2.16.1](#upgrading-from-previous-versions)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.16.0`
-1. Upgrade your FiftyOne SDKs to version 2.16.0
+    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.16.1`
+1. Upgrade your FiftyOne SDKs to version 2.16.1
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to

@@ -98,11 +98,19 @@ To use this chart's ingress object
               pathType: Prefix
               serviceName: teams-api
               servicePort: 80
+            - path: /cloud_credentials
+              pathType: Prefix
+              serviceName: teams-api
+              servicePort: 80
             - path: /health
               pathType: Prefix
               serviceName: teams-api
               servicePort: 80
             - path: /graphql/v1
+              pathType: Prefix
+              serviceName: teams-api
+              servicePort: 80
+            - path: /rpc
               pathType: Prefix
               serviceName: teams-api
               servicePort: 80
