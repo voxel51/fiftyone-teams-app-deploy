@@ -2,6 +2,21 @@ apiVersion: v1
 entries:
   fiftyone-teams-app:
   - apiVersion: v2
+    appVersion: v2.16.2
+    created: "2026-02-20T13:20:38.795615368Z"
+    description: 'FiftyOne Enterprise is the enterprise version of the open source
+      [FiftyOne](https://github.com/voxel51/fiftyone) project. The FiftyOne Enterprise
+      Helm chart is the recommended way to install and configure FiftyOne Enterprise
+      on Kubernetes. '
+    digest: cb43a5c65a21e7d3d6c29a959240c12bcd95b772a398fa45a6e4298922b32710
+    icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
+    kubeVersion: '>=1.31-0'
+    name: fiftyone-teams-app
+    type: application
+    urls:
+    - https://github.com/voxel51/fiftyone-teams-app-deploy/releases/download/fiftyone-teams-app-2.16.2/fiftyone-teams-app-2.16.2.tgz
+    version: 2.16.2
+  - apiVersion: v2
     appVersion: v2.16.1
     created: "2026-02-18T23:57:06.772998928Z"
     description: 'FiftyOne Enterprise is the enterprise version of the open source
@@ -1005,4 +1020,4 @@ entries:
     urls:
     - https://github.com/voxel51/fiftyone-teams-app-deploy/releases/download/fiftyone-teams-app-0.1.7/fiftyone-teams-app-0.1.7.tgz
     version: 0.1.7
-generated: "2026-02-18T23:57:06.773305379Z"
+generated: "2026-02-20T13:20:38.79583074Z"
