@@ -109,7 +109,7 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Download README artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: helm-fiftyone-ai-readme
           path: helm-fiftyone-ai-readme
