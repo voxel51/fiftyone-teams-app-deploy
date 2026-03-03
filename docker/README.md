@@ -233,7 +233,7 @@ You can override the default image used by any service in
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.16.2
+    image: voxel51/fiftyone-app-torch:v2.16.3
 ```
 
 ## :rocket: Step 4: Initial Deployment
