@@ -2,7 +2,10 @@
 
 <!-- Explain why you are making this change. Describe the problem. -->
 
-<!-- Please check a priority box below, and also assign a priority label to the PR. Definitions for each priority are on each label. -->
+<!-- Please check a priority box below, and also assign a priority label
+to the PR. Definitions for each priority are on its label.
+-->
+
 Review Priority
 
 * [ ] high
