@@ -316,6 +316,21 @@ helm repo update voxel51
 
 Finally, edit your `values.yaml` file and install FiftyOne Enterprise:
 
+> **NOTE**: This chart uses `namespace.name` from your `values.yaml` to set the
+> namespace for all chart resources. The Helm `--namespace` flag alone does
+> **not** control where resources are created. You **must** set `namespace.name`
+> in your `values.yaml` to match your target namespace. If deploying to a
+> namespace other than the default `fiftyone-teams`, add the following to your
+> `values.yaml`:
+>
+> ```yaml
+> namespace:
+>   # Set to true to have the chart create the namespace, or false if it
+>   # already exists
+>   create: false
+>   name: your-namespace-here
+> ```
+
 ```shell
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
   --namespace your-namespace-here \
