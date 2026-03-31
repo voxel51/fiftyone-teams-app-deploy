@@ -3672,6 +3672,13 @@
                 "boolean"
               ]
             },
+            "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS": {
+              "default": "kubernetes",
+              "description": "Deployment characteristics for the `teams-app`.\n`kubernetes`: Indicates the app is running in a Kubernetes environment.\n`docker`: Indicates the app is running in a Docker environment.\n`kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment",
+              "required": [],
+              "title": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+              "type": "string"
+            },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
               "default": "2.17.0",
               "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==0.11.0`).",
