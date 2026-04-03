@@ -79,6 +79,9 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- with $v.extraContainers | default $baseTpl.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
           livenessProbe:
             exec:
               command:

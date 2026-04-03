@@ -89,6 +89,9 @@ spec:
             {{- with .Values.apiSettings.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+        {{- with .Values.apiSettings.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- if .Values.apiSettings.initContainers.enabled }}
       initContainers:
         {{-
