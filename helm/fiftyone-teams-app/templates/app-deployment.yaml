@@ -35,6 +35,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      {{- if .Values.appSettings.extraContainers }}
+      shareProcessNamespace: true
+      {{- end }}
       securityContext:
         {{- toYaml .Values.appSettings.podSecurityContext | nindent 8 }}
       containers:
