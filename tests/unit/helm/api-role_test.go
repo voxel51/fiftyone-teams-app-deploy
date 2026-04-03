@@ -305,6 +305,11 @@ func (s *apiRoleTemplateTest) TestRules() {
             "apiGroups": [""],
             "resources": ["pods"],
             "verbs": ["get", "list", "watch", "delete"]
+          },
+          {
+            "apiGroups": [""],
+            "resources": ["pods/log"],
+            "verbs": ["get"]
           }
         ]`
 				var expectedRules []rbacv1.PolicyRule
