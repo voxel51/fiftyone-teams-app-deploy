@@ -44,6 +44,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ $serviceAccountName }}
+      {{- if .Values.apiSettings.extraContainers }}
+      shareProcessNamespace: true
+      {{- end }}
       securityContext:
         {{- toYaml .Values.apiSettings.podSecurityContext | nindent 8 }}
       containers:
