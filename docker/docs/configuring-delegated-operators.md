@@ -29,7 +29,7 @@ in conjunction with one of the three plugin configurations.
       -f compose.dedicated-plugins.yaml \
       -f compose.delegated-operators.yaml \
       -f compose.override.yaml \
-      up --d
+      up -d
     ```
 
 Optionally, delegated operation run logs may be uploaded to a
