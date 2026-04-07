@@ -50,6 +50,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
+      {{- if ($v.extraContainers | default $baseTpl.extraContainers) }}
+      shareProcessNamespace: true
+      {{- end }}
       securityContext:
         {{- toYaml (merge (dict) ($v.podSecurityContext | default dict) ($baseTpl.podSecurityContext)) | nindent 8 }}
       containers:
@@ -106,6 +109,9 @@ spec:
             failureThreshold: {{ ($v.startup).failureThreshold | default $baseTpl.startup.failureThreshold }}
             periodSeconds: {{ ($v.startup).periodSeconds | default $baseTpl.startup.periodSeconds }}
             timeoutSeconds: {{ ($v.startup).timeoutSeconds | default $baseTpl.startup.timeoutSeconds }}
+        {{- with $v.extraContainers | default $baseTpl.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with (merge (dict) ($v.nodeSelector | default dict) ($baseTpl.nodeSelector)) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
