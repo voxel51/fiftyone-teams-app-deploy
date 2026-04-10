@@ -157,14 +157,12 @@ mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 > Docker Compose reads `.env` natively. Sourcing it can cause issues with
 > values containing special characters (e.g., MongoDB URIs with `@`, `?`, `=`)
 > and may require quoting that is otherwise unnecessary.
-
 > [!IMPORTANT]
 > The license file directory must be accessible to the Docker containers at
 > runtime. Ensure the path is within a directory that is volume-mounted into
 > the containers (e.g., `/opt/data/licenses/`). The license file should have
 > read permissions (`chmod 644`). If the file is stored outside the
 > container's mount path, services will fail to start without a clear error.
-
 > [!TIP]
 > When rotating the license, to ensure that the new license values are
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
