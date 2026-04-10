@@ -146,12 +146,27 @@ and dataset sizes.
 2. Place the license file there and rename it to `license`
 
 ```bash
-. .env
+# Set this to match the LOCAL_LICENSE_FILE_DIR value in your .env file
+LOCAL_LICENSE_FILE_DIR="/path/to/your/licenses"
 mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
 mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
 ```
 
-> [!TIP] When rotating the license, to ensure that the new license values are
+> [!WARNING]
+> **Do not `source` (`. .env`) the `.env` file in your shell.**
+> Docker Compose reads `.env` natively. Sourcing it can cause issues with
+> values containing special characters (e.g., MongoDB URIs with `@`, `?`, `=`)
+> and may require quoting that is otherwise unnecessary.
+
+> [!IMPORTANT]
+> The license file directory must be accessible to the Docker containers at
+> runtime. Ensure the path is within a directory that is volume-mounted into
+> the containers (e.g., `/opt/data/licenses/`). The license file should have
+> read permissions (`chmod 644`). If the file is stored outside the
+> container's mount path, services will fail to start without a clear error.
+
+> [!TIP]
+> When rotating the license, to ensure that the new license values are
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
@@ -237,8 +252,14 @@ services:
 ```
 
 > [!NOTE]
-> Always include a version tag when overriding images (e.g., `:v2.17.1`).
-> Omitting the tag will result in a **not found** error.
+> Default images and versions for all services are defined in
+> `common-services.yaml` and will be used automatically. You only need to
+> specify images in `compose.override.yaml` if you want to customize — for
+> example, switching `fiftyone-app` to the `-torch` or `-gpt` variant, or
+> pinning a specific version. The override can be extended to other services
+> for additional customization as needed. Always include a version tag when
+> overriding images (e.g., `:v2.17.1`). Omitting the tag will result in a
+> **not found** error.
 
 ## :rocket: Step 4: Initial Deployment
 
@@ -250,10 +271,16 @@ In `compose.override.yaml`, make sure:
 services:
   fiftyone-app:
     environment:
-      FIFTYONE_DATABASE_ADMIN: true
+      FIFTYONE_DATABASE_ADMIN: true # Only for first install
 ```
 
-> This allows the application to create and migrate the database schema.
+> [!IMPORTANT]
+> This is required **only for the very first deployment** to create the
+> database schema. After initial deployment is verified and all containers
+> are healthy, set `FIFTYONE_DATABASE_ADMIN` to `false` and restart. It
+> should remain `false` for normal operation, including during version
+> upgrades. Leaving it `true` risks unintended automatic database
+> migrations on container restarts.
 
 ### 2. Launch the application
 
@@ -267,10 +294,19 @@ docker compose commands
 
 ```shell
 docker compose \
+  -f compose.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.override.yaml \
   up -d
 ```
+
+> [!IMPORTANT]
+> `compose.yaml` must be included as the base file when using
+> `compose.delegated-operators.yaml`. Unlike `compose.dedicated-plugins.yaml`
+> or `compose.plugins.yaml` (which replace `compose.yaml`),
+> `compose.delegated-operators.yaml` is an overlay and does not reference
+> `common-services.yaml` on its own. Without `compose.yaml`, containers will
+> start but fail to communicate with each other.
 
 This will start the following containers:
 
