@@ -302,10 +302,13 @@ docker compose \
 
 > [!IMPORTANT]
 > `compose.yaml` must be included as the base file when using
-> `compose.delegated-operators.yaml`. Unlike `compose.dedicated-plugins.yaml`
-> or `compose.plugins.yaml` (which replace `compose.yaml`),
-> `compose.delegated-operators.yaml` is an overlay and does not reference
-> `common-services.yaml` on its own. Without `compose.yaml`, containers will
+> `compose.delegated-operators.yaml`. While `compose.delegated-operators.yaml`
+> does reference `teams-do-common` from `../common-services.yaml`, it only
+> defines the `teams-do` service and does NOT include the core services
+> (`fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`). Therefore you must
+> include `compose.yaml` as the base file to provide those core services.
+> Contrast this with `compose.plugins.yaml` and `compose.dedicated-plugins.yaml`
+> (which replace `compose.yaml`). Without `compose.yaml`, containers will
 > start but fail to communicate with each other.
 
 This will start the following containers:
