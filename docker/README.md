@@ -262,7 +262,7 @@ services:
     environment:
       FIFTYONE_DATABASE_ADMIN: false
 ```
-
+> This allows the application to create and migrate the database schema.
 
 ### 2. Launch the application
 
