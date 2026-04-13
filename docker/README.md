@@ -144,25 +144,18 @@ and dataset sizes.
 
 1. Set `LOCAL_LICENSE_FILE_DIR` in your `.env`
 2. Place the license file there and rename it to `license`
+3. Ensure the license directory is volume-mounted into the containers
+   (e.g., `/opt/data/licenses/`)
+4. Set read permissions on the license file: `chmod 644 license`
 
 ```bash
 # Set this to match the LOCAL_LICENSE_FILE_DIR value in your .env file
 LOCAL_LICENSE_FILE_DIR="/path/to/your/licenses"
 mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
 mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
+chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 ```
 
-> [!WARNING]
-> **Do not `source` (`. .env`) the `.env` file in your shell.**
-> Docker Compose reads `.env` natively. Sourcing it can cause issues with
-> values containing special characters (e.g., MongoDB URIs with `@`, `?`, `=`)
-> and may require quoting that is otherwise unnecessary.
-> [!IMPORTANT]
-> The license file directory must be accessible to the Docker containers at
-> runtime. Ensure the path is within a directory that is volume-mounted into
-> the containers (e.g., `/opt/data/licenses/`). The license file should have
-> read permissions (`chmod 644`). If the file is stored outside the
-> container's mount path, services will fail to start without a clear error.
 > [!TIP]
 > When rotating the license, to ensure that the new license values are
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
@@ -270,13 +263,6 @@ services:
       FIFTYONE_DATABASE_ADMIN: false
 ```
 
-> [!IMPORTANT]
-> This is required **only for the very first deployment** to create the
-> database schema. After initial deployment is verified and all containers
-> are healthy, set `FIFTYONE_DATABASE_ADMIN` to `false` and restart. It
-> should remain `false` for normal operation, including during version
-> upgrades. Leaving it `true` risks unintended automatic database
-> migrations on container restarts.
 
 ### 2. Launch the application
 
