@@ -251,13 +251,11 @@ services:
 
 > [!NOTE]
 > Default images and versions for all services are defined in
-> `common-services.yaml` and will be used automatically. You only need to
-> specify images in `compose.override.yaml` if you want to customize — for
-> example, switching `fiftyone-app` to the `-torch` or `-gpt` variant, or
-> pinning a specific version. The override can be extended to other services
-> for additional customization as needed. Always include a version tag when
-> overriding images (e.g., `:v2.17.1`). Omitting the tag will result in a
-> **not found** error.
+> `common-services.yaml`. To override an image or version, 
+> set the value in `compose.override.yaml`. For
+> example, instead of using the `fiftyone-app` image, you may instead the `fiftyone-app-gpt` image.
+> Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
+> Omitting the tag will result in a **not found** error.
 
 ## :rocket: Step 4: Initial Deployment
 
@@ -269,7 +267,7 @@ In `compose.override.yaml`, make sure:
 services:
   fiftyone-app:
     environment:
-      FIFTYONE_DATABASE_ADMIN: true # Only for first install
+      FIFTYONE_DATABASE_ADMIN: false
 ```
 
 > [!IMPORTANT]
@@ -298,16 +296,6 @@ docker compose \
   up -d
 ```
 
-> [!IMPORTANT]
-> `compose.yaml` must be included as the base file when using
-> `compose.delegated-operators.yaml`. While `compose.delegated-operators.yaml`
-> does reference `teams-do-common` from `../common-services.yaml`, it only
-> defines the `teams-do` service and does NOT include the core services
-> (`fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`). Therefore you must
-> include `compose.yaml` as the base file to provide those core services.
-> Contrast this with `compose.plugins.yaml` and `compose.dedicated-plugins.yaml`
-> (which replace `compose.yaml`). Without `compose.yaml`, containers will
-> start but fail to communicate with each other.
 
 This will start the following containers:
 
