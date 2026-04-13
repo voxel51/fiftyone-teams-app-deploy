@@ -144,14 +144,20 @@ and dataset sizes.
 
 1. Set `LOCAL_LICENSE_FILE_DIR` in your `.env`
 2. Place the license file there and rename it to `license`
+3. Ensure the license directory is volume-mounted into the containers
+   (e.g., `/opt/data/licenses/`)
+4. Set read permissions on the license file: `chmod 644 license`
 
 ```bash
-. .env
+# Set this to match the LOCAL_LICENSE_FILE_DIR value in your .env file
+LOCAL_LICENSE_FILE_DIR="/path/to/your/licenses"
 mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
 mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
+chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 ```
 
-> [!TIP] When rotating the license, to ensure that the new license values are
+> [!TIP]
+> When rotating the license, to ensure that the new license values are
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
@@ -237,7 +243,11 @@ services:
 ```
 
 > [!NOTE]
-> Always include a version tag when overriding images (e.g., `:v2.17.1`).
+> Default images and versions for all services are defined in
+> `common-services.yaml`. To override an image or version,
+> set the value in `compose.override.yaml`. For example, instead of using
+> the `fiftyone-app` image, you may instead the `fiftyone-app-gpt` image.
+> Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
 > Omitting the tag will result in a **not found** error.
 
 ## :rocket: Step 4: Initial Deployment
@@ -250,7 +260,7 @@ In `compose.override.yaml`, make sure:
 services:
   fiftyone-app:
     environment:
-      FIFTYONE_DATABASE_ADMIN: true
+      FIFTYONE_DATABASE_ADMIN: false
 ```
 
 > This allows the application to create and migrate the database schema.
@@ -267,6 +277,7 @@ docker compose commands
 
 ```shell
 docker compose \
+  -f compose.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.override.yaml \
   up -d
