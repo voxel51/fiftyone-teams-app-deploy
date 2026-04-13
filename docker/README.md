@@ -244,8 +244,8 @@ services:
 
 > [!NOTE]
 > Default images and versions for all services are defined in
-> `common-services.yaml`. To override an image or version, 
-> set the value in `compose.override.yaml`. For example, instead of using 
+> `common-services.yaml`. To override an image or version,
+> set the value in `compose.override.yaml`. For example, instead of using
 > the `fiftyone-app` image, you may instead the `fiftyone-app-gpt` image.
 > Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
 > Omitting the tag will result in a **not found** error.
