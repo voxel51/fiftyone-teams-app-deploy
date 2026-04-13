@@ -74,7 +74,7 @@ jobs:
           echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_OUTPUT}"
 
       - name: Trigger Internal Chart Build by Release
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.WD_HCI_FG_PAT }}
           script: |
