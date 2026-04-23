@@ -36,7 +36,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
-      {{- if .Values.pluginsSettings.extraContainers }}
+      {{- if or .Values.pluginsSettings.extraContainers .Values.pluginsSettings.nativeSidecarContainers }}
       shareProcessNamespace: true
       {{- end }}
       securityContext:
@@ -80,8 +80,9 @@ spec:
         {{- with .Values.pluginsSettings.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- if .Values.pluginsSettings.initContainers.enabled }}
+      {{- if or .Values.pluginsSettings.initContainers.enabled .Values.pluginsSettings.nativeSidecarContainers }}
       initContainers:
+        {{- if .Values.pluginsSettings.initContainers.enabled }}
         {{-
           include "fiftyone-teams-app.commonInitContainers"
           (
@@ -92,6 +93,10 @@ spec:
             "tag" .Values.pluginsSettings.initContainers.image.tag
           ) | nindent 8
         }}
+        {{- end }}
+        {{- with .Values.pluginsSettings.nativeSidecarContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
       {{- with .Values.pluginsSettings.nodeSelector }}
       nodeSelector:

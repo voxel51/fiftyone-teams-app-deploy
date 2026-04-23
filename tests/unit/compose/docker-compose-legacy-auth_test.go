@@ -28,6 +28,8 @@ var legacyAuthComposeFile = filepath.Join(dockerLegacyAuthDir, "compose.yaml")
 var legacyAuthComposePluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.plugins.yaml")
 var legacyAuthComposeDedicatedPluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.dedicated-plugins.yaml")
 var legacyAuthComposeDelegatedOperationsFile = filepath.Join(dockerLegacyAuthDir, "compose.delegated-operators.yaml")
+var legacyAuthComposeTelemetryFile = filepath.Join(dockerLegacyAuthDir, "compose.telemetry.yaml")
+var legacyAuthComposeTelemetryDelegatedOperatorsFile = filepath.Join(dockerLegacyAuthDir, "compose.telemetry.delegated-operators.yaml")
 var legacyAuthEnvTemplateFilePath = filepath.Join(dockerLegacyAuthDir, "env.template")
 
 type commonServicesLegacyAuthDockerComposeTest struct {
@@ -101,6 +103,41 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			[]string{
 				"teams-do",
+			},
+		},
+		{
+			"composeTelemetry",
+			[]string{legacyAuthComposeFile, legacyAuthComposeTelemetryFile},
+			s.dotEnvFiles,
+			[]string{
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composeTelemetryDelegatedOperators",
+			[]string{
+				legacyAuthComposeFile,
+				legacyAuthComposeDelegatedOperationsFile,
+				legacyAuthComposeTelemetryFile,
+				legacyAuthComposeTelemetryDelegatedOperatorsFile,
+			},
+			s.dotEnvFiles,
+			[]string{
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"teams-do",
+				"teams-do-telemetry",
+				"telemetry-redis",
 			},
 		},
 	}
@@ -186,6 +223,39 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 			[]string{legacyAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			"voxel51/fiftyone-teams-cv-full:v2.19.0",
+		},
+		{
+			"telemetryRedis",
+			"telemetry-redis",
+			[]string{legacyAuthComposeFile, legacyAuthComposeTelemetryFile},
+			s.dotEnvFiles,
+			"redis:7-alpine",
+		},
+		{
+			"telemetrySidecarFiftyoneApp",
+			"fiftyone-app-telemetry",
+			[]string{legacyAuthComposeFile, legacyAuthComposeTelemetryFile},
+			s.dotEnvFiles,
+			"voxel51/telemetry-sidecar:latest",
+		},
+		{
+			"telemetrySidecarTeamsApi",
+			"teams-api-telemetry",
+			[]string{legacyAuthComposeFile, legacyAuthComposeTelemetryFile},
+			s.dotEnvFiles,
+			"voxel51/telemetry-sidecar:latest",
+		},
+		{
+			"telemetrySidecarTeamsDo",
+			"teams-do-telemetry",
+			[]string{
+				legacyAuthComposeFile,
+				legacyAuthComposeDelegatedOperationsFile,
+				legacyAuthComposeTelemetryFile,
+				legacyAuthComposeTelemetryDelegatedOperatorsFile,
+			},
+			s.dotEnvFiles,
+			"voxel51/telemetry-sidecar:latest",
 		},
 	}
 

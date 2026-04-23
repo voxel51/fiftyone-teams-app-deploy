@@ -50,7 +50,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
-      {{- if ($v.extraContainers | default $baseTpl.extraContainers) }}
+      {{- if or ($v.extraContainers | default $baseTpl.extraContainers) ($v.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers) }}
       shareProcessNamespace: true
       {{- end }}
       securityContext:
@@ -112,6 +112,10 @@ spec:
         {{- with $v.extraContainers | default $baseTpl.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with $v.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with (merge (dict) ($v.nodeSelector | default dict) ($baseTpl.nodeSelector)) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
