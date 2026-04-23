@@ -1,6 +1,6 @@
 SHELL := $(SHELL) -e
 ASDF := $(shell asdf where golang)
-VERSION ?= 2.17.1
+VERSION ?= 2.17.2
 
 # Help
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))
@@ -54,7 +54,7 @@ helm-plugins-diff:  ## Installs the helm diff plugin
 		echo "helm-diff is already installed."; \
 	else \
 		echo "Installing helm-diff plugin..."; \
-		helm plugin install https://github.com/databus23/helm-diff; \
+		helm plugin install https://github.com/databus23/helm-diff --verify=false; \
 	fi
 
 helm-plugins-schema:  ## Installs the helm schema plugin
@@ -63,7 +63,7 @@ helm-plugins-schema:  ## Installs the helm schema plugin
 		echo "helm-schema is already installed."; \
 	else \
 		echo "Installing helm-schema plugin..."; \
-		helm plugin install https://github.com/dadav/helm-schema; \
+		helm plugin install https://github.com/dadav/helm-schema --verify=false; \
 	fi
 
 helm-plugins:  helm-plugins-diff helm-plugins-schema  ## Install the helm plugins we use

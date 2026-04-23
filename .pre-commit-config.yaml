@@ -1,7 +1,7 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
@@ -18,7 +18,7 @@ repos:
         exclude: ^helm/fiftyone-teams-app/values.schema.json
       - id: trailing-whitespace
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5
+    rev: v1.5.6
     hooks:
       - id: forbid-tabs
         exclude_types:
@@ -35,7 +35,7 @@ repos:
           # A base filename makes it relative to each chart directory found
           - --template-files=README.md.gotmpl
   - repo: https://github.com/dadav/helm-schema
-    rev: 0.18.1
+    rev: 0.23.1
     hooks:
       - id: helm-schema
         args:
@@ -48,12 +48,12 @@ repos:
           # - --helm-docs-compatibility-mode
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
+    rev: v0.48.0
     hooks:
       - id: markdownlint
       - id: markdownlint-fix
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         exclude: helm/local-self-signed-example/cert-manger-crds|tests/go.sum
@@ -62,7 +62,7 @@ repos:
           # fiftyone.management as fom
           - fom,aks,NotIn
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.37.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
         entry: yamllint --config-file .yamllint.yaml
@@ -98,7 +98,7 @@ repos:
       - id: go-fmt
       - id: go-mod-tidy
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.7
+    rev: v1.7.12
     hooks:
       - id: actionlint
   - repo: https://github.com/syntaqx/git-hooks
@@ -113,7 +113,7 @@ repos:
           - --case-indent
           - --indent=2
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v4.2.0
+    rev: v4.4.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
