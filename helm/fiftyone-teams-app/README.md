@@ -51,8 +51,8 @@ FiftyOne Enterprise 2.14+ introduces custom roles and role bindings to allow the
 `teams-api` deployment to create, update, and remove batch jobs and pods for
 kubernetes-based
 [on-demand delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
-An additional service account is now created by the helm chart to utilize these roles
-and is attached to the `teams-api` deployment object.
+An additional service account is now created by the helm chart to utilize these
+roles and is attached to the `teams-api` deployment object.
 
 The
 [on-demand delegated operations](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-on-demand-orchestrator.md).
@@ -691,26 +691,27 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 1. **Get detailed pod information**:
 
-   ```shell
-   kubectl describe pod <pod-name>
-   ```
+    ```shell
+    kubectl describe pod <pod-name>
+    ```
 
 1. **Check application logs**:
 
-   ```shell
-   kubectl logs <pod-name>
-   # For previous container instance logs
-   kubectl logs <pod-name> --previous
-   ```
+    ```shell
+    kubectl logs <pod-name>
+    # For previous container instance logs
+    kubectl logs <pod-name> --previous
+    ```
 
 1. **Check events for issues**:
 
-   ```shell
-   kubectl get events --sort-by='.lastTimestamp'
-   ```
+    ```shell
+    kubectl get events --sort-by='.lastTimestamp'
+    ```
 
 ## Values
 
+<!-- markdownlint-disable MD060 -->
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
@@ -1082,6 +1083,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
+<!-- markdownlint-enable MD060 -->
 
 <!-- Reference Links -->
 [affinity]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/

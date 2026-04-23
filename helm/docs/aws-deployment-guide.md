@@ -647,7 +647,7 @@ You can now navigate to your DNS name in a browser.
 ### Introduction
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | INT-001 | Introductory material must contain use cases for the software. | This is covered in the [Introduction](#introduction) section. |
 | INT-002 | Introductory material contains an overview of a typical customer deployment, including lists of all resources that are set up when the deployment is complete. | This is covered in the [Deploying](#deploying) section. |
 | INT-003 | Introductory material contains a description of all deployment options discussed in the user guide (e.g. single-AZ, multi-AZ or multi-region), if applicable. | This is covered in the [Introduction](#introduction) section. |
@@ -658,15 +658,15 @@ You can now navigate to your DNS name in a browser.
 ### Prerequisites and Requirements
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | PRQ-001 | All technical prerequisites and requirements to complete the deployment process are listed (e.g. required OS, database type and storage requirements). | This is covered in the [Technical Requirements](#technical-requirements) section. |
-| PRQ-002 | The deployment guide lists all prerequisite skills or specialized knowledge (for example, familiarity with AWS, specific AWS services, or a scripting or programming language). |  This is covered in the [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge) section. |
+| PRQ-002 | The deployment guide lists all prerequisite skills or specialized knowledge (for example, familiarity with AWS, specific AWS services, or a scripting or programming language). | This is covered in the [Prerequisites Skills and Knowledge](#prerequisites-skills-and-knowledge) section. |
 | PRQ-003 | The deployment guide lists the environment configuration that is needed for the deployment (e.g. an AWS account, a specific operating system, licensing, DNS). | This is covered in the [Technical Requirements](#technical-requirements) section. |
 
 ### Architecture Diagrams
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | ARCH-001 | Architecture diagrams must include all AWS services and resources deployed by the solution and illustrate how the services and resources connect with each other in a typical customer environment. | This is covered in the attached documentation. |
 | ARCH-004 | Architecture diagrams use official AWS Architecture Icons. | This is covered in the attached documentation. |
 | ARCH-005 | Network diagrams demonstrate virtual private clouds (VPCs) and subnets. | This is covered in the attached documentation. |
@@ -676,7 +676,7 @@ You can now navigate to your DNS name in a browser.
 ### Security
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | DSEC-002 | The application does not require the use of AWS account root privileges for deployment or operation. | This is covered in the [Root Privileges](#root-privileges) section. |
 | DSEC-003 | The deployment guide provides prescriptive guidance on following the policy of least privilege for all access granted as part of the deployment. | This is covered in the [Principle Of Least Privilege](#principle-of-least-privilege) section. |
 | DSEC-004 | The deployment guide clearly documents any public resources (e.g. Amazon S3 buckets with bucket policies allowing public access). | This is covered in the [Public Resources](#public-resources) section. |
@@ -691,7 +691,7 @@ You can now navigate to your DNS name in a browser.
 ### Costs
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | CST-001 | The deployment guide includes a list of billable services and guidance on whether each service is mandatory or optional. | This is covered in the [Billable Services](#billable-services) section. |
 | CST-002 | The deployment guide includes the cost model and licensing costs. | This is covered in the [License Model](#license-model) section. |
 
@@ -699,14 +699,14 @@ You can now navigate to your DNS name in a browser.
 ### Sizing
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | SIZ-001 | Either provide scripts to provision required resources or provide guidance for type and size selection for resources. | This is covered in the [Sizing](#sizing) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Deployment Assets
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | DAS-001 | The deployment guide provides step-by-step instructions for deploying the workload on AWS according to the typical deployment architecture. | This is covered in the [Deploying](#deploying) section. |
 | DAS-004 | The deployment guide contains prescriptive guidance for testing and troubleshooting. | This is covered in the [Health Checks](#health-checks) section. |
 
@@ -714,21 +714,21 @@ You can now navigate to your DNS name in a browser.
 ### Health Checks
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | HLCH-001 | The deployment guide provides step-by-step instructions for how to assess and monitor the health and proper function of the application. | This is covered in the [Health Checks](#health-checks) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Backup and Recovery
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | BAR-001 | Identify the data stores and the configurations to be backed up. If any of the data stores are proprietary, provide step-by-step instructions for backup and recovery. | This is covered in the [Backup and Recovery](#backup-and-recovery) section. |
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
 ### Routine Maintenance
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | RM-001 | The deployment guide provides step-by-step instructions for rotating programmatic system credentials and cryptographic keys. | [Secrets And Sensitive Data](#secrets-and-sensitive-data) section. |
 | RM-002 | The deployment guide provides prescriptive guidance for software patches and upgrades. | This is covered in the [Upgrades](#upgrades) section. |
 | RM-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [License Management](#license-management) section. |
@@ -738,7 +738,7 @@ You can now navigate to your DNS name in a browser.
 ### Emergency Maintenance
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | EMER-001 | The deployment guide provides step-by-step instructions on handling fault conditions. | This is covered in the [Fault Conditions](#fault-conditions) section. |
 | EMER-002 | The deployment guide provides step-by-step instructions on how to recover the software. | This is covered in the [Backup and Recovery](#backup-and-recovery) section. |
 
@@ -746,7 +746,7 @@ You can now navigate to your DNS name in a browser.
 ### Support
 
 | Req Code | Requirement Description | Content |
-|----------|------------------------|---------|
+| -------- | ----------------------- | ------- |
 | SUP-001 | The deployment guide provides details on how to receive support. | This is covered in the [Support](#support) section. |
 | SUP-002 | The deployment guide provides details on technical support tiers. | This is covered in the [Support](#support) section. |
 | SUP-003 | The deployment guide provides prescriptive guidance on managing licenses. | This is covered in the [License Management](#license-management) section. |
