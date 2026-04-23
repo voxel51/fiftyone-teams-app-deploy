@@ -28,6 +28,8 @@ var internalAuthComposeFile = filepath.Join(dockerInternalAuthDir, "compose.yaml
 var internalAuthComposePluginsFile = filepath.Join(dockerInternalAuthDir, "compose.plugins.yaml")
 var internalAuthComposeDedicatedPluginsFile = filepath.Join(dockerInternalAuthDir, "compose.dedicated-plugins.yaml")
 var internalAuthComposeDelegatedOperationsFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.yaml")
+var internalAuthComposeTelemetryFile = filepath.Join(dockerInternalAuthDir, "compose.telemetry.yaml")
+var internalAuthComposeTelemetryDelegatedOperatorsFile = filepath.Join(dockerInternalAuthDir, "compose.telemetry.delegated-operators.yaml")
 var internalAuthEnvTemplateFilePath = filepath.Join(dockerInternalAuthDir, "env.template")
 
 type commonServicesInternalAuthDockerComposeTest struct {
@@ -101,6 +103,41 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			[]string{
 				"teams-do",
+			},
+		},
+		{
+			"composeTelemetry",
+			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
+			s.dotEnvFiles,
+			[]string{
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composeTelemetryDelegatedOperators",
+			[]string{
+				internalAuthComposeFile,
+				internalAuthComposeDelegatedOperationsFile,
+				internalAuthComposeTelemetryFile,
+				internalAuthComposeTelemetryDelegatedOperatorsFile,
+			},
+			s.dotEnvFiles,
+			[]string{
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"teams-do",
+				"teams-do-telemetry",
+				"telemetry-redis",
 			},
 		},
 	}
@@ -186,6 +223,39 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			[]string{internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			"voxel51/fiftyone-teams-cv-full:v2.17.1",
+		},
+		{
+			"telemetryRedis",
+			"telemetry-redis",
+			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
+			s.dotEnvFiles,
+			"redis:7-alpine",
+		},
+		{
+			"telemetrySidecarFiftyoneApp",
+			"fiftyone-app-telemetry",
+			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
+			s.dotEnvFiles,
+			"voxel51/telemetry-sidecar:latest",
+		},
+		{
+			"telemetrySidecarTeamsApi",
+			"teams-api-telemetry",
+			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
+			s.dotEnvFiles,
+			"voxel51/telemetry-sidecar:latest",
+		},
+		{
+			"telemetrySidecarTeamsDo",
+			"teams-do-telemetry",
+			[]string{
+				internalAuthComposeFile,
+				internalAuthComposeDelegatedOperationsFile,
+				internalAuthComposeTelemetryFile,
+				internalAuthComposeTelemetryDelegatedOperatorsFile,
+			},
+			s.dotEnvFiles,
+			"voxel51/telemetry-sidecar:latest",
 		},
 	}
 

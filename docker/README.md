@@ -75,6 +75,7 @@ regarding FiftyOne Enterprise.
 - [Advanced Configuration](#advanced-configuration)
   - [Backup And Recovery](#backup-and-recovery)
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
+  - [Telemetry](#telemetry)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -644,6 +645,17 @@ Please see
 and
 [adding secrets](https://docs.voxel51.com/enterprise/secrets.html#adding-secrets)
 for questions regarding storage and encryption.
+
+### Telemetry
+
+FiftyOne Enterprise ships an optional telemetry overlay that exposes live
+per-service metrics (CPU, memory, FDs, thread counts) and tailed logs on
+the Settings → Metrics page. Enable by layering `compose.telemetry.yaml`
+onto your existing compose invocation.
+
+Please refer to the
+[telemetry configuration documentation](./docs/configuring-telemetry.md)
+for full details.
 
 ### Snapshot Archival
 
