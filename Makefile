@@ -63,7 +63,7 @@ helm-plugins-schema:  ## Installs the helm schema plugin
 		echo "helm-schema is already installed."; \
 	else \
 		echo "Installing helm-schema plugin..."; \
-		helm plugin install https://github.com/dadav/helm-schema; \
+		helm plugin install https://github.com/dadav/helm-schema --verify=false; \
 	fi
 
 helm-plugins:  helm-plugins-diff helm-plugins-schema  ## Install the helm plugins we use
