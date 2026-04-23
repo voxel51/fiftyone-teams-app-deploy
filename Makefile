@@ -54,7 +54,7 @@ helm-plugins-diff:  ## Installs the helm diff plugin
 		echo "helm-diff is already installed."; \
 	else \
 		echo "Installing helm-diff plugin..."; \
-		helm plugin install https://github.com/databus23/helm-diff; \
+		helm plugin install https://github.com/databus23/helm-diff --verify=false; \
 	fi
 
 helm-plugins-schema:  ## Installs the helm schema plugin
