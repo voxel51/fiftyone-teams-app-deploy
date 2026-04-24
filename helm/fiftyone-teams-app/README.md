@@ -142,6 +142,7 @@ for steps on how to add your license file.
 - [Estimated Completion Time](#estimated-completion-time)
 - [Sizing](#sizing)
 - [Usage](#usage)
+- [Recommended Next Steps](#recommended-next-steps)
 - [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
   - [Backup And Recovery](#backup-and-recovery)

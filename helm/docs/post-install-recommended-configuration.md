@@ -27,6 +27,7 @@ If you do not already have shared storage configured, refer to
 for steps on creating a PV and PVC.
 
 The examples below assume:
+
 - PVC name: `plugins-pvc`
 - Plugin directory: `/opt/plugins`
 
@@ -49,7 +50,7 @@ own `teams-plugins` pod. This provides:
 There are three plugin modes available:
 
 | Mode | Description |
-|---|---|
+| --- | --- |
 | Builtin Only (default) | Only builtin plugins shipped with FiftyOne Enterprise |
 | Shared | Custom plugins run inside `fiftyone-app` — may starve the app |
 | **Dedicated (recommended)** | Custom plugins run in a dedicated `teams-plugins` pod |
@@ -252,6 +253,7 @@ kubectl get pods -n <your-namespace>
 ```
 
 You should see:
+
 - `teams-plugins-*` — dedicated plugins pod
 - `teams-do-*` (one or more) — delegated operator worker pod(s)
 
@@ -276,10 +278,14 @@ the [FiftyOne Docs](https://docs.voxel51.com/plugins/index.html).
 
 Some recommended plugins to get started:
 
-- [`@voxel51/brain`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/brain) — compute embeddings and similarity indexes
-- [`@voxel51/annotation`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/annotation) — annotation workflows
-- [`@voxel51/evaluation`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/evaluation) — model evaluation panels
-- [`@voxel51/zoo`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/zoo) — access the FiftyOne Model Zoo
+- [`@voxel51/brain`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/brain)
+  — compute embeddings and similarity indexes
+- [`@voxel51/annotation`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/annotation)
+  — annotation workflows
+- [`@voxel51/evaluation`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/evaluation)
+  — model evaluation panels
+- [`@voxel51/zoo`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/zoo)
+  — access the FiftyOne Model Zoo
 
 To use plugins with custom dependencies (e.g. `torch`, `transformers`), build
 and use

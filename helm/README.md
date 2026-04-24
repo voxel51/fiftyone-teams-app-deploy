@@ -289,7 +289,7 @@ get started, we strongly recommend enabling the following features for a
 production-ready deployment:
 
 | Step | What it enables |
-|---|---|
+| --- | --- |
 | **Dedicated Plugins** | Install and run custom plugins in an isolated `teams-plugins` pod, keeping plugin workloads separate from the main app |
 | **Delegated Operators** | Schedule compute-heavy tasks — embeddings, model evaluation, dataset import, annotation — from the UI and run them on dedicated background workers |
 | **On-Demand Orchestrator** | *(Optional)* Spin up Kubernetes pods on demand per job instead of maintaining always-on workers; more cost-efficient for infrequent or GPU-heavy workloads |
