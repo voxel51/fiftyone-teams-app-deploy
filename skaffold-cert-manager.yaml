@@ -1,5 +1,5 @@
 ---
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v4beta14
 kind: Config
 metadata:
   name: cert-manager-crds
@@ -15,7 +15,7 @@ deploy:
   kubectl: {}
 
 ---
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v4beta14
 kind: Config
 metadata:
   name: cert-manager-self-signed-cluster-issuer
@@ -33,7 +33,7 @@ deploy:
   kubectl: {}
 
 ---
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v4beta14
 kind: Config
 metadata:
   name: cert-manager
