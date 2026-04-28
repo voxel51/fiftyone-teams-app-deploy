@@ -1,10 +1,10 @@
 ---
+# from https://github.com/mongodb/mongodb-kubernetes/blob/master/helm_chart/crds/mongodbcommunity.mongodb.com_mongodbcommunity.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    helm.sh/resource-policy: keep
-    controller-gen.kubebuilder.io/version: v0.15.0
+    controller-gen.kubebuilder.io/version: v0.18.0
     service.binding: path={.metadata.name}-{.spec.users[0].db}-{.spec.users[0].name},objectType=Secret
     service.binding/connectionString: path={.metadata.name}-{.spec.users[0].db}-{.spec.users[0].name},objectType=Secret,sourceKey=connectionString.standardSrv
     service.binding/password: path={.metadata.name}-{.spec.users[0].db}-{.spec.users[0].name},objectType=Secret,sourceKey=password
@@ -58,7 +58,8 @@ spec:
               description: MongoDBCommunitySpec defines the desired state of MongoDB
               properties:
                 additionalConnectionStringConfig:
-                  description: Additional options to be appended to the connection string. These options apply to the entire resource and to each user.
+                  description: Additional options to be appended to the connection string. These
+                    options apply to the entire resource and to each user.
                   nullable: true
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
@@ -74,7 +75,8 @@ spec:
                   description: AgentConfiguration sets options for the MongoDB automation agent
                   properties:
                     auditLogRotate:
-                      description: AuditLogRotate if enabled, will enable AuditLogRotate for all processes.
+                      description: AuditLogRotate if enabled, will enable AuditLogRotate for all
+                        processes.
                       properties:
                         includeAuditLogsWithMongoDBLogs:
                           description: |-
@@ -171,12 +173,14 @@ spec:
                   properties:
                     processes:
                       items:
-                        description: OverrideProcess contains fields that we can override on the AutomationConfig processes.
+                        description: OverrideProcess contains fields that we can override on the
+                          AutomationConfig processes.
                         properties:
                           disabled:
                             type: boolean
                           logRotate:
-                            description: CrdLogRotate is the crd definition of LogRotate including fields in strings while the agent supports them as float64
+                            description: CrdLogRotate is the crd definition of LogRotate including fields in
+                              strings while the agent supports them as float64
                             properties:
                               includeAuditLogsWithMongoDBLogs:
                                 description: |-
@@ -231,6 +235,9 @@ spec:
                           x-kubernetes-preserve-unknown-fields: true
                       type: object
                   type: object
+                clusterDomain:
+                  format: hostname
+                  type: string
                 featureCompatibilityVersion:
                   description: |-
                     FeatureCompatibilityVersion configures the feature compatibility version that will
@@ -264,7 +271,8 @@ spec:
                       description: Name of a Secret containing a HTTP Basic Auth Password.
                       properties:
                         key:
-                          description: Key is the key in the secret storing this password. Defaults to "password"
+                          description: Key is the key in the secret storing this password. Defaults to
+                            "password"
                           type: string
                         name:
                           description: Name is the name of the secret storing this user's password
@@ -281,7 +289,8 @@ spec:
                         Prometheus endpoint.
                       properties:
                         key:
-                          description: Key is the key in the secret storing this password. Defaults to "password"
+                          description: Key is the key in the secret storing this password. Defaults to
+                            "password"
                           type: string
                         name:
                           description: Name is the name of the secret storing this user's password
@@ -310,7 +319,8 @@ spec:
                     type: object
                   type: array
                 security:
-                  description: Security configures security features, such as TLS, and authentication settings for a deployment
+                  description: Security configures security features, such as TLS, and
+                    authentication settings for a deployment
                   properties:
                     authentication:
                       properties:
@@ -329,14 +339,13 @@ spec:
                                 This field is effectively required, but due to backwards compatibility is
                                 allowed to be empty. Instances of this type with an empty value here are
                                 almost certainly wrong.
-                                TODO: Add other useful fields. apiVersion, kind, uid?
                                 More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
                               type: string
                           type: object
                           x-kubernetes-map-type: atomic
                         agentMode:
-                          description: AgentMode contains the authentication mode used by the automation agent.
+                          description: AgentMode contains the authentication mode used by the automation
+                            agent.
                           enum:
                             - SCRAM
                             - SCRAM-SHA-256
@@ -348,7 +357,8 @@ spec:
                           nullable: true
                           type: boolean
                         modes:
-                          description: Modes is an array specifying which authentication methods should be enabled.
+                          description: Modes is an array specifying which authentication methods should be
+                            enabled.
                           items:
                             enum:
                               - SCRAM
@@ -361,7 +371,8 @@ spec:
                         - modes
                       type: object
                     roles:
-                      description: User-specified custom MongoDB roles that should be configured in the deployment.
+                      description: User-specified custom MongoDB roles that should be configured in
+                        the deployment.
                       items:
                         description: CustomRole defines a custom MongoDB role.
                         properties:
@@ -391,7 +402,8 @@ spec:
                           privileges:
                             description: The privileges to grant the role.
                             items:
-                              description: Privilege defines the actions a role is allowed to perform on a given resource.
+                              description: Privilege defines the actions a role is allowed to perform on a
+                                given resource.
                               properties:
                                 actions:
                                   items:
@@ -442,7 +454,8 @@ spec:
                         type: object
                       type: array
                     tls:
-                      description: TLS configuration for both client-server and server-server communication
+                      description: TLS configuration for both client-server and server-server
+                        communication
                       properties:
                         caCertificateSecretRef:
                           description: |-
@@ -456,9 +469,7 @@ spec:
                                 This field is effectively required, but due to backwards compatibility is
                                 allowed to be empty. Instances of this type with an empty value here are
                                 almost certainly wrong.
-                                TODO: Add other useful fields. apiVersion, kind, uid?
                                 More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
                               type: string
                           type: object
                           x-kubernetes-map-type: atomic
@@ -475,9 +486,7 @@ spec:
                                 This field is effectively required, but due to backwards compatibility is
                                 allowed to be empty. Instances of this type with an empty value here are
                                 almost certainly wrong.
-                                TODO: Add other useful fields. apiVersion, kind, uid?
                                 More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
                               type: string
                           type: object
                           x-kubernetes-map-type: atomic
@@ -496,16 +505,15 @@ spec:
                                 This field is effectively required, but due to backwards compatibility is
                                 allowed to be empty. Instances of this type with an empty value here are
                                 almost certainly wrong.
-                                TODO: Add other useful fields. apiVersion, kind, uid?
                                 More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
                               type: string
                           type: object
                           x-kubernetes-map-type: atomic
                         enabled:
                           type: boolean
                         optional:
-                          description: Optional configures if TLS should be required or optional for connections
+                          description: Optional configures if TLS should be required or optional for
+                            connections
                           type: boolean
                       required:
                         - enabled
@@ -517,7 +525,8 @@ spec:
                     that should be merged into the operator created one.
                   properties:
                     metadata:
-                      description: StatefulSetMetadataWrapper is a wrapper around Labels and Annotations
+                      description: StatefulSetMetadataWrapper is a wrapper around Labels and
+                        Annotations
                       properties:
                         annotations:
                           additionalProperties:
@@ -535,12 +544,14 @@ spec:
                     - spec
                   type: object
                 type:
-                  description: Type defines which type of MongoDB deployment the resource should create
+                  description: Type defines which type of MongoDB deployment the resource should
+                    create
                   enum:
                     - ReplicaSet
                   type: string
                 users:
-                  description: Users specifies the MongoDB users that should be configured in your deployment
+                  description: Users specifies the MongoDB users that should be configured in your
+                    deployment
                   items:
                     properties:
                       additionalConnectionStringConfig:
@@ -550,13 +561,22 @@ spec:
                         nullable: true
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
+                      connectionStringSecretAnnotations:
+                        additionalProperties:
+                          type: string
+                        description: ConnectionStringSecretAnnotations is the annotations of the secret
+                          object created by the operator which exposes the
+                          connection strings for the user.
+                        type: object
                       connectionStringSecretName:
                         description: |-
                           ConnectionStringSecretName is the name of the secret object created by the operator which exposes the connection strings for the user.
                           If provided, this secret must be different for each user in a deployment.
                         type: string
                       connectionStringSecretNamespace:
-                        description: ConnectionStringSecretNamespace is the namespace of the secret object created by the operator which exposes the connection strings for the user.
+                        description: ConnectionStringSecretNamespace is the namespace of the secret
+                          object created by the operator which exposes the
+                          connection strings for the user.
                         type: string
                       db:
                         default: admin
@@ -566,10 +586,12 @@ spec:
                         description: Name is the username of the user
                         type: string
                       passwordSecretRef:
-                        description: PasswordSecretRef is a reference to the secret containing this user's password
+                        description: PasswordSecretRef is a reference to the secret containing this
+                          user's password
                         properties:
                           key:
-                            description: Key is the key in the secret storing this password. Defaults to "password"
+                            description: Key is the key in the secret storing this password. Defaults to
+                              "password"
                             type: string
                           name:
                             description: Name is the name of the secret storing this user's password
