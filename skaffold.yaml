@@ -1,5 +1,5 @@
 ---
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v4beta14
 kind: Config
 metadata:
   name: fiftyone-teams

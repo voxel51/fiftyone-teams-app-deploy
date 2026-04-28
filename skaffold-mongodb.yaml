@@ -1,5 +1,5 @@
 ---
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v4beta14
 kind: Config
 metadata:
   name: mongodb-community-operator-crds
@@ -13,7 +13,7 @@ deploy:
   kubectl: {}
 
 ---
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v4beta14
 kind: Config
 metadata:
   name: mongodb-community-operator-namespace
@@ -25,7 +25,7 @@ deploy:
   kubectl: {}
 
 ---
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v4beta14
 kind: Config
 metadata:
   name: mongodb-community-operator-secrets
@@ -40,7 +40,7 @@ requires:
   - configs:
       - mongodb-community-operator-namespace
 ---
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v4beta14
 kind: Config
 metadata:
   name: mongodb
