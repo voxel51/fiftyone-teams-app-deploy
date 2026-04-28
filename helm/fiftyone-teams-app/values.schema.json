@@ -3436,7 +3436,6 @@
             "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS": {
               "default": "kubernetes",
               "description": "Deployment characteristics for the `teams-app`.\n`kubernetes`: Indicates the app is running in a Kubernetes environment.\n`docker`: Indicates the app is running in a Docker environment.\n`kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment",
-              "required": [],
               "title": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
               "type": "string"
             },
