@@ -1419,6 +1419,11 @@ teamsAppSettings:
     # -- Controls whether anonymous analytics are captured for the
     # application. Set to false to opt-out of anonymous analytics.
     FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: true
+    # -- Deployment characteristics for the `teams-app`.
+    # `kubernetes`: Indicates the app is running in a Kubernetes environment.
+    # `docker`: Indicates the app is running in a Docker environment.
+    # `kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment
+    FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS: 'kubernetes'
 
   # -- Secret variables to be passed to the `teams-app` containers.
   secretEnv: {}
