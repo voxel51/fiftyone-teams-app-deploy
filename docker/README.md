@@ -239,7 +239,7 @@ You can override the default image used by any service in
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.17.2
+    image: voxel51/fiftyone-app-torch:v2.18.0
 ```
 
 > [!NOTE]
@@ -836,6 +836,7 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `FIFTYONE_APP_THEME`                         | The default theme configuration for your FiftyOne Enterprise application as described [in our documentation](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                              | No                        |
 | `FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE`     | Controls whether Query Performance mode is enabled by default for every dataset for the application. Set to false to set default mode to off.                                                                                                                                  | No                        |
 | `FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE`      | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application.                                                                                                                                 | No                        |
+| `FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS`    | Deployment characteristics for the `teams-app`                                                                                                                                                                                                                                 | No                        |
 | `FIFTYONE_API_URI`                           | The URI to be displayed in the `Install FiftyOne` Modal and `API Keys` configuration screens                                                                                                                                                                                   | No                        |
 | `FIFTYONE_AUTH_SECRET`                       | The secret used for services to authenticate with `teams-cas`; also used to login to the SuperAdmin UI                                                                                                                                                                         | Yes                       |
 | `FIFTYONE_DATABASE_NAME`                     | The MongoDB Database that `fiftyone-app`, `teams-api`, and `teams-app` use for FiftyOne Enterprise dataset metadata; the default is `fiftyone`                                                                                                                                 | Yes                       |

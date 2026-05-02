@@ -9,5 +9,5 @@ pre-commit 4.6.0
 python 3.14.4
 shellcheck 0.11.0
 shfmt 3.13.1
-skaffold 2.18.3
+skaffold 2.19.0
 yq 4.53.2

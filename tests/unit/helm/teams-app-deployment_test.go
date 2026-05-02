@@ -493,6 +493,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "true"
           },
           {
+            "name": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+            "value": "kubernetes"
+          },
+          {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
             "value": "%s"
           },
@@ -573,6 +577,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
             "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+            "value": "kubernetes"
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
@@ -670,6 +678,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "true"
           },
           {
+            "name": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+            "value": "kubernetes"
+          },
+          {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
             "value": "%s"
           },
@@ -749,6 +761,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
             "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+            "value": "kubernetes"
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
@@ -831,6 +847,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "true"
           },
           {
+            "name": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+            "value": "kubernetes"
+          },
+          {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
             "value": "%s"
           },
@@ -911,6 +931,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "true"
           },
           {
+            "name": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+            "value": "kubernetes"
+          },
+          {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
             "value": "%s"
           },
@@ -989,6 +1013,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED",
             "value": "true"
+          },
+          {
+            "name": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+            "value": "kubernetes"
           },
           {
             "name": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
