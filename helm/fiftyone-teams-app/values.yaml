@@ -54,6 +54,14 @@ apiSettings:
     # -- (int) The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated.
     # Overrides `FIFTYONE_DO_EXPIRATION_DAYS` if provided.
     FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES:
+    # @schema
+    # type: ["string", "null"]
+    # @schema
+    # -- Cloud bucket prefix where delegated operation logs are uploaded after the retention period expires,
+    # e.g. `gs://my-bucket/do-logs` or `s3://my-bucket/do-logs`. If unset, logs are deleted without being uploaded.
+    FIFTYONE_DO_LOG_BUCKET_PATH:
+    # -- The number of days to retain delegated operation logs in MongoDB before archiving or deleting them.
+    FIFTYONE_DO_LOG_RETENTION_DAYS: 30
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}

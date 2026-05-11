@@ -47,6 +47,22 @@
                 "null"
               ]
             },
+            "FIFTYONE_DO_LOG_BUCKET_PATH": {
+              "default": "",
+              "description": "Cloud bucket prefix where delegated operation logs are uploaded after the retention period expires,\ne.g. `gs://my-bucket/do-logs` or `s3://my-bucket/do-logs`. If unset, logs are deleted without being uploaded.",
+              "required": [],
+              "title": "FIFTYONE_DO_LOG_BUCKET_PATH",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "FIFTYONE_DO_LOG_RETENTION_DAYS": {
+              "default": 30,
+              "description": "The number of days to retain delegated operation logs in MongoDB before archiving or deleting them.",
+              "title": "FIFTYONE_DO_LOG_RETENTION_DAYS",
+              "type": "integer"
+            },
             "FIFTYONE_DO_REQUEUE_DELAY_MINUTES": {
               "default": 30,
               "description": "The number of minutes an operation can sit in a queued state before being requeued.\nCan be any positive number.",
