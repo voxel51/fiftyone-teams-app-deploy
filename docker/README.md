@@ -239,7 +239,7 @@ You can override the default image used by any service in
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.18.1
+    image: voxel51/fiftyone-app-torch:v2.19.0
 ```
 
 > [!NOTE]
