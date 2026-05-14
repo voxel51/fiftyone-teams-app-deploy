@@ -53,10 +53,11 @@ regarding FiftyOne Enterprise.
 - [Step 6: Identity Provider (IdP) and Authentication (CAS) (Optional)](#step-6-identity-provider-idp-and-authentication-cas-optional)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
+- [Advanced DO Settings](#advanced-do-settings)
+  - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
+  - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
+  - [:on: On-Demand Delegated Operator Executors](#on-on-demand-delegated-operator-executors)
 - [Upgrades](#upgrades)
-  - [:no_entry_sign: Disable Automatic Migrations](#no_entry_sign-disable-automatic-migrations)
-  - [:hammer_and_wrench: What Happens If You Migrate with database admin False?](#hammer_and_wrench-what-happens-if-you-migrate-with-database-admin-false)
-  - [:books: Next Steps](#books-next-steps)
 - [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
   - [Backup And Recovery](#backup-and-recovery)
@@ -64,9 +65,6 @@ regarding FiftyOne Enterprise.
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
-  - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
-  - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
-  - [:on: On-Demand Delegated Operator Executors](#on-on-demand-delegated-operator-executors)
   - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
 - [Validating](#validating)
 - [Health Checks And Monitoring](#health-checks-and-monitoring)
@@ -398,75 +396,77 @@ v1.6. This enables centralized login, roles, and user management.
    to bring up services.
 1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
 
+## Advanced DO Settings
+
+### :desktop_computer: GPU-Enabled Workloads
+
+FiftyOne services like Delegated Operators can be scheduled on **GPU-enabled
+hardware** for more efficient computation.
+
+To setup containers with GPU resources, see the
+[configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
+
+### :bricks: Custom Plugin Images
+
+If your delegated operators or plugins require **custom dependencies**, build
+and deploy **custom plugin images**. Base them on
+`voxel51/fiftyone-teams-cv-full`, which includes a full CV/ML environment, and
+extend with:
+
+- Custom Python packages
+- Internal SDKs or models
+
+### :on: On-Demand Delegated Operator Executors
+
+FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
+executors for Databricks and Anyscale. Please refer to the
+[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
+
 ## Upgrades
 
-When upgrading FiftyOne Enterprise, you must explicitly **prevent automatic
-database migrations** to avoid breaking active SDK sessions or deployments.
+The recommended upgrade path is:
 
-### :no_entry_sign: Disable Automatic Migrations
+1. Pull the latest compose files from this repo:
 
-Before running your upgraded containers, set the following override:
+   ```shell
+   git pull origin main
+   ```
 
-```yaml
-services:
-  fiftyone-app:
-    environment:
-      FIFTYONE_DATABASE_ADMIN: false
-```
+   This automatically populates the latest service versions.
 
-> This ensures that **no automatic migrations** will occur when the container
-> starts.
+1. Confirm `FIFTYONE_DATABASE_ADMIN` is set to `false` in your
+   `compose.override.yaml`:
 
-The environment variable `FIFTYONE_DATABASE_ADMIN` acts as a safeguard to
-prevent the database from being modified automatically.
+   ```yaml
+   services:
+     fiftyone-app:
+       environment:
+         FIFTYONE_DATABASE_ADMIN: false
+   ```
 
-### :hammer_and_wrench: What Happens If You Migrate with database admin False?
+   > This prevents automatic database migrations from running on startup and
+   > breaking active SDK sessions.
 
-If `FIFTYONE_DATABASE_ADMIN=false` is set, and a migration attempt is made via
-CLI:
+1. If you are using custom images defined in `compose.override.yaml`, update
+   their version tags to match the new release.
 
-```shell
-$ fiftyone migrate --all
-Traceback (most recent call last):
-...
-OSError: Cannot migrate database from v0.22.0 to v0.22.3 when database_admin=False.
-```
+1. Bring the stack down and back up:
 
-or no action will be taken:
+   ```shell
+   docker compose \
+     -f compose.dedicated-plugins.yaml \
+     -f compose.delegated-operators.yaml \
+     -f compose.override.yaml \
+     down
 
-```shell
-$ fiftyone migrate --info
-FiftyOne Enterprise version: 0.14.4
+   docker compose \
+     -f compose.dedicated-plugins.yaml \
+     -f compose.delegated-operators.yaml \
+     -f compose.override.yaml \
+     up -d
+   ```
 
-FiftyOne compatibility version: 0.22.3
-Other compatible versions: >=0.19,<0.23
-
-Database version: 0.21.2
-
-dataset     version
-----------  ---------
-quickstart  0.22.0
-$ fiftyone migrate --all
-$ fiftyone migrate --info
-FiftyOne Enterprise version: 0.14.4
-
-FiftyOne compatibility version: 0.23.0
-Other compatible versions: >=0.19,<0.23
-
-Database version: 0.21.2
-
-dataset     version
-----------  ---------
-quickstart  0.21.2
-```
-
-### :books: Next Steps
-
-After disabling `FIFTYONE_DATABASE_ADMIN`, refer to:
-
-[Upgrading](./docs/upgrading.md)
-
-for complete guidance on upgrading from previous versions
+For full upgrade guidance, refer to [Upgrading](./docs/upgrading.md).
 
 ## Known Issues
 
@@ -605,30 +605,6 @@ mounted into containers or provided via environment variables.
 FiftyOne Enterprise continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
-
-### :desktop_computer: GPU-Enabled Workloads
-
-FiftyOne services like Delegated Operators can be scheduled on **GPU-enabled
-hardware** for more efficient computation.
-
-To setup containers with GPU resources, see the
-[configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
-
-### :bricks: Custom Plugin Images
-
-If your delegated operators or plugins require **custom dependencies**, build
-and deploy **custom plugin images**. Base them on
-`voxel51/fiftyone-teams-cv-full`, which includes a full CV/ML environment, and
-extend with:
-
-- Custom Python packages
-- Internal SDKs or models
-
-### :on: On-Demand Delegated Operator Executors
-
-FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
-executors for Databricks and Anyscale. Please refer to the
-[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 
 ### Terms of Service, Privacy, and Imprint URLs
 
