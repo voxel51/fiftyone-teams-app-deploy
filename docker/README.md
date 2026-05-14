@@ -132,25 +132,20 @@ and dataset sizes.
 Before deploying FiftyOne Enterprise, you must have a running MongoDB database.
 FiftyOne Enterprise supports:
 
-- **MongoDB Atlas** (managed cloud) — recommended for most deployments
-- **MongoDB Community Edition** — self-hosted, open source
-- **MongoDB Enterprise** — self-hosted, commercial
+- **MongoDB Atlas** (managed cloud)
+- **MongoDB Community Edition** (self-hosted, open source)
+- **MongoDB Enterprise** (self-hosted, commercial)
 
 Ensure your MongoDB version meets FiftyOne's
 [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
 
 Once your database is running, record your MongoDB connection URI. You will
-need it in Step 3 when configuring your `.env` file. The URI follows this
+need it in Step 2 when configuring your `.env` file. The URI follows this
 format:
 
 ```dotenv
 FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin"
 ```
-
-> [!NOTE]
-> For MongoDB Atlas, copy the connection string from the Atlas UI
-> (**Connect → Drivers**) and replace `<password>` with your database user's
-> password.
 
 ## :closed_lock_with_key: Step 1: Prepare License File
 
