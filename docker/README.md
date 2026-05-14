@@ -35,36 +35,22 @@ regarding FiftyOne Enterprise.
 - [:white_check_mark: Technical Requirements](#white_check_mark-technical-requirements)
 - [:clock10: Estimated Completion Time](#clock10-estimated-completion-time)
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
+- [:wrench: Step 0: Set Up MongoDB Database](#wrench-step-0-set-up-mongodb-database)
 - [:closed_lock_with_key: Step 1: Prepare License File](#closed_lock_with_key-step-1-prepare-license-file)
-- [:file_folder: Step 2: Choose Authentication Mode](#file_folder-step-2-choose-authentication-mode)
-  - [:point_right: Choose your mode](#point_right-choose-your-mode)
-- [:gear: Step 3: Configure Environment](#gear-step-3-configure-environment)
+- [:gear: Step 2: Configure Environment](#gear-step-2-configure-environment)
   - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
   - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
   - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
   - [:package: Official Docker Images](#package-official-docker-images)
-- [:rocket: Step 4: Initial Deployment](#rocket-step-4-initial-deployment)
+- [:rocket: Step 3: Initial Deployment](#rocket-step-3-initial-deployment)
   - [1. Enable Database Admin mode](#1-enable-database-admin-mode)
   - [2. Launch the application](#2-launch-the-application)
-- [:globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-5-configure-ssl--reverse-proxy-nginx--load-balancer)
+- [:globe_with_meridians: Step 4: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-4-configure-ssl--reverse-proxy-nginx--load-balancer)
   - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
-  - [:open_file_folder: Nginx Configuration Options](#open_file_folder-nginx-configuration-options)
-    - [:small_blue_diamond: 1. **Path-Based Routing**](#small_blue_diamond-1-path-based-routing)
-    - [:small_blue_diamond: 2. **Hostname-Based Routing**](#small_blue_diamond-2-hostname-based-routing)
+  - [:open_file_folder: Nginx Configuration](#open_file_folder-nginx-configuration)
   - [:memo: Notes](#memo-notes)
-- [:jigsaw: Step 6: Configuring FiftyOne Enterprise Plugins](#jigsaw-step-6-configuring-fiftyone-enterprise-plugins)
-  - [:small_blue_diamond: 1. Builtin Plugins Only (Default)](#small_blue_diamond-1-builtin-plugins-only-default)
-  - [:small_blue_diamond: 2. Shared Plugins](#small_blue_diamond-2-shared-plugins)
-    - [Enable shared plugin mode](#enable-shared-plugin-mode)
-  - [:small_blue_diamond: 3. RECOMMENDED: Dedicated Plugins](#small_blue_diamond-3-recommended-dedicated-plugins)
-    - [Enable dedicated plugin mode](#enable-dedicated-plugin-mode)
-  - [:pushpin: Notes](#pushpin-notes)
-- [:gear: Step 7: Advanced Delegated Operations Configuration (Optional)](#gear-step-7-advanced-delegated-operations-configuration-optional)
-  - [:page_facing_up: Upload Run Logs](#page_facing_up-upload-run-logs)
-  - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
-  - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
-  - [:on: On-Demand Delegated Operator Executors](#on-on-demand-delegated-operator-executors)
-- [Step 8: Identity Provider (IdP) and Authentication (CAS)](#step-8-identity-provider-idp-and-authentication-cas)
+- [:page_facing_up: Step 5: Configure Delegated Operation Logs](#page_facing_up-step-5-configure-delegated-operation-logs)
+- [Step 6: Identity Provider (IdP) and Authentication (CAS) (Optional)](#step-6-identity-provider-idp-and-authentication-cas-optional)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
 - [Upgrades](#upgrades)
@@ -78,6 +64,9 @@ regarding FiftyOne Enterprise.
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
+  - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
+  - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
+  - [:on: On-Demand Delegated Operator Executors](#on-on-demand-delegated-operator-executors)
   - [Terms of Service, Privacy, and Imprint URLs](#terms-of-service-privacy-and-imprint-urls)
 - [Validating](#validating)
 - [Health Checks And Monitoring](#health-checks-and-monitoring)
@@ -138,6 +127,31 @@ the applications.
 Resource usage varies dramatically with operations, use cases,
 and dataset sizes.
 
+## :wrench: Step 0: Set Up MongoDB Database
+
+Before deploying FiftyOne Enterprise, you must have a running MongoDB database.
+FiftyOne Enterprise supports:
+
+- **MongoDB Atlas** (managed cloud) — recommended for most deployments
+- **MongoDB Community Edition** — self-hosted, open source
+- **MongoDB Enterprise** — self-hosted, commercial
+
+Ensure your MongoDB version meets FiftyOne's
+[version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+
+Once your database is running, record your MongoDB connection URI. You will
+need it in Step 3 when configuring your `.env` file. The URI follows this
+format:
+
+```dotenv
+FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin"
+```
+
+> [!NOTE]
+> For MongoDB Atlas, copy the connection string from the Atlas UI
+> (**Connect → Drivers**) and replace `<password>` with your database user's
+> password.
+
 ## :closed_lock_with_key: Step 1: Prepare License File
 
 > Required for **v2.0+**
@@ -161,24 +175,13 @@ chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
-## :file_folder: Step 2: Choose Authentication Mode
+## :gear: Step 2: Configure Environment
 
-FiftyOne Enterprise offers two authentication modes:
-
-- `legacy-auth` → Choose this mode if using Auth0 for user authentication and
-  authorization.
-- `internal-auth` → Choose this mode when in an airgapped deployment - aigapped
-  deployments will not require network egress to external services.
-
-### :point_right: Choose your mode
-
-Navigate into the appropriate directory:
+Navigate into the `internal-auth` directory:
 
 ```bash
-cd legacy-auth       # or internal-auth
+cd internal-auth
 ```
-
-## :gear: Step 3: Configure Environment
 
 ### 1. Copy the template `.env` file
 
@@ -250,7 +253,7 @@ services:
 > Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
 > Omitting the tag will result in a **not found** error.
 
-## :rocket: Step 4: Initial Deployment
+## :rocket: Step 3: Initial Deployment
 
 ### 1. Enable Database Admin mode
 
@@ -267,17 +270,14 @@ services:
 
 ### 2. Launch the application
 
-It is highly recommended to set up your FiftyOne Enterprise Deployment with
-Delegated Operation. Delegated Operators allow FiftyOne Enterprise to offload
-plugin execution to **worker containers**, enabling scalable and reliable
-long-running operations.
-
-To launch worker containers, include `compose.delegated-operators.yaml` in your
-docker compose commands
+FiftyOne Enterprise is deployed with **Dedicated Plugins** and **Delegated
+Operators** enabled by default. Dedicated Plugins run in an isolated
+`teams-plugins` container, and Delegated Operators offload plugin execution to
+**worker containers**, enabling scalable and reliable long-running operations.
 
 ```shell
 docker compose \
-  -f compose.yaml \
+  -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.override.yaml \
   up -d
@@ -310,7 +310,7 @@ curl -Iv http://localhost:3000/api/hello
 # Expected: HTTP/1.1 200 OK
 ```
 
-## :globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
+## :globe_with_meridians: Step 4: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
 
 Next, you will need to place a **reverse proxy or SSL endpoint** in front of
 your FiftyOne Enterprise services. This can be a tool like:
@@ -338,28 +338,11 @@ These proxies will:
 | `/_pymongo`          | `teams-api` | MongoDB requests via SDK             |
 | `/health`            | `teams-api` | Health check endpoint                |
 
-### :open_file_folder: Nginx Configuration Options
+### :open_file_folder: Nginx Configuration
 
-Voxel51 provides example Nginx configs for two routing strategies:
-
-#### :small_blue_diamond: 1. **Path-Based Routing**
-
-All services are routed based on URL path:
-
-:page_facing_up: Full configuration here:
+All services are routed based on URL path using a single hostname. See the full
+example configuration:
 [`example-nginx-path-routing.conf`](./example-nginx-path-routing.conf)
-
-#### :small_blue_diamond: 2. **Hostname-Based Routing**
-
-teams-app and teams-api are routed using different subdomain or hostname:
-
-- `fiftyone.your-company.com` → App
-- `fiftyone-api.your-company.com` → API
-
-:page_facing_up: Full configuration here:
-
-- [`example-nginx-site.conf`](./example-nginx-site.conf) (App + CAS)
-- [`example-nginx-api.conf`](./example-nginx-api.conf) (API)
 
 ### :memo: Notes
 
@@ -370,128 +353,27 @@ teams-app and teams-api are routed using different subdomain or hostname:
 - To validate your deployments api connection, see
   [Validating Your Deployment](../docs/validating-deployment.md)
 
-## :jigsaw: Step 6: Configuring FiftyOne Enterprise Plugins
+## :page_facing_up: Step 5: Configure Delegated Operation Logs
 
-FiftyOne Enterprise supports three plugin modes: **Builtin**, **Shared**, and
-**Dedicated**. Each offers different trade-offs in isolation, flexibility, and
-resource management.
+Add the log path for delegated operation runs to your `compose.override.yaml`:
 
-### :small_blue_diamond: 1. Builtin Plugins Only (Default)
-
-This is the default configuration. It enables only the plugins shipped with the
-platform.
-
-:white_check_mark: No additional configuration needed.
-
-### :small_blue_diamond: 2. Shared Plugins
-
-Custom plugins are run **within the same container** as the app
-(`fiftyone-app`). Use this if:
-
-- You want to quickly prototype plugins
-- You’re okay with shared resource usage between app and plugins
-
-#### Enable shared plugin mode
-
-1. Use `compose.plugins.yaml` (instead of `compose.yaml`)
-2. This mounts a shared volume for plugins across services
-
-```shell
-docker compose \
-  -f compose.plugins.yaml \
-  -f compose.delegated-operators.yaml \
-  -f compose.override.yaml \
-  up -d
+```yaml
+services:
+  teams-do:
+    environment:
+      FIFTYONE_DELEGATED_OPERATION_LOG_PATH: "gs://your-bucket/logs"
 ```
 
-> 📁 Plugins will run inside the `fiftyone-app` container.
+Logs are stored in the format:
 
-### :small_blue_diamond: 3. RECOMMENDED: Dedicated Plugins
-
-Custom plugins are run in a **separate `teams-plugins` container**, isolated
-from the app and API services.
-
-Use this mode when:
-
-- You want full isolation and stability
-- You are running many or complex plugins
-- You need to manage plugin memory or compute separately
-
-#### Enable dedicated plugin mode
-
-1. Ensure your `.env` file includes the following:
-
-```shell
-FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151
-```
-
-1. Use `compose.dedicated-plugins.yaml` (instead of `compose.yaml`)
-
-```shell
-docker compose \
-  -f compose.dedicated-plugins.yaml \
-  -f compose.delegated-operators.yaml \
-  -f compose.override.yaml \
-  up -d
-```
-
-1. Optional: If using a [proxy server](./docs/configuring-proxies.md), ensure
-   the plugin service is excluded from proxying.
-
-> 🔧 This prevents traffic from being routed incorrectly through your proxy for
-> internal plugin calls.
-
-### :pushpin: Notes
-
-- All plugin modes require persistent storage (volumes) for plugin files.
-- For multi-node deployments, ensure that the volume is available on all nodes.
-- To manage and deploy plugins via the UI, go to:
-  `https://<your-domain>/settings/plugins`
-
-## :gear: Step 7: Advanced Delegated Operations Configuration (Optional)
-
-### :page_facing_up: Upload Run Logs
-
-You can enable **log uploads** for delegated operation runs by setting:
-
-```shell
-FIFTYONE_DELEGATED_OPERATION_LOG_PATH=/mnt/shared/logs
-```
-
-Logs will be stored in the format:
-
-```shell
+```text
 /mnt/shared/logs/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log
 ```
 
 This is useful for auditing, debugging, or monitoring delegated operator
 executions in shared storage or cloud buckets.
 
-### :desktop_computer: GPU-Enabled Workloads
-
-FiftyOne services like Delegated Operators can be scheduled on **GPU-enabled
-hardware** for more efficient computation.
-
-To setup containers with GPU resources, see the
-[configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
-
-### :bricks: Custom Plugin Images
-
-If your delegated operators or plugins require **custom dependencies**, build
-and deploy **custom plugin images**. You can base them on
-`voxel51/fiftyone-app`, and include:
-
-- Custom Python packages
-- ML libraries (e.g. PyTorch, OpenCV)
-- Internal SDKs or models
-
-### :on: On-Demand Delegated Operator Executors
-
-FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
-executors for Databricks and Anyscale. Please refer to the
-[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
-
-## Step 8: Identity Provider (IdP) and Authentication (CAS)
+## Step 6: Identity Provider (IdP) and Authentication (CAS) (Optional)
 
 ### :information_source: IdP configuration
 
@@ -728,6 +610,30 @@ mounted into containers or provided via environment variables.
 FiftyOne Enterprise continues to support the use of environment variables to set
 storage credentials in the application context and is providing an alternate
 configuration path.
+
+### :desktop_computer: GPU-Enabled Workloads
+
+FiftyOne services like Delegated Operators can be scheduled on **GPU-enabled
+hardware** for more efficient computation.
+
+To setup containers with GPU resources, see the
+[configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
+
+### :bricks: Custom Plugin Images
+
+If your delegated operators or plugins require **custom dependencies**, build
+and deploy **custom plugin images**. Base them on
+`voxel51/fiftyone-teams-cv-full`, which includes a full CV/ML environment, and
+extend with:
+
+- Custom Python packages
+- Internal SDKs or models
+
+### :on: On-Demand Delegated Operator Executors
+
+FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
+executors for Databricks and Anyscale. Please refer to the
+[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 
 ### Terms of Service, Privacy, and Imprint URLs
 
