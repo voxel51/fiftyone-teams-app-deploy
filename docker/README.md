@@ -50,7 +50,7 @@ regarding FiftyOne Enterprise.
   - [:open_file_folder: Nginx Configuration](#open_file_folder-nginx-configuration)
   - [:memo: Notes](#memo-notes)
 - [:page_facing_up: Step 5: Configure Delegated Operation Logs](#page_facing_up-step-5-configure-delegated-operation-logs)
-- [Step 6: Identity Provider (IdP) and Authentication (CAS) (Optional)](#step-6-identity-provider-idp-and-authentication-cas-optional)
+- [Step 6: Identity Provider (IdP) and Authentication (CAS) (Air Gapped Deployments Only)](#step-6-identity-provider-idp-and-authentication-cas-air-gapped-deployments-only)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
 - [Advanced DO Settings](#advanced-do-settings)
@@ -366,7 +366,8 @@ Logs are stored in the format:
 This is useful for auditing, debugging, or monitoring delegated operator
 executions in shared storage or cloud buckets.
 
-## Step 6: Identity Provider (IdP) and Authentication (CAS) (Optional)
+<!-- markdownlint-disable-next-line MD013 -->
+## Step 6: Identity Provider (IdP) and Authentication (CAS) (Air Gapped Deployments Only)
 
 ### :information_source: IdP configuration
 
