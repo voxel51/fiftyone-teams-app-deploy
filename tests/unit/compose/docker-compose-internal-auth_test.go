@@ -28,7 +28,9 @@ var internalAuthComposeFile = filepath.Join(dockerInternalAuthDir, "compose.yaml
 var internalAuthComposePluginsFile = filepath.Join(dockerInternalAuthDir, "compose.plugins.yaml")
 var internalAuthComposeDedicatedPluginsFile = filepath.Join(dockerInternalAuthDir, "compose.dedicated-plugins.yaml")
 var internalAuthComposeDelegatedOperationsFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.yaml")
+var internalAuthComposeDelegatedOperationsGpuFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.gpu.yaml")
 var internalAuthComposeTelemetryFile = filepath.Join(dockerInternalAuthDir, "compose.telemetry.yaml")
+var internalAuthComposeTelemetryPluginsFile = filepath.Join(dockerInternalAuthDir, "compose.telemetry.plugins.yaml")
 var internalAuthComposeTelemetryDelegatedOperatorsFile = filepath.Join(dockerInternalAuthDir, "compose.telemetry.delegated-operators.yaml")
 var internalAuthEnvTemplateFilePath = filepath.Join(dockerInternalAuthDir, "env.template")
 
@@ -61,12 +63,14 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 		name        string
 		configPaths []string // file paths to one or more Compose files.
 		envFiles    []string // file paths to ".env" files with additional environment variable data
+		profiles    []string // compose profiles to activate
 		expected    []string
 	}{
 		{
 			"compose",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
@@ -78,6 +82,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			"composePlugins",
 			[]string{internalAuthComposePluginsFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
@@ -89,6 +94,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			"composeDedicatedPlugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
@@ -101,14 +107,30 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			"composeDelegatedOperations",
 			[]string{internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"teams-do",
+			},
+		},
+		{
+			"composeDelegatedOperationsGpu",
+			[]string{
+				internalAuthComposeDelegatedOperationsFile,
+				internalAuthComposeDelegatedOperationsGpuFile,
+			},
+			s.dotEnvFiles,
+			[]string{"gpu"},
+			[]string{
+				"teams-do",
+				"teams-do-gpu",
+				"teams-do-gpu-telemetry",
 			},
 		},
 		{
 			"composeTelemetry",
 			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
@@ -116,6 +138,28 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 				"teams-api-telemetry",
 				"teams-app",
 				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composeTelemetryPlugins",
+			[]string{
+				internalAuthComposeFile,
+				internalAuthComposeDedicatedPluginsFile,
+				internalAuthComposeTelemetryFile,
+				internalAuthComposeTelemetryPluginsFile,
+			},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"teams-plugins",
+				"teams-plugins-telemetry",
 				"telemetry-redis",
 			},
 		},
@@ -128,6 +172,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 				internalAuthComposeTelemetryDelegatedOperatorsFile,
 			},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
@@ -155,6 +200,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
+				cli.WithProfiles(testCase.profiles),
 			)
 			s.NoError(err)
 

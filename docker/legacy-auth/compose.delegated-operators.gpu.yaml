@@ -1,0 +1,87 @@
+---
+# GPU-enabled delegated-operator worker + telemetry sidecar. Requires a
+# Linux host with the NVIDIA driver, nvidia-container-toolkit, and the
+# `nvidia` runtime configured in dockerd. Docker Desktop on macOS /
+# Windows does not support GPU passthrough.
+#
+# Gated behind the `gpu` profile. Activate with:
+#
+#   docker compose --profile gpu \
+#     -f compose.yaml \
+#     -f compose.delegated-operators.yaml \
+#     -f compose.delegated-operators.gpu.yaml \
+#     -f compose.telemetry.yaml \
+#     -f compose.telemetry.delegated-operators.yaml \
+#     up -d
+#
+# For Proxy Server instructions please see
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+services:
+  teams-do-gpu:
+    image: voxel51/fiftyone-teams-cv-full:v2.17.1
+    profiles: ["gpu"]
+    shm_size: "8g"
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote -m -n teams-do-gpu"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: "false"
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: "true"
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
+    deploy:
+      replicas: 1
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${NVIDIA_GPU_COUNT:-1}
+              capabilities: ["gpu"]
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+      - telemetry-socket-gpu:/tmp/telemetry
+    restart: always
+
+  teams-do-gpu-telemetry:
+    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
+    pid: "service:teams-do-gpu"
+    profiles: ["gpu"]
+    cap_add:
+      - SYS_PTRACE
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${NVIDIA_GPU_COUNT:-1}
+              capabilities: ["gpu"]
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
+      POD_NAME: teams-do-gpu
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: delegated-operator
+      TARGET_NAME: ${TEAMS_DO_TARGET_NAME:-fiftyone delegated}
+      EXECUTOR_SIDECAR: "true"
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+    volumes:
+      - telemetry-socket-gpu:/tmp/telemetry
+    depends_on:
+      teams-do-gpu:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+    restart: always
+
+volumes:
+  plugins-vol:
+  telemetry-socket-gpu:

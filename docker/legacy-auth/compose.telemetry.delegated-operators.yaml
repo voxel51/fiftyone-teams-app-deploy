@@ -36,6 +36,8 @@ services:
   teams-do-telemetry:
     image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
     pid: "service:teams-do"
+    cap_add:
+      - SYS_PTRACE
     environment:
       POD_NAME: teams-do
       POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
@@ -49,8 +51,11 @@ services:
     volumes:
       - telemetry-socket:/tmp/telemetry
     depends_on:
-      - teams-do
-      - telemetry-redis
+      teams-do:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
     restart: always
 
 volumes:

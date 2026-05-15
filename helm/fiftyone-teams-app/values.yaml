@@ -120,6 +120,14 @@ apiSettings:
 
   # -- Affinity and anti-affinity for `teams-api`. [Reference][affinity].
   affinity: {}
+  # -- Additional containers to run in the `teams-api` pod alongside the
+  # main container. When non-empty, the pod is configured with
+  # `shareProcessNamespace: true`. [Reference][sidecar-containers].
+  extraContainers: []
+  # -- Native sidecar containers for the `teams-api` pod (Kubernetes 1.29+).
+  # Entries are rendered under `initContainers`; set `restartPolicy: Always`
+  # on each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].
+  nativeSidecarContainers: []
   initContainers:
     # -- Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
@@ -390,6 +398,14 @@ appSettings:
 
   # -- Affinity and anti-affinity for `fiftyone-app`. [Reference][affinity].
   affinity: {}
+  # -- Additional containers to run in the `fiftyone-app` pod alongside the
+  # main container. When non-empty, the pod is configured with
+  # `shareProcessNamespace: true`. [Reference][sidecar-containers].
+  extraContainers: []
+  # -- Native sidecar containers for the `fiftyone-app` pod (Kubernetes 1.29+).
+  # Entries are rendered under `initContainers`; set `restartPolicy: Always`
+  # on each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].
+  nativeSidecarContainers: []
   initContainers:
     # -- Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
@@ -820,6 +836,15 @@ delegatedOperatorDeployments:
     volumeMounts: []
     # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
     volumes: []
+    # -- Additional containers to run in each delegated-operator-executor pod
+    # alongside the main container. When non-empty, the pod is configured
+    # with `shareProcessNamespace: true`. [Reference][sidecar-containers].
+    extraContainers: []
+    # -- Native sidecar containers for delegated-operator-executor pods
+    # (Kubernetes 1.29+). Entries are rendered under `initContainers`; set
+    # `restartPolicy: Always` on each entry to enable the native sidecar
+    # lifecycle. [Reference][sidecar-containers].
+    nativeSidecarContainers: []
 
   # -- Additional deployments to configure. Each template
   # will use .Values.delegatedOperatorDeployments.template as a base.
@@ -996,6 +1021,18 @@ delegatedOperatorJobTemplates:
     volumeMounts: []
     # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
     volumes: []
+    # -- Additional containers to run in each on-demand delegated-operator Job
+    # pod alongside the executor container. When non-empty, the pod is
+    # configured with `shareProcessNamespace: true`. Note: a regular
+    # container that does not exit will block Job completion; for telemetry
+    # sidecars use `nativeSidecarContainers` instead. [Reference][sidecar-containers].
+    extraContainers: []
+    # -- Native sidecar containers for on-demand delegated-operator Job pods
+    # (Kubernetes 1.29+). Entries are rendered under `initContainers`; set
+    # `restartPolicy: Always` on each entry to enable the native sidecar
+    # lifecycle. Kubelet auto-terminates these when the executor container
+    # finishes, so the Job completes cleanly. [Reference][sidecar-containers].
+    nativeSidecarContainers: []
   # -- On-Demand Delegated Operator Jobs.
   jobs: {}
     # Default CPU-only batch job
@@ -1227,6 +1264,14 @@ pluginsSettings:
 
   # -- Affinity and anti-affinity for `teams-plugins`. [Reference][affinity].
   affinity: {}
+  # -- Additional containers to run in the `teams-plugins` pod alongside the
+  # main container. When non-empty, the pod is configured with
+  # `shareProcessNamespace: true`. [Reference][sidecar-containers].
+  extraContainers: []
+  # -- Native sidecar containers for the `teams-plugins` pod (Kubernetes 1.29+).
+  # Entries are rendered under `initContainers`; set `restartPolicy: Always`
+  # on each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].
+  nativeSidecarContainers: []
   initContainers:
     # -- Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:

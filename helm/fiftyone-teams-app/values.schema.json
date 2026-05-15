@@ -102,6 +102,15 @@
           "title": "env",
           "type": "object"
         },
+        "extraContainers": {
+          "description": "Additional containers to run in the `teams-api` pod alongside the\nmain container. When non-empty, the pod is configured with\n`shareProcessNamespace: true`. [Reference][sidecar-containers].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "extraContainers",
+          "type": "array"
+        },
         "image": {
           "properties": {
             "pullPolicy": {
@@ -327,6 +336,15 @@
           "required": [],
           "title": "liveness",
           "type": "object"
+        },
+        "nativeSidecarContainers": {
+          "description": "Native sidecar containers for the `teams-api` pod (Kubernetes 1.29+).\nEntries are rendered under `initContainers`; set `restartPolicy: Always`\non each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "nativeSidecarContainers",
+          "type": "array"
         },
         "nodeSelector": {
           "description": "nodeSelector for `teams-api`. [Reference][node-selector].",
@@ -794,6 +812,15 @@
           "title": "env",
           "type": "object"
         },
+        "extraContainers": {
+          "description": "Additional containers to run in the `fiftyone-app` pod alongside the\nmain container. When non-empty, the pod is configured with\n`shareProcessNamespace: true`. [Reference][sidecar-containers].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "extraContainers",
+          "type": "array"
+        },
         "image": {
           "properties": {
             "pullPolicy": {
@@ -1015,6 +1042,15 @@
           "required": [],
           "title": "liveness",
           "type": "object"
+        },
+        "nativeSidecarContainers": {
+          "description": "Native sidecar containers for the `fiftyone-app` pod (Kubernetes 1.29+).\nEntries are rendered under `initContainers`; set `restartPolicy: Always`\non each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "nativeSidecarContainers",
+          "type": "array"
         },
         "nodeSelector": {
           "description": "nodeSelector for `fiftyone-app`. [Reference][node-selector].",
@@ -2025,6 +2061,15 @@
               "title": "env",
               "type": "object"
             },
+            "extraContainers": {
+              "description": "Additional containers to run in each delegated-operator-executor pod\nalongside the main container. When non-empty, the pod is configured\nwith `shareProcessNamespace: true`. [Reference][sidecar-containers].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "extraContainers",
+              "type": "array"
+            },
             "image": {
               "properties": {
                 "pullPolicy": {
@@ -2090,6 +2135,15 @@
               "required": [],
               "title": "liveness",
               "type": "object"
+            },
+            "nativeSidecarContainers": {
+              "description": "Native sidecar containers for delegated-operator-executor pods\n(Kubernetes 1.29+). Entries are rendered under `initContainers`; set\n`restartPolicy: Always` on each entry to enable the native sidecar\nlifecycle. [Reference][sidecar-containers].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "nativeSidecarContainers",
+              "type": "array"
             },
             "nodeSelector": {
               "description": "nodeSelector for `delegated-operator-executor`. [Reference][node-selector].",
@@ -2385,6 +2439,15 @@
               "title": "env",
               "type": "object"
             },
+            "extraContainers": {
+              "description": "Additional containers to run in each on-demand delegated-operator Job\npod alongside the executor container. When non-empty, the pod is\nconfigured with `shareProcessNamespace: true`. Note: a regular\ncontainer that does not exit will block Job completion; for telemetry\nsidecars use `nativeSidecarContainers` instead. [Reference][sidecar-containers].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "extraContainers",
+              "type": "array"
+            },
             "image": {
               "properties": {
                 "pullPolicy": {
@@ -2431,6 +2494,15 @@
               "required": [],
               "title": "labels",
               "type": "object"
+            },
+            "nativeSidecarContainers": {
+              "description": "Native sidecar containers for on-demand delegated-operator Job pods\n(Kubernetes 1.29+). Entries are rendered under `initContainers`; set\n`restartPolicy: Always` on each entry to enable the native sidecar\nlifecycle. Kubelet auto-terminates these when the executor container\nfinishes, so the Job completes cleanly. [Reference][sidecar-containers].",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "nativeSidecarContainers",
+              "type": "array"
             },
             "nodeSelector": {
               "description": "nodeSelector for `delegated-operator-executor`. [Reference][node-selector].",
@@ -2791,6 +2863,15 @@
           "title": "env",
           "type": "object"
         },
+        "extraContainers": {
+          "description": "Additional containers to run in the `teams-plugins` pod alongside the\nmain container. When non-empty, the pod is configured with\n`shareProcessNamespace: true`. [Reference][sidecar-containers].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "extraContainers",
+          "type": "array"
+        },
         "image": {
           "properties": {
             "pullPolicy": {
@@ -3012,6 +3093,15 @@
           "required": [],
           "title": "liveness",
           "type": "object"
+        },
+        "nativeSidecarContainers": {
+          "description": "Native sidecar containers for the `teams-plugins` pod (Kubernetes 1.29+).\nEntries are rendered under `initContainers`; set `restartPolicy: Always`\non each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "nativeSidecarContainers",
+          "type": "array"
         },
         "nodeSelector": {
           "description": "nodeSelector for `teams-plugins`. [Reference][node-selector].",

@@ -32,15 +32,30 @@ docker compose \
   up -d
 ```
 
-Can be combined with the plugins or delegated-operators overlays. For
-delegated operators, add the companion `compose.telemetry.delegated-operators.yaml`
-overlay so the teams-do executor is also observed:
+Can be combined with the plugins or delegated-operators overlays. Each
+optional service has its own companion telemetry overlay so its sidecar
+is added only when that service is enabled:
 
 ```shell
 docker compose \
   -f compose.yaml \
   -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
+  -f compose.telemetry.yaml \
+  -f compose.telemetry.plugins.yaml \
+  -f compose.telemetry.delegated-operators.yaml \
+  up -d
+```
+
+For GPU-enabled delegated operators, layer
+`compose.delegated-operators.gpu.yaml` (which includes its own bundled
+telemetry sidecar) and activate the `gpu` profile:
+
+```shell
+docker compose --profile gpu \
+  -f compose.yaml \
+  -f compose.delegated-operators.yaml \
+  -f compose.delegated-operators.gpu.yaml \
   -f compose.telemetry.yaml \
   -f compose.telemetry.delegated-operators.yaml \
   up -d
@@ -54,11 +69,19 @@ docker compose \
 - `fiftyone-app-telemetry`, `teams-api-telemetry` — sidecar containers, one
   per observed service. Each joins the target's PID namespace via
   `pid: "service:<target>"` so it can read `/proc/<pid>/fd/1` and use
-  psutil to sample CPU, memory, FDs, and thread counts.
+  psutil to sample CPU, memory, FDs, and thread counts. Sidecars run
+  with the `SYS_PTRACE` capability so py-spy can attach to the target.
+- `teams-plugins-telemetry` (only with `compose.telemetry.plugins.yaml`) —
+  sidecar for the dedicated `teams-plugins` service.
 - `teams-do-telemetry` (only with `compose.telemetry.delegated-operators.yaml`) —
   sidecar in `EXECUTOR_SIDECAR=true` mode that watches the executor for
   per-operation child processes and records per-op metrics back to the
   `delegated_ops` MongoDB document.
+- `teams-do-gpu` + `teams-do-gpu-telemetry` (only with
+  `compose.delegated-operators.gpu.yaml` and `--profile gpu`) — a GPU-
+  enabled delegated-operator worker registered as a distinct
+  orchestrator (`-n teams-do-gpu`) plus its paired sidecar. Sidecar
+  reads GPU metrics via NVML and requires its own GPU reservation.
 - `FIFTYONE_TELEMETRY_REDIS_URL` injected on `fiftyone-app`, `teams-api`,
   `teams-app`, and (when the DO overlay is used) `teams-do` so the in-app
   telemetry blueprint and SSE endpoints can read from Redis.
@@ -79,6 +102,21 @@ time, either:
 2. Deploy via the helm chart, which automatically adds a telemetry sidecar
    to every pod in the delegated-operator deployment.
 
+### Sidecar lifecycle on workload restart
+
+Each sidecar joins its workload's PID namespace at container-create
+time. If the workload is recreated (force-recreate, image upgrade,
+configuration change) the namespace reference goes stale and Docker
+cannot re-attach the sidecar — it stays in `Exited (137)` until
+manually recreated.
+
+The overlays mitigate this with `depends_on.<target>.restart: true`
+(compose v2.17+), which tells compose to recreate the sidecar in
+lockstep with the workload. `docker compose version` must report
+v2.17 or newer for this to take effect. If the workload itself crash-
+loops, the sidecar follows it into the crash loop, matching the
+Kubernetes pod-restart behavior.
+
 ## Environment overrides
 
 All knobs live in your `.env` — see `env.template` for the full list:
@@ -91,8 +129,12 @@ All knobs live in your `.env` — see `env.template` for the full list:
 | `TELEMETRY_REDIS_MAXMEMORY`    | `400mb`                             | Redis maxmemory budget                               |
 | `TELEMETRY_NAMESPACE`          | `docker`                            | Namespace label attached to each registered pod      |
 | `FIFTYONE_APP_TARGET_NAME`     | `hypercorn`                         | Substring used to locate the fiftyone-app process    |
-| `TEAMS_API_TARGET_NAME`        | `fiftyone.teams.api`                | Substring used to locate the teams-api process       |
+| `TEAMS_API_TARGET_NAME`        | `fiftyone-teams-api`                | Substring used to locate the teams-api process       |
+| `TEAMS_PLUGINS_TARGET_NAME`    | `hypercorn`                         | Substring used to locate the teams-plugins process   |
 | `TEAMS_DO_TARGET_NAME`         | `fiftyone delegated`                | Substring used to locate the teams-do process        |
+| `NVIDIA_GPU_COUNT`             | `1`                                 | GPU reservation for the GPU DO worker + sidecar      |
+| `NVIDIA_VISIBLE_DEVICES`       | `all`                               | Pass-through to teams-do-gpu / sidecar               |
+| `NVIDIA_DRIVER_CAPABILITIES`   | `compute,utility`                   | Must include `utility` so NVML is available          |
 
 ## Access control
 

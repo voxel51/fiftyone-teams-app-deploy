@@ -25,6 +25,7 @@
   - [Template Storage Options](#template-storage-options)
   - [Secrets Options](#secrets-options)
 - [Separate CPU and GPU Templates](#separate-cpu-and-gpu-templates)
+- [Optional: Telemetry Sidecar](#optional-telemetry-sidecar)
 - [Refresh Orchestrator Operators](#refresh-orchestrator-operators)
 - [Additional Considerations](#additional-considerations)
 - [Credential Rotation](#credential-rotation)
@@ -459,6 +460,99 @@ fom.register_orchestrator(
 )
 ```
 
+## Optional: Telemetry Sidecar
+
+If your deployment runs the telemetry overlay (see the helm chart's
+`extraContainers` / `nativeSidecarContainers` options or the docker
+`compose.telemetry.yaml`), you can attach a per-Job telemetry sidecar to
+on-demand Kubernetes orchestrators as well. This emits per-operation
+metrics back to the same Redis backend so the Settings → Metrics page
+sees individual delegated runs.
+
+Use a Kubernetes
+[native sidecar](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/)
+(an `initContainer` with `restartPolicy: Always`, requires Kubernetes
+1.29+). A regular
+sidecar container would block Job completion — the Job stays in
+`Running` until every container exits. Native sidecars are
+auto-terminated by the kubelet when all non-sidecar containers
+complete, so the Job finalizes cleanly.
+
+Add the following to your Job template's Pod spec:
+
+```yaml
+spec:
+  shareProcessNamespace: true
+  initContainers:
+    - name: telemetry-sidecar
+      image: voxel51/telemetry-sidecar:latest
+      restartPolicy: Always
+      securityContext:
+        capabilities:
+          add: [SYS_PTRACE]
+      env:
+        - name: TARGET_NAME
+          value: delegated
+        - name: SERVICE_TYPE
+          value: delegated-operator
+        - name: EXECUTOR_SIDECAR
+          value: "true"
+        - name: TELEMETRY_SOCKET
+          value: /tmp/telemetry/agent.sock
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: FIFTYONE_TELEMETRY_REDIS_URL
+          value: redis://telemetry-redis.fiftyone.svc.cluster.local:6379
+        - name: FIFTYONE_DATABASE_URI
+          valueFrom:
+            secretKeyRef:
+              name: fiftyone-secrets
+              key: database-uri
+        - name: FIFTYONE_DATABASE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: fiftyone-secrets
+              key: database-name
+      volumeMounts:
+        - mountPath: /tmp/telemetry
+          name: telemetry-socket
+  containers:
+    - name: task-worker
+      # ... existing container config ...
+      env:
+        # ... existing env, plus:
+        - name: TELEMETRY_SOCKET
+          value: /tmp/telemetry/agent.sock
+        - name: FIFTYONE_TELEMETRY_REDIS_URL
+          value: redis://telemetry-redis.fiftyone.svc.cluster.local:6379
+      volumeMounts:
+        # ... existing mounts, plus:
+        - mountPath: /tmp/telemetry
+          name: telemetry-socket
+  volumes:
+    - name: telemetry-socket
+      emptyDir: {}
+```
+
+Notes:
+
+- `shareProcessNamespace: true` lets the sidecar's psutil call see the
+  worker process via `/proc/<pid>` in the shared PID namespace.
+- `SYS_PTRACE` is required so py-spy can attach to the worker.
+- `EXECUTOR_SIDECAR=true` switches the sidecar into per-operation mode;
+  the worker writes execution metadata to `TELEMETRY_SOCKET` and the
+  sidecar records per-op metrics into the `delegated_ops` MongoDB
+  document.
+- The `FIFTYONE_TELEMETRY_REDIS_URL` must be reachable from wherever
+  the Job runs. For same-cluster Jobs use the in-cluster service DNS
+  name. For remote clusters, use a routable hostname or load balancer.
+
 ## Refresh Orchestrator Operators
 
 This step is only required if you've added a plugin directory with custom
@@ -542,6 +636,53 @@ spec:
       serviceAccountName: your-org-fiftyone-teams
       podSecurityContext:
           runAsNonRoot: false
+      shareProcessNamespace: true
+      initContainers:
+      - name: telemetry-sidecar
+        image: voxel51/telemetry-sidecar:latest
+        restartPolicy: Always
+        securityContext:
+          capabilities:
+            add: [SYS_PTRACE]
+        env:
+          - name: TARGET_NAME
+            value: delegated
+          - name: SERVICE_TYPE
+            value: delegated-operator
+          - name: EXECUTOR_SIDECAR
+            value: "true"
+          - name: TELEMETRY_SOCKET
+            value: /tmp/telemetry/agent.sock
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: FIFTYONE_TELEMETRY_REDIS_URL
+            value: redis://telemetry-redis.your-org-fiftyone-ai.svc.cluster.local:6379
+          - name: FIFTYONE_DATABASE_URI
+            valueFrom:
+              secretKeyRef:
+                key: mongodbConnectionString
+                name: your-org-teams-secrets
+          - name: FIFTYONE_DATABASE_NAME
+            valueFrom:
+              secretKeyRef:
+                key: fiftyoneDatabaseName
+                name: your-org-teams-secrets
+        resources:
+          limits:
+            cpu: 50m
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 512Mi
+        volumeMounts:
+          - mountPath: /tmp/telemetry
+            name: telemetry-socket
       containers:
       - name: task-worker
         image: registry/image:tag
@@ -585,8 +726,12 @@ spec:
             value: "true"
           - name: FIFTYONE_PLUGINS_DIR
             value: /opt/plugins
+          - name: FIFTYONE_TELEMETRY_REDIS_URL
+            value: redis://telemetry-redis.your-org-fiftyone-ai.svc.cluster.local:6379
           - name: NUMBA_CACHE_DIR
             value: /tmp/numba
+          - name: TELEMETRY_SOCKET
+            value: /tmp/telemetry/agent.sock
           - name: TORCH_HOME
             value: /opt/fiftyone_zoo/your-org/torch
         resources:
@@ -618,6 +763,8 @@ spec:
             name: memory-media-cache-vol
           - mountPath: /dev/shm
             name: shm-vol
+          - mountPath: /tmp/telemetry
+            name: telemetry-socket
       volumes:
         - name: nfs-plugins-ro-vol
           persistentVolumeClaim:
@@ -652,5 +799,13 @@ spec:
             medium: Memory
             sizeLimit: 2Gi
           name: shm-vol
+        - emptyDir: {}
+          name: telemetry-socket
       restartPolicy: Never
 ```
+
+The `telemetry-sidecar` init container above is optional. Remove it
+(plus `shareProcessNamespace: true`, the `TELEMETRY_SOCKET` /
+`FIFTYONE_TELEMETRY_REDIS_URL` env vars on `task-worker`, and the
+`telemetry-socket` volume + mount) if you are not running the
+telemetry overlay.
