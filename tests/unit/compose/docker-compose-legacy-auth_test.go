@@ -28,7 +28,9 @@ var legacyAuthComposeFile = filepath.Join(dockerLegacyAuthDir, "compose.yaml")
 var legacyAuthComposePluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.plugins.yaml")
 var legacyAuthComposeDedicatedPluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.dedicated-plugins.yaml")
 var legacyAuthComposeDelegatedOperationsFile = filepath.Join(dockerLegacyAuthDir, "compose.delegated-operators.yaml")
+var legacyAuthComposeDelegatedOperationsGpuFile = filepath.Join(dockerLegacyAuthDir, "compose.delegated-operators.gpu.yaml")
 var legacyAuthComposeTelemetryFile = filepath.Join(dockerLegacyAuthDir, "compose.telemetry.yaml")
+var legacyAuthComposeTelemetryPluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.telemetry.plugins.yaml")
 var legacyAuthComposeTelemetryDelegatedOperatorsFile = filepath.Join(dockerLegacyAuthDir, "compose.telemetry.delegated-operators.yaml")
 var legacyAuthEnvTemplateFilePath = filepath.Join(dockerLegacyAuthDir, "env.template")
 
@@ -61,12 +63,14 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 		name        string
 		configPaths []string // file paths to one or more Compose files.
 		envFiles    []string // file paths to ".env" files with additional environment variable data
+		profiles    []string // compose profiles to activate
 		expected    []string
 	}{
 		{
 			"compose",
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
@@ -78,6 +82,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			"composePlugins",
 			[]string{legacyAuthComposePluginsFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
@@ -89,6 +94,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			"composeDedicatedPlugins",
 			[]string{legacyAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"teams-api",
@@ -101,14 +107,30 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			"composeDelegatedOperations",
 			[]string{legacyAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"teams-do",
+			},
+		},
+		{
+			"composeDelegatedOperationsGpu",
+			[]string{
+				legacyAuthComposeDelegatedOperationsFile,
+				legacyAuthComposeDelegatedOperationsGpuFile,
+			},
+			s.dotEnvFiles,
+			[]string{"gpu"},
+			[]string{
+				"teams-do",
+				"teams-do-gpu",
+				"teams-do-gpu-telemetry",
 			},
 		},
 		{
 			"composeTelemetry",
 			[]string{legacyAuthComposeFile, legacyAuthComposeTelemetryFile},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
@@ -116,6 +138,28 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 				"teams-api-telemetry",
 				"teams-app",
 				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composeTelemetryPlugins",
+			[]string{
+				legacyAuthComposeFile,
+				legacyAuthComposeDedicatedPluginsFile,
+				legacyAuthComposeTelemetryFile,
+				legacyAuthComposeTelemetryPluginsFile,
+			},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"teams-plugins",
+				"teams-plugins-telemetry",
 				"telemetry-redis",
 			},
 		},
@@ -128,6 +172,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 				legacyAuthComposeTelemetryDelegatedOperatorsFile,
 			},
 			s.dotEnvFiles,
+			nil,
 			[]string{
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
@@ -155,6 +200,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 				cli.WithName(s.projectName),
 				cli.WithEnvFiles(testCase.envFiles...),
 				cli.WithDotEnv,
+				cli.WithProfiles(testCase.profiles),
 			)
 			s.NoError(err)
 

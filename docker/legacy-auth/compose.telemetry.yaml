@@ -15,7 +15,6 @@
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 services:
-  # Redis backend for telemetry samples and log streams.
   telemetry-redis:
     image: ${TELEMETRY_REDIS_IMAGE:-redis:7-alpine}
     command:
@@ -33,9 +32,6 @@ services:
     volumes:
       - telemetry-redis-data:/data
 
-  # Inject the Redis URL onto the services that read/write telemetry.
-  # teams-api serves the /telemetry Sanic blueprint; teams-app serves
-  # /api/telemetry/stream + /api/telemetry/logs SSE endpoints.
   fiftyone-app:
     environment:
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
@@ -55,6 +51,8 @@ services:
   fiftyone-app-telemetry:
     image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
     pid: "service:fiftyone-app"
+    cap_add:
+      - SYS_PTRACE
     environment:
       POD_NAME: fiftyone-app
       POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
@@ -62,22 +60,30 @@ services:
       TARGET_NAME: ${FIFTYONE_APP_TARGET_NAME:-hypercorn}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
     depends_on:
-      - fiftyone-app
-      - telemetry-redis
+      fiftyone-app:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
     restart: always
 
   teams-api-telemetry:
     image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
     pid: "service:teams-api"
+    cap_add:
+      - SYS_PTRACE
     environment:
       POD_NAME: teams-api
       POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
       SERVICE_TYPE: teams-api
-      TARGET_NAME: ${TEAMS_API_TARGET_NAME:-fiftyone.teams.api}
+      TARGET_NAME: ${TEAMS_API_TARGET_NAME:-fiftyone-teams-api}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
     depends_on:
-      - teams-api
-      - telemetry-redis
+      teams-api:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
     restart: always
 
 volumes:

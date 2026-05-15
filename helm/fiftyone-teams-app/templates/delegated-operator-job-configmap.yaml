@@ -42,6 +42,8 @@ data:
   {{- $mergedTolerations := $jobConfig.tolerations | default $baseTpl.tolerations }}
   {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts }}
   {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes }}
+  {{- $mergedExtraContainers := $jobConfig.extraContainers | default $baseTpl.extraContainers }}
+  {{- $mergedNativeSidecarContainers := $jobConfig.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers }}
   {{- /* Trunc at 48 for the random ID to be generated via API */ -}}
   {{- $metadataName := kebabcase $jobName | trunc 48 }}
 
@@ -87,6 +89,9 @@ data:
         spec:
           restartPolicy: {{ $jobConfig.restartPolicy | default $baseTpl.restartPolicy | default "Never" }}
           serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
+          {{- if or $mergedExtraContainers $mergedNativeSidecarContainers }}
+          shareProcessNamespace: true
+          {{- end }}
           {{- with $mergedPodSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
@@ -119,6 +124,13 @@ data:
               volumeMounts:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
+            {{- with $mergedExtraContainers }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with $mergedNativeSidecarContainers }}
+          initContainers:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $mergedNodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
