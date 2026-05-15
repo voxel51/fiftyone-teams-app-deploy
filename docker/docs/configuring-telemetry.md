@@ -73,8 +73,9 @@ docker compose --profile gpu \
   with the `SYS_PTRACE` capability so py-spy can attach to the target.
 - `teams-plugins-telemetry` (only with `compose.telemetry.plugins.yaml`) —
   sidecar for the dedicated `teams-plugins` service.
-- `teams-do-telemetry` (only with `compose.telemetry.delegated-operators.yaml`) —
-  sidecar in `EXECUTOR_SIDECAR=true` mode that watches the executor for
+- `teams-do-telemetry` (only with
+  `compose.telemetry.delegated-operators.yaml`) — sidecar in
+  `EXECUTOR_SIDECAR=true` mode that watches the executor for
   per-operation child processes and records per-op metrics back to the
   `delegated_ops` MongoDB document.
 - `teams-do-gpu` + `teams-do-gpu-telemetry` (only with

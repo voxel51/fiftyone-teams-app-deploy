@@ -115,15 +115,24 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 		{
 			"composeDelegatedOperationsGpu",
 			[]string{
+				legacyAuthComposeFile,
 				legacyAuthComposeDelegatedOperationsFile,
 				legacyAuthComposeDelegatedOperationsGpuFile,
+				legacyAuthComposeTelemetryFile,
 			},
 			s.dotEnvFiles,
 			[]string{"gpu"},
 			[]string{
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
 				"teams-do",
 				"teams-do-gpu",
 				"teams-do-gpu-telemetry",
+				"telemetry-redis",
 			},
 		},
 		{
