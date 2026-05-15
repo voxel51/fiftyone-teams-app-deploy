@@ -107,7 +107,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "extraContainers",
           "type": "array"
         },
@@ -342,7 +341,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "nativeSidecarContainers",
           "type": "array"
         },
@@ -817,7 +815,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "extraContainers",
           "type": "array"
         },
@@ -1048,7 +1045,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "nativeSidecarContainers",
           "type": "array"
         },
@@ -2066,7 +2062,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "extraContainers",
               "type": "array"
             },
@@ -2141,7 +2136,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "nativeSidecarContainers",
               "type": "array"
             },
@@ -2444,7 +2438,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "extraContainers",
               "type": "array"
             },
@@ -2500,7 +2493,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "nativeSidecarContainers",
               "type": "array"
             },
@@ -2868,7 +2860,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "extraContainers",
           "type": "array"
         },
@@ -3099,7 +3090,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "nativeSidecarContainers",
           "type": "array"
         },
