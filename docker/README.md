@@ -145,14 +145,20 @@ and dataset sizes.
 
 1. Set `LOCAL_LICENSE_FILE_DIR` in your `.env`
 2. Place the license file there and rename it to `license`
+3. Ensure the license directory is volume-mounted into the containers
+   (e.g., `/opt/data/licenses/`)
+4. Set read permissions on the license file: `chmod 644 license`
 
 ```bash
-. .env
+# Set this to match the LOCAL_LICENSE_FILE_DIR value in your .env file
+LOCAL_LICENSE_FILE_DIR="/path/to/your/licenses"
 mkdir -p "${LOCAL_LICENSE_FILE_DIR}"
 mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
+chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 ```
 
-> [!TIP] When rotating the license, to ensure that the new license values are
+> [!TIP]
+> When rotating the license, to ensure that the new license values are
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
@@ -234,11 +240,15 @@ You can override the default image used by any service in
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.17.1
+    image: voxel51/fiftyone-app-torch:v2.18.1
 ```
 
 > [!NOTE]
-> Always include a version tag when overriding images (e.g., `:v2.17.1`).
+> Default images and versions for all services are defined in
+> `common-services.yaml`. To override an image or version,
+> set the value in `compose.override.yaml`. For example, instead of using
+> the `fiftyone-app` image, you may instead the `fiftyone-app-gpt` image.
+> Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
 > Omitting the tag will result in a **not found** error.
 
 ## :rocket: Step 4: Initial Deployment
@@ -251,7 +261,7 @@ In `compose.override.yaml`, make sure:
 services:
   fiftyone-app:
     environment:
-      FIFTYONE_DATABASE_ADMIN: true
+      FIFTYONE_DATABASE_ADMIN: false
 ```
 
 > This allows the application to create and migrate the database schema.
@@ -268,6 +278,7 @@ docker compose commands
 
 ```shell
 docker compose \
+  -f compose.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.override.yaml \
   up -d
@@ -837,6 +848,7 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `FIFTYONE_APP_THEME`                         | The default theme configuration for your FiftyOne Enterprise application as described [in our documentation](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                              | No                        |
 | `FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE`     | Controls whether Query Performance mode is enabled by default for every dataset for the application. Set to false to set default mode to off.                                                                                                                                  | No                        |
 | `FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE`      | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application.                                                                                                                                 | No                        |
+| `FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS`    | Deployment characteristics for the `teams-app`                                                                                                                                                                                                                                 | No                        |
 | `FIFTYONE_API_URI`                           | The URI to be displayed in the `Install FiftyOne` Modal and `API Keys` configuration screens                                                                                                                                                                                   | No                        |
 | `FIFTYONE_AUTH_SECRET`                       | The secret used for services to authenticate with `teams-cas`; also used to login to the SuperAdmin UI                                                                                                                                                                         | Yes                       |
 | `FIFTYONE_DATABASE_NAME`                     | The MongoDB Database that `fiftyone-app`, `teams-api`, and `teams-app` use for FiftyOne Enterprise dataset metadata; the default is `fiftyone`                                                                                                                                 | Yes                       |

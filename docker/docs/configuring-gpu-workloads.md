@@ -28,8 +28,8 @@
 
 Many machine learning applications utilize
 GPU hardware for intensive computations.
-The FiftyOne Enterprise docker compose files allow users to schedule containers on
-GPU-enabled nodes using a service's
+The FiftyOne Enterprise docker compose files allow users to schedule containers
+on GPU-enabled nodes using a service's
 [`deploy.resource.reservation.devices`][compose-deploy-resources].
 
 The below will show an example deploying a GPU-enabled container via docker
@@ -65,7 +65,7 @@ services:
       service: teams-do-common
 
   teams-do-with-gpu:
-    image: voxel51/fiftyone-teams-cv-full:v2.17.1
+    image: voxel51/fiftyone-teams-cv-full:v2.18.1
     command: >
       /bin/sh -c "fiftyone delegated launch -t remote  -n 'teams-do-with-gpu' -m"
     environment:

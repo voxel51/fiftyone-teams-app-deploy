@@ -19,7 +19,6 @@
         "dnsName": {
           "default": "",
           "description": "Controls whether `teams-api` is added to the chart's ingress.\nWhen an empty string, a rule for `teams-api` is not added to the chart managed ingress.\nWhen not an empty string, becomes the value to the `host` in the ingress' rule and\nset `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api`\nto generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators.",
-          "required": [],
           "title": "dnsName",
           "type": "string"
         },
@@ -29,14 +28,12 @@
             "FIFTYONE_DO_EXPIRATION_DAYS": {
               "default": 1,
               "description": "Deprecated use `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` instead. The amount of time in days that an unmonitored delegated operation can\nrun before being automatically terminated. Overridden by `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` if provided.",
-              "required": [],
               "title": "FIFTYONE_DO_EXPIRATION_DAYS",
               "type": "integer"
             },
             "FIFTYONE_DO_EXPIRATION_MINUTES": {
               "default": 30,
               "description": "(int) The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated.\nIf your executor was launched with the `-m` argument or is push based, then it is monitored.",
-              "required": [],
               "title": "FIFTYONE_DO_EXPIRATION_MINUTES",
               "type": "integer"
             },
@@ -53,21 +50,18 @@
             "FIFTYONE_DO_REQUEUE_DELAY_MINUTES": {
               "default": 30,
               "description": "The number of minutes an operation can sit in a queued state before being requeued.\nCan be any positive number.",
-              "required": [],
               "title": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
               "type": "integer"
             },
             "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS": {
               "default": 3,
               "description": "The number of times an operation is requeued before being terminated.\n`-1` will never terminate. `0` will immediately terminate.",
-              "required": [],
               "title": "FIFTYONE_DO_REQUEUE_MAX_ATTEMPTS",
               "type": "integer"
             },
             "FIFTYONE_ENV": {
               "default": "production",
               "description": "Controls FiftyOne GraphQL verbosity.\nWhen \"production\", debug mode is disabled and the default logging level is \"INFO\".\nWhen \"development\", debug mode is enabled and the default logging level is \"DEBUG\".\nCan be overridden by setting `apiSettings.env.LOGGING_LEVEL`.",
-              "required": [],
               "title": "FIFTYONE_ENV",
               "type": "string"
             },
@@ -84,7 +78,6 @@
             "FIFTYONE_LOGGING_FORMAT": {
               "default": "text",
               "description": "The format to use for log messages.\nCan be one of `json` or `text`.",
-              "required": [],
               "title": "FIFTYONE_LOGGING_FORMAT",
               "type": "string"
             },
@@ -101,7 +94,6 @@
             "LOGGING_LEVEL": {
               "default": "INFO",
               "description": "Logging level. Overrides the value of `FIFTYONE_ENV`.\nCan be one of \"DEBUG\", \"INFO\", \"WARN\", \"ERROR\", or \"CRITICAL\".",
-              "required": [],
               "title": "LOGGING_LEVEL",
               "type": "string"
             }
@@ -140,14 +132,12 @@
             "repository": {
               "default": "voxel51/fiftyone-teams-api",
               "description": "Container image for the `teams-api`.",
-              "required": [],
               "title": "repository",
               "type": "string"
             },
             "tag": {
               "default": "",
               "description": "Image tag for `teams-api`. Defaults to the chart version.",
-              "required": [],
               "title": "tag",
               "type": "string"
             }
@@ -163,7 +153,6 @@
               "properties": {
                 "allowPrivilegeEscalation": {
                   "default": false,
-                  "required": [],
                   "title": "allowPrivilegeEscalation",
                   "type": "boolean"
                 },
@@ -173,13 +162,11 @@
                       "items": {
                         "anyOf": [
                           {
-                            "required": [],
                             "type": "string"
                           }
                         ],
                         "required": []
                       },
-                      "required": [],
                       "title": "drop",
                       "type": "array"
                     }
@@ -190,7 +177,6 @@
                 },
                 "runAsNonRoot": {
                   "default": true,
-                  "required": [],
                   "title": "runAsNonRoot",
                   "type": "boolean"
                 },
@@ -211,7 +197,6 @@
             "enabled": {
               "default": true,
               "description": "Whether to enable init containers for `teams-api`. [Reference][init-containers].",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -220,14 +205,12 @@
                 "repository": {
                   "default": "docker.io/busybox",
                   "description": "Init container images repositories for `teams-api`. [Reference][init-containers].",
-                  "required": [],
                   "title": "repository",
                   "type": "string"
                 },
                 "tag": {
                   "default": "stable-glibc",
                   "description": "Init container images tags for `teams-api`. [Reference][init-containers].",
-                  "required": [],
                   "title": "tag",
                   "type": "string"
                 }
@@ -334,21 +317,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the liveness probe for the `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the liveness probe for `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Number of seconds after which the liveness probe times out for the `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -384,7 +364,6 @@
             "enabled": {
               "default": false,
               "description": "Whether a pod disruption budget is enabled for `teams-api`.",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -417,7 +396,6 @@
             "create": {
               "default": true,
               "description": "Controls whether to create the `Role`, `RoleBinding`,\nand `ServiceAccount` for on-demand delegated-operator submission.",
-              "required": [],
               "title": "create",
               "type": "boolean"
             },
@@ -438,7 +416,6 @@
                 "name": {
                   "default": "",
                   "description": "Name of the `Role` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
-                  "required": [],
                   "title": "name",
                   "type": "string"
                 }
@@ -458,7 +435,6 @@
                 "create": {
                   "default": true,
                   "description": "Controls whether to create the `RoleBinding` named\n`apiSettings.rbac.roleBinding.name`.",
-                  "required": [],
                   "title": "create",
                   "type": "boolean"
                 },
@@ -471,7 +447,6 @@
                 "name": {
                   "default": "",
                   "description": "Name of the `RoleBinding` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-do-management`.",
-                  "required": [],
                   "title": "name",
                   "type": "string"
                 }
@@ -491,7 +466,6 @@
                 "create": {
                   "default": true,
                   "description": "Controls whether to create the `ServiceAccount` named\n`apiSettings.rbac.serviceAccount.name`.",
-                  "required": [],
                   "title": "create",
                   "type": "boolean"
                 },
@@ -504,7 +478,6 @@
                 "name": {
                   "default": "",
                   "description": "Name of the `ServiceAccount` (existing or to be created) in the namespace `namespace.name` used for DO management.\nDefaults to `release-name-fiftyone-teams-app-teams-api`.",
-                  "required": [],
                   "title": "name",
                   "type": "string"
                 }
@@ -523,21 +496,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the readiness probe for the `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -550,7 +520,6 @@
           "default": 1,
           "description": "Number of pods in the `teams-api` deployment's ReplicaSet.\nWhen \u003e 1, you must also configure volumes, volumeMounts and set\n`apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`.\nFor more information see [the documentation][configure-ha-teams-api].",
           "minimum": 1,
-          "required": [],
           "title": "replicaCount",
           "type": "integer"
         },
@@ -596,14 +565,12 @@
             "containerPort": {
               "default": 8000,
               "description": "Service container port for `teams-api`.",
-              "required": [],
               "title": "containerPort",
               "type": "integer"
             },
             "name": {
               "default": "teams-api",
               "description": "Service name.",
-              "required": [],
               "title": "name",
               "type": "string"
             },
@@ -620,21 +587,18 @@
             "port": {
               "default": 80,
               "description": "Service port for `teams-api`.",
-              "required": [],
               "title": "port",
               "type": "integer"
             },
             "shortname": {
               "default": "teams-api",
               "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `teams-api`. [Reference][ports].",
-              "required": [],
               "title": "shortname",
               "type": "string"
             },
             "type": {
               "default": "ClusterIP",
               "description": "Service type for `teams-api`. [Reference][service-type].",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -648,21 +612,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the startup probe for the `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 30,
               "description": "How often (in seconds) to perform the startup probe for `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Number of seconds after which the startup probe times out for the `teams-api`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -676,7 +637,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "tolerations",
           "type": "array"
         },
@@ -685,7 +645,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "topologySpreadConstraints",
           "type": "array"
         },
@@ -694,7 +653,6 @@
           "properties": {
             "type": {
               "default": "RollingUpdate",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -708,7 +666,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumeMounts",
           "type": "array"
         },
@@ -717,7 +674,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumes",
           "type": "array"
         }
@@ -740,35 +696,30 @@
             "enabled": {
               "default": false,
               "description": "Controls horizontal pod autoscaling for `fiftyone-app`. [Reference][autoscaling].",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
             "maxReplicas": {
               "default": 20,
               "description": "Maximum replicas for horizontal pod autoscaling for `fiftyone-app`.",
-              "required": [],
               "title": "maxReplicas",
               "type": "integer"
             },
             "minReplicas": {
               "default": 2,
               "description": "Minimum Replicas for horizontal pod autoscaling for `fiftyone-app`.",
-              "required": [],
               "title": "minReplicas",
               "type": "integer"
             },
             "targetCPUUtilizationPercentage": {
               "default": 80,
               "description": "Percent CPU utilization for autoscaling for `fiftyone-app`.",
-              "required": [],
               "title": "targetCPUUtilizationPercentage",
               "type": "integer"
             },
             "targetMemoryUtilizationPercentage": {
               "default": 80,
               "description": "Percent memory utilization for autoscaling for `fiftyone-app`.",
-              "required": [],
               "title": "targetMemoryUtilizationPercentage",
               "type": "integer"
             }
@@ -891,14 +842,12 @@
             "repository": {
               "default": "voxel51/fiftyone-app",
               "description": "Container image for `fiftyone-app`.",
-              "required": [],
               "title": "repository",
               "type": "string"
             },
             "tag": {
               "default": "",
               "description": "Image tag for `fiftyone-app`. Defaults to the chart version.",
-              "required": [],
               "title": "tag",
               "type": "string"
             }
@@ -914,7 +863,6 @@
               "properties": {
                 "allowPrivilegeEscalation": {
                   "default": false,
-                  "required": [],
                   "title": "allowPrivilegeEscalation",
                   "type": "boolean"
                 },
@@ -924,13 +872,11 @@
                       "items": {
                         "anyOf": [
                           {
-                            "required": [],
                             "type": "string"
                           }
                         ],
                         "required": []
                       },
-                      "required": [],
                       "title": "drop",
                       "type": "array"
                     }
@@ -941,13 +887,11 @@
                 },
                 "runAsNonRoot": {
                   "default": true,
-                  "required": [],
                   "title": "runAsNonRoot",
                   "type": "boolean"
                 },
                 "runAsUser": {
                   "default": 1000,
-                  "required": [],
                   "title": "runAsUser",
                   "type": "integer"
                 }
@@ -959,7 +903,6 @@
             "enabled": {
               "default": true,
               "description": "Whether to enable init containers for `fiftyone-app`. [Reference][init-containers].",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -968,14 +911,12 @@
                 "repository": {
                   "default": "docker.io/busybox",
                   "description": "Init container images repositories for `fiftyone-app`. [Reference][init-containers].",
-                  "required": [],
                   "title": "repository",
                   "type": "string"
                 },
                 "tag": {
                   "default": "stable-glibc",
                   "description": "Init container images tags for `fiftyone-app`. [Reference][init-containers].",
-                  "required": [],
                   "title": "tag",
                   "type": "string"
                 }
@@ -1082,21 +1023,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the liveness probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the liveness probe for `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -1132,7 +1070,6 @@
             "enabled": {
               "default": false,
               "description": "Whether a pod disruption budget is enabled for `fiftyone-app`.",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -1164,21 +1101,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the readiness probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the readiness probe for `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -1191,7 +1125,6 @@
           "default": 2,
           "description": "Number of pods in the `fiftyone-app` deployment's ReplicaSet.\nIgnored when `appSettings.autoscaling.enabled: true`. [Reference][deployment].",
           "minimum": 1,
-          "required": [],
           "title": "replicaCount",
           "type": "integer"
         },
@@ -1237,14 +1170,12 @@
             "containerPort": {
               "default": 5151,
               "description": "Service container port for `fiftyone-app`.",
-              "required": [],
               "title": "containerPort",
               "type": "integer"
             },
             "name": {
               "default": "fiftyone-app",
               "description": "Service name.",
-              "required": [],
               "title": "name",
               "type": "string"
             },
@@ -1261,21 +1192,18 @@
             "port": {
               "default": 80,
               "description": "Service port.",
-              "required": [],
               "title": "port",
               "type": "integer"
             },
             "shortname": {
               "default": "fiftyone-app",
               "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `fiftyone-app`. [Reference][ports].",
-              "required": [],
               "title": "shortname",
               "type": "string"
             },
             "type": {
               "default": "ClusterIP",
               "description": "Service type for `fiftyone-app`. [Reference][service-type].",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -1289,21 +1217,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the startup probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 30,
               "description": "How often (in seconds) to perform the startup probe for `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the startup probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -1317,7 +1242,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "tolerations",
           "type": "array"
         },
@@ -1326,7 +1250,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "topologySpreadConstraints",
           "type": "array"
         },
@@ -1335,7 +1258,6 @@
           "properties": {
             "type": {
               "default": "RollingUpdate",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -1349,7 +1271,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumeMounts",
           "type": "array"
         },
@@ -1358,7 +1279,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumes",
           "type": "array"
         }
@@ -1385,7 +1305,6 @@
         "enable_invitations": {
           "default": true,
           "description": "Allow ADMINs to invite users by email\nNOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal`",
-          "required": [],
           "title": "enable_invitations",
           "type": "boolean"
         },
@@ -1395,35 +1314,30 @@
             "CAS_DATABASE_NAME": {
               "default": "cas",
               "description": "Provide the name for the CAS database.\nWhen multiple deployments use the same database instance,\nset `CAS_DATABASE_NAME` to a unique value for each deployment.",
-              "required": [],
               "title": "CAS_DATABASE_NAME",
               "type": "string"
             },
             "CAS_DEFAULT_USER_ROLE": {
               "default": "GUEST",
               "description": "Set the default user role for new users\nOne of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN`",
-              "required": [],
               "title": "CAS_DEFAULT_USER_ROLE",
               "type": "string"
             },
             "CAS_MONGODB_URI_KEY": {
               "default": "mongodbConnectionString",
               "description": "The key from `secret.fiftyone.name` that contains the CAS MongoDB\nConnection String.",
-              "required": [],
               "title": "CAS_MONGODB_URI_KEY",
               "type": "string"
             },
             "DEBUG": {
               "default": "cas:*,-cas:*:debug",
               "description": "Set the log level for CAS\nexamples:\n`DEBUG: cas:*` - shows all CAS logs\n`DEBUG: cas:*:info` - shows all CAS INFO logs\n`DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs",
-              "required": [],
               "title": "DEBUG",
               "type": "string"
             },
             "FIFTYONE_AUTH_MODE": {
               "default": "legacy",
               "description": "Configure Authentication Mode.\nOne of `legacy` or `internal`",
-              "required": [],
               "title": "FIFTYONE_AUTH_MODE",
               "type": "string"
             }
@@ -1453,14 +1367,12 @@
             "repository": {
               "default": "voxel51/fiftyone-teams-cas",
               "description": "Container image for `teams-cas`.",
-              "required": [],
               "title": "repository",
               "type": "string"
             },
             "tag": {
               "default": "",
               "description": "Image tag for `teams-cas`. Defaults to the chart version.",
-              "required": [],
               "title": "tag",
               "type": "string"
             }
@@ -1476,7 +1388,6 @@
               "properties": {
                 "allowPrivilegeEscalation": {
                   "default": false,
-                  "required": [],
                   "title": "allowPrivilegeEscalation",
                   "type": "boolean"
                 },
@@ -1486,13 +1397,11 @@
                       "items": {
                         "anyOf": [
                           {
-                            "required": [],
                             "type": "string"
                           }
                         ],
                         "required": []
                       },
-                      "required": [],
                       "title": "drop",
                       "type": "array"
                     }
@@ -1503,13 +1412,11 @@
                 },
                 "runAsNonRoot": {
                   "default": true,
-                  "required": [],
                   "title": "runAsNonRoot",
                   "type": "boolean"
                 },
                 "runAsUser": {
                   "default": 1000,
-                  "required": [],
                   "title": "runAsUser",
                   "type": "integer"
                 }
@@ -1521,7 +1428,6 @@
             "enabled": {
               "default": true,
               "description": "Whether to enable init containers for `teams-cas`. [Reference][init-containers].",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -1530,14 +1436,12 @@
                 "repository": {
                   "default": "docker.io/busybox",
                   "description": "Init container images repositories for `teams-cas`. [Reference][init-containers].",
-                  "required": [],
                   "title": "repository",
                   "type": "string"
                 },
                 "tag": {
                   "default": "stable-glibc",
                   "description": "Init container images tags for `teams-cas`. [Reference][init-containers].",
-                  "required": [],
                   "title": "tag",
                   "type": "string"
                 }
@@ -1644,21 +1548,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the liveness probe for the `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the liveness probe for `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the liveness probe for the `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -1685,7 +1586,6 @@
             "enabled": {
               "default": false,
               "description": "Whether a pod disruption budget is enabled for `teams-cas`.",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -1717,21 +1617,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the readiness probe for the `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the readiness probe for `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the readiness probe for the `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -1744,7 +1641,6 @@
           "default": 2,
           "description": "Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment].",
           "minimum": 1,
-          "required": [],
           "title": "replicaCount",
           "type": "integer"
         },
@@ -1790,14 +1686,12 @@
             "containerPort": {
               "default": 3000,
               "description": "Service container port for `teams-cas`.",
-              "required": [],
               "title": "containerPort",
               "type": "integer"
             },
             "name": {
               "default": "teams-cas",
               "description": "Service name.",
-              "required": [],
               "title": "name",
               "type": "string"
             },
@@ -1814,21 +1708,18 @@
             "port": {
               "default": 80,
               "description": "Service port.",
-              "required": [],
               "title": "port",
               "type": "integer"
             },
             "shortname": {
               "default": "teams-cas",
               "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `teams-cas`. [Reference][ports].",
-              "required": [],
               "title": "shortname",
               "type": "string"
             },
             "type": {
               "default": "ClusterIP",
               "description": "Service type for `teams-cas`. [Reference][service-type].",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -1842,21 +1733,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the startup probe for the `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 30,
               "description": "How often (in seconds) to perform the startup probe for `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the startup probe for the `teams-cas`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -1870,7 +1758,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "tolerations",
           "type": "array"
         },
@@ -1879,7 +1766,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "topologySpreadConstraints",
           "type": "array"
         },
@@ -1888,7 +1774,6 @@
           "properties": {
             "type": {
               "default": "RollingUpdate",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -1902,7 +1787,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumeMounts",
           "type": "array"
         },
@@ -1911,7 +1795,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumes",
           "type": "array"
         }
@@ -1931,7 +1814,6 @@
               "properties": {
                 "enabled": {
                   "default": false,
-                  "required": [],
                   "title": "enabled",
                   "type": "boolean"
                 },
@@ -1939,13 +1821,11 @@
                   "properties": {
                     "FIFTYONE_MEDIA_CACHE_DIR": {
                       "default": "/opt/media_cache",
-                      "required": [],
                       "title": "FIFTYONE_MEDIA_CACHE_DIR",
                       "type": "string"
                     },
                     "FIFTYONE_MEDIA_CACHE_SIZE_BYTES": {
                       "default": "2147483648",
-                      "required": [],
                       "title": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
                       "type": "string"
                     }
@@ -1956,7 +1836,6 @@
                 },
                 "replicaCount": {
                   "default": 1,
-                  "required": [],
                   "title": "replicaCount",
                   "type": "integer"
                 },
@@ -1966,19 +1845,16 @@
                       "properties": {
                         "cpu": {
                           "default": 4,
-                          "required": [],
                           "title": "cpu",
                           "type": "integer"
                         },
                         "ephemeral-storage": {
                           "default": "1Gi",
-                          "required": [],
                           "title": "ephemeral-storage",
                           "type": "string"
                         },
                         "memory": {
                           "default": "16Gi",
-                          "required": [],
                           "title": "memory",
                           "type": "string"
                         }
@@ -1991,19 +1867,16 @@
                       "properties": {
                         "cpu": {
                           "default": 4,
-                          "required": [],
                           "title": "cpu",
                           "type": "integer"
                         },
                         "ephemeral-storage": {
                           "default": "1Gi",
-                          "required": [],
                           "title": "ephemeral-storage",
                           "type": "string"
                         },
                         "memory": {
                           "default": "16Gi",
-                          "required": [],
                           "title": "memory",
                           "type": "string"
                         }
@@ -2024,13 +1897,11 @@
                         "properties": {
                           "mountPath": {
                             "default": "/dev/shm",
-                            "required": [],
                             "title": "mountPath",
                             "type": "string"
                           },
                           "name": {
                             "default": "shm-vol",
-                            "required": [],
                             "title": "name",
                             "type": "string"
                           }
@@ -2042,13 +1913,11 @@
                         "properties": {
                           "mountPath": {
                             "default": "/opt/media_cache",
-                            "required": [],
                             "title": "mountPath",
                             "type": "string"
                           },
                           "name": {
                             "default": "memory-media-cache-vol",
-                            "required": [],
                             "title": "name",
                             "type": "string"
                           }
@@ -2059,7 +1928,6 @@
                     ],
                     "required": []
                   },
-                  "required": [],
                   "title": "volumeMounts",
                   "type": "array"
                 },
@@ -2072,13 +1940,11 @@
                             "properties": {
                               "medium": {
                                 "default": "Memory",
-                                "required": [],
                                 "title": "medium",
                                 "type": "string"
                               },
                               "sizeLimit": {
                                 "default": "2Gi",
-                                "required": [],
                                 "title": "sizeLimit",
                                 "type": "string"
                               }
@@ -2089,7 +1955,6 @@
                           },
                           "name": {
                             "default": "shm-vol",
-                            "required": [],
                             "title": "name",
                             "type": "string"
                           }
@@ -2103,13 +1968,11 @@
                             "properties": {
                               "medium": {
                                 "default": "Memory",
-                                "required": [],
                                 "title": "medium",
                                 "type": "string"
                               },
                               "sizeLimit": {
                                 "default": "2.5Gi",
-                                "required": [],
                                 "title": "sizeLimit",
                                 "type": "string"
                               }
@@ -2120,7 +1983,6 @@
                           },
                           "name": {
                             "default": "memory-media-cache-vol",
-                            "required": [],
                             "title": "name",
                             "type": "string"
                           }
@@ -2131,7 +1993,6 @@
                     ],
                     "required": []
                   },
-                  "required": [],
                   "title": "volumes",
                   "type": "array"
                 }
@@ -2163,7 +2024,6 @@
             "description": {
               "default": "",
               "description": "A description for the delegated operator instance. This is unused\nin the template context. Each operator should either set their own\ndescription or, optionally, use the default. If unset at the\noperator context, it will be defaulted to\n`Long running operations delegated to $name` where `$name` is the name\nof the Deployment object.",
-              "required": [],
               "title": "description",
               "type": "string"
             },
@@ -2173,7 +2033,6 @@
                 "FIFTYONE_DELEGATED_OPERATION_LOG_PATH": {
                   "default": "",
                   "description": "Full path to a network-mounted file system or a cloud storage path to\nuse for storing logs generated by delegated operation runs, one file\nper job. The default `\"\"` means log upload is disabled.",
-                  "required": [],
                   "title": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
                   "type": "string"
                 },
@@ -2232,14 +2091,12 @@
                 "repository": {
                   "default": "voxel51/fiftyone-teams-cv-full",
                   "description": "Container image for `delegated-operator-executor`.",
-                  "required": [],
                   "title": "repository",
                   "type": "string"
                 },
                 "tag": {
                   "default": "",
                   "description": "Image tag for `delegated-operator-executor`. Defaults to the chart version.",
-                  "required": [],
                   "title": "tag",
                   "type": "string"
                 }
@@ -2259,21 +2116,18 @@
                 "failureThreshold": {
                   "default": 5,
                   "description": "Number of times to retry the liveness probe for the `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "failureThreshold",
                   "type": "integer"
                 },
                 "periodSeconds": {
                   "default": 30,
                   "description": "How often (in seconds) to perform the liveness probe for `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "periodSeconds",
                   "type": "integer"
                 },
                 "timeoutSeconds": {
                   "default": 30,
                   "description": "Timeout for the liveness probe for the `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "timeoutSeconds",
                   "type": "integer"
                 }
@@ -2308,7 +2162,6 @@
                 "enabled": {
                   "default": false,
                   "description": "Whether a pod disruption budget is enabled for `teams-plugins`.",
-                  "required": [],
                   "title": "enabled",
                   "type": "boolean"
                 },
@@ -2340,21 +2193,18 @@
                 "failureThreshold": {
                   "default": 5,
                   "description": "Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "failureThreshold",
                   "type": "integer"
                 },
                 "periodSeconds": {
                   "default": 30,
                   "description": "How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "periodSeconds",
                   "type": "integer"
                 },
                 "timeoutSeconds": {
                   "default": 30,
                   "description": "Timeout for the readiness probe for the `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "timeoutSeconds",
                   "type": "integer"
                 }
@@ -2367,7 +2217,6 @@
               "default": 3,
               "description": "Number of pods in the delegated-operator-executor deployment's ReplicaSet.\nThis should not exceed the value set in the deployment's license file for\n max concurrent delegated operators, which defaults to 3.",
               "minimum": 1,
-              "required": [],
               "title": "replicaCount",
               "type": "integer"
             },
@@ -2407,21 +2256,18 @@
                 "failureThreshold": {
                   "default": 5,
                   "description": "Number of times to retry the startup probe for the `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "failureThreshold",
                   "type": "integer"
                 },
                 "periodSeconds": {
                   "default": 30,
                   "description": "How often (in seconds) to perform the startup probe for `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "periodSeconds",
                   "type": "integer"
                 },
                 "timeoutSeconds": {
                   "default": 30,
                   "description": "Timeout for the startup probe for the `teams-do`. [Reference][probes].",
-                  "required": [],
                   "title": "timeoutSeconds",
                   "type": "integer"
                 }
@@ -2435,7 +2281,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "tolerations",
               "type": "array"
             },
@@ -2444,7 +2289,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "topologySpreadConstraints",
               "type": "array"
             },
@@ -2453,7 +2297,6 @@
               "properties": {
                 "type": {
                   "default": "RollingUpdate",
-                  "required": [],
                   "title": "type",
                   "type": "string"
                 }
@@ -2467,7 +2310,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "volumeMounts",
               "type": "array"
             },
@@ -2476,7 +2318,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "volumes",
               "type": "array"
             }
@@ -2503,7 +2344,6 @@
             "create": {
               "default": true,
               "description": "Controls whether to create the `ConfigMap` named `delegatedOperatorJobTemplates.configMap.name`.",
-              "required": [],
               "title": "create",
               "type": "boolean"
             },
@@ -2516,7 +2356,6 @@
             "name": {
               "default": "",
               "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates.\nDefaults to `release-name-fiftyone-teams-app-do-templates`.",
-              "required": [],
               "title": "name",
               "type": "string"
             }
@@ -2582,7 +2421,6 @@
                 "FIFTYONE_DELEGATED_OPERATION_LOG_PATH": {
                   "default": "",
                   "description": "Full path to a network-mounted file system or a cloud storage path to\nuse for storing logs generated by delegated operation runs, one file\nper job. The default `\"\"` means log upload is disabled.",
-                  "required": [],
                   "title": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
                   "type": "string"
                 },
@@ -2631,14 +2469,12 @@
                 "repository": {
                   "default": "voxel51/fiftyone-teams-cv-full",
                   "description": "Container image for `delegated-operator-executor`.",
-                  "required": [],
                   "title": "repository",
                   "type": "string"
                 },
                 "tag": {
                   "default": "",
                   "description": "Image tag for `delegated-operator-executor`. Defaults to the chart version.",
-                  "required": [],
                   "title": "tag",
                   "type": "string"
                 }
@@ -2716,7 +2552,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "tolerations",
               "type": "array"
             },
@@ -2735,7 +2570,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "volumeMounts",
               "type": "array"
             },
@@ -2744,7 +2578,6 @@
               "items": {
                 "required": []
               },
-              "required": [],
               "title": "volumes",
               "type": "array"
             }
@@ -2763,13 +2596,11 @@
       "items": {
         "anyOf": [
           {
-            "required": [],
             "type": "string"
           }
         ],
         "required": []
       },
-      "required": [],
       "title": "fiftyoneLicenseSecrets",
       "type": "array"
     },
@@ -2784,7 +2615,6 @@
       "items": {
         "required": []
       },
-      "required": [],
       "title": "imagePullSecrets",
       "type": "array"
     },
@@ -2801,13 +2631,11 @@
           "properties": {
             "path": {
               "default": "/*",
-              "required": [],
               "title": "path",
               "type": "string"
             },
             "pathType": {
               "default": "ImplementationSpecific",
-              "required": [],
               "title": "pathType",
               "type": "string"
             }
@@ -2819,14 +2647,12 @@
         "className": {
           "default": "",
           "description": "Name of the ingress class.  When empty, a default Ingress class should be defined.\nWhen not empty, this value will be the Ingress class name.\n[Reference][ingress-default-ingress-class]",
-          "required": [],
           "title": "className",
           "type": "string"
         },
         "enabled": {
           "default": true,
           "description": "Controls whether to create the ingress. When `false`, uses a pre-existing ingress.\n[Reference][ingress].",
-          "required": [],
           "title": "enabled",
           "type": "boolean"
         },
@@ -2844,28 +2670,24 @@
                 "properties": {
                   "path": {
                     "default": "/cas",
-                    "required": [],
                     "title": "path",
                     "type": "string"
                   },
                   "pathType": {
                     "default": "Prefix",
                     "description": "Ingress path type",
-                    "required": [],
                     "title": "pathType",
                     "type": "string"
                   },
                   "serviceName": {
                     "default": "teams-cas",
                     "description": "Ingress path service name",
-                    "required": [],
                     "title": "serviceName",
                     "type": "string"
                   },
                   "servicePort": {
                     "default": 80,
                     "description": "(int) Ingress path service port",
-                    "required": [],
                     "title": "servicePort",
                     "type": "integer"
                   }
@@ -2877,28 +2699,24 @@
                 "properties": {
                   "path": {
                     "default": "/*",
-                    "required": [],
                     "title": "path",
                     "type": "string"
                   },
                   "pathType": {
                     "default": "ImplementationSpecific",
                     "description": "Ingress path type",
-                    "required": [],
                     "title": "pathType",
                     "type": "string"
                   },
                   "serviceName": {
                     "default": "teams-app",
                     "description": "Ingress path service name",
-                    "required": [],
                     "title": "serviceName",
                     "type": "string"
                   },
                   "servicePort": {
                     "default": 80,
                     "description": "(int) Ingress path service port",
-                    "required": [],
                     "title": "servicePort",
                     "type": "integer"
                   }
@@ -2909,21 +2727,18 @@
             ],
             "required": []
           },
-          "required": [],
           "title": "paths",
           "type": "array"
         },
         "tlsEnabled": {
           "default": true,
           "description": "Controls whether the chart managed ingress contains a `spec.tls` stanza.",
-          "required": [],
           "title": "tlsEnabled",
           "type": "boolean"
         },
         "tlsSecretName": {
           "default": "fiftyone-teams-tls-secret",
           "description": "Name of secret containing TLS certificate for `teams-app`.\nCertificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`.\nWhen `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`.",
-          "required": [],
           "title": "tlsSecretName",
           "type": "string"
         }
@@ -2937,14 +2752,12 @@
         "create": {
           "default": false,
           "description": "Controls whether to create the namespace.\nWhen `false`, the namespace must already exists.",
-          "required": [],
           "title": "create",
           "type": "boolean"
         },
         "name": {
           "default": "fiftyone-teams",
           "description": "The namespace name used for chart resources.",
-          "required": [],
           "title": "name",
           "type": "string"
         }
@@ -2968,35 +2781,30 @@
             "enabled": {
               "default": false,
               "description": "Controls horizontal pod autoscaling for `teams-plugins`. [Reference][autoscaling].",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
             "maxReplicas": {
               "default": 20,
               "description": "Maximum replicas for horizontal pod autoscaling for `teams-plugins`.",
-              "required": [],
               "title": "maxReplicas",
               "type": "integer"
             },
             "minReplicas": {
               "default": 2,
               "description": "Minimum Replicas for horizontal pod autoscaling for `teams-plugins`.",
-              "required": [],
               "title": "minReplicas",
               "type": "integer"
             },
             "targetCPUUtilizationPercentage": {
               "default": 80,
               "description": "Percent CPU utilization for autoscaling for `teams-plugins`.",
-              "required": [],
               "title": "targetCPUUtilizationPercentage",
               "type": "integer"
             },
             "targetMemoryUtilizationPercentage": {
               "default": 80,
               "description": "Percent memory utilization for autoscaling for `teams-plugins`.",
-              "required": [],
               "title": "targetMemoryUtilizationPercentage",
               "type": "integer"
             }
@@ -3014,7 +2822,6 @@
         "enabled": {
           "default": false,
           "description": "Controls whether to create a dedicated `teams-plugins` deployment.",
-          "required": [],
           "title": "enabled",
           "type": "boolean"
         },
@@ -3086,14 +2893,12 @@
             "repository": {
               "default": "voxel51/fiftyone-app",
               "description": "Container image for `teams-plugins`.",
-              "required": [],
               "title": "repository",
               "type": "string"
             },
             "tag": {
               "default": "",
               "description": "Image tag for `teams-plugins`. Defaults to the chart version.",
-              "required": [],
               "title": "tag",
               "type": "string"
             }
@@ -3109,7 +2914,6 @@
               "properties": {
                 "allowPrivilegeEscalation": {
                   "default": false,
-                  "required": [],
                   "title": "allowPrivilegeEscalation",
                   "type": "boolean"
                 },
@@ -3119,13 +2923,11 @@
                       "items": {
                         "anyOf": [
                           {
-                            "required": [],
                             "type": "string"
                           }
                         ],
                         "required": []
                       },
-                      "required": [],
                       "title": "drop",
                       "type": "array"
                     }
@@ -3136,13 +2938,11 @@
                 },
                 "runAsNonRoot": {
                   "default": true,
-                  "required": [],
                   "title": "runAsNonRoot",
                   "type": "boolean"
                 },
                 "runAsUser": {
                   "default": 1000,
-                  "required": [],
                   "title": "runAsUser",
                   "type": "integer"
                 }
@@ -3154,7 +2954,6 @@
             "enabled": {
               "default": true,
               "description": "Whether to enable init containers for `teams-plugins`. [Reference][init-containers].",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -3163,14 +2962,12 @@
                 "repository": {
                   "default": "docker.io/busybox",
                   "description": "Init container images repositories for `teams-plugins`. [Reference][init-containers].",
-                  "required": [],
                   "title": "repository",
                   "type": "string"
                 },
                 "tag": {
                   "default": "stable-glibc",
                   "description": "Init container images tags for `teams-plugins`. [Reference][init-containers].",
-                  "required": [],
                   "title": "tag",
                   "type": "string"
                 }
@@ -3277,21 +3074,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the liveness probe for the `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the liveness probe for `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the liveness probe for the `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -3327,7 +3121,6 @@
             "enabled": {
               "default": false,
               "description": "Whether a pod disruption budget is enabled for `teams-plugins`.",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -3359,21 +3152,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the readiness probe for the `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the readiness probe for `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the readiness probe for the `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -3386,7 +3176,6 @@
           "default": 2,
           "description": "Number of pods in the `teams-plugins` deployment's ReplicaSet.\nIgnored when `pluginsSettings.autoscaling.enabled: true`. [Reference][deployment].",
           "minimum": 1,
-          "required": [],
           "title": "replicaCount",
           "type": "integer"
         },
@@ -3432,14 +3221,12 @@
             "containerPort": {
               "default": 5151,
               "description": "Service container port for `teams-plugins`.",
-              "required": [],
               "title": "containerPort",
               "type": "integer"
             },
             "name": {
               "default": "teams-plugins",
               "description": "Service name.",
-              "required": [],
               "title": "name",
               "type": "string"
             },
@@ -3456,21 +3243,18 @@
             "port": {
               "default": 80,
               "description": "Service port.",
-              "required": [],
               "title": "port",
               "type": "integer"
             },
             "shortname": {
               "default": "teams-plugins",
               "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `teams-plugins`. [Reference][ports].",
-              "required": [],
               "title": "shortname",
               "type": "string"
             },
             "type": {
               "default": "ClusterIP",
               "description": "Service type for `teams-plugins`. [Reference][service-type].",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -3484,21 +3268,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the startup probe for the `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 30,
               "description": "How often (in seconds) to perform the startup probe for `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the startup probe for the `teams-plugins`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -3512,7 +3293,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "tolerations",
           "type": "array"
         },
@@ -3521,7 +3301,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "topologySpreadConstraints",
           "type": "array"
         },
@@ -3530,7 +3309,6 @@
           "properties": {
             "type": {
               "default": "RollingUpdate",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -3544,7 +3322,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumeMounts",
           "type": "array"
         },
@@ -3553,7 +3330,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumes",
           "type": "array"
         }
@@ -3567,7 +3343,6 @@
         "create": {
           "default": true,
           "description": "Controls whether to create the secret named `secret.name`.",
-          "required": [],
           "title": "create",
           "type": "boolean"
         },
@@ -3576,35 +3351,30 @@
             "cookieSecret": {
               "default": "",
               "description": "A randomly generated string for cookie encryption.\nTo generate, run `openssl rand -hex 32`.",
-              "required": [],
               "title": "cookieSecret",
               "type": "string"
             },
             "encryptionKey": {
               "default": "",
               "description": "Encryption key for storage credentials. [Reference][fiftyone-encryption-key].",
-              "required": [],
               "title": "encryptionKey",
               "type": "string"
             },
             "fiftyoneAuthSecret": {
               "default": "",
               "description": "A randomly generated string for CAS Authentication.\nThis can be any string you care to use generated by any mechanism you\n  prefer.\nThis is used for inter-service authentication and for the SuperUser to\n authenticate at the CAS UI to configure the Central Authentication Service.",
-              "required": [],
               "title": "fiftyoneAuthSecret",
               "type": "string"
             },
             "fiftyoneDatabaseName": {
               "default": "",
               "description": "MongoDB Database Name for FiftyOne Enterprise.",
-              "required": [],
               "title": "fiftyoneDatabaseName",
               "type": "string"
             },
             "mongodbConnectionString": {
               "default": "",
               "description": "MongoDB Connection String. [Reference][mongodb-connection-string].",
-              "required": [],
               "title": "mongodbConnectionString",
               "type": "string"
             }
@@ -3622,7 +3392,6 @@
         "name": {
           "default": "fiftyone-teams-secrets",
           "description": "Name of the secret (existing or to be created) in the namespace `namespace.name`.",
-          "required": [],
           "title": "name",
           "type": "string"
         }
@@ -3642,7 +3411,6 @@
         "create": {
           "default": true,
           "description": "Controls whether to create the service account named `serviceAccount.name`.",
-          "required": [],
           "title": "create",
           "type": "boolean"
         },
@@ -3655,7 +3423,6 @@
         "name": {
           "default": "fiftyone-teams",
           "description": "Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments.\n[Reference][service-account].",
-          "required": [],
           "title": "name",
           "type": "string"
         }
@@ -3679,35 +3446,30 @@
             "enabled": {
               "default": false,
               "description": "Controls horizontal pod autoscaling for `teams-app`.  [Reference][autoscaling].",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
             "maxReplicas": {
               "default": 5,
               "description": "Maximum Replicas for horizontal autoscaling for `teams-app`.",
-              "required": [],
               "title": "maxReplicas",
               "type": "integer"
             },
             "minReplicas": {
               "default": 2,
               "description": "Minimum Replicas for horizontal autoscaling for `teams-app`.",
-              "required": [],
               "title": "minReplicas",
               "type": "integer"
             },
             "targetCPUUtilizationPercentage": {
               "default": 80,
               "description": "Percent CPU utilization for autoscaling for `teams-app`.",
-              "required": [],
               "title": "targetCPUUtilizationPercentage",
               "type": "integer"
             },
             "targetMemoryUtilizationPercentage": {
               "default": 80,
               "description": "Percent memory utilization for autoscaling for `teams-app`.",
-              "required": [],
               "title": "targetMemoryUtilizationPercentage",
               "type": "integer"
             }
@@ -3725,7 +3487,6 @@
         "dnsName": {
           "default": "",
           "description": "DNS Name for the `teams-app` service.\nUsed in the chart managed ingress (`spec.tls.hosts` and `spec.rules[0].host`)",
-          "required": [],
           "title": "dnsName",
           "type": "string"
         },
@@ -3762,17 +3523,21 @@
                 "boolean"
               ]
             },
+            "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS": {
+              "default": "kubernetes",
+              "description": "Deployment characteristics for the `teams-app`.\n`kubernetes`: Indicates the app is running in a Kubernetes environment.\n`docker`: Indicates the app is running in a Docker environment.\n`kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment",
+              "title": "FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS",
+              "type": "string"
+            },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
-              "default": "2.17.1",
+              "default": "2.18.1",
               "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==0.11.0`).",
-              "required": [],
               "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
               "type": "string"
             },
             "FIFTYONE_APP_THEME": {
               "default": "dark",
               "description": "The default theme configuration.\n`dark`: Theme will be dark when user visits for the first time.\n`light`: Theme will be light theme when user visits for the first time.\n`always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app).\n`always-light`: Sets light theme on each refresh (overrides user theme changes in the app).",
-              "required": [],
               "title": "FIFTYONE_APP_THEME",
               "type": "string"
             },
@@ -3794,7 +3559,6 @@
         "fiftyoneApiOverride": {
           "default": "",
           "description": "Overrides the `FIFTYONE_API_URI` environment variable. When set\n`FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance\nfor connecting to the FiftyOne Enterprise API.\n`FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or\nuses the teamsAppSettings.dnsName",
-          "required": [],
           "title": "fiftyoneApiOverride",
           "type": "string"
         },
@@ -3819,14 +3583,12 @@
             "repository": {
               "default": "voxel51/fiftyone-teams-app",
               "description": "Container image for `teams-app`.",
-              "required": [],
               "title": "repository",
               "type": "string"
             },
             "tag": {
               "default": "",
               "description": "Image tag for `teams-app`.  Defaults to the chart version.",
-              "required": [],
               "title": "tag",
               "type": "string"
             }
@@ -3842,7 +3604,6 @@
               "properties": {
                 "allowPrivilegeEscalation": {
                   "default": false,
-                  "required": [],
                   "title": "allowPrivilegeEscalation",
                   "type": "boolean"
                 },
@@ -3852,13 +3613,11 @@
                       "items": {
                         "anyOf": [
                           {
-                            "required": [],
                             "type": "string"
                           }
                         ],
                         "required": []
                       },
-                      "required": [],
                       "title": "drop",
                       "type": "array"
                     }
@@ -3869,13 +3628,11 @@
                 },
                 "runAsNonRoot": {
                   "default": true,
-                  "required": [],
                   "title": "runAsNonRoot",
                   "type": "boolean"
                 },
                 "runAsUser": {
                   "default": 1000,
-                  "required": [],
                   "title": "runAsUser",
                   "type": "integer"
                 }
@@ -3887,7 +3644,6 @@
             "enabled": {
               "default": true,
               "description": "Whether to enable init containers for `teams-app`.  [Reference][init-containers].",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -3896,14 +3652,12 @@
                 "repository": {
                   "default": "docker.io/busybox",
                   "description": "Init container images repositories for `teams-app`.  [Reference][init-containers].",
-                  "required": [],
                   "title": "repository",
                   "type": "string"
                 },
                 "tag": {
                   "default": "stable-glibc",
                   "description": "Init container images tags for `teams-app`.  [Reference][init-containers].",
-                  "required": [],
                   "title": "tag",
                   "type": "string"
                 }
@@ -4010,21 +3764,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the liveness probe for the `teams-app`.  [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the liveness probe for `teams-app`.  [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the liveness probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -4051,7 +3802,6 @@
             "enabled": {
               "default": false,
               "description": "Whether a pod disruption budget is enabled for `teams-app`.",
-              "required": [],
               "title": "enabled",
               "type": "boolean"
             },
@@ -4083,21 +3833,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the readiness probe for the `teams-app`.  [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 15,
               "description": "How often (in seconds) to perform the readiness probe for `teams-app`.  [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -4110,7 +3857,6 @@
           "default": 2,
           "description": "Number of pods in the `teams-app` deployment's ReplicaSet.\nIgnored when `teamsAppSettings.autoscaling.enabled: true`. [Reference][deployment].",
           "minimum": 1,
-          "required": [],
           "title": "replicaCount",
           "type": "integer"
         },
@@ -4156,14 +3902,12 @@
             "containerPort": {
               "default": 3000,
               "description": "Service container port for `teams-app`.",
-              "required": [],
               "title": "containerPort",
               "type": "integer"
             },
             "name": {
               "default": "teams-app",
               "description": "Service name.",
-              "required": [],
               "title": "name",
               "type": "string"
             },
@@ -4180,21 +3924,18 @@
             "port": {
               "default": 80,
               "description": "Service port.",
-              "required": [],
               "title": "port",
               "type": "integer"
             },
             "shortname": {
               "default": "teams-app",
               "description": "TODO: Kevin/topher - Consider changing name from `shortname` to `portName`.\nTODO: Alex - Default should include protocol in the name per kubernetes standards.\nPort name (maximum length is 15 characters) for `teams-app`.  [Reference][ports].",
-              "required": [],
               "title": "shortname",
               "type": "string"
             },
             "type": {
               "default": "ClusterIP",
               "description": "Service type for `teams-app`.  [Reference][service-type].",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -4208,21 +3949,18 @@
             "failureThreshold": {
               "default": 5,
               "description": "Number of times to retry the startup probe for the `teams-app`.  [Reference][probes].",
-              "required": [],
               "title": "failureThreshold",
               "type": "integer"
             },
             "periodSeconds": {
               "default": 30,
               "description": "How often (in seconds) to perform the startup probe for `teams-app`.  [Reference][probes].",
-              "required": [],
               "title": "periodSeconds",
               "type": "integer"
             },
             "timeoutSeconds": {
               "default": 5,
               "description": "Timeout for the startup probe for the `fiftyone-app`. [Reference][probes].",
-              "required": [],
               "title": "timeoutSeconds",
               "type": "integer"
             }
@@ -4236,7 +3974,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "tolerations",
           "type": "array"
         },
@@ -4245,7 +3982,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "topologySpreadConstraints",
           "type": "array"
         },
@@ -4254,7 +3990,6 @@
           "properties": {
             "type": {
               "default": "RollingUpdate",
-              "required": [],
               "title": "type",
               "type": "string"
             }
@@ -4268,7 +4003,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumeMounts",
           "type": "array"
         },
@@ -4277,7 +4011,6 @@
           "items": {
             "required": []
           },
-          "required": [],
           "title": "volumes",
           "type": "array"
         }
