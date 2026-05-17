@@ -2489,7 +2489,7 @@
               "type": "object"
             },
             "nativeSidecarContainers": {
-              "description": "Native sidecar containers for on-demand delegated-operator Job pods\n(Kubernetes 1.29+). Entries are rendered under `initContainers`; set\n`restartPolicy: Always` on each entry to enable the native sidecar\nlifecycle. Kubelet auto-terminates these when the executor container\nfinishes, so the Job completes cleanly. [Reference][sidecar-containers].",
+              "description": "Native sidecar containers for on-demand delegated-operator Job pods\n(Kubernetes 1.29+). Entries are rendered under `initContainers`; set\n`restartPolicy: Always` on each entry to enable the native sidecar\nlifecycle. Kubelet auto-terminates these when the executor container\nfinishes, so the Job completes cleanly. The chart auto-injects\n`TARGET_CONTAINER=executor` on each entry (override by setting it\nexplicitly). [Reference][sidecar-containers].",
               "items": {
                 "required": []
               },

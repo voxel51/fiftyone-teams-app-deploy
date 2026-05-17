@@ -1031,7 +1031,9 @@ delegatedOperatorJobTemplates:
     # (Kubernetes 1.29+). Entries are rendered under `initContainers`; set
     # `restartPolicy: Always` on each entry to enable the native sidecar
     # lifecycle. Kubelet auto-terminates these when the executor container
-    # finishes, so the Job completes cleanly. [Reference][sidecar-containers].
+    # finishes, so the Job completes cleanly. The chart auto-injects
+    # `TARGET_CONTAINER=executor` on each entry (override by setting it
+    # explicitly). [Reference][sidecar-containers].
     nativeSidecarContainers: []
   # -- On-Demand Delegated Operator Jobs.
   jobs: {}

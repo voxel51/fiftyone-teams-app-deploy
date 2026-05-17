@@ -44,6 +44,31 @@ data:
   {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes }}
   {{- $mergedExtraContainers := $jobConfig.extraContainers | default $baseTpl.extraContainers }}
   {{- $mergedNativeSidecarContainers := $jobConfig.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers }}
+
+  {{- /* telemetry-sidecar needs a shared emptyDir; values can't reliably keep it through fleet regenerators, so reconcile it here. */ -}}
+  {{- $needsTelemetrySocket := false }}
+  {{- range $sidecar := $mergedNativeSidecarContainers }}
+    {{- range $vm := ($sidecar.volumeMounts | default list) }}
+      {{- if eq $vm.name "telemetry-socket" }}{{- $needsTelemetrySocket = true }}{{- end }}
+    {{- end }}
+  {{- end }}
+  {{- if $needsTelemetrySocket }}
+    {{- $hasVolume := false }}
+    {{- range $v := ($mergedVolumes | default list) }}
+      {{- if eq $v.name "telemetry-socket" }}{{- $hasVolume = true }}{{- end }}
+    {{- end }}
+    {{- if not $hasVolume }}
+      {{- $mergedVolumes = append ($mergedVolumes | default list) (dict "name" "telemetry-socket" "emptyDir" dict) }}
+    {{- end }}
+    {{- $hasMount := false }}
+    {{- range $vm := ($mergedVolumeMounts | default list) }}
+      {{- if eq $vm.name "telemetry-socket" }}{{- $hasMount = true }}{{- end }}
+    {{- end }}
+    {{- if not $hasMount }}
+      {{- $mergedVolumeMounts = append ($mergedVolumeMounts | default list) (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+    {{- end }}
+  {{- end }}
+
   {{- /* Trunc at 48 for the random ID to be generated via API */ -}}
   {{- $metadataName := kebabcase $jobName | trunc 48 }}
 
@@ -129,7 +154,20 @@ data:
             {{- end }}
           {{- with $mergedNativeSidecarContainers }}
           initContainers:
-            {{- toYaml . | nindent 12 }}
+            {{- /* TARGET_CONTAINER tells the telemetry sidecar's log tailer which container to follow; the executor is hardcoded so we know the value. */ -}}
+            {{- range $sidecar := . }}
+            {{- $hasTargetContainer := false }}
+            {{- range $env := ($sidecar.env | default list) }}
+              {{- if eq $env.name "TARGET_CONTAINER" }}
+                {{- $hasTargetContainer = true }}
+              {{- end }}
+            {{- end }}
+            {{- $rendered := deepCopy $sidecar }}
+            {{- if not $hasTargetContainer }}
+              {{- $_ := set $rendered "env" (prepend ($sidecar.env | default list) (dict "name" "TARGET_CONTAINER" "value" "executor")) }}
+            {{- end }}
+            {{- list $rendered | toYaml | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with $mergedNodeSelector }}
           nodeSelector:
