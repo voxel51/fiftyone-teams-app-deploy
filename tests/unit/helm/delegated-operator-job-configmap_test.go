@@ -660,9 +660,10 @@ func (s *doK8sConfigMapTemplateTest) loadTestFile(filename, chartVersion string)
 
 func (s *doK8sConfigMapTemplateTest) TestNativeSidecarTelemetryAutoInject() {
 	testCases := []struct {
-		name     string
-		values   map[string]string
-		expected func(subT gruntworkTesting.TestingT, job batchv1.Job)
+		name      string
+		values    map[string]string
+		strValues map[string]string
+		expected  func(subT gruntworkTesting.TestingT, job batchv1.Job)
 	}{
 		{
 			"AutoInjectsTelemetrySocketWiringWhenSidecarHasExecutorEnv",
@@ -672,7 +673,9 @@ func (s *doK8sConfigMapTemplateTest) TestNativeSidecarTelemetryAutoInject() {
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].image":         "telemetry-sidecar:latest",
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].restartPolicy": "Always",
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].env[0].name":   "EXECUTOR_SIDECAR",
-				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].env[0].value":  "true",
+			},
+			map[string]string{
+				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].env[0].value": "true",
 			},
 			func(subT gruntworkTesting.TestingT, job batchv1.Job) {
 				podSpec := job.Spec.Template.Spec
@@ -700,9 +703,11 @@ func (s *doK8sConfigMapTemplateTest) TestNativeSidecarTelemetryAutoInject() {
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].image":         "telemetry-sidecar:latest",
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].restartPolicy": "Always",
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].env[0].name":   "EXECUTOR_SIDECAR",
-				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].env[0].value":  "true",
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].env[1].name":   "TARGET_CONTAINER",
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].env[1].value":  "custom-executor",
+			},
+			map[string]string{
+				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].env[0].value": "true",
 			},
 			func(subT gruntworkTesting.TestingT, job batchv1.Job) {
 				sidecar := job.Spec.Template.Spec.InitContainers[0]
@@ -718,6 +723,7 @@ func (s *doK8sConfigMapTemplateTest) TestNativeSidecarTelemetryAutoInject() {
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].image":         "istio-proxy:latest",
 				"delegatedOperatorJobTemplates.template.nativeSidecarContainers[0].restartPolicy": "Always",
 			},
+			nil,
 			func(subT gruntworkTesting.TestingT, job batchv1.Job) {
 				podSpec := job.Spec.Template.Spec
 				s.False(volumeContains(podSpec.Volumes, "telemetry-socket"), "Non-executor sidecar must not auto-inject telemetry-socket volume")
@@ -736,7 +742,7 @@ func (s *doK8sConfigMapTemplateTest) TestNativeSidecarTelemetryAutoInject() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: testCase.values, SetStrValues: testCase.strValues}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap
