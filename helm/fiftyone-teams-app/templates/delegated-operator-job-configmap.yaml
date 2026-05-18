@@ -45,14 +45,13 @@ data:
   {{- $mergedExtraContainers := $jobConfig.extraContainers | default $baseTpl.extraContainers }}
   {{- $mergedNativeSidecarContainers := $jobConfig.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers }}
 
-  {{- /* telemetry-sidecar needs a shared emptyDir; values can't reliably keep it through fleet regenerators, so reconcile it here. */ -}}
-  {{- $needsTelemetrySocket := false }}
+  {{- $hasExecutorSidecar := false }}
   {{- range $sidecar := $mergedNativeSidecarContainers }}
-    {{- range $vm := ($sidecar.volumeMounts | default list) }}
-      {{- if eq $vm.name "telemetry-socket" }}{{- $needsTelemetrySocket = true }}{{- end }}
+    {{- range $env := ($sidecar.env | default list) }}
+      {{- if and (eq $env.name "EXECUTOR_SIDECAR") (eq (toString $env.value) "true") }}{{- $hasExecutorSidecar = true }}{{- end }}
     {{- end }}
   {{- end }}
-  {{- if $needsTelemetrySocket }}
+  {{- if $hasExecutorSidecar }}
     {{- $hasVolume := false }}
     {{- range $v := ($mergedVolumes | default list) }}
       {{- if eq $v.name "telemetry-socket" }}{{- $hasVolume = true }}{{- end }}
@@ -154,17 +153,25 @@ data:
             {{- end }}
           {{- with $mergedNativeSidecarContainers }}
           initContainers:
-            {{- /* TARGET_CONTAINER tells the telemetry sidecar's log tailer which container to follow; the executor is hardcoded so we know the value. */ -}}
             {{- range $sidecar := . }}
+            {{- $isExecutor := false }}
             {{- $hasTargetContainer := false }}
             {{- range $env := ($sidecar.env | default list) }}
-              {{- if eq $env.name "TARGET_CONTAINER" }}
-                {{- $hasTargetContainer = true }}
-              {{- end }}
+              {{- if eq $env.name "TARGET_CONTAINER" }}{{- $hasTargetContainer = true }}{{- end }}
+              {{- if and (eq $env.name "EXECUTOR_SIDECAR") (eq (toString $env.value) "true") }}{{- $isExecutor = true }}{{- end }}
             {{- end }}
             {{- $rendered := deepCopy $sidecar }}
             {{- if not $hasTargetContainer }}
               {{- $_ := set $rendered "env" (prepend ($sidecar.env | default list) (dict "name" "TARGET_CONTAINER" "value" "executor")) }}
+            {{- end }}
+            {{- if $isExecutor }}
+              {{- $hasSocketMount := false }}
+              {{- range $vm := ($sidecar.volumeMounts | default list) }}
+                {{- if eq $vm.name "telemetry-socket" }}{{- $hasSocketMount = true }}{{- end }}
+              {{- end }}
+              {{- if not $hasSocketMount }}
+                {{- $_ := set $rendered "volumeMounts" (append ($sidecar.volumeMounts | default list) (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry")) }}
+              {{- end }}
             {{- end }}
             {{- list $rendered | toYaml | nindent 12 }}
             {{- end }}
