@@ -119,6 +119,11 @@ Inputs: same dict as telemetry.sidecar-env.
     {{- toYaml . | nindent 4 }}
   {{- end }}
   securityContext:
+    # The sidecar image runs as root (SYS_PTRACE + /proc/<pid>/fd/1 access
+    # require it). Explicit container-level override so it works even when
+    # the pod's podSecurityContext sets runAsNonRoot: true.
+    runAsNonRoot: false
+    runAsUser: 0
     capabilities:
       add:
         - SYS_PTRACE
@@ -154,6 +159,11 @@ not exit would block Job completion.
     failureThreshold: 30
     periodSeconds: 1
   securityContext:
+    # The sidecar image runs as root (SYS_PTRACE + /proc/<pid>/fd/1 access
+    # require it). Explicit container-level override so it works even when
+    # the pod's podSecurityContext sets runAsNonRoot: true.
+    runAsNonRoot: false
+    runAsUser: 0
     capabilities:
       add:
         - SYS_PTRACE
