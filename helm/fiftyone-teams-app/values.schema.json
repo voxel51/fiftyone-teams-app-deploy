@@ -4102,8 +4102,8 @@
         "sidecar": {
           "properties": {
             "image": {
-              "default": "voxel51/telemetry-sidecar:latest",
-              "description": "Container image for the auto-injected `telemetry-sidecar` containers.",
+              "default": "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.61",
+              "description": "Container image for the auto-injected `telemetry-sidecar` containers.\nThe image is built and published from voxel51/fiftyone-teams `sidecar/`\nto the internal Voxel51 GAR. Override for environments without access\nto that registry (e.g. external chart consumers).",
               "title": "image",
               "type": "string"
             },
