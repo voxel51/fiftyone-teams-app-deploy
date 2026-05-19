@@ -26,9 +26,5 @@ roleRef:
   kind: Role
   name: {{ include "telemetry.role.name" . }}
 subjects:
-{{- range .Values.telemetry.serviceAccounts | default (list "default") }}
-  - kind: ServiceAccount
-    name: {{ . }}
-    namespace: {{ $.Values.namespace.name }}
-{{- end }}
+  {{- include "telemetry.role.subjects" . | nindent 2 }}
 {{- end }}

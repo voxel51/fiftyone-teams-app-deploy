@@ -4010,11 +4010,11 @@
       "type": "object"
     },
     "telemetry": {
-      "description": "In-cluster telemetry support. When enabled, the chart renders a small\nRedis Deployment + Service (used by `telemetry-sidecar` containers\nconfigured on workload pods via `extraContainers`) plus a Role/RoleBinding\ngranting the sidecar's service accounts read access to `pods/log`.\nThe chart itself does NOT inject `telemetry-sidecar` containers; consumers\nwire those into `extraContainers` on the relevant workloads and point the\n`FIFTYONE_TELEMETRY_REDIS_URL` env var at this service.",
+      "description": "In-cluster telemetry. When enabled (the default), the chart renders:\n  - a Redis Deployment + Service that collects per-service metric streams\n  - a Role + RoleBinding granting the sidecar read access to `pods/log`\n  - a `telemetry-sidecar` container auto-injected into the\n    `teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator\n    workloads, plus a `nativeSidecarContainers` entry on the\n    delegated-operator Job template\n  - `FIFTYONE_TELEMETRY_REDIS_URL` on every workload that talks to the\n    redis backend (api, app, plugins, teams-app, delegated operators)\n\nSet `enabled: false` to skip all telemetry resources and sidecar injection.",
       "properties": {
         "enabled": {
           "default": true,
-          "description": "Whether to render the telemetry Redis Deployment/Service and the\ntelemetry pod-logs Role/RoleBinding. Defaults to `true` so consumers\nthat wire up `telemetry-sidecar` containers get a working redis without\nadditional opt-in. Set to `false` to skip rendering all telemetry-related\nresources.",
+          "description": "Master switch. When `true` (default), all telemetry resources and\nauto-injected sidecars are rendered. When `false`, none are.",
           "title": "enabled",
           "type": "boolean"
         },
@@ -4092,12 +4092,73 @@
           "type": "object"
         },
         "serviceAccounts": {
-          "description": "ServiceAccount names (in `namespace.name`) bound to the telemetry\npod-logs Role. Each entry becomes a `ServiceAccount` subject on the\ngenerated RoleBinding. When empty, the RoleBinding subjects default to\nthe `default` ServiceAccount.",
+          "description": "ServiceAccount names (in `namespace.name`) bound to the telemetry\npod-logs Role. Each entry becomes a `ServiceAccount` subject on the\ngenerated RoleBinding. When empty, the RoleBinding subjects default to\nthe chart's main app service account and the teams-api RBAC service\naccount so auto-injected sidecars can read their target's logs.",
           "items": {
             "required": []
           },
           "title": "serviceAccounts",
           "type": "array"
+        },
+        "sidecar": {
+          "properties": {
+            "image": {
+              "default": "voxel51/telemetry-sidecar:latest",
+              "description": "Container image for the auto-injected `telemetry-sidecar` containers.",
+              "title": "image",
+              "type": "string"
+            },
+            "imagePullPolicy": {
+              "default": "Always",
+              "description": "Pull policy for the sidecar image.",
+              "title": "imagePullPolicy",
+              "type": "string"
+            },
+            "resources": {
+              "description": "Resource requests/limits for each auto-injected sidecar container.",
+              "properties": {
+                "limits": {
+                  "properties": {
+                    "cpu": {
+                      "default": "100m",
+                      "title": "cpu",
+                      "type": "string"
+                    },
+                    "memory": {
+                      "default": "512Mi",
+                      "title": "memory",
+                      "type": "string"
+                    }
+                  },
+                  "required": [],
+                  "title": "limits",
+                  "type": "object"
+                },
+                "requests": {
+                  "properties": {
+                    "cpu": {
+                      "default": "100m",
+                      "title": "cpu",
+                      "type": "string"
+                    },
+                    "memory": {
+                      "default": "512Mi",
+                      "title": "memory",
+                      "type": "string"
+                    }
+                  },
+                  "required": [],
+                  "title": "requests",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "sidecar",
+          "type": "object"
         }
       },
       "required": [],

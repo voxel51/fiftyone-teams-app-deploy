@@ -36,7 +36,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
-      {{- if or .Values.pluginsSettings.extraContainers .Values.pluginsSettings.nativeSidecarContainers }}
+      {{- if or .Values.pluginsSettings.extraContainers .Values.pluginsSettings.nativeSidecarContainers .Values.telemetry.enabled }}
       shareProcessNamespace: true
       {{- end }}
       securityContext:
@@ -79,6 +79,9 @@ spec:
           {{- end }}
         {{- with .Values.pluginsSettings.extraContainers }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.telemetry.enabled }}
+        {{- include "telemetry.sidecar" (dict "ctx" . "serviceType" "teams-plugins" "targetName" "hypercorn") | nindent 8 }}
         {{- end }}
       {{- if or .Values.pluginsSettings.initContainers.enabled .Values.pluginsSettings.nativeSidecarContainers }}
       initContainers:

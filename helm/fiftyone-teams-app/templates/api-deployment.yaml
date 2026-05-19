@@ -44,7 +44,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ $serviceAccountName }}
-      {{- if or .Values.apiSettings.extraContainers .Values.apiSettings.nativeSidecarContainers }}
+      {{- if or .Values.apiSettings.extraContainers .Values.apiSettings.nativeSidecarContainers .Values.telemetry.enabled }}
       shareProcessNamespace: true
       {{- end }}
       securityContext:
@@ -94,6 +94,9 @@ spec:
             {{- end }}
         {{- with .Values.apiSettings.extraContainers }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.telemetry.enabled }}
+        {{- include "telemetry.sidecar" (dict "ctx" . "serviceType" "teams-api" "targetName" "fiftyone-teams-api") | nindent 8 }}
         {{- end }}
       {{- if or .Values.apiSettings.initContainers.enabled .Values.apiSettings.nativeSidecarContainers }}
       initContainers:

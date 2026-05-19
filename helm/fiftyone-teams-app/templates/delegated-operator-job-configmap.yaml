@@ -24,6 +24,7 @@ data:
       "apiServicePort" (float64 $.Values.apiSettings.service.port)
       "env" (merge (deepCopy ($jobConfig.env | default dict)) ($baseTpl.env))
       "secretEnv" (merge (deepCopy ($jobConfig.secretEnv | default dict)) ($baseTpl.secretEnv))
+      "ctx" $
   }}
 
   {{- /* label context for helpers. */ -}}
@@ -43,7 +44,21 @@ data:
   {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts }}
   {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes }}
   {{- $mergedExtraContainers := $jobConfig.extraContainers | default $baseTpl.extraContainers }}
-  {{- $mergedNativeSidecarContainers := $jobConfig.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers }}
+  {{- $mergedNativeSidecarContainers := $jobConfig.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers | default list }}
+
+  {{- /* Auto-inject the telemetry native-sidecar when telemetry is enabled
+       and the consumer hasn't supplied one of their own. */ -}}
+  {{- if $.Values.telemetry.enabled }}
+    {{- $hasTelemetrySidecar := false }}
+    {{- range $sc := $mergedNativeSidecarContainers }}
+      {{- if eq $sc.name "telemetry-sidecar" }}{{- $hasTelemetrySidecar = true }}{{- end }}
+    {{- end }}
+    {{- if not $hasTelemetrySidecar }}
+      {{- $telemetrySidecarYaml := include "telemetry.native-sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "targetContainer" "executor" "executor" true) }}
+      {{- $telemetrySidecar := $telemetrySidecarYaml | fromYamlArray | first }}
+      {{- $mergedNativeSidecarContainers = append $mergedNativeSidecarContainers $telemetrySidecar }}
+    {{- end }}
+  {{- end }}
 
   {{- $hasExecutorSidecar := false }}
   {{- range $sidecar := $mergedNativeSidecarContainers }}

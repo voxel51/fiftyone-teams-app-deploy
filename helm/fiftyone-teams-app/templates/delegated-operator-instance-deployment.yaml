@@ -11,6 +11,7 @@
     "apiServicePort" (float64 $.Values.apiSettings.service.port)
     "env" (merge (dict) ($v.env | default dict) ($baseTpl.env))
     "secretEnv" (merge (dict) ($v.secretEnv | default dict) ($baseTpl.secretEnv))
+    "ctx" $
   )
 }}
 {{- $defaultDescription := printf "Long running operations delegated to %s" $name }}
@@ -50,7 +51,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
-      {{- if or ($v.extraContainers | default $baseTpl.extraContainers) ($v.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers) }}
+      {{- if or ($v.extraContainers | default $baseTpl.extraContainers) ($v.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers) $.Values.telemetry.enabled }}
       shareProcessNamespace: true
       {{- end }}
       securityContext:
@@ -78,7 +79,17 @@ spec:
             {{- include "delegated-operator-deployments.env-vars-list" $envContext | indent 12 }}
           resources:
             {{- toYaml (merge (dict) ($v.resources | default dict) ($baseTpl.resources)) | nindent 12 }}
-          {{- with $v.volumeMounts | default $baseTpl.volumeMounts }}
+          {{- $mergedVolumeMounts := $v.volumeMounts | default $baseTpl.volumeMounts | default list }}
+          {{- if $.Values.telemetry.enabled }}
+          {{- $hasSocketMount := false }}
+          {{- range $vm := $mergedVolumeMounts }}
+            {{- if eq $vm.name "telemetry-socket" }}{{- $hasSocketMount = true }}{{- end }}
+          {{- end }}
+          {{- if not $hasSocketMount }}
+            {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+          {{- end }}
+          {{- end }}
+          {{- with $mergedVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -112,6 +123,9 @@ spec:
         {{- with $v.extraContainers | default $baseTpl.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if $.Values.telemetry.enabled }}
+        {{- include "telemetry.sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true) | nindent 8 }}
+        {{- end }}
       {{- with $v.nativeSidecarContainers | default $baseTpl.nativeSidecarContainers }}
       initContainers:
         {{- toYaml . | nindent 8 }}
@@ -139,7 +153,17 @@ spec:
           ) | nindent 8
         }}
       {{- end }}
-      {{- with $v.volumes | default $baseTpl.volumes }}
+      {{- $mergedVolumes := $v.volumes | default $baseTpl.volumes | default list }}
+      {{- if $.Values.telemetry.enabled }}
+      {{- $hasSocketVol := false }}
+      {{- range $vol := $mergedVolumes }}
+        {{- if eq $vol.name "telemetry-socket" }}{{- $hasSocketVol = true }}{{- end }}
+      {{- end }}
+      {{- if not $hasSocketVol }}
+        {{- $mergedVolumes = append $mergedVolumes (dict "name" "telemetry-socket" "emptyDir" dict) }}
+      {{- end }}
+      {{- end }}
+      {{- with $mergedVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
