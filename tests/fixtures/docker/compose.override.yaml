@@ -2,3 +2,25 @@ services:
   fiftyone-app:
     environment:
       FIFTYONE_DATABASE_ADMIN: false
+
+  # Integration tests don't have access to the private
+  # `voxel51/telemetry-sidecar` image. Replace each sidecar with a
+  # public idle alpine container so the stack still composes correctly
+  # but no private-registry pull is required. Sidecars are not exercised
+  # by these tests — only the main services are.
+  fiftyone-app-telemetry:
+    image: alpine:3.20
+    command: ["tail", "-f", "/dev/null"]
+    pull_policy: missing
+  teams-api-telemetry:
+    image: alpine:3.20
+    command: ["tail", "-f", "/dev/null"]
+    pull_policy: missing
+  teams-plugins-telemetry:
+    image: alpine:3.20
+    command: ["tail", "-f", "/dev/null"]
+    pull_policy: missing
+  teams-do-telemetry:
+    image: alpine:3.20
+    command: ["tail", "-f", "/dev/null"]
+    pull_policy: missing
