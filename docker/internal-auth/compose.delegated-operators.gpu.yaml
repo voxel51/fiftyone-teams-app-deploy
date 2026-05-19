@@ -49,14 +49,19 @@ services:
     restart: always
 
   teams-do-gpu-telemetry:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
+    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:v0.1.62}
     pid: "service:teams-do-gpu"
     profiles: ["gpu"]
     cap_add:
       - SYS_PTRACE
     deploy:
       resources:
+        limits:
+          cpus: "0.10"
+          memory: 512M
         reservations:
+          cpus: "0.10"
+          memory: 512M
           devices:
             - driver: nvidia
               count: ${NVIDIA_GPU_COUNT:-1}

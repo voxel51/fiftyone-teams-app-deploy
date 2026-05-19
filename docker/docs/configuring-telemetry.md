@@ -149,20 +149,37 @@ Kubernetes pod-restart behavior.
 
 All knobs live in your `.env` — see `env.template` for the full list:
 
-| Variable                       | Default                             | Purpose                                              |
-| ------------------------------ | ----------------------------------- | ---------------------------------------------------- |
-| `FIFTYONE_TELEMETRY_REDIS_URL` | `redis://telemetry-redis:6379`      | Override to point at an external Redis if desired    |
-| `TELEMETRY_SIDECAR_IMAGE`      | `voxel51/telemetry-sidecar:latest`  | Pin sidecar to a specific tag for production         |
-| `TELEMETRY_REDIS_IMAGE`        | `redis:7-alpine`                    | Alternate redis image                                |
-| `TELEMETRY_REDIS_MAXMEMORY`    | `400mb`                             | Redis maxmemory budget                               |
-| `TELEMETRY_NAMESPACE`          | `docker`                            | Namespace label attached to each registered pod      |
-| `FIFTYONE_APP_TARGET_NAME`     | `hypercorn`                         | Substring used to locate the fiftyone-app process    |
-| `TEAMS_API_TARGET_NAME`        | `fiftyone-teams-api`                | Substring used to locate the teams-api process       |
-| `TEAMS_PLUGINS_TARGET_NAME`    | `hypercorn`                         | Substring used to locate the teams-plugins process   |
-| `TEAMS_DO_TARGET_NAME`         | `fiftyone delegated`                | Substring used to locate the teams-do process        |
-| `NVIDIA_GPU_COUNT`             | `1`                                 | GPU reservation for the GPU DO worker + sidecar      |
-| `NVIDIA_VISIBLE_DEVICES`       | `all`                               | Pass-through to teams-do-gpu / sidecar               |
-| `NVIDIA_DRIVER_CAPABILITIES`   | `compute,utility`                   | Must include `utility` so NVML is available          |
+| Variable                           | Default                             | Purpose                                              |
+| ---------------------------------- | ----------------------------------- | ---------------------------------------------------- |
+| `FIFTYONE_TELEMETRY_REDIS_URL`     | `redis://telemetry-redis:6379`      | Override to point at an external Redis if desired    |
+| `TELEMETRY_SIDECAR_IMAGE`          | `voxel51/telemetry-sidecar:v0.1.62` | Pinned to match the helm chart's `telemetry.sidecar.image` tag |
+| `TELEMETRY_REDIS_IMAGE`            | `redis:7-alpine`                    | Alternate redis image                                |
+| `TELEMETRY_REDIS_MAXMEMORY`        | `400mb`                             | Redis maxmemory budget                               |
+| `TELEMETRY_REDIS_MAXMEMORY_POLICY` | `allkeys-lru`                       | Redis eviction policy (mirrors helm `telemetry.redis.maxmemoryPolicy`) |
+| `TELEMETRY_NAMESPACE`              | `docker`                            | Namespace label attached to each registered pod      |
+| `FIFTYONE_APP_TARGET_NAME`         | `hypercorn`                         | Substring used to locate the fiftyone-app process    |
+| `TEAMS_API_TARGET_NAME`            | `fiftyone-teams-api`                | Substring used to locate the teams-api process       |
+| `TEAMS_PLUGINS_TARGET_NAME`        | `hypercorn`                         | Substring used to locate the teams-plugins process   |
+| `TEAMS_DO_TARGET_NAME`             | `fiftyone delegated`                | Substring used to locate the teams-do process        |
+| `NVIDIA_GPU_COUNT`                 | `1`                                 | GPU reservation for the GPU DO worker + sidecar      |
+| `NVIDIA_VISIBLE_DEVICES`           | `all`                               | Pass-through to teams-do-gpu / sidecar               |
+| `NVIDIA_DRIVER_CAPABILITIES`       | `compute,utility`                   | Must include `utility` so NVML is available          |
+
+## Resource limits
+
+Telemetry containers ship with conservative CPU and memory limits that
+mirror the helm chart's defaults — sized so the sidecars do not starve
+the workloads they observe. The values are declared under each
+service's `deploy.resources` block in the compose files; compose v2
+honors `cpus` and `memory` limits/reservations outside swarm mode.
+
+| Service              | CPU limit | Memory limit | Notes                                |
+| -------------------- | --------- | ------------ | ------------------------------------ |
+| `telemetry-redis`    | `0.25`    | `512M`       | Reserves `0.10` CPU / `256M` memory  |
+| `*-telemetry` (any sidecar) | `0.10` | `512M`     | Reserved == limit                    |
+
+To tune these for your hardware, override `deploy.resources` in a
+`compose.override.yaml` (the override merges with the base entry).
 
 ## Access control
 

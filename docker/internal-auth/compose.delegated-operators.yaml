@@ -16,7 +16,7 @@ services:
       service: teams-do-common
 
   teams-do-telemetry:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
+    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:v0.1.62}
     pid: "service:teams-do"
     cap_add:
       - SYS_PTRACE
@@ -30,6 +30,14 @@ services:
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 512M
+        reservations:
+          cpus: "0.10"
+          memory: 512M
     volumes:
       - telemetry-socket:/tmp/telemetry
     depends_on:
