@@ -110,7 +110,7 @@ Inputs: same dict as telemetry.sidecar-env.
 */}}
 {{- define "telemetry.sidecar" -}}
 - name: telemetry-sidecar
-  image: {{ .ctx.Values.telemetry.sidecar.image | default "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.61" | quote }}
+  image: {{ .ctx.Values.telemetry.sidecar.image | default "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62" | quote }}
   imagePullPolicy: {{ .ctx.Values.telemetry.sidecar.imagePullPolicy | default "Always" }}
   env:
     {{- include "telemetry.sidecar-env" . | nindent 4 }}
@@ -136,7 +136,7 @@ not exit would block Job completion.
 */}}
 {{- define "telemetry.native-sidecar" -}}
 - name: telemetry-sidecar
-  image: {{ .ctx.Values.telemetry.sidecar.image | default "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.61" | quote }}
+  image: {{ .ctx.Values.telemetry.sidecar.image | default "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62" | quote }}
   imagePullPolicy: {{ .ctx.Values.telemetry.sidecar.imagePullPolicy | default "Always" }}
   restartPolicy: Always
   env:
