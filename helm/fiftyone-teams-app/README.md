@@ -712,6 +712,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 ## Values
 
 <!-- markdownlint-disable MD060 -->
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
@@ -1084,6 +1085,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
+
 <!-- markdownlint-enable MD060 -->
 
 <!-- Reference Links -->
