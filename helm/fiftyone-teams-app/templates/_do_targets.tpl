@@ -52,7 +52,7 @@ Create a merged list of environment variables for delegated-operator templates
       key: encryptionKey
 {{- if and .ctx .ctx.Values.telemetry.enabled }}
 - name: FIFTYONE_TELEMETRY_REDIS_URL
-  value: {{ printf "redis://%s:6379" (include "telemetry.redis.name" .ctx) | quote }}
+  value: {{ include "telemetry.redis.url" .ctx | quote }}
 - name: TELEMETRY_SOCKET
   value: /tmp/telemetry/agent.sock
 {{- end }}
