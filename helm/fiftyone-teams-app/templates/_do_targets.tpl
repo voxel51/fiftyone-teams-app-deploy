@@ -50,6 +50,12 @@ Create a merged list of environment variables for delegated-operator templates
     secretKeyRef:
       name: {{ .secretName }}
       key: encryptionKey
+{{- if and .ctx .ctx.Values.telemetry.enabled }}
+- name: FIFTYONE_TELEMETRY_REDIS_URL
+  value: {{ printf "redis://%s:6379" (include "telemetry.redis.name" .ctx) | quote }}
+- name: TELEMETRY_SOCKET
+  value: /tmp/telemetry/agent.sock
+{{- end }}
 {{- range $key, $val := .env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

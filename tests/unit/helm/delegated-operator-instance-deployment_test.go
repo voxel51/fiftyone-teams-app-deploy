@@ -82,7 +82,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDisabled() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == nil {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -200,7 +200,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == nil {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -276,7 +276,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			if testCase.expected == nil {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -358,7 +358,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == nil {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -370,7 +370,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestMetadataNamespace(
 				s.Empty(deployment.ObjectMeta.Namespace, "Metadata namespace should be nil")
 
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -455,7 +455,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
 			subT.Parallel()
 
 			if testCase.expected == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
 
@@ -465,7 +465,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestReplicas() {
 				s.Empty(&deployment.Spec.Replicas, "Replica count should be nil.")
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -782,7 +782,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 			subT.Parallel()
 
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
 
@@ -792,7 +792,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTopologySpreadCons
 				s.Empty(deployment.Spec.Template.Spec.TopologySpreadConstraints, "Topology constraints should be nil")
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -845,7 +845,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCount() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == nil {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -1697,7 +1697,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -1707,7 +1707,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -1901,7 +1901,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -1911,7 +1911,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImage() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -2001,7 +2001,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImagePull
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -2011,7 +2011,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerImagePull
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -2074,7 +2074,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerName() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -2084,7 +2084,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerName() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -2425,7 +2425,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 			subT.Parallel()
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -2435,7 +2435,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerResourceR
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -2581,7 +2581,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -2592,7 +2592,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerSecurityC
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -2800,7 +2800,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -2811,7 +2811,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerVolumeMou
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -3127,9 +3127,9 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestAffinity() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -3209,7 +3209,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets()
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -3220,7 +3220,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestImagePullSecrets()
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -3332,7 +3332,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -3342,7 +3342,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestNodeSelector() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -3462,7 +3462,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentAnnotati
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -3473,7 +3473,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentAnnotati
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
@@ -3594,7 +3594,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -3604,7 +3604,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodAnnotations() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
 				allRange := strings.Split(output, "---")
@@ -3767,7 +3767,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -3777,7 +3777,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestPodSecurityContext
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -3955,7 +3955,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -3966,7 +3966,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTemplateLabels() {
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -4038,7 +4038,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestServiceAccountName
 			subT.Parallel()
 
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -4048,7 +4048,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestServiceAccountName
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -4227,7 +4227,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -4238,7 +4238,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTolerations() {
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -4451,7 +4451,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 			subT.Parallel()
 
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -4462,7 +4462,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestVolumes() {
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
 				// when vars are set outside of the if statement, they aren't accessible from within the conditional
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -4754,7 +4754,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 			subT.Parallel()
 
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -4765,7 +4765,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerLivenessP
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
 
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -5007,7 +5007,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 			subT := s.T()
 			subT.Parallel()
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -5017,7 +5017,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerReadiness
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -5262,7 +5262,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 			subT := s.T()
 			subT.Parallel()
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -5272,7 +5272,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerStartupPr
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -5472,7 +5472,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 			subT.Parallel()
 
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/delegated-operator-instance-deployment.yaml in chart")
@@ -5482,7 +5482,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerCmdArgs()
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				// https://github.com/gruntwork-io/terratest/issues/586#issuecomment-848542351
@@ -5659,7 +5659,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateSt
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.values == nil {
 

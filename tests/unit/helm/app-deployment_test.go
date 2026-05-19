@@ -94,7 +94,7 @@ func (s *deploymentAppTemplateTest) TestMetadataLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -135,7 +135,7 @@ func (s *deploymentAppTemplateTest) TestMetadataName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -173,7 +173,7 @@ func (s *deploymentAppTemplateTest) TestMetadataNamespace() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -211,7 +211,7 @@ func (s *deploymentAppTemplateTest) TestReplicas() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -370,7 +370,7 @@ func (s *deploymentAppTemplateTest) TestTopologySpreadConstraints() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -401,7 +401,7 @@ func (s *deploymentAppTemplateTest) TestContainerCount() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -912,7 +912,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -974,7 +974,7 @@ func (s *deploymentAppTemplateTest) TestContainerImage() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1012,7 +1012,7 @@ func (s *deploymentAppTemplateTest) TestContainerImagePullPolicy() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1051,7 +1051,7 @@ func (s *deploymentAppTemplateTest) TestContainerName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1137,7 +1137,7 @@ func (s *deploymentAppTemplateTest) TestContainerLivenessProbe() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1200,7 +1200,7 @@ func (s *deploymentAppTemplateTest) TestContainerPorts() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1286,7 +1286,7 @@ func (s *deploymentAppTemplateTest) TestContainerReadinessProbe() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1372,7 +1372,7 @@ func (s *deploymentAppTemplateTest) TestContainerStartupProbe() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1430,7 +1430,7 @@ func (s *deploymentAppTemplateTest) TestContainerResourceRequirements() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1484,7 +1484,7 @@ func (s *deploymentAppTemplateTest) TestContainerSecurityContext() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1561,7 +1561,7 @@ func (s *deploymentAppTemplateTest) TestContainerVolumeMounts() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1599,7 +1599,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerCount() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1638,7 +1638,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerImage() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1690,7 +1690,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerCommand() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1763,7 +1763,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerResourceRequirements() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1824,7 +1824,7 @@ func (s *deploymentAppTemplateTest) TestInitContainerSecurityContext() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1891,7 +1891,7 @@ func (s *deploymentAppTemplateTest) TestAffinity() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1929,7 +1929,7 @@ func (s *deploymentAppTemplateTest) TestImagePullSecrets() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1973,7 +1973,7 @@ func (s *deploymentAppTemplateTest) TestNodeSelector() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2016,7 +2016,7 @@ func (s *deploymentAppTemplateTest) TestDeploymentAnnotations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2063,7 +2063,7 @@ func (s *deploymentAppTemplateTest) TestPodAnnotations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2125,7 +2125,7 @@ func (s *deploymentAppTemplateTest) TestPodSecurityContext() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2194,7 +2194,7 @@ func (s *deploymentAppTemplateTest) TestTemplateLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2242,7 +2242,7 @@ func (s *deploymentAppTemplateTest) TestServiceAccountName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2298,7 +2298,7 @@ func (s *deploymentAppTemplateTest) TestTolerations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2381,7 +2381,7 @@ func (s *deploymentAppTemplateTest) TestVolumes() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2454,7 +2454,7 @@ func (s *deploymentAppTemplateTest) TestDeploymentUpdateStrategy() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment

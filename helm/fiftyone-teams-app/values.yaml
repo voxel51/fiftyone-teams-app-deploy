@@ -1643,19 +1643,20 @@ teamsAppSettings:
   # -- Volumes for `teams-app` pods. [Reference][volumes].
   volumes: []
 
-# In-cluster telemetry support. When enabled, the chart renders a small
-# Redis Deployment + Service (used by `telemetry-sidecar` containers
-# configured on workload pods via `extraContainers`) plus a Role/RoleBinding
-# granting the sidecar's service accounts read access to `pods/log`.
-# The chart itself does NOT inject `telemetry-sidecar` containers; consumers
-# wire those into `extraContainers` on the relevant workloads and point the
-# `FIFTYONE_TELEMETRY_REDIS_URL` env var at this service.
+# In-cluster telemetry. When enabled (the default), the chart renders:
+#   - a Redis Deployment + Service that collects per-service metric streams
+#   - a Role + RoleBinding granting the sidecar read access to `pods/log`
+#   - a `telemetry-sidecar` container auto-injected into the
+#     `teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator
+#     workloads, plus a `nativeSidecarContainers` entry on the
+#     delegated-operator Job template
+#   - `FIFTYONE_TELEMETRY_REDIS_URL` on every workload that talks to the
+#     redis backend (api, app, plugins, teams-app, delegated operators)
+#
+# Set `enabled: false` to skip all telemetry resources and sidecar injection.
 telemetry:
-  # -- Whether to render the telemetry Redis Deployment/Service and the
-  # telemetry pod-logs Role/RoleBinding. Defaults to `true` so consumers
-  # that wire up `telemetry-sidecar` containers get a working redis without
-  # additional opt-in. Set to `false` to skip rendering all telemetry-related
-  # resources.
+  # -- Master switch. When `true` (default), all telemetry resources and
+  # auto-injected sidecars are rendered. When `false`, none are.
   enabled: true
   redis:
     # -- Container image for the telemetry Redis Deployment.
@@ -1674,8 +1675,22 @@ telemetry:
       limits:
         cpu: 250m
         memory: 512Mi
+  sidecar:
+    # -- Container image for the auto-injected `telemetry-sidecar` containers.
+    image: voxel51/telemetry-sidecar:latest
+    # -- Pull policy for the sidecar image.
+    imagePullPolicy: Always
+    # -- Resource requests/limits for each auto-injected sidecar container.
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 100m
+        memory: 512Mi
   # -- ServiceAccount names (in `namespace.name`) bound to the telemetry
   # pod-logs Role. Each entry becomes a `ServiceAccount` subject on the
   # generated RoleBinding. When empty, the RoleBinding subjects default to
-  # the `default` ServiceAccount.
+  # the chart's main app service account and the teams-api RBAC service
+  # account so auto-injected sidecars can read their target's logs.
   serviceAccounts: []

@@ -89,7 +89,7 @@ func (s *doK8sConfigMapTemplateTest) TestDisabled() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == "" {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -138,7 +138,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -177,7 +177,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataNamespace() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -218,7 +218,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataAnnotations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap
@@ -291,7 +291,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap
@@ -638,7 +638,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -742,7 +742,7 @@ func (s *doK8sConfigMapTemplateTest) TestNativeSidecarTelemetryAutoInject() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values, SetStrValues: testCase.strValues}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values), SetStrValues: testCase.strValues}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap

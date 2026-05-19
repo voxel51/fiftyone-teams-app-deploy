@@ -102,7 +102,7 @@ func (s *deploymentPluginsTemplateTest) TestMetadataLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == nil {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -162,7 +162,7 @@ func (s *deploymentPluginsTemplateTest) TestMetadataName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == "" {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -220,7 +220,7 @@ func (s *deploymentPluginsTemplateTest) TestMetadataNamespace() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == "" {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -278,7 +278,7 @@ func (s *deploymentPluginsTemplateTest) TestReplicas() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			if testCase.expected == 0 {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -452,7 +452,7 @@ func (s *deploymentPluginsTemplateTest) TestTopologySpreadConstraints() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -490,7 +490,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerCount() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == 0 {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -971,7 +971,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -981,7 +981,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1056,7 +1056,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerImage() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1066,7 +1066,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerImage() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1115,7 +1115,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerImagePullPolicy() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1125,7 +1125,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerImagePullPolicy() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1174,7 +1174,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerName() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1184,7 +1184,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerName() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1284,7 +1284,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerLivenessProbe() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1294,7 +1294,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerLivenessProbe() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1370,7 +1370,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerPorts() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1380,7 +1380,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerPorts() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1480,7 +1480,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1490,7 +1490,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerReadinessProbe() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1590,7 +1590,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerStartupProbe() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1600,7 +1600,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerStartupProbe() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1671,7 +1671,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerResourceRequirements() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1681,7 +1681,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerResourceRequirements() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1748,7 +1748,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerSecurityContext() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1758,7 +1758,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerSecurityContext() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1849,7 +1849,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerVolumeMounts() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -1859,7 +1859,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerVolumeMounts() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -1902,7 +1902,7 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerCount() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1944,7 +1944,7 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerImage() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1999,7 +1999,7 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerCommand() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2075,7 +2075,7 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerResourceRequirements() 
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2139,7 +2139,7 @@ func (s *deploymentPluginsTemplateTest) TestInitContainerSecurityContext() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2218,7 +2218,7 @@ func (s *deploymentPluginsTemplateTest) TestAffinity() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2228,7 +2228,7 @@ func (s *deploymentPluginsTemplateTest) TestAffinity() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2277,7 +2277,7 @@ func (s *deploymentPluginsTemplateTest) TestImagePullSecrets() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2287,7 +2287,7 @@ func (s *deploymentPluginsTemplateTest) TestImagePullSecrets() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2342,7 +2342,7 @@ func (s *deploymentPluginsTemplateTest) TestNodeSelector() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2352,7 +2352,7 @@ func (s *deploymentPluginsTemplateTest) TestNodeSelector() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2406,7 +2406,7 @@ func (s *deploymentPluginsTemplateTest) TestDeploymentAnnotations() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2416,7 +2416,7 @@ func (s *deploymentPluginsTemplateTest) TestDeploymentAnnotations() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2474,7 +2474,7 @@ func (s *deploymentPluginsTemplateTest) TestPodAnnotations() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2484,7 +2484,7 @@ func (s *deploymentPluginsTemplateTest) TestPodAnnotations() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2559,7 +2559,7 @@ func (s *deploymentPluginsTemplateTest) TestPodSecurityContext() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2569,7 +2569,7 @@ func (s *deploymentPluginsTemplateTest) TestPodSecurityContext() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2650,7 +2650,7 @@ func (s *deploymentPluginsTemplateTest) TestTemplateLabels() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2660,7 +2660,7 @@ func (s *deploymentPluginsTemplateTest) TestTemplateLabels() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2718,7 +2718,7 @@ func (s *deploymentPluginsTemplateTest) TestServiceAccountName() {
 			subT.Parallel()
 
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2728,7 +2728,7 @@ func (s *deploymentPluginsTemplateTest) TestServiceAccountName() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2797,7 +2797,7 @@ func (s *deploymentPluginsTemplateTest) TestTolerations() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2807,7 +2807,7 @@ func (s *deploymentPluginsTemplateTest) TestTolerations() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -2904,7 +2904,7 @@ func (s *deploymentPluginsTemplateTest) TestVolumes() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -2914,7 +2914,7 @@ func (s *deploymentPluginsTemplateTest) TestVolumes() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: testCase.values}
+				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
@@ -3000,7 +3000,7 @@ func (s *deploymentPluginsTemplateTest) TestDeploymentUpdateStrategy() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			var deployment appsv1.Deployment
 
 			if testCase.values == nil {
