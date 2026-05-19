@@ -1094,6 +1094,13 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
+| telemetry.enabled | bool | `true` | Whether to render the telemetry Redis Deployment/Service and the telemetry pod-logs Role/RoleBinding. Defaults to `true` so consumers that wire up `telemetry-sidecar` containers get a working redis without additional opt-in. Set to `false` to skip rendering all telemetry-related resources. |
+| telemetry.redis.image | string | `"redis:7-alpine"` | Container image for the telemetry Redis Deployment. |
+| telemetry.redis.maxmemory | string | `"400mb"` | `--maxmemory` flag passed to `redis-server`. |
+| telemetry.redis.maxmemoryPolicy | string | `"allkeys-lru"` | `--maxmemory-policy` flag passed to `redis-server`. |
+| telemetry.redis.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Resource requests/limits for the telemetry Redis container. [Reference][resources]. |
+| telemetry.redis.storage | string | `"1Gi"` | Persistent volume size for the telemetry Redis PVC. |
+| telemetry.serviceAccounts | list | `[]` | ServiceAccount names (in `namespace.name`) bound to the telemetry pod-logs Role. Each entry becomes a `ServiceAccount` subject on the generated RoleBinding. When empty, the RoleBinding subjects default to the `default` ServiceAccount. |
 <!-- markdownlint-enable MD060 -->
 
 <!-- Reference Links -->

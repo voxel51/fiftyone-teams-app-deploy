@@ -1,0 +1,74 @@
+{{- if .Values.telemetry.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "telemetry.redis.name" . }}-data
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "telemetry.redis.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.telemetry.redis.storage | default "1Gi" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "telemetry.redis.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "telemetry.redis.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "telemetry.redis.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "telemetry.redis.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: redis
+          image: {{ .Values.telemetry.redis.image | default "redis:7-alpine" }}
+          args:
+            - redis-server
+            - --save
+            - "60"
+            - "1"
+            - --dir
+            - /data
+            - --maxmemory
+            - {{ .Values.telemetry.redis.maxmemory | default "400mb" | quote }}
+            - --maxmemory-policy
+            - {{ .Values.telemetry.redis.maxmemoryPolicy | default "allkeys-lru" | quote }}
+          ports:
+            - containerPort: 6379
+          {{- with .Values.telemetry.redis.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: {{ include "telemetry.redis.name" . }}-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "telemetry.redis.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "telemetry.redis.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "telemetry.redis.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: 6379
+      targetPort: 6379
+{{- end }}

@@ -172,6 +172,10 @@ data:
               {{- if not $hasSocketMount }}
                 {{- $_ := set $rendered "volumeMounts" (append ($sidecar.volumeMounts | default list) (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry")) }}
               {{- end }}
+              {{- /* Gate the main container on the socket being bound — native sidecar readiness alone doesn't wait. */ -}}
+              {{- if not (hasKey $sidecar "readinessProbe") }}
+                {{- $_ := set $rendered "readinessProbe" (dict "exec" (dict "command" (list "sh" "-c" "test -S /tmp/telemetry/agent.sock")) "periodSeconds" 1 "failureThreshold" 30) }}
+              {{- end }}
             {{- end }}
             {{- list $rendered | toYaml | nindent 12 }}
             {{- end }}
