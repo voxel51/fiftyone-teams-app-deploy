@@ -17,6 +17,7 @@ services:
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_SIGNED_URL_EXPIRATION: ${FIFTYONE_SIGNED_URL_EXPIRATION:-24}
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
@@ -43,6 +44,7 @@ services:
       FIFTYONE_ENV: ${FIFTYONE_ENV}
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_LOGGING_FORMAT: ${FIFTYONE_LOGGING_FORMAT:-text}
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
       LOGGING_LEVEL: ${API_LOGGING_LEVEL:-INFO}
       MONGO_DEFAULT_DB: ${FIFTYONE_DATABASE_NAME}
@@ -72,6 +74,7 @@ services:
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
       FIFTYONE_TEAMS_PROXY_URL: ${FIFTYONE_TEAMS_PROXY_URL}
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       NODE_ENV: production
       RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
       FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: ${FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED:-true}
@@ -144,6 +147,7 @@ services:
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
@@ -158,8 +162,12 @@ services:
 
   teams-do-common:
     image: voxel51/fiftyone-teams-cv-full:v2.19.0
+    # Telemetry default-on requires teams-do to share its PID namespace
+    # with a single sidecar (compose's `pid: "service:<name>"` only joins
+    # one replica). Force replicas=1 to keep the 1:1 pairing deterministic.
+    # See docker/docs/configuring-telemetry.md for multi-worker patterns.
     deploy:
-      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
+      replicas: 1
     command: >
       /bin/sh -c "fiftyone delegated launch -t remote -m"
     environment:
@@ -171,6 +179,9 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
     restart: always
     volumes:
       - plugins-vol:/opt/plugins:ro
+      - telemetry-socket:/tmp/telemetry
