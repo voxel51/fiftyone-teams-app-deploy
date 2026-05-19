@@ -1,4 +1,4 @@
-{{- if .Values.telemetry.enabled }}
+{{- if and .Values.telemetry.enabled (not .Values.telemetry.redis.external.url) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

@@ -6,6 +6,25 @@ Name of the telemetry redis Deployment/Service/PVC.
 {{- end }}
 
 {{/*
+Resolves the URL for the telemetry Redis backend.
+
+If `telemetry.redis.external.url` is set, returns it (chart skips the
+bundled Redis Deployment/Service/PVC and consumer workloads + sidecars
+are wired at the external URL instead — e.g. for managed Redis like
+ElastiCache or MemoryStore). Otherwise returns the in-cluster Service
+URL of the bundled Redis.
+
+Always returns a non-empty URL when telemetry is enabled.
+*/}}
+{{- define "telemetry.redis.url" -}}
+{{- if .Values.telemetry.redis.external.url -}}
+{{- .Values.telemetry.redis.external.url -}}
+{{- else -}}
+{{- printf "redis://%s:6379" (include "telemetry.redis.name" .) -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Selector labels for the telemetry redis Deployment/Service.
 */}}
 {{- define "telemetry.redis.selectorLabels" -}}
@@ -91,7 +110,7 @@ Inputs (dict):
   value: /tmp/telemetry/agent.sock
 {{- end }}
 - name: FIFTYONE_TELEMETRY_REDIS_URL
-  value: {{ printf "redis://%s:6379" (include "telemetry.redis.name" .ctx) | quote }}
+  value: {{ include "telemetry.redis.url" .ctx | quote }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -180,7 +199,7 @@ env-vars-list helpers.
 {{- define "telemetry.redis-url-env" -}}
 {{- if .Values.telemetry.enabled }}
 - name: FIFTYONE_TELEMETRY_REDIS_URL
-  value: {{ printf "redis://%s:6379" (include "telemetry.redis.name" .) | quote }}
+  value: {{ include "telemetry.redis.url" . | quote }}
 {{- end }}
 {{- end }}
 

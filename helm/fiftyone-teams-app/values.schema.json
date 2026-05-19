@@ -4020,6 +4020,20 @@
         },
         "redis": {
           "properties": {
+            "external": {
+              "description": "When `external.url` is set, the chart does NOT render the bundled\nRedis `Deployment`/`Service`/`PersistentVolumeClaim`; consumer\nworkloads and auto-injected sidecars are wired at the external URL\ninstead. Use this for managed Redis (ElastiCache, MemoryStore, etc.)\nor an existing shared Redis you already operate.",
+              "properties": {
+                "url": {
+                  "default": "",
+                  "description": "URL of an external Redis to use instead of the bundled one\n(e.g. `redis://my-redis.example.com:6379`).",
+                  "title": "url",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "external",
+              "type": "object"
+            },
             "image": {
               "default": "redis:7-alpine",
               "description": "Container image for the telemetry Redis Deployment.",

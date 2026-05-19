@@ -1675,6 +1675,15 @@ telemetry:
       limits:
         cpu: 250m
         memory: 512Mi
+    # When `external.url` is set, the chart does NOT render the bundled
+    # Redis `Deployment`/`Service`/`PersistentVolumeClaim`; consumer
+    # workloads and auto-injected sidecars are wired at the external URL
+    # instead. Use this for managed Redis (ElastiCache, MemoryStore, etc.)
+    # or an existing shared Redis you already operate.
+    external:
+      # -- URL of an external Redis to use instead of the bundled one
+      # (e.g. `redis://my-redis.example.com:6379`).
+      url: ""
   sidecar:
     # -- Container image for the auto-injected `telemetry-sidecar` containers.
     # The image is built and published from voxel51/fiftyone-teams `sidecar/`

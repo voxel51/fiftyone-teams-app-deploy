@@ -1096,6 +1096,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
 | telemetry.enabled | bool | `true` | Master switch. When `true` (default), all telemetry resources and auto-injected sidecars are rendered. When `false`, none are. |
+| telemetry.redis.external.url | string | `""` | URL of an external Redis to use instead of the bundled one (e.g. `redis://my-redis.example.com:6379`). |
 | telemetry.redis.image | string | `"redis:7-alpine"` | Container image for the telemetry Redis Deployment. |
 | telemetry.redis.maxmemory | string | `"400mb"` | `--maxmemory` flag passed to `redis-server`. |
 | telemetry.redis.maxmemoryPolicy | string | `"allkeys-lru"` | `--maxmemory-policy` flag passed to `redis-server`. |

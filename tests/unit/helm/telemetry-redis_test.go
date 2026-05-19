@@ -60,6 +60,73 @@ func (s *telemetryRedisTemplateTest) TestExplicitlyDisabled() {
 	s.ErrorContains(err, "could not find template templates/telemetry-redis.yaml in chart")
 }
 
+// TestExternalUrlSkipsBundled ensures that setting telemetry.redis.external.url
+// causes the bundled Redis Deployment/Service/PVC to NOT be rendered. The
+// chart should leave Redis provisioning to the operator in this case.
+func (s *telemetryRedisTemplateTest) TestExternalUrlSkipsBundled() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.redis.external.url": "redis://my-managed-redis:6379",
+	}}
+
+	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	s.ErrorContains(err, "could not find template templates/telemetry-redis.yaml in chart")
+}
+
+// TestExternalUrlWiresApiDeployment ensures that setting external.url causes
+// FIFTYONE_TELEMETRY_REDIS_URL on the api deployment to point at the external
+// URL rather than the in-cluster Service.
+func (s *telemetryRedisTemplateTest) TestExternalUrlWiresApiDeployment() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.redis.external.url": "redis://my-managed-redis:6379",
+	}}
+
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName,
+		[]string{"templates/api-deployment.yaml"})
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+	s.Require().Len(deployment.Spec.Template.Spec.Containers, 2,
+		"Expected api + telemetry-sidecar containers")
+
+	for _, container := range deployment.Spec.Template.Spec.Containers {
+		var found *corev1.EnvVar
+		for i, ev := range container.Env {
+			if ev.Name == "FIFTYONE_TELEMETRY_REDIS_URL" {
+				found = &container.Env[i]
+				break
+			}
+		}
+		s.Require().NotNil(found,
+			"FIFTYONE_TELEMETRY_REDIS_URL should be set on %s container", container.Name)
+		s.Equal("redis://my-managed-redis:6379", found.Value,
+			"FIFTYONE_TELEMETRY_REDIS_URL on %s should point at the external URL",
+			container.Name)
+	}
+}
+
+// TestBundledUrlWiresApiDeployment ensures the default in-cluster URL is
+// release-scoped on the api deployment's containers.
+func (s *telemetryRedisTemplateTest) TestBundledUrlWiresApiDeployment() {
+	options := &helm.Options{SetValues: nil}
+
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName,
+		[]string{"templates/api-deployment.yaml"})
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+	expectedURL := fmt.Sprintf("redis://%s-telemetry-redis:6379", s.releaseName)
+	for _, container := range deployment.Spec.Template.Spec.Containers {
+		for _, ev := range container.Env {
+			if ev.Name == "FIFTYONE_TELEMETRY_REDIS_URL" {
+				s.Equal(expectedURL, ev.Value,
+					"FIFTYONE_TELEMETRY_REDIS_URL on %s should be release-scoped in-cluster URL",
+					container.Name)
+			}
+		}
+	}
+}
+
 // extractDeployment finds the Deployment document in the multi-doc render output.
 func (s *telemetryRedisTemplateTest) extractDeployment(output string) appsv1.Deployment {
 	for _, doc := range splitYAMLDocs(output) {
