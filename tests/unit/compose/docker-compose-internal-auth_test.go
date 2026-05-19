@@ -29,9 +29,6 @@ var internalAuthComposePluginsFile = filepath.Join(dockerInternalAuthDir, "compo
 var internalAuthComposeDedicatedPluginsFile = filepath.Join(dockerInternalAuthDir, "compose.dedicated-plugins.yaml")
 var internalAuthComposeDelegatedOperationsFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.yaml")
 var internalAuthComposeDelegatedOperationsGpuFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.gpu.yaml")
-var internalAuthComposeTelemetryFile = filepath.Join(dockerInternalAuthDir, "compose.telemetry.yaml")
-var internalAuthComposeTelemetryPluginsFile = filepath.Join(dockerInternalAuthDir, "compose.telemetry.plugins.yaml")
-var internalAuthComposeTelemetryDelegatedOperatorsFile = filepath.Join(dockerInternalAuthDir, "compose.telemetry.delegated-operators.yaml")
 var internalAuthEnvTemplateFilePath = filepath.Join(dockerInternalAuthDir, "env.template")
 
 type commonServicesInternalAuthDockerComposeTest struct {
@@ -73,9 +70,12 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			nil,
 			[]string{
 				"fiftyone-app",
+				"fiftyone-app-telemetry",
 				"teams-api",
+				"teams-api-telemetry",
 				"teams-app",
 				"teams-cas",
+				"telemetry-redis",
 			},
 		},
 		{
@@ -85,79 +85,17 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			nil,
 			[]string{
 				"fiftyone-app",
+				"fiftyone-app-telemetry",
 				"teams-api",
+				"teams-api-telemetry",
 				"teams-app",
 				"teams-cas",
+				"telemetry-redis",
 			},
 		},
 		{
 			"composeDedicatedPlugins",
 			[]string{internalAuthComposeDedicatedPluginsFile},
-			s.dotEnvFiles,
-			nil,
-			[]string{
-				"fiftyone-app",
-				"teams-api",
-				"teams-app",
-				"teams-cas",
-				"teams-plugins",
-			},
-		},
-		{
-			"composeDelegatedOperations",
-			[]string{internalAuthComposeDelegatedOperationsFile},
-			s.dotEnvFiles,
-			nil,
-			[]string{
-				"teams-do",
-			},
-		},
-		{
-			"composeDelegatedOperationsGpu",
-			[]string{
-				internalAuthComposeFile,
-				internalAuthComposeDelegatedOperationsFile,
-				internalAuthComposeDelegatedOperationsGpuFile,
-				internalAuthComposeTelemetryFile,
-			},
-			s.dotEnvFiles,
-			[]string{"gpu"},
-			[]string{
-				"fiftyone-app",
-				"fiftyone-app-telemetry",
-				"teams-api",
-				"teams-api-telemetry",
-				"teams-app",
-				"teams-cas",
-				"teams-do",
-				"teams-do-gpu",
-				"teams-do-gpu-telemetry",
-				"telemetry-redis",
-			},
-		},
-		{
-			"composeTelemetry",
-			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
-			s.dotEnvFiles,
-			nil,
-			[]string{
-				"fiftyone-app",
-				"fiftyone-app-telemetry",
-				"teams-api",
-				"teams-api-telemetry",
-				"teams-app",
-				"teams-cas",
-				"telemetry-redis",
-			},
-		},
-		{
-			"composeTelemetryPlugins",
-			[]string{
-				internalAuthComposeFile,
-				internalAuthComposeDedicatedPluginsFile,
-				internalAuthComposeTelemetryFile,
-				internalAuthComposeTelemetryPluginsFile,
-			},
 			s.dotEnvFiles,
 			nil,
 			[]string{
@@ -173,13 +111,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			},
 		},
 		{
-			"composeTelemetryDelegatedOperators",
-			[]string{
-				internalAuthComposeFile,
-				internalAuthComposeDelegatedOperationsFile,
-				internalAuthComposeTelemetryFile,
-				internalAuthComposeTelemetryDelegatedOperatorsFile,
-			},
+			"composeDelegatedOperations",
+			[]string{internalAuthComposeFile, internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			nil,
 			[]string{
@@ -190,6 +123,29 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 				"teams-app",
 				"teams-cas",
 				"teams-do",
+				"teams-do-telemetry",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composeDelegatedOperationsGpu",
+			[]string{
+				internalAuthComposeFile,
+				internalAuthComposeDelegatedOperationsFile,
+				internalAuthComposeDelegatedOperationsGpuFile,
+			},
+			s.dotEnvFiles,
+			[]string{"gpu"},
+			[]string{
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"teams-do",
+				"teams-do-gpu",
+				"teams-do-gpu-telemetry",
 				"teams-do-telemetry",
 				"telemetry-redis",
 			},
@@ -275,28 +231,28 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 		{
 			"delegatedOperationsTeamsDo",
 			"teams-do",
-			[]string{internalAuthComposeDelegatedOperationsFile},
+			[]string{internalAuthComposeFile, internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			"voxel51/fiftyone-teams-cv-full:v2.18.1",
 		},
 		{
 			"telemetryRedis",
 			"telemetry-redis",
-			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
+			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
 			"redis:7-alpine",
 		},
 		{
 			"telemetrySidecarFiftyoneApp",
 			"fiftyone-app-telemetry",
-			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
+			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
 			"voxel51/telemetry-sidecar:latest",
 		},
 		{
 			"telemetrySidecarTeamsApi",
 			"teams-api-telemetry",
-			[]string{internalAuthComposeFile, internalAuthComposeTelemetryFile},
+			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
 			"voxel51/telemetry-sidecar:latest",
 		},
@@ -306,9 +262,14 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			[]string{
 				internalAuthComposeFile,
 				internalAuthComposeDelegatedOperationsFile,
-				internalAuthComposeTelemetryFile,
-				internalAuthComposeTelemetryDelegatedOperatorsFile,
 			},
+			s.dotEnvFiles,
+			"voxel51/telemetry-sidecar:latest",
+		},
+		{
+			"telemetrySidecarTeamsPlugins",
+			"teams-plugins-telemetry",
+			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			"voxel51/telemetry-sidecar:latest",
 		},
@@ -375,6 +336,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
 		},
 		{
@@ -392,6 +354,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
 				"MONGO_DEFAULT_DB=fiftyone",
@@ -412,6 +375,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
 				"FIFTYONE_TEAMS_PROXY_URL=http://fiftyone-app:5151",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
@@ -459,6 +423,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
 		},
 		{
@@ -476,6 +441,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
 				"MONGO_DEFAULT_DB=fiftyone",
@@ -497,6 +463,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
 				"FIFTYONE_TEAMS_PROXY_URL=http://fiftyone-app:5151",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
@@ -543,6 +510,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
 		},
 		{
@@ -560,6 +528,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
 				"MONGO_DEFAULT_DB=fiftyone",
@@ -581,6 +550,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_SERVER_ADDRESS=",
 				"FIFTYONE_SERVER_PATH_PREFIX=/api/proxy/fiftyone-teams",
 				"FIFTYONE_TEAMS_PROXY_URL=http://fiftyone-app:5151",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"NODE_ENV=production",
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151",
@@ -626,12 +596,13 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
 		},
 		{
 			"delegatedOperationsTeamsDo",
 			"teams-do",
-			[]string{internalAuthComposeDelegatedOperationsFile},
+			[]string{internalAuthComposeFile, internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			[]string{
 				"API_URL=http://teams-api:8000",
@@ -642,6 +613,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"TELEMETRY_SOCKET=/tmp/telemetry/agent.sock",
 			},
 		},
 	}
@@ -832,7 +805,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceRestart() {
 		{
 			"delegatedOperationsTeamsDo",
 			"teams-do",
-			[]string{internalAuthComposeDelegatedOperationsFile},
+			[]string{internalAuthComposeFile, internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
@@ -1030,7 +1003,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 		{
 			"delegatedOperationsTeamsDo",
 			"teams-do",
-			[]string{internalAuthComposeDelegatedOperationsFile},
+			[]string{internalAuthComposeFile, internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
 				{
@@ -1038,6 +1011,13 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 					Source:   "plugins-vol",
 					Target:   "/opt/plugins",
 					ReadOnly: true,
+					Volume:   &types.ServiceVolumeVolume{},
+				},
+				{
+					Type:     "volume",
+					Source:   "telemetry-socket",
+					Target:   "/tmp/telemetry",
+					ReadOnly: false,
 					Volume:   &types.ServiceVolumeVolume{},
 				},
 			},
@@ -1087,7 +1067,11 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 			"default",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			nil,
+			types.Volumes{
+				"telemetry-redis-data": {
+					Name: "fiftyone-compose-test_telemetry-redis-data",
+				},
+			},
 		},
 		{
 			"plugins",
@@ -1096,6 +1080,9 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 			types.Volumes{
 				"plugins-vol": {
 					Name: "fiftyone-compose-test_plugins-vol",
+				},
+				"telemetry-redis-data": {
+					Name: "fiftyone-compose-test_telemetry-redis-data",
 				},
 			},
 		},
@@ -1107,15 +1094,24 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 				"plugins-vol": {
 					Name: "fiftyone-compose-test_plugins-vol",
 				},
+				"telemetry-redis-data": {
+					Name: "fiftyone-compose-test_telemetry-redis-data",
+				},
 			},
 		},
 		{
 			"delegatedOperations",
-			[]string{internalAuthComposeDelegatedOperationsFile},
+			[]string{internalAuthComposeFile, internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			types.Volumes{
 				"plugins-vol": {
 					Name: "fiftyone-compose-test_plugins-vol",
+				},
+				"telemetry-redis-data": {
+					Name: "fiftyone-compose-test_telemetry-redis-data",
+				},
+				"telemetry-socket": {
+					Name: "fiftyone-compose-test_telemetry-socket",
 				},
 			},
 		},

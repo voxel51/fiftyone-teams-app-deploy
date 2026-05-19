@@ -1,4 +1,12 @@
 ---
+# Layered on top of a base compose file (e.g. compose.yaml). The base
+# compose file is expected to provide the `telemetry-redis` service.
+#
+# `teams-do` is forced to `replicas: 1` (see teams-do-common in
+# ../common-services.yaml) so the paired `teams-do-telemetry` sidecar's
+# `pid: "service:teams-do"` joins a single deterministic PID namespace.
+# For multi-worker patterns see docker/docs/configuring-telemetry.md.
+#
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 services:
@@ -7,5 +15,31 @@ services:
       file: ../common-services.yaml
       service: teams-do-common
 
+  teams-do-telemetry:
+    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
+    pid: "service:teams-do"
+    cap_add:
+      - SYS_PTRACE
+    environment:
+      POD_NAME: teams-do
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: delegated-operator
+      TARGET_NAME: ${TEAMS_DO_TARGET_NAME:-fiftyone delegated}
+      EXECUTOR_SIDECAR: "true"
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+    volumes:
+      - telemetry-socket:/tmp/telemetry
+    depends_on:
+      teams-do:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+    restart: always
+
 volumes:
   plugins-vol:
+  telemetry-socket:

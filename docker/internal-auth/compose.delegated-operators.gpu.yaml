@@ -10,9 +10,10 @@
 #     -f compose.yaml \
 #     -f compose.delegated-operators.yaml \
 #     -f compose.delegated-operators.gpu.yaml \
-#     -f compose.telemetry.yaml \
-#     -f compose.telemetry.delegated-operators.yaml \
 #     up -d
+#
+# Telemetry (redis + paired sidecars) is bundled by default in the base
+# compose.yaml and compose.delegated-operators.yaml files.
 #
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies

@@ -14,38 +14,37 @@
 
 # Configuring FiftyOne Enterprise Telemetry
 
-The telemetry overlay adds a lightweight per-service metrics collector
-(sidecar pattern) plus a Redis backend. Once enabled, the Settings →
-Metrics page in teams-app displays live CPU / memory / thread / file-descriptor
-samples and tailed stdout logs for each observed service.
+Telemetry adds a lightweight per-service metrics collector (sidecar
+pattern) plus a Redis backend. The Settings → Metrics page in teams-app
+displays live CPU / memory / thread / file-descriptor samples and tailed
+stdout logs for each observed service.
 
-This overlay is optional and layered on top of the main compose file.
+**Telemetry is enabled by default.** The base compose files bundle the
+`telemetry-redis` service and per-workload sidecars; no opt-in flags or
+overlay files are needed.
 
-## Enable
-
-Use the `compose.telemetry.yaml` overlay alongside your normal deployment:
+## Default deployment
 
 ```shell
-docker compose \
-  -f compose.yaml \
-  -f compose.telemetry.yaml \
-  up -d
+docker compose -f compose.yaml up -d
 ```
 
-Can be combined with the plugins or delegated-operators overlays. Each
-optional service has its own companion telemetry overlay so its sidecar
-is added only when that service is enabled:
+renders `fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`,
+`telemetry-redis`, `fiftyone-app-telemetry`, and `teams-api-telemetry`.
+
+Combine with optional overlays as before — each carries its own bundled
+sidecar:
 
 ```shell
 docker compose \
   -f compose.yaml \
   -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
-  -f compose.telemetry.yaml \
-  -f compose.telemetry.plugins.yaml \
-  -f compose.telemetry.delegated-operators.yaml \
   up -d
 ```
+
+This adds `teams-plugins`, `teams-plugins-telemetry`, `teams-do`, and
+`teams-do-telemetry` in addition to the default set.
 
 For GPU-enabled delegated operators, layer
 `compose.delegated-operators.gpu.yaml` (which includes its own bundled
@@ -56,12 +55,10 @@ docker compose --profile gpu \
   -f compose.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.delegated-operators.gpu.yaml \
-  -f compose.telemetry.yaml \
-  -f compose.telemetry.delegated-operators.yaml \
   up -d
 ```
 
-## What it adds
+## What's bundled by default
 
 - `telemetry-redis` — Redis 7 container that holds metric streams and log
   entries. Data is capped by a maxmemory policy (`allkeys-lru`) so disk usage
@@ -71,11 +68,10 @@ docker compose --profile gpu \
   `pid: "service:<target>"` so it can read `/proc/<pid>/fd/1` and use
   psutil to sample CPU, memory, FDs, and thread counts. Sidecars run
   with the `SYS_PTRACE` capability so py-spy can attach to the target.
-- `teams-plugins-telemetry` (only with `compose.telemetry.plugins.yaml`) —
+- `teams-plugins-telemetry` (only with `compose.dedicated-plugins.yaml`) —
   sidecar for the dedicated `teams-plugins` service.
-- `teams-do-telemetry` (only with
-  `compose.telemetry.delegated-operators.yaml`) — sidecar in
-  `EXECUTOR_SIDECAR=true` mode that watches the executor for
+- `teams-do-telemetry` (only with `compose.delegated-operators.yaml`) —
+  sidecar in `EXECUTOR_SIDECAR=true` mode that watches the executor for
   per-operation child processes and records per-op metrics back to the
   `delegated_ops` MongoDB document.
 - `teams-do-gpu` + `teams-do-gpu-telemetry` (only with
@@ -84,15 +80,46 @@ docker compose --profile gpu \
   orchestrator (`-n teams-do-gpu`) plus its paired sidecar. Sidecar
   reads GPU metrics via NVML and requires its own GPU reservation.
 - `FIFTYONE_TELEMETRY_REDIS_URL` injected on `fiftyone-app`, `teams-api`,
-  `teams-app`, and (when the DO overlay is used) `teams-do` so the in-app
-  telemetry blueprint and SSE endpoints can read from Redis.
+  `teams-app`, `teams-plugins`, and (when the DO overlay is used)
+  `teams-do` so the in-app telemetry blueprint and SSE endpoints can
+  read from Redis.
+
+## Opt out
+
+To run without telemetry, add a `compose.override.yaml` that scales the
+telemetry services to zero replicas:
+
+```yaml
+services:
+  telemetry-redis:
+    deploy:
+      replicas: 0
+  fiftyone-app-telemetry:
+    deploy:
+      replicas: 0
+  teams-api-telemetry:
+    deploy:
+      replicas: 0
+  # Only needed when running the corresponding overlay:
+  teams-plugins-telemetry:
+    deploy:
+      replicas: 0
+  teams-do-telemetry:
+    deploy:
+      replicas: 0
+```
+
+`docker compose -f compose.yaml -f compose.override.yaml up -d` will start
+the base services without the telemetry collector. The main containers
+will still have `FIFTYONE_TELEMETRY_REDIS_URL` set, but the in-app agent
+gracefully no-ops when Redis is unreachable.
 
 ### Scaling teams-do with telemetry
 
 docker-compose's `pid: "service:<name>"` only joins a single replica's
-PID namespace. To keep the sidecar observation honest, the telemetry DO
-overlay **forces `teams-do` replicas to 1**, overriding
-`FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`.
+PID namespace. To keep the sidecar observation honest, `teams-do-common`
+**forces `teams-do` replicas to 1**, overriding any
+`FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` setting.
 
 If you need more than one delegated-operator worker observed at the same
 time, either:

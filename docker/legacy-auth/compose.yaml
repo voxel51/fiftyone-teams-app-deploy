@@ -1,6 +1,11 @@
 ---
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+#
+# Telemetry (`telemetry-redis` + per-service sidecars) is enabled by
+# default. To opt out, scale the telemetry services to 0 in a
+# `compose.override.yaml`, or unset `FIFTYONE_TELEMETRY_REDIS_URL` and
+# remove the sidecar services. See docker/docs/configuring-telemetry.md.
 services:
   fiftyone-app:
     extends:
@@ -24,3 +29,64 @@ services:
     extends:
       file: ../common-services.yaml
       service: teams-cas-common
+
+  telemetry-redis:
+    image: ${TELEMETRY_REDIS_IMAGE:-redis:7-alpine}
+    command:
+      - redis-server
+      - --save
+      - "60"
+      - "1"
+      - --dir
+      - /data
+      - --maxmemory
+      - ${TELEMETRY_REDIS_MAXMEMORY:-400mb}
+      - --maxmemory-policy
+      - allkeys-lru
+    restart: always
+    volumes:
+      - telemetry-redis-data:/data
+
+  # One sidecar per observed service. `pid: "service:<target>"` joins the
+  # target's PID namespace so the sidecar can read /proc/<pid>/fd/1 and
+  # psutil can see the target's process.
+  fiftyone-app-telemetry:
+    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
+    pid: "service:fiftyone-app"
+    cap_add:
+      - SYS_PTRACE
+    environment:
+      POD_NAME: fiftyone-app
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: fiftyone-app
+      TARGET_NAME: ${FIFTYONE_APP_TARGET_NAME:-hypercorn}
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+    depends_on:
+      fiftyone-app:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+    restart: always
+
+  teams-api-telemetry:
+    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:latest}
+    pid: "service:teams-api"
+    cap_add:
+      - SYS_PTRACE
+    environment:
+      POD_NAME: teams-api
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: teams-api
+      TARGET_NAME: ${TEAMS_API_TARGET_NAME:-fiftyone-teams-api}
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+    depends_on:
+      teams-api:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+    restart: always
+
+volumes:
+  telemetry-redis-data:
