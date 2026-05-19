@@ -1661,8 +1661,20 @@ telemetry:
   redis:
     # -- Container image for the telemetry Redis Deployment.
     image: redis:7-alpine
-    # -- Persistent volume size for the telemetry Redis PVC.
-    storage: 1Gi
+    persistence:
+      # -- Controls whether a `PersistentVolumeClaim` is created for the
+      # bundled telemetry Redis. When `false`, Redis runs with an `emptyDir`
+      # volume and state is lost on pod restart — fine for dev clusters
+      # without a dynamic PV provisioner, not for production.
+      enabled: true
+      # -- Storage size for the telemetry Redis `PersistentVolumeClaim`.
+      size: 1Gi
+      # @schema
+      # type: ["string", "null"]
+      # @schema
+      # -- `StorageClass` name for the telemetry Redis `PersistentVolumeClaim`.
+      # Leave unset to use the cluster's default `StorageClass`.
+      storageClass: ""
     # -- `--maxmemory` flag passed to `redis-server`.
     maxmemory: 400mb
     # -- `--maxmemory-policy` flag passed to `redis-server`.

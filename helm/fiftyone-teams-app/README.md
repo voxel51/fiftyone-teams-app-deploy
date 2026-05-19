@@ -1100,8 +1100,10 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.redis.image | string | `"redis:7-alpine"` | Container image for the telemetry Redis Deployment. |
 | telemetry.redis.maxmemory | string | `"400mb"` | `--maxmemory` flag passed to `redis-server`. |
 | telemetry.redis.maxmemoryPolicy | string | `"allkeys-lru"` | `--maxmemory-policy` flag passed to `redis-server`. |
+| telemetry.redis.persistence.enabled | bool | `true` | Controls whether a `PersistentVolumeClaim` is created for the bundled telemetry Redis. When `false`, Redis runs with an `emptyDir` volume and state is lost on pod restart — fine for dev clusters without a dynamic PV provisioner, not for production. |
+| telemetry.redis.persistence.size | string | `"1Gi"` | Storage size for the telemetry Redis `PersistentVolumeClaim`. |
+| telemetry.redis.persistence.storageClass | string | `""` | `StorageClass` name for the telemetry Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |
 | telemetry.redis.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Resource requests/limits for the telemetry Redis container. [Reference][resources]. |
-| telemetry.redis.storage | string | `"1Gi"` | Persistent volume size for the telemetry Redis PVC. |
 | telemetry.serviceAccounts | list | `[]` | ServiceAccount names (in `namespace.name`) bound to the telemetry pod-logs Role. Each entry becomes a `ServiceAccount` subject on the generated RoleBinding. When empty, the RoleBinding subjects default to the chart's main app service account and the teams-api RBAC service account so auto-injected sidecars can read their target's logs. |
 | telemetry.sidecar.image | string | `"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62"` | Container image for the auto-injected `telemetry-sidecar` containers. The image is built and published from voxel51/fiftyone-teams `sidecar/` to the internal Voxel51 GAR. Override for environments without access to that registry (e.g. external chart consumers). |
 | telemetry.sidecar.imagePullPolicy | string | `"Always"` | Pull policy for the sidecar image. |

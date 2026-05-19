@@ -4052,6 +4052,35 @@
               "title": "maxmemoryPolicy",
               "type": "string"
             },
+            "persistence": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "description": "Controls whether a `PersistentVolumeClaim` is created for the\nbundled telemetry Redis. When `false`, Redis runs with an `emptyDir`\nvolume and state is lost on pod restart — fine for dev clusters\nwithout a dynamic PV provisioner, not for production.",
+                  "title": "enabled",
+                  "type": "boolean"
+                },
+                "size": {
+                  "default": "1Gi",
+                  "description": "Storage size for the telemetry Redis `PersistentVolumeClaim`.",
+                  "title": "size",
+                  "type": "string"
+                },
+                "storageClass": {
+                  "default": "",
+                  "description": "`StorageClass` name for the telemetry Redis `PersistentVolumeClaim`.\nLeave unset to use the cluster's default `StorageClass`.",
+                  "required": [],
+                  "title": "storageClass",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [],
+              "title": "persistence",
+              "type": "object"
+            },
             "resources": {
               "description": "Resource requests/limits for the telemetry Redis container. [Reference][resources].",
               "properties": {
@@ -4093,12 +4122,6 @@
               "required": [],
               "title": "resources",
               "type": "object"
-            },
-            "storage": {
-              "default": "1Gi",
-              "description": "Persistent volume size for the telemetry Redis PVC.",
-              "title": "storage",
-              "type": "string"
             }
           },
           "required": [],

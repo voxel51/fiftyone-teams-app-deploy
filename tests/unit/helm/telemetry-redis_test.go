@@ -235,8 +235,9 @@ func (s *telemetryRedisTemplateTest) TestServiceMetadata() {
 
 func (s *telemetryRedisTemplateTest) TestPVCMetadata() {
 	options := &helm.Options{SetValues: map[string]string{
-		"telemetry.enabled":       "true",
-		"telemetry.redis.storage": "5Gi",
+		"telemetry.enabled":                        "true",
+		"telemetry.redis.persistence.size":         "5Gi",
+		"telemetry.redis.persistence.storageClass": "gp3",
 	}}
 
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
@@ -251,7 +252,32 @@ func (s *telemetryRedisTemplateTest) TestPVCMetadata() {
 		s.Equal(expectedName, pvc.ObjectMeta.Name)
 		req := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
 		s.Equal("5Gi", req.String())
+		s.Require().NotNil(pvc.Spec.StorageClassName, "StorageClassName should be set")
+		s.Equal("gp3", *pvc.Spec.StorageClassName)
 		return
 	}
 	s.Fail("PVC document not found in rendered output")
+}
+
+// TestPersistenceDisabledSkipsPVCAndUsesEmptyDir ensures that with
+// persistence.enabled=false, the PVC is not rendered and the Deployment
+// switches the redis-data volume to emptyDir.
+func (s *telemetryRedisTemplateTest) TestPersistenceDisabledSkipsPVCAndUsesEmptyDir() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.redis.persistence.enabled": "false",
+	}}
+
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	s.NotContains(output, "kind: PersistentVolumeClaim",
+		"PVC should not render when persistence.enabled=false")
+
+	deployment := s.extractDeployment(output)
+	volumes := deployment.Spec.Template.Spec.Volumes
+	s.Require().Len(volumes, 1, "Deployment should have exactly one volume")
+	s.Equal("redis-data", volumes[0].Name)
+	s.NotNil(volumes[0].EmptyDir,
+		"redis-data volume should be emptyDir when persistence is disabled")
+	s.Nil(volumes[0].PersistentVolumeClaim,
+		"redis-data volume should NOT reference a PVC when persistence is disabled")
 }
