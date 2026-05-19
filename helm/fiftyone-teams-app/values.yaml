@@ -1680,7 +1680,7 @@ telemetry:
     # The image is built and published from voxel51/fiftyone-teams `sidecar/`
     # to the internal Voxel51 GAR. Override for environments without access
     # to that registry (e.g. external chart consumers).
-    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.61
+    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62
     # -- Pull policy for the sidecar image.
     imagePullPolicy: Always
     # -- Resource requests/limits for each auto-injected sidecar container.

@@ -40,7 +40,7 @@ EXPECTED_IMAGES=(
 UNPUBLISHED_IMAGES=(
   # Built from voxel51/fiftyone-teams `sidecar/`, published to the
   # internal Voxel51 GAR. Requires GCP auth to pull.
-  "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.61"
+  "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62"
 )
 
 . "$(dirname "$0")/common.sh"
