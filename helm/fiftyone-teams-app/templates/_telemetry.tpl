@@ -155,8 +155,8 @@ Inputs: same dict as telemetry.sidecar-env.
 
 {{/*
 A native-sidecar (initContainer with restartPolicy: Always) variant — for use under
-spec.initContainers, primarily in DO Jobs where a regular extraContainer that does
-not exit would block Job completion.
+spec.initContainers in DO Jobs, where a regular sidecar container that does not exit
+would block Job completion.
 */}}
 {{- define "telemetry.native-sidecar" -}}
 - name: telemetry-sidecar

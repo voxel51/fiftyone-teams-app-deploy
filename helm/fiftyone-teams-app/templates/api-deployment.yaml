@@ -44,7 +44,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ $serviceAccountName }}
-      {{- if or .Values.apiSettings.extraContainers .Values.apiSettings.nativeSidecarContainers .Values.telemetry.enabled }}
+      {{- if .Values.telemetry.enabled }}
       shareProcessNamespace: true
       {{- end }}
       securityContext:
@@ -92,15 +92,11 @@ spec:
             {{- with .Values.apiSettings.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-        {{- with .Values.apiSettings.extraContainers }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
         {{- if .Values.telemetry.enabled }}
         {{- include "telemetry.sidecar" (dict "ctx" . "serviceType" "teams-api" "targetName" "fiftyone-teams-api") | nindent 8 }}
         {{- end }}
-      {{- if or .Values.apiSettings.initContainers.enabled .Values.apiSettings.nativeSidecarContainers }}
+      {{- if .Values.apiSettings.initContainers.enabled }}
       initContainers:
-        {{- if .Values.apiSettings.initContainers.enabled }}
         {{-
           include "fiftyone-teams-app.commonInitContainers"
           (
@@ -111,10 +107,6 @@ spec:
             "tag" .Values.apiSettings.initContainers.image.tag
           ) | nindent 8
         }}
-        {{- end }}
-        {{- with .Values.apiSettings.nativeSidecarContainers }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
       {{- end }}
       {{- with .Values.apiSettings.nodeSelector }}
       nodeSelector:

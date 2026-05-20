@@ -35,7 +35,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
-      {{- if or .Values.appSettings.extraContainers .Values.appSettings.nativeSidecarContainers .Values.telemetry.enabled }}
+      {{- if .Values.telemetry.enabled }}
       shareProcessNamespace: true
       {{- end }}
       securityContext:
@@ -76,15 +76,11 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- with .Values.appSettings.extraContainers }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
         {{- if .Values.telemetry.enabled }}
         {{- include "telemetry.sidecar" (dict "ctx" . "serviceType" "fiftyone-app" "targetName" "hypercorn") | nindent 8 }}
         {{- end }}
-      {{- if or .Values.appSettings.initContainers.enabled .Values.appSettings.nativeSidecarContainers }}
+      {{- if .Values.appSettings.initContainers.enabled }}
       initContainers:
-        {{- if .Values.appSettings.initContainers.enabled }}
         {{-
           include "fiftyone-teams-app.commonInitContainers"
           (
@@ -95,10 +91,6 @@ spec:
             "tag" .Values.appSettings.initContainers.image.tag
           ) | nindent 8
         }}
-        {{- end }}
-        {{- with .Values.appSettings.nativeSidecarContainers }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
       {{- end }}
       {{- with .Values.appSettings.nodeSelector }}
       nodeSelector:

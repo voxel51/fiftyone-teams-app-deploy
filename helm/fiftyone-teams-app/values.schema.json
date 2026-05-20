@@ -102,14 +102,6 @@
           "title": "env",
           "type": "object"
         },
-        "extraContainers": {
-          "description": "Additional containers to run in the `teams-api` pod alongside the\nmain container. When non-empty, the pod is configured with\n`shareProcessNamespace: true`. [Reference][sidecar-containers].",
-          "items": {
-            "required": []
-          },
-          "title": "extraContainers",
-          "type": "array"
-        },
         "image": {
           "properties": {
             "pullPolicy": {
@@ -335,14 +327,6 @@
           "required": [],
           "title": "liveness",
           "type": "object"
-        },
-        "nativeSidecarContainers": {
-          "description": "Native sidecar containers for the `teams-api` pod (Kubernetes 1.29+).\nEntries are rendered under `initContainers`; set `restartPolicy: Always`\non each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].",
-          "items": {
-            "required": []
-          },
-          "title": "nativeSidecarContainers",
-          "type": "array"
         },
         "nodeSelector": {
           "description": "nodeSelector for `teams-api`. [Reference][node-selector].",
@@ -810,14 +794,6 @@
           "title": "env",
           "type": "object"
         },
-        "extraContainers": {
-          "description": "Additional containers to run in the `fiftyone-app` pod alongside the\nmain container. When non-empty, the pod is configured with\n`shareProcessNamespace: true`. [Reference][sidecar-containers].",
-          "items": {
-            "required": []
-          },
-          "title": "extraContainers",
-          "type": "array"
-        },
         "image": {
           "properties": {
             "pullPolicy": {
@@ -1039,14 +1015,6 @@
           "required": [],
           "title": "liveness",
           "type": "object"
-        },
-        "nativeSidecarContainers": {
-          "description": "Native sidecar containers for the `fiftyone-app` pod (Kubernetes 1.29+).\nEntries are rendered under `initContainers`; set `restartPolicy: Always`\non each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].",
-          "items": {
-            "required": []
-          },
-          "title": "nativeSidecarContainers",
-          "type": "array"
         },
         "nodeSelector": {
           "description": "nodeSelector for `fiftyone-app`. [Reference][node-selector].",
@@ -2057,14 +2025,6 @@
               "title": "env",
               "type": "object"
             },
-            "extraContainers": {
-              "description": "Additional containers to run in each delegated-operator-executor pod\nalongside the main container. When non-empty, the pod is configured\nwith `shareProcessNamespace: true`. [Reference][sidecar-containers].",
-              "items": {
-                "required": []
-              },
-              "title": "extraContainers",
-              "type": "array"
-            },
             "image": {
               "properties": {
                 "pullPolicy": {
@@ -2130,14 +2090,6 @@
               "required": [],
               "title": "liveness",
               "type": "object"
-            },
-            "nativeSidecarContainers": {
-              "description": "Native sidecar containers for delegated-operator-executor pods\n(Kubernetes 1.29+). Entries are rendered under `initContainers`; set\n`restartPolicy: Always` on each entry to enable the native sidecar\nlifecycle. [Reference][sidecar-containers].",
-              "items": {
-                "required": []
-              },
-              "title": "nativeSidecarContainers",
-              "type": "array"
             },
             "nodeSelector": {
               "description": "nodeSelector for `delegated-operator-executor`. [Reference][node-selector].",
@@ -2433,14 +2385,6 @@
               "title": "env",
               "type": "object"
             },
-            "extraContainers": {
-              "description": "Additional containers to run in each on-demand delegated-operator Job\npod alongside the executor container. When non-empty, the pod is\nconfigured with `shareProcessNamespace: true`. Note: a regular\ncontainer that does not exit will block Job completion; for telemetry\nsidecars use `nativeSidecarContainers` instead. [Reference][sidecar-containers].",
-              "items": {
-                "required": []
-              },
-              "title": "extraContainers",
-              "type": "array"
-            },
             "image": {
               "properties": {
                 "pullPolicy": {
@@ -2487,14 +2431,6 @@
               "required": [],
               "title": "labels",
               "type": "object"
-            },
-            "nativeSidecarContainers": {
-              "description": "Native sidecar containers for on-demand delegated-operator Job pods\n(Kubernetes 1.29+). Entries are rendered under `initContainers`; set\n`restartPolicy: Always` on each entry to enable the native sidecar\nlifecycle. Kubelet auto-terminates these when the executor container\nfinishes, so the Job completes cleanly. The chart auto-injects\n`TARGET_CONTAINER=executor` on each entry (override by setting it\nexplicitly). [Reference][sidecar-containers].",
-              "items": {
-                "required": []
-              },
-              "title": "nativeSidecarContainers",
-              "type": "array"
             },
             "nodeSelector": {
               "description": "nodeSelector for `delegated-operator-executor`. [Reference][node-selector].",
@@ -2855,14 +2791,6 @@
           "title": "env",
           "type": "object"
         },
-        "extraContainers": {
-          "description": "Additional containers to run in the `teams-plugins` pod alongside the\nmain container. When non-empty, the pod is configured with\n`shareProcessNamespace: true`. [Reference][sidecar-containers].",
-          "items": {
-            "required": []
-          },
-          "title": "extraContainers",
-          "type": "array"
-        },
         "image": {
           "properties": {
             "pullPolicy": {
@@ -3084,14 +3012,6 @@
           "required": [],
           "title": "liveness",
           "type": "object"
-        },
-        "nativeSidecarContainers": {
-          "description": "Native sidecar containers for the `teams-plugins` pod (Kubernetes 1.29+).\nEntries are rendered under `initContainers`; set `restartPolicy: Always`\non each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].",
-          "items": {
-            "required": []
-          },
-          "title": "nativeSidecarContainers",
-          "type": "array"
         },
         "nodeSelector": {
           "description": "nodeSelector for `teams-plugins`. [Reference][node-selector].",
@@ -4010,18 +3930,18 @@
       "type": "object"
     },
     "telemetry": {
-      "description": "In-cluster telemetry. When enabled (the default), the chart renders:\n  - a Redis Deployment + Service that collects per-service metric streams\n  - a Role + RoleBinding granting the sidecar read access to `pods/log`\n  - a `telemetry-sidecar` container auto-injected into the\n    `teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator\n    workloads, plus a `nativeSidecarContainers` entry on the\n    delegated-operator Job template\n  - `FIFTYONE_TELEMETRY_REDIS_URL` on every workload that talks to the\n    redis backend (api, app, plugins, teams-app, delegated operators)\n\nSet `enabled: false` to skip all telemetry resources and sidecar injection.",
+      "description": "In-cluster telemetry. When enabled (the default), the chart renders:\n  - a Redis Deployment + Service that collects per-service metric streams\n  - a Role + RoleBinding granting the sidecar read access to `pods/log`\n  - a `telemetry-sidecar` container injected into the `teams-api`,\n    `fiftyone-app`, `teams-plugins`, and delegated-operator workloads,\n    and as a native sidecar `initContainer` on delegated-operator Jobs\n  - `FIFTYONE_TELEMETRY_REDIS_URL` on every workload that talks to the\n    redis backend (api, app, plugins, teams-app, delegated operators)\n\nSet `enabled: false` to skip all telemetry resources and sidecar injection.",
       "properties": {
         "enabled": {
           "default": true,
-          "description": "Master switch. When `true` (default), all telemetry resources and\nauto-injected sidecars are rendered. When `false`, none are.",
+          "description": "Master switch. When `true` (default), all telemetry resources and\nsidecars are rendered. When `false`, none are.",
           "title": "enabled",
           "type": "boolean"
         },
         "redis": {
           "properties": {
             "external": {
-              "description": "When `external.url` is set, the chart does NOT render the bundled\nRedis `Deployment`/`Service`/`PersistentVolumeClaim`; consumer\nworkloads and auto-injected sidecars are wired at the external URL\ninstead. Use this for managed Redis (ElastiCache, MemoryStore, etc.)\nor an existing shared Redis you already operate.",
+              "description": "When `external.url` is set, the chart does NOT render the bundled\nRedis `Deployment`/`Service`/`PersistentVolumeClaim`; consumer\nworkloads and telemetry sidecars are wired at the external URL\ninstead. Use this for managed Redis (ElastiCache, MemoryStore, etc.)\nor an existing shared Redis you already operate.",
               "properties": {
                 "url": {
                   "default": "",
@@ -4129,7 +4049,7 @@
           "type": "object"
         },
         "serviceAccounts": {
-          "description": "ServiceAccount names (in `namespace.name`) bound to the telemetry\npod-logs Role. Each entry becomes a `ServiceAccount` subject on the\ngenerated RoleBinding. When empty, the RoleBinding subjects default to\nthe chart's main app service account and the teams-api RBAC service\naccount so auto-injected sidecars can read their target's logs.",
+          "description": "ServiceAccount names (in `namespace.name`) bound to the telemetry\npod-logs Role. Each entry becomes a `ServiceAccount` subject on the\ngenerated RoleBinding. When empty, the RoleBinding subjects default to\nthe chart's main app service account and the teams-api RBAC service\naccount so the telemetry sidecars can read their target's logs.",
           "items": {
             "required": []
           },
@@ -4174,7 +4094,7 @@
               "type": "object"
             },
             "resources": {
-              "description": "Resource requests/limits for each auto-injected sidecar container.",
+              "description": "Resource requests/limits for each `telemetry-sidecar` container.",
               "properties": {
                 "limits": {
                   "properties": {

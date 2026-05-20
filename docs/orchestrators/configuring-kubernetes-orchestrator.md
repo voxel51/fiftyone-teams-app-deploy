@@ -462,12 +462,11 @@ fom.register_orchestrator(
 
 ## Optional: Telemetry Sidecar
 
-If your deployment runs telemetry (see the helm chart's
-`extraContainers` / `nativeSidecarContainers` options, or the docker
-compose files where it is bundled by default), you can attach a per-Job
-telemetry sidecar to on-demand Kubernetes orchestrators as well. This
-emits per-operation metrics back to the same Redis backend so the
-Settings → Metrics page sees individual delegated runs.
+If your deployment runs telemetry (the helm chart and docker compose
+files include it by default), you can attach a per-Job telemetry sidecar
+to on-demand Kubernetes orchestrators as well. This emits per-operation
+metrics back to the same Redis backend so the Settings → Metrics page
+sees individual delegated runs.
 
 Use a Kubernetes
 [native sidecar](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/)

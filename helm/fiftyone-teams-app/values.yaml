@@ -120,14 +120,6 @@ apiSettings:
 
   # -- Affinity and anti-affinity for `teams-api`. [Reference][affinity].
   affinity: {}
-  # -- Additional containers to run in the `teams-api` pod alongside the
-  # main container. When non-empty, the pod is configured with
-  # `shareProcessNamespace: true`. [Reference][sidecar-containers].
-  extraContainers: []
-  # -- Native sidecar containers for the `teams-api` pod (Kubernetes 1.29+).
-  # Entries are rendered under `initContainers`; set `restartPolicy: Always`
-  # on each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].
-  nativeSidecarContainers: []
   initContainers:
     # -- Container security configuration for `teams-api` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
@@ -398,14 +390,6 @@ appSettings:
 
   # -- Affinity and anti-affinity for `fiftyone-app`. [Reference][affinity].
   affinity: {}
-  # -- Additional containers to run in the `fiftyone-app` pod alongside the
-  # main container. When non-empty, the pod is configured with
-  # `shareProcessNamespace: true`. [Reference][sidecar-containers].
-  extraContainers: []
-  # -- Native sidecar containers for the `fiftyone-app` pod (Kubernetes 1.29+).
-  # Entries are rendered under `initContainers`; set `restartPolicy: Always`
-  # on each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].
-  nativeSidecarContainers: []
   initContainers:
     # -- Container security configuration for `fiftyone-app` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
@@ -836,15 +820,6 @@ delegatedOperatorDeployments:
     volumeMounts: []
     # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
     volumes: []
-    # -- Additional containers to run in each delegated-operator-executor pod
-    # alongside the main container. When non-empty, the pod is configured
-    # with `shareProcessNamespace: true`. [Reference][sidecar-containers].
-    extraContainers: []
-    # -- Native sidecar containers for delegated-operator-executor pods
-    # (Kubernetes 1.29+). Entries are rendered under `initContainers`; set
-    # `restartPolicy: Always` on each entry to enable the native sidecar
-    # lifecycle. [Reference][sidecar-containers].
-    nativeSidecarContainers: []
 
   # -- Additional deployments to configure. Each template
   # will use .Values.delegatedOperatorDeployments.template as a base.
@@ -1021,20 +996,6 @@ delegatedOperatorJobTemplates:
     volumeMounts: []
     # -- Volumes for `delegated-operator-executor`. [Reference][volumes].
     volumes: []
-    # -- Additional containers to run in each on-demand delegated-operator Job
-    # pod alongside the executor container. When non-empty, the pod is
-    # configured with `shareProcessNamespace: true`. Note: a regular
-    # container that does not exit will block Job completion; for telemetry
-    # sidecars use `nativeSidecarContainers` instead. [Reference][sidecar-containers].
-    extraContainers: []
-    # -- Native sidecar containers for on-demand delegated-operator Job pods
-    # (Kubernetes 1.29+). Entries are rendered under `initContainers`; set
-    # `restartPolicy: Always` on each entry to enable the native sidecar
-    # lifecycle. Kubelet auto-terminates these when the executor container
-    # finishes, so the Job completes cleanly. The chart auto-injects
-    # `TARGET_CONTAINER=executor` on each entry (override by setting it
-    # explicitly). [Reference][sidecar-containers].
-    nativeSidecarContainers: []
   # -- On-Demand Delegated Operator Jobs.
   jobs: {}
     # Default CPU-only batch job
@@ -1266,14 +1227,6 @@ pluginsSettings:
 
   # -- Affinity and anti-affinity for `teams-plugins`. [Reference][affinity].
   affinity: {}
-  # -- Additional containers to run in the `teams-plugins` pod alongside the
-  # main container. When non-empty, the pod is configured with
-  # `shareProcessNamespace: true`. [Reference][sidecar-containers].
-  extraContainers: []
-  # -- Native sidecar containers for the `teams-plugins` pod (Kubernetes 1.29+).
-  # Entries are rendered under `initContainers`; set `restartPolicy: Always`
-  # on each entry to enable the native sidecar lifecycle. [Reference][sidecar-containers].
-  nativeSidecarContainers: []
   initContainers:
     # -- Container security configuration for `teams-plugins` `initContainers`. [Reference][container-security-context].
     containerSecurityContext:
@@ -1646,17 +1599,16 @@ teamsAppSettings:
 # In-cluster telemetry. When enabled (the default), the chart renders:
 #   - a Redis Deployment + Service that collects per-service metric streams
 #   - a Role + RoleBinding granting the sidecar read access to `pods/log`
-#   - a `telemetry-sidecar` container auto-injected into the
-#     `teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator
-#     workloads, plus a `nativeSidecarContainers` entry on the
-#     delegated-operator Job template
+#   - a `telemetry-sidecar` container injected into the `teams-api`,
+#     `fiftyone-app`, `teams-plugins`, and delegated-operator workloads,
+#     and as a native sidecar `initContainer` on delegated-operator Jobs
 #   - `FIFTYONE_TELEMETRY_REDIS_URL` on every workload that talks to the
 #     redis backend (api, app, plugins, teams-app, delegated operators)
 #
 # Set `enabled: false` to skip all telemetry resources and sidecar injection.
 telemetry:
   # -- Master switch. When `true` (default), all telemetry resources and
-  # auto-injected sidecars are rendered. When `false`, none are.
+  # sidecars are rendered. When `false`, none are.
   enabled: true
   redis:
     # -- Container image for the telemetry Redis Deployment.
@@ -1689,7 +1641,7 @@ telemetry:
         memory: 512Mi
     # When `external.url` is set, the chart does NOT render the bundled
     # Redis `Deployment`/`Service`/`PersistentVolumeClaim`; consumer
-    # workloads and auto-injected sidecars are wired at the external URL
+    # workloads and telemetry sidecars are wired at the external URL
     # instead. Use this for managed Redis (ElastiCache, MemoryStore, etc.)
     # or an existing shared Redis you already operate.
     external:
@@ -1709,7 +1661,7 @@ telemetry:
       repository: voxel51/telemetry-sidecar
       # -- Image tag for `telemetry-sidecar`. Defaults to the chart version.
       tag: ""
-    # -- Resource requests/limits for each auto-injected sidecar container.
+    # -- Resource requests/limits for each `telemetry-sidecar` container.
     resources:
       requests:
         cpu: 100m
@@ -1721,5 +1673,5 @@ telemetry:
   # pod-logs Role. Each entry becomes a `ServiceAccount` subject on the
   # generated RoleBinding. When empty, the RoleBinding subjects default to
   # the chart's main app service account and the teams-api RBAC service
-  # account so auto-injected sidecars can read their target's logs.
+  # account so the telemetry sidecars can read their target's logs.
   serviceAccounts: []
