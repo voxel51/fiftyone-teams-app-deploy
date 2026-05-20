@@ -247,14 +247,14 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			"fiftyone-app-telemetry",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/telemetry-sidecar:v0.1.62",
+			"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62",
 		},
 		{
 			"telemetrySidecarTeamsApi",
 			"teams-api-telemetry",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			"voxel51/telemetry-sidecar:v0.1.62",
+			"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62",
 		},
 		{
 			"telemetrySidecarTeamsDo",
@@ -264,14 +264,14 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 				internalAuthComposeDelegatedOperationsFile,
 			},
 			s.dotEnvFiles,
-			"voxel51/telemetry-sidecar:v0.1.62",
+			"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62",
 		},
 		{
 			"telemetrySidecarTeamsPlugins",
 			"teams-plugins-telemetry",
 			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
-			"voxel51/telemetry-sidecar:v0.1.62",
+			"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62",
 		},
 	}
 

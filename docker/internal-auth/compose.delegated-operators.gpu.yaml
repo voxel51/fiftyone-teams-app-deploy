@@ -49,7 +49,7 @@ services:
     restart: always
 
   teams-do-gpu-telemetry:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:v0.1.62}
+    image: ${TELEMETRY_SIDECAR_IMAGE:-us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62}
     pid: "service:teams-do-gpu"
     profiles: ["gpu"]
     cap_add:
