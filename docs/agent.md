@@ -5,8 +5,6 @@ App. It lets you work with your datasets using natural language. You can import
 data, run model inference, find duplicates, evaluate predictions, and more, all
 from a conversational interface.
 
-![FiftyOne Agent Demo](https://cdn.voxel51.com/voxel-agent/enterprise/voxel_agent_demo_1.webp)
-  
 ## Central Deployment
 
 ### Enable the Agent
