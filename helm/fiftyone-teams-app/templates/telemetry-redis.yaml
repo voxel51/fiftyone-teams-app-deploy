@@ -27,6 +27,8 @@ metadata:
     {{- include "telemetry.redis.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "telemetry.redis.selectorLabels" . | nindent 6 }}
