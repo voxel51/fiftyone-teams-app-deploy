@@ -125,7 +125,7 @@ pluginsSettings:
 telemetry:
   sidecar:
     image:
-      repository: voxel51/telemetry-sidecar
+      repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/telemetry-sidecar
       pullPolicy: IfNotPresent
       tag: v2.19.0rc8
 teamsAppSettings:
