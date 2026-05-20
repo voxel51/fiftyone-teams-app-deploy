@@ -39,110 +39,42 @@ services:
       - plugins-vol:/opt/plugins:ro
 
   telemetry-redis:
-    image: ${TELEMETRY_REDIS_IMAGE:-redis:7-alpine}
-    command:
-      - redis-server
-      - --save
-      - "60"
-      - "1"
-      - --dir
-      - /data
-      - --maxmemory
-      - ${TELEMETRY_REDIS_MAXMEMORY:-400mb}
-      - --maxmemory-policy
-      - ${TELEMETRY_REDIS_MAXMEMORY_POLICY:-allkeys-lru}
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: "0.25"
-          memory: 512M
-        reservations:
-          cpus: "0.10"
-          memory: 256M
-    volumes:
-      - telemetry-redis-data:/data
+    extends:
+      file: ../common-services.yaml
+      service: telemetry-redis-common
 
   fiftyone-app-telemetry:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:v0.1.62}
-    pid: "service:fiftyone-app"
-    cap_add:
-      - SYS_PTRACE
-    environment:
-      POD_NAME: fiftyone-app
-      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
-      SERVICE_TYPE: fiftyone-app
-      TARGET_NAME: ${FIFTYONE_APP_TARGET_NAME:-hypercorn}
-      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
-    deploy:
-      resources:
-        limits:
-          cpus: "0.10"
-          memory: 512M
-        reservations:
-          cpus: "0.10"
-          memory: 512M
+    extends:
+      file: ../common-services.yaml
+      service: fiftyone-app-telemetry-common
     depends_on:
       fiftyone-app:
         condition: service_started
         restart: true
       telemetry-redis:
         condition: service_started
-    restart: always
 
   teams-api-telemetry:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:v0.1.62}
-    pid: "service:teams-api"
-    cap_add:
-      - SYS_PTRACE
-    environment:
-      POD_NAME: teams-api
-      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
-      SERVICE_TYPE: teams-api
-      TARGET_NAME: ${TEAMS_API_TARGET_NAME:-fiftyone-teams-api}
-      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
-    deploy:
-      resources:
-        limits:
-          cpus: "0.10"
-          memory: 512M
-        reservations:
-          cpus: "0.10"
-          memory: 512M
+    extends:
+      file: ../common-services.yaml
+      service: teams-api-telemetry-common
     depends_on:
       teams-api:
         condition: service_started
         restart: true
       telemetry-redis:
         condition: service_started
-    restart: always
 
   teams-plugins-telemetry:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-voxel51/telemetry-sidecar:v0.1.62}
-    pid: "service:teams-plugins"
-    cap_add:
-      - SYS_PTRACE
-    environment:
-      POD_NAME: teams-plugins
-      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
-      SERVICE_TYPE: teams-plugins
-      TARGET_NAME: ${TEAMS_PLUGINS_TARGET_NAME:-hypercorn}
-      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
-    deploy:
-      resources:
-        limits:
-          cpus: "0.10"
-          memory: 512M
-        reservations:
-          cpus: "0.10"
-          memory: 512M
+    extends:
+      file: ../common-services.yaml
+      service: teams-plugins-telemetry-common
     depends_on:
       teams-plugins:
         condition: service_started
         restart: true
       telemetry-redis:
         condition: service_started
-    restart: always
 
 volumes:
   plugins-vol:
