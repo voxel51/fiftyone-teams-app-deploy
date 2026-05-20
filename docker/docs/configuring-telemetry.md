@@ -152,7 +152,6 @@ All knobs live in your `.env` — see `env.template` for the full list:
 | Variable                           | Default                                | Purpose                                                                                            |
 | ---------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `FIFTYONE_TELEMETRY_REDIS_URL`     | `redis://telemetry-redis:6379`         | Override to point at an external Redis if desired                                                  |
-| `TELEMETRY_SIDECAR_IMAGE`          | (Voxel51 GAR — see note below)         | Same default image as the helm chart. External consumers without GAR access must override.         |
 | `TELEMETRY_REDIS_IMAGE`            | `redis:7-alpine`                       | Alternate redis image                                                                              |
 | `TELEMETRY_REDIS_MAXMEMORY`        | `400mb`                                | Redis maxmemory budget                                                                             |
 | `TELEMETRY_REDIS_MAXMEMORY_POLICY` | `allkeys-lru`                          | Redis eviction policy (mirrors helm `telemetry.redis.maxmemoryPolicy`)                             |
@@ -164,9 +163,6 @@ All knobs live in your `.env` — see `env.template` for the full list:
 | `NVIDIA_GPU_COUNT`                 | `1`                                    | GPU reservation for the GPU DO worker + sidecar                                                    |
 | `NVIDIA_VISIBLE_DEVICES`           | `all`                                  | Pass-through to teams-do-gpu / sidecar                                                             |
 | `NVIDIA_DRIVER_CAPABILITIES`       | `compute,utility`                      | Must include `utility` so NVML is available                                                        |
-
-Default `TELEMETRY_SIDECAR_IMAGE`:
-`us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62`
 
 ## Resource limits
 

@@ -1105,8 +1105,9 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.redis.persistence.storageClass | string | `""` | `StorageClass` name for the telemetry Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |
 | telemetry.redis.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Resource requests/limits for the telemetry Redis container. [Reference][resources]. |
 | telemetry.serviceAccounts | list | `[]` | ServiceAccount names (in `namespace.name`) bound to the telemetry pod-logs Role. Each entry becomes a `ServiceAccount` subject on the generated RoleBinding. When empty, the RoleBinding subjects default to the chart's main app service account and the teams-api RBAC service account so auto-injected sidecars can read their target's logs. |
-| telemetry.sidecar.image | string | `"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62"` | Container image for the auto-injected `telemetry-sidecar` containers. The image is built and published from voxel51/fiftyone-teams `sidecar/` to the internal Voxel51 GAR. Override for environments without access to that registry (e.g. external chart consumers). |
-| telemetry.sidecar.imagePullPolicy | string | `"Always"` | Pull policy for the sidecar image. |
+| telemetry.sidecar.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
+| telemetry.sidecar.image.repository | string | `"voxel51/telemetry-sidecar"` | Container image for `telemetry-sidecar`. |
+| telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to the chart version. |
 | telemetry.sidecar.resources | object | `{"limits":{"cpu":"100m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests/limits for each auto-injected sidecar container. |
 <!-- markdownlint-enable MD060 -->
 

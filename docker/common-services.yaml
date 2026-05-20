@@ -225,7 +225,7 @@ services:
   # target's PID namespace so the sidecar can read /proc/<pid>/fd/1 and
   # psutil can see the target's process.
   fiftyone-app-telemetry-common:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62}
+    image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:fiftyone-app"
     cap_add:
       - SYS_PTRACE
@@ -246,7 +246,7 @@ services:
     restart: always
 
   teams-api-telemetry-common:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62}
+    image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-api"
     cap_add:
       - SYS_PTRACE
@@ -267,7 +267,7 @@ services:
     restart: always
 
   teams-plugins-telemetry-common:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62}
+    image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-plugins"
     cap_add:
       - SYS_PTRACE
@@ -288,7 +288,7 @@ services:
     restart: always
 
   teams-do-telemetry-common:
-    image: ${TELEMETRY_SIDECAR_IMAGE:-us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62}
+    image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-do"
     cap_add:
       - SYS_PTRACE

@@ -26,21 +26,7 @@ EXPECTED_IMAGES=(
   "voxel51/fiftyone-teams-app"
   "voxel51/fiftyone-teams-cas"
   "voxel51/fiftyone-teams-cv-full"
-)
-
-# Images that the chart references by default but that are NOT publicly
-# pullable. They bypass the docker_pull validation step but still count
-# as "expected" for the in-helm-template check (so their presence doesn't
-# trip the "in helm template but not in our published images" guard).
-# Add the explicit `:tag` here — no auto-tag.
-#
-# Move entries OUT of this list once the corresponding image has a
-# publicly-pullable tag (e.g. once the telemetry sidecar starts
-# publishing to Docker Hub instead of the private Voxel51 GAR).
-UNPUBLISHED_IMAGES=(
-  # Built from voxel51/fiftyone-teams `sidecar/`, published to the
-  # internal Voxel51 GAR. Requires GCP auth to pull.
-  "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62"
+  "voxel51/telemetry-sidecar"
 )
 
 . "$(dirname "$0")/common.sh"
@@ -120,7 +106,7 @@ expected_tag=$(yq '.appVersion' "${GIT_ROOT}/helm/fiftyone-teams-app/Chart.yaml"
 
 for img in "${EXPECTED_IMAGES[@]}"; do
   if [[ ${img} == *":"* ]]; then
-    # Image already carries an explicit tag (e.g. telemetry-sidecar:latest);
+    # Image already carries an explicit tag (e.g. redis:7-alpine);
     # use as-is.
     img_with_tag="${img}"
   elif [[ ${img} =~ "voxel51/" ]]; then
@@ -144,9 +130,7 @@ helm_images=$(
 
 read -r -a helm_images_array <<<"${helm_images}"
 
-# Images that are allowed in the helm template but skip docker_pull
-# validation (e.g. not yet published to a public registry).
-known_images_for_template_check=("${expected_images_with_tag[@]}" "${UNPUBLISHED_IMAGES[@]}")
+known_images_for_template_check=("${expected_images_with_tag[@]}")
 
 pids=()
 rcs=()

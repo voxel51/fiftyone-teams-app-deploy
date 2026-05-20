@@ -129,8 +129,8 @@ Inputs: same dict as telemetry.sidecar-env.
 */}}
 {{- define "telemetry.sidecar" -}}
 - name: telemetry-sidecar
-  image: {{ .ctx.Values.telemetry.sidecar.image | default "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62" | quote }}
-  imagePullPolicy: {{ .ctx.Values.telemetry.sidecar.imagePullPolicy | default "Always" }}
+  image: "{{ .ctx.Values.telemetry.sidecar.image.repository }}:{{ .ctx.Values.telemetry.sidecar.image.tag | default .ctx.Chart.AppVersion }}"
+  imagePullPolicy: {{ .ctx.Values.telemetry.sidecar.image.pullPolicy | default "Always" }}
   env:
     {{- include "telemetry.sidecar-env" . | nindent 4 }}
   {{- with .ctx.Values.telemetry.sidecar.resources }}
@@ -160,8 +160,8 @@ not exit would block Job completion.
 */}}
 {{- define "telemetry.native-sidecar" -}}
 - name: telemetry-sidecar
-  image: {{ .ctx.Values.telemetry.sidecar.image | default "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62" | quote }}
-  imagePullPolicy: {{ .ctx.Values.telemetry.sidecar.imagePullPolicy | default "Always" }}
+  image: "{{ .ctx.Values.telemetry.sidecar.image.repository }}:{{ .ctx.Values.telemetry.sidecar.image.tag | default .ctx.Chart.AppVersion }}"
+  imagePullPolicy: {{ .ctx.Values.telemetry.sidecar.image.pullPolicy | default "Always" }}
   restartPolicy: Always
   env:
     {{- include "telemetry.sidecar-env" . | nindent 4 }}

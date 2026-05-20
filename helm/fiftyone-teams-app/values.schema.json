@@ -4139,16 +4139,39 @@
         "sidecar": {
           "properties": {
             "image": {
-              "default": "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62",
-              "description": "Container image for the auto-injected `telemetry-sidecar` containers.\nThe image is built and published from voxel51/fiftyone-teams `sidecar/`\nto the internal Voxel51 GAR. Override for environments without access\nto that registry (e.g. external chart consumers).",
+              "properties": {
+                "pullPolicy": {
+                  "default": "Always",
+                  "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "Always",
+                        "IfNotPresent",
+                        "Never"
+                      ],
+                      "required": []
+                    }
+                  ],
+                  "required": [],
+                  "title": "pullPolicy"
+                },
+                "repository": {
+                  "default": "voxel51/telemetry-sidecar",
+                  "description": "Container image for `telemetry-sidecar`.",
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "",
+                  "description": "Image tag for `telemetry-sidecar`. Defaults to the chart version.",
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [],
               "title": "image",
-              "type": "string"
-            },
-            "imagePullPolicy": {
-              "default": "Always",
-              "description": "Pull policy for the sidecar image.",
-              "title": "imagePullPolicy",
-              "type": "string"
+              "type": "object"
             },
             "resources": {
               "description": "Resource requests/limits for each auto-injected sidecar container.",

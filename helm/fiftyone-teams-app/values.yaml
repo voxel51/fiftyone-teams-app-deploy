@@ -1697,13 +1697,18 @@ telemetry:
       # (e.g. `redis://my-redis.example.com:6379`).
       url: ""
   sidecar:
-    # -- Container image for the auto-injected `telemetry-sidecar` containers.
-    # The image is built and published from voxel51/fiftyone-teams `sidecar/`
-    # to the internal Voxel51 GAR. Override for environments without access
-    # to that registry (e.g. external chart consumers).
-    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-telemetry-sidecar:v0.1.62
-    # -- Pull policy for the sidecar image.
-    imagePullPolicy: Always
+    image:
+      # @schema
+      # oneOf:
+      #   - enum: ["Always", "IfNotPresent", "Never"]
+      # @schema
+      # -- Instruct when the kubelet should pull (download) the specified image.
+      # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
+      pullPolicy: Always
+      # -- Container image for `telemetry-sidecar`.
+      repository: voxel51/telemetry-sidecar
+      # -- Image tag for `telemetry-sidecar`. Defaults to the chart version.
+      tag: ""
     # -- Resource requests/limits for each auto-injected sidecar container.
     resources:
       requests:
