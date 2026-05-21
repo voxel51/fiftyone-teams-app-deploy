@@ -1085,7 +1085,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
-| telemetry.enabled | bool | `true` | Master switch. When `true` (default), all telemetry resources and sidecars are rendered. When `false`, none are. |
+| telemetry.enabled | bool | `true` | Master switch. When `true` (default), all telemetry resources and sidecars are rendered. When `false`, none are — note that the FiftyOne UI's delegated-operator log viewer depends on the sidecar and will be empty without it. |
 | telemetry.redis.external.url | string | `""` | URL of an external Redis to use instead of the bundled one (e.g. `redis://my-redis.example.com:6379`). |
 | telemetry.redis.image | string | `"redis:7-alpine"` | Container image for the telemetry Redis Deployment. |
 | telemetry.redis.maxmemory | string | `"400mb"` | `--maxmemory` flag passed to `redis-server`. |
@@ -1099,6 +1099,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.sidecar.image.repository | string | `"voxel51/telemetry-sidecar"` | Container image for `telemetry-sidecar`. |
 | telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to the chart version. |
 | telemetry.sidecar.resources | object | `{"limits":{"cpu":"100m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests/limits for each `telemetry-sidecar` container. |
+
 <!-- markdownlint-enable MD060 -->
 
 <!-- Reference Links -->

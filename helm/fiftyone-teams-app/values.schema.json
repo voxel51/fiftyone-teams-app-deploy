@@ -3930,11 +3930,11 @@
       "type": "object"
     },
     "telemetry": {
-      "description": "In-cluster telemetry. When enabled (the default), the chart renders:\n  - a Redis Deployment + Service that collects per-service metric streams\n  - a Role + RoleBinding granting the sidecar read access to `pods/log`\n  - a `telemetry-sidecar` container injected into the `teams-api`,\n    `fiftyone-app`, `teams-plugins`, and delegated-operator workloads,\n    and as a native sidecar `initContainer` on delegated-operator Jobs\n  - `FIFTYONE_TELEMETRY_REDIS_URL` on every workload that talks to the\n    redis backend (api, app, plugins, teams-app, delegated operators)\n\nSet `enabled: false` to skip all telemetry resources and sidecar injection.",
+      "description": "In-cluster telemetry. When enabled (the default), the chart renders:\n  - a Redis Deployment + Service that collects per-service metric streams\n  - a Role + RoleBinding granting the sidecar read access to `pods/log`\n  - a `telemetry-sidecar` container injected into the `teams-api`,\n    `fiftyone-app`, `teams-plugins`, and delegated-operator workloads,\n    and as a native sidecar `initContainer` on delegated-operator Jobs\n  - `FIFTYONE_TELEMETRY_REDIS_URL` on every workload that talks to the\n    redis backend (api, app, plugins, teams-app, delegated operators)\n\nSetting `enabled: false` skips all telemetry resources and sidecar\ninjection. Note that the FiftyOne UI's log viewer for delegated-\noperator runs depends on the sidecar to capture per-operation logs;\ndisabling telemetry will leave that log viewer empty.",
       "properties": {
         "enabled": {
           "default": true,
-          "description": "Master switch. When `true` (default), all telemetry resources and\nsidecars are rendered. When `false`, none are.",
+          "description": "Master switch. When `true` (default), all telemetry resources and\nsidecars are rendered. When `false`, none are — note that the\nFiftyOne UI's delegated-operator log viewer depends on the sidecar\nand will be empty without it.",
           "title": "enabled",
           "type": "boolean"
         },

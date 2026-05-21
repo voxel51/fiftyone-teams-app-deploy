@@ -1605,10 +1605,15 @@ teamsAppSettings:
 #   - `FIFTYONE_TELEMETRY_REDIS_URL` on every workload that talks to the
 #     redis backend (api, app, plugins, teams-app, delegated operators)
 #
-# Set `enabled: false` to skip all telemetry resources and sidecar injection.
+# Setting `enabled: false` skips all telemetry resources and sidecar
+# injection. Note that the FiftyOne UI's log viewer for delegated-
+# operator runs depends on the sidecar to capture per-operation logs;
+# disabling telemetry will leave that log viewer empty.
 telemetry:
   # -- Master switch. When `true` (default), all telemetry resources and
-  # sidecars are rendered. When `false`, none are.
+  # sidecars are rendered. When `false`, none are — note that the
+  # FiftyOne UI's delegated-operator log viewer depends on the sidecar
+  # and will be empty without it.
   enabled: true
   redis:
     # -- Container image for the telemetry Redis Deployment.

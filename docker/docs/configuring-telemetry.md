@@ -86,6 +86,11 @@ docker compose --profile gpu \
 
 ## Opt out
 
+> [!NOTE]
+> The telemetry sidecar can be disabled, but doing so disables the
+> FiftyOne UI's log viewer for delegated-operator runs — it depends
+> on the sidecar to capture per-operation logs.
+
 To run without telemetry, add a `compose.override.yaml` that scales the
 telemetry services to zero replicas:
 

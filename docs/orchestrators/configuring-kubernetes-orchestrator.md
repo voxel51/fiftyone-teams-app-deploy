@@ -25,7 +25,7 @@
   - [Template Storage Options](#template-storage-options)
   - [Secrets Options](#secrets-options)
 - [Separate CPU and GPU Templates](#separate-cpu-and-gpu-templates)
-- [Optional: Telemetry Sidecar](#optional-telemetry-sidecar)
+- [Telemetry Sidecar](#telemetry-sidecar)
 - [Refresh Orchestrator Operators](#refresh-orchestrator-operators)
 - [Additional Considerations](#additional-considerations)
 - [Credential Rotation](#credential-rotation)
@@ -460,7 +460,12 @@ fom.register_orchestrator(
 )
 ```
 
-## Optional: Telemetry Sidecar
+## Telemetry Sidecar
+
+> [!NOTE]
+> The telemetry sidecar can be disabled, but doing so disables the
+> FiftyOne UI's log viewer for delegated-operator runs — it depends
+> on the sidecar to capture per-operation logs.
 
 If your deployment runs telemetry (the helm chart and docker compose
 files include it by default), you can attach a per-Job telemetry sidecar
@@ -484,14 +489,20 @@ spec:
   shareProcessNamespace: true
   initContainers:
     - name: telemetry-sidecar
-      image: voxel51/telemetry-sidecar:latest
+      image: voxel51/telemetry-sidecar:v2.19.0
       restartPolicy: Always
       securityContext:
+        # The sidecar image runs as root (SYS_PTRACE +
+        # /proc/<pid>/fd/1 access require it). Set explicitly so it
+        # works even when the pod's podSecurityContext sets
+        # runAsNonRoot: true.
+        runAsNonRoot: false
+        runAsUser: 0
         capabilities:
           add: [SYS_PTRACE]
       env:
         - name: TARGET_NAME
-          value: delegated
+          value: "fiftyone delegated"
         - name: SERVICE_TYPE
           value: delegated-operator
         - name: EXECUTOR_SIDECAR
@@ -507,7 +518,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: FIFTYONE_TELEMETRY_REDIS_URL
-          value: redis://telemetry-redis.fiftyone.svc.cluster.local:6379
+          value: redis://<release-name>-telemetry-redis.fiftyone-teams.svc.cluster.local:6379
         - name: FIFTYONE_DATABASE_URI
           valueFrom:
             secretKeyRef:
@@ -529,7 +540,7 @@ spec:
         - name: TELEMETRY_SOCKET
           value: /tmp/telemetry/agent.sock
         - name: FIFTYONE_TELEMETRY_REDIS_URL
-          value: redis://telemetry-redis.fiftyone.svc.cluster.local:6379
+          value: redis://<release-name>-telemetry-redis.fiftyone-teams.svc.cluster.local:6379
       volumeMounts:
         # ... existing mounts, plus:
         - mountPath: /tmp/telemetry
@@ -638,14 +649,20 @@ spec:
       shareProcessNamespace: true
       initContainers:
       - name: telemetry-sidecar
-        image: voxel51/telemetry-sidecar:latest
+        image: voxel51/telemetry-sidecar:v2.19.0
         restartPolicy: Always
         securityContext:
+          # The sidecar image runs as root (SYS_PTRACE +
+          # /proc/<pid>/fd/1 access require it). Set explicitly so it
+          # works even when the pod's podSecurityContext sets
+          # runAsNonRoot: true.
+          runAsNonRoot: false
+          runAsUser: 0
           capabilities:
             add: [SYS_PTRACE]
         env:
           - name: TARGET_NAME
-            value: delegated
+            value: "fiftyone delegated"
           - name: SERVICE_TYPE
             value: delegated-operator
           - name: EXECUTOR_SIDECAR
