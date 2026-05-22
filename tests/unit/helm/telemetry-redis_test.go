@@ -115,7 +115,8 @@ func (s *telemetryRedisTemplateTest) TestBundledUrlWiresApiDeployment() {
 	var deployment appsv1.Deployment
 	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
 
-	expectedURL := fmt.Sprintf("redis://%s-telemetry-redis:6379", s.releaseName)
+	expectedURL := fmt.Sprintf("redis://%s-telemetry-redis.%s.svc.cluster.local:6379",
+		s.releaseName, "fiftyone-teams")
 	for _, container := range deployment.Spec.Template.Spec.Containers {
 		for _, ev := range container.Env {
 			if ev.Name == "FIFTYONE_TELEMETRY_REDIS_URL" {
@@ -181,7 +182,8 @@ func (s *telemetryRedisTemplateTest) TestExternalUrlWiresDelegatedOperatorJobCon
 	// The ConfigMap embeds the Job spec as a multi-line YAML string in
 	// .data.<job-name>. The render output is plain text, so we just need to
 	// ensure no occurrence of the in-cluster URL leaks through.
-	inClusterURL := fmt.Sprintf("redis://%s-telemetry-redis:6379", s.releaseName)
+	inClusterURL := fmt.Sprintf("redis://%s-telemetry-redis.%s.svc.cluster.local:6379",
+		s.releaseName, "fiftyone-teams")
 	s.NotContains(output, inClusterURL,
 		"DO Job ConfigMap must not embed the in-cluster Redis URL when external.url is set")
 	s.Contains(output, "redis://my-managed-redis:6379",

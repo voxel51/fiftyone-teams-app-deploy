@@ -12,7 +12,9 @@ If `telemetry.redis.external.url` is set, returns it (chart skips the
 bundled Redis Deployment/Service/PVC and consumer workloads + sidecars
 are wired at the external URL instead — e.g. for managed Redis like
 ElastiCache or MemoryStore). Otherwise returns the in-cluster Service
-URL of the bundled Redis.
+URL of the bundled Redis as a fully-qualified `<svc>.<ns>.svc.cluster.local`
+hostname so cross-namespace consumers (e.g. delegated-operator Jobs
+scheduled into a different namespace) still resolve it.
 
 Always returns a non-empty URL when telemetry is enabled.
 */}}
@@ -20,7 +22,7 @@ Always returns a non-empty URL when telemetry is enabled.
 {{- if .Values.telemetry.redis.external.url -}}
 {{- .Values.telemetry.redis.external.url -}}
 {{- else -}}
-{{- printf "redis://%s:6379" (include "telemetry.redis.name" .) -}}
+{{- printf "redis://%s.%s.svc.cluster.local:6379" (include "telemetry.redis.name" .) .Values.namespace.name -}}
 {{- end -}}
 {{- end }}
 
