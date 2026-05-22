@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
     - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
     - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
@@ -97,6 +98,50 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.19+ Telemetry Sidecars
+
+FiftyOne Enterprise v2.19.0 adds a `telemetry-sidecar` service paired
+with each `fiftyone-app`, `teams-api`, `teams-plugins`, and `teams-do*`
+service, plus a `telemetry-redis` service that buffers the streamed
+metrics/logs. Telemetry is enabled by default.
+
+> [!IMPORTANT]
+> The sidecar powers the FiftyOne UI's delegated-operator log viewer.
+> Disabling telemetry will leave that log viewer empty.
+
+**Resource impact.** Each sidecar reserves `0.10` CPUs and `512M` memory
+(reservation == limit). A stock deploy adds four sidecars
+(`fiftyone-app` + `teams-api` + `teams-plugins` + one `teams-do`),
+so expect roughly **+0.4 CPU** and **+2 GiB memory** of container
+overhead, plus the bundled `telemetry-redis` service
+(`0.10` CPU / `256M` memory reservation, `0.25` / `512M` limits) and its
+`telemetry-redis-data` named volume.
+
+**Host requirements.**
+
+1. **Docker Compose v2.17+** for `depends_on.<svc>.restart: true`
+   semantics. Older versions will see stale PID namespaces after a
+   target container is recreated.
+1. **Linux host with PID-namespace sharing** (`pid: "service:<target>"`)
+   and **`SYS_PTRACE`** capability granted to each sidecar container.
+   Docker Desktop on macOS/Windows supports this, but some hardened
+   container runtimes (gVisor, Kata) do not — telemetry will fail to
+   attach to the target process there.
+1. **`teams-do` is forced to `replicas: 1`** while telemetry is enabled,
+   because Compose's `pid: "service:<name>"` only joins a single
+   replica. To run multiple delegated-operator workers, see
+   [`docker/docs/configuring-telemetry.md`](configuring-telemetry.md).
+
+**Opt-out.** Add a `compose.override.yaml` that scales the
+`telemetry-redis` and `*-telemetry` services to `replicas: 0`. See
+[`configuring-telemetry.md`](configuring-telemetry.md#opt-out) for the
+full override snippet.
+
+**External Redis.** Point at a managed Redis instead of the bundled
+one by setting `FIFTYONE_TELEMETRY_REDIS_URL` in your `.env` to a
+fully-qualified URL (e.g. `redis://my-managed-redis.example.com:6379`)
+and scaling `telemetry-redis` to `replicas: 0` as above.
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 

@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
     - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
     - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.9+ Startup Probe Changes](#fiftyone-enterprise-v29-startup-probe-changes)
@@ -140,6 +141,65 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.19+ Telemetry Sidecars
+
+FiftyOne Enterprise v2.19.0 adds a `telemetry-sidecar` container to the
+`teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator
+workloads (and as a native init-sidecar on delegated-operator `Job` pods),
+plus an in-cluster Redis `Deployment` + `Service` + `PersistentVolumeClaim`
+that buffers the streamed metrics/logs. Telemetry is enabled by default.
+
+> [!IMPORTANT]
+> The sidecar powers the FiftyOne UI's delegated-operator log viewer.
+> Disabling telemetry (`telemetry.enabled: false`) will leave that
+> log viewer empty.
+
+**Resource impact.** Each sidecar requests `100m` CPU and `512Mi` memory
+(request == limit). A stock deploy adds four sidecars
+(`teams-api` + `fiftyone-app` + `teams-plugins` + one delegated-operator),
+so expect roughly **+400m CPU** and **+2 GiB memory** of pod overhead,
+plus the bundled Redis (`100m` / `256Mi` requests, `250m` / `512Mi` limits)
+and its `1Gi` PVC. Tune via `telemetry.sidecar.resources` and
+`telemetry.redis.resources` / `telemetry.redis.persistence.size`.
+
+**Cluster requirements.**
+
+1. **`shareProcessNamespace: true`** is set on all four workloads so
+   the sidecar can read `/proc/<pid>/fd/1` of the target container.
+1. **The sidecar runs as root with `SYS_PTRACE`** (required for
+   `py-spy` and `/proc` access). Clusters that enforce
+   [Pod Security Admission][psa] `restricted`, or admission
+   policies (OPA/Gatekeeper, Kyverno) that block
+   `runAsUser: 0` or capability adds, will reject these pods at
+   admission. On such clusters, either:
+    - allow the chart's `namespace.name` namespace at PSA `baseline`
+      (or relax the relevant admission policy), or
+    - disable telemetry with `telemetry.enabled: false`.
+
+**Opt-out.** Set the following in your `values.yaml`:
+
+```yaml
+telemetry:
+  enabled: false
+```
+
+This skips every telemetry resource (Redis, sidecars, Role/RoleBinding)
+and reverts the workloads to their pre-v2.19 shape.
+
+**External Redis.** To point at a managed Redis (ElastiCache,
+MemoryStore, an existing cluster) instead of running the bundled one,
+set:
+
+```yaml
+telemetry:
+  redis:
+    external:
+      url: redis://my-managed-redis.example.com:6379
+```
+
+The chart will skip the bundled `Deployment` / `Service` / `PVC` and
+wire every consumer at this URL.
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 
@@ -596,3 +656,4 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 <!-- Reference Links -->
 [init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+[psa]: https://kubernetes.io/docs/concepts/security/pod-security-admission/
