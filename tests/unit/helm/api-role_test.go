@@ -286,6 +286,28 @@ func (s *apiRoleTemplateTest) TestMetadataLabels() {
 }
 
 func (s *apiRoleTemplateTest) TestRules() {
+	// The pods/log GET rule must remain present regardless of telemetry
+	// settings — the api uses it for its own DO log retrieval flows, and
+	// the telemetry RoleBinding piggybacks on this rule for the api SA
+	// (see _telemetry.tpl: telemetry.role.subjects). Render both with
+	// telemetry on and off to lock that in.
+	expectedRulesJson := `[
+      {
+        "apiGroups": ["batch"],
+        "resources": ["jobs"],
+        "verbs": ["create", "get", "list", "watch", "update", "delete"]
+      },
+      {
+        "apiGroups": [""],
+        "resources": ["pods"],
+        "verbs": ["get", "list", "watch", "delete"]
+      },
+      {
+        "apiGroups": [""],
+        "resources": ["pods/log"],
+        "verbs": ["get"]
+      }
+    ]`
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -295,27 +317,21 @@ func (s *apiRoleTemplateTest) TestRules() {
 			"defaultValues",
 			nil,
 			func(rules []rbacv1.PolicyRule) {
-				expectedRulesJson := `[
-          {
-            "apiGroups": ["batch"],
-            "resources": ["jobs"],
-            "verbs": ["create", "get", "list", "watch", "update", "delete"]
-          },
-          {
-            "apiGroups": [""],
-            "resources": ["pods"],
-            "verbs": ["get", "list", "watch", "delete"]
-          },
-          {
-            "apiGroups": [""],
-            "resources": ["pods/log"],
-            "verbs": ["get"]
-          }
-        ]`
 				var expectedRules []rbacv1.PolicyRule
 				err := json.Unmarshal([]byte(expectedRulesJson), &expectedRules)
 				s.NoError(err)
 				s.Equal(expectedRules, rules, "Rules should be equal")
+			},
+		},
+		{
+			"telemetryDisabled",
+			map[string]string{"telemetry.enabled": "false"},
+			func(rules []rbacv1.PolicyRule) {
+				var expectedRules []rbacv1.PolicyRule
+				err := json.Unmarshal([]byte(expectedRulesJson), &expectedRules)
+				s.NoError(err)
+				s.Equal(expectedRules, rules,
+					"api-role rules must be unchanged when telemetry is disabled")
 			},
 		},
 	}
