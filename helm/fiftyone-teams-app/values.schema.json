@@ -4017,6 +4017,12 @@
                   "title": "enabled",
                   "type": "boolean"
                 },
+                "existingClaim": {
+                  "default": "",
+                  "description": "Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to\nbind the telemetry Redis to. When set, the chart will NOT create a\n`PersistentVolumeClaim` and the `size` / `storageClass` fields above\nare ignored — you are responsible for provisioning the claim out of\nband. Use this on clusters without a dynamic PV provisioner, or to\nreuse an existing volume across releases. Has no effect when\n`persistence.enabled` is `false`.",
+                  "title": "existingClaim",
+                  "type": "string"
+                },
                 "size": {
                   "default": "1Gi",
                   "description": "Storage size for the telemetry Redis `PersistentVolumeClaim`.",

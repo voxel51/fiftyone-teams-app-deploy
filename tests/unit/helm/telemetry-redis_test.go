@@ -344,3 +344,73 @@ func (s *telemetryRedisTemplateTest) TestPersistenceDisabledSkipsPVCAndUsesEmpty
 	s.Nil(volumes[0].PersistentVolumeClaim,
 		"redis-data volume should NOT reference a PVC when persistence is disabled")
 }
+
+// TestExistingClaimSkipsPVCAndMountsNamedClaim ensures that
+// persistence.existingClaim points the Deployment at the named PVC and
+// suppresses chart-managed PVC creation — the path for clusters without
+// a dynamic PV provisioner where the operator pre-creates the claim.
+func (s *telemetryRedisTemplateTest) TestExistingClaimSkipsPVCAndMountsNamedClaim() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.redis.persistence.existingClaim": "my-prebuilt-redis-pvc",
+	}}
+
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	s.NotContains(output, "kind: PersistentVolumeClaim",
+		"PVC should not render when persistence.existingClaim is set")
+
+	deployment := s.extractDeployment(output)
+	volumes := deployment.Spec.Template.Spec.Volumes
+	s.Require().Len(volumes, 1, "Deployment should have exactly one volume")
+	s.Equal("redis-data", volumes[0].Name)
+	s.Require().NotNil(volumes[0].PersistentVolumeClaim,
+		"redis-data volume should reference a PVC when existingClaim is set")
+	s.Equal("my-prebuilt-redis-pvc", volumes[0].PersistentVolumeClaim.ClaimName,
+		"claimName should match the user-supplied existingClaim, not the chart-generated name")
+	s.Nil(volumes[0].EmptyDir,
+		"redis-data volume should NOT be emptyDir when existingClaim is set")
+}
+
+// TestExistingClaimIgnoresStorageClassAndSize ensures that size/storageClass
+// have no effect once the user has taken over claim provisioning via
+// existingClaim — the chart has no PVC to apply them to.
+func (s *telemetryRedisTemplateTest) TestExistingClaimIgnoresStorageClassAndSize() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.redis.persistence.existingClaim": "my-prebuilt-redis-pvc",
+		"telemetry.redis.persistence.size":          "100Gi",
+		"telemetry.redis.persistence.storageClass":  "gp3",
+	}}
+
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	s.NotContains(output, "kind: PersistentVolumeClaim",
+		"PVC should not render when existingClaim is set, even with size/storageClass")
+	s.NotContains(output, "100Gi",
+		"size should not leak into the rendered output when existingClaim is set")
+	s.NotContains(output, "storageClassName",
+		"storageClassName should not appear in any rendered object when existingClaim is set")
+}
+
+// TestPersistenceDisabledBeatsExistingClaim ensures persistence.enabled=false
+// remains the kill-switch — even with existingClaim set, the user opting out
+// of persistence should yield an emptyDir volume rather than a stale claim
+// mount.
+func (s *telemetryRedisTemplateTest) TestPersistenceDisabledBeatsExistingClaim() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.redis.persistence.enabled":       "false",
+		"telemetry.redis.persistence.existingClaim": "my-prebuilt-redis-pvc",
+	}}
+
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	s.NotContains(output, "kind: PersistentVolumeClaim",
+		"PVC should not render when persistence.enabled=false")
+
+	deployment := s.extractDeployment(output)
+	volumes := deployment.Spec.Template.Spec.Volumes
+	s.Require().Len(volumes, 1)
+	s.NotNil(volumes[0].EmptyDir,
+		"persistence.enabled=false should take precedence and yield an emptyDir volume")
+	s.Nil(volumes[0].PersistentVolumeClaim,
+		"redis-data volume should NOT reference the existingClaim when persistence is disabled")
+}

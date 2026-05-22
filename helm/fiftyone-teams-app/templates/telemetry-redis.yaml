@@ -1,5 +1,5 @@
 {{- if and .Values.telemetry.enabled (not .Values.telemetry.redis.external.url) }}
-{{- if .Values.telemetry.redis.persistence.enabled }}
+{{- if and .Values.telemetry.redis.persistence.enabled (not .Values.telemetry.redis.persistence.existingClaim) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -72,7 +72,7 @@ spec:
         - name: redis-data
           {{- if .Values.telemetry.redis.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "telemetry.redis.name" . }}-data
+            claimName: {{ .Values.telemetry.redis.persistence.existingClaim | default (printf "%s-data" (include "telemetry.redis.name" .)) }}
           {{- else }}
           emptyDir: {}
           {{- end }}

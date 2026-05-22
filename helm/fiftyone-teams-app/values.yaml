@@ -1632,6 +1632,14 @@ telemetry:
       # -- `StorageClass` name for the telemetry Redis `PersistentVolumeClaim`.
       # Leave unset to use the cluster's default `StorageClass`.
       storageClass: ""
+      # -- Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to
+      # bind the telemetry Redis to. When set, the chart will NOT create a
+      # `PersistentVolumeClaim` and the `size` / `storageClass` fields above
+      # are ignored — you are responsible for provisioning the claim out of
+      # band. Use this on clusters without a dynamic PV provisioner, or to
+      # reuse an existing volume across releases. Has no effect when
+      # `persistence.enabled` is `false`.
+      existingClaim: ""
     # -- `--maxmemory` flag passed to `redis-server`.
     maxmemory: 400mb
     # -- `--maxmemory-policy` flag passed to `redis-server`.
