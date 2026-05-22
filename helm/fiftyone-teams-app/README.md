@@ -1097,7 +1097,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.serviceAccounts | list | `[]` | ServiceAccount names (in `namespace.name`) bound to the telemetry pod-logs Role. Each entry becomes a `ServiceAccount` subject on the generated RoleBinding. When empty, the RoleBinding subjects default to the chart's main app service account and the teams-api RBAC service account so the telemetry sidecars can read their target's logs. |
 | telemetry.sidecar.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | telemetry.sidecar.image.repository | string | `"voxel51/telemetry-sidecar"` | Container image for `telemetry-sidecar`. |
-| telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to the chart version. |
+| telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to `Chart.AppVersion`. |
 | telemetry.sidecar.resources | object | `{"limits":{"cpu":"100m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests/limits for each `telemetry-sidecar` container. |
 
 <!-- markdownlint-enable MD060 -->

@@ -4084,7 +4084,7 @@
                 },
                 "tag": {
                   "default": "",
-                  "description": "Image tag for `telemetry-sidecar`. Defaults to the chart version.",
+                  "description": "Image tag for `telemetry-sidecar`. Defaults to `Chart.AppVersion`.",
                   "title": "tag",
                   "type": "string"
                 }
