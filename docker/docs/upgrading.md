@@ -20,6 +20,8 @@
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
+      - [Host Requirements](#host-requirements)
+      - [Opting out of Telemetry](#opting-out-of-telemetry)
     - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
     - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
@@ -101,24 +103,21 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.19+ Telemetry Sidecars
 
-FiftyOne Enterprise v2.19.0 adds a `telemetry-sidecar` service paired
-with each `fiftyone-app`, `teams-api`, `teams-plugins`, and `teams-do*`
-service, plus a `telemetry-redis` service that buffers the streamed
-metrics/logs. Telemetry is enabled by default.
+FiftyOne Enterprise v2.19.0 adds observability features that are viewable
+by admins directly within the FiftyOne UI.
+This is enabled by a `telemetry-sidecar` service paired with each
+`fiftyone-app`, `teams-api`, `teams-plugins`, and `teams-do*` service,
+plus a `telemetry-redis` service that buffers the streamed metrics/logs.
 
-> [!IMPORTANT]
-> The sidecar powers the FiftyOne UI's delegated-operator log viewer.
-> Disabling telemetry will leave that log viewer empty.
+**Resource impact:** Each sidecar reserves `0.10` CPUs and `512M` memory
+(reservation == limit).
+A stock deploy adds four sidecars (`fiftyone-app` + `teams-api` +
+`teams-plugins` + one `teams-do`), so expect roughly **+0.4 CPU** and **+2 GiB
+memory** of additional resource usage, plus the bundled `telemetry-redis`
+service (`0.10` CPU / `256M` memory reservation, `0.25` / `512M` limits) and
+its `telemetry-redis-data` named volume.
 
-**Resource impact.** Each sidecar reserves `0.10` CPUs and `512M` memory
-(reservation == limit). A stock deploy adds four sidecars
-(`fiftyone-app` + `teams-api` + `teams-plugins` + one `teams-do`),
-so expect roughly **+0.4 CPU** and **+2 GiB memory** of container
-overhead, plus the bundled `telemetry-redis` service
-(`0.10` CPU / `256M` memory reservation, `0.25` / `512M` limits) and its
-`telemetry-redis-data` named volume.
-
-**Host requirements.**
+##### Host Requirements
 
 1. **Docker Compose v2.17+** for `depends_on.<svc>.restart: true`
    semantics. Older versions will see stale PID namespaces after a
@@ -133,15 +132,23 @@ overhead, plus the bundled `telemetry-redis` service
    replica. To run multiple delegated-operator workers, see
    [`docker/docs/configuring-telemetry.md`](configuring-telemetry.md).
 
-**Opt-out.** Add a `compose.override.yaml` that scales the
-`telemetry-redis` and `*-telemetry` services to `replicas: 0`. See
-[`configuring-telemetry.md`](configuring-telemetry.md#opt-out) for the
-full override snippet.
-
-**External Redis.** Point at a managed Redis instead of the bundled
+**External Redis:** Point at a managed Redis instead of the bundled
 one by setting `FIFTYONE_TELEMETRY_REDIS_URL` in your `.env` to a
 fully-qualified URL (e.g. `redis://my-managed-redis.example.com:6379`)
-and scaling `telemetry-redis` to `replicas: 0` as above.
+and scaling `telemetry-redis` to `replicas: 0` as below.
+
+##### Opting out of Telemetry
+
+The new Telemetry features are enabled by default, but can be disabled by
+adding a `compose.override.yaml` that scales the `telemetry-redis` and
+`*-telemetry` services to `replicas: 0`.
+See
+[`configuring-telemetry.md`](configuring-telemetry.md#opt-out)
+for the full override snippet.
+
+> [!IMPORTANT]
+> The sidecar powers the FiftyOne UI's delegated-operator log viewer.
+> Disabling telemetry will leave that log viewer empty.
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 
