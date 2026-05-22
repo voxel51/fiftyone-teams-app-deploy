@@ -131,8 +131,10 @@ func (s *telemetryRoleBindingTemplateTest) TestRoleRules() {
 
 func (s *telemetryRoleBindingTemplateTest) TestRoleBindingDefaultSubject() {
 	// With an unset serviceAccounts list, the binding falls back to the
-	// chart's main app service account and the teams-api RBAC service
-	// account (the SAs used by auto-injected sidecars).
+	// chart's main app service account — the SA used by sidecars on
+	// fiftyone-app, teams-plugins, and delegated-operator workloads. The
+	// teams-api SA is intentionally NOT bound here; api-role.yaml already
+	// grants it pods/log GET.
 	options := &helm.Options{SetValues: map[string]string{
 		"telemetry.enabled": "true",
 	}}
@@ -141,19 +143,11 @@ func (s *telemetryRoleBindingTemplateTest) TestRoleBindingDefaultSubject() {
 	rb, ok := s.extractRoleBinding(output)
 	s.Require().True(ok, "RoleBinding document not found in rendered output")
 
-	s.Require().Len(rb.Subjects, 2, "Default RoleBinding should bind to app + api-rbac SAs")
-	subjectNames := map[string]bool{}
-	for _, sub := range rb.Subjects {
-		s.Equal("ServiceAccount", sub.Kind)
-		s.Equal("fiftyone-teams", sub.Namespace)
-		subjectNames[sub.Name] = true
-	}
+	s.Require().Len(rb.Subjects, 1, "Default RoleBinding should bind only to the main app SA")
+	s.Equal("ServiceAccount", rb.Subjects[0].Kind)
+	s.Equal("fiftyone-teams", rb.Subjects[0].Namespace)
 	// Main app SA: chart default serviceAccount.name = "fiftyone-teams"
-	mainAppSA := "fiftyone-teams"
-	// teams-api SA: <fullname>-teams-api
-	apiSA := fmt.Sprintf("%s-fiftyone-teams-app-teams-api", s.releaseName)
-	s.True(subjectNames[mainAppSA], "should bind to main app SA %q", mainAppSA)
-	s.True(subjectNames[apiSA], "should bind to teams-api SA %q", apiSA)
+	s.Equal("fiftyone-teams", rb.Subjects[0].Name)
 }
 
 func (s *telemetryRoleBindingTemplateTest) TestRoleBindingMultipleSubjects() {

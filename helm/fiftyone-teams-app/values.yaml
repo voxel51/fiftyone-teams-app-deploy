@@ -1693,7 +1693,9 @@ telemetry:
         memory: 512Mi
   # -- ServiceAccount names (in `namespace.name`) bound to the telemetry
   # pod-logs Role. Each entry becomes a `ServiceAccount` subject on the
-  # generated RoleBinding. When empty, the RoleBinding subjects default to
-  # the chart's main app service account and the teams-api RBAC service
-  # account so the telemetry sidecars can read their target's logs.
+  # generated RoleBinding. When empty, the RoleBinding binds the chart's
+  # main app service account (used by sidecars on `fiftyone-app`,
+  # `teams-plugins`, and the delegated-operator workloads). The teams-api
+  # sidecar uses the teams-api RBAC service account, which already has
+  # `pods/log` GET via `api-role.yaml` and does not need to be re-bound.
   serviceAccounts: []

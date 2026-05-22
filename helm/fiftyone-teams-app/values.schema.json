@@ -4114,7 +4114,7 @@
           "type": "object"
         },
         "serviceAccounts": {
-          "description": "ServiceAccount names (in `namespace.name`) bound to the telemetry\npod-logs Role. Each entry becomes a `ServiceAccount` subject on the\ngenerated RoleBinding. When empty, the RoleBinding subjects default to\nthe chart's main app service account and the teams-api RBAC service\naccount so the telemetry sidecars can read their target's logs.",
+          "description": "ServiceAccount names (in `namespace.name`) bound to the telemetry\npod-logs Role. Each entry becomes a `ServiceAccount` subject on the\ngenerated RoleBinding. When empty, the RoleBinding binds the chart's\nmain app service account (used by sidecars on `fiftyone-app`,\n`teams-plugins`, and the delegated-operator workloads). The teams-api\nsidecar uses the teams-api RBAC service account, which already has\n`pods/log` GET via `api-role.yaml` and does not need to be re-bound.",
           "items": {
             "required": []
           },

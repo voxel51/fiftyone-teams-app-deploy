@@ -62,13 +62,17 @@ app.voxel51.com/component: telemetry
 
 {{/*
 Default subjects for the telemetry RoleBinding. When .Values.telemetry.serviceAccounts
-is empty, bind to both the main app service account and the teams-api RBAC service
-account (covering the SAs used by the auto-injected sidecars).
+is empty, bind to the main app service account — the SA used by the auto-injected
+sidecars on app/plugins/delegated-operator pods.
+
+The teams-api sidecar uses the teams-api RBAC service account, which is already
+granted `pods/log` GET by api-role.yaml; binding it here would be a redundant
+duplicate. When `apiSettings.rbac.create` is false, api-deployment falls back to
+the main app SA anyway, which this RoleBinding still covers.
 */}}
 {{- define "telemetry.role.subjects" -}}
 {{- $appSA := include "fiftyone-teams-app.serviceAccountName" . | trim -}}
-{{- $apiSA := include "teams-api-rbac.service-account-name" . | trim -}}
-{{- $defaultSubjects := list $appSA $apiSA | uniq -}}
+{{- $defaultSubjects := list $appSA -}}
 {{- $subjects := .Values.telemetry.serviceAccounts | default $defaultSubjects -}}
 {{- range $subjects }}
 - kind: ServiceAccount
