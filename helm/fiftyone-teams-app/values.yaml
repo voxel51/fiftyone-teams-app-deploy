@@ -1644,6 +1644,23 @@ telemetry:
       limits:
         cpu: 250m
         memory: 512Mi
+    # -- Pod-level security attributes for the telemetry Redis. Defaults
+    # to a non-root UID/GID matching the `redis` user in the upstream
+    # `redis:7-alpine` image (999). `fsGroup` ensures the mounted `/data`
+    # volume is group-writable. [Reference][security-context].
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+    # -- Container-level security attributes for the telemetry Redis.
+    # `readOnlyRootFilesystem: true` is safe because writes go to the
+    # `/data` volume. [Reference][container-security-context].
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: ["ALL"]
     # When `external.url` is set, the chart does NOT render the bundled
     # Redis `Deployment`/`Service`/`PersistentVolumeClaim`; consumer
     # workloads and telemetry sidecars are wired at the external URL

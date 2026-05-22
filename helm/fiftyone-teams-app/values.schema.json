@@ -3940,6 +3940,43 @@
         },
         "redis": {
           "properties": {
+            "containerSecurityContext": {
+              "description": "Container-level security attributes for the telemetry Redis.\n`readOnlyRootFilesystem: true` is safe because writes go to the\n`/data` volume. [Reference][container-security-context].",
+              "properties": {
+                "allowPrivilegeEscalation": {
+                  "default": false,
+                  "title": "allowPrivilegeEscalation",
+                  "type": "boolean"
+                },
+                "capabilities": {
+                  "properties": {
+                    "drop": {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          }
+                        ],
+                        "required": []
+                      },
+                      "title": "drop",
+                      "type": "array"
+                    }
+                  },
+                  "required": [],
+                  "title": "capabilities",
+                  "type": "object"
+                },
+                "readOnlyRootFilesystem": {
+                  "default": true,
+                  "title": "readOnlyRootFilesystem",
+                  "type": "boolean"
+                }
+              },
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
             "external": {
               "description": "When `external.url` is set, the chart does NOT render the bundled\nRedis `Deployment`/`Service`/`PersistentVolumeClaim`; consumer\nworkloads and telemetry sidecars are wired at the external URL\ninstead. Use this for managed Redis (ElastiCache, MemoryStore, etc.)\nor an existing shared Redis you already operate.",
               "properties": {
@@ -3999,6 +4036,34 @@
               },
               "required": [],
               "title": "persistence",
+              "type": "object"
+            },
+            "podSecurityContext": {
+              "description": "Pod-level security attributes for the telemetry Redis. Defaults\nto a non-root UID/GID matching the `redis` user in the upstream\n`redis:7-alpine` image (999). `fsGroup` ensures the mounted `/data`\nvolume is group-writable. [Reference][security-context].",
+              "properties": {
+                "fsGroup": {
+                  "default": 999,
+                  "title": "fsGroup",
+                  "type": "integer"
+                },
+                "runAsGroup": {
+                  "default": 999,
+                  "title": "runAsGroup",
+                  "type": "integer"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 999,
+                  "title": "runAsUser",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "podSecurityContext",
               "type": "object"
             },
             "resources": {

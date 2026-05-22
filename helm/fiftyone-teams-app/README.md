@@ -1086,6 +1086,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
 | telemetry.enabled | bool | `true` | Master switch. When `true` (default), all telemetry resources and sidecars are rendered. When `false`, none are — note that the FiftyOne UI's delegated-operator log viewer depends on the sidecar and will be empty without it. |
+| telemetry.redis.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Container-level security attributes for the telemetry Redis. `readOnlyRootFilesystem: true` is safe because writes go to the `/data` volume. [Reference][container-security-context]. |
 | telemetry.redis.external.url | string | `""` | URL of an external Redis to use instead of the bundled one (e.g. `redis://my-redis.example.com:6379`). |
 | telemetry.redis.image | string | `"redis:7-alpine"` | Container image for the telemetry Redis Deployment. |
 | telemetry.redis.maxmemory | string | `"400mb"` | `--maxmemory` flag passed to `redis-server`. |
@@ -1093,6 +1094,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.redis.persistence.enabled | bool | `true` | Controls whether a `PersistentVolumeClaim` is created for the bundled telemetry Redis. When `false`, Redis runs with an `emptyDir` volume and state is lost on pod restart — fine for dev clusters without a dynamic PV provisioner, not for production. |
 | telemetry.redis.persistence.size | string | `"1Gi"` | Storage size for the telemetry Redis `PersistentVolumeClaim`. |
 | telemetry.redis.persistence.storageClass | string | `""` | `StorageClass` name for the telemetry Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |
+| telemetry.redis.podSecurityContext | object | `{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999}` | Pod-level security attributes for the telemetry Redis. Defaults to a non-root UID/GID matching the `redis` user in the upstream `redis:7-alpine` image (999). `fsGroup` ensures the mounted `/data` volume is group-writable. [Reference][security-context]. |
 | telemetry.redis.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Resource requests/limits for the telemetry Redis container. [Reference][resources]. |
 | telemetry.serviceAccounts | list | `[]` | ServiceAccount names (in `namespace.name`) bound to the telemetry pod-logs Role. Each entry becomes a `ServiceAccount` subject on the generated RoleBinding. When empty, the RoleBinding subjects default to the chart's main app service account and the teams-api RBAC service account so the telemetry sidecars can read their target's logs. |
 | telemetry.sidecar.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |

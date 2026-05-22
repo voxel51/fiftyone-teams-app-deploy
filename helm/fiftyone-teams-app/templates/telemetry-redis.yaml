@@ -37,9 +37,17 @@ spec:
       labels:
         {{- include "telemetry.redis.labels" . | nindent 8 }}
     spec:
+      {{- with .Values.telemetry.redis.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: redis
           image: {{ .Values.telemetry.redis.image | default "redis:7-alpine" }}
+          {{- with .Values.telemetry.redis.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           args:
             - redis-server
             - --save
