@@ -367,7 +367,29 @@
           "type": "object"
         },
         "podSecurityContext": {
-          "description": "Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].",
+          "description": "Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].\nImage runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.",
+          "properties": {
+            "fsGroup": {
+              "default": 1000,
+              "title": "fsGroup",
+              "type": "integer"
+            },
+            "runAsGroup": {
+              "default": 1000,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 1000,
+              "title": "runAsUser",
+              "type": "integer"
+            }
+          },
           "required": [],
           "title": "podSecurityContext",
           "type": "object"
@@ -1055,7 +1077,29 @@
           "type": "object"
         },
         "podSecurityContext": {
-          "description": "Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].",
+          "description": "Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].\nImage runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.",
+          "properties": {
+            "fsGroup": {
+              "default": 1000,
+              "title": "fsGroup",
+              "type": "integer"
+            },
+            "runAsGroup": {
+              "default": 1000,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 1000,
+              "title": "runAsUser",
+              "type": "integer"
+            }
+          },
           "required": [],
           "title": "podSecurityContext",
           "type": "object"
@@ -2129,7 +2173,29 @@
               "type": "object"
             },
             "podSecurityContext": {
-              "description": "Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].",
+              "description": "Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].\nImage runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.",
+              "properties": {
+                "fsGroup": {
+                  "default": 1000,
+                  "title": "fsGroup",
+                  "type": "integer"
+                },
+                "runAsGroup": {
+                  "default": 1000,
+                  "title": "runAsGroup",
+                  "type": "integer"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 1000,
+                  "title": "runAsUser",
+                  "type": "integer"
+                }
+              },
               "required": [],
               "title": "podSecurityContext",
               "type": "object"
@@ -2445,7 +2511,29 @@
               "type": "object"
             },
             "podSecurityContext": {
-              "description": "Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].",
+              "description": "Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].\nImage runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.",
+              "properties": {
+                "fsGroup": {
+                  "default": 1000,
+                  "title": "fsGroup",
+                  "type": "integer"
+                },
+                "runAsGroup": {
+                  "default": 1000,
+                  "title": "runAsGroup",
+                  "type": "integer"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 1000,
+                  "title": "runAsUser",
+                  "type": "integer"
+                }
+              },
               "required": [],
               "title": "podSecurityContext",
               "type": "object"
@@ -3052,7 +3140,29 @@
           "type": "object"
         },
         "podSecurityContext": {
-          "description": "Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].",
+          "description": "Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].\nImage runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.",
+          "properties": {
+            "fsGroup": {
+              "default": 1000,
+              "title": "fsGroup",
+              "type": "integer"
+            },
+            "runAsGroup": {
+              "default": 1000,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 1000,
+              "title": "runAsUser",
+              "type": "integer"
+            }
+          },
           "required": [],
           "title": "podSecurityContext",
           "type": "object"
@@ -4012,8 +4122,8 @@
             "persistence": {
               "properties": {
                 "enabled": {
-                  "default": true,
-                  "description": "Controls whether a `PersistentVolumeClaim` is created for the\nbundled telemetry Redis. When `false`, Redis runs with an `emptyDir`\nvolume and state is lost on pod restart — fine for dev clusters\nwithout a dynamic PV provisioner, not for production.",
+                  "default": false,
+                  "description": "Controls whether a `PersistentVolumeClaim` is created for the\nbundled telemetry Redis. Defaults to `false` (emptyDir) so the chart\ninstalls cleanly on clusters without a dynamic PV provisioner or a\ndefault `StorageClass`. Telemetry archives flush to MongoDB every\n~10 minutes (`metrics_history`, `service_logs`, completed DO runs),\nso what you lose on a Redis pod restart is only the in-window\ndashboard backscroll (~10 minutes of un-archived data, plus any\nlive op buffers). Other workload crashes do NOT affect Redis state\n— only a Redis pod restart drops the in-memory window.\n\nSet to `true` to provision a PVC and have Redis recover its in-window\ndata across pod restarts (requires a working `StorageClass`, or set\n`existingClaim` below to point at a pre-provisioned PVC).",
                   "title": "enabled",
                   "type": "boolean"
                 },

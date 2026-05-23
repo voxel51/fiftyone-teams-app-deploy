@@ -48,7 +48,8 @@ func (s *telemetryRedisTemplateTest) TestEnabledByDefault() {
 	s.Require().NoError(err)
 	s.Contains(output, "kind: Deployment", "Redis Deployment should be rendered by default")
 	s.Contains(output, "kind: Service", "Redis Service should be rendered by default")
-	s.Contains(output, "kind: PersistentVolumeClaim", "Redis PVC should be rendered by default")
+	s.NotContains(output, "kind: PersistentVolumeClaim",
+		"Redis PVC should NOT be rendered by default — persistence.enabled defaults to false so the chart installs cleanly on clusters without a default StorageClass")
 }
 
 func (s *telemetryRedisTemplateTest) TestExplicitlyDisabled() {
@@ -297,8 +298,10 @@ func (s *telemetryRedisTemplateTest) TestServiceMetadata() {
 }
 
 func (s *telemetryRedisTemplateTest) TestPVCMetadata() {
+	// persistence.enabled defaults to false; re-enable to exercise the PVC-rendering path.
 	options := &helm.Options{SetValues: map[string]string{
 		"telemetry.enabled":                        "true",
+		"telemetry.redis.persistence.enabled":      "true",
 		"telemetry.redis.persistence.size":         "5Gi",
 		"telemetry.redis.persistence.storageClass": "gp3",
 	}}
@@ -350,7 +353,9 @@ func (s *telemetryRedisTemplateTest) TestPersistenceDisabledSkipsPVCAndUsesEmpty
 // suppresses chart-managed PVC creation — the path for clusters without
 // a dynamic PV provisioner where the operator pre-creates the claim.
 func (s *telemetryRedisTemplateTest) TestExistingClaimSkipsPVCAndMountsNamedClaim() {
+	// persistence.enabled defaults to false; re-enable to exercise the existingClaim mount path.
 	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.redis.persistence.enabled":       "true",
 		"telemetry.redis.persistence.existingClaim": "my-prebuilt-redis-pvc",
 	}}
 
@@ -375,7 +380,9 @@ func (s *telemetryRedisTemplateTest) TestExistingClaimSkipsPVCAndMountsNamedClai
 // have no effect once the user has taken over claim provisioning via
 // existingClaim — the chart has no PVC to apply them to.
 func (s *telemetryRedisTemplateTest) TestExistingClaimIgnoresStorageClassAndSize() {
+	// persistence.enabled defaults to false; re-enable so the test exercises the existingClaim path with size/storageClass set.
 	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.redis.persistence.enabled":       "true",
 		"telemetry.redis.persistence.existingClaim": "my-prebuilt-redis-pvc",
 		"telemetry.redis.persistence.size":          "100Gi",
 		"telemetry.redis.persistence.storageClass":  "gp3",

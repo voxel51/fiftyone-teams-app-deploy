@@ -121,7 +121,7 @@ spec:
             periodSeconds: {{ ($v.startup).periodSeconds | default $baseTpl.startup.periodSeconds }}
             timeoutSeconds: {{ ($v.startup).timeoutSeconds | default $baseTpl.startup.timeoutSeconds }}
         {{- if $.Values.telemetry.enabled }}
-        {{- include "telemetry.sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true) | nindent 8 }}
+        {{- include "telemetry.sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true "targetUid" (coalesce (($v.podSecurityContext | default dict).runAsUser) (($baseTpl.podSecurityContext | default dict).runAsUser))) | nindent 8 }}
         {{- end }}
       {{- with (merge (dict) ($v.nodeSelector | default dict) ($baseTpl.nodeSelector)) }}
       nodeSelector:

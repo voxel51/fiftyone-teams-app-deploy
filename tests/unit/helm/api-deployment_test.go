@@ -2400,11 +2400,11 @@ func (s *deploymentApiTemplateTest) TestPodSecurityContext() {
 			"defaultValues",
 			nil,
 			func(podSecurityContext *corev1.PodSecurityContext) {
-				s.Nil(podSecurityContext.FSGroup, "should be nil")
+				s.Equal(int64(1000), *podSecurityContext.FSGroup, "fsGroup should be 1000 (image UID)")
+				s.Equal(int64(1000), *podSecurityContext.RunAsGroup, "runAsGroup should be 1000")
+				s.True(*podSecurityContext.RunAsNonRoot, "runAsNonRoot should be true")
+				s.Equal(int64(1000), *podSecurityContext.RunAsUser, "runAsUser should be 1000")
 				s.Nil(podSecurityContext.FSGroupChangePolicy, "should be nil")
-				s.Nil(podSecurityContext.RunAsGroup, "should be nil")
-				s.Nil(podSecurityContext.RunAsNonRoot, "should be nil")
-				s.Nil(podSecurityContext.RunAsUser, "should be nil")
 				s.Nil(podSecurityContext.SeccompProfile, "should be nil")
 				s.Nil(podSecurityContext.SELinuxOptions, "should be nil")
 				s.Nil(podSecurityContext.SupplementalGroups, "should be nil")

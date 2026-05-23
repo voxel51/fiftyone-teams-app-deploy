@@ -132,28 +132,32 @@ func (s *telemetrySidecarTemplateTest) TestShareProcessNamespaceDisabledWithTele
 	}
 }
 
-// TestSidecarSecurityContext asserts the telemetry-sidecar container's
-// securityContext renders with the elevated privileges the image needs:
-// root UID (py-spy + /proc/<pid>/fd/1) and SYS_PTRACE. This is the
-// posture that makes telemetry incompatible with PSA `restricted` —
-// regressing this without an explicit posture-change PR would silently
-// break log capture on the clusters that already accept it.
+// TestSidecarSecurityContext asserts the sidecar's securityContext follows
+// the paired workload's runAsUser, drops all default caps, and only adds
+// SYS_PTRACE on executor (DO) sidecars where py-spy crash-stack archives are
+// load-bearing. Service-mode sidecars (api/app/plugins) get no elevated caps.
 func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 	cases := []struct {
-		template string
-		values   map[string]string
+		template       string
+		values         map[string]string
+		executor       bool
+		expectRunAsUid int64
 	}{
-		{"templates/api-deployment.yaml", nil},
-		{"templates/app-deployment.yaml", nil},
+		{"templates/api-deployment.yaml", nil, false, 1000},
+		{"templates/app-deployment.yaml", nil, false, 1000},
 		{
 			"templates/plugins-deployment.yaml",
 			map[string]string{"pluginsSettings.enabled": "true"},
+			false,
+			1000,
 		},
 		{
 			"templates/delegated-operator-instance-deployment.yaml",
 			map[string]string{
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
+			true,
+			1000,
 		},
 	}
 
@@ -173,13 +177,16 @@ func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 			sc := sidecar.SecurityContext
 			s.Require().NotNil(sc, "telemetry-sidecar should have a securityContext")
 
-			s.Require().NotNil(sc.RunAsNonRoot, "RunAsNonRoot should be set on sidecar")
-			s.False(*sc.RunAsNonRoot, "telemetry-sidecar must run as root")
-
 			s.Require().NotNil(sc.RunAsUser, "RunAsUser should be set on sidecar")
-			s.EqualValues(0, *sc.RunAsUser, "telemetry-sidecar must run as UID 0")
+			s.EqualValues(tc.expectRunAsUid, *sc.RunAsUser, "sidecar UID should match paired workload")
+
+			s.Require().NotNil(sc.AllowPrivilegeEscalation, "allowPrivilegeEscalation should be set")
+			s.False(*sc.AllowPrivilegeEscalation, "sidecar must not allow privilege escalation")
 
 			s.Require().NotNil(sc.Capabilities, "Capabilities should be set on sidecar")
+			s.Contains(sc.Capabilities.Drop, corev1.Capability("ALL"),
+				"sidecar must drop all default capabilities")
+
 			var hasPtrace bool
 			for _, capability := range sc.Capabilities.Add {
 				if capability == "SYS_PTRACE" {
@@ -187,7 +194,68 @@ func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 					break
 				}
 			}
-			s.True(hasPtrace, "telemetry-sidecar must add SYS_PTRACE")
+			if tc.executor {
+				s.True(hasPtrace, "executor sidecar must add SYS_PTRACE for py-spy crash archives")
+			} else {
+				s.False(hasPtrace, "service-mode sidecar must not add SYS_PTRACE")
+			}
+		})
+	}
+}
+
+// TestSidecarMatchesWorkloadUid asserts the sidecar's runAsUser follows
+// the paired workload's podSecurityContext.runAsUser override, so same-UID
+// /proc reads work without root or SYS_PTRACE.
+func (s *telemetrySidecarTemplateTest) TestSidecarMatchesWorkloadUid() {
+	const overrideUid = "1500"
+
+	cases := []struct {
+		template string
+		values   map[string]string
+	}{
+		{
+			"templates/api-deployment.yaml",
+			map[string]string{"apiSettings.podSecurityContext.runAsUser": overrideUid},
+		},
+		{
+			"templates/app-deployment.yaml",
+			map[string]string{"appSettings.podSecurityContext.runAsUser": overrideUid},
+		},
+		{
+			"templates/plugins-deployment.yaml",
+			map[string]string{
+				"pluginsSettings.enabled":                      "true",
+				"pluginsSettings.podSecurityContext.runAsUser": overrideUid,
+			},
+		},
+		{
+			"templates/delegated-operator-instance-deployment.yaml",
+			map[string]string{
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				"delegatedOperatorDeployments.template.podSecurityContext.runAsUser": overrideUid,
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		s.Run(tc.template, func() {
+			options := &helm.Options{SetValues: tc.values}
+			output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName,
+				[]string{tc.template})
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+			sidecar := findSidecar(deployment.Spec.Template.Spec.Containers)
+			s.Require().NotNil(sidecar, "telemetry-sidecar should be injected into %s", tc.template)
+
+			sc := sidecar.SecurityContext
+			s.Require().NotNil(sc.RunAsUser, "RunAsUser should follow workload override")
+			s.EqualValues(1500, *sc.RunAsUser, "sidecar UID should match workload override")
+
+			s.Require().NotNil(sc.RunAsNonRoot, "RunAsNonRoot should be set")
+			s.True(*sc.RunAsNonRoot, "non-zero UID implies runAsNonRoot: true")
 		})
 	}
 }

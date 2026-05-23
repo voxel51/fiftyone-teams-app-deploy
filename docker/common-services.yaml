@@ -227,8 +227,10 @@ services:
   fiftyone-app-telemetry-common:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:fiftyone-app"
-    cap_add:
-      - SYS_PTRACE
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     environment:
       POD_NAME: fiftyone-app
       POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
@@ -248,8 +250,10 @@ services:
   teams-api-telemetry-common:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-api"
-    cap_add:
-      - SYS_PTRACE
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     environment:
       POD_NAME: teams-api
       POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
@@ -269,8 +273,10 @@ services:
   teams-plugins-telemetry-common:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-plugins"
-    cap_add:
-      - SYS_PTRACE
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     environment:
       POD_NAME: teams-plugins
       POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
@@ -290,8 +296,12 @@ services:
   teams-do-telemetry-common:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-do"
+    cap_drop:
+      - ALL
     cap_add:
       - SYS_PTRACE
+    security_opt:
+      - no-new-privileges:true
     environment:
       POD_NAME: teams-do
       POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}

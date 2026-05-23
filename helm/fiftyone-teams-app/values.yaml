@@ -191,7 +191,12 @@ apiSettings:
     minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context].
-  podSecurityContext: {}
+  # Image runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
   # -- RBAC roles, bindings, and service accounts which will be used to
   # submit on-demand delegated operators to the kubernetes API.
   # If `apiSettings.rbac.create=true`, these will be used by the `teams-api` pods.
@@ -458,7 +463,12 @@ appSettings:
     minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context].
-  podSecurityContext: {}
+  # Image runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
   readiness:
     # -- Number of times to retry the readiness probe for the `fiftyone-app`. [Reference][probes].
     failureThreshold: 5
@@ -788,7 +798,12 @@ delegatedOperatorDeployments:
       minAvailable:
       # maxUnavailable: ""
     # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
-    podSecurityContext: {}
+    # Image runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
     readiness:
       # -- Number of times to retry the readiness probe for the `teams-do`. [Reference][probes].
       failureThreshold: 5
@@ -972,7 +987,12 @@ delegatedOperatorJobTemplates:
     # -- Annotations for delegated-operator-executor pods. [Reference][annotations].
     podAnnotations: {}
     # -- Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context].
-    podSecurityContext: {}
+    # Image runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
     # Instead of setting default resources, we require the user define them
     # This enables running on resource constrained environments
     # (like Minikube). To set resources, uncomment the following
@@ -1295,7 +1315,12 @@ pluginsSettings:
     minAvailable:
     # maxUnavailable: ""
   # -- Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context].
-  podSecurityContext: {}
+  # Image runs as UID 1000:1000 — declared here so PSA `restricted` and pod-level runAsNonRoot policies accept the workload.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
   readiness:
     # -- Number of times to retry the readiness probe for the `teams-plugins`. [Reference][probes].
     failureThreshold: 5
@@ -1620,10 +1645,19 @@ telemetry:
     image: redis:7-alpine
     persistence:
       # -- Controls whether a `PersistentVolumeClaim` is created for the
-      # bundled telemetry Redis. When `false`, Redis runs with an `emptyDir`
-      # volume and state is lost on pod restart — fine for dev clusters
-      # without a dynamic PV provisioner, not for production.
-      enabled: true
+      # bundled telemetry Redis. Defaults to `false` (emptyDir) so the chart
+      # installs cleanly on clusters without a dynamic PV provisioner or a
+      # default `StorageClass`. Telemetry archives flush to MongoDB every
+      # ~10 minutes (`metrics_history`, `service_logs`, completed DO runs),
+      # so what you lose on a Redis pod restart is only the in-window
+      # dashboard backscroll (~10 minutes of un-archived data, plus any
+      # live op buffers). Other workload crashes do NOT affect Redis state
+      # — only a Redis pod restart drops the in-memory window.
+      #
+      # Set to `true` to provision a PVC and have Redis recover its in-window
+      # data across pod restarts (requires a working `StorageClass`, or set
+      # `existingClaim` below to point at a pre-provisioned PVC).
+      enabled: false
       # -- Storage size for the telemetry Redis `PersistentVolumeClaim`.
       size: 1Gi
       # @schema

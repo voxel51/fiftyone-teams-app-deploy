@@ -144,14 +144,21 @@ Inputs: same dict as telemetry.sidecar-env.
     {{- toYaml . | nindent 4 }}
   {{- end }}
   securityContext:
-    # The sidecar image runs as root (SYS_PTRACE + /proc/<pid>/fd/1 access
-    # require it). Explicit container-level override so it works even when
-    # the pod's podSecurityContext sets runAsNonRoot: true.
+    # Match the paired workload's UID so same-UID /proc reads work without elevated caps.
+    {{- if .targetUid }}
+    runAsUser: {{ .targetUid }}
+    runAsNonRoot: {{ ne (int .targetUid) 0 }}
+    {{- else }}
     runAsNonRoot: false
     runAsUser: 0
+    {{- end }}
+    allowPrivilegeEscalation: false
     capabilities:
+      drop: ["ALL"]
+      {{- if .executor }}
       add:
         - SYS_PTRACE
+      {{- end }}
   {{- if .executor }}
   volumeMounts:
     - name: telemetry-socket
@@ -184,14 +191,21 @@ would block Job completion.
     failureThreshold: 30
     periodSeconds: 1
   securityContext:
-    # The sidecar image runs as root (SYS_PTRACE + /proc/<pid>/fd/1 access
-    # require it). Explicit container-level override so it works even when
-    # the pod's podSecurityContext sets runAsNonRoot: true.
+    # Match the paired workload's UID so same-UID /proc reads work without elevated caps.
+    {{- if .targetUid }}
+    runAsUser: {{ .targetUid }}
+    runAsNonRoot: {{ ne (int .targetUid) 0 }}
+    {{- else }}
     runAsNonRoot: false
     runAsUser: 0
+    {{- end }}
+    allowPrivilegeEscalation: false
     capabilities:
+      drop: ["ALL"]
+      {{- if .executor }}
       add:
         - SYS_PTRACE
+      {{- end }}
   volumeMounts:
     - name: telemetry-socket
       mountPath: /tmp/telemetry
