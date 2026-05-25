@@ -20,10 +20,13 @@ import (
 
 type telemetryRedisTemplateTest struct {
 	suite.Suite
-	chartPath   string
-	releaseName string
-	namespace   string
-	templates   []string
+	chartPath      string
+	releaseName    string
+	namespace      string
+	deploymentTpl  string
+	pvcTpl         string
+	serviceTpl     string
+	allBundledTpls []string
 }
 
 func TestTelemetryRedisTemplate(t *testing.T) {
@@ -32,24 +35,39 @@ func TestTelemetryRedisTemplate(t *testing.T) {
 	helmChartPath, err := filepath.Abs(chartPath)
 	require.NoError(t, err)
 
+	deploymentTpl := "templates/telemetry-redis-deployment.yaml"
+	pvcTpl := "templates/telemetry-redis-pvc.yaml"
+	serviceTpl := "templates/telemetry-redis-service.yaml"
+
 	suite.Run(t, &telemetryRedisTemplateTest{
-		Suite:       suite.Suite{},
-		chartPath:   helmChartPath,
-		releaseName: "fiftyone-test",
-		namespace:   "fiftyone-" + strings.ToLower(random.UniqueId()),
-		templates:   []string{"templates/telemetry-redis.yaml"},
+		Suite:          suite.Suite{},
+		chartPath:      helmChartPath,
+		releaseName:    "fiftyone-test",
+		namespace:      "fiftyone-" + strings.ToLower(random.UniqueId()),
+		deploymentTpl:  deploymentTpl,
+		pvcTpl:         pvcTpl,
+		serviceTpl:     serviceTpl,
+		allBundledTpls: []string{deploymentTpl, pvcTpl, serviceTpl},
 	})
 }
 
 func (s *telemetryRedisTemplateTest) TestEnabledByDefault() {
 	options := &helm.Options{SetValues: nil}
 
-	output, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	// Deployment + Service render unconditionally when telemetry is enabled.
+	deploymentOut, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, []string{s.deploymentTpl})
 	s.Require().NoError(err)
-	s.Contains(output, "kind: Deployment", "Redis Deployment should be rendered by default")
-	s.Contains(output, "kind: Service", "Redis Service should be rendered by default")
-	s.NotContains(output, "kind: PersistentVolumeClaim",
-		"Redis PVC should NOT be rendered by default — persistence.enabled defaults to false so the chart installs cleanly on clusters without a default StorageClass")
+	s.Contains(deploymentOut, "kind: Deployment", "Redis Deployment should be rendered by default")
+
+	serviceOut, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, []string{s.serviceTpl})
+	s.Require().NoError(err)
+	s.Contains(serviceOut, "kind: Service", "Redis Service should be rendered by default")
+
+	// persistence.enabled defaults to false → PVC template renders empty so the
+	// chart installs cleanly on clusters without a default StorageClass.
+	_, err = helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, []string{s.pvcTpl})
+	s.ErrorContains(err, "could not find template",
+		"Redis PVC should NOT be rendered by default")
 }
 
 func (s *telemetryRedisTemplateTest) TestExplicitlyDisabled() {
@@ -57,8 +75,8 @@ func (s *telemetryRedisTemplateTest) TestExplicitlyDisabled() {
 		"telemetry.enabled": "false",
 	}}
 
-	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	s.ErrorContains(err, "could not find template templates/telemetry-redis.yaml in chart")
+	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.allBundledTpls)
+	s.ErrorContains(err, "could not find template")
 }
 
 // TestExternalUrlSkipsBundled ensures that setting telemetry.redis.external.url
@@ -69,8 +87,8 @@ func (s *telemetryRedisTemplateTest) TestExternalUrlSkipsBundled() {
 		"telemetry.redis.external.url": "redis://my-managed-redis:6379",
 	}}
 
-	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	s.ErrorContains(err, "could not find template templates/telemetry-redis.yaml in chart")
+	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.allBundledTpls)
+	s.ErrorContains(err, "could not find template")
 }
 
 // TestExternalUrlWiresApiDeployment ensures that setting external.url causes
@@ -191,18 +209,12 @@ func (s *telemetryRedisTemplateTest) TestExternalUrlWiresDelegatedOperatorJobCon
 		"DO Job ConfigMap should embed the external Redis URL")
 }
 
-// extractDeployment finds the Deployment document in the multi-doc render output.
-func (s *telemetryRedisTemplateTest) extractDeployment(output string) appsv1.Deployment {
-	for _, doc := range splitYAMLDocs(output) {
-		if !strings.Contains(doc, "kind: Deployment") {
-			continue
-		}
-		var deployment appsv1.Deployment
-		helm.UnmarshalK8SYaml(s.T(), doc, &deployment)
-		return deployment
-	}
-	s.Fail("Deployment document not found in rendered output")
-	return appsv1.Deployment{}
+// renderDeployment renders just the Deployment template and unmarshals it.
+func (s *telemetryRedisTemplateTest) renderDeployment(options *helm.Options) appsv1.Deployment {
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, []string{s.deploymentTpl})
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+	return deployment
 }
 
 func (s *telemetryRedisTemplateTest) TestDeploymentMetadata() {
@@ -210,8 +222,7 @@ func (s *telemetryRedisTemplateTest) TestDeploymentMetadata() {
 		"telemetry.enabled": "true",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	deployment := s.extractDeployment(output)
+	deployment := s.renderDeployment(options)
 
 	expectedName := fmt.Sprintf("%s-telemetry-redis", s.releaseName)
 	s.Equal(expectedName, deployment.ObjectMeta.Name, "Deployment name should be release-prefixed")
@@ -227,8 +238,7 @@ func (s *telemetryRedisTemplateTest) TestDeploymentNamespaceOverride() {
 		"namespace.name":    "my-ns",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	deployment := s.extractDeployment(output)
+	deployment := s.renderDeployment(options)
 	s.Equal("my-ns", deployment.ObjectMeta.Namespace)
 }
 
@@ -237,8 +247,7 @@ func (s *telemetryRedisTemplateTest) TestDeploymentDefaultImage() {
 		"telemetry.enabled": "true",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	deployment := s.extractDeployment(output)
+	deployment := s.renderDeployment(options)
 
 	containers := deployment.Spec.Template.Spec.Containers
 	s.Require().Len(containers, 1, "Deployment should have exactly one container")
@@ -252,49 +261,37 @@ func (s *telemetryRedisTemplateTest) TestDeploymentImageOverride() {
 		"telemetry.redis.image": "my-registry/redis:custom",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	deployment := s.extractDeployment(output)
+	deployment := s.renderDeployment(options)
 	s.Equal("my-registry/redis:custom", deployment.Spec.Template.Spec.Containers[0].Image)
 }
 
 func (s *telemetryRedisTemplateTest) TestDeploymentRedisArgs() {
 	options := &helm.Options{SetValues: map[string]string{
-		"telemetry.enabled":               "true",
-		"telemetry.redis.maxmemory":       "1gb",
-		"telemetry.redis.maxmemoryPolicy": "noeviction",
+		"telemetry.enabled":         "true",
+		"telemetry.redis.maxmemory": "1gb",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	deployment := s.extractDeployment(output)
+	deployment := s.renderDeployment(options)
 
 	args := deployment.Spec.Template.Spec.Containers[0].Args
 	s.Contains(args, "redis-server")
 	s.Contains(args, "1gb", "maxmemory arg should be present")
-	s.Contains(args, "noeviction", "maxmemory-policy arg should be present")
+	s.Contains(args, "allkeys-lru", "maxmemory-policy should be hardcoded to allkeys-lru")
 }
 
 func (s *telemetryRedisTemplateTest) TestServiceMetadata() {
-	// The render output contains PVC + Deployment + Service. Use a Service-only
-	// unmarshal by isolating the Service doc.
 	options := &helm.Options{SetValues: map[string]string{
 		"telemetry.enabled": "true",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, []string{s.serviceTpl})
 
-	for _, doc := range splitYAMLDocs(output) {
-		if !strings.Contains(doc, "kind: Service") {
-			continue
-		}
-		var svc corev1.Service
-		helm.UnmarshalK8SYaml(s.T(), doc, &svc)
-		expectedName := fmt.Sprintf("%s-telemetry-redis", s.releaseName)
-		s.Equal(expectedName, svc.ObjectMeta.Name)
-		s.Require().Len(svc.Spec.Ports, 1)
-		s.EqualValues(6379, svc.Spec.Ports[0].Port)
-		return
-	}
-	s.Fail("Service document not found in rendered output")
+	var svc corev1.Service
+	helm.UnmarshalK8SYaml(s.T(), output, &svc)
+	expectedName := fmt.Sprintf("%s-telemetry-redis", s.releaseName)
+	s.Equal(expectedName, svc.ObjectMeta.Name)
+	s.Require().Len(svc.Spec.Ports, 1)
+	s.EqualValues(6379, svc.Spec.Ports[0].Port)
 }
 
 func (s *telemetryRedisTemplateTest) TestPVCMetadata() {
@@ -306,23 +303,24 @@ func (s *telemetryRedisTemplateTest) TestPVCMetadata() {
 		"telemetry.redis.persistence.storageClass": "gp3",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, []string{s.pvcTpl})
 
-	for _, doc := range splitYAMLDocs(output) {
-		if !strings.Contains(doc, "kind: PersistentVolumeClaim") {
-			continue
-		}
-		var pvc corev1.PersistentVolumeClaim
-		helm.UnmarshalK8SYaml(s.T(), doc, &pvc)
-		expectedName := fmt.Sprintf("%s-telemetry-redis-data", s.releaseName)
-		s.Equal(expectedName, pvc.ObjectMeta.Name)
-		req := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
-		s.Equal("5Gi", req.String())
-		s.Require().NotNil(pvc.Spec.StorageClassName, "StorageClassName should be set")
-		s.Equal("gp3", *pvc.Spec.StorageClassName)
-		return
-	}
-	s.Fail("PVC document not found in rendered output")
+	var pvc corev1.PersistentVolumeClaim
+	helm.UnmarshalK8SYaml(s.T(), output, &pvc)
+	expectedName := fmt.Sprintf("%s-telemetry-redis-data", s.releaseName)
+	s.Equal(expectedName, pvc.ObjectMeta.Name)
+	req := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
+	s.Equal("5Gi", req.String())
+	s.Require().NotNil(pvc.Spec.StorageClassName, "StorageClassName should be set")
+	s.Equal("gp3", *pvc.Spec.StorageClassName)
+}
+
+// assertPVCNotRendered confirms the PVC template renders empty for the given
+// values — i.e. the chart does NOT create a PVC. Helm errors with "could not
+// find template" when --show-only targets a template that produces no output.
+func (s *telemetryRedisTemplateTest) assertPVCNotRendered(options *helm.Options, msg string) {
+	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, []string{s.pvcTpl})
+	s.ErrorContains(err, "could not find template", msg)
 }
 
 // TestPersistenceDisabledSkipsPVCAndUsesEmptyDir ensures that with
@@ -333,12 +331,9 @@ func (s *telemetryRedisTemplateTest) TestPersistenceDisabledSkipsPVCAndUsesEmpty
 		"telemetry.redis.persistence.enabled": "false",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	s.assertPVCNotRendered(options, "PVC should not render when persistence.enabled=false")
 
-	s.NotContains(output, "kind: PersistentVolumeClaim",
-		"PVC should not render when persistence.enabled=false")
-
-	deployment := s.extractDeployment(output)
+	deployment := s.renderDeployment(options)
 	volumes := deployment.Spec.Template.Spec.Volumes
 	s.Require().Len(volumes, 1, "Deployment should have exactly one volume")
 	s.Equal("redis-data", volumes[0].Name)
@@ -359,12 +354,9 @@ func (s *telemetryRedisTemplateTest) TestExistingClaimSkipsPVCAndMountsNamedClai
 		"telemetry.redis.persistence.existingClaim": "my-prebuilt-redis-pvc",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	s.assertPVCNotRendered(options, "PVC should not render when persistence.existingClaim is set")
 
-	s.NotContains(output, "kind: PersistentVolumeClaim",
-		"PVC should not render when persistence.existingClaim is set")
-
-	deployment := s.extractDeployment(output)
+	deployment := s.renderDeployment(options)
 	volumes := deployment.Spec.Template.Spec.Volumes
 	s.Require().Len(volumes, 1, "Deployment should have exactly one volume")
 	s.Equal("redis-data", volumes[0].Name)
@@ -388,14 +380,14 @@ func (s *telemetryRedisTemplateTest) TestExistingClaimIgnoresStorageClassAndSize
 		"telemetry.redis.persistence.storageClass":  "gp3",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	s.assertPVCNotRendered(options, "PVC should not render when existingClaim is set, even with size/storageClass")
 
-	s.NotContains(output, "kind: PersistentVolumeClaim",
-		"PVC should not render when existingClaim is set, even with size/storageClass")
-	s.NotContains(output, "100Gi",
-		"size should not leak into the rendered output when existingClaim is set")
-	s.NotContains(output, "storageClassName",
-		"storageClassName should not appear in any rendered object when existingClaim is set")
+	// Confirm size/storageClass don't leak into the deployment either.
+	deploymentOut := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, []string{s.deploymentTpl})
+	s.NotContains(deploymentOut, "100Gi",
+		"size should not leak into the rendered Deployment when existingClaim is set")
+	s.NotContains(deploymentOut, "storageClassName",
+		"storageClassName should not appear in the Deployment when existingClaim is set")
 }
 
 // TestPersistenceDisabledBeatsExistingClaim ensures persistence.enabled=false
@@ -408,12 +400,9 @@ func (s *telemetryRedisTemplateTest) TestPersistenceDisabledBeatsExistingClaim()
 		"telemetry.redis.persistence.existingClaim": "my-prebuilt-redis-pvc",
 	}}
 
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	s.assertPVCNotRendered(options, "PVC should not render when persistence.enabled=false")
 
-	s.NotContains(output, "kind: PersistentVolumeClaim",
-		"PVC should not render when persistence.enabled=false")
-
-	deployment := s.extractDeployment(output)
+	deployment := s.renderDeployment(options)
 	volumes := deployment.Spec.Template.Spec.Volumes
 	s.Require().Len(volumes, 1)
 	s.NotNil(volumes[0].EmptyDir,

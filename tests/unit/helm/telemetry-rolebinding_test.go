@@ -36,7 +36,10 @@ func TestTelemetryRoleBindingTemplate(t *testing.T) {
 		chartPath:   helmChartPath,
 		releaseName: "fiftyone-test",
 		namespace:   "fiftyone-" + strings.ToLower(random.UniqueId()),
-		templates:   []string{"templates/telemetry-rolebinding.yaml"},
+		templates: []string{
+			"templates/telemetry-role.yaml",
+			"templates/telemetry-rolebinding.yaml",
+		},
 	})
 }
 
@@ -55,7 +58,7 @@ func (s *telemetryRoleBindingTemplateTest) TestExplicitlyDisabled() {
 	}}
 
 	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	s.ErrorContains(err, "could not find template templates/telemetry-rolebinding.yaml in chart")
+	s.ErrorContains(err, "could not find template")
 }
 
 // extractRole finds the Role document (not RoleBinding) in multi-doc render output.
