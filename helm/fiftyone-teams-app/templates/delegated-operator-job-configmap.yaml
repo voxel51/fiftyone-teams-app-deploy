@@ -41,23 +41,23 @@ data:
   {{- $mergedPodSecurityContext := merge (deepCopy ($jobConfig.podSecurityContext | default dict)) ($baseTpl.podSecurityContext | default dict) }}
   {{- $mergedResources := merge (deepCopy ($jobConfig.resources | default dict)) ($baseTpl.resources) }}
   {{- $mergedTolerations := $jobConfig.tolerations | default $baseTpl.tolerations }}
-  {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts }}
-  {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes }}
+  {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts | default list }}
+  {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes | default list }}
 
   {{- if $.Values.telemetry.enabled }}
-    {{- $hasVolume := false }}
-    {{- range $v := ($mergedVolumes | default list) }}
-      {{- if eq $v.name "telemetry-socket" }}{{- $hasVolume = true }}{{- end }}
+    {{- $hasSocketVolume := false }}
+    {{- range $vol := $mergedVolumes }}
+      {{- if eq $vol.name "telemetry-socket" }}{{- $hasSocketVolume = true }}{{- end }}
     {{- end }}
-    {{- if not $hasVolume }}
-      {{- $mergedVolumes = append ($mergedVolumes | default list) (dict "name" "telemetry-socket" "emptyDir" dict) }}
+    {{- if not $hasSocketVolume }}
+      {{- $mergedVolumes = append $mergedVolumes (dict "name" "telemetry-socket" "emptyDir" dict) }}
     {{- end }}
-    {{- $hasMount := false }}
-    {{- range $vm := ($mergedVolumeMounts | default list) }}
-      {{- if eq $vm.name "telemetry-socket" }}{{- $hasMount = true }}{{- end }}
+    {{- $hasSocketMount := false }}
+    {{- range $vm := $mergedVolumeMounts }}
+      {{- if eq $vm.name "telemetry-socket" }}{{- $hasSocketMount = true }}{{- end }}
     {{- end }}
-    {{- if not $hasMount }}
-      {{- $mergedVolumeMounts = append ($mergedVolumeMounts | default list) (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+    {{- if not $hasSocketMount }}
+      {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
     {{- end }}
   {{- end }}
 

@@ -5689,3 +5689,97 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestDeploymentUpdateSt
 		})
 	}
 }
+
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySocketInjection() {
+	const socketName = "telemetry-socket"
+
+	countVolumes := func(vols []corev1.Volume, name string) int {
+		n := 0
+		for _, v := range vols {
+			if v.Name == name {
+				n++
+			}
+		}
+		return n
+	}
+	countMounts := func(mounts []corev1.VolumeMount, name string) int {
+		n := 0
+		for _, m := range mounts {
+			if m.Name == name {
+				n++
+			}
+		}
+		return n
+	}
+	// findContainer returns the named container (the main DO container,
+	// not the telemetry-sidecar) from a pod spec.
+	findContainer := func(containers []corev1.Container, name string) *corev1.Container {
+		for i, c := range containers {
+			if c.Name == name {
+				return &containers[i]
+			}
+		}
+		return nil
+	}
+
+	testCases := []struct {
+		name      string
+		values    map[string]string
+		expectVol int
+		expectMnt int
+	}{
+		{
+			name: "autoInjectsWhenUserHasNoTelemetrySocket",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			expectVol: 1,
+			expectMnt: 1,
+		},
+		{
+			name: "doesNotDuplicateWhenUserDeclaresTelemetrySocket",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                    "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].name":            socketName,
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].emptyDir.medium": "Memory",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].name":       socketName,
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].mountPath":  "/custom/path",
+			},
+			expectVol: 1,
+			expectMnt: 1,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		s.Run(tc.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: tc.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			docs := strings.Split(output, "---")
+			s.Require().GreaterOrEqual(len(docs), 2, "expected at least one rendered deployment")
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, docs[1], &deployment)
+
+			s.Equal(
+				tc.expectVol,
+				countVolumes(deployment.Spec.Template.Spec.Volumes, socketName),
+				"telemetry-socket volume count mismatch",
+			)
+
+			main := findContainer(deployment.Spec.Template.Spec.Containers, "teams-do-cpu-default")
+			s.Require().NotNil(main, "main DO container not found")
+			s.Equal(
+				tc.expectMnt,
+				countMounts(main.VolumeMounts, socketName),
+				"telemetry-socket volumeMount count mismatch on main container",
+			)
+		})
+	}
+}

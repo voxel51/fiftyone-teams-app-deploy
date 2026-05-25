@@ -16,6 +16,24 @@
 }}
 {{- $defaultDescription := printf "Long running operations delegated to %s" $name }}
 {{- $updateStrategy := merge (dict) ($v.updateStrategy|default dict) ($baseTpl.updateStrategy) }}
+{{- $mergedVolumeMounts := $v.volumeMounts | default $baseTpl.volumeMounts | default list }}
+{{- $mergedVolumes := $v.volumes | default $baseTpl.volumes | default list }}
+{{- if $.Values.telemetry.enabled }}
+  {{- $hasSocketVolume := false }}
+  {{- range $vol := $mergedVolumes }}
+    {{- if eq $vol.name "telemetry-socket" }}{{- $hasSocketVolume = true }}{{- end }}
+  {{- end }}
+  {{- if not $hasSocketVolume }}
+    {{- $mergedVolumes = append $mergedVolumes (dict "name" "telemetry-socket" "emptyDir" dict) }}
+  {{- end }}
+  {{- $hasSocketMount := false }}
+  {{- range $vm := $mergedVolumeMounts }}
+    {{- if eq $vm.name "telemetry-socket" }}{{- $hasSocketMount = true }}{{- end }}
+  {{- end }}
+  {{- if not $hasSocketMount }}
+    {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+  {{- end }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -79,16 +97,6 @@ spec:
             {{- include "delegated-operator-deployments.env-vars-list" $envContext | indent 12 }}
           resources:
             {{- toYaml (merge (dict) ($v.resources | default dict) ($baseTpl.resources)) | nindent 12 }}
-          {{- $mergedVolumeMounts := $v.volumeMounts | default $baseTpl.volumeMounts | default list }}
-          {{- if $.Values.telemetry.enabled }}
-          {{- $hasSocketMount := false }}
-          {{- range $vm := $mergedVolumeMounts }}
-            {{- if eq $vm.name "telemetry-socket" }}{{- $hasSocketMount = true }}{{- end }}
-          {{- end }}
-          {{- if not $hasSocketMount }}
-            {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
-          {{- end }}
-          {{- end }}
           {{- with $mergedVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
@@ -145,16 +153,6 @@ spec:
             "context" $labelContext
           ) | nindent 8
         }}
-      {{- end }}
-      {{- $mergedVolumes := $v.volumes | default $baseTpl.volumes | default list }}
-      {{- if $.Values.telemetry.enabled }}
-      {{- $hasSocketVol := false }}
-      {{- range $vol := $mergedVolumes }}
-        {{- if eq $vol.name "telemetry-socket" }}{{- $hasSocketVol = true }}{{- end }}
-      {{- end }}
-      {{- if not $hasSocketVol }}
-        {{- $mergedVolumes = append $mergedVolumes (dict "name" "telemetry-socket" "emptyDir" dict) }}
-      {{- end }}
       {{- end }}
       {{- with $mergedVolumes }}
       volumes:

@@ -650,6 +650,110 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 	}
 }
 
+// renderJob renders a single job from the rendered ConfigMap data and
+// returns it as a batchv1.Job for introspection. The job template body
+// in the ConfigMap is Jinja, which we render with placeholder values so
+// the result is valid YAML.
+func (s *doK8sConfigMapTemplateTest) renderJob(data map[string]string, key string) batchv1.Job {
+	s.T().Helper()
+	s.Require().Contains(data, key, "ConfigMap should contain key %q", key)
+
+	jinjaArgs := map[string]interface{}{
+		"_id":      "test-id",
+		"_command": "fiftyone",
+		"_args":    []string{"test"},
+	}
+	jobYAML, err := convertJinjaToYAML(data[key], jinjaArgs)
+	s.Require().NoError(err)
+
+	var job batchv1.Job
+	helm.UnmarshalK8SYaml(s.T(), jobYAML, &job)
+	return job
+}
+
+func (s *doK8sConfigMapTemplateTest) TestTelemetrySocketInjection() {
+	const socketName = "telemetry-socket"
+	jobKey := "cpuDefault.yaml"
+
+	// helper: count entries with the given name
+	countByName := func(volumes []corev1.Volume, name string) int {
+		n := 0
+		for _, v := range volumes {
+			if v.Name == name {
+				n++
+			}
+		}
+		return n
+	}
+	countMountsByName := func(mounts []corev1.VolumeMount, name string) int {
+		n := 0
+		for _, m := range mounts {
+			if m.Name == name {
+				n++
+			}
+		}
+		return n
+	}
+
+	testCases := []struct {
+		name      string
+		values    map[string]string
+		expectVol int // expected occurrences of telemetry-socket volume
+		expectMnt int // expected occurrences of telemetry-socket mount
+	}{
+		{
+			name: "autoInjectsWhenUserHasNoTelemetrySocket",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			expectVol: 1,
+			expectMnt: 1,
+		},
+		{
+			name: "doesNotDuplicateWhenUserDeclaresTelemetrySocket",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                     "nil",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumes[0].name":            socketName,
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumes[0].emptyDir.medium": "Memory",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumeMounts[0].name":       socketName,
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumeMounts[0].mountPath":  "/custom/path",
+			},
+			expectVol: 1,
+			expectMnt: 1,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		s.Run(tc.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: tc.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			job := s.renderJob(configMap.Data, jobKey)
+
+			s.Equal(
+				tc.expectVol,
+				countByName(job.Spec.Template.Spec.Volumes, socketName),
+				"telemetry-socket volume count mismatch",
+			)
+			s.Require().NotEmpty(job.Spec.Template.Spec.Containers, "expected at least one container")
+			s.Equal(
+				tc.expectMnt,
+				countMountsByName(job.Spec.Template.Spec.Containers[0].VolumeMounts, socketName),
+				"telemetry-socket volumeMount count mismatch",
+			)
+		})
+	}
+}
+
 func (s *doK8sConfigMapTemplateTest) loadTestFile(filename, chartVersion string) string {
 	content, err := os.ReadFile(filename)
 	s.NoError(err, "Failed to read test file: %s", filename)
