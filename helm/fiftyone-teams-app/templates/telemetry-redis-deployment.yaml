@@ -1,23 +1,4 @@
 {{- if and .Values.telemetry.enabled (not .Values.telemetry.redis.external.url) }}
-{{- if and .Values.telemetry.redis.persistence.enabled (not .Values.telemetry.redis.persistence.existingClaim) }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ include "telemetry.redis.name" . }}-data
-  namespace: {{ .Values.namespace.name }}
-  labels:
-    {{- include "telemetry.redis.labels" . | nindent 4 }}
-spec:
-  accessModes:
-    - ReadWriteOnce
-  {{- with .Values.telemetry.redis.persistence.storageClass }}
-  storageClassName: {{ . | quote }}
-  {{- end }}
-  resources:
-    requests:
-      storage: {{ .Values.telemetry.redis.persistence.size | default "1Gi" }}
----
-{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -76,18 +57,4 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ include "telemetry.redis.name" . }}
-  namespace: {{ .Values.namespace.name }}
-  labels:
-    {{- include "telemetry.redis.labels" . | nindent 4 }}
-spec:
-  selector:
-    {{- include "telemetry.redis.selectorLabels" . | nindent 4 }}
-  ports:
-    - port: 6379
-      targetPort: 6379
 {{- end }}
