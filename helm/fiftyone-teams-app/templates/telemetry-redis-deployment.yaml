@@ -39,7 +39,7 @@ spec:
             - --maxmemory
             - {{ .Values.telemetry.redis.maxmemory | default "400mb" | quote }}
             - --maxmemory-policy
-            - {{ .Values.telemetry.redis.maxmemoryPolicy | default "allkeys-lru" | quote }}
+            - allkeys-lru
           ports:
             - containerPort: 6379
           {{- with .Values.telemetry.redis.resources }}

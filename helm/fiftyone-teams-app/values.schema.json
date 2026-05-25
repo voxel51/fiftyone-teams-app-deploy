@@ -4113,12 +4113,6 @@
               "title": "maxmemory",
               "type": "string"
             },
-            "maxmemoryPolicy": {
-              "default": "allkeys-lru",
-              "description": "`--maxmemory-policy` flag passed to `redis-server`.",
-              "title": "maxmemoryPolicy",
-              "type": "string"
-            },
             "persistence": {
               "properties": {
                 "enabled": {
@@ -4205,12 +4199,12 @@
                 "requests": {
                   "properties": {
                     "cpu": {
-                      "default": "100m",
+                      "default": "250m",
                       "title": "cpu",
                       "type": "string"
                     },
                     "memory": {
-                      "default": "256Mi",
+                      "default": "512Mi",
                       "title": "memory",
                       "type": "string"
                     }

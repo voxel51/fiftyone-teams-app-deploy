@@ -1676,13 +1676,11 @@ telemetry:
       existingClaim: ""
     # -- `--maxmemory` flag passed to `redis-server`.
     maxmemory: 400mb
-    # -- `--maxmemory-policy` flag passed to `redis-server`.
-    maxmemoryPolicy: allkeys-lru
     # -- Resource requests/limits for the telemetry Redis container. [Reference][resources].
     resources:
       requests:
-        cpu: 100m
-        memory: 256Mi
+        cpu: 250m
+        memory: 512Mi
       limits:
         cpu: 250m
         memory: 512Mi
