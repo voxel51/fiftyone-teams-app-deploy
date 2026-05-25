@@ -222,22 +222,3 @@ env-vars-list helpers.
   value: {{ include "telemetry.redis.url" . | quote }}
 {{- end }}
 {{- end }}
-
-{{/*
-Emit the `telemetry-socket` shared emptyDir volume entry for spec.volumes.
-Used by DO deployments and DO jobs so the sidecar's unix socket can be
-reached by both the executor and the sidecar.
-*/}}
-{{- define "telemetry.socket-volume" -}}
-- name: telemetry-socket
-  emptyDir: {}
-{{- end }}
-
-{{/*
-Emit the `telemetry-socket` volumeMount for a workload container that needs to
-reach the sidecar's unix socket. Pair with telemetry.socket-volume.
-*/}}
-{{- define "telemetry.socket-volume-mount" -}}
-- name: telemetry-socket
-  mountPath: /tmp/telemetry
-{{- end }}
