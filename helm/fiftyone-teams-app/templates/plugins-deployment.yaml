@@ -78,7 +78,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
         {{- if .Values.telemetry.enabled }}
-        {{- include "telemetry.sidecar" (dict "ctx" . "serviceType" "teams-plugins" "targetName" "hypercorn" "targetUid" ((.Values.pluginsSettings.podSecurityContext | default dict).runAsUser)) | nindent 8 }}
+        {{- include "telemetry.sidecar" (dict "ctx" . "serviceType" "teams-plugins" "targetName" "hypercorn") | nindent 8 }}
         {{- end }}
       {{- if .Values.pluginsSettings.initContainers.enabled }}
       initContainers:

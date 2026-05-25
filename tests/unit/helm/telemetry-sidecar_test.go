@@ -132,24 +132,21 @@ func (s *telemetrySidecarTemplateTest) TestShareProcessNamespaceDisabledWithTele
 	}
 }
 
-// TestSidecarSecurityContext asserts the sidecar's securityContext follows
-// the paired workload's runAsUser, drops all default caps, and only adds
-// SYS_PTRACE on executor (DO) sidecars where py-spy crash-stack archives are
-// load-bearing. Service-mode sidecars (api/app/plugins) get no elevated caps.
+// TestSidecarSecurityContext asserts the sidecar drops all default caps,
+// disables privilege escalation, and only adds SYS_PTRACE on executor (DO)
+// sidecars where py-spy crash-stack archives are load-bearing.
 func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 	cases := []struct {
-		template       string
-		values         map[string]string
-		executor       bool
-		expectRunAsUid int64
+		template string
+		values   map[string]string
+		executor bool
 	}{
-		{"templates/api-deployment.yaml", nil, false, 1000},
-		{"templates/app-deployment.yaml", nil, false, 1000},
+		{"templates/api-deployment.yaml", nil, false},
+		{"templates/app-deployment.yaml", nil, false},
 		{
 			"templates/plugins-deployment.yaml",
 			map[string]string{"pluginsSettings.enabled": "true"},
 			false,
-			1000,
 		},
 		{
 			"templates/delegated-operator-instance-deployment.yaml",
@@ -157,7 +154,6 @@ func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 			},
 			true,
-			1000,
 		},
 	}
 
@@ -176,9 +172,6 @@ func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 
 			sc := sidecar.SecurityContext
 			s.Require().NotNil(sc, "telemetry-sidecar should have a securityContext")
-
-			s.Require().NotNil(sc.RunAsUser, "RunAsUser should be set on sidecar")
-			s.EqualValues(tc.expectRunAsUid, *sc.RunAsUser, "sidecar UID should match paired workload")
 
 			s.Require().NotNil(sc.AllowPrivilegeEscalation, "allowPrivilegeEscalation should be set")
 			s.False(*sc.AllowPrivilegeEscalation, "sidecar must not allow privilege escalation")
@@ -199,63 +192,6 @@ func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 			} else {
 				s.False(hasPtrace, "service-mode sidecar must not add SYS_PTRACE")
 			}
-		})
-	}
-}
-
-// TestSidecarMatchesWorkloadUid asserts the sidecar's runAsUser follows
-// the paired workload's podSecurityContext.runAsUser override, so same-UID
-// /proc reads work without root or SYS_PTRACE.
-func (s *telemetrySidecarTemplateTest) TestSidecarMatchesWorkloadUid() {
-	const overrideUid = "1500"
-
-	cases := []struct {
-		template string
-		values   map[string]string
-	}{
-		{
-			"templates/api-deployment.yaml",
-			map[string]string{"apiSettings.podSecurityContext.runAsUser": overrideUid},
-		},
-		{
-			"templates/app-deployment.yaml",
-			map[string]string{"appSettings.podSecurityContext.runAsUser": overrideUid},
-		},
-		{
-			"templates/plugins-deployment.yaml",
-			map[string]string{
-				"pluginsSettings.enabled":                      "true",
-				"pluginsSettings.podSecurityContext.runAsUser": overrideUid,
-			},
-		},
-		{
-			"templates/delegated-operator-instance-deployment.yaml",
-			map[string]string{
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
-				"delegatedOperatorDeployments.template.podSecurityContext.runAsUser": overrideUid,
-			},
-		},
-	}
-
-	for _, tc := range cases {
-		tc := tc
-		s.Run(tc.template, func() {
-			options := &helm.Options{SetValues: tc.values}
-			output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName,
-				[]string{tc.template})
-
-			var deployment appsv1.Deployment
-			helm.UnmarshalK8SYaml(s.T(), output, &deployment)
-
-			sidecar := findSidecar(deployment.Spec.Template.Spec.Containers)
-			s.Require().NotNil(sidecar, "telemetry-sidecar should be injected into %s", tc.template)
-
-			sc := sidecar.SecurityContext
-			s.Require().NotNil(sc.RunAsUser, "RunAsUser should follow workload override")
-			s.EqualValues(1500, *sc.RunAsUser, "sidecar UID should match workload override")
-
-			s.Require().NotNil(sc.RunAsNonRoot, "RunAsNonRoot should be set")
-			s.True(*sc.RunAsNonRoot, "non-zero UID implies runAsNonRoot: true")
 		})
 	}
 }

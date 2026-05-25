@@ -144,20 +144,11 @@ Inputs: same dict as telemetry.sidecar-env.
     {{- toYaml . | nindent 4 }}
   {{- end }}
   securityContext:
-    # Match the paired workload's UID so same-UID /proc reads work without elevated caps.
-    {{- if .targetUid }}
-    runAsUser: {{ .targetUid }}
-    runAsNonRoot: {{ ne (int .targetUid) 0 }}
-    {{- else }}
-    runAsNonRoot: false
-    runAsUser: 0
-    {{- end }}
     allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
       {{- if .executor }}
-      add:
-        - SYS_PTRACE
+      add: ["SYS_PTRACE"]
       {{- end }}
   {{- if .executor }}
   volumeMounts:
@@ -191,20 +182,11 @@ would block Job completion.
     failureThreshold: 30
     periodSeconds: 1
   securityContext:
-    # Match the paired workload's UID so same-UID /proc reads work without elevated caps.
-    {{- if .targetUid }}
-    runAsUser: {{ .targetUid }}
-    runAsNonRoot: {{ ne (int .targetUid) 0 }}
-    {{- else }}
-    runAsNonRoot: false
-    runAsUser: 0
-    {{- end }}
     allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
       {{- if .executor }}
-      add:
-        - SYS_PTRACE
+      add: ["SYS_PTRACE"]
       {{- end }}
   volumeMounts:
     - name: telemetry-socket
