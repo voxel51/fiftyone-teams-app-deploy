@@ -324,9 +324,8 @@ Create a merged list of environment variables for delegated-operator-executor
     secretKeyRef:
       name: {{ .secretName }}
       key: encryptionKey
+{{- include "telemetry.redis-url-env" .ctx }}
 {{- if and .ctx .ctx.Values.telemetry.enabled }}
-- name: FIFTYONE_TELEMETRY_REDIS_URL
-  value: {{ include "telemetry.redis.url" .ctx | quote }}
 - name: TELEMETRY_SOCKET
   value: /tmp/telemetry/agent.sock
 {{- end }}
