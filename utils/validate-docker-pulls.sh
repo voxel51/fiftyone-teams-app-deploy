@@ -105,11 +105,7 @@ expected_images_with_tag=()
 expected_tag=$(yq '.appVersion' "${GIT_ROOT}/helm/fiftyone-teams-app/Chart.yaml")
 
 for img in "${EXPECTED_IMAGES[@]}"; do
-  if [[ ${img} == *":"* ]]; then
-    # Image already carries an explicit tag (e.g. redis:7-alpine);
-    # use as-is.
-    img_with_tag="${img}"
-  elif [[ ${img} =~ "voxel51/" ]]; then
+  if [[ ${img} =~ "voxel51/" ]]; then
     # Only add a tag for our organizations images, not
     # publicly available ones our chart may reference
     img_with_tag="${img}:${expected_tag}"
@@ -130,14 +126,12 @@ helm_images=$(
 
 read -r -a helm_images_array <<<"${helm_images}"
 
-known_images_for_template_check=("${expected_images_with_tag[@]}")
-
 pids=()
 rcs=()
 exit_code=0
 
 for img in "${helm_images_array[@]}"; do
-  if [[ ! ${known_images_for_template_check[*]} =~ ${img} ]]; then
+  if [[ ! ${expected_images_with_tag[*]} =~ ${img} ]]; then
     echo "Image ${img} is in the 'helm template', but not in our published images!"
     exit 1
   fi
