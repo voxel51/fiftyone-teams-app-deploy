@@ -725,13 +725,13 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySocketInjection() {
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		s.Run(tc.name, func() {
+	for _, testCase := range testCases {
+		testCase := testCase
+		s.Run(testCase.name, func() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: tc.values}
+			options := &helm.Options{SetValues: testCase.values}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap
@@ -740,13 +740,13 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySocketInjection() {
 			job := s.renderJob(configMap.Data, jobKey)
 
 			s.Equal(
-				tc.expectVol,
+				testCase.expectVol,
 				countByName(job.Spec.Template.Spec.Volumes, socketName),
 				"telemetry-socket volume count mismatch",
 			)
 			s.Require().NotEmpty(job.Spec.Template.Spec.Containers, "expected at least one container")
 			s.Equal(
-				tc.expectMnt,
+				testCase.expectMnt,
 				countMountsByName(job.Spec.Template.Spec.Containers[0].VolumeMounts, socketName),
 				"telemetry-socket volumeMount count mismatch",
 			)
