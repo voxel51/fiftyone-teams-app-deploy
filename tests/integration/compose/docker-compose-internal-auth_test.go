@@ -240,7 +240,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "Executor started",
+					log:              "Registering executor builtin",
 				},
 			},
 		},
