@@ -90,6 +90,7 @@ services:
     cap_drop:
       - ALL
     cap_add:
+      - DAC_READ_SEARCH
       - SYS_PTRACE
     security_opt:
       - no-new-privileges:true
@@ -155,6 +156,7 @@ services:
     cap_drop:
       - ALL
     cap_add:
+      - DAC_READ_SEARCH
       - SYS_PTRACE
     security_opt:
       - no-new-privileges:true

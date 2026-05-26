@@ -55,6 +55,7 @@ services:
     pid: "service:teams-do-gpu"
     profiles: ["gpu"]
     cap_add:
+      - DAC_READ_SEARCH
       - SYS_PTRACE
     deploy:
       resources:
