@@ -219,6 +219,8 @@ services:
     pid: "service:fiftyone-app"
     cap_drop:
       - ALL
+    cap_add:
+      - DAC_READ_SEARCH
     security_opt:
       - no-new-privileges:true
     environment:
@@ -242,6 +244,8 @@ services:
     pid: "service:teams-api"
     cap_drop:
       - ALL
+    cap_add:
+      - DAC_READ_SEARCH
     security_opt:
       - no-new-privileges:true
     environment:
@@ -265,6 +269,8 @@ services:
     pid: "service:teams-plugins"
     cap_drop:
       - ALL
+    cap_add:
+      - DAC_READ_SEARCH
     security_opt:
       - no-new-privileges:true
     environment:
@@ -289,6 +295,7 @@ services:
     cap_drop:
       - ALL
     cap_add:
+      - DAC_READ_SEARCH
       - SYS_PTRACE
     security_opt:
       - no-new-privileges:true
