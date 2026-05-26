@@ -32,8 +32,7 @@ docker compose -f compose.yaml up -d
 renders `fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`,
 `telemetry-redis`, `fiftyone-app-telemetry`, and `teams-api-telemetry`.
 
-Combine with optional overlays as before — each carries its own bundled
-sidecar:
+Optional overlays carry their own bundled sidecar:
 
 ```shell
 docker compose \
@@ -86,10 +85,10 @@ docker compose --profile gpu \
 
 ## Opt out
 
-> [!NOTE]
-> The telemetry sidecar can be disabled, but doing so disables the
-> FiftyOne UI's log viewer for delegated-operator runs — it depends
-> on the sidecar to capture per-operation logs.
+> [!IMPORTANT]
+> Disabling the telemetry sidecar leaves the FiftyOne UI's
+> delegated-operator log viewer empty — it depends on the sidecar to
+> capture per-operation logs.
 
 To run without telemetry, add a `compose.override.yaml` that scales the
 telemetry services to zero replicas:
@@ -139,16 +138,13 @@ time, either:
 
 Each sidecar joins its workload's PID namespace at container-create
 time. If the workload is recreated (force-recreate, image upgrade,
-configuration change) the namespace reference goes stale and Docker
-cannot re-attach the sidecar — it stays in `Exited (137)` until
-manually recreated.
+config change) the namespace reference goes stale and the sidecar
+stays in `Exited (137)` until manually recreated.
 
-The overlays mitigate this with `depends_on.<target>.restart: true`
-(compose v2.17+), which tells compose to recreate the sidecar in
-lockstep with the workload. `docker compose version` must report
-v2.17 or newer for this to take effect. If the workload itself crash-
-loops, the sidecar follows it into the crash loop, matching the
-Kubernetes pod-restart behavior.
+The compose files set `depends_on.<target>.restart: true` so the
+sidecar is recreated in lockstep with the workload. This requires
+Docker Compose v2.17 or newer. If the workload crash-loops, the
+sidecar follows it.
 
 ## Environment overrides
 
@@ -159,7 +155,6 @@ All knobs live in your `.env` — see `env.template` for the full list:
 | `FIFTYONE_TELEMETRY_REDIS_URL`     | `redis://telemetry-redis:6379`         | Override to point at an external Redis if desired                                                  |
 | `TELEMETRY_REDIS_IMAGE`            | `redis:7-alpine`                       | Alternate redis image                                                                              |
 | `TELEMETRY_REDIS_MAXMEMORY`        | `400mb`                                | Redis maxmemory budget                                                                             |
-| `TELEMETRY_REDIS_MAXMEMORY_POLICY` | `allkeys-lru`                          | Redis eviction policy (mirrors helm `telemetry.redis.maxmemoryPolicy`)                             |
 | `TELEMETRY_NAMESPACE`              | `docker`                               | Namespace label attached to each registered pod                                                    |
 | `FIFTYONE_APP_TARGET_NAME`         | `hypercorn`                            | Substring used to locate the fiftyone-app process                                                  |
 | `TEAMS_API_TARGET_NAME`            | `fiftyone-teams-api`                   | Substring used to locate the teams-api process                                                     |

@@ -208,7 +208,7 @@ services:
       - --maxmemory
       - ${TELEMETRY_REDIS_MAXMEMORY:-400mb}
       - --maxmemory-policy
-      - ${TELEMETRY_REDIS_MAXMEMORY_POLICY:-allkeys-lru}
+      - allkeys-lru
     restart: always
     deploy:
       resources:
