@@ -217,10 +217,12 @@ services:
   fiftyone-app-telemetry-common:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:fiftyone-app"
+    # Matches the workload image's USER 1000:1000 so the kernel's
+    # ptrace_may_access() check on /proc/<workload-pid>/fd/1 reads passes via the
+    # same-UID fast path to allow for log tailing
+    user: "1000:1000"
     cap_drop:
       - ALL
-    cap_add:
-      - DAC_READ_SEARCH  # required for reading log files in target container
     security_opt:
       - no-new-privileges:true
     environment:
@@ -242,10 +244,9 @@ services:
   teams-api-telemetry-common:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-api"
+    user: "1000:1000"
     cap_drop:
       - ALL
-    cap_add:
-      - DAC_READ_SEARCH  # required for reading log files in target container
     security_opt:
       - no-new-privileges:true
     environment:
@@ -267,10 +268,9 @@ services:
   teams-plugins-telemetry-common:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-plugins"
+    user: "1000:1000"
     cap_drop:
       - ALL
-    cap_add:
-      - DAC_READ_SEARCH  # required for reading log files in target container
     security_opt:
       - no-new-privileges:true
     environment:
@@ -292,10 +292,10 @@ services:
   teams-do-telemetry-common:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-do"
+    user: "1000:1000"
     cap_drop:
       - ALL
     cap_add:
-      - DAC_READ_SEARCH  # required for reading log files in target container
       - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
     security_opt:
       - no-new-privileges:true
