@@ -146,22 +146,24 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.19+ Telemetry Sidecars
 
-FiftyOne Enterprise v2.19.0 adds observability features that are viewable
-by admins directly within the FiftyOne UI.
-This is enabled by a  `telemetry-sidecar` container, which is added to the
+FiftyOne Enterprise v2.19.0 adds observability features viewable by
+admins directly in the FiftyOne UI.
+These are powered by a `telemetry-sidecar` container injected into the
 `teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator
-workloads (and as a native init-sidecar on on-demand delegated-operator `Job`
-pods), plus an in-cluster Redis `Deployment` + `Service` +
-`PersistentVolumeClaim` that buffers the streamed metrics/logs.
+workloads (and as a native init-sidecar on on-demand delegated-operator
+`Job` pods), plus an in-cluster Redis `Deployment` + `Service` that
+buffers the streamed metrics and logs.
 
-**Resource impact:** Each sidecar requests `100m` CPU and `512Mi` memory
-(request == limit).
-A stock deploy adds four sidecars (`teams-api` + `fiftyone-app` +
-`teams-plugins` + one delegated-operator), so expect roughly **+400m CPU** and
-**+2 GiB memory** of additional resource usage, plus the bundled Redis (`100m`
-/ `256Mi` requests, `250m` / `512Mi` limits) and its `1Gi` PVC.
-Tune via `telemetry.sidecar.resources` and `telemetry.redis.resources` /
-`telemetry.redis.persistence.size`.
+**Resource impact:**
+Each sidecar requests `100m` CPU and `512Mi` memory (request == limit).
+A stock deploy adds four sidecars
+(`teams-api` + `fiftyone-app` + `teams-plugins` + one
+delegated-operator), so expect roughly **+400m CPU** and **+2 GiB
+memory** in additional resource usage, plus the bundled Redis (`250m`
+CPU / `512Mi` memory, request == limit) backed by an `emptyDir`.
+Tune via `telemetry.sidecar.resources` and `telemetry.redis.resources`;
+opt into a `PersistentVolumeClaim` with
+`telemetry.redis.persistence.enabled: true`.
 
 ##### Cluster Requirements
 
@@ -171,17 +173,17 @@ Tune via `telemetry.sidecar.resources` and `telemetry.redis.resources` /
    `py-spy` and `/proc` access).
    Clusters that enforce
    [Pod Security Admission][psa]
-   `restricted`, or admission policies (OPA/Gatekeeper, Kyverno) that block
-   `runAsUser: 0` or capability adds, will reject these pods at
+   `restricted`, or admission policies (OPA/Gatekeeper, Kyverno) that
+   block `runAsUser: 0` or capability adds, will reject these pods at
    admission.
    On such clusters, either:
     - allow the chart's `namespace.name` namespace at PSA `baseline`
       (or relax the relevant admission policy), or
     - disable telemetry with `telemetry.enabled: false`.
 
-**External Redis:** To point at a managed Redis (ElastiCache,
-MemoryStore, an existing cluster) instead of running the bundled one,
-set:
+**External Redis:**
+To point at a managed Redis (ElastiCache, MemoryStore, an existing
+cluster) instead of running the bundled one, set:
 
 ```yaml
 telemetry:
@@ -190,13 +192,13 @@ telemetry:
       url: redis://my-managed-redis.example.com:6379
 ```
 
-The chart will skip the bundled Redis' `Deployment` / `Service` / `PVC` and
-wire every consumer at this URL.
+The chart skips the bundled Redis' `Deployment` and `Service` and wires
+every consumer at this URL.
 
 ##### Opting out of Telemetry
 
-The new Telemetry features are enabled by default, but can be disabled by
-setting the following in your `values.yaml` file:
+Telemetry is enabled by default.
+To disable it, set the following in your `values.yaml` file:
 
 ```yaml
 telemetry:
@@ -205,11 +207,11 @@ telemetry:
 
 > [!IMPORTANT]
 > The sidecar powers the FiftyOne UI's delegated-operator log viewer.
-> Disabling telemetry (`telemetry.enabled: false`) will leave that
-> log viewer empty.
+> Disabling telemetry (`telemetry.enabled: false`) will leave that log
+> viewer empty.
 
 This skips every telemetry resource (Redis, sidecars, Role/RoleBinding)
-and causes workloads to match their pre-v2.19 shape.
+and renders the workloads without telemetry containers or env vars.
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 

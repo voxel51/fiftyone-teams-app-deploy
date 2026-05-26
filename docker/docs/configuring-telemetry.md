@@ -15,13 +15,15 @@
 # Configuring FiftyOne Enterprise Telemetry
 
 Telemetry adds a lightweight per-service metrics collector (sidecar
-pattern) plus a Redis backend. The Settings → Metrics page in teams-app
-displays live CPU / memory / thread / file-descriptor samples and tailed
-stdout logs for each observed service.
+pattern) plus a Redis backend.
+The Settings → Metrics page in teams-app displays live CPU / memory /
+thread / file-descriptor samples and tailed stdout logs for each
+observed service.
 
-**Telemetry is enabled by default.** The base compose files bundle the
-`telemetry-redis` service and per-workload sidecars; no opt-in flags or
-overlay files are needed.
+**Telemetry is enabled by default.**
+The base compose files bundle the `telemetry-redis` service and
+per-workload sidecars;
+no opt-in flags or overlay files are needed.
 
 ## Default deployment
 
@@ -32,7 +34,8 @@ docker compose -f compose.yaml up -d
 renders `fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`,
 `telemetry-redis`, `fiftyone-app-telemetry`, and `teams-api-telemetry`.
 
-Optional overlays carry their own bundled sidecar:
+Optional overlays carry their own bundled sidecar.
+For example:
 
 ```shell
 docker compose \
@@ -59,29 +62,33 @@ docker compose --profile gpu \
 
 ## What's bundled by default
 
-- `telemetry-redis` — Redis 7 container that holds metric streams and log
-  entries. Data is capped by a maxmemory policy (`allkeys-lru`) so disk usage
+- `telemetry-redis` — Redis 7 container that holds metric streams and
+  log entries.
+  Data is capped by the `allkeys-lru` maxmemory policy so disk usage
   stays bounded.
-- `fiftyone-app-telemetry`, `teams-api-telemetry` — sidecar containers, one
-  per observed service. Each joins the target's PID namespace via
-  `pid: "service:<target>"` so it can read `/proc/<pid>/fd/1` and use
-  psutil to sample CPU, memory, FDs, and thread counts. Sidecars run
-  with the `SYS_PTRACE` capability so py-spy can attach to the target.
-- `teams-plugins-telemetry` (only with `compose.dedicated-plugins.yaml`) —
-  sidecar for the dedicated `teams-plugins` service.
+- `fiftyone-app-telemetry`, `teams-api-telemetry` — sidecar containers,
+  one per observed service.
+  Each joins the target's PID namespace via `pid: "service:<target>"`
+  so it can read `/proc/<pid>/fd/1` and use psutil to sample CPU,
+  memory, FDs, and thread counts.
+  Sidecars run with the `SYS_PTRACE` capability so py-spy can attach
+  to the target.
+- `teams-plugins-telemetry` (only with `compose.dedicated-plugins.yaml`)
+  — sidecar for the dedicated `teams-plugins` service.
 - `teams-do-telemetry` (only with `compose.delegated-operators.yaml`) —
   sidecar in `EXECUTOR_SIDECAR=true` mode that watches the executor for
   per-operation child processes and records per-op metrics back to the
   `delegated_ops` MongoDB document.
 - `teams-do-gpu` + `teams-do-gpu-telemetry` (only with
-  `compose.delegated-operators.gpu.yaml` and `--profile gpu`) — a GPU-
-  enabled delegated-operator worker registered as a distinct
-  orchestrator (`-n teams-do-gpu`) plus its paired sidecar. Sidecar
-  reads GPU metrics via NVML and requires its own GPU reservation.
-- `FIFTYONE_TELEMETRY_REDIS_URL` injected on `fiftyone-app`, `teams-api`,
-  `teams-app`, `teams-plugins`, and (when the DO overlay is used)
-  `teams-do` so the in-app telemetry blueprint and SSE endpoints can
-  read from Redis.
+  `compose.delegated-operators.gpu.yaml` and `--profile gpu`) — a
+  GPU-enabled delegated-operator worker registered as a distinct
+  orchestrator (`-n teams-do-gpu`) plus its paired sidecar.
+  The sidecar reads GPU metrics via NVML and requires its own GPU
+  reservation.
+- `FIFTYONE_TELEMETRY_REDIS_URL` is injected on `fiftyone-app`,
+  `teams-api`, `teams-app`, `teams-plugins`, and (when the DO overlay
+  is used) `teams-do` so the in-app telemetry blueprint and SSE
+  endpoints can read from Redis.
 
 ## Opt out
 
@@ -113,38 +120,40 @@ services:
       replicas: 0
 ```
 
-`docker compose -f compose.yaml -f compose.override.yaml up -d` will start
-the base services without the telemetry collector. The main containers
-will still have `FIFTYONE_TELEMETRY_REDIS_URL` set, but the in-app agent
-gracefully no-ops when Redis is unreachable.
+`docker compose -f compose.yaml -f compose.override.yaml up -d` starts
+the base services without the telemetry collector.
+The main containers still have `FIFTYONE_TELEMETRY_REDIS_URL` set, but
+the in-app agent gracefully no-ops when Redis is unreachable.
 
 ### Scaling teams-do with telemetry
 
 docker-compose's `pid: "service:<name>"` only joins a single replica's
-PID namespace. To keep the sidecar observation honest, `teams-do-common`
-**forces `teams-do` replicas to 1**, overriding any
+PID namespace.
+To keep the sidecar observation honest, `teams-do-common` forces
+`teams-do` replicas to 1, overriding any
 `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` setting.
 
-If you need more than one delegated-operator worker observed at the same
-time, either:
+If you need more than one delegated-operator worker observed at the
+same time, either:
 
 1. Define additional explicit services in a compose override — e.g.
-   `teams-do-1`, `teams-do-2` — each with a paired `teams-do-N-telemetry`
-   sidecar using `pid: "service:teams-do-N"`.
-2. Deploy via the helm chart, which automatically adds a telemetry sidecar
-   to every pod in the delegated-operator deployment.
+   `teams-do-1`, `teams-do-2` — each with a paired
+   `teams-do-N-telemetry` sidecar using `pid: "service:teams-do-N"`.
+2. Deploy via the helm chart, which automatically adds a telemetry
+   sidecar to every pod in the delegated-operator deployment.
 
 ### Sidecar lifecycle on workload restart
 
 Each sidecar joins its workload's PID namespace at container-create
-time. If the workload is recreated (force-recreate, image upgrade,
-config change) the namespace reference goes stale and the sidecar
-stays in `Exited (137)` until manually recreated.
+time.
+If the workload is recreated (force-recreate, image upgrade, config
+change) the namespace reference goes stale and the sidecar stays in
+`Exited (137)` until manually recreated.
 
 The compose files set `depends_on.<target>.restart: true` so the
-sidecar is recreated in lockstep with the workload. This requires
-Docker Compose v2.17 or newer. If the workload crash-loops, the
-sidecar follows it.
+sidecar is recreated in lockstep with the workload.
+This requires Docker Compose v2.17 or newer.
+If the workload crash-loops, the sidecar follows it.
 
 ## Environment overrides
 
@@ -168,9 +177,11 @@ All knobs live in your `.env` — see `env.template` for the full list:
 
 Telemetry containers ship with conservative CPU and memory limits that
 mirror the helm chart's defaults — sized so the sidecars do not starve
-the workloads they observe. The values are declared under each
-service's `deploy.resources` block in the compose files; compose v2
-honors `cpus` and `memory` limits/reservations outside swarm mode.
+the workloads they observe.
+The values are declared under each service's `deploy.resources` block
+in the compose files;
+compose v2 honors `cpus` and `memory` limits/reservations outside swarm
+mode.
 
 | Service                       | CPU limit | Memory limit | Notes                               |
 | ----------------------------- | --------- | ------------ | ----------------------------------- |
@@ -180,12 +191,6 @@ honors `cpus` and `memory` limits/reservations outside swarm mode.
 To tune these for your hardware, override `deploy.resources` in a
 `compose.override.yaml` (the override merges with the base entry).
 
-## Access control
-
-The telemetry endpoints (`/telemetry/*` on teams-api; `/api/telemetry/stream`
-and `/api/telemetry/logs` on teams-app) require an authenticated user with
-the `ADMIN` role. Non-admin users and unauthenticated requests receive 401/403.
-
 ## Verify
 
 ```shell
@@ -193,7 +198,8 @@ docker compose exec telemetry-redis redis-cli HGETALL active_targets
 docker compose exec telemetry-redis redis-cli XLEN metrics:fiftyone-app
 ```
 
-`XLEN` should increase over time. If it does not, check the sidecar logs:
+`XLEN` should increase over time.
+If it does not, check the sidecar logs:
 
 ```shell
 docker compose logs fiftyone-app-telemetry teams-api-telemetry --tail 20

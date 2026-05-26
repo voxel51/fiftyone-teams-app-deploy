@@ -103,25 +103,29 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.19+ Telemetry Sidecars
 
-FiftyOne Enterprise v2.19.0 adds observability features that are viewable
-by admins directly within the FiftyOne UI.
-This is enabled by a `telemetry-sidecar` service paired with each
+FiftyOne Enterprise v2.19.0 adds observability features viewable by
+admins directly in the FiftyOne UI.
+These are powered by a `telemetry-sidecar` service paired with each
 `fiftyone-app`, `teams-api`, `teams-plugins`, and `teams-do*` service,
-plus a `telemetry-redis` service that buffers the streamed metrics/logs.
+plus a `telemetry-redis` service that buffers the streamed metrics and
+logs.
 
-**Resource impact:** Each sidecar reserves `0.10` CPUs and `512M` memory
+**Resource impact:**
+Each sidecar reserves `0.10` CPUs and `512M` memory
 (reservation == limit).
-A stock deploy adds four sidecars (`fiftyone-app` + `teams-api` +
-`teams-plugins` + one `teams-do`), so expect roughly **+0.4 CPU** and **+2 GiB
-memory** of additional resource usage, plus the bundled `telemetry-redis`
-service (`0.10` CPU / `256M` memory reservation, `0.25` / `512M` limits) and
-its `telemetry-redis-data` named volume.
+A stock deploy adds four sidecars
+(`fiftyone-app` + `teams-api` + `teams-plugins` + one `teams-do`), so
+expect roughly **+0.4 CPU** and **+2 GiB memory** in additional
+resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
+/ `256M` memory reservation, `0.25` / `512M` limits) and its
+`telemetry-redis-data` named volume.
 
 ##### Host Requirements
 
 1. **Docker Compose v2.17+** for `depends_on.<svc>.restart: true`
-   semantics. Older versions will see stale PID namespaces after a
-   target container is recreated.
+   semantics.
+   Older versions will see stale PID namespaces after a target
+   container is recreated.
 1. **Linux host with PID-namespace sharing** (`pid: "service:<target>"`)
    and **`SYS_PTRACE`** capability granted to each sidecar container.
    Docker Desktop on macOS/Windows supports this, but some hardened
@@ -129,19 +133,21 @@ its `telemetry-redis-data` named volume.
    attach to the target process there.
 1. **`teams-do` is forced to `replicas: 1`** while telemetry is enabled,
    because Compose's `pid: "service:<name>"` only joins a single
-   replica. To run multiple delegated-operator workers, see
+   replica.
+   To run multiple delegated-operator workers, see
    [`docker/docs/configuring-telemetry.md`](configuring-telemetry.md).
 
-**External Redis:** Point at a managed Redis instead of the bundled
-one by setting `FIFTYONE_TELEMETRY_REDIS_URL` in your `.env` to a
-fully-qualified URL (e.g. `redis://my-managed-redis.example.com:6379`)
-and scaling `telemetry-redis` to `replicas: 0` as below.
+**External Redis:**
+Point at a managed Redis instead of the bundled one by setting
+`FIFTYONE_TELEMETRY_REDIS_URL` in your `.env` to a fully-qualified URL
+(e.g. `redis://my-managed-redis.example.com:6379`) and scaling
+`telemetry-redis` to `replicas: 0` as below.
 
 ##### Opting out of Telemetry
 
-The new Telemetry features are enabled by default, but can be disabled by
-adding a `compose.override.yaml` that scales the `telemetry-redis` and
-`*-telemetry` services to `replicas: 0`.
+Telemetry is enabled by default.
+To disable it, add a `compose.override.yaml` that scales the
+`telemetry-redis` and `*-telemetry` services to `replicas: 0`.
 See
 [`configuring-telemetry.md`](configuring-telemetry.md#opt-out)
 for the full override snippet.

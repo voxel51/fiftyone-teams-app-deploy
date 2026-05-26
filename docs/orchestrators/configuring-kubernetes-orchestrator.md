@@ -462,25 +462,25 @@ fom.register_orchestrator(
 
 ## Telemetry Sidecar
 
-> [!NOTE]
+> [!IMPORTANT]
 > The telemetry sidecar can be disabled, but doing so disables the
-> FiftyOne UI's log viewer for delegated-operator runs — it depends
-> on the sidecar to capture per-operation logs.
+> FiftyOne UI's log viewer for delegated-operator runs — it depends on
+> the sidecar to capture per-operation logs.
 
 If your deployment runs telemetry (the helm chart and docker compose
-files include it by default), you can attach a per-Job telemetry sidecar
-to on-demand Kubernetes orchestrators as well. This emits per-operation
-metrics back to the same Redis backend so the Settings → Metrics page
-sees individual delegated runs.
+files include it by default), you can attach a per-Job telemetry
+sidecar to on-demand Kubernetes orchestrators as well.
+This emits per-operation metrics back to the same Redis backend so the
+Settings → Metrics page sees individual delegated runs.
 
 Use a Kubernetes
 [native sidecar](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/)
 (an `initContainer` with `restartPolicy: Always`, requires Kubernetes
-1.29+). A regular
-sidecar container would block Job completion — the Job stays in
-`Running` until every container exits. Native sidecars are
-auto-terminated by the kubelet when all non-sidecar containers
-complete, so the Job finalizes cleanly.
+1.29+).
+A regular sidecar container would block Job completion — the Job stays
+in `Running` until every container exits.
+Native sidecars are auto-terminated by the kubelet when all non-sidecar
+containers complete, so the Job finalizes cleanly.
 
 Add the following to your Job template's Pod spec:
 
@@ -559,9 +559,10 @@ Notes:
   the worker writes execution metadata to `TELEMETRY_SOCKET` and the
   sidecar records per-op metrics into the `delegated_ops` MongoDB
   document.
-- The `FIFTYONE_TELEMETRY_REDIS_URL` must be reachable from wherever
-  the Job runs. For same-cluster Jobs use the in-cluster service DNS
-  name. For remote clusters, use a routable hostname or load balancer.
+- `FIFTYONE_TELEMETRY_REDIS_URL` must be reachable from wherever the
+  Job runs.
+  For same-cluster Jobs use the in-cluster service DNS name.
+  For remote clusters, use a routable hostname or load balancer.
 
 ## Refresh Orchestrator Operators
 
@@ -820,8 +821,12 @@ spec:
       restartPolicy: Never
 ```
 
-The `telemetry-sidecar` init container above is optional. Remove it
-(plus `shareProcessNamespace: true`, the `TELEMETRY_SOCKET` /
-`FIFTYONE_TELEMETRY_REDIS_URL` env vars on `task-worker`, and the
-`telemetry-socket` volume + mount) if you are not running the
-telemetry overlay.
+The `telemetry-sidecar` init container above is optional.
+If you are not running telemetry, remove all of the following from the
+template:
+
+- the `telemetry-sidecar` init container
+- `shareProcessNamespace: true` on the Pod spec
+- the `TELEMETRY_SOCKET` and `FIFTYONE_TELEMETRY_REDIS_URL` env vars on
+  `task-worker`
+- the `telemetry-socket` volume and its mount on `task-worker`
