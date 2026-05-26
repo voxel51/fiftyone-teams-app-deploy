@@ -22,6 +22,7 @@
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Host Requirements](#host-requirements)
       - [Opting out of Telemetry](#opting-out-of-telemetry)
+      - [Scaling delegated-operator workers](#scaling-delegated-operator-workers)
     - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
     - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
@@ -131,11 +132,14 @@ resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
    Docker Desktop on macOS/Windows supports this, but some hardened
    container runtimes (gVisor, Kata) do not — telemetry will fail to
    attach to the target process there.
-1. **`teams-do` is forced to `replicas: 1`** while telemetry is enabled,
-   because Compose's `pid: "service:<name>"` only joins a single
-   replica.
-   To run multiple delegated-operator workers, see
-   [`docker/docs/configuring-telemetry.md`](configuring-telemetry.md).
+1. **Delegated-operator workers are scaled via Compose profiles**
+   (`do-2`, `do-3`) rather than the old
+   `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` env var, because
+   Compose's `pid: "service:<name>"` only joins a single replica.
+   Slot 1 (`teams-do`) is always on, and slots 2-3 each get their own
+   paired sidecar. See
+   [Scaling delegated-operator workers](#scaling-delegated-operator-workers)
+   below.
 1. **`teams-do` requires the **`SYS_PTRACE`** capability to allow the
    telemetry agent to observe the target process.
 
@@ -157,6 +161,55 @@ for the full override snippet.
 > [!IMPORTANT]
 > The sidecar powers the FiftyOne UI's delegated-operator log viewer.
 > Disabling telemetry will leave that log viewer empty.
+
+##### Scaling delegated-operator workers
+
+> [!WARNING]
+> **Breaking change.**
+> `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` is no longer honored
+> in docker compose deployments — setting it has no effect.
+> The default rendered worker count drops from **3** (pre-2.19.0) to
+> **1** when you layer `compose.delegated-operators.yaml`.
+
+`compose.delegated-operators.yaml` now declares three worker slots,
+each paired with its own telemetry sidecar:
+
+| Slot | Service       | Activation             |
+| ---- | ------------- | ---------------------- |
+| 1    | `teams-do`    | always on (no profile) |
+| 2    | `teams-do-2`  | profile `do-2`, `do-3` |
+| 3    | `teams-do-3`  | profile `do-3`         |
+
+Set `COMPOSE_PROFILES=do-N` to add slots 2-3; profiles are nested so
+`do-3` includes slot 2.
+
+**To preserve the previous default of three workers**, set the
+following in your `.env`:
+
+```shell
+COMPOSE_PROFILES=do-3
+```
+
+(or pass `--profile do-3` on the `docker compose` command line). If
+you previously customized `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`,
+remove it from your `.env` and pick the matching `do-N` profile —
+the cap is 3. For larger worker counts, prefer the helm chart, which
+automatically attaches a telemetry sidecar to every pod in the
+delegated-operator deployment. If docker compose is required, the
+slot-2/3 service blocks can be duplicated as `teams-do-4` / etc.
+(bump the service name, `pid`, `POD_NAME`, `-n`, and socket-volume
+name on each copy) — see the per-slot inline comments in
+`compose.delegated-operators.yaml`.
+
+Each worker now registers under its own orchestrator name (slot 2 as
+`teams-do-2`, slot 3 as `teams-do-3`) so they surface separately in
+Settings → Metrics. Resource impact scales linearly with the worker
+count: each additional slot adds ~0.2 CPU and ~1 GiB of memory
+(worker reservation + paired sidecar).
+
+See
+[`docker/docs/configuring-telemetry.md`](configuring-telemetry.md#scaling-teams-do-with-telemetry)
+for the full slot/profile reference.
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 

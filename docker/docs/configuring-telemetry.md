@@ -39,21 +39,28 @@ Optional overlays carry their own bundled sidecar.
 `compose.dedicated-plugins.yaml` are mutually exclusive base files —
 pick one, then layer the `compose.delegated-operators.yaml` overlay on
 top.
-For example, to run the dedicated-plugins base with delegated
-operators:
+
+The delegated-operators overlay defines three worker slots —
+`teams-do` (always on) and `teams-do-2` / `teams-do-3` gated behind
+cumulative Compose profiles (`do-2`, `do-3`). The default (no
+profile) runs one observed worker; set `COMPOSE_PROFILES=do-N` to add
+slots up to N. `do-N` includes every lower slot, so `do-3` runs three
+workers. For example, to run the dedicated-plugins base with two
+delegated-operator workers:
 
 ```shell
-docker compose \
+COMPOSE_PROFILES=do-2 docker compose \
   -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
   up -d
 ```
 
+(or set `COMPOSE_PROFILES=do-2` in your `.env`).
 This renders the dedicated-plugins base set (`fiftyone-app`,
 `teams-api`, `teams-app`, `teams-cas`, `teams-plugins`,
 `telemetry-redis`, `fiftyone-app-telemetry`, `teams-api-telemetry`,
-`teams-plugins-telemetry`) plus `teams-do` and `teams-do-telemetry`
-from the overlay.
+`teams-plugins-telemetry`) plus `teams-do` / `teams-do-2` and their
+paired sidecars from the overlay.
 
 For GPU-enabled delegated operators, layer
 `compose.delegated-operators.gpu.yaml` (which includes its own bundled
@@ -82,10 +89,13 @@ docker compose --profile gpu \
   py-spy can attach to the target.
 - `teams-plugins-telemetry` (only with `compose.dedicated-plugins.yaml`)
   — sidecar for the dedicated `teams-plugins` service.
-- `teams-do-telemetry` (only with `compose.delegated-operators.yaml`) —
-  sidecar in `EXECUTOR_SIDECAR=true` mode that watches the executor for
-  per-operation child processes and records per-op metrics back to the
-  `delegated_ops` MongoDB document.
+- `teams-do-telemetry` (only with `compose.delegated-operators.yaml`)
+  — sidecar in `EXECUTOR_SIDECAR=true` mode that watches the executor
+  for per-operation child processes and records per-op metrics back
+  to the `delegated_ops` MongoDB document. Additional workers
+  (`teams-do-2`, `teams-do-3`) opt-in via Compose profiles and each
+  get their own paired sidecar — see [Scaling teams-do with
+  telemetry](#scaling-teams-do-with-telemetry).
 - `teams-do-gpu` + `teams-do-gpu-telemetry` (only with
   `compose.delegated-operators.gpu.yaml` and `--profile gpu`) — a
   GPU-enabled delegated-operator worker registered as a distinct
@@ -125,6 +135,13 @@ services:
   teams-do-telemetry:
     deploy:
       replicas: 0
+  # Additional delegated-operator slots only run with COMPOSE_PROFILES=do-2/do-3:
+  teams-do-2-telemetry:
+    deploy:
+      replicas: 0
+  teams-do-3-telemetry:
+    deploy:
+      replicas: 0
 ```
 
 `docker compose -f compose.yaml -f compose.override.yaml up -d` starts
@@ -135,19 +152,62 @@ the in-app agent gracefully no-ops when Redis is unreachable.
 ### Scaling teams-do with telemetry
 
 docker-compose's `pid: "service:<name>"` only joins a single replica's
-PID namespace.
-To keep the sidecar observation honest, `teams-do-common` forces
-`teams-do` replicas to 1, overriding any
-`FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` setting.
+PID namespace, so a single `teams-do` service scaled to N replicas
+would leave N-1 of them invisible to the sidecar.
+`compose.delegated-operators.yaml` instead declares three worker
+slots, each as its own Compose service with its own paired sidecar and
+its own executor-socket volume:
 
-If you need more than one delegated-operator worker observed at the
-same time, either:
+| Slot | Service       | Sidecar                 | Activation             |
+| ---- | ------------- | ----------------------- | ---------------------- |
+| 1    | `teams-do`    | `teams-do-telemetry`    | always on (no profile) |
+| 2    | `teams-do-2`  | `teams-do-2-telemetry`  | profile `do-2`, `do-3` |
+| 3    | `teams-do-3`  | `teams-do-3-telemetry`  | profile `do-3`         |
 
-1. Define additional explicit services in a compose override — e.g.
-   `teams-do-1`, `teams-do-2` — each with a paired
-   `teams-do-N-telemetry` sidecar using `pid: "service:teams-do-N"`.
-2. Deploy via the helm chart, which automatically adds a telemetry
-   sidecar to every pod in the delegated-operator deployment.
+The default (no profile) runs one observed worker. To add more,
+activate the matching Compose profile — `do-N` runs N workers because
+higher numbers include every lower slot:
+
+```shell
+# 1 worker (default):
+docker compose -f compose.yaml \
+  -f compose.delegated-operators.yaml up -d
+
+# 2 workers:
+COMPOSE_PROFILES=do-2 docker compose -f compose.yaml \
+  -f compose.delegated-operators.yaml up -d
+
+# 3 workers:
+COMPOSE_PROFILES=do-3 docker compose -f compose.yaml \
+  -f compose.delegated-operators.yaml up -d
+```
+
+Set `COMPOSE_PROFILES` in your `.env` to persist the choice, or pass
+`--profile do-N` on the command line. Each worker registers under its
+own orchestrator name (slot 2 as `teams-do-2`, slot 3 as `teams-do-3`)
+so they surface separately in Settings → Metrics.
+
+> [!IMPORTANT]
+> This replaces the previous `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`
+> setting, which is no longer honored — setting it has no effect.
+> Pre-telemetry defaults rendered three `teams-do` replicas; the
+> post-telemetry default renders one observed worker. If you relied
+> on the previous default, set `COMPOSE_PROFILES=do-3` to restore the
+> three-worker behavior (each worker now has its own sidecar).
+
+Additionally,
+
+> [!NOTE]
+> The cap of 3 is intentional. The value must not exceed your
+> license's max concurrent delegated operators. For more than 3
+> workers, prefer the helm chart, which automatically attaches a
+> telemetry sidecar to every pod in the delegated-operator
+> deployment. If you must stay on docker compose, the slot-2 and
+> slot-3 blocks in `compose.delegated-operators.yaml` are
+> copy-paste templates: duplicate them as `teams-do-4` /
+> `teams-do-4-telemetry` (and so on), bumping the service name,
+> `pid: "service:teams-do-N"`, `POD_NAME`, `-n teams-do-N`, and
+> `telemetry-socket-N` volume on each copy.
 
 ### Sidecar lifecycle on workload restart
 
