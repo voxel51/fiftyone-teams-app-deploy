@@ -320,7 +320,9 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 			// Validate system health
 			for _, expected := range testCase.expected {
 				logger.Log(subT, fmt.Sprintf("Validating service %s...", expected.name))
-				s.Contains(output, fmt.Sprintf("Container %s-%s-1  Started", dockerOptions.ProjectName, expected.name), fmt.Sprintf("%s - %s - docker compose output should contain service container started", testCase.name, expected.name))
+				// Compose CLI v2.x emitted two spaces between `-1` and
+				// `Started`; v5.x emits one. Match either with \s+.
+				s.Regexp(fmt.Sprintf(`Container %s-%s-1\s+Started`, dockerOptions.ProjectName, expected.name), output, fmt.Sprintf("%s - %s - docker compose output should contain service container started", testCase.name, expected.name))
 
 				// Validate endpoint response
 				// Skip fiftyone-app and teams-plugins because they do not have callable endpoints that return a response payload.
