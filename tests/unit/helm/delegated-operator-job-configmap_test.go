@@ -21,6 +21,7 @@ import (
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 type doK8sConfigMapTemplateTest struct {
@@ -752,6 +753,360 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySocketInjection() {
 			)
 		})
 	}
+}
+
+// TestTelemetryRedisUrlEnv asserts FIFTYONE_TELEMETRY_REDIS_URL is wired on
+// both the workload container and the native-sidecar initContainer in the
+// rendered DO Job. External URL must point at the user-supplied managed Redis;
+// otherwise the bundled in-cluster Service URL must be release- and
+// namespace-scoped. Regression: the DO templates env-vars helper previously
+// built the URL inline via printf rather than going through the
+// telemetry.redis.url helper, which silently ignored external.url.
+func (s *doK8sConfigMapTemplateTest) TestTelemetryRedisUrlEnv() {
+	jobKey := "cpuDefault.yaml"
+
+	testCases := []struct {
+		name        string
+		values      map[string]string
+		expectedURL string
+	}{
+		{
+			"bundledRedisUrl",
+			map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			fmt.Sprintf("redis://%s-telemetry-redis.fiftyone-teams.svc.cluster.local:6379", s.releaseName),
+		},
+		{
+			"externalRedisUrl",
+			map[string]string{
+				"telemetry.enabled":                                    "true",
+				"telemetry.redis.external.url":                         "redis://my-managed-redis:6379",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			"redis://my-managed-redis:6379",
+		},
+	}
+
+	findEnv := func(envs []corev1.EnvVar, name string) *corev1.EnvVar {
+		for i, ev := range envs {
+			if ev.Name == name {
+				return &envs[i]
+			}
+		}
+		return nil
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			job := s.renderJob(configMap.Data, jobKey)
+
+			s.Require().NotEmpty(job.Spec.Template.Spec.Containers, "expected at least one workload container")
+			for _, container := range job.Spec.Template.Spec.Containers {
+				ev := findEnv(container.Env, "FIFTYONE_TELEMETRY_REDIS_URL")
+				s.Require().NotNil(ev,
+					"FIFTYONE_TELEMETRY_REDIS_URL should be set on workload container %s", container.Name)
+				s.Equal(testCase.expectedURL, ev.Value,
+					"FIFTYONE_TELEMETRY_REDIS_URL on workload container %s should match expected URL",
+					container.Name)
+			}
+
+			// The native-sidecar lives under initContainers (with
+			// restartPolicy: Always) so a long-running sidecar does not block
+			// Job completion.
+			var sidecar *corev1.Container
+			for i, c := range job.Spec.Template.Spec.InitContainers {
+				if c.Name == "telemetry-sidecar" {
+					sidecar = &job.Spec.Template.Spec.InitContainers[i]
+					break
+				}
+			}
+			s.Require().NotNil(sidecar, "telemetry-sidecar initContainer should be injected")
+			ev := findEnv(sidecar.Env, "FIFTYONE_TELEMETRY_REDIS_URL")
+			s.Require().NotNil(ev, "FIFTYONE_TELEMETRY_REDIS_URL should be set on telemetry-sidecar")
+			s.Equal(testCase.expectedURL, ev.Value,
+				"FIFTYONE_TELEMETRY_REDIS_URL on telemetry-sidecar should match expected URL")
+		})
+	}
+}
+
+// TestShareProcessNamespace asserts the rendered DO Job pod opts into
+// PID-namespace sharing when telemetry is on — the native-sidecar reads
+// /proc/<pid>/fd/1 in the workload's PID namespace and would silently fail to
+// capture logs without this. With telemetry off, the share must not be set.
+func (s *doK8sConfigMapTemplateTest) TestShareProcessNamespace() {
+	jobKey := "cpuDefault.yaml"
+
+	testCases := []struct {
+		name              string
+		values            map[string]string
+		expectShareNSTrue bool
+	}{
+		{
+			"telemetryEnabled",
+			map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			true,
+		},
+		{
+			"telemetryDisabled",
+			map[string]string{
+				"telemetry.enabled": "false",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			job := s.renderJob(configMap.Data, jobKey)
+
+			share := job.Spec.Template.Spec.ShareProcessNamespace
+			if testCase.expectShareNSTrue {
+				s.Require().NotNil(share, "shareProcessNamespace should be set on Job pod")
+				s.True(*share, "shareProcessNamespace should be true on Job pod")
+			} else {
+				if share != nil {
+					s.False(*share, "shareProcessNamespace should not be true when telemetry is disabled")
+				}
+			}
+		})
+	}
+}
+
+// findInitContainerByName returns a pointer into the slice for the first
+// initContainer with the given name, or nil. Mirrors findContainerByName
+// (defined in telemetry_sidecar_helpers_test.go) for spec.initContainers.
+func findInitContainerByName(containers []corev1.Container, name string) *corev1.Container {
+	for i, c := range containers {
+		if c.Name == name {
+			return &containers[i]
+		}
+	}
+	return nil
+}
+
+func (s *doK8sConfigMapTemplateTest) TestSidecarContainerImage() {
+	jobKey := "cpuDefault.yaml"
+
+	cInfo, err := chartInfo(s.T(), s.chartPath)
+	s.NoError(err)
+	chartAppVersion, exists := cInfo["appVersion"]
+	s.True(exists, "failed to get app version from chart info")
+
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected string
+	}{
+		{
+			"defaultValues",
+			map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			fmt.Sprintf("voxel51/telemetry-sidecar:%s", chartAppVersion),
+		},
+		{
+			"overrideImageRepositoryAndTag",
+			map[string]string{
+				"telemetry.enabled":                                    "true",
+				"telemetry.sidecar.image.repository":                   "my-registry/telemetry-sidecar",
+				"telemetry.sidecar.image.tag":                          "v1.2.3",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			"my-registry/telemetry-sidecar:v1.2.3",
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			job := s.renderJob(configMap.Data, jobKey)
+			sidecar := findInitContainerByName(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar, "telemetry-sidecar initContainer should be injected")
+			s.Equal(testCase.expected, sidecar.Image)
+		})
+	}
+}
+
+func (s *doK8sConfigMapTemplateTest) TestSidecarContainerResourceRequirements() {
+	jobKey := "cpuDefault.yaml"
+
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(r corev1.ResourceRequirements)
+	}{
+		{
+			"defaultValues",
+			map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			func(r corev1.ResourceRequirements) {
+				expected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("100m"),
+						"memory": resource.MustParse("512Mi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("100m"),
+						"memory": resource.MustParse("512Mi"),
+					},
+				}
+				s.Equal(expected, r, "default sidecar resources should match chart defaults")
+			},
+		},
+		{
+			"overrideResources",
+			map[string]string{
+				"telemetry.enabled":                                    "true",
+				"telemetry.sidecar.resources.limits.cpu":               "200m",
+				"telemetry.sidecar.resources.limits.memory":            "1Gi",
+				"telemetry.sidecar.resources.requests.cpu":             "200m",
+				"telemetry.sidecar.resources.requests.memory":          "768Mi",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			func(r corev1.ResourceRequirements) {
+				expected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("200m"),
+						"memory": resource.MustParse("1Gi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("200m"),
+						"memory": resource.MustParse("768Mi"),
+					},
+				}
+				s.Equal(expected, r)
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			job := s.renderJob(configMap.Data, jobKey)
+			sidecar := findInitContainerByName(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar, "telemetry-sidecar initContainer should be injected")
+			testCase.expected(sidecar.Resources)
+		})
+	}
+}
+
+// TestSidecarContainerSecurityContext asserts the DO Job's native-sidecar
+// drops all default capabilities, disables privilege escalation, AND adds
+// SYS_PTRACE — DO Jobs are executor pods where the sidecar archives py-spy
+// crash stacks from the workload's PID namespace.
+func (s *doK8sConfigMapTemplateTest) TestSidecarContainerSecurityContext() {
+	jobKey := "cpuDefault.yaml"
+
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.enabled": "true",
+		"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	job := s.renderJob(configMap.Data, jobKey)
+	sidecar := findInitContainerByName(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar")
+	s.Require().NotNil(sidecar, "telemetry-sidecar initContainer should be injected")
+
+	sc := sidecar.SecurityContext
+	s.Require().NotNil(sc, "telemetry-sidecar should have a securityContext")
+	s.Require().NotNil(sc.AllowPrivilegeEscalation)
+	s.False(*sc.AllowPrivilegeEscalation, "sidecar must not allow privilege escalation")
+	s.Require().NotNil(sc.Capabilities)
+	s.Contains(sc.Capabilities.Drop, corev1.Capability("ALL"),
+		"sidecar must drop all default capabilities")
+
+	var hasPtrace bool
+	for _, capability := range sc.Capabilities.Add {
+		if capability == "SYS_PTRACE" {
+			hasPtrace = true
+			break
+		}
+	}
+	s.True(hasPtrace, "executor sidecar must add SYS_PTRACE for py-spy crash archives")
+}
+
+// TestSidecarContainerRestartPolicyAndProbe asserts the DO Job native-sidecar
+// is configured to NOT block Job completion (restartPolicy: Always makes it a
+// native-sidecar initContainer) and that the workload waits for the agent
+// socket before starting (readinessProbe).
+func (s *doK8sConfigMapTemplateTest) TestSidecarContainerRestartPolicyAndProbe() {
+	jobKey := "cpuDefault.yaml"
+
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.enabled": "true",
+		"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	job := s.renderJob(configMap.Data, jobKey)
+	sidecar := findInitContainerByName(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar")
+	s.Require().NotNil(sidecar, "telemetry-sidecar initContainer should be injected")
+
+	// native-sidecar: initContainer with restartPolicy=Always so it runs
+	// alongside the workload but does not block Job completion.
+	s.Require().NotNil(sidecar.RestartPolicy, "native-sidecar must set restartPolicy")
+	s.Equal(corev1.ContainerRestartPolicyAlways, *sidecar.RestartPolicy)
+
+	s.Require().NotNil(sidecar.ReadinessProbe, "native-sidecar must have a readinessProbe")
+	s.Require().NotNil(sidecar.ReadinessProbe.Exec, "readinessProbe must use exec")
+	s.NotEmpty(sidecar.ReadinessProbe.Exec.Command, "readinessProbe exec command must be set")
 }
 
 func (s *doK8sConfigMapTemplateTest) loadTestFile(filename, chartVersion string) string {

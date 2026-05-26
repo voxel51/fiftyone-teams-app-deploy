@@ -1180,6 +1180,67 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 	}
 }
 
+// TestTelemetryRedisUrlEnv asserts that FIFTYONE_TELEMETRY_REDIS_URL is wired
+// on both the main api container and the auto-injected telemetry-sidecar.
+// External URL must point at the user-supplied managed Redis; otherwise the
+// bundled in-cluster Service URL must be release- and namespace-scoped.
+// Regression: the DO env-vars helper previously built the URL inline via
+// printf rather than going through the telemetry.redis.url helper, which
+// silently ignored external.url.
+func (s *deploymentApiTemplateTest) TestTelemetryRedisUrlEnv() {
+	testCases := []struct {
+		name        string
+		values      map[string]string
+		expectedURL string
+	}{
+		{
+			"bundledRedisUrl",
+			map[string]string{"telemetry.enabled": "true"},
+			fmt.Sprintf("redis://%s-telemetry-redis.fiftyone-teams.svc.cluster.local:6379", s.releaseName),
+		},
+		{
+			"externalRedisUrl",
+			map[string]string{
+				"telemetry.enabled":            "true",
+				"telemetry.redis.external.url": "redis://my-managed-redis:6379",
+			},
+			"redis://my-managed-redis:6379",
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			s.Require().Len(deployment.Spec.Template.Spec.Containers, 2,
+				"Expected api + telemetry-sidecar containers")
+
+			for _, container := range deployment.Spec.Template.Spec.Containers {
+				var found *corev1.EnvVar
+				for i, ev := range container.Env {
+					if ev.Name == "FIFTYONE_TELEMETRY_REDIS_URL" {
+						found = &container.Env[i]
+						break
+					}
+				}
+				s.Require().NotNil(found,
+					"FIFTYONE_TELEMETRY_REDIS_URL should be set on %s container", container.Name)
+				s.Equal(testCase.expectedURL, found.Value,
+					"FIFTYONE_TELEMETRY_REDIS_URL on %s should match expected URL", container.Name)
+			}
+		})
+	}
+}
+
 func (s *deploymentApiTemplateTest) TestContainerImage() {
 
 	// Get chart info (to later obtain the chart's appVersion)
@@ -2141,6 +2202,238 @@ func (s *deploymentApiTemplateTest) TestInitContainerSecurityContext() {
 
 			testCase.expected(deployment.Spec.Template.Spec.InitContainers[0].SecurityContext)
 		})
+	}
+}
+
+// TestShareProcessNamespace asserts that PID-namespace sharing is enabled when
+// telemetry is on (the sidecar reads /proc/<pid>/fd/1 in the workload's PID
+// namespace) and NOT enabled when telemetry is off — otherwise we'd punch an
+// unnecessary hole in pod isolation for users who opt out.
+func (s *deploymentApiTemplateTest) TestShareProcessNamespace() {
+	testCases := []struct {
+		name              string
+		values            map[string]string
+		expectShareNSTrue bool
+	}{
+		{
+			"telemetryEnabled",
+			map[string]string{"telemetry.enabled": "true"},
+			true,
+		},
+		{
+			"telemetryDisabled",
+			map[string]string{"telemetry.enabled": "false"},
+			false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			share := deployment.Spec.Template.Spec.ShareProcessNamespace
+			if testCase.expectShareNSTrue {
+				s.Require().NotNil(share, "shareProcessNamespace should be set")
+				s.True(*share, "shareProcessNamespace should be true")
+			} else {
+				if share != nil {
+					s.False(*share, "shareProcessNamespace should not be true when telemetry is disabled")
+				}
+			}
+		})
+	}
+}
+
+func (s *deploymentApiTemplateTest) TestSidecarContainerImage() {
+	cInfo, err := chartInfo(s.T(), s.chartPath)
+	s.NoError(err)
+	chartAppVersion, exists := cInfo["appVersion"]
+	s.True(exists, "failed to get app version from chart info")
+
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected string
+	}{
+		{
+			"defaultValues",
+			map[string]string{"telemetry.enabled": "true"},
+			fmt.Sprintf("voxel51/telemetry-sidecar:%s", chartAppVersion),
+		},
+		{
+			"overrideImageRepositoryAndTag",
+			map[string]string{
+				"telemetry.enabled":                  "true",
+				"telemetry.sidecar.image.repository": "my-registry/telemetry-sidecar",
+				"telemetry.sidecar.image.tag":        "v1.2.3",
+			},
+			"my-registry/telemetry-sidecar:v1.2.3",
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			sidecar := findContainerByName(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected")
+			s.Equal(testCase.expected, sidecar.Image)
+		})
+	}
+}
+
+func (s *deploymentApiTemplateTest) TestSidecarContainerImagePullPolicy() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected corev1.PullPolicy
+	}{
+		{
+			"defaultValues",
+			map[string]string{"telemetry.enabled": "true"},
+			corev1.PullAlways,
+		},
+		{
+			"overridePullPolicy",
+			map[string]string{
+				"telemetry.enabled":                  "true",
+				"telemetry.sidecar.image.pullPolicy": "IfNotPresent",
+			},
+			corev1.PullIfNotPresent,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			sidecar := findContainerByName(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar)
+			s.Equal(testCase.expected, sidecar.ImagePullPolicy)
+		})
+	}
+}
+
+func (s *deploymentApiTemplateTest) TestSidecarContainerResourceRequirements() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(resourceRequirements corev1.ResourceRequirements)
+	}{
+		{
+			"defaultValues",
+			map[string]string{"telemetry.enabled": "true"},
+			func(r corev1.ResourceRequirements) {
+				expected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("100m"),
+						"memory": resource.MustParse("512Mi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("100m"),
+						"memory": resource.MustParse("512Mi"),
+					},
+				}
+				s.Equal(expected, r, "default sidecar resources should match chart defaults")
+			},
+		},
+		{
+			"overrideResources",
+			map[string]string{
+				"telemetry.enabled":                           "true",
+				"telemetry.sidecar.resources.limits.cpu":      "200m",
+				"telemetry.sidecar.resources.limits.memory":   "1Gi",
+				"telemetry.sidecar.resources.requests.cpu":    "200m",
+				"telemetry.sidecar.resources.requests.memory": "768Mi",
+			},
+			func(r corev1.ResourceRequirements) {
+				expected := corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						"cpu":    resource.MustParse("200m"),
+						"memory": resource.MustParse("1Gi"),
+					},
+					Requests: corev1.ResourceList{
+						"cpu":    resource.MustParse("200m"),
+						"memory": resource.MustParse("768Mi"),
+					},
+				}
+				s.Equal(expected, r)
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			sidecar := findContainerByName(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar)
+			testCase.expected(sidecar.Resources)
+		})
+	}
+}
+
+// TestSidecarContainerSecurityContext asserts the sidecar drops all default
+// capabilities and disables privilege escalation. The api deployment is
+// service-mode (non-executor), so SYS_PTRACE must NOT be added — that capability
+// is reserved for DO/executor sidecars where py-spy crash-stack archives are
+// load-bearing.
+func (s *deploymentApiTemplateTest) TestSidecarContainerSecurityContext() {
+	options := &helm.Options{SetValues: map[string]string{"telemetry.enabled": "true"}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+	sidecar := findContainerByName(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar")
+	s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected")
+
+	sc := sidecar.SecurityContext
+	s.Require().NotNil(sc, "telemetry-sidecar should have a securityContext")
+	s.Require().NotNil(sc.AllowPrivilegeEscalation)
+	s.False(*sc.AllowPrivilegeEscalation, "sidecar must not allow privilege escalation")
+	s.Require().NotNil(sc.Capabilities)
+	s.Contains(sc.Capabilities.Drop, corev1.Capability("ALL"),
+		"sidecar must drop all default capabilities")
+	for _, capability := range sc.Capabilities.Add {
+		s.NotEqual(corev1.Capability("SYS_PTRACE"), capability,
+			"service-mode sidecar must not add SYS_PTRACE")
 	}
 }
 

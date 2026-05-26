@@ -36,150 +36,110 @@ func TestTelemetryRoleBindingTemplate(t *testing.T) {
 		chartPath:   helmChartPath,
 		releaseName: "fiftyone-test",
 		namespace:   "fiftyone-" + strings.ToLower(random.UniqueId()),
-		templates: []string{
-			"templates/telemetry-role.yaml",
-			"templates/telemetry-rolebinding.yaml",
-		},
+		templates:   []string{"templates/telemetry-rolebinding.yaml"},
 	})
 }
 
-func (s *telemetryRoleBindingTemplateTest) TestEnabledByDefault() {
+func (s *telemetryRoleBindingTemplateTest) TestRenderConditions() {
+	testCases := []struct {
+		name    string
+		values  map[string]string
+		renders bool
+	}{
+		{
+			"defaultValues",
+			nil,
+			true,
+		},
+		{
+			"telemetryDisabled",
+			map[string]string{"telemetry.enabled": "false"},
+			false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+
+			if testCase.renders {
+				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.Contains(output, "kind: RoleBinding", "RoleBinding should be rendered")
+			} else {
+				_, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.ErrorContains(err, "could not find template")
+			}
+		})
+	}
+}
+
+func (s *telemetryRoleBindingTemplateTest) TestSubjects() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(subjects []rbacv1.Subject)
+	}{
+		{
+			// With an unset serviceAccounts list, the binding falls back to
+			// the chart's main app service account — the SA used by sidecars
+			// on fiftyone-app, teams-plugins, and delegated-operator
+			// workloads. The teams-api SA is intentionally NOT bound here;
+			// api-role.yaml already grants it pods/log GET.
+			"defaultValues",
+			nil,
+			func(subjects []rbacv1.Subject) {
+				s.Require().Len(subjects, 1, "Default RoleBinding should bind only to the main app SA")
+				s.Equal("ServiceAccount", subjects[0].Kind)
+				s.Equal("fiftyone-teams", subjects[0].Namespace)
+				s.Equal("fiftyone-teams", subjects[0].Name)
+			},
+		},
+		{
+			"overrideServiceAccountsAndNamespace",
+			map[string]string{
+				"telemetry.serviceAccounts[0]": "sa-one",
+				"telemetry.serviceAccounts[1]": "sa-two",
+				"namespace.name":               "my-ns",
+			},
+			func(subjects []rbacv1.Subject) {
+				s.Require().Len(subjects, 2)
+				s.Equal("sa-one", subjects[0].Name)
+				s.Equal("my-ns", subjects[0].Namespace)
+				s.Equal("sa-two", subjects[1].Name)
+				s.Equal("my-ns", subjects[1].Namespace)
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var rb rbacv1.RoleBinding
+			helm.UnmarshalK8SYaml(subT, output, &rb)
+
+			testCase.expected(rb.Subjects)
+		})
+	}
+}
+
+func (s *telemetryRoleBindingTemplateTest) TestRoleRef() {
 	options := &helm.Options{SetValues: nil}
-
-	output, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	s.Require().NoError(err)
-	s.Contains(output, "kind: Role", "Role should be rendered by default")
-	s.Contains(output, "kind: RoleBinding", "RoleBinding should be rendered by default")
-}
-
-func (s *telemetryRoleBindingTemplateTest) TestExplicitlyDisabled() {
-	options := &helm.Options{SetValues: map[string]string{
-		"telemetry.enabled": "false",
-	}}
-
-	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	s.ErrorContains(err, "could not find template")
-}
-
-// extractRole finds the Role document (not RoleBinding) in multi-doc render output.
-func (s *telemetryRoleBindingTemplateTest) extractRole(output string) (rbacv1.Role, bool) {
-	for _, doc := range splitYAMLDocs(output) {
-		if !strings.Contains(doc, "\nkind: Role\n") {
-			continue
-		}
-		var role rbacv1.Role
-		helm.UnmarshalK8SYaml(s.T(), doc, &role)
-		return role, true
-	}
-	return rbacv1.Role{}, false
-}
-
-// extractRoleBinding finds the RoleBinding document in multi-doc render output.
-func (s *telemetryRoleBindingTemplateTest) extractRoleBinding(output string) (rbacv1.RoleBinding, bool) {
-	for _, doc := range splitYAMLDocs(output) {
-		if !strings.Contains(doc, "kind: RoleBinding") {
-			continue
-		}
-		var rb rbacv1.RoleBinding
-		helm.UnmarshalK8SYaml(s.T(), doc, &rb)
-		return rb, true
-	}
-	return rbacv1.RoleBinding{}, false
-}
-
-func (s *telemetryRoleBindingTemplateTest) TestRoleMetadata() {
-	options := &helm.Options{SetValues: map[string]string{
-		"telemetry.enabled": "true",
-	}}
-
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	role, ok := s.extractRole(output)
-	s.Require().True(ok, "Role document not found in rendered output")
 
-	expectedName := fmt.Sprintf("%s-telemetry-pod-logs", s.releaseName)
-	s.Equal(expectedName, role.ObjectMeta.Name)
-	s.Equal("fiftyone-teams", role.ObjectMeta.Namespace)
-	s.Equal("telemetry", role.ObjectMeta.Labels["app.kubernetes.io/name"])
-	s.Equal(s.releaseName, role.ObjectMeta.Labels["app.kubernetes.io/instance"])
-	s.Equal("telemetry", role.ObjectMeta.Labels["app.voxel51.com/component"])
-}
-
-func (s *telemetryRoleBindingTemplateTest) TestRoleRules() {
-	options := &helm.Options{SetValues: map[string]string{
-		"telemetry.enabled": "true",
-	}}
-
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	role, ok := s.extractRole(output)
-	s.Require().True(ok, "Role document not found in rendered output")
-
-	s.Require().Len(role.Rules, 2, "Role should have exactly two rules")
-
-	var hasPodsGet, hasPodsLogGet bool
-	for _, rule := range role.Rules {
-		for _, resource := range rule.Resources {
-			if resource == "pods" {
-				s.Contains(rule.Verbs, "get", "pods rule should grant get")
-				hasPodsGet = true
-			}
-			if resource == "pods/log" {
-				s.Contains(rule.Verbs, "get", "pods/log rule should grant get")
-				hasPodsLogGet = true
-			}
-		}
-	}
-	s.True(hasPodsGet, "Role should grant get on pods")
-	s.True(hasPodsLogGet, "Role should grant get on pods/log")
-}
-
-func (s *telemetryRoleBindingTemplateTest) TestRoleBindingDefaultSubject() {
-	// With an unset serviceAccounts list, the binding falls back to the
-	// chart's main app service account — the SA used by sidecars on
-	// fiftyone-app, teams-plugins, and delegated-operator workloads. The
-	// teams-api SA is intentionally NOT bound here; api-role.yaml already
-	// grants it pods/log GET.
-	options := &helm.Options{SetValues: map[string]string{
-		"telemetry.enabled": "true",
-	}}
-
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	rb, ok := s.extractRoleBinding(output)
-	s.Require().True(ok, "RoleBinding document not found in rendered output")
-
-	s.Require().Len(rb.Subjects, 1, "Default RoleBinding should bind only to the main app SA")
-	s.Equal("ServiceAccount", rb.Subjects[0].Kind)
-	s.Equal("fiftyone-teams", rb.Subjects[0].Namespace)
-	// Main app SA: chart default serviceAccount.name = "fiftyone-teams"
-	s.Equal("fiftyone-teams", rb.Subjects[0].Name)
-}
-
-func (s *telemetryRoleBindingTemplateTest) TestRoleBindingMultipleSubjects() {
-	options := &helm.Options{SetValues: map[string]string{
-		"telemetry.enabled":            "true",
-		"telemetry.serviceAccounts[0]": "sa-one",
-		"telemetry.serviceAccounts[1]": "sa-two",
-		"namespace.name":               "my-ns",
-	}}
-
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	rb, ok := s.extractRoleBinding(output)
-	s.Require().True(ok, "RoleBinding document not found in rendered output")
-
-	s.Require().Len(rb.Subjects, 2)
-	s.Equal("sa-one", rb.Subjects[0].Name)
-	s.Equal("my-ns", rb.Subjects[0].Namespace)
-	s.Equal("sa-two", rb.Subjects[1].Name)
-	s.Equal("my-ns", rb.Subjects[1].Namespace)
-}
-
-func (s *telemetryRoleBindingTemplateTest) TestRoleBindingRoleRef() {
-	options := &helm.Options{SetValues: map[string]string{
-		"telemetry.enabled": "true",
-	}}
-
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	rb, ok := s.extractRoleBinding(output)
-	s.Require().True(ok, "RoleBinding document not found in rendered output")
+	var rb rbacv1.RoleBinding
+	helm.UnmarshalK8SYaml(s.T(), output, &rb)
 
 	expectedName := fmt.Sprintf("%s-telemetry-pod-logs", s.releaseName)
 	s.Equal("Role", rb.RoleRef.Kind)
