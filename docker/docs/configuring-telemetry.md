@@ -35,18 +35,25 @@ renders `fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`,
 `telemetry-redis`, `fiftyone-app-telemetry`, and `teams-api-telemetry`.
 
 Optional overlays carry their own bundled sidecar.
-For example:
+`compose.yaml`, `compose.plugins.yaml`, and
+`compose.dedicated-plugins.yaml` are mutually exclusive base files —
+pick one, then layer the `compose.delegated-operators.yaml` overlay on
+top.
+For example, to run the dedicated-plugins base with delegated
+operators:
 
 ```shell
 docker compose \
-  -f compose.yaml \
   -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
   up -d
 ```
 
-This adds `teams-plugins`, `teams-plugins-telemetry`, `teams-do`, and
-`teams-do-telemetry` in addition to the default set.
+This renders the dedicated-plugins base set (`fiftyone-app`,
+`teams-api`, `teams-app`, `teams-cas`, `teams-plugins`,
+`telemetry-redis`, `fiftyone-app-telemetry`, `teams-api-telemetry`,
+`teams-plugins-telemetry`) plus `teams-do` and `teams-do-telemetry`
+from the overlay.
 
 For GPU-enabled delegated operators, layer
 `compose.delegated-operators.gpu.yaml` (which includes its own bundled
