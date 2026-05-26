@@ -55,8 +55,8 @@ services:
     pid: "service:teams-do-gpu"
     profiles: ["gpu"]
     cap_add:
-      - DAC_READ_SEARCH
-      - SYS_PTRACE
+      - DAC_READ_SEARCH  # required for reading log files in target container
+      - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
     deploy:
       resources:
         limits:

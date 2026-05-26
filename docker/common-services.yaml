@@ -220,7 +220,7 @@ services:
     cap_drop:
       - ALL
     cap_add:
-      - DAC_READ_SEARCH
+      - DAC_READ_SEARCH  # required for reading log files in target container
     security_opt:
       - no-new-privileges:true
     environment:
@@ -245,7 +245,7 @@ services:
     cap_drop:
       - ALL
     cap_add:
-      - DAC_READ_SEARCH
+      - DAC_READ_SEARCH  # required for reading log files in target container
     security_opt:
       - no-new-privileges:true
     environment:
@@ -270,7 +270,7 @@ services:
     cap_drop:
       - ALL
     cap_add:
-      - DAC_READ_SEARCH
+      - DAC_READ_SEARCH  # required for reading log files in target container
     security_opt:
       - no-new-privileges:true
     environment:
@@ -295,8 +295,8 @@ services:
     cap_drop:
       - ALL
     cap_add:
-      - DAC_READ_SEARCH
-      - SYS_PTRACE
+      - DAC_READ_SEARCH  # required for reading log files in target container
+      - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
     security_opt:
       - no-new-privileges:true
     environment:
