@@ -473,7 +473,7 @@ sidecar to on-demand Kubernetes orchestrators as well.
 This emits per-operation metrics back to the same Redis backend so the
 Settings → Metrics page sees individual delegated runs.
 
-Use a Kubernetes
+Use of a Kubernetes
 [native sidecar](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/)
 (an `initContainer` with `restartPolicy: Always`, requires Kubernetes
 1.29+).
@@ -561,7 +561,7 @@ Notes:
   document.
 - `FIFTYONE_TELEMETRY_REDIS_URL` must be reachable from wherever the
   Job runs.
-  For same-cluster Jobs use the in-cluster service DNS name.
+  For same-cluster Jobs, use the in-cluster service DNS name.
   For remote clusters, use a routable hostname or load balancer.
 
 ## Refresh Orchestrator Operators
@@ -692,10 +692,10 @@ spec:
                 name: your-org-teams-secrets
         resources:
           limits:
-            cpu: 50m
+            cpu: 100m
             memory: 512Mi
           requests:
-            cpu: 50m
+            cpu: 100m
             memory: 512Mi
         volumeMounts:
           - mountPath: /tmp/telemetry

@@ -78,8 +78,8 @@ docker compose --profile gpu \
   Each joins the target's PID namespace via `pid: "service:<target>"`
   so it can read `/proc/<pid>/fd/1` and use psutil to sample CPU,
   memory, FDs, and thread counts.
-  Sidecars run with the `SYS_PTRACE` capability so py-spy can attach
-  to the target.
+  Sidecars for delegated operations run with the `SYS_PTRACE` capability so
+  py-spy can attach to the target.
 - `teams-plugins-telemetry` (only with `compose.dedicated-plugins.yaml`)
   — sidecar for the dedicated `teams-plugins` service.
 - `teams-do-telemetry` (only with `compose.delegated-operators.yaml`) —

@@ -113,7 +113,7 @@ logs.
 **Resource impact:**
 Each sidecar reserves `0.10` CPUs and `512M` memory
 (reservation == limit).
-A stock deploy adds four sidecars
+A default deploy adds four sidecars
 (`fiftyone-app` + `teams-api` + `teams-plugins` + one `teams-do`), so
 expect roughly **+0.4 CPU** and **+2 GiB memory** in additional
 resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
@@ -127,7 +127,7 @@ resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
    Older versions will see stale PID namespaces after a target
    container is recreated.
 1. **Linux host with PID-namespace sharing** (`pid: "service:<target>"`)
-   and **`SYS_PTRACE`** capability granted to each sidecar container.
+   enabled for each sidecar container.
    Docker Desktop on macOS/Windows supports this, but some hardened
    container runtimes (gVisor, Kata) do not — telemetry will fail to
    attach to the target process there.
@@ -136,9 +136,11 @@ resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
    replica.
    To run multiple delegated-operator workers, see
    [`docker/docs/configuring-telemetry.md`](configuring-telemetry.md).
+1. **`teams-do` requires the **`SYS_PTRACE`** capability to allow the
+   telemetry agent to observe the target process.
 
 **External Redis:**
-Point at a managed Redis instead of the bundled one by setting
+Use an existing Redis instance instead of the bundled one by setting
 `FIFTYONE_TELEMETRY_REDIS_URL` in your `.env` to a fully-qualified URL
 (e.g. `redis://my-managed-redis.example.com:6379`) and scaling
 `telemetry-redis` to `replicas: 0` as below.

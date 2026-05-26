@@ -156,7 +156,7 @@ buffers the streamed metrics and logs.
 
 **Resource impact:**
 Each sidecar requests `100m` CPU and `512Mi` memory (request == limit).
-A stock deploy adds four sidecars
+A default deploy adds four sidecars
 (`teams-api` + `fiftyone-app` + `teams-plugins` + one
 delegated-operator), so expect roughly **+400m CPU** and **+2 GiB
 memory** in additional resource usage, plus the bundled Redis (`250m`
@@ -169,7 +169,7 @@ opt into a `PersistentVolumeClaim` with
 
 1. **`shareProcessNamespace: true`** is set on all four workloads so
    the sidecar can read `/proc/<pid>/fd/1` of the target container.
-1. **The sidecar runs as root with `SYS_PTRACE`** (required for
+1. **The teams-do sidecar runs as root with `SYS_PTRACE`** (required for
    `py-spy` and `/proc` access).
    Clusters that enforce
    [Pod Security Admission][psa]
