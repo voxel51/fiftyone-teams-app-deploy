@@ -122,9 +122,7 @@ services:
     restart: always
 
   # Slot 3 — included by the `do-3` profile. Mirror of slot 2 with its
-  # own socket volume and orchestrator name. The cap is 3 by design;
-  # for higher worker counts use the helm chart, which adds a sidecar
-  # to every pod automatically.
+  # own socket volume and orchestrator name.
   teams-do-3:
     image: voxel51/fiftyone-teams-cv-full:v2.19.0
     profiles: ["do-3"]

@@ -199,15 +199,12 @@ Additionally,
 
 > [!NOTE]
 > The cap of 3 is intentional. The value must not exceed your
-> license's max concurrent delegated operators. For more than 3
-> workers, prefer the helm chart, which automatically attaches a
-> telemetry sidecar to every pod in the delegated-operator
-> deployment. If you must stay on docker compose, the slot-2 and
-> slot-3 blocks in `compose.delegated-operators.yaml` are
-> copy-paste templates: duplicate them as `teams-do-4` /
-> `teams-do-4-telemetry` (and so on), bumping the service name,
-> `pid: "service:teams-do-N"`, `POD_NAME`, `-n teams-do-N`, and
-> `telemetry-socket-N` volume on each copy.
+> license's max concurrent delegated operators.
+> For more than 3 workers, the slot-2 and slot-3 blocks in
+> `compose.delegated-operators.yaml` are copy-paste templates:
+> duplicate them as `teams-do-4` / `teams-do-4-telemetry` (and so on),
+> bumping the service name, `pid: "service:teams-do-N"`, `POD_NAME`,
+> `-n teams-do-N`, and `telemetry-socket-N` volume on each copy.
 
 ### Sidecar lifecycle on workload restart
 
@@ -242,9 +239,8 @@ All knobs live in your `.env` — see `env.template` for the full list:
 
 ## Resource limits
 
-Telemetry containers ship with conservative CPU and memory limits that
-mirror the helm chart's defaults — sized so the sidecars do not starve
-the workloads they observe.
+Telemetry containers ship with conservative CPU and memory limits sized so the
+sidecars do not starve the workloads they observe.
 The values are declared under each service's `deploy.resources` block
 in the compose files;
 compose v2 honors `cpus` and `memory` limits/reservations outside swarm
