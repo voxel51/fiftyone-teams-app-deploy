@@ -1113,6 +1113,16 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 				"telemetry-socket": {
 					Name: "fiftyone-compose-test_telemetry-socket",
 				},
+				// telemetry-socket-{2,3} are declared at the project level
+				// so they appear in project.Volumes regardless of which
+				// `do-N` profile is active. Slot 2/3 services only start
+				// when the matching profile is selected.
+				"telemetry-socket-2": {
+					Name: "fiftyone-compose-test_telemetry-socket-2",
+				},
+				"telemetry-socket-3": {
+					Name: "fiftyone-compose-test_telemetry-socket-3",
+				},
 			},
 		},
 	}
