@@ -91,6 +91,12 @@ services:
         condition: service_started
     restart: always
 
+# Tmpfs-backed named volume with uid/gid set at mount time so the
+# non-root sidecar can bind agent.sock.
 volumes:
   plugins-vol:
   telemetry-socket-gpu:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "uid=1000,gid=1000,mode=0755"

@@ -169,17 +169,16 @@ opt into a `PersistentVolumeClaim` with
 
 1. **`shareProcessNamespace: true`** is set on all four workloads so
    the sidecar can read `/proc/<pid>/fd/1` of the target container.
-1. **The teams-do sidecar runs as root with `SYS_PTRACE`** (required for
-   `py-spy` and `/proc` access).
-   Clusters that enforce
-   [Pod Security Admission][psa]
-   `restricted`, or admission policies (OPA/Gatekeeper, Kyverno) that
-   block `runAsUser: 0` or capability adds, will reject these pods at
-   admission.
-   On such clusters, either:
-    - allow the chart's `namespace.name` namespace at PSA `baseline`
-      (or relax the relevant admission policy), or
-    - disable telemetry with `telemetry.enabled: false`.
+1. **Sidecars run as UID/GID 1000** (matching the workload image's
+   user) with `cap_drop: ALL`. The delegated-operator sidecar
+   additionally has `SYS_PTRACE` added (required for `py-spy` stack
+   sampling); the other three sidecars run with no capabilities. This
+   posture is compatible with
+   [Pod Security Admission][psa] `restricted` out of the box.
+   Clusters enforcing additional admission policies (OPA/Gatekeeper,
+   Kyverno) that explicitly block `SYS_PTRACE` on the
+   delegated-operator namespace can either allow that single capability
+   or disable telemetry with `telemetry.enabled: false`.
 
 **External Redis:**
 To point at a managed Redis (ElastiCache, MemoryStore, an existing

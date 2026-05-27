@@ -186,8 +186,15 @@ services:
         condition: service_started
     restart: always
 
+# Tmpfs-backed named volumes with uid/gid set at mount time so the
+# non-root sidecar can bind agent.sock without any init container.
+# Add new slots with `telemetry-socket-N: *telemetry-socket-spec`.
 volumes:
   plugins-vol:
-  telemetry-socket:
-  telemetry-socket-2:
-  telemetry-socket-3:
+  telemetry-socket: &telemetry-socket-spec
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "uid=1000,gid=1000,mode=0755"
+  telemetry-socket-2: *telemetry-socket-spec
+  telemetry-socket-3: *telemetry-socket-spec
