@@ -130,11 +130,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					// Sanic's "Starting worker" only fires in multi-worker mode; the test
-					// env runs single-worker, so we assert on Sanic's INFO-level "Goin'
-					// Fast" startup line instead — works regardless of worker count or log
-					// level (INFO is the default).
-					log: "Goin' Fast",
+					log:              "Goin' Fast",
 				},
 				{
 					name:             "teams-app",
@@ -171,11 +167,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					// Sanic's "Starting worker" only fires in multi-worker mode; the test
-					// env runs single-worker, so we assert on Sanic's INFO-level "Goin'
-					// Fast" startup line instead — works regardless of worker count or log
-					// level (INFO is the default).
-					log: "Goin' Fast",
+					log:              "Goin' Fast",
 				},
 				{
 					name:             "teams-app",
@@ -219,11 +211,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					// Sanic's "Starting worker" only fires in multi-worker mode; the test
-					// env runs single-worker, so we assert on Sanic's INFO-level "Goin'
-					// Fast" startup line instead — works regardless of worker count or log
-					// level (INFO is the default).
-					log: "Goin' Fast",
+					log:              "Goin' Fast",
 				},
 				{
 					name:             "teams-app",
