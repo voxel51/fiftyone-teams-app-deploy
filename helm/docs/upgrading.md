@@ -21,6 +21,7 @@
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Cluster Requirements](#cluster-requirements)
+      - [Volume ownership (upgrading from v2.18 or earlier)](#volume-ownership-upgrading-from-v218-or-earlier)
       - [Opting out of Telemetry](#opting-out-of-telemetry)
     - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
     - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
@@ -169,17 +170,16 @@ opt into a `PersistentVolumeClaim` with
 
 1. **`shareProcessNamespace: true`** is set on all four workloads so
    the sidecar can read `/proc/<pid>/fd/1` of the target container.
-1. **The teams-do sidecar runs as root with `SYS_PTRACE`** (required for
-   `py-spy` and `/proc` access).
-   Clusters that enforce
-   [Pod Security Admission][psa]
-   `restricted`, or admission policies (OPA/Gatekeeper, Kyverno) that
-   block `runAsUser: 0` or capability adds, will reject these pods at
-   admission.
-   On such clusters, either:
-    - allow the chart's `namespace.name` namespace at PSA `baseline`
-      (or relax the relevant admission policy), or
-    - disable telemetry with `telemetry.enabled: false`.
+1. **Sidecars run as UID/GID 1000** (matching the workload image's
+   user) with `cap_drop: ALL`. The delegated-operator sidecar
+   additionally has `SYS_PTRACE` added (required for `py-spy` stack
+   sampling); the other three sidecars run with no capabilities. This
+   posture is compatible with
+   [Pod Security Admission][psa] `restricted` out of the box.
+   Clusters enforcing additional admission policies (OPA/Gatekeeper,
+   Kyverno) that explicitly block `SYS_PTRACE` on the
+   delegated-operator namespace can either allow that single capability
+   or disable telemetry with `telemetry.enabled: false`.
 
 **External Redis:**
 To point at a managed Redis (ElastiCache, MemoryStore, an existing
@@ -194,6 +194,62 @@ telemetry:
 
 The chart skips the bundled Redis' `Deployment` and `Service` and wires
 every consumer at this URL.
+
+##### Volume ownership (upgrading from v2.18 or earlier)
+
+In v2.19+ all workloads and their telemetry sidecars run as UID/GID
+1000 (UID/GID 999 for the bundled Redis, matching the upstream
+`redis:7-alpine` image). The chart sets `podSecurityContext.fsGroup`
+on each pod so Kubernetes group-chowns the mounted volumes at attach
+time. For most CSI drivers this is automatic on chart upgrade — no
+operator action required.
+
+**Two edge cases need manual remediation:**
+
+1. **CSI drivers that ignore `fsGroup`** (notably NFS, some Filestore
+   configurations, certain `ReadWriteMany` volumes): the recursive
+   chown is skipped, leaving pre-existing data owned by whatever UID
+   the prior root-running containers wrote it as. The new UID-1000
+   container can't write back. Symptom: workload pod crash-loops with
+   `PermissionError: [Errno 13]` against `/opt/plugins` or
+   `/data` shortly after a chart upgrade.
+
+   Remediate by chowning the volume contents once, from a debug pod
+   with elevated privileges:
+
+   ```shell
+   kubectl run -n <namespace> chown-fix --rm -i --restart=Never \
+     --image=alpine \
+     --overrides='{"spec":{"containers":[{"name":"chown-fix","image":"alpine","command":["chown","-R","1000:1000","/v"],"volumeMounts":[{"name":"v","mountPath":"/v"}],"securityContext":{"runAsUser":0}}],"volumes":[{"name":"v","persistentVolumeClaim":{"claimName":"<your-pvc>"}}]}}'
+   ```
+
+   Use UID `999` (not `1000`) for the Redis data PVC if you opted into
+   `telemetry.redis.persistence.enabled: true`.
+
+2. **Very large pre-populated PVs** (e.g. multi-GB `plugins-vol`): the
+   recursive chown on first attach can stall pod startup for several
+   minutes — readiness probes may fail long enough for the rollout to
+   look stuck before recovering. Mitigate by setting:
+
+   ```yaml
+   apiSettings:
+     podSecurityContext:
+       fsGroupChangePolicy: OnRootMismatch
+   fiftyoneAppSettings:
+     podSecurityContext:
+       fsGroupChangePolicy: OnRootMismatch
+   pluginsSettings:
+     podSecurityContext:
+       fsGroupChangePolicy: OnRootMismatch
+   ```
+
+   With `OnRootMismatch` the recursive walk is skipped when the
+   volume's root directory already matches the target GID — effectively
+   a one-time cost rather than per-rollout. Requires Kubernetes 1.23+.
+
+Fresh installs are unaffected: empty PVs come up correctly via
+`fsGroup` regardless of CSI driver, and there is no pre-existing
+root-owned data to chown.
 
 ##### Opting out of Telemetry
 

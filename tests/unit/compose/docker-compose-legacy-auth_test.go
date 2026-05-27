@@ -696,6 +696,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"PYTHONUNBUFFERED=1",
 				"TELEMETRY_SOCKET=/tmp/telemetry/agent.sock",
 			},
 		},
@@ -1198,17 +1199,20 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestVolumes() {
 					Name: "fiftyone-compose-test_telemetry-redis-data",
 				},
 				"telemetry-socket": {
-					Name: "fiftyone-compose-test_telemetry-socket",
+					Name:       "fiftyone-compose-test_telemetry-socket",
+					DriverOpts: telemetrySocketDriverOpts,
 				},
 				// telemetry-socket-{2,3} are declared at the project level
 				// so they appear in project.Volumes regardless of which
 				// `do-N` profile is active. Slot 2/3 services only start
 				// when the matching profile is selected.
 				"telemetry-socket-2": {
-					Name: "fiftyone-compose-test_telemetry-socket-2",
+					Name:       "fiftyone-compose-test_telemetry-socket-2",
+					DriverOpts: telemetrySocketDriverOpts,
 				},
 				"telemetry-socket-3": {
-					Name: "fiftyone-compose-test_telemetry-socket-3",
+					Name:       "fiftyone-compose-test_telemetry-socket-3",
+					DriverOpts: telemetrySocketDriverOpts,
 				},
 			},
 		},
