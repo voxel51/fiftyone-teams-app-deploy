@@ -29,11 +29,10 @@
 # invisible to the telemetry sidecar. The cap of 3 is a deliberate
 # trade-off — for higher worker counts prefer the helm chart. If
 # docker compose is required, the slot-2/3 blocks below are templates:
-# duplicate them as `teams-do-4` / `teams-do-4-telemetry`, bumping the
-# service name, `pid`, `POD_NAME`, `-n teams-do-N`, and
-# `telemetry-socket-N` volume on each copy, then add
-# `telemetry-socket-N: *telemetry-socket-spec` to the volumes block.
-# See docker/docs/configuring-telemetry.md for details.
+# duplicate them as `teams-do-4` / `teams-do-4-telemetry` etc.,
+# bumping the service name, `pid`, `POD_NAME`, `-n teams-do-N`, and
+# `telemetry-socket-N` volume on each copy. See
+# docker/docs/configuring-telemetry.md for details.
 #
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies

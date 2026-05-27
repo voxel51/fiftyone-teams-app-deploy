@@ -21,7 +21,6 @@
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Host Requirements](#host-requirements)
-      - [Volume ownership (upgrading from v2.18 or earlier)](#volume-ownership-upgrading-from-v218-or-earlier)
       - [Opting out of Telemetry](#opting-out-of-telemetry)
       - [Scaling delegated-operator workers](#scaling-delegated-operator-workers)
     - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
@@ -149,59 +148,6 @@ Use an existing Redis instance instead of the bundled one by setting
 `FIFTYONE_TELEMETRY_REDIS_URL` in your `.env` to a fully-qualified URL
 (e.g. `redis://my-managed-redis.example.com:6379`) and scaling
 `telemetry-redis` to `replicas: 0` as below.
-
-##### Volume ownership (upgrading from v2.18 or earlier)
-
-The telemetry sidecars and workload containers now run as UID/GID 1000
-(previously root). Fresh deploys are unaffected — the
-`telemetry-socket{,-2,-3,-gpu}` named volumes are declared with
-`driver_opts: type: tmpfs, o: "uid=1000,gid=1000,mode=0775"`, so Docker
-creates them already owned by UID 1000.
-
-Existing named volumes from a v2.18-or-earlier deploy retain their
-original `root:root` ownership across `up`/`down` cycles. Once the
-sidecar image flips to UID 1000, the first restart crash-loops with
-`PermissionError: [Errno 13]` when the sidecar tries to bind
-`agent.sock`. Pick one of the two paths below to remediate.
-
-**Option 1 — Drop and recreate all project volumes (simplest):**
-
-```shell
-docker compose -p <project> -f compose.yaml -f compose.delegated-operators.yaml down --volumes
-docker compose -p <project> -f compose.yaml -f compose.delegated-operators.yaml up -d
-```
-
-`--volumes` only removes volumes declared in this project's compose
-files; other Docker projects on the host are untouched.
-`telemetry-redis-data` is also wiped — telemetry archives in MongoDB
-are unaffected, but the un-archived ~10 minute dashboard backscroll is
-lost (same trade-off as `telemetry.redis.persistence.enabled: false`
-in the helm chart).
-
-**Option 2 — Selective wipe of only the socket volumes (preserves
-redis backscroll and plugins):**
-
-```shell
-docker compose -p <project> -f compose.yaml -f compose.delegated-operators.yaml down
-docker volume rm <project>_telemetry-socket <project>_telemetry-socket-2 <project>_telemetry-socket-3
-docker compose -p <project> -f compose.yaml -f compose.delegated-operators.yaml up -d
-```
-
-Recreated socket volumes come up 1000-owned via `driver_opts`. Persistent
-volumes (`plugins-vol`, `telemetry-redis-data`) are preserved as-is —
-the workload Dockerfile pre-chowns `/opt/plugins` and the upstream redis
-image owns its `/data`, so existing data continues to be readable by the
-new UID 1000 / UID 999 containers.
-
-If you maintain custom overrides that declare additional named volumes
-that non-root workloads write to, chown each manually before `up -d`:
-
-```shell
-docker run --rm -v <project>_<volume>:/v alpine chown 1000:1000 /v
-```
-
-Use UID `999` (not `1000`) when chowning `telemetry-redis-data` — the
-upstream `redis:7-alpine` image runs as the built-in `redis` user.
 
 ##### Opting out of Telemetry
 

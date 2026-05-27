@@ -180,9 +180,6 @@ services:
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
-      # Flush stdout per line so `docker logs` shows registration/heartbeat
-      # output in near-real-time instead of block-buffered chunks.
-      PYTHONUNBUFFERED: "1"
       TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
     restart: always
     volumes:

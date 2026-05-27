@@ -696,7 +696,6 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
-				"PYTHONUNBUFFERED=1",
 				"TELEMETRY_SOCKET=/tmp/telemetry/agent.sock",
 			},
 		},
