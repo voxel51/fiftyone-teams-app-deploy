@@ -93,7 +93,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "Connecting to MongoDB",
+					log:              "motd.py",
 				},
 				{
 					name:             "teams-app",
@@ -130,7 +130,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "Connecting to MongoDB",
+					log:              "motd.py",
 				},
 				{
 					name:             "teams-app",
@@ -167,7 +167,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "Connecting to MongoDB",
+					log:              "motd.py",
 				},
 				{
 					name:             "teams-app",
@@ -211,7 +211,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "Connecting to MongoDB",
+					log:              "motd.py",
 				},
 				{
 					name:             "teams-app",
