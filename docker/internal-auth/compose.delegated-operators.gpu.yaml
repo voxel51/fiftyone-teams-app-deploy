@@ -54,8 +54,8 @@ services:
     image: voxel51/telemetry-sidecar:v2.19.0
     pid: "service:teams-do-gpu"
     profiles: ["gpu"]
+    user: "1000:1000"
     cap_add:
-      - DAC_READ_SEARCH  # required for reading log files in target container
       - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
     deploy:
       resources:

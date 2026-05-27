@@ -87,10 +87,10 @@ services:
     image: voxel51/telemetry-sidecar:v2.19.0
     profiles: ["do-2", "do-3"]
     pid: "service:teams-do-2"
+    user: "1000:1000"
     cap_drop:
       - ALL
     cap_add:
-      - DAC_READ_SEARCH  # required for reading log files in target container
       - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
     security_opt:
       - no-new-privileges:true
@@ -153,10 +153,10 @@ services:
     image: voxel51/telemetry-sidecar:v2.19.0
     profiles: ["do-3"]
     pid: "service:teams-do-3"
+    user: "1000:1000"
     cap_drop:
       - ALL
     cap_add:
-      - DAC_READ_SEARCH  # required for reading log files in target container
       - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
     security_opt:
       - no-new-privileges:true
