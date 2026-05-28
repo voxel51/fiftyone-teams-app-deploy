@@ -51,7 +51,7 @@ We will configure the
 [delegated operators](./configuring-delegated-operators.md)
 with GPUs.
 
-For most deployments, prefer the shipped GPU overlay
+For most deployments, use the shipped GPU overlay
 `compose.delegated-operators.gpu.yaml`, which already includes the GPU
 worker and its paired telemetry sidecar. Activate it alongside the CPU
 worker profile (e.g. `COMPOSE_PROFILES=do-1,gpu`); see
