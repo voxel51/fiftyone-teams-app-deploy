@@ -61,7 +61,6 @@ delegated-operator workers either
 1. Set `COMPOSE_PROFILES=do-2` in your `.env`
 1. Set the environment variable while calling compose up
 
-    
 This renders the services
 
 - FiftyOne Enterprise
@@ -149,7 +148,6 @@ To run without telemetry
 1. Add a `compose.override.yaml` that scales the
    telemetry services to zero replicas:
 
-    
 ### Scaling teams-do with telemetry
 
 Docker Compose's `pid: "service:<name>"` only joins a single replica's PID namespace.
@@ -189,13 +187,11 @@ own orchestrator name (slot 2 as `teams-do-2`, slot 3 as `teams-do-3`)
 so they surface distinctly in Settings → Metrics.
 
 > [!IMPORTANT]
-> This replaces the previous `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`
-> setting, which is no longer honored — setting it has no effect.
-> Pre-telemetry defaults rendered three `teams-do` replicas; the
-> post-telemetry default renders one observed worker. If you relied
-> on the previous default, set `COMPOSE_PROFILES=do-3` to restore the
-> three-worker behavior (each worker now has its own sidecar).
-
+> v2.19 deprecates the `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`
+> environment variable.
+> Prior to v2.19, the `teams-do` replica count defaulted to `3`.
+> To retain the prior replica count behavior,
+> set `COMPOSE_PROFILES=do-3` in your `.env` file.
 > [!NOTE]
 > The cap of 3 is intentional as the value must not exceed your
 > license's max concurrent delegated operators.
