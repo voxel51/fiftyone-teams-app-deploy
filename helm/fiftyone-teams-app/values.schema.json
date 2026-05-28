@@ -4040,7 +4040,7 @@
       "type": "object"
     },
     "telemetry": {
-      "description": "In-cluster telemetry. Renders a Redis Deployment + Service, a Role/RoleBinding\ngranting `pods/log` read access, and a `telemetry-sidecar` injected into the\n`teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator workloads.",
+      "description": "In-cluster telemetry. Renders a Redis Deployment, Service, a Role/RoleBinding\ngranting `pods/log` read access, and a `telemetry-sidecar` injected into the\n`teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator workloads.",
       "properties": {
         "enabled": {
           "default": true,

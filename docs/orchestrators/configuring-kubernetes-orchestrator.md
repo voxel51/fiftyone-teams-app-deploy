@@ -467,7 +467,7 @@ fom.register_orchestrator(
 > FiftyOne UI's log viewer for delegated-operator runs — it depends on
 > the sidecar to capture per-operation logs.
 
-If your deployment runs telemetry (the Helm chart includes 
+If your deployment runs telemetry (the Helm chart includes
 it by default), you can attach a per-Job telemetry
 sidecar to on-demand Kubernetes orchestrators as well.
 This emits per-operation metrics back to the same Redis backend so the
