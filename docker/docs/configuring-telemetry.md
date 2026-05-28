@@ -38,15 +38,13 @@ renders `fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`,
 Optional overlays provide their own bundled sidecar.
 The `compose.yaml`, `compose.plugins.yaml`, and
 `compose.dedicated-plugins.yaml` are mutually exclusive base files —
-pick one, then layer the `compose.delegated-operators.yaml` overlay on
-`compose.dedicated-plugins.yaml` are mutually exclusive base files.
-Pick one and layer the `compose.delegated-operators.yaml` overlay on
+pick one, then layer the `compose.delegated-operators.yaml` overlay on top.
 
 The delegated-operators overlay defines three worker slots
 
 1. `teams-do` (always on)
 1. `teams-do-2`
-    1. Enabled using the `do-2` Compose profile
+    1. Enabled using the `do-2` and `do-3` Compose profiles
 1. `teams-do-3`
     1. Enabled using the `do-3` Compose profile
 
@@ -55,8 +53,7 @@ Set `COMPOSE_PROFILES=do-<N>` to add slots up to `<N>`.
 `do-<N>` includes previous slots.
 For example `do-3` runs three workers.
 
-To run the dedicated-plugins base with two
-delegated-operator workers either
+To run the dedicated-plugins base with two delegated-operator workers either:
 
 1. Set `COMPOSE_PROFILES=do-2` in your `.env`
 1. Set the environment variable while calling compose up
@@ -92,7 +89,7 @@ docker compose --profile gpu \
   up -d
 ```
 
-## What's bundled by default
+## What's included
 
 - Services
   - `telemetry-redis`

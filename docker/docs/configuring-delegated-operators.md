@@ -40,7 +40,7 @@ in conjunction with one of the three plugin configurations.
 > profiles (`do-2`, `do-3`). Set `COMPOSE_PROFILES=do-N` to add slots
 > up to N (cap of 3). This replaces the deprecated
 > `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` environment variable.
-> If you used on the <2.19 default of 3 workers, set `COMPOSE_PROFILES=do-3`. 
+> If you used on the <2.19 default of 3 workers, set `COMPOSE_PROFILES=do-3`.
 > See
 > [Scaling teams-do with telemetry](./configuring-telemetry.md#scaling-teams-do-with-telemetry)
 > for the slot/profile reference and the rationale.
