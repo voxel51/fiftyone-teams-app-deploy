@@ -4,6 +4,13 @@
         apiSettings.replicaCount will be set to 1 for this deployment.  Please see
         https://helm.fiftyone.ai for details.
 {{ end }}
-
+{{- if and .Values.telemetry.enabled (not .Values.telemetry.redis.external.url) (not .Values.telemetry.redis.persistence.enabled) (not .Values.telemetry.redis.persistence.existingClaim) }}
+[INFO]  Telemetry Redis is running on an emptyDir volume (no PersistentVolumeClaim).
+        Long-term telemetry archives in MongoDB are unaffected, but the in-window
+        dashboard backscroll (~10 minutes of un-archived data) is lost if the
+        Redis pod restarts. To make telemetry survive Redis restarts, set
+        `telemetry.redis.persistence.enabled: true` (needs a working StorageClass
+        or `telemetry.redis.persistence.existingClaim` pointing at a pre-created PVC).
+{{ end }}
 Visit the following URL to access your FiftyOne Enterprise application:
   http{{ if $.Values.ingress.tlsEnabled }}s{{ end }}://{{ .Values.teamsAppSettings.dnsName }}

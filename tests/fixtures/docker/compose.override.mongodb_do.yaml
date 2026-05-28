@@ -2,3 +2,5 @@ services:
   teams-do:
     depends_on: [mongodb]
     image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-app:${FIFTYONE_APP_VERSION}
+  teams-do-telemetry:
+    image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/telemetry-sidecar:${FIFTYONE_APP_VERSION}

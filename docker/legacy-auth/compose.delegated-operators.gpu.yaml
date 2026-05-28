@@ -1,0 +1,102 @@
+---
+# GPU-enabled delegated-operator worker + telemetry sidecar. Requires a
+# Linux host with the NVIDIA driver, nvidia-container-toolkit, and the
+# `nvidia` runtime configured in dockerd. Docker Desktop on macOS /
+# Windows does not support GPU passthrough.
+#
+# Gated behind the `gpu` profile. Activate with:
+#
+#   docker compose --profile gpu \
+#     -f compose.yaml \
+#     -f compose.delegated-operators.yaml \
+#     -f compose.delegated-operators.gpu.yaml \
+#     up -d
+#
+# Telemetry (redis + paired sidecars) is bundled by default in the base
+# compose.yaml and compose.delegated-operators.yaml files.
+#
+# For Proxy Server instructions please see
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+services:
+  teams-do-gpu:
+    image: voxel51/fiftyone-teams-cv-full:v2.19.0
+    profiles: ["gpu"]
+    shm_size: "8g"
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote -m -n teams-do-gpu"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: "false"
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: "true"
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+    deploy:
+      replicas: 1
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${NVIDIA_GPU_COUNT:-1}
+              capabilities: ["gpu"]
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+      - telemetry-socket-gpu:/tmp/telemetry
+    restart: always
+
+  teams-do-gpu-telemetry:
+    image: voxel51/telemetry-sidecar:v2.19.0
+    pid: "service:teams-do-gpu"
+    profiles: ["gpu"]
+    user: "1000:1000"
+    cap_add:
+      - SYS_PTRACE  # required for profiling metrics (sampled stacks via py-spy)
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 512M
+        reservations:
+          cpus: "0.10"
+          memory: 512M
+          devices:
+            - driver: nvidia
+              count: ${NVIDIA_GPU_COUNT:-1}
+              capabilities: ["gpu"]
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
+      POD_NAME: teams-do-gpu
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: delegated-operator
+      TARGET_NAME: ${TEAMS_DO_TARGET_NAME:-fiftyone delegated}
+      EXECUTOR_SIDECAR: "true"
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+    volumes:
+      - telemetry-socket-gpu:/tmp/telemetry
+    depends_on:
+      teams-do-gpu:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+    restart: always
+
+# Tmpfs-backed named volume with uid/gid set at mount time so the
+# non-root sidecar can bind agent.sock.
+volumes:
+  plugins-vol:
+  telemetry-socket-gpu:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "uid=1000,gid=1000,mode=0755"

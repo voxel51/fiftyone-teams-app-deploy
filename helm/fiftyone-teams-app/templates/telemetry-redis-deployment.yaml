@@ -1,0 +1,60 @@
+{{- if and .Values.telemetry.enabled (not .Values.telemetry.redis.external.url) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "telemetry.redis.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "telemetry.redis.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "telemetry.redis.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "telemetry.redis.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.telemetry.redis.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: redis
+          image: {{ .Values.telemetry.redis.image | default "redis:7-alpine" }}
+          {{- with .Values.telemetry.redis.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          args:
+            - redis-server
+            - --save
+            - "60"
+            - "1"
+            - --dir
+            - /data
+            - --maxmemory
+            - {{ .Values.telemetry.redis.maxmemory | default "400mb" | quote }}
+            - --maxmemory-policy
+            - allkeys-lru
+          ports:
+            - containerPort: 6379
+          {{- with .Values.telemetry.redis.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          {{- if .Values.telemetry.redis.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.telemetry.redis.persistence.existingClaim | default (printf "%s-data" (include "telemetry.redis.name" .)) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}

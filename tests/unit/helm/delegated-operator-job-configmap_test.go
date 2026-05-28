@@ -89,7 +89,7 @@ func (s *doK8sConfigMapTemplateTest) TestDisabled() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == "" {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -138,7 +138,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -177,7 +177,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataNamespace() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -218,7 +218,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataAnnotations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap
@@ -291,7 +291,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap
@@ -638,7 +638,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -646,6 +646,110 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 			helm.UnmarshalK8SYaml(subT, output, &configMap)
 
 			testCase.expected(subT, configMap.Data)
+		})
+	}
+}
+
+// renderJob renders a single job from the rendered ConfigMap data and
+// returns it as a batchv1.Job for introspection. The job template body
+// in the ConfigMap is Jinja, which we render with placeholder values so
+// the result is valid YAML.
+func (s *doK8sConfigMapTemplateTest) renderJob(data map[string]string, key string) batchv1.Job {
+	s.T().Helper()
+	s.Require().Contains(data, key, "ConfigMap should contain key %q", key)
+
+	jinjaArgs := map[string]interface{}{
+		"_id":      "test-id",
+		"_command": "fiftyone",
+		"_args":    []string{"test"},
+	}
+	jobYAML, err := convertJinjaToYAML(data[key], jinjaArgs)
+	s.Require().NoError(err)
+
+	var job batchv1.Job
+	helm.UnmarshalK8SYaml(s.T(), jobYAML, &job)
+	return job
+}
+
+func (s *doK8sConfigMapTemplateTest) TestTelemetrySocketInjection() {
+	const socketName = "telemetry-socket"
+	jobKey := "cpuDefault.yaml"
+
+	// helper: count entries with the given name
+	countByName := func(volumes []corev1.Volume, name string) int {
+		n := 0
+		for _, v := range volumes {
+			if v.Name == name {
+				n++
+			}
+		}
+		return n
+	}
+	countMountsByName := func(mounts []corev1.VolumeMount, name string) int {
+		n := 0
+		for _, m := range mounts {
+			if m.Name == name {
+				n++
+			}
+		}
+		return n
+	}
+
+	testCases := []struct {
+		name      string
+		values    map[string]string
+		expectVol int // expected occurrences of telemetry-socket volume
+		expectMnt int // expected occurrences of telemetry-socket mount
+	}{
+		{
+			name: "autoInjectsWhenUserHasNoTelemetrySocket",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			expectVol: 1,
+			expectMnt: 1,
+		},
+		{
+			name: "doesNotDuplicateWhenUserDeclaresTelemetrySocket",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                     "nil",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumes[0].name":            socketName,
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumes[0].emptyDir.medium": "Memory",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumeMounts[0].name":       socketName,
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumeMounts[0].mountPath":  "/custom/path",
+			},
+			expectVol: 1,
+			expectMnt: 1,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			job := s.renderJob(configMap.Data, jobKey)
+
+			s.Equal(
+				testCase.expectVol,
+				countByName(job.Spec.Template.Spec.Volumes, socketName),
+				"telemetry-socket volume count mismatch",
+			)
+			s.Require().NotEmpty(job.Spec.Template.Spec.Containers, "expected at least one container")
+			s.Equal(
+				testCase.expectMnt,
+				countMountsByName(job.Spec.Template.Spec.Containers[0].VolumeMounts, socketName),
+				"telemetry-socket volumeMount count mismatch",
+			)
 		})
 	}
 }
