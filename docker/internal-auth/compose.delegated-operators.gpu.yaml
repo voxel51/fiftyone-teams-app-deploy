@@ -56,7 +56,7 @@ services:
     profiles: ["gpu"]
     user: "1000:1000"
     cap_add:
-      - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
+      - SYS_PTRACE  # required for profiling metrics (sampled stacks via py-spy)
     deploy:
       resources:
         limits:
@@ -91,7 +91,7 @@ services:
         condition: service_started
     restart: always
 
-# Tmpfs-backed named volume with uid/gid set at mount time so the
+# tmpfs-backed named volume with uid/gid set at mount time so the
 # non-root sidecar can bind agent.sock.
 volumes:
   plugins-vol:

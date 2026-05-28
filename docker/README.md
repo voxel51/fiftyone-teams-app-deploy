@@ -663,7 +663,6 @@ FiftyOne Enterprise bundles a telemetry sidecar and Redis backend by
 default in every compose file.
 The Settings → Metrics page in teams-app exposes live per-service
 metrics (CPU, memory, FDs, thread counts) and tailed logs.
-No opt-in flags are required.
 
 Please refer to the
 [telemetry configuration documentation](./docs/configuring-telemetry.md)

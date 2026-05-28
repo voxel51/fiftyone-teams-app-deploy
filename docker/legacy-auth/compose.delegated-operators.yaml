@@ -1,38 +1,5 @@
 ---
-# Layered on top of a base compose file (e.g. compose.yaml). The base
-# compose file is expected to provide the `telemetry-redis` service.
-#
-# Each delegated-operator worker shares its PID namespace with a paired
-# telemetry sidecar (compose's `pid: "service:<name>"` only joins one
-# replica). To observe more than one worker at a time we declare a
-# fixed set of slots; slot 1 is always on and slots 2-3 are opt-in via
-# cumulative Compose profiles:
-#
-#   slot 1  teams-do      + teams-do-telemetry       (always on)
-#   slot 2  teams-do-2    + teams-do-2-telemetry     (do-2, do-3)
-#   slot 3  teams-do-3    + teams-do-3-telemetry     (do-3)
-#
-# Default (no profile) runs one worker. Selecting `do-N` for N>1 adds
-# slots up to N; profiles are nested so `do-3` includes slot 2.
-# Activate via `COMPOSE_PROFILES` in `.env`, e.g.
-#
-#   COMPOSE_PROFILES=do-3
-#   docker compose -f compose.yaml -f compose.delegated-operators.yaml up -d
-#
-# or equivalently with explicit flags:
-#
-#   docker compose --profile do-3 \
-#     -f compose.yaml -f compose.delegated-operators.yaml up -d
-#
-# This replaces the pre-telemetry `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`
-# knob, which scaled `teams-do` to N replicas but left N-1 of them
-# invisible to the telemetry sidecar. The cap of 3 is a deliberate
-# trade-off — for higher worker counts prefer the helm chart. If
-# docker compose is required, the slot-2/3 blocks below are templates:
-# duplicate them as `teams-do-4` / `teams-do-4-telemetry` etc.,
-# bumping the service name, `pid`, `POD_NAME`, `-n teams-do-N`, and
-# `telemetry-socket-N` volume on each copy. See
-# docker/docs/configuring-telemetry.md for details.
+# See docker/docs/configuring-telemetry.md for details on telemetry settings.
 #
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
@@ -188,7 +155,7 @@ services:
         condition: service_started
     restart: always
 
-# Tmpfs-backed named volumes with uid/gid set at mount time so the
+# tmpfs-backed named volumes with uid/gid set at mount time so the
 # non-root sidecar can bind agent.sock without any init container.
 # Add new slots with `telemetry-socket-N: *telemetry-socket-spec`.
 volumes:

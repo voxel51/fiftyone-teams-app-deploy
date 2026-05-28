@@ -2,10 +2,7 @@
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 #
-# Telemetry (`telemetry-redis` + per-service sidecars) is enabled by
-# default. To opt out, scale the telemetry services to 0 in a
-# `compose.override.yaml`, or unset `FIFTYONE_TELEMETRY_REDIS_URL` and
-# remove the sidecar services. See docker/docs/configuring-telemetry.md.
+# See docker/docs/configuring-telemetry.md for details on telemetry settings.
 services:
   fiftyone-app:
     extends:
