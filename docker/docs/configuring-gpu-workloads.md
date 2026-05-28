@@ -52,18 +52,18 @@ We will configure the
 with GPUs.
 
 For most deployments, use the shipped GPU overlay
-`compose.delegated-operators.gpu.yaml`, which already includes the GPU
+`compose.delegated-operators.gpu.yaml`, which includes the GPU
 worker and its paired telemetry sidecar. Activate it alongside the CPU
 worker profile (e.g. `COMPOSE_PROFILES=do-1,gpu`); see
 [Configuring Telemetry](./configuring-telemetry.md#scaling-teams-do-with-telemetry)
 for the full profile reference.
 
-If you need a custom inline example instead, the snippet below shows
+The snippet below contains custom inline example of
 how to add a GPU-based delegated operator (`teams-do-with-gpu`)
-alongside the standard `teams-do` slot. Pair it with telemetry by
-adding a matching `teams-do-with-gpu-telemetry` sidecar — see
-`docker/<auth-dir>/compose.delegated-operators.gpu.yaml` for a
-worked example.
+alongside the standard `teams-do`. Pair it with telemetry by
+adding a matching `teams-do-with-gpu-telemetry` sidecar. See
+`docker/<auth-dir>/compose.delegated-operators.gpu.yaml` for an
+example.
 
 ```yaml
 services:

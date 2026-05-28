@@ -127,13 +127,8 @@ resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
    semantics.
    Older versions will see stale PID namespaces after a target
    container is recreated.
-1. **Linux host with PID-namespace sharing** (`pid: "service:<target>"`)
-   enabled for each sidecar container.
-   Docker Desktop on macOS/Windows supports this, but some hardened
-   container runtimes (gVisor, Kata) do not — telemetry will fail to
-   attach to the target process there.
-1. **Delegated-operator workers are scaled via Compose profiles**
-   (`do-2`, `do-3`) rather than the old
+1. **Delegated-operator workers are scaled via [Compose profiles](https://docs.docker.com/compose/how-tos/profiles/)**
+   (`do-2`, `do-3`) rather than the deprecated
    `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` env var, because
    Compose's `pid: "service:<name>"` only joins a single replica.
    Slot 1 (`teams-do`) is always on, and slots 2-3 each get their own
@@ -144,7 +139,7 @@ resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
    telemetry agent to observe the target process.
 
 **External Redis:**
-Use an existing Redis instance instead of the bundled one by setting
+To use an existing Redis instance instead of the bundled one by setting
 `FIFTYONE_TELEMETRY_REDIS_URL` in your `.env` to a fully-qualified URL
 (e.g. `redis://my-managed-redis.example.com:6379`) and scaling
 `telemetry-redis` to `replicas: 0` as below.
@@ -155,7 +150,7 @@ Telemetry is enabled by default.
 To disable it, add a `compose.override.yaml` that scales the
 `telemetry-redis` and `*-telemetry` services to `replicas: 0`.
 See
-[`configuring-telemetry.md`](configuring-telemetry.md#opt-out)
+[`configuring-telemetry.md`](configuring-telemetry.md#opting-out)
 for the full override snippet.
 
 > [!IMPORTANT]
@@ -166,7 +161,7 @@ for the full override snippet.
 
 > [!WARNING]
 > **Breaking change.**
-> `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` is no longer honored
+> `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` is deprecated
 > in docker compose deployments — setting it has no effect.
 > The default rendered worker count drops from **3** (pre-2.19.0) to
 > **1** when you layer `compose.delegated-operators.yaml`.
@@ -180,7 +175,7 @@ each paired with its own telemetry sidecar:
 | 2    | `teams-do-2`  | profile `do-2`, `do-3` |
 | 3    | `teams-do-3`  | profile `do-3`         |
 
-Set `COMPOSE_PROFILES=do-N` to add slots 2-3; profiles are nested so
+Set `COMPOSE_PROFILES=do-<N>` to add slots 2-3; profiles are nested so
 `do-3` includes slot 2.
 
 **To preserve the previous default of three workers**, set the
@@ -190,13 +185,11 @@ following in your `.env`:
 COMPOSE_PROFILES=do-3
 ```
 
-(or pass `--profile do-3` on the `docker compose` command line). If
-you previously customized `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`,
-remove it from your `.env` and pick the matching `do-N` profile —
-the cap is 3. For larger worker counts, prefer the helm chart, which
-automatically attaches a telemetry sidecar to every pod in the
-delegated-operator deployment. If docker compose is required, the
-slot-2/3 service blocks can be duplicated as `teams-do-4` / etc.
+If
+you previously set `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`,
+remove it from your `.env` and pick the matching `do-<N>` profile.
+For more than three, the slot-2/3 service blocks can be duplicated
+as `teams-do-4` / etc.
 (bump the service name, `pid`, `POD_NAME`, `-n`, and socket-volume
 name on each copy) — see the per-slot inline comments in
 `compose.delegated-operators.yaml`.

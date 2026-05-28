@@ -15,17 +15,18 @@
 # Configuring FiftyOne Enterprise Telemetry
 
 Telemetry adds a lightweight per-service metrics collector (sidecar
-pattern) plus a Redis backend.
-The Settings → Metrics page in teams-app displays live CPU / memory /
+pattern) and a Redis backend.
+In the app, the Settings → Metrics page in displays live CPU / memory /
 thread / file-descriptor samples and tailed stdout logs for each
 observed service.
 
 **Telemetry is enabled by default.**
-The base compose files bundle the `telemetry-redis` service and
-per-workload sidecars;
-no opt-in flags or overlay files are needed.
+The base compose files contain the `telemetry-redis` service and
+per-workload sidecars.
 
 ## Default deployment
+
+Running
 
 ```shell
 docker compose -f compose.yaml up -d
@@ -34,33 +35,51 @@ docker compose -f compose.yaml up -d
 renders `fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`,
 `telemetry-redis`, `fiftyone-app-telemetry`, and `teams-api-telemetry`.
 
-Optional overlays carry their own bundled sidecar.
-`compose.yaml`, `compose.plugins.yaml`, and
+Optional overlays provide their own bundled sidecar.
+The `compose.yaml`, `compose.plugins.yaml`, and
 `compose.dedicated-plugins.yaml` are mutually exclusive base files —
 pick one, then layer the `compose.delegated-operators.yaml` overlay on
-top.
+`compose.dedicated-plugins.yaml` are mutually exclusive base files.
+Pick one and layer the `compose.delegated-operators.yaml` overlay on
 
-The delegated-operators overlay defines three worker slots —
-`teams-do` (always on) and `teams-do-2` / `teams-do-3` gated behind
-cumulative Compose profiles (`do-2`, `do-3`). The default (no
-profile) runs one observed worker; set `COMPOSE_PROFILES=do-N` to add
-slots up to N. `do-N` includes every lower slot, so `do-3` runs three
-workers. For example, to run the dedicated-plugins base with two
-delegated-operator workers:
+The delegated-operators overlay defines three worker slots
 
-```shell
-COMPOSE_PROFILES=do-2 docker compose \
-  -f compose.dedicated-plugins.yaml \
-  -f compose.delegated-operators.yaml \
-  up -d
-```
+1. `teams-do` (always on)
+1. `teams-do-2`
+    1. Enabled using the `do-2` Compose profile
+1. `teams-do-3`
+    1. Enabled using the `do-3` Compose profile
 
-(or set `COMPOSE_PROFILES=do-2` in your `.env`).
-This renders the dedicated-plugins base set (`fiftyone-app`,
-`teams-api`, `teams-app`, `teams-cas`, `teams-plugins`,
-`telemetry-redis`, `fiftyone-app-telemetry`, `teams-api-telemetry`,
-`teams-plugins-telemetry`) plus `teams-do` / `teams-do-2` and their
-paired sidecars from the overlay.
+The default (no profile) runs one delegated operator worker.
+Set `COMPOSE_PROFILES=do-<N>` to add slots up to `<N>`.
+`do-<N>` includes previous slots.
+For example `do-3` runs three workers.
+
+To run the dedicated-plugins base with two
+delegated-operator workers either
+
+1. Set `COMPOSE_PROFILES=do-2` in your `.env`
+1. Set the environment variable while calling compose up
+
+    
+This renders the services
+
+- FiftyOne Enterprise
+  - `fiftyone-app`,
+  - `teams-api`
+  - `teams-app`
+  - `teams-cas`
+  - `teams-plugins`,
+- Telemetry
+  - `telemetry-redis`
+  - `fiftyone-app-telemetry`
+  - `teams-api-telemetry`,
+  - `teams-plugins-telemetry`
+  - `teams-do-telemetry`
+  - `teams-do-2-telemetry`
+- Delegated Operator
+  - `teams-do`
+  - `teams-do-2`
 
 For GPU-enabled delegated operators, layer
 `compose.delegated-operators.gpu.yaml` (which includes its own bundled
@@ -76,97 +95,79 @@ docker compose --profile gpu \
 
 ## What's bundled by default
 
-- `telemetry-redis` — Redis 7 container that holds metric streams and
-  log entries.
-  Data is capped by the `allkeys-lru` maxmemory policy so disk usage
-  stays bounded.
-- `fiftyone-app-telemetry`, `teams-api-telemetry` — sidecar containers,
-  one per observed service.
-  Each joins the target's PID namespace via `pid: "service:<target>"`
-  so it can read `/proc/<pid>/fd/1` and use psutil to sample CPU,
-  memory, FDs, and thread counts.
-  Sidecars for delegated operations run with the `SYS_PTRACE` capability so
-  py-spy can attach to the target.
-- `teams-plugins-telemetry` (only with `compose.dedicated-plugins.yaml`)
-  — sidecar for the dedicated `teams-plugins` service.
-- `teams-do-telemetry` (only with `compose.delegated-operators.yaml`)
-  — sidecar in `EXECUTOR_SIDECAR=true` mode that watches the executor
-  for per-operation child processes and records per-op metrics back
-  to the `delegated_ops` MongoDB document. Additional workers
-  (`teams-do-2`, `teams-do-3`) opt-in via Compose profiles and each
-  get their own paired sidecar — see [Scaling teams-do with
-  telemetry](#scaling-teams-do-with-telemetry).
-- `teams-do-gpu` + `teams-do-gpu-telemetry` (only with
-  `compose.delegated-operators.gpu.yaml` and `--profile gpu`) — a
-  GPU-enabled delegated-operator worker registered as a distinct
-  orchestrator (`-n teams-do-gpu`) plus its paired sidecar.
-  The sidecar reads GPU metrics via NVML and requires its own GPU
-  reservation.
-- `FIFTYONE_TELEMETRY_REDIS_URL` is injected on `fiftyone-app`,
-  `teams-api`, `teams-app`, `teams-plugins`, and (when the DO overlay
-  is used) `teams-do` so the in-app telemetry blueprint and SSE
-  endpoints can read from Redis.
+- Services
+  - `telemetry-redis`
+    - Redis 7 container that holds metric streams and log entries.
+    - Data is capped by the `allkeys-lru` maxmemory policy so disk usage
+      stays bounded.
+  - `teams-do-gpu`
+    - only with `compose.delegated-operators.gpu.yaml` and `--profile gpu`
+    - GPU-enabled delegated-operator worker registered as a distinct
+      orchestrator (`-n teams-do-gpu`) plus its paired sidecar.
+- Service Side Cars
+  - `fiftyone-app-telemetry` and `teams-api-telemetry`
+    - Each joins the target's PID namespace via `pid: "service:<target>"`
+      so it can read `/proc/<pid>/fd/1` and use psutil to sample CPU,
+      memory, file descriptors, and thread counts
+    - For delegated operations run with the `SYS_PTRACE` capability so
+      py-spy can attach to the target
+  - `teams-plugins-telemetry`
+    - Only with `compose.dedicated-plugins.yaml`
+    - For the dedicated `teams-plugins` service
+  - `teams-do-telemetry`
+    - Only with `compose.delegated-operators.yaml`
+    - In `EXECUTOR_SIDECAR=true` mode that watches the executor
+      for per-operation child processes and records per-operation metrics
+      back to the `delegated_ops` MongoDB document
+    - Additional workers (`teams-do-2`, `teams-do-3`)
+      - Opt-in via Compose profiles and each
+        get their own paired sidecar
+      - See
+        [Scaling teams-do with telemetry](#scaling-teams-do-with-telemetry)
+  - `teams-do-gpu-telemetry`
+    - Only with `compose.delegated-operators.gpu.yaml` and `--profile gpu`
+    - The sidecar reads GPU metrics via NVML and requires its own GPU
+      reservation.
+- Environment Variables
+  - `FIFTYONE_TELEMETRY_REDIS_URL` environment variable is set on these services
+    so the telemetry blueprint and server-sent events endpoints can read from Redis
+    - `fiftyone-app`
+    - `teams-api`
+    - `teams-app`
+    - `teams-plugins`
+    - (when the DO overlay is used) `teams-do`
 
-## Opt out
+## Opting out
 
 > [!IMPORTANT]
 > Disabling the telemetry sidecar leaves the FiftyOne UI's
-> delegated-operator log viewer empty — it depends on the sidecar to
-> capture per-operation logs.
+> delegated-operator log viewer empty.
+> The log viewer depends on the sidecar to capture per-operation logs.
 
-To run without telemetry, add a `compose.override.yaml` that scales the
-telemetry services to zero replicas:
+To run without telemetry
 
-```yaml
-services:
-  telemetry-redis:
-    deploy:
-      replicas: 0
-  fiftyone-app-telemetry:
-    deploy:
-      replicas: 0
-  teams-api-telemetry:
-    deploy:
-      replicas: 0
-  # Only needed when running the corresponding overlay:
-  teams-plugins-telemetry:
-    deploy:
-      replicas: 0
-  teams-do-telemetry:
-    deploy:
-      replicas: 0
-  # Additional delegated-operator slots only run with COMPOSE_PROFILES=do-2/do-3:
-  teams-do-2-telemetry:
-    deploy:
-      replicas: 0
-  teams-do-3-telemetry:
-    deploy:
-      replicas: 0
-```
+1. Add a `compose.override.yaml` that scales the
+   telemetry services to zero replicas:
 
-`docker compose -f compose.yaml -f compose.override.yaml up -d` starts
-the base services without the telemetry collector.
-The main containers still have `FIFTYONE_TELEMETRY_REDIS_URL` set, but
-the in-app agent gracefully no-ops when Redis is unreachable.
-
+    
 ### Scaling teams-do with telemetry
 
-docker-compose's `pid: "service:<name>"` only joins a single replica's
-PID namespace, so a single `teams-do` service scaled to N replicas
-would leave N-1 of them invisible to the sidecar.
-`compose.delegated-operators.yaml` instead declares three worker
-slots, each as its own Compose service with its own paired sidecar and
+Docker Compose's `pid: "service:<name>"` only joins a single replica's PID namespace.
+Thus single `teams-do` service scaled to `<N>` replicas
+would leave `<N-1>` of them invisible to the sidecar.
+Instead, `compose.delegated-operators.yaml` contains three worker
+slots as its own Compose service, paired service sidecar, and
 its own executor-socket volume:
 
-| Slot | Service       | Sidecar                 | Activation             |
-| ---- | ------------- | ----------------------- | ---------------------- |
-| 1    | `teams-do`    | `teams-do-telemetry`    | always on (no profile) |
-| 2    | `teams-do-2`  | `teams-do-2-telemetry`  | profile `do-2`, `do-3` |
-| 3    | `teams-do-3`  | `teams-do-3-telemetry`  | profile `do-3`         |
+| Slot | Service       | Sidecar                 | Activation               |
+| ---- | ------------- | ----------------------- | ------------------------ |
+| 1    | `teams-do`    | `teams-do-telemetry`    | always on (no profile)   |
+| 2    | `teams-do-2`  | `teams-do-2-telemetry`  | profile `do-2` or `do-3` |
+| 3    | `teams-do-3`  | `teams-do-3-telemetry`  | profile `do-3`           |
 
-The default (no profile) runs one observed worker. To add more,
-activate the matching Compose profile — `do-N` runs N workers because
-higher numbers include every lower slot:
+The default (no profile) runs one delegated operator worker. To add more,
+activate the matching Compose profile — `do-<N>` runs `<N>` workers because
+higher numbers include every prior slot:
 
 ```shell
 # 1 worker (default):
@@ -183,9 +184,9 @@ COMPOSE_PROFILES=do-3 docker compose -f compose.yaml \
 ```
 
 Set `COMPOSE_PROFILES` in your `.env` to persist the choice, or pass
-`--profile do-N` on the command line. Each worker registers under its
+`--profile do-<N>` on the command line. Each worker registers under its
 own orchestrator name (slot 2 as `teams-do-2`, slot 3 as `teams-do-3`)
-so they surface separately in Settings → Metrics.
+so they surface distinctly in Settings → Metrics.
 
 > [!IMPORTANT]
 > This replaces the previous `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`
@@ -195,14 +196,12 @@ so they surface separately in Settings → Metrics.
 > on the previous default, set `COMPOSE_PROFILES=do-3` to restore the
 > three-worker behavior (each worker now has its own sidecar).
 
-Additionally,
-
 > [!NOTE]
-> The cap of 3 is intentional. The value must not exceed your
+> The cap of 3 is intentional as the value must not exceed your
 > license's max concurrent delegated operators.
-> For more than 3 workers, the slot-2 and slot-3 blocks in
-> `compose.delegated-operators.yaml` are copy-paste templates:
-> duplicate them as `teams-do-4` / `teams-do-4-telemetry` (and so on),
+> For more than 3 workers, use the slot-3 blocks in
+> `compose.delegated-operators.yaml` as templates.
+> Duplicate them as `teams-do-4` / `teams-do-4-telemetry`,
 > bumping the service name, `pid: "service:teams-do-N"`, `POD_NAME`,
 > `-n teams-do-N`, and `telemetry-socket-N` volume on each copy.
 
@@ -242,8 +241,8 @@ All knobs live in your `.env` — see `env.template` for the full list:
 Telemetry containers ship with conservative CPU and memory limits sized so the
 sidecars do not starve the workloads they observe.
 The values are declared under each service's `deploy.resources` block
-in the compose files;
-compose v2 honors `cpus` and `memory` limits/reservations outside swarm
+in the Cpmpose files.
+Compose v2 honors `cpus` and `memory` limits and reservations outside swarm
 mode.
 
 | Service                       | CPU limit | Memory limit | Notes                               |
