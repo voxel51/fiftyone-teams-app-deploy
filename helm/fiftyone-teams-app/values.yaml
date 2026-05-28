@@ -1621,7 +1621,7 @@ teamsAppSettings:
   # -- Volumes for `teams-app` pods. [Reference][volumes].
   volumes: []
 
-# In-cluster telemetry. Renders a Redis Deployment + Service, a Role/RoleBinding
+# In-cluster telemetry. Renders a Redis Deployment, Service, a Role/RoleBinding
 # granting `pods/log` read access, and a `telemetry-sidecar` injected into the
 # `teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator workloads.
 telemetry:

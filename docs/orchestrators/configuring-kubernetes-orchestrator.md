@@ -467,18 +467,17 @@ fom.register_orchestrator(
 > FiftyOne UI's log viewer for delegated-operator runs — it depends on
 > the sidecar to capture per-operation logs.
 
-If your deployment runs telemetry (the helm chart and docker compose
-files include it by default), you can attach a per-Job telemetry
+If your deployment runs telemetry (the Helm chart includes 
+it by default), you can attach a per-Job telemetry
 sidecar to on-demand Kubernetes orchestrators as well.
 This emits per-operation metrics back to the same Redis backend so the
 Settings → Metrics page sees individual delegated runs.
 
-Use of a Kubernetes
+We use Kubernetes
 [native sidecar](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/)
-(an `initContainer` with `restartPolicy: Always`, requires Kubernetes
-1.29+).
-A regular sidecar container would block Job completion — the Job stays
-in `Running` until every container exits.
+(an `initContainer` with `restartPolicy: Always`).
+A regular sidecar container would block Job completion where the Job stays
+in `Running` status until every container exits.
 Native sidecars are auto-terminated by the kubelet when all non-sidecar
 containers complete, so the Job finalizes cleanly.
 
@@ -822,7 +821,7 @@ spec:
 ```
 
 The `telemetry-sidecar` init container above is optional.
-If you are not running telemetry, remove all of the following from the
+To opt out of running telemetry, remove all of the following from the
 template:
 
 - the `telemetry-sidecar` init container

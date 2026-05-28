@@ -150,7 +150,7 @@ FiftyOne Enterprise v2.19.0 adds observability features viewable by
 admins directly in the FiftyOne UI.
 These are powered by a `telemetry-sidecar` container injected into the
 `teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator
-workloads (and as a native init-sidecar on on-demand delegated-operator
+workloads (and as a native sidecar on on-demand delegated-operator
 `Job` pods), plus an in-cluster Redis `Deployment` + `Service` that
 buffers the streamed metrics and logs.
 
@@ -161,8 +161,8 @@ A default deploy adds four sidecars
 delegated-operator), so expect roughly **+400m CPU** and **+2 GiB
 memory** in additional resource usage, plus the bundled Redis (`250m`
 CPU / `512Mi` memory, request == limit) backed by an `emptyDir`.
-Tune via `telemetry.sidecar.resources` and `telemetry.redis.resources`;
-opt into a `PersistentVolumeClaim` with
+Tune via `telemetry.sidecar.resources` and `telemetry.redis.resources`.
+Opt into a `PersistentVolumeClaim` with
 `telemetry.redis.persistence.enabled: true`.
 
 ##### Cluster Requirements
@@ -205,7 +205,7 @@ telemetry:
 ```
 
 > [!IMPORTANT]
-> The sidecar powers the FiftyOne UI's delegated-operator log viewer.
+> The telemetry sidecars power the FiftyOne UI's delegated-operator log viewer.
 > Disabling telemetry (`telemetry.enabled: false`) will leave that log
 > viewer empty.
 
