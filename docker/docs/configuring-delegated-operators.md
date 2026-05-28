@@ -38,10 +38,10 @@ in conjunction with one of the three plugin configurations.
 > telemetry sidecar. Slot 1 is always on (the default renders one
 > observed worker); slots 2 and 3 are gated behind cumulative Compose
 > profiles (`do-2`, `do-3`). Set `COMPOSE_PROFILES=do-N` to add slots
-> up to N (cap of 3). This replaces the old
-> `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` env var, which is no
-> longer honored — if you relied on the pre-telemetry default of 3
-> workers, set `COMPOSE_PROFILES=do-3`. See
+> up to N (cap of 3). This replaces the deprecated
+> `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` environment variable.
+> If you used on the <2.19 default of 3 workers, set `COMPOSE_PROFILES=do-3`. 
+> See
 > [Scaling teams-do with telemetry](./configuring-telemetry.md#scaling-teams-do-with-telemetry)
 > for the slot/profile reference and the rationale.
 
