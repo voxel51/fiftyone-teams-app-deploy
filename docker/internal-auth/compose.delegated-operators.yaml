@@ -1,4 +1,6 @@
 ---
+# See docker/docs/configuring-telemetry.md for details on telemetry settings.
+#
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 services:
@@ -7,5 +9,159 @@ services:
       file: ../common-services.yaml
       service: teams-do-common
 
+  teams-do-telemetry:
+    extends:
+      file: ../common-services.yaml
+      service: teams-do-telemetry-common
+    depends_on:
+      teams-do:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+
+  # Slot 2 — included by the `do-2` and `do-3` profiles. Defined inline
+  # (rather than extending teams-do-common) so it can own its own
+  # executor-socket named volume; named volumes are shared by their
+  # volume name, so reusing `telemetry-socket` across slots would
+  # clobber the socket. `-n teams-do-2` registers this worker as a
+  # distinct orchestrator name so it surfaces separately in the
+  # Settings → Metrics UI.
+  teams-do-2:
+    image: voxel51/fiftyone-teams-cv-full:v2.19.0
+    profiles: ["do-2", "do-3"]
+    deploy:
+      replicas: 1
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote -m -n teams-do-2"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: false
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+    restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+      - telemetry-socket-2:/tmp/telemetry
+
+  teams-do-2-telemetry:
+    image: voxel51/telemetry-sidecar:v2.19.0
+    profiles: ["do-2", "do-3"]
+    pid: "service:teams-do-2"
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_PTRACE  # required for profiling metrics (sampled stacks via py-spy)
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POD_NAME: teams-do-2
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: delegated-operator
+      TARGET_NAME: ${TEAMS_DO_TARGET_NAME:-fiftyone delegated}
+      EXECUTOR_SIDECAR: "true"
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 512M
+        reservations:
+          cpus: "0.10"
+          memory: 512M
+    volumes:
+      - telemetry-socket-2:/tmp/telemetry
+    depends_on:
+      teams-do-2:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+    restart: always
+
+  # Slot 3 — included by the `do-3` profile. Mirror of slot 2 with its
+  # own socket volume and orchestrator name.
+  teams-do-3:
+    image: voxel51/fiftyone-teams-cv-full:v2.19.0
+    profiles: ["do-3"]
+    deploy:
+      replicas: 1
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote -m -n teams-do-3"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: false
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+    restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+      - telemetry-socket-3:/tmp/telemetry
+
+  teams-do-3-telemetry:
+    image: voxel51/telemetry-sidecar:v2.19.0
+    profiles: ["do-3"]
+    pid: "service:teams-do-3"
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_PTRACE  # required for profiling metrics (sampled stacks via py-spy)
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POD_NAME: teams-do-3
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: delegated-operator
+      TARGET_NAME: ${TEAMS_DO_TARGET_NAME:-fiftyone delegated}
+      EXECUTOR_SIDECAR: "true"
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 512M
+        reservations:
+          cpus: "0.10"
+          memory: 512M
+    volumes:
+      - telemetry-socket-3:/tmp/telemetry
+    depends_on:
+      teams-do-3:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+    restart: always
+
+# tmpfs-backed named volumes with uid/gid set at mount time so the
+# non-root sidecar can bind agent.sock without any init container.
+# Add new slots with `telemetry-socket-N: *telemetry-socket-spec`.
 volumes:
   plugins-vol:
+  telemetry-socket: &telemetry-socket-spec
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "uid=1000,gid=1000,mode=0755"
+  telemetry-socket-2: *telemetry-socket-spec
+  telemetry-socket-3: *telemetry-socket-spec

@@ -19,6 +19,10 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
+      - [Host Requirements](#host-requirements)
+      - [Opting out of Telemetry](#opting-out-of-telemetry)
+      - [Scaling delegated-operator workers](#scaling-delegated-operator-workers)
     - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
     - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.7+ Delegated Operator Changes](#fiftyone-enterprise-v27-delegated-operator-changes)
@@ -97,6 +101,108 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.19+ Telemetry Sidecars
+
+FiftyOne Enterprise v2.19.0 adds observability features viewable by
+admins directly in the FiftyOne UI.
+These are powered by a `telemetry-sidecar` service paired with each
+`fiftyone-app`, `teams-api`, `teams-plugins`, and `teams-do*` service,
+plus a `telemetry-redis` service that buffers the streamed metrics and
+logs.
+
+**Resource impact:**
+Each sidecar reserves `0.10` CPUs and `512M` memory
+(reservation == limit).
+A default deploy adds four sidecars
+(`fiftyone-app` + `teams-api` + `teams-plugins` + one `teams-do`), so
+expect roughly **+0.4 CPU** and **+2 GiB memory** in additional
+resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
+/ `256M` memory reservation, `0.25` / `512M` limits) and its
+`telemetry-redis-data` named volume.
+
+##### Host Requirements
+
+1. **Docker Compose v2.17+** for `depends_on.<svc>.restart: true`
+   semantics.
+   Older versions will see stale PID namespaces after a target
+   container is recreated.
+1. **Delegated-operator workers are scaled via [Compose profiles](https://docs.docker.com/compose/how-tos/profiles/)**
+   (`do-2`, `do-3`) rather than the deprecated
+   `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` env var, because
+   Compose's `pid: "service:<name>"` only joins a single replica.
+   Slot 1 (`teams-do`) is always on, and slots 2-3 each get their own
+   paired sidecar. See
+   [Scaling delegated-operator workers](#scaling-delegated-operator-workers)
+   below.
+1. **`teams-do` requires the **`SYS_PTRACE`** capability to allow the
+   telemetry agent to observe the target process.
+
+**External Redis:**
+To use an existing Redis instance instead of the bundled one by setting
+`FIFTYONE_TELEMETRY_REDIS_URL` in your `.env` to a fully-qualified URL
+(e.g. `redis://my-managed-redis.example.com:6379`) and scaling
+`telemetry-redis` to `replicas: 0` as below.
+
+##### Opting out of Telemetry
+
+Telemetry is enabled by default.
+To disable it, add a `compose.override.yaml` that scales the
+`telemetry-redis` and `*-telemetry` services to `replicas: 0`.
+See
+[`configuring-telemetry.md`](configuring-telemetry.md#opting-out)
+for the full override snippet.
+
+> [!IMPORTANT]
+> The sidecar powers the FiftyOne UI's delegated-operator log viewer.
+> Disabling telemetry will leave that log viewer empty.
+
+##### Scaling delegated-operator workers
+
+> [!WARNING]
+> **Breaking change.**
+> `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` is deprecated
+> in docker compose deployments — setting it has no effect.
+> The default rendered worker count drops from **3** (pre-2.19.0) to
+> **1** when you layer `compose.delegated-operators.yaml`.
+
+`compose.delegated-operators.yaml` now declares three worker slots,
+each paired with its own telemetry sidecar:
+
+| Slot | Service       | Activation             |
+| ---- | ------------- | ---------------------- |
+| 1    | `teams-do`    | always on (no profile) |
+| 2    | `teams-do-2`  | profile `do-2`, `do-3` |
+| 3    | `teams-do-3`  | profile `do-3`         |
+
+Set `COMPOSE_PROFILES=do-<N>` to add slots 2-3; profiles are nested so
+`do-3` includes slot 2.
+
+**To preserve the previous default of three workers**, set the
+following in your `.env`:
+
+```shell
+COMPOSE_PROFILES=do-3
+```
+
+If
+you previously set `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`,
+remove it from your `.env` and pick the matching `do-<N>` profile.
+For more than three, the slot-2/3 service blocks can be duplicated
+as `teams-do-4` / etc.
+(bump the service name, `pid`, `POD_NAME`, `-n`, and socket-volume
+name on each copy) — see the per-slot inline comments in
+`compose.delegated-operators.yaml`.
+
+Each worker now registers under its own orchestrator name (slot 2 as
+`teams-do-2`, slot 3 as `teams-do-3`) so they surface separately in
+Settings → Metrics. Resource impact scales linearly with the worker
+count: each additional slot adds ~0.2 CPU and ~1 GiB of memory
+(worker reservation + paired sidecar).
+
+See
+[`docker/docs/configuring-telemetry.md`](configuring-telemetry.md#scaling-teams-do-with-telemetry)
+for the full slot/profile reference.
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 

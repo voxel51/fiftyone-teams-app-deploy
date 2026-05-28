@@ -51,11 +51,19 @@ We will configure the
 [delegated operators](./configuring-delegated-operators.md)
 with GPUs.
 
-In your `compose.delegated-operators.yaml`, under `.services.teams-do`,
-add the `deploy.resource.reservation.devices` configuration.
+For most deployments, use the shipped GPU overlay
+`compose.delegated-operators.gpu.yaml`, which includes the GPU
+worker and its paired telemetry sidecar. Activate it alongside the CPU
+worker profile (e.g. `COMPOSE_PROFILES=do-1,gpu`); see
+[Configuring Telemetry](./configuring-telemetry.md#scaling-teams-do-with-telemetry)
+for the full profile reference.
 
-The below will deploy a CPU-based delegated operator (`teams-do`) as well
-as a GPU-based delegated operator (`teams-do-with-gpu`):
+The snippet below contains custom inline example of
+how to add a GPU-based delegated operator (`teams-do-with-gpu`)
+alongside the standard `teams-do`. Pair it with telemetry by
+adding a matching `teams-do-with-gpu-telemetry` sidecar. See
+`docker/<auth-dir>/compose.delegated-operators.gpu.yaml` for an
+example.
 
 ```yaml
 services:
@@ -81,7 +89,7 @@ services:
     volumes:
       - plugins-vol:/opt/plugins:ro
     deploy:
-      replicas: ${FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS:-3}
+      replicas: 1
       resources:
         reservations:
           devices:

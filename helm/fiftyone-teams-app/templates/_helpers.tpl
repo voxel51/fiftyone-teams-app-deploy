@@ -324,6 +324,11 @@ Create a merged list of environment variables for delegated-operator-executor
     secretKeyRef:
       name: {{ .secretName }}
       key: encryptionKey
+{{- if and .ctx .ctx.Values.telemetry.enabled }}
+{{- include "telemetry.redis-url-env" .ctx }}
+- name: TELEMETRY_SOCKET
+  value: /tmp/telemetry/agent.sock
+{{- end }}
 {{- range $key, $val := .env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -382,6 +387,7 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- include "telemetry.redis-url-env" . }}
 {{- range $key, $val := .Values.apiSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -427,6 +433,7 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
+{{- include "telemetry.redis-url-env" . }}
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -543,6 +550,7 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
+{{- include "telemetry.redis-url-env" . }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -594,6 +602,7 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- else }}
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
 {{- end }}
+{{- include "telemetry.redis-url-env" . }}
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

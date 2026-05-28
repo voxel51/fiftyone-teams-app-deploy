@@ -24,6 +24,7 @@ data:
       "apiServicePort" (float64 $.Values.apiSettings.service.port)
       "env" (merge (deepCopy ($jobConfig.env | default dict)) ($baseTpl.env))
       "secretEnv" (merge (deepCopy ($jobConfig.secretEnv | default dict)) ($baseTpl.secretEnv))
+      "ctx" $
   }}
 
   {{- /* label context for helpers. */ -}}
@@ -40,8 +41,26 @@ data:
   {{- $mergedPodSecurityContext := merge (deepCopy ($jobConfig.podSecurityContext | default dict)) ($baseTpl.podSecurityContext | default dict) }}
   {{- $mergedResources := merge (deepCopy ($jobConfig.resources | default dict)) ($baseTpl.resources) }}
   {{- $mergedTolerations := $jobConfig.tolerations | default $baseTpl.tolerations }}
-  {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts }}
-  {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes }}
+  {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts | default list }}
+  {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes | default list }}
+
+  {{- if $.Values.telemetry.enabled }}
+    {{- $hasSocketVolume := false }}
+    {{- range $vol := $mergedVolumes }}
+      {{- if eq $vol.name "telemetry-socket" }}{{- $hasSocketVolume = true }}{{- end }}
+    {{- end }}
+    {{- if not $hasSocketVolume }}
+      {{- $mergedVolumes = append $mergedVolumes (dict "name" "telemetry-socket" "emptyDir" dict) }}
+    {{- end }}
+    {{- $hasSocketMount := false }}
+    {{- range $vm := $mergedVolumeMounts }}
+      {{- if eq $vm.name "telemetry-socket" }}{{- $hasSocketMount = true }}{{- end }}
+    {{- end }}
+    {{- if not $hasSocketMount }}
+      {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+    {{- end }}
+  {{- end }}
+
   {{- /* Trunc at 48 for the random ID to be generated via API */ -}}
   {{- $metadataName := kebabcase $jobName | trunc 48 }}
 
@@ -87,6 +106,9 @@ data:
         spec:
           restartPolicy: {{ $jobConfig.restartPolicy | default $baseTpl.restartPolicy | default "Never" }}
           serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
+          {{- if $.Values.telemetry.enabled }}
+          shareProcessNamespace: true
+          {{- end }}
           {{- with $mergedPodSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
@@ -119,6 +141,10 @@ data:
               volumeMounts:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
+          {{- if $.Values.telemetry.enabled }}
+          initContainers:
+            {{- include "telemetry.native-sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true "targetContainer" "executor") | nindent 12 }}
+          {{- end }}
           {{- with $mergedNodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
