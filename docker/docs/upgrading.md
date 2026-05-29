@@ -104,7 +104,7 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.19+ Telemetry Sidecars
 
-FiftyOne Enterprise v2.19.1 adds observability features viewable by
+FiftyOne Enterprise v2.19.0 adds observability features viewable by
 admins directly in the FiftyOne UI.
 These are powered by a `telemetry-sidecar` service paired with each
 `fiftyone-app`, `teams-api`, `teams-plugins`, and `teams-do*` service,
