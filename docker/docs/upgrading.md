@@ -163,7 +163,7 @@ for the full override snippet.
 > **Breaking change.**
 > `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` is deprecated
 > in docker compose deployments — setting it has no effect.
-> The default rendered worker count drops from **3** (pre-2.19.1) to
+> The default rendered worker count drops from **3** (pre-2.19.0) to
 > **1** when you layer `compose.delegated-operators.yaml`.
 
 `compose.delegated-operators.yaml` now declares three worker slots,
