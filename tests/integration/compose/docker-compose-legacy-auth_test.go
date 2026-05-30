@@ -93,7 +93,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "motd.py",
+					log:              "FiftyOne Teams API starting up",
 				},
 				{
 					name:             "teams-app",
@@ -107,7 +107,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:3030/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "FiftyOne CAS starting up",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -130,7 +130,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "motd.py",
+					log:              "FiftyOne Teams API starting up",
 				},
 				{
 					name:             "teams-app",
@@ -144,7 +144,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:3030/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "FiftyOne CAS starting up",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -167,7 +167,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "motd.py",
+					log:              "FiftyOne Teams API starting up",
 				},
 				{
 					name:             "teams-app",
@@ -181,7 +181,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:3030/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "FiftyOne CAS starting up",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -211,7 +211,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "motd.py",
+					log:              "FiftyOne Teams API starting up",
 				},
 				{
 					name:             "teams-app",
@@ -225,7 +225,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:3030/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "FiftyOne CAS starting up",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{

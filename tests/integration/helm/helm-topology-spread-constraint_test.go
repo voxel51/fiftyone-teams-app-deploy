@@ -96,7 +96,7 @@ func (s *topologyAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/health", ""),
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "Starting worker",
+					log:              "FiftyOne Teams API starting up",
 				},
 				{
 					name:             "teams-app",
@@ -110,7 +110,7 @@ func (s *topologyAuthHelmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "FiftyOne CAS starting up",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
