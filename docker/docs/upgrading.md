@@ -104,7 +104,7 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.19+ Telemetry Sidecars
 
-FiftyOne Enterprise v2.20.0 adds observability features viewable by
+FiftyOne Enterprise v2.19.0 adds observability features viewable by
 admins directly in the FiftyOne UI.
 These are powered by a `telemetry-sidecar` service paired with each
 `fiftyone-app`, `teams-api`, `teams-plugins`, and `teams-do*` service,
@@ -163,7 +163,7 @@ for the full override snippet.
 > **Breaking change.**
 > `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS` is deprecated
 > in docker compose deployments — setting it has no effect.
-> The default rendered worker count drops from **3** (pre-2.20.0) to
+> The default rendered worker count drops from **3** (pre-2.19.0) to
 > **1** when you layer `compose.delegated-operators.yaml`.
 
 `compose.delegated-operators.yaml` now declares three worker slots,
