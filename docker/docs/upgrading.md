@@ -112,15 +112,18 @@ plus a `telemetry-redis` service that buffers the streamed metrics and
 logs.
 
 **Resource impact:**
-Each sidecar reserves `0.10` CPUs and `512M` memory, except the
-`teams-plugins` container which reserves 0.20 CPU. (reservation == limit).
-A default deploy (using `compose.yaml` rather than one of its variants) adds
-two sidecars
-(`fiftyone-app` + `teams-api`), so
-expect roughly **+0.2 CPU** and **+1 GiB memory** in additional
-resource usage, plus the bundled `telemetry-redis` service (`0.10` CPU
-/ `256M` memory reservation, `0.25` / `512M` limits) and its
-`telemetry-redis-data` named volume.
+By default the telemetry requires an additional `0.55` CPU and `1.5Gi` of
+resources used by:
+
+- `telemetry-sidecar` container
+  - `teams-api`: 0.1 CPU and 512 Mi memory
+  - `fiftyone-app`: 0.2 CPU and 512 Mi memory
+- Redis container
+  - 0.25 CPU and 512Mi memory
+
+The additional required resources depends of replica count for each
+deployment.
+The optional deployments may also increase this amount.
 
 ##### Host Requirements
 
