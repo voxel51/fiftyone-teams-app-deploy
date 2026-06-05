@@ -161,7 +161,16 @@ A default deploy adds three sidecars
 so expect roughly **+600m CPU** and **+1.5 GiB memory** in additional
 resource usage, plus the bundled Redis
 (`250m` CPU / `512Mi` memory, request == limit)
-backed by an `emptyDir`.
+By default the telemetry requires an additional `850m` CPU and `2Gi` of resources used by
+
+* `telemetry-sidecar` container
+  * `200m` CPU and `512Mi` memory per each replica of 
+    * `teams-api` x 1
+    * `fiftyone-app` x 2
+* Redis container
+  * `250m` CPU and `512Mi` memory
+
+The additional required resources depends of replica count for each deployment. The optional deployments may also increase this amount.
 Tune via `telemetry.sidecar.resources` and `telemetry.redis.resources`.
 Opt into a `PersistentVolumeClaim` with
 `telemetry.redis.persistence.enabled: true`.
