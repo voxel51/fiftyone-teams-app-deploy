@@ -4274,7 +4274,7 @@
                 "limits": {
                   "properties": {
                     "cpu": {
-                      "default": "100m",
+                      "default": "200m",
                       "title": "cpu",
                       "type": "string"
                     },
@@ -4291,7 +4291,7 @@
                 "requests": {
                   "properties": {
                     "cpu": {
-                      "default": "100m",
+                      "default": "200m",
                       "title": "cpu",
                       "type": "string"
                     },

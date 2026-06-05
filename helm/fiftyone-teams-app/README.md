@@ -1100,7 +1100,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.sidecar.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | telemetry.sidecar.image.repository | string | `"voxel51/telemetry-sidecar"` | Container image for `telemetry-sidecar`. |
 | telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to `Chart.AppVersion`. |
-| telemetry.sidecar.resources | object | `{"limits":{"cpu":"100m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests/limits for each `telemetry-sidecar` container. |
+| telemetry.sidecar.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"512Mi"}}` | Resource requests/limits for each `telemetry-sidecar` container. |
 
 <!-- markdownlint-enable MD060 -->
 
