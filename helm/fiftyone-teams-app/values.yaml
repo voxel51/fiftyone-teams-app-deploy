@@ -779,6 +779,17 @@ delegatedOperatorDeployments:
       #   cpu: 8
       #   memory: 16Gi
 
+    # GPU metrics auto-enable when this operator requests a GPU. Only set the
+    # options below if GPU charts stay empty while the operator uses the GPU.
+    telemetry:
+      sidecar:
+        # -- Extra sidecar env vars. Rarely set; GPU env is auto-configured.
+        env: {}
+        # -- Sidecar resource overrides. Only needed on GKE-style clusters where
+        # GPU charts stay empty: give the sidecar a GPU (enable GPU time-sharing
+        # so it shares the operator's GPU).
+        resources: {}
+
     # -- Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity].
     affinity: {}
     # -- nodeSelector for `delegated-operator-executor`. [Reference][node-selector].
@@ -898,6 +909,15 @@ delegatedOperatorDeployments:
     #       cpu: 8
     #       ephemeral-storage: 1Gi
     #       memory: 16Gi
+    #   # Only on GKE-style clusters where GPU charts stay empty: give the
+    #   # sidecar a GPU too (turn on GPU time-sharing first).
+    #   telemetry:
+    #     sidecar:
+    #       resources:
+    #         limits:
+    #           nvidia.com/gpu: 1
+    #         requests:
+    #           nvidia.com/gpu: 1
     #   volumes:
     #     - name: shm-vol
     #       emptyDir:

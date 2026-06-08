@@ -90,6 +90,8 @@ Inputs (dict):
   podName          — value for POD_NAME env var (defaults to fieldRef metadata.name)
   executor         — bool, when true emit EXECUTOR_SIDECAR=true and TELEMETRY_SOCKET env
   targetContainer  — when set, emit TARGET_CONTAINER env var (used by job sidecars)
+  sidecarEnv       — optional map of extra env vars to append (e.g. NVIDIA_* so a
+                     sidecar on a GPU node can read NVML/GPU metrics)
 */}}
 {{- define "telemetry.sidecar-env" -}}
 {{- $secretName := .ctx.Values.secret.name -}}
@@ -127,11 +129,17 @@ Inputs (dict):
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- range $name, $value := .sidecarEnv }}
+- name: {{ $name }}
+  value: {{ $value | quote }}
+{{- end }}
 {{- end }}
 
 {{/*
 A regular spec.containers entry: telemetry-sidecar for api/app/plugins/DO deployments.
-Inputs: same dict as telemetry.sidecar-env.
+Inputs: same dict as telemetry.sidecar-env, plus optional `sidecarResources` —
+when non-empty it replaces telemetry.sidecar.resources for this one sidecar
+(e.g. to request `nvidia.com/gpu` so the sidecar can read GPU metrics).
 */}}
 {{- define "telemetry.sidecar" -}}
 - name: telemetry-sidecar
@@ -139,7 +147,7 @@ Inputs: same dict as telemetry.sidecar-env.
   imagePullPolicy: {{ .ctx.Values.telemetry.sidecar.image.pullPolicy | default "Always" }}
   env:
     {{- include "telemetry.sidecar-env" . | nindent 4 }}
-  {{- with .ctx.Values.telemetry.sidecar.resources }}
+  {{- with (.sidecarResources | default .ctx.Values.telemetry.sidecar.resources) }}
   resources:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -175,7 +183,7 @@ would block Job completion.
   restartPolicy: Always
   env:
     {{- include "telemetry.sidecar-env" . | nindent 4 }}
-  {{- with .ctx.Values.telemetry.sidecar.resources }}
+  {{- with (.sidecarResources | default .ctx.Values.telemetry.sidecar.resources) }}
   resources:
     {{- toYaml . | nindent 4 }}
   {{- end }}

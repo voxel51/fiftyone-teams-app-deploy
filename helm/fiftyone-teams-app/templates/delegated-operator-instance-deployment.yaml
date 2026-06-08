@@ -16,6 +16,18 @@
 }}
 {{- $defaultDescription := printf "Long running operations delegated to %s" $name }}
 {{- $updateStrategy := merge (dict) ($v.updateStrategy|default dict) ($baseTpl.updateStrategy) }}
+{{- $mergedResources := merge (dict) ($v.resources | default dict) ($baseTpl.resources | default dict) }}
+{{- $sidecarOverride := (merge (dict) ($v.telemetry | default dict) ($baseTpl.telemetry | default dict)).sidecar | default dict }}
+{{- /* When the worker requests a GPU, expose it to the sidecar too so GPU
+       metrics are collected without any extra config. NVIDIA_VISIBLE_DEVICES is
+       honored where the NVIDIA runtime accepts it (most non-GKE setups); GKE
+       gates GPUs via the device plugin, so use telemetry.sidecar.resources there. */}}
+{{- $gpuRequested := or (not (empty (dig "limits" "nvidia.com/gpu" "" $mergedResources))) (not (empty (dig "requests" "nvidia.com/gpu" "" $mergedResources))) }}
+{{- $autoSidecarEnv := dict }}
+{{- if $gpuRequested }}
+{{- $autoSidecarEnv = dict "NVIDIA_VISIBLE_DEVICES" "all" "NVIDIA_DRIVER_CAPABILITIES" "utility" }}
+{{- end }}
+{{- $sidecarEnv := merge (dict) ($sidecarOverride.env | default dict) $autoSidecarEnv }}
 {{- $mergedVolumeMounts := $v.volumeMounts | default $baseTpl.volumeMounts | default list }}
 {{- $mergedVolumes := $v.volumes | default $baseTpl.volumes | default list }}
 {{- if $.Values.telemetry.enabled }}
@@ -99,7 +111,7 @@ spec:
           env:
             {{- include "delegated-operator-deployments.env-vars-list" $envContext | indent 12 }}
           resources:
-            {{- toYaml (merge (dict) ($v.resources | default dict) ($baseTpl.resources)) | nindent 12 }}
+            {{- toYaml $mergedResources | nindent 12 }}
           {{- with $mergedVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
@@ -132,7 +144,7 @@ spec:
             periodSeconds: {{ ($v.startup).periodSeconds | default $baseTpl.startup.periodSeconds }}
             timeoutSeconds: {{ ($v.startup).timeoutSeconds | default $baseTpl.startup.timeoutSeconds }}
         {{- if $.Values.telemetry.enabled }}
-        {{- include "telemetry.sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true) | nindent 8 }}
+        {{- include "telemetry.sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true "sidecarEnv" $sidecarEnv "sidecarResources" ($sidecarOverride.resources | default dict)) | nindent 8 }}
         {{- end }}
       {{- with (merge (dict) ($v.nodeSelector | default dict) ($baseTpl.nodeSelector)) }}
       nodeSelector:

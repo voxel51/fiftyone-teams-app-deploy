@@ -2288,6 +2288,33 @@
               "title": "startup",
               "type": "object"
             },
+            "telemetry": {
+              "description": "GPU metrics auto-enable when this operator requests a GPU. Only set the\noptions below if GPU charts stay empty while the operator uses the GPU.",
+              "properties": {
+                "sidecar": {
+                  "properties": {
+                    "env": {
+                      "description": "Extra sidecar env vars. Rarely set; GPU env is auto-configured.",
+                      "required": [],
+                      "title": "env",
+                      "type": "object"
+                    },
+                    "resources": {
+                      "description": "Sidecar resource overrides. Only needed on GKE-style clusters where\nGPU charts stay empty: give the sidecar a GPU (enable GPU time-sharing\nso it shares the operator's GPU).",
+                      "required": [],
+                      "title": "resources",
+                      "type": "object"
+                    }
+                  },
+                  "required": [],
+                  "title": "sidecar",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "telemetry",
+              "type": "object"
+            },
             "tolerations": {
               "description": "Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations].",
               "items": {
