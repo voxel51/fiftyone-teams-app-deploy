@@ -3550,7 +3550,7 @@
               "type": "string"
             },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
-              "default": "2.19.0",
+              "default": "2.20.0",
               "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==0.11.0`).",
               "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
               "type": "string"
@@ -4274,7 +4274,7 @@
                 "limits": {
                   "properties": {
                     "cpu": {
-                      "default": "100m",
+                      "default": "200m",
                       "title": "cpu",
                       "type": "string"
                     },
@@ -4291,7 +4291,7 @@
                 "requests": {
                   "properties": {
                     "cpu": {
-                      "default": "100m",
+                      "default": "200m",
                       "title": "cpu",
                       "type": "string"
                     },

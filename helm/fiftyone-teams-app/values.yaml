@@ -1425,7 +1425,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.19.0
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.20.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
@@ -1699,10 +1699,10 @@ telemetry:
     # -- Resource requests/limits for each `telemetry-sidecar` container.
     resources:
       requests:
-        cpu: 100m
+        cpu: 200m
         memory: 512Mi
       limits:
-        cpu: 100m
+        cpu: 200m
         memory: 512Mi
   # -- ServiceAccount names (in `namespace.name`) bound to the telemetry
   # pod-logs Role. When empty, the RoleBinding binds the chart's main app
