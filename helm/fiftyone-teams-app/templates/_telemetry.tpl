@@ -137,9 +137,7 @@ Inputs (dict):
 
 {{/*
 A regular spec.containers entry: telemetry-sidecar for api/app/plugins/DO deployments.
-Inputs: same dict as telemetry.sidecar-env, plus optional `sidecarResources` —
-when non-empty it replaces telemetry.sidecar.resources for this one sidecar
-(e.g. to request `nvidia.com/gpu` so the sidecar can read GPU metrics).
+Inputs: same dict as telemetry.sidecar-env.
 */}}
 {{- define "telemetry.sidecar" -}}
 - name: telemetry-sidecar
@@ -147,7 +145,7 @@ when non-empty it replaces telemetry.sidecar.resources for this one sidecar
   imagePullPolicy: {{ .ctx.Values.telemetry.sidecar.image.pullPolicy | default "Always" }}
   env:
     {{- include "telemetry.sidecar-env" . | nindent 4 }}
-  {{- with (.sidecarResources | default .ctx.Values.telemetry.sidecar.resources) }}
+  {{- with .ctx.Values.telemetry.sidecar.resources }}
   resources:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -183,7 +181,7 @@ would block Job completion.
   restartPolicy: Always
   env:
     {{- include "telemetry.sidecar-env" . | nindent 4 }}
-  {{- with (.sidecarResources | default .ctx.Values.telemetry.sidecar.resources) }}
+  {{- with .ctx.Values.telemetry.sidecar.resources }}
   resources:
     {{- toYaml . | nindent 4 }}
   {{- end }}
