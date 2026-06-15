@@ -1,5 +1,8 @@
 # Recommended Post-Installation Configuration
 
+<!-- toc -->
+<!-- tocstop -->
+
 After completing the base Helm installation, we recommend enabling the
 following features for a production-ready FiftyOne Enterprise deployment:
 
@@ -35,7 +38,7 @@ The examples below assume:
 
 By default, plugins run inside the `fiftyone-app` pod (built-in only mode).
 We recommend enabling **dedicated plugins mode**, which runs plugins in their
-own `teams-plugins` pod. This provides:
+own dedicated `teams-plugins` pod. This provides:
 
 - **Custom plugin support** — install plugins from the
   [FiftyOne Plugin Library](https://github.com/voxel51/fiftyone-plugins) or
@@ -72,14 +75,14 @@ Then apply the changes:
 
 ```bash
 helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
-  -f values.yaml \
-  -n <your-namespace>
+  --values values.yaml \
+  --namespace <your-namespace>
 ```
 
 Verify the `teams-plugins` pod is running:
 
 ```bash
-kubectl get pods -n <your-namespace> | grep teams-plugins
+kubectl get pods --namespace <your-namespace> | grep teams-plugins
 ```
 
 For more details, see
@@ -122,14 +125,14 @@ Then apply the changes:
 
 ```bash
 helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
-  -f values.yaml \
-  -n <your-namespace>
+  --values values.yaml \
+  --namespace <your-namespace>
 ```
 
 Verify the `teams-do` pod is running:
 
 ```bash
-kubectl get pods -n <your-namespace> | grep teams-do
+kubectl get pods --namespace <your-namespace> | grep teams-do
 ```
 
 For full configuration options, see
@@ -180,9 +183,9 @@ For full details, see
 
 ### Multiple Orchestrators
 
-For deployments with mixed workloads, you can register multiple delegated
-operator orchestrators — for example, one targeting GPU nodes and one
-targeting CPU nodes — and route specific operators to the appropriate
+For deployments with mixed workloads, you may register multiple delegated
+operator orchestrators. For example, one targeting GPU nodes and one
+targeting CPU nodes. You may run specific operators to the appropriate
 orchestrator from the FiftyOne UI.
 
 ```yaml
@@ -231,8 +234,8 @@ delegatedOperatorDeployments:
 > **Note:** The Helm chart's `delegatedOperatorJobTemplates.jobs` does not
 > currently support `priorityClassName` natively. To use Kubernetes
 > [PriorityClasses](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
-> with delegated operator jobs — for example, to prevent DO workloads from
-> contending with user-facing pods — define custom Jinja2 job templates via a
+> with delegated operator jobs (for example, to prevent DO workloads from
+> contending with user-facing pods), define custom Jinja2 job templates via a
 > ConfigMap and register them using the
 > [FiftyOne Management SDK](https://docs.voxel51.com/enterprise/management_sdk.html).
 
@@ -247,7 +250,7 @@ for details on custom job templates.
 After applying all changes, verify that all expected pods are running:
 
 ```bash
-kubectl get pods -n <your-namespace>
+kubectl get pods --namespace <your-namespace>
 ```
 
 You should see:
