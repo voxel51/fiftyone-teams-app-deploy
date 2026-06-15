@@ -4,8 +4,8 @@ After completing the base Helm installation, we strongly recommend enabling the
 following features for a production-ready FiftyOne Enterprise deployment:
 
 1. [Dedicated Plugins Mode](#dedicated-plugins-mode)
-2. [Delegated Operators](#delegated-operators)
-3. [GPU Workloads (Optional)](#gpu-workloads-optional)
+1. [Delegated Operators](#delegated-operators)
+1. [GPU Workloads (Optional)](#gpu-workloads-optional)
 
 The default installation uses **builtin-only plugins** and has **no delegated
 operator workers**. While this is sufficient to get started, it limits the
