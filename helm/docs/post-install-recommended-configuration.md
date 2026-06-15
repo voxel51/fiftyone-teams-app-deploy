@@ -9,7 +9,7 @@ following features for a production-ready FiftyOne Enterprise deployment:
 
 The default installation uses **built-in plugins** and has **no delegated
 operator workers**. While sufficient to get started, it limits the ability to
-install custom plugins and tasks (run long-running or compute-heavy) in the
+install custom plugins and run long-running or compute-heavy tasks in the
 background.
 
 > **Note:** Steps 1 and 2 require shared storage (a PersistentVolumeClaim).
