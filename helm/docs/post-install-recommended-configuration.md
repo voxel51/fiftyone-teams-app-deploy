@@ -1,6 +1,17 @@
 # Recommended Post-Installation Configuration
 
 <!-- toc -->
+
+- [Prerequisites: Shared Storage](#prerequisites-shared-storage)
+- [Dedicated Plugins Mode](#dedicated-plugins-mode)
+- [Delegated Operators](#delegated-operators)
+  - [On-Demand Delegated Operators](#on-demand-delegated-operators)
+- [GPU Workloads (Optional)](#gpu-workloads-optional)
+  - [Multiple Orchestrators](#multiple-orchestrators)
+- [Advanced: Custom Job Priorities](#advanced-custom-job-priorities)
+- [Verifying Your Setup](#verifying-your-setup)
+- [Getting Started with Plugins](#getting-started-with-plugins)
+
 <!-- tocstop -->
 
 After completing the base Helm installation, we recommend enabling the
