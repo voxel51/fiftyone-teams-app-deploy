@@ -467,7 +467,7 @@ The recommended upgrade path is:
    git pull origin main
    ```
 
-   This automatically populates the latest service versions.
+   > This automatically populates the latest service versions.
 
 1. Confirm `FIFTYONE_DATABASE_ADMIN` is set to `false` in your
    `compose.override.yaml`:
