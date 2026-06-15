@@ -436,8 +436,8 @@ Verify the deployment is working end-to-end by logging in as a regular user.
 
 ### :desktop_computer: GPU-Enabled Workloads
 
-FiftyOne services like Delegated Operators can be scheduled on **GPU-enabled
-hardware** for more efficient computation.
+FiftyOne services like Delegated Operators can be scheduled on
+**GPU-enabled hardware** for more efficient computation.
 
 To set up containers with GPU resources, see the
 [configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
