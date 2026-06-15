@@ -338,8 +338,9 @@ These proxies will:
 
 ### :open_file_folder: Nginx Configuration
 
-All services are routed based on URL path using a single hostname. See the full
-example configuration:
+All services are routed based on URL path using a
+single hostname via path based routing.
+See a full example configuration in
 [`example-nginx-path-routing.conf`](./example-nginx-path-routing.conf)
 
 ### :memo: Notes
