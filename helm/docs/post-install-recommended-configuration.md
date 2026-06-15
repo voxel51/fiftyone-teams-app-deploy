@@ -271,8 +271,9 @@ for orc in orc_svc.list():
 ## Getting Started with Plugins
 
 Once dedicated plugins are enabled, you can install community plugins from the
-[FiftyOne Plugin Library](https://github.com/voxel51/fiftyone-plugins) or
-the [FiftyOne Docs](https://docs.voxel51.com/plugins/index.html).
+[FiftyOne Plugin Library](https://github.com/voxel51/fiftyone-plugins)
+or the
+[FiftyOne Docs](https://docs.voxel51.com/plugins/index.html).
 
 We recommend starting with these plugins:
 
