@@ -267,10 +267,11 @@ services:
 
 ### 2. Launch the application
 
-FiftyOne Enterprise is deployed with **Dedicated Plugins** and **Delegated
-Operators** enabled by default. Dedicated Plugins run in an isolated
-`teams-plugins` container, and Delegated Operators offload plugin execution to
-**worker containers**, enabling scalable and reliable long-running operations.
+FiftyOne Enterprise is deployed with **Dedicated Plugins** and
+**Delegated Operators** enabled by default.
+Dedicated Plugins run in an isolated `teams-plugins` container.
+Delegated Operators offload plugin execution to **worker containers**,
+enabling scalable and reliable long-running operations.
 
 ```shell
 docker compose \
