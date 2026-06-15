@@ -35,21 +35,21 @@ regarding FiftyOne Enterprise.
 - [:white_check_mark: Technical Requirements](#white_check_mark-technical-requirements)
 - [:clock10: Estimated Completion Time](#clock10-estimated-completion-time)
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
-- [:wrench: Step 0: Set Up MongoDB Database](#wrench-step-0-set-up-mongodb-database)
-- [:closed_lock_with_key: Step 1: Prepare License File](#closed_lock_with_key-step-1-prepare-license-file)
-- [:gear: Step 2: Configure Environment](#gear-step-2-configure-environment)
+- [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-0-set-up-mongodb-database)
+- [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-1-prepare-license-file)
+- [:gear: Step 3: Configure Environment](#gear-step-2-configure-environment)
   - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
   - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
   - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
   - [:package: Official Docker Images](#package-official-docker-images)
-- [:rocket: Step 3: Initial Deployment](#rocket-step-3-initial-deployment)
+- [:rocket: Step 4: Initial Deployment](#rocket-step-3-initial-deployment)
   - [1. Enable Database Admin mode](#1-enable-database-admin-mode)
   - [2. Launch the application](#2-launch-the-application)
-- [:globe_with_meridians: Step 4: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-4-configure-ssl--reverse-proxy-nginx--load-balancer)
+- [:globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-4-configure-ssl--reverse-proxy-nginx--load-balancer)
   - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
   - [:open_file_folder: Nginx Configuration](#open_file_folder-nginx-configuration)
   - [:memo: Notes](#memo-notes)
-- [:page_facing_up: Step 5: Configure Delegated Operation Logs](#page_facing_up-step-5-configure-delegated-operation-logs)
+- [:page_facing_up: Step 6: Configure Delegated Operation Logs](#page_facing_up-step-5-configure-delegated-operation-logs)
 - [Step 6: Identity Provider (IdP) and Authentication (CAS) (Air Gapped Deployments Only)](#step-6-identity-provider-idp-and-authentication-cas-air-gapped-deployments-only)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
@@ -129,7 +129,7 @@ the applications.
 Resource usage varies dramatically with operations, use cases,
 and dataset sizes.
 
-## :wrench: Step 0: Set Up MongoDB Database
+## :wrench: Step 1: Set Up MongoDB Database
 
 Before deploying FiftyOne Enterprise, you must have a running MongoDB database.
 FiftyOne Enterprise supports:
@@ -149,7 +149,7 @@ The URI follows this format:
 FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin"
 ```
 
-## :closed_lock_with_key: Step 1: Prepare License File
+## :closed_lock_with_key: Step 2: Prepare License File
 
 > Required for **v2.0+**
 
@@ -172,7 +172,7 @@ chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
-## :gear: Step 2: Configure Environment
+## :gear: Step 3: Configure Environment
 
 Navigate into the `internal-auth` directory:
 
@@ -250,7 +250,7 @@ services:
 > Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
 > Omitting the tag will result in a **not found** error.
 
-## :rocket: Step 3: Initial Deployment
+## :rocket: Step 4: Initial Deployment
 
 ### 1. Enable Database Admin mode
 
