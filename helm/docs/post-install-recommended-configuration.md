@@ -1,16 +1,16 @@
 # Recommended Post-Installation Configuration
 
-After completing the base Helm installation, we strongly recommend enabling the
+After completing the base Helm installation, we recommend enabling the
 following features for a production-ready FiftyOne Enterprise deployment:
 
 1. [Dedicated Plugins Mode](#dedicated-plugins-mode)
 1. [Delegated Operators](#delegated-operators)
 1. [GPU Workloads (Optional)](#gpu-workloads-optional)
 
-The default installation uses **builtin-only plugins** and has **no delegated
-operator workers**. While this is sufficient to get started, it limits the
-ability to install custom plugins and run long-running or compute-heavy tasks
-in the background.
+The default installation uses **built-in plugins** and has **no delegated
+operator workers**. While sufficient to get started, it limits the ability to
+install custom plugins and tasks (run long-running or compute-heavy) in the
+background.
 
 > **Note:** Steps 1 and 2 require shared storage (a PersistentVolumeClaim).
 > See [Prerequisites](#prerequisites-shared-storage) before proceeding.
@@ -35,7 +35,7 @@ The examples below assume:
 
 ## Dedicated Plugins Mode
 
-By default, plugins run inside the `fiftyone-app` pod (builtin-only mode).
+By default, plugins run inside the `fiftyone-app` pod (built-in only mode).
 We recommend enabling **dedicated plugins mode**, which runs plugins in their
 own `teams-plugins` pod. This provides:
 
@@ -51,7 +51,7 @@ There are three plugin modes available:
 
 | Mode | Description |
 | --- | --- |
-| Builtin Only (default) | Only builtin plugins shipped with FiftyOne Enterprise |
+| Built-in Only (default) | Only built-in plugins shipped with FiftyOne Enterprise |
 | Shared | Custom plugins run inside `fiftyone-app` — may starve the app |
 | **Dedicated (recommended)** | Custom plugins run in a dedicated `teams-plugins` pod |
 
@@ -96,9 +96,9 @@ computing embeddings, running model evaluations, importing datasets, or
 annotation workflows — to be scheduled from the FiftyOne UI and executed in
 the background on dedicated compute workers.
 
-> **Note:** If you are using builtin-only plugin mode, omit the PVC volume
+> **Note:** If you are using built-in only plugin mode, omit the PVC volume
 > mount from the configuration below. The `teamsDo` pod will only be able to
-> execute builtin operators.
+> execute built-in operators.
 
 To enable delegated operators with dedicated plugins, add the following to
 your `values.yaml`:
@@ -212,7 +212,7 @@ delegatedOperatorDeployments:
         - name: plugins-vol
           mountPath: /opt/plugins
 
-    teamsDocpu:
+    teamsDoCpu:
       replicaCount: 2
       env:
         FIFTYONE_PLUGINS_DIR: /opt/plugins
@@ -276,7 +276,7 @@ Once dedicated plugins are enabled, you can install community plugins from the
 [FiftyOne Plugin Library](https://github.com/voxel51/fiftyone-plugins) or
 the [FiftyOne Docs](https://docs.voxel51.com/plugins/index.html).
 
-Some recommended plugins to get started:
+We recommend starting with these plugins:
 
 - [`@voxel51/brain`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/brain)
   — compute embeddings and similarity indexes
@@ -287,6 +287,5 @@ Some recommended plugins to get started:
 - [`@voxel51/zoo`](https://github.com/voxel51/fiftyone-plugins/tree/main/plugins/zoo)
   — access the FiftyOne Model Zoo
 
-To use plugins with custom dependencies (e.g. `torch`, `transformers`), build
-and use
+To use plugins with custom dependencies (e.g. `transformers`), build and use
 [Custom Plugin Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
