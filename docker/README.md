@@ -481,9 +481,9 @@ The recommended upgrade path is:
    > This prevents automatic database migrations from running on startup and
    > breaking active SDK sessions.
 
-1. If you are using [Custom Plugin Images](#bricks-custom-plugin-images),
-   rebuild them using the updated base image version, then update their tags
-   in `compose.override.yaml` to match the new release.
+1. When using [Custom Plugin Images](#bricks-custom-plugin-images),
+   rebuild them using the updated base image version.
+   Update their tags in `compose.override.yaml` to match the new release.
 
 1. Bring the stack down and back up:
 
