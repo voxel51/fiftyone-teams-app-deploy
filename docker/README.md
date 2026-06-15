@@ -141,9 +141,9 @@ FiftyOne Enterprise supports:
 Ensure your MongoDB version meets FiftyOne's
 [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
 
-Once your database is running, record your MongoDB connection URI. You will
-need it in Step 2 when configuring your `.env` file. The URI follows this
-format:
+Once your database is running, record your MongoDB connection URI.
+You will need it in Step 2 when configuring your `.env` file.
+The URI follows this format:
 
 ```dotenv
 FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin"
