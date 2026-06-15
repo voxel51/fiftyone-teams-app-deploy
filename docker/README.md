@@ -443,9 +443,9 @@ To set up containers with GPU resources, see the
 ### :bricks: Custom Plugin Images
 
 If your delegated operators or plugins require **custom dependencies**, build
-and deploy **custom plugin images**. Base them on
-`voxel51/fiftyone-teams-cv-full`, which includes a full CV/ML environment, and
-extend with:
+and deploy **custom plugin images**.
+Use `voxel51/fiftyone-teams-cv-full` as the base image
+(that includes a full CV/ML environment), and extend with:
 
 - Custom Python packages
 - Internal SDKs or models
