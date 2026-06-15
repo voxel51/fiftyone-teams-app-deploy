@@ -428,7 +428,7 @@ v1.6. This enables centralized login, roles, and user management.
 
 Verify the deployment is working end-to-end by logging in as a regular user.
 
-1. Open `https://<ENVIRONMENT>.fiftyone.ai` in a browser.
+1. In a browser, open `https://<ENVIRONMENT>.fiftyone.ai`.
 1. Log in with the admin user credentials you created in Step 7.
 1. Confirm you are redirected to the FiftyOne Enterprise home page.
 
