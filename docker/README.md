@@ -452,8 +452,9 @@ Use `voxel51/fiftyone-teams-cv-full` as the base image
 
 ### :on: On-Demand Delegated Operator Executors
 
-FiftyOne Enterprise v2.11 introduces support for on-demand delegated operator
-executors for Databricks and Anyscale. Please refer to the
+FiftyOne Enterprise v2.11 introduces support for on-demand
+delegated operator executors for Databricks and Anyscale.
+Please refer to the
 [configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 
 ## Upgrades
