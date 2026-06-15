@@ -3,6 +3,7 @@
 After completing the base Helm installation, we recommend enabling the
 following features for a production-ready FiftyOne Enterprise deployment:
 
+1. [Prerequisites](#prerequisites-shared-storage)
 1. [Dedicated Plugins Mode](#dedicated-plugins-mode)
 1. [Delegated Operators](#delegated-operators)
 1. [GPU Workloads (Optional)](#gpu-workloads-optional)
@@ -11,9 +12,6 @@ The default installation uses **built-in plugins** and has **no delegated
 operator workers**. While sufficient to get started, it limits the ability to
 install custom plugins and run long-running or compute-heavy tasks in the
 background.
-
-> **Note:** Steps 1 and 2 require shared storage (a PersistentVolumeClaim).
-> See [Prerequisites](#prerequisites-shared-storage) before proceeding.
 
 ---
 
@@ -45,7 +43,7 @@ own `teams-plugins` pod. This provides:
 - **Resource isolation** — plugin workloads do not affect `fiftyone-app`
   stability or performance
 - **Custom dependency support** — plugins with heavy ML dependencies (e.g.
-  `torch`, `transformers`) are isolated from the main app
+  `transformers`) are isolated from the main app
 
 There are three plugin modes available:
 
