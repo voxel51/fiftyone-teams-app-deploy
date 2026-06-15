@@ -405,10 +405,10 @@ v1.6. This enables centralized login, roles, and user management.
 
 ## Step 7: Initial CAS Setup
 
-Log into the CAS Super Admin UI at
-`https://<ENVIRONMENT>.fiftyone.ai/cas/configurations`. When prompted, enter
-the value of `FIFTYONE_AUTH_SECRET` from your `.env` file in the **API Key**
-field.
+1. Navigate to the CAS Super Admin UI at
+  `https://<ENVIRONMENT>.fiftyone.ai/cas/configurations`.
+1. In the **API Key** field (upper right corner), enter the
+   value of `FIFTYONE_AUTH_SECRET` (from your `.env` file)
 
 ### Add First Admin User
 
