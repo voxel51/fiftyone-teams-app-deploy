@@ -283,10 +283,10 @@ FiftyOne Enterprise installation at the DNS address you created
 
 ## Recommended Next Steps
 
-The base `helm install` above starts FiftyOne Enterprise with **built-in only
-plugins** and **no delegated operator workers**. While sufficient to get
-started, we recommend enabling the following features for a production-ready
-deployment:
+The base `helm install` above starts FiftyOne Enterprise with
+**built-in only plugins** and **no delegated operator workers**.
+While sufficient to get started, we recommend enabling
+the following features for a production-ready deployment:
 
 | Step | What it enables |
 | --- | --- |

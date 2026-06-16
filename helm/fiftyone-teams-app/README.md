@@ -343,10 +343,10 @@ A minimal example `values.yaml` may be found
 
 ## Recommended Next Steps
 
-The base installation enables FiftyOne Enterprise with built-in plugins only
-and no delegated operator workers. For a production-ready deployment, we
-recommend enabling **dedicated plugins** and **delegated operators** after
-completing the install above.
+The base installation enables FiftyOne Enterprise with
+**built-in only plugins** and **no delegated operator workers**.
+For a production-ready deployment, we recommend enabling **dedicated plugins**
+and **delegated operators** after completing the install above.
 
 See [Recommended Post-Installation Configuration](../docs/post-install-recommended-configuration.md)
 for step-by-step instructions.

@@ -22,10 +22,10 @@ following features for a production-ready FiftyOne Enterprise deployment:
 1. [Delegated Operators](#delegated-operators)
 1. [GPU Workloads (Optional)](#gpu-workloads-optional)
 
-The default installation uses **built-in plugins** and has **no delegated
-operator workers**. While sufficient to get started, it limits the ability to
-install custom plugins and run long-running or compute-heavy tasks in the
-background.
+The default installation uses **built-in plugins** and
+has **no delegated operator workers**.
+While sufficient to get started, it limits the ability to install custom
+plugins and run long-running or compute-heavy tasks in the background.
 
 ---
 
@@ -103,9 +103,9 @@ For more details, see
 
 ## Delegated Operators
 
-Delegated operators allow long-running or compute-heavy tasks — such as
+Delegated operators allow long-running or compute-heavy tasks (such as
 computing embeddings, running model evaluations, importing datasets, or
-annotation workflows — to be scheduled from the FiftyOne UI and executed in
+annotation workflows) to be scheduled from the FiftyOne UI and executed in
 the background on dedicated compute workers.
 
 > **Note:** If you are using built-in only plugin mode, omit the PVC volume
@@ -153,8 +153,8 @@ For full configuration options, see
 
 As an alternative to always-on workers, FiftyOne Enterprise v2.11.0+ supports
 **on-demand delegated operators** that spin up compute pods only when a job is
-scheduled, and tear them down when complete. This is more cost-efficient for
-infrequent or GPU-intensive workloads.
+scheduled, and tear them down when complete.
+This is more cost-efficient for infrequent or GPU-intensive workloads.
 
 See
 [Configuring On-Demand Orchestrator](../../docs/configuring-on-demand-orchestrator.md)
@@ -194,9 +194,10 @@ For full details, see
 
 ### Multiple Orchestrators
 
-For deployments with mixed workloads, you may register multiple delegated
-operator orchestrators. For example, one targeting GPU nodes and one
-targeting CPU nodes. You may run specific operators to the appropriate
+For deployments with mixed workloads, you may
+register multiple delegated operator orchestrators.
+For example, one targeting GPU nodes and one targeting CPU nodes.
+You may run specific operators to the appropriate
 orchestrator from the FiftyOne UI.
 
 ```yaml
@@ -243,7 +244,8 @@ delegatedOperatorDeployments:
 ## Advanced: Custom Job Priorities
 
 > **Note:** The Helm chart's `delegatedOperatorJobTemplates.jobs` does not
-> currently support `priorityClassName` natively. To use Kubernetes
+> currently support `priorityClassName` natively.
+> To use Kubernetes
 > [PriorityClasses](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
 > with delegated operator jobs (for example, to prevent DO workloads from
 > contending with user-facing pods), define custom Jinja2 job templates via a
