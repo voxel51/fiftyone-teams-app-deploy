@@ -108,10 +108,6 @@ computing embeddings, running model evaluations, importing datasets, or
 annotation workflows) to be scheduled from the FiftyOne UI and executed in
 the background on dedicated compute workers.
 
-> **Note:** If you are using built-in only plugin mode, omit the PVC volume
-> mount from the configuration below. The `teamsDo` pod will only be able to
-> execute built-in operators.
-
 To enable delegated operators with dedicated plugins, add the following to
 your `values.yaml`:
 
