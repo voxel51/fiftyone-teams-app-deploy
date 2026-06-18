@@ -320,6 +320,8 @@ curl -Iv http://localhost:3000/api/hello
 # Expected: HTTP/1.1 200 OK
 ```
 
+For a full health assessment, see [Basic Health Assessment](#basic-health-assessment).
+
 ## :globe_with_meridians: Step 6: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
 
 Next, you will need to place a **reverse proxy or SSL endpoint** in front of
