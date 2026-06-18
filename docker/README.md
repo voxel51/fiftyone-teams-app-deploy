@@ -464,6 +464,14 @@ Use `voxel51/fiftyone-teams-cv-full` as the base image
 - Custom Python packages
 - Internal SDKs or models
 
+Once built, reference your custom image in `compose.override.yaml`:
+
+```yaml
+services:
+  teams-do:
+    image: fiftyone-cv-full-custom:v2.19.0
+```
+
 ### :on: On-Demand Delegated Operator Executors
 
 FiftyOne Enterprise v2.11 introduces support for on-demand
