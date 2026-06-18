@@ -440,7 +440,8 @@ v1.6. This enables centralized login, roles, and user management.
 Verify the deployment's IDP setup by logging in as a regular user.
 
 1. In a browser, open `https://<ENVIRONMENT>.fiftyone.ai`.
-1. Log in with the user credentials of the admin you created in the CAS Super Admin UI.
+1. Log in with the user credentials of the admin
+   you created in the CAS Super Admin UI.
 1. Confirm you are redirected to the FiftyOne Enterprise home page.
 
 ## Advanced DO Settings
