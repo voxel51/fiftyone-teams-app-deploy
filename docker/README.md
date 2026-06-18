@@ -35,28 +35,29 @@ regarding FiftyOne Enterprise.
 - [:white_check_mark: Technical Requirements](#white_check_mark-technical-requirements)
 - [:clock10: Estimated Completion Time](#clock10-estimated-completion-time)
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
-- [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-0-set-up-mongodb-database)
-- [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-1-prepare-license-file)
-- [:gear: Step 3: Configure Environment](#gear-step-2-configure-environment)
+- [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-1-set-up-mongodb-database)
+- [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-2-prepare-license-file)
+- [:file_folder: Step 3: Choose Authentication Mode](#file_folder-step-3-choose-authentication-mode)
+- [:gear: Step 4: Configure Environment](#gear-step-4-configure-environment)
   - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
   - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
   - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
   - [:package: Official Docker Images](#package-official-docker-images)
-- [:rocket: Step 4: Initial Deployment](#rocket-step-3-initial-deployment)
+- [:rocket: Step 5: Initial Deployment](#rocket-step-5-initial-deployment)
   - [1. Enable Database Admin mode](#1-enable-database-admin-mode)
   - [2. Launch the application](#2-launch-the-application)
-- [:globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-4-configure-ssl--reverse-proxy-nginx--load-balancer)
+- [:globe_with_meridians: Step 6: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-6-configure-ssl--reverse-proxy-nginx--load-balancer)
   - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
   - [:open_file_folder: Nginx Configuration](#open_file_folder-nginx-configuration)
   - [:memo: Notes](#memo-notes)
-- [:page_facing_up: Step 6: Configure Delegated Operation Logs](#page_facing_up-step-5-configure-delegated-operation-logs)
-- [Step 6: Identity Provider (IdP) and Authentication (CAS) (Air Gapped Deployments Only)](#step-6-identity-provider-idp-and-authentication-cas-air-gapped-deployments-only)
+- [:page_facing_up: Step 7: Configure Delegated Operation Logs](#page_facing_up-step-7-configure-delegated-operation-logs)
+- [Step 8: Identity Provider (IdP) and Authentication (CAS)](#step-8-identity-provider-idp-and-authentication-cas)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
-- [Step 7: Initial CAS Setup](#step-7-initial-cas-setup)
+- [Step 9: Initial CAS Setup](#step-9-initial-cas-setup)
   - [Add First Admin User](#add-first-admin-user)
   - [Enable Auto Join](#enable-auto-join)
-- [Step 8: Test End User Login](#step-8-test-end-user-login)
+- [Step 10: Test End User Login](#step-10-test-end-user-login)
 - [Advanced DO Settings](#advanced-do-settings)
   - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
@@ -140,9 +141,10 @@ FiftyOne Enterprise supports:
 
 Ensure your MongoDB version meets FiftyOne's
 [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+MongoDB 8.0+ is recommended.
 
 Once your database is running, record your MongoDB connection URI.
-You will need it in Step 2 when configuring your `.env` file.
+You will need it in Step 4 when configuring your `.env` file.
 The URI follows this format:
 
 ```dotenv
@@ -172,13 +174,23 @@ chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
-## :gear: Step 3: Configure Environment
+## :file_folder: Step 3: Choose Authentication Mode
 
-Navigate into the `internal-auth` directory:
+FiftyOne Enterprise supports two authentication modes.
+Choose the one that matches your deployment:
+
+| Mode            | Use when                                                                                |
+|-----------------|-----------------------------------------------------------------------------------------|
+| `internal-auth` | All air-gapped deployments, OR standard deployments using an **OIDC** Identity Provider |
+| `legacy-auth`   | Standard deployments using a **SAML** Identity Provider                                 |
+
+Navigate into the appropriate directory:
 
 ```bash
-cd internal-auth
+cd internal-auth  # or legacy-auth
 ```
+
+## :gear: Step 4: Configure Environment
 
 ### 1. Copy the template `.env` file
 
@@ -250,7 +262,7 @@ services:
 > Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
 > Omitting the tag will result in a **not found** error.
 
-## :rocket: Step 4: Initial Deployment
+## :rocket: Step 5: Initial Deployment
 
 ### 1. Enable Database Admin mode
 
@@ -308,7 +320,7 @@ curl -Iv http://localhost:3000/api/hello
 # Expected: HTTP/1.1 200 OK
 ```
 
-## :globe_with_meridians: Step 4: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
+## :globe_with_meridians: Step 6: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
 
 Next, you will need to place a **reverse proxy or SSL endpoint** in front of
 your FiftyOne Enterprise services. This can be a tool like:
@@ -352,7 +364,7 @@ See a full example configuration in
 - To validate your deployments api connection, see
   [Validating Your Deployment](../docs/validating-deployment.md)
 
-## :page_facing_up: Step 5: Configure Delegated Operation Logs
+## :page_facing_up: Step 7: Configure Delegated Operation Logs
 
 Add the log path for delegated operation runs to your `compose.override.yaml`:
 
@@ -372,8 +384,7 @@ Logs are stored in the format:
 This is useful for auditing, debugging, or monitoring delegated operator
 executions in shared storage or cloud buckets.
 
-<!-- markdownlint-disable-next-line MD013 -->
-## Step 6: Identity Provider (IdP) and Authentication (CAS) (Air Gapped Deployments Only)
+## Step 8: Identity Provider (IdP) and Authentication (CAS)
 
 ### :information_source: IdP configuration
 
@@ -403,7 +414,7 @@ v1.6. This enables centralized login, roles, and user management.
    to bring up services.
 1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
 
-## Step 7: Initial CAS Setup
+## Step 9: Initial CAS Setup
 
 1. Navigate to the CAS Super Admin UI at
   `https://<ENVIRONMENT>.fiftyone.ai/cas/configurations`.
@@ -424,13 +435,12 @@ v1.6. This enables centralized login, roles, and user management.
 1. Select **Allow auto join**.
 1. Select **Save**.
 
-## Step 8: Test End User Login
+## Step 10: Test End User Login
 
-Verify the deployment is working end-to-end by logging in as a regular user.
+Verify the deployment's IDP setup by logging in as a regular user.
 
 1. In a browser, open `https://<ENVIRONMENT>.fiftyone.ai`.
-1. Log in with the user credentials of the admin
-   you created in the CAS Super Admin UI
+1. Log in with the user credentials of the admin you created in the CAS Super Admin UI.
 1. Confirm you are redirected to the FiftyOne Enterprise home page.
 
 ## Advanced DO Settings
@@ -489,7 +499,7 @@ The recommended upgrade path is:
    rebuild them using the updated base image version.
    Update their tags in `compose.override.yaml` to match the new release.
 
-1. Bring the stack down and back up:
+1. Bring the compose stack down:
 
    ```shell
    docker compose \
@@ -497,7 +507,11 @@ The recommended upgrade path is:
      -f compose.delegated-operators.yaml \
      -f compose.override.yaml \
      down
+   ```
 
+1. Bring the new stack up:
+
+   ```shell
    docker compose \
      -f compose.dedicated-plugins.yaml \
      -f compose.delegated-operators.yaml \
