@@ -714,18 +714,18 @@ docker compose ps --format "table {{.Name}}\t{{.Service}}\t{{.RunningFor}}\t{{.S
 Expected output for a healthy deployment:
 
 ```shell
-NAME                      SERVICE         CREATED        STATUS
-compose-fiftyone-app-1    fiftyone-app    15 hours ago   Up 15 hours
-compose-fiftyone-app-2    fiftyone-app    15 hours ago   Up 15 hours
-compose-fiftyone-app-3    fiftyone-app    15 hours ago   Up 15 hours
-compose-teams-api-1       teams-api       15 hours ago   Up 15 hours
-compose-teams-api-2       teams-api       15 hours ago   Up 15 hours
-compose-teams-api-3       teams-api       15 hours ago   Up 15 hours
-compose-teams-app-1       teams-app       15 hours ago   Up 15 hours
-compose-teams-cas-1       teams-cas       15 hours ago   Up 15 hours
-compose-teams-do-1        teams-do        15 hours ago   Up 15 hours
-compose-teams-do-2        teams-do        15 hours ago   Up 15 hours
-compose-teams-plugins-1   teams-plugins   15 hours ago   Up 15 hours
+NAME                              SERVICE                   CREATED       STATUS
+compose-fiftyone-app-1            fiftyone-app              2 weeks ago   Up 2 weeks
+compose-fiftyone-app-telemetry-1  fiftyone-app-telemetry    2 weeks ago   Up 2 weeks
+compose-teams-api-1               teams-api                 2 weeks ago   Up 2 weeks
+compose-teams-api-telemetry-1     teams-api-telemetry       2 weeks ago   Up 2 weeks
+compose-teams-app-1               teams-app                 2 weeks ago   Up 2 weeks
+compose-teams-cas-1               teams-cas                 2 weeks ago   Up 2 weeks
+compose-teams-do-1                teams-do                  2 weeks ago   Up 2 weeks
+compose-teams-do-telemetry-1      teams-do-telemetry        2 weeks ago   Up 2 weeks
+compose-teams-plugins-1           teams-plugins             2 weeks ago   Up 2 weeks
+compose-teams-plugins-telemetry-1 teams-plugins-telemetry   2 weeks ago   Up 2 weeks
+compose-telemetry-redis-1         telemetry-redis           2 weeks ago   Up 2 weeks
 ```
 
 Note that number of containers and containers names may vary per deployment.
