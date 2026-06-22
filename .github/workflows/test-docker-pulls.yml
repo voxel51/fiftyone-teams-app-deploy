@@ -22,10 +22,10 @@ jobs:
   docker-pulls:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6.2.0
       - name: Checkout voxel51/aloha-github-workflows
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: voxel51/aloha-github-workflows
           ref: main
