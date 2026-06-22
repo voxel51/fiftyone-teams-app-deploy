@@ -4,6 +4,16 @@
         apiSettings.replicaCount will be set to 1 for this deployment.  Please see
         https://helm.fiftyone.ai for details.
 {{ end }}
+{{- if and .Values.telemetry.enabled (not .Values.telemetry.rbac.create) }}
+[WARN]  Telemetry is enabled but `telemetry.rbac.create` is false, so the chart
+        is NOT creating the Role/RoleBinding that grants the sidecar `pods/log`
+        access. On Kubernetes the sidecar tails container logs via the pods/log
+        API, so unless you have separately provisioned a Role/RoleBinding
+        granting `pods/log` to the sidecar's service account (or pointed
+        `telemetry.serviceAccounts` at an account that already has it), the
+        delegated-operator log viewer will be empty. The Settings → Metrics
+        dashboard is unaffected. See https://helm.fiftyone.ai for details.
+{{ end }}
 {{- if and .Values.telemetry.enabled (not .Values.telemetry.redis.external.url) (not .Values.telemetry.redis.persistence.enabled) (not .Values.telemetry.redis.persistence.existingClaim) }}
 [INFO]  Telemetry Redis is running on an emptyDir volume (no PersistentVolumeClaim).
         Long-term telemetry archives in MongoDB are unaffected, but the in-window

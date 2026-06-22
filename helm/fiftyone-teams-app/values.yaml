@@ -1628,6 +1628,17 @@ telemetry:
   # -- When `false`, no telemetry resources or sidecars are rendered and the
   # FiftyOne UI's delegated-operator log viewer will be empty.
   enabled: true
+  rbac:
+    # -- When `false`, the telemetry `Role`/`RoleBinding` granting the sidecar
+    # `pods/log` read access are not rendered. Set `false` only when the
+    # install identity cannot create namespaced RBAC AND `serviceAccounts`
+    # points at an existing account that already carries `pods/log` (e.g. the
+    # teams-api RBAC SA). On Kubernetes the sidecar tails container logs via the
+    # `pods/log` API; without this grant those calls return `403`, so the
+    # delegated-operator log viewer stays empty. The Settings → Metrics
+    # dashboard is unaffected — metrics use the pod's shared process namespace,
+    # not the Kubernetes API.
+    create: true
   redis:
     # -- Container image for the telemetry Redis Deployment.
     image: redis:7-alpine
