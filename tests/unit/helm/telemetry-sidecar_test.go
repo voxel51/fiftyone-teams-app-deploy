@@ -50,9 +50,12 @@ func findSidecar(containers []corev1.Container) *corev1.Container {
 
 // TestShareProcessNamespaceEnabledByDefault asserts that the api, app,
 // plugins, and delegated-operator deployments all opt into PID-namespace
-// sharing when telemetry is enabled (the default). The sidecar relies on
-// /proc/<pid>/fd/1 access in the target container's PID namespace, so
-// dropping this would silently break log capture.
+// sharing when telemetry is enabled (the default). The sidecar samples the
+// target via the shared PID namespace — psutil reads /proc/<pid> for CPU,
+// memory, threads, and file descriptors, and py-spy attaches for stack
+// archives — so dropping this would silently break metrics capture. (Log
+// capture is separate: on Kubernetes the sidecar tails the container's logs
+// via the pods/log API, which the telemetry Role grants.)
 func (s *telemetrySidecarTemplateTest) TestShareProcessNamespaceEnabledByDefault() {
 	cases := []struct {
 		template string
@@ -130,6 +133,29 @@ func (s *telemetrySidecarTemplateTest) TestShareProcessNamespaceDisabledWithTele
 			}
 		})
 	}
+}
+
+// TestSidecarRenderedWithRbacCreateDisabled asserts that disabling the
+// telemetry RBAC escape hatch (telemetry.rbac.create=false) does not affect
+// sidecar injection. Metrics ride on the shared process namespace, not the
+// pods/log Role, so an install identity without namespaced RBAC permissions
+// still gets the sidecar and the Settings → Metrics dashboard.
+func (s *telemetrySidecarTemplateTest) TestSidecarRenderedWithRbacCreateDisabled() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.rbac.create": "false",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName,
+		[]string{"templates/app-deployment.yaml"})
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+	s.NotNil(findSidecar(deployment.Spec.Template.Spec.Containers),
+		"telemetry-sidecar should still be injected when telemetry.rbac.create is false")
+	s.Require().NotNil(deployment.Spec.Template.Spec.ShareProcessNamespace,
+		"shareProcessNamespace should still be set when telemetry.rbac.create is false")
+	s.True(*deployment.Spec.Template.Spec.ShareProcessNamespace,
+		"shareProcessNamespace should still be true when telemetry.rbac.create is false")
 }
 
 // TestSidecarSecurityContext asserts the sidecar drops all default caps,
