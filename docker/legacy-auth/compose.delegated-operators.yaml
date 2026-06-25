@@ -28,7 +28,7 @@ services:
   # distinct orchestrator name so it surfaces separately in the
   # Settings → Metrics UI.
   teams-do-2:
-    image: voxel51/fiftyone-teams-cv-full:v2.20.0
+    image: voxel51/fiftyone-teams-cv-full:v2.21.0
     profiles: ["do-2", "do-3"]
     deploy:
       replicas: 1
@@ -51,7 +51,7 @@ services:
       - telemetry-socket-2:/tmp/telemetry
 
   teams-do-2-telemetry:
-    image: voxel51/telemetry-sidecar:v2.20.0
+    image: voxel51/telemetry-sidecar:v2.21.0
     profiles: ["do-2", "do-3"]
     pid: "service:teams-do-2"
     user: "1000:1000"
@@ -94,7 +94,7 @@ services:
   # for higher worker counts use the helm chart, which adds a sidecar
   # to every pod automatically.
   teams-do-3:
-    image: voxel51/fiftyone-teams-cv-full:v2.20.0
+    image: voxel51/fiftyone-teams-cv-full:v2.21.0
     profiles: ["do-3"]
     deploy:
       replicas: 1
@@ -117,7 +117,7 @@ services:
       - telemetry-socket-3:/tmp/telemetry
 
   teams-do-3-telemetry:
-    image: voxel51/telemetry-sidecar:v2.20.0
+    image: voxel51/telemetry-sidecar:v2.21.0
     profiles: ["do-3"]
     pid: "service:teams-do-3"
     user: "1000:1000"
