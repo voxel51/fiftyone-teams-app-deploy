@@ -179,10 +179,10 @@ chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 FiftyOne Enterprise supports two authentication modes.
 Choose the one that matches your deployment:
 
-| Mode            | Use when                                                                                |
-|-----------------|-----------------------------------------------------------------------------------------|
-| `internal-auth` | All air-gapped deployments, OR standard deployments using an **OIDC** Identity Provider |
-| `legacy-auth`   | Standard deployments using a **SAML** Identity Provider                                 |
+| Mode            | Use when                                                                   |
+|-----------------|----------------------------------------------------------------------------|
+| `internal-auth` | Deployment is Air-gapped or Identity Provider is **OpenID Connect (OIDC)** |
+| `legacy-auth`   | Identity Provider is **SAML**                                              |
 
 Navigate into the appropriate directory:
 
@@ -320,7 +320,8 @@ curl -Iv http://localhost:3000/api/hello
 # Expected: HTTP/1.1 200 OK
 ```
 
-For a full health assessment, see [Basic Health Assessment](#basic-health-assessment).
+For a full health assessment, see
+[Basic Health Assessment](#basic-health-assessment).
 
 ## :globe_with_meridians: Step 6: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
 
@@ -439,7 +440,7 @@ v1.6. This enables centralized login, roles, and user management.
 
 ## Step 10: Test End User Login
 
-Verify the deployment's IDP setup by logging in as a regular user.
+Verify the deployment's IdP setup by logging in as a regular user.
 
 1. In a browser, open `https://<ENVIRONMENT>.fiftyone.ai`.
 1. Log in with the user credentials of the admin
@@ -479,7 +480,7 @@ services:
 FiftyOne Enterprise v2.11 introduces support for on-demand
 delegated operator executors for Databricks and Anyscale.
 Please refer to the
-[configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
+[configuring delegated operators documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-delegated-operators.md).
 
 ## Upgrades
 
@@ -487,21 +488,14 @@ The recommended upgrade path is:
 
 1. Pull the latest compose files from this repo:
 
-   ```shell
-   git pull origin main
-   ```
+    
 
    > This automatically populates the latest service versions.
 
 1. Confirm `FIFTYONE_DATABASE_ADMIN` is set to `false` in your
    `compose.override.yaml`:
 
-   ```yaml
-   services:
-     fiftyone-app:
-       environment:
-         FIFTYONE_DATABASE_ADMIN: false
-   ```
+    
 
    > This prevents automatic database migrations from running on startup and
    > breaking active SDK sessions.
@@ -512,23 +506,11 @@ The recommended upgrade path is:
 
 1. Bring the compose stack down:
 
-   ```shell
-   docker compose \
-     -f compose.dedicated-plugins.yaml \
-     -f compose.delegated-operators.yaml \
-     -f compose.override.yaml \
-     down
-   ```
+    
 
 1. Bring the new stack up:
 
-   ```shell
-   docker compose \
-     -f compose.dedicated-plugins.yaml \
-     -f compose.delegated-operators.yaml \
-     -f compose.override.yaml \
-     up -d
-   ```
+    
 
 For full upgrade guidance, refer to [Upgrading](./docs/upgrading.md).
 
