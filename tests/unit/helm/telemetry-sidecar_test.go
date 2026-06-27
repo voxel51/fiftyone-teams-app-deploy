@@ -48,22 +48,22 @@ func findSidecar(containers []corev1.Container) *corev1.Container {
 	return nil
 }
 
-func hasVolumeMount(mounts []corev1.VolumeMount, name string) bool {
-	for _, m := range mounts {
-		if m.Name == name {
-			return true
+func findVolumeMount(mounts []corev1.VolumeMount, name string) *corev1.VolumeMount {
+	for i := range mounts {
+		if mounts[i].Name == name {
+			return &mounts[i]
 		}
 	}
-	return false
+	return nil
 }
 
-func hasVolume(volumes []corev1.Volume, name string) bool {
-	for _, v := range volumes {
-		if v.Name == name {
-			return true
+func findVolume(volumes []corev1.Volume, name string) *corev1.Volume {
+	for i := range volumes {
+		if volumes[i].Name == name {
+			return &volumes[i]
 		}
 	}
-	return false
+	return nil
 }
 
 // telemetrySidecarWorkload is the per-template fixture shared by the
@@ -127,12 +127,18 @@ func (s *telemetrySidecarTemplateTest) TestSidecarExtraVolumes() {
 			sidecar := findSidecar(deployment.Spec.Template.Spec.Containers)
 			s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected into %s", tc.template)
 
-			s.True(hasVolumeMount(sidecar.VolumeMounts, "ca-certs"),
-				"sidecar should mount the customer extra volume on %s", tc.template)
-			s.True(hasVolume(deployment.Spec.Template.Spec.Volumes, "ca-certs"),
-				"pod spec should include the telemetry extra volume on %s", tc.template)
+			mount := findVolumeMount(sidecar.VolumeMounts, "ca-certs")
+			s.Require().NotNil(mount, "sidecar should mount the customer extra volume on %s", tc.template)
+			s.Equal("/etc/ssl/custom", mount.MountPath, "extra mount path should pass through on %s", tc.template)
+			s.True(mount.ReadOnly, "extra mount readOnly should pass through on %s", tc.template)
+
+			vol := findVolume(deployment.Spec.Template.Spec.Volumes, "ca-certs")
+			s.Require().NotNil(vol, "pod spec should include the telemetry extra volume on %s", tc.template)
+			s.Require().NotNil(vol.Secret, "extra volume source should pass through on %s", tc.template)
+			s.Equal("my-ca", vol.Secret.SecretName, "extra volume secretName should pass through on %s", tc.template)
+
 			if tc.executor {
-				s.True(hasVolumeMount(sidecar.VolumeMounts, "telemetry-socket"),
+				s.NotNil(findVolumeMount(sidecar.VolumeMounts, "telemetry-socket"),
 					"executor sidecar must keep the telemetry-socket mount on %s", tc.template)
 			}
 		})
