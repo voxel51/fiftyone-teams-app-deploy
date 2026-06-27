@@ -71,9 +71,10 @@ func (s *telemetryRoleBindingTemplateTest) TestRbacCreateDisabled() {
 		"telemetry.enabled":     "true",
 		"telemetry.rbac.create": "false",
 	}}
-
-	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, s.templates)
-	s.ErrorContains(err, "could not find template")
+	for _, tmpl := range s.templates {
+		_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, []string{tmpl})
+		s.ErrorContains(err, "could not find template", "%s should be skipped", tmpl)
+	}
 }
 
 // extractRole finds the Role document (not RoleBinding) in multi-doc render output.
