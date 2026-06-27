@@ -48,6 +48,97 @@ func findSidecar(containers []corev1.Container) *corev1.Container {
 	return nil
 }
 
+func hasVolumeMount(mounts []corev1.VolumeMount, name string) bool {
+	for _, m := range mounts {
+		if m.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func hasVolume(volumes []corev1.Volume, name string) bool {
+	for _, v := range volumes {
+		if v.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+// telemetrySidecarWorkload is the per-template fixture shared by the
+// extra-volume tests: the deployment template, the values needed to render
+// it, and whether its sidecar runs in executor (DO) mode — executor sidecars
+// also carry the telemetry-socket mount, which must survive alongside any
+// customer-supplied extra mounts.
+var telemetrySidecarWorkloads = []struct {
+	template string
+	values   map[string]string
+	executor bool
+}{
+	{"templates/api-deployment.yaml", nil, false},
+	{"templates/app-deployment.yaml", nil, false},
+	{
+		"templates/plugins-deployment.yaml",
+		map[string]string{"pluginsSettings.enabled": "true"},
+		false,
+	},
+	{
+		"templates/delegated-operator-instance-deployment.yaml",
+		map[string]string{
+			"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+		},
+		true,
+	},
+}
+
+// TestSidecarExtraVolumes asserts that telemetry.sidecar.extraVolumeMounts land
+// on the sidecar container and telemetry.sidecar.extraVolumes land on the pod
+// spec across every workload, so customers can hand the sidecar the same certs
+// the app containers already use. On the executor (DO) sidecar, the
+// telemetry-socket mount must survive alongside the customer mount.
+func (s *telemetrySidecarTemplateTest) TestSidecarExtraVolumes() {
+	extra := map[string]string{
+		"telemetry.sidecar.extraVolumeMounts[0].name":         "ca-certs",
+		"telemetry.sidecar.extraVolumeMounts[0].mountPath":    "/etc/ssl/custom",
+		"telemetry.sidecar.extraVolumeMounts[0].readOnly":     "true",
+		"telemetry.sidecar.extraVolumes[0].name":              "ca-certs",
+		"telemetry.sidecar.extraVolumes[0].secret.secretName": "my-ca",
+	}
+
+	for _, tc := range telemetrySidecarWorkloads {
+		tc := tc
+		s.Run(tc.template, func() {
+			values := map[string]string{}
+			for k, v := range tc.values {
+				values[k] = v
+			}
+			for k, v := range extra {
+				values[k] = v
+			}
+
+			options := &helm.Options{SetValues: values}
+			output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName,
+				[]string{tc.template})
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+			sidecar := findSidecar(deployment.Spec.Template.Spec.Containers)
+			s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected into %s", tc.template)
+
+			s.True(hasVolumeMount(sidecar.VolumeMounts, "ca-certs"),
+				"sidecar should mount the customer extra volume on %s", tc.template)
+			s.True(hasVolume(deployment.Spec.Template.Spec.Volumes, "ca-certs"),
+				"pod spec should include the telemetry extra volume on %s", tc.template)
+			if tc.executor {
+				s.True(hasVolumeMount(sidecar.VolumeMounts, "telemetry-socket"),
+					"executor sidecar must keep the telemetry-socket mount on %s", tc.template)
+			}
+		})
+	}
+}
+
 // TestShareProcessNamespaceEnabledByDefault asserts that the api, app,
 // plugins, and delegated-operator deployments all opt into PID-namespace
 // sharing when telemetry is enabled (the default). The sidecar relies on

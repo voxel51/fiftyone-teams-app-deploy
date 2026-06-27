@@ -4233,6 +4233,22 @@
         },
         "sidecar": {
           "properties": {
+            "extraVolumeMounts": {
+              "description": "Additional volume mounts for the `telemetry-sidecar` container, e.g. to\nmount the same CA certs the app containers use. [Reference][volumes].",
+              "items": {
+                "required": []
+              },
+              "title": "extraVolumeMounts",
+              "type": "array"
+            },
+            "extraVolumes": {
+              "description": "Additional pod volumes available to the `telemetry-sidecar`. Omit any\nvolume already defined on the workload (`*.volumes`) to avoid name\ncollisions. [Reference][volumes].",
+              "items": {
+                "required": []
+              },
+              "title": "extraVolumes",
+              "type": "array"
+            },
             "image": {
               "properties": {
                 "pullPolicy": {
