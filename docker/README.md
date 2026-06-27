@@ -488,14 +488,21 @@ The recommended upgrade path is:
 
 1. Pull the latest compose files from this repo:
 
-    
+   ```shell
+   git pull origin main
+   ```
 
    > This automatically populates the latest service versions.
 
 1. Confirm `FIFTYONE_DATABASE_ADMIN` is set to `false` in your
    `compose.override.yaml`:
 
-    
+   ```yaml
+   services:
+     fiftyone-app:
+       environment:
+         FIFTYONE_DATABASE_ADMIN: false
+   ```
 
    > This prevents automatic database migrations from running on startup and
    > breaking active SDK sessions.
@@ -506,11 +513,23 @@ The recommended upgrade path is:
 
 1. Bring the compose stack down:
 
-    
+   ```shell
+   docker compose \
+     -f compose.dedicated-plugins.yaml \
+     -f compose.delegated-operators.yaml \
+     -f compose.override.yaml \
+     down
+   ```
 
 1. Bring the new stack up:
 
-    
+   ```shell
+   docker compose \
+     -f compose.dedicated-plugins.yaml \
+     -f compose.delegated-operators.yaml \
+     -f compose.override.yaml \
+     up -d
+   ```
 
 For full upgrade guidance, refer to [Upgrading](./docs/upgrading.md).
 
