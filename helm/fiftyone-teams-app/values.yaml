@@ -898,8 +898,6 @@ delegatedOperatorDeployments:
     #       cpu: 8
     #       ephemeral-storage: 1Gi
     #       memory: 16Gi
-    #   # GPU metrics appear automatically — the telemetry sidecar reads this
-    #   # operator's GPU without requesting its own allocation.
     #   volumes:
     #     - name: shm-vol
     #       emptyDir:
