@@ -4048,6 +4048,19 @@
           "title": "enabled",
           "type": "boolean"
         },
+        "rbac": {
+          "properties": {
+            "create": {
+              "default": true,
+              "description": "When `false`, the telemetry `Role`/`RoleBinding` granting the sidecar\n`pods/log` read access are not rendered. Set `false` only when the\ninstall identity cannot create namespaced RBAC AND `serviceAccounts`\npoints at an existing account that already carries `pods/log` (e.g. the\nteams-api RBAC SA). On Kubernetes the sidecar tails container logs via the\n`pods/log` API; without this grant those calls return `403`, so the\ndelegated-operator log viewer stays empty. The Settings → Metrics\ndashboard is unaffected — metrics use the pod's shared process namespace,\nnot the Kubernetes API.",
+              "title": "create",
+              "type": "boolean"
+            }
+          },
+          "required": [],
+          "title": "rbac",
+          "type": "object"
+        },
         "redis": {
           "properties": {
             "containerSecurityContext": {
