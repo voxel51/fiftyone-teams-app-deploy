@@ -215,7 +215,7 @@ print(Fernet.generate_key().decode())
 services:
   fiftyone-app:
     environment:
-      FIFTYONE_DATABASE_ADMIN: true # Only for first install
+      # Add any environment variable overrides here
 ```
 
 ### :package: Official Docker Images
@@ -253,9 +253,12 @@ services:
 
 ## :rocket: Step 4: Initial Deployment
 
-### 1. Enable Database Admin mode
+### 1. Database admin mode
 
-In `compose.override.yaml`, make sure:
+A fresh install does **not** require database admin mode (as of v2.9+) — a new
+database automatically initializes to the connecting client's version, so no
+migration is needed. Keep `FIFTYONE_DATABASE_ADMIN: false` (the default) in
+`compose.override.yaml`:
 
 ```yaml
 services:
@@ -264,7 +267,8 @@ services:
       FIFTYONE_DATABASE_ADMIN: false
 ```
 
-> This allows the application to create and migrate the database schema.
+> `false` is the safe default. Set `true` only when intentionally running a
+> database migration (see [Upgrades](#upgrades)).
 
 ### 2. Launch the application
 
