@@ -44,7 +44,7 @@ regarding FiftyOne Enterprise.
   - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
   - [:package: Official Docker Images](#package-official-docker-images)
 - [:rocket: Step 5: Initial Deployment](#rocket-step-5-initial-deployment)
-  - [1. Enable Database Admin mode](#1-enable-database-admin-mode)
+  - [1. Database admin mode](#1-database-admin-mode)
   - [2. Launch the application](#2-launch-the-application)
 - [:globe_with_meridians: Step 6: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-6-configure-ssl--reverse-proxy-nginx--load-balancer)
   - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
@@ -223,11 +223,16 @@ print(Fernet.generate_key().decode())
 
 ### 3. Create a `compose.override.yaml` to override configuration
 
+Create an overrides file (`compose.override.yaml`) and add overrides there.
+Avoid changing the `yaml` files in this directory and instead use overrides.
+
+For example, adding a variable to the `fiftyone-app` service would look like:
+
 ```yaml
 services:
   fiftyone-app:
     environment:
-      FIFTYONE_DATABASE_ADMIN: true # Only for first install
+      EXAMPLE_VARIABLE: example-value
 ```
 
 ### :package: Official Docker Images
@@ -265,9 +270,12 @@ services:
 
 ## :rocket: Step 5: Initial Deployment
 
-### 1. Enable Database Admin mode
+### 1. Database admin mode
 
-In `compose.override.yaml`, make sure:
+A fresh install does **not** require database admin mode (as of v2.9+) — a new
+database automatically initializes to the connecting client's version, so no
+migration is needed. Keep `FIFTYONE_DATABASE_ADMIN: false` (the default) in
+`compose.override.yaml`:
 
 ```yaml
 services:
@@ -275,8 +283,6 @@ services:
     environment:
       FIFTYONE_DATABASE_ADMIN: false
 ```
-
-> This allows the application to create and migrate the database schema.
 
 ### 2. Launch the application
 
