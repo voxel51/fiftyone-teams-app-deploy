@@ -216,7 +216,16 @@ services:
   fiftyone-app:
     environment:
       # Add any environment variable overrides here
-```
+Create an overrides file (`compose.override.yaml`) and add overrides there.
+Avoid changing the `yaml` files in this directory and instead use overrides.
+
+For example, adding a variable to the `fiftyone-app` service would look like:
+
+```yaml
+services:
+  fiftyone-app:
+    environment:
+      EXAMPLE_VARIABLE: example-value
 
 ### :package: Official Docker Images
 
