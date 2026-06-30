@@ -32,3 +32,14 @@ func findVolumeMount(mounts []corev1.VolumeMount, name string) *corev1.VolumeMou
 	}
 	return nil
 }
+
+// envValue returns the value of the env var with the given name and whether it
+// was found.
+func envValue(env []corev1.EnvVar, name string) (string, bool) {
+	for _, e := range env {
+		if e.Name == name {
+			return e.Value, true
+		}
+	}
+	return "", false
+}

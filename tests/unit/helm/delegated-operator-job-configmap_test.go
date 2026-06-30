@@ -792,15 +792,6 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarGpuEnv() {
 	const gpuResource = "nvidia.com/gpu"
 	jobKey := "cpuDefault.yaml"
 
-	envValue := func(env []corev1.EnvVar, name string) (string, bool) {
-		for _, e := range env {
-			if e.Name == name {
-				return e.Value, true
-			}
-		}
-		return "", false
-	}
-
 	// gpuKey escapes the dot in nvidia.com/gpu so helm --set treats the whole
 	// string as a single map key rather than a nested path.
 	gpuKey := func(section string) string {

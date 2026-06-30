@@ -5711,16 +5711,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySocketInj
 		}
 		return n
 	}
-	// findContainer returns the named container (the main DO container,
-	// not the telemetry-sidecar) from a pod spec.
-	findContainer := func(containers []corev1.Container, name string) *corev1.Container {
-		for i, c := range containers {
-			if c.Name == name {
-				return &containers[i]
-			}
-		}
-		return nil
-	}
 
 	testCases := []struct {
 		name      string
@@ -5784,6 +5774,38 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySocketInj
 	}
 }
 
+// TestTelemetryDisabledOmitsSidecar verifies that when telemetry is disabled
+// the rendered DO deployment carries neither the telemetry-sidecar container nor
+// the telemetry-socket volume/mount. The disabled shape is also covered
+// indirectly by TestContainerCount (container count is 1, not 2) and the
+// disableTelemetry-based volume/mount tests; this is the focused negative
+// assertion living next to the positive cases above.
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetryDisabledOmitsSidecar() {
+	const socketName = "telemetry-socket"
+
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.enabled": "false",
+		"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	docs := strings.Split(output, "---")
+	s.Require().GreaterOrEqual(len(docs), 2, "expected at least one rendered deployment")
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), docs[1], &deployment)
+
+	s.Nil(findContainer(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar"),
+		"telemetry-sidecar container should be absent when telemetry is disabled")
+	s.Nil(findVolume(deployment.Spec.Template.Spec.Volumes, socketName),
+		"telemetry-socket volume should be absent when telemetry is disabled")
+
+	main := findContainer(deployment.Spec.Template.Spec.Containers, "teams-do-cpu-default")
+	s.Require().NotNil(main, "main DO container not found")
+	s.Nil(findVolumeMount(main.VolumeMounts, socketName),
+		"telemetry-socket volumeMount should be absent when telemetry is disabled")
+}
+
 // TestTelemetrySidecarGpuEnv verifies that when a delegated-operator executor
 // requests a GPU (via resources.limits or resources.requests), its
 // telemetry-sidecar is given the NVIDIA_* env vars needed to read GPU metrics,
@@ -5791,23 +5813,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySocketInj
 // is requested, the sidecar receives no NVIDIA_* env vars.
 func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySidecarGpuEnv() {
 	const gpuResource = "nvidia.com/gpu"
-
-	findContainer := func(containers []corev1.Container, name string) *corev1.Container {
-		for i, c := range containers {
-			if c.Name == name {
-				return &containers[i]
-			}
-		}
-		return nil
-	}
-	envValue := func(env []corev1.EnvVar, name string) (string, bool) {
-		for _, e := range env {
-			if e.Name == name {
-				return e.Value, true
-			}
-		}
-		return "", false
-	}
 
 	// gpuKey escapes the dot in nvidia.com/gpu so helm --set treats the whole
 	// string as a single map key rather than a nested path.
