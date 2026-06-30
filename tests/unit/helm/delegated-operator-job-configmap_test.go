@@ -754,6 +754,35 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySocketInjection() {
 	}
 }
 
+// TestTelemetryDisabledOmitsSidecar verifies that when telemetry is disabled
+// the rendered job carries neither the telemetry-sidecar initContainer nor the
+// telemetry-socket volume/mount. The full disabled-telemetry job shape is also
+// covered by golden files in TestData; this is the focused negative assertion
+// living next to the positive cases above.
+func (s *doK8sConfigMapTemplateTest) TestTelemetryDisabledOmitsSidecar() {
+	const socketName = "telemetry-socket"
+	jobKey := "cpuDefault.yaml"
+
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.enabled": "false",
+		"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	job := s.renderJob(configMap.Data, jobKey)
+
+	s.Nil(findContainer(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar"),
+		"telemetry-sidecar initContainer should be absent when telemetry is disabled")
+	s.Nil(findVolume(job.Spec.Template.Spec.Volumes, socketName),
+		"telemetry-socket volume should be absent when telemetry is disabled")
+	s.Require().NotEmpty(job.Spec.Template.Spec.Containers, "expected at least one container")
+	s.Nil(findVolumeMount(job.Spec.Template.Spec.Containers[0].VolumeMounts, socketName),
+		"telemetry-socket volumeMount should be absent when telemetry is disabled")
+}
+
 // TestTelemetrySidecarGpuEnv verifies that when a delegated-operator job's
 // executor requests a GPU (via resources.limits or resources.requests), its
 // telemetry native-sidecar is given the NVIDIA_* env vars needed to read GPU
@@ -763,14 +792,6 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarGpuEnv() {
 	const gpuResource = "nvidia.com/gpu"
 	jobKey := "cpuDefault.yaml"
 
-	findContainer := func(containers []corev1.Container, name string) *corev1.Container {
-		for i, c := range containers {
-			if c.Name == name {
-				return &containers[i]
-			}
-		}
-		return nil
-	}
 	envValue := func(env []corev1.EnvVar, name string) (string, bool) {
 		for _, e := range env {
 			if e.Name == name {

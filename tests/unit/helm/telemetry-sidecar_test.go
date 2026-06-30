@@ -38,33 +38,7 @@ func TestTelemetrySidecarTemplate(t *testing.T) {
 	})
 }
 
-// findSidecar locates the telemetry-sidecar container in a slice of containers.
-func findSidecar(containers []corev1.Container) *corev1.Container {
-	for i, c := range containers {
-		if c.Name == "telemetry-sidecar" {
-			return &containers[i]
-		}
-	}
-	return nil
-}
-
-func findVolumeMount(mounts []corev1.VolumeMount, name string) *corev1.VolumeMount {
-	for i := range mounts {
-		if mounts[i].Name == name {
-			return &mounts[i]
-		}
-	}
-	return nil
-}
-
-func findVolume(volumes []corev1.Volume, name string) *corev1.Volume {
-	for i := range volumes {
-		if volumes[i].Name == name {
-			return &volumes[i]
-		}
-	}
-	return nil
-}
+const telemetrySidecarName = "telemetry-sidecar"
 
 // telemetrySidecarWorkload is the per-template fixture shared by the
 // extra-volume tests: the deployment template, the values needed to render
@@ -124,7 +98,7 @@ func (s *telemetrySidecarTemplateTest) TestSidecarExtraVolumes() {
 			var deployment appsv1.Deployment
 			helm.UnmarshalK8SYaml(s.T(), output, &deployment)
 
-			sidecar := findSidecar(deployment.Spec.Template.Spec.Containers)
+			sidecar := findContainer(deployment.Spec.Template.Spec.Containers, telemetrySidecarName)
 			s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected into %s", tc.template)
 
 			mount := findVolumeMount(sidecar.VolumeMounts, "ca-certs")
@@ -247,7 +221,7 @@ func (s *telemetrySidecarTemplateTest) TestSidecarRenderedWithRbacCreateDisabled
 	var deployment appsv1.Deployment
 	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
 
-	s.NotNil(findSidecar(deployment.Spec.Template.Spec.Containers),
+	s.NotNil(findContainer(deployment.Spec.Template.Spec.Containers, telemetrySidecarName),
 		"telemetry-sidecar should still be injected when telemetry.rbac.create is false")
 	s.Require().NotNil(deployment.Spec.Template.Spec.ShareProcessNamespace,
 		"shareProcessNamespace should still be set when telemetry.rbac.create is false")
@@ -290,7 +264,7 @@ func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 			var deployment appsv1.Deployment
 			helm.UnmarshalK8SYaml(s.T(), output, &deployment)
 
-			sidecar := findSidecar(deployment.Spec.Template.Spec.Containers)
+			sidecar := findContainer(deployment.Spec.Template.Spec.Containers, telemetrySidecarName)
 			s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected into %s", tc.template)
 
 			sc := sidecar.SecurityContext
