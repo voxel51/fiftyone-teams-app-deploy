@@ -5783,3 +5783,108 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySocketInj
 		})
 	}
 }
+
+// TestTelemetrySidecarGpuEnv verifies that when a delegated-operator executor
+// requests a GPU (via resources.limits or resources.requests), its
+// telemetry-sidecar is given the NVIDIA_* env vars needed to read GPU metrics,
+// without the sidecar requesting its own nvidia.com/gpu allocation. When no GPU
+// is requested, the sidecar receives no NVIDIA_* env vars.
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySidecarGpuEnv() {
+	const gpuResource = "nvidia.com/gpu"
+
+	findContainer := func(containers []corev1.Container, name string) *corev1.Container {
+		for i, c := range containers {
+			if c.Name == name {
+				return &containers[i]
+			}
+		}
+		return nil
+	}
+	envValue := func(env []corev1.EnvVar, name string) (string, bool) {
+		for _, e := range env {
+			if e.Name == name {
+				return e.Value, true
+			}
+		}
+		return "", false
+	}
+
+	// gpuKey escapes the dot in nvidia.com/gpu so helm --set treats the whole
+	// string as a single map key rather than a nested path.
+	gpuKey := func(section string) string {
+		return "delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources." +
+			section + ".nvidia\\.com/gpu"
+	}
+
+	testCases := []struct {
+		name      string
+		values    map[string]string
+		expectGpu bool
+	}{
+		{
+			name: "gpuInLimitsExposesEnvToSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				gpuKey("limits"): "1",
+			},
+			expectGpu: true,
+		},
+		{
+			name: "gpuInRequestsExposesEnvToSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				gpuKey("requests"): "1",
+			},
+			expectGpu: true,
+		},
+		{
+			name: "noGpuOmitsEnvFromSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			expectGpu: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		s.Run(tc.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: tc.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			docs := strings.Split(output, "---")
+			s.Require().GreaterOrEqual(len(docs), 2, "expected at least one rendered deployment")
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, docs[1], &deployment)
+
+			sidecar := findContainer(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar, "telemetry-sidecar container not found")
+
+			visibleDevices, hasVisibleDevices := envValue(sidecar.Env, "NVIDIA_VISIBLE_DEVICES")
+			driverCaps, hasDriverCaps := envValue(sidecar.Env, "NVIDIA_DRIVER_CAPABILITIES")
+
+			if tc.expectGpu {
+				s.True(hasVisibleDevices, "sidecar should have NVIDIA_VISIBLE_DEVICES")
+				s.Equal("all", visibleDevices, "NVIDIA_VISIBLE_DEVICES value mismatch")
+				s.True(hasDriverCaps, "sidecar should have NVIDIA_DRIVER_CAPABILITIES")
+				s.Equal("compute,utility", driverCaps, "NVIDIA_DRIVER_CAPABILITIES value mismatch")
+
+				// The sidecar reads the executor's GPU; it must not request its own.
+				_, limitsHasGpu := sidecar.Resources.Limits[corev1.ResourceName(gpuResource)]
+				_, requestsHasGpu := sidecar.Resources.Requests[corev1.ResourceName(gpuResource)]
+				s.False(limitsHasGpu, "sidecar must not request nvidia.com/gpu in limits")
+				s.False(requestsHasGpu, "sidecar must not request nvidia.com/gpu in requests")
+			} else {
+				s.False(hasVisibleDevices, "sidecar should not have NVIDIA_VISIBLE_DEVICES when no GPU requested")
+				s.False(hasDriverCaps, "sidecar should not have NVIDIA_DRIVER_CAPABILITIES when no GPU requested")
+			}
+		})
+	}
+}
