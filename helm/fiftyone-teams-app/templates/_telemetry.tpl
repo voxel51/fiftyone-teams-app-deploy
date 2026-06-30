@@ -150,10 +150,16 @@ Inputs: same dict as telemetry.sidecar-env.
       {{- if .executor }}
       add: ["SYS_PTRACE"]
       {{- end }}
+  {{- $mounts := list }}
   {{- if .executor }}
+  {{- $mounts = append $mounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+  {{- end }}
+  {{- with .ctx.Values.telemetry.sidecar.extraVolumeMounts }}
+  {{- $mounts = concat $mounts . }}
+  {{- end }}
+  {{- with $mounts }}
   volumeMounts:
-    - name: telemetry-socket
-      mountPath: /tmp/telemetry
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
 
@@ -188,9 +194,12 @@ would block Job completion.
       {{- if .executor }}
       add: ["SYS_PTRACE"]
       {{- end }}
+  {{- $mounts := list (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+  {{- with .ctx.Values.telemetry.sidecar.extraVolumeMounts }}
+  {{- $mounts = concat $mounts . }}
+  {{- end }}
   volumeMounts:
-    - name: telemetry-socket
-      mountPath: /tmp/telemetry
+    {{- toYaml $mounts | nindent 4 }}
 {{- end }}
 
 {{/*

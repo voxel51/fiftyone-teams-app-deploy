@@ -1684,6 +1684,13 @@ telemetry:
       # (e.g. `redis://my-redis.example.com:6379`).
       url: ""
   sidecar:
+    # -- Additional volume mounts for the `telemetry-sidecar` container, e.g. to
+    # mount the same CA certs the app containers use. [Reference][volumes].
+    extraVolumeMounts: []
+    # -- Additional pod volumes available to the `telemetry-sidecar`. Omit any
+    # volume already defined on the workload (`*.volumes`) to avoid name
+    # collisions. [Reference][volumes].
+    extraVolumes: []
     image:
       # @schema
       # oneOf:

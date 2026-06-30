@@ -33,6 +33,9 @@
   {{- if not $hasSocketMount }}
     {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
   {{- end }}
+  {{- with $.Values.telemetry.sidecar.extraVolumes }}
+    {{- $mergedVolumes = concat $mergedVolumes . }}
+  {{- end }}
 {{- end }}
 apiVersion: apps/v1
 kind: Deployment
