@@ -44,7 +44,7 @@ regarding FiftyOne Enterprise.
   - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
   - [:package: Official Docker Images](#package-official-docker-images)
 - [:rocket: Step 4: Initial Deployment](#rocket-step-4-initial-deployment)
-  - [1. Enable Database Admin mode](#1-enable-database-admin-mode)
+  - [1. Database admin mode](#1-database-admin-mode)
   - [2. Launch the application](#2-launch-the-application)
 - [:globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-5-configure-ssl--reverse-proxy-nginx--load-balancer)
   - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
