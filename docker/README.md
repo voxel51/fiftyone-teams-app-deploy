@@ -267,8 +267,6 @@ services:
       FIFTYONE_DATABASE_ADMIN: false
 ```
 
-> `false` is the safe default. Set `true` only when intentionally running a
-> database migration (see [Upgrades](#upgrades)).
 
 ### 2. Launch the application
 
