@@ -42,7 +42,6 @@ regarding FiftyOne Enterprise.
   - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
   - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
   - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
-  - [:package: Official Docker Images](#package-official-docker-images)
 - [:rocket: Step 4: Initial Deployment](#rocket-step-4-initial-deployment)
   - [1. Database admin mode](#1-database-admin-mode)
   - [2. Launch the application](#2-launch-the-application)
@@ -275,7 +274,6 @@ services:
     environment:
       FIFTYONE_DATABASE_ADMIN: false
 ```
-
 
 ### 2. Launch the application
 
