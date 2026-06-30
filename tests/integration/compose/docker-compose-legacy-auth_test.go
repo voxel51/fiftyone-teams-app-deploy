@@ -98,7 +98,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-app",
 					url:              "http://127.0.0.1:3000/api/hello",
-					responsePayload:  `{"name":"John Doe"}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
 				},
@@ -135,7 +135,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-app",
 					url:              "http://127.0.0.1:3000/api/hello",
-					responsePayload:  `{"name":"John Doe"}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
 				},
@@ -172,7 +172,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-app",
 					url:              "http://127.0.0.1:3000/api/hello",
-					responsePayload:  `{"name":"John Doe"}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
 				},
@@ -216,7 +216,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-app",
 					url:              "http://127.0.0.1:3000/api/hello",
-					responsePayload:  `{"name":"John Doe"}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
 				},

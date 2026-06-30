@@ -97,7 +97,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-app",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
-					responsePayload:  `{"name":"John Doe"}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
 				},
@@ -174,7 +174,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-app",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
-					responsePayload:  `{"name":"John Doe"}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
 				},
@@ -261,7 +261,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-app",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
-					responsePayload:  `{"name":"John Doe"}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              " ✓ Ready in",
 				},
