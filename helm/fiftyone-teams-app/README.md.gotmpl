@@ -142,6 +142,7 @@ for steps on how to add your license file.
 - [Estimated Completion Time](#estimated-completion-time)
 - [Sizing](#sizing)
 - [Usage](#usage)
+- [Recommended Next Steps](#recommended-next-steps)
 - [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
   - [Backup And Recovery](#backup-and-recovery)
@@ -339,6 +340,16 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 
 A minimal example `values.yaml` may be found
 [in the repository](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+
+## Recommended Next Steps
+
+The base installation enables FiftyOne Enterprise with
+**built-in only plugins** and **no delegated operator workers**.
+For a production-ready deployment, we recommend enabling **dedicated plugins**
+and **delegated operators** after completing the install above.
+
+See [Recommended Post-Installation Configuration](../docs/post-install-recommended-configuration.md)
+for step-by-step instructions.
 
 ## Upgrades
 
