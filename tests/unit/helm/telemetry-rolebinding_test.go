@@ -61,6 +61,22 @@ func (s *telemetryRoleBindingTemplateTest) TestExplicitlyDisabled() {
 	s.ErrorContains(err, "could not find template")
 }
 
+// With telemetry enabled but rbac.create false, the Role/RoleBinding are
+// skipped so an install identity without namespaced RBAC permissions can still
+// deploy telemetry. Metrics keep working (shared process namespace), but the
+// sidecar loses pods/log API access, so the log viewer stays empty unless
+// serviceAccounts points at an SA that already carries pods/log.
+func (s *telemetryRoleBindingTemplateTest) TestRbacCreateDisabled() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.enabled":     "true",
+		"telemetry.rbac.create": "false",
+	}}
+	for _, tmpl := range s.templates {
+		_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName, []string{tmpl})
+		s.ErrorContains(err, "could not find template", "%s should be skipped", tmpl)
+	}
+}
+
 // extractRole finds the Role document (not RoleBinding) in multi-doc render output.
 func (s *telemetryRoleBindingTemplateTest) extractRole(output string) (rbacv1.Role, bool) {
 	for _, doc := range splitYAMLDocs(output) {

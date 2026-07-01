@@ -83,6 +83,10 @@ casSettings:
     # Set the name of the Mongo database for CAS if not using the default `cas`
     # CAS_DATABASE_NAME: your-cas-name
 
+# For a production-ready deployment, we recommend enabling dedicated plugins
+# and delegated operators after your initial install. See:
+# https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/post-install-recommended-configuration.md
+
 # delegatedOperatorDeployments:
 #   deployments:
 #     teamsDoCpuDefault:
@@ -106,7 +110,7 @@ teamsAppSettings:
 #   env:
 #     # Set FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE to override the `Install FiftyOne`
 #     # bash command in the `Settings > Install FiftyOne` modal
-#     FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.20.0
+#     FIFTYONE_APP_INSTALL_FIFTYONE_OVERRIDE: pip install --index-url https://privatepypi.internal.org fiftyone==2.21.0
 
 # ingress:
 #   annotations:

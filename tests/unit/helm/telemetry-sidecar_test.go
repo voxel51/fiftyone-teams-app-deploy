@@ -38,21 +38,95 @@ func TestTelemetrySidecarTemplate(t *testing.T) {
 	})
 }
 
-// findSidecar locates the telemetry-sidecar container in a slice of containers.
-func findSidecar(containers []corev1.Container) *corev1.Container {
-	for i, c := range containers {
-		if c.Name == "telemetry-sidecar" {
-			return &containers[i]
-		}
+const telemetrySidecarName = "telemetry-sidecar"
+
+// telemetrySidecarWorkload is the per-template fixture shared by the
+// extra-volume tests: the deployment template, the values needed to render
+// it, and whether its sidecar runs in executor (DO) mode — executor sidecars
+// also carry the telemetry-socket mount, which must survive alongside any
+// customer-supplied extra mounts.
+var telemetrySidecarWorkloads = []struct {
+	template string
+	values   map[string]string
+	executor bool
+}{
+	{"templates/api-deployment.yaml", nil, false},
+	{"templates/app-deployment.yaml", nil, false},
+	{
+		"templates/plugins-deployment.yaml",
+		map[string]string{"pluginsSettings.enabled": "true"},
+		false,
+	},
+	{
+		"templates/delegated-operator-instance-deployment.yaml",
+		map[string]string{
+			"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+		},
+		true,
+	},
+}
+
+// TestSidecarExtraVolumes asserts that telemetry.sidecar.extraVolumeMounts land
+// on the sidecar container and telemetry.sidecar.extraVolumes land on the pod
+// spec across every workload, so customers can hand the sidecar the same certs
+// the app containers already use. On the executor (DO) sidecar, the
+// telemetry-socket mount must survive alongside the customer mount.
+func (s *telemetrySidecarTemplateTest) TestSidecarExtraVolumes() {
+	extra := map[string]string{
+		"telemetry.sidecar.extraVolumeMounts[0].name":         "ca-certs",
+		"telemetry.sidecar.extraVolumeMounts[0].mountPath":    "/etc/ssl/custom",
+		"telemetry.sidecar.extraVolumeMounts[0].readOnly":     "true",
+		"telemetry.sidecar.extraVolumes[0].name":              "ca-certs",
+		"telemetry.sidecar.extraVolumes[0].secret.secretName": "my-ca",
 	}
-	return nil
+
+	for _, tc := range telemetrySidecarWorkloads {
+		tc := tc
+		s.Run(tc.template, func() {
+			values := map[string]string{}
+			for k, v := range tc.values {
+				values[k] = v
+			}
+			for k, v := range extra {
+				values[k] = v
+			}
+
+			options := &helm.Options{SetValues: values}
+			output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName,
+				[]string{tc.template})
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+			sidecar := findContainer(deployment.Spec.Template.Spec.Containers, telemetrySidecarName)
+			s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected into %s", tc.template)
+
+			mount := findVolumeMount(sidecar.VolumeMounts, "ca-certs")
+			s.Require().NotNil(mount, "sidecar should mount the customer extra volume on %s", tc.template)
+			s.Equal("/etc/ssl/custom", mount.MountPath, "extra mount path should pass through on %s", tc.template)
+			s.True(mount.ReadOnly, "extra mount readOnly should pass through on %s", tc.template)
+
+			vol := findVolume(deployment.Spec.Template.Spec.Volumes, "ca-certs")
+			s.Require().NotNil(vol, "pod spec should include the telemetry extra volume on %s", tc.template)
+			s.Require().NotNil(vol.Secret, "extra volume source should pass through on %s", tc.template)
+			s.Equal("my-ca", vol.Secret.SecretName, "extra volume secretName should pass through on %s", tc.template)
+
+			if tc.executor {
+				s.NotNil(findVolumeMount(sidecar.VolumeMounts, "telemetry-socket"),
+					"executor sidecar must keep the telemetry-socket mount on %s", tc.template)
+			}
+		})
+	}
 }
 
 // TestShareProcessNamespaceEnabledByDefault asserts that the api, app,
 // plugins, and delegated-operator deployments all opt into PID-namespace
-// sharing when telemetry is enabled (the default). The sidecar relies on
-// /proc/<pid>/fd/1 access in the target container's PID namespace, so
-// dropping this would silently break log capture.
+// sharing when telemetry is enabled (the default). The sidecar samples the
+// target via the shared PID namespace — psutil reads /proc/<pid> for CPU,
+// memory, threads, and file descriptors, and py-spy attaches for stack
+// archives — so dropping this would silently break metrics capture. (Log
+// capture is separate: on Kubernetes the sidecar tails the container's logs
+// via the pods/log API, which the telemetry Role grants.)
 func (s *telemetrySidecarTemplateTest) TestShareProcessNamespaceEnabledByDefault() {
 	cases := []struct {
 		template string
@@ -132,6 +206,29 @@ func (s *telemetrySidecarTemplateTest) TestShareProcessNamespaceDisabledWithTele
 	}
 }
 
+// TestSidecarRenderedWithRbacCreateDisabled asserts that disabling the
+// telemetry RBAC escape hatch (telemetry.rbac.create=false) does not affect
+// sidecar injection. Metrics ride on the shared process namespace, not the
+// pods/log Role, so an install identity without namespaced RBAC permissions
+// still gets the sidecar and the Settings → Metrics dashboard.
+func (s *telemetrySidecarTemplateTest) TestSidecarRenderedWithRbacCreateDisabled() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.rbac.create": "false",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName,
+		[]string{"templates/app-deployment.yaml"})
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+	s.NotNil(findContainer(deployment.Spec.Template.Spec.Containers, telemetrySidecarName),
+		"telemetry-sidecar should still be injected when telemetry.rbac.create is false")
+	s.Require().NotNil(deployment.Spec.Template.Spec.ShareProcessNamespace,
+		"shareProcessNamespace should still be set when telemetry.rbac.create is false")
+	s.True(*deployment.Spec.Template.Spec.ShareProcessNamespace,
+		"shareProcessNamespace should still be true when telemetry.rbac.create is false")
+}
+
 // TestSidecarSecurityContext asserts the sidecar drops all default caps,
 // disables privilege escalation, and only adds SYS_PTRACE on executor (DO)
 // sidecars where py-spy crash-stack archives are load-bearing.
@@ -167,7 +264,7 @@ func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 			var deployment appsv1.Deployment
 			helm.UnmarshalK8SYaml(s.T(), output, &deployment)
 
-			sidecar := findSidecar(deployment.Spec.Template.Spec.Containers)
+			sidecar := findContainer(deployment.Spec.Template.Spec.Containers, telemetrySidecarName)
 			s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected into %s", tc.template)
 
 			sc := sidecar.SecurityContext

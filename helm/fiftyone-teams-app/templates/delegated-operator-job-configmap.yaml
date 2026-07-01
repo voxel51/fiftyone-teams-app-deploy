@@ -44,6 +44,17 @@ data:
   {{- $mergedVolumeMounts := $jobConfig.volumeMounts | default $baseTpl.volumeMounts | default list }}
   {{- $mergedVolumes := $jobConfig.volumes | default $baseTpl.volumes | default list }}
 
+  {{- /* When the executor requests a GPU, expose that same GPU to its telemetry
+         sidecar for read-only metrics. This sets env vars only — the sidecar never
+         requests its own nvidia.com/gpu, so it consumes no GPU quota and the
+         executor keeps the allocated GPU. Honored where the NVIDIA runtime accepts
+         NVIDIA_VISIBLE_DEVICES (most setups; GKE blocks env-based exposure). */}}
+  {{- $gpuRequested := or (not (empty (dig "limits" "nvidia.com/gpu" "" $mergedResources))) (not (empty (dig "requests" "nvidia.com/gpu" "" $mergedResources))) }}
+  {{- $sidecarEnv := dict }}
+  {{- if $gpuRequested }}
+  {{- $sidecarEnv = dict "NVIDIA_VISIBLE_DEVICES" "all" "NVIDIA_DRIVER_CAPABILITIES" "compute,utility" }}
+  {{- end }}
+
   {{- if $.Values.telemetry.enabled }}
     {{- $hasSocketVolume := false }}
     {{- range $vol := $mergedVolumes }}
@@ -58,6 +69,9 @@ data:
     {{- end }}
     {{- if not $hasSocketMount }}
       {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+    {{- end }}
+    {{- with $.Values.telemetry.sidecar.extraVolumes }}
+      {{- $mergedVolumes = concat $mergedVolumes . }}
     {{- end }}
   {{- end }}
 
@@ -143,7 +157,7 @@ data:
               {{- end }}
           {{- if $.Values.telemetry.enabled }}
           initContainers:
-            {{- include "telemetry.native-sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true "targetContainer" "executor") | nindent 12 }}
+            {{- include "telemetry.native-sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true "targetContainer" "executor" "sidecarEnv" $sidecarEnv) | nindent 12 }}
           {{- end }}
           {{- with $mergedNodeSelector }}
           nodeSelector:

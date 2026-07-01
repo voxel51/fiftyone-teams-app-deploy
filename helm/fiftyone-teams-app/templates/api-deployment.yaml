@@ -133,3 +133,8 @@ spec:
         {{- with .Values.apiSettings.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if .Values.telemetry.enabled }}
+        {{- with .Values.telemetry.sidecar.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- end }}

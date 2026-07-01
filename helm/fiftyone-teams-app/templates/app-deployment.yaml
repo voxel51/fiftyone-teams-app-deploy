@@ -108,7 +108,11 @@ spec:
       topologySpreadConstraints:
         {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.appSettings.topologySpreadConstraints "selectorLabels" "teams-app.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
-      {{- with .Values.appSettings.volumes }}
+      {{- $volumes := .Values.appSettings.volumes | default list }}
+      {{- if .Values.telemetry.enabled }}
+      {{- $volumes = concat $volumes (.Values.telemetry.sidecar.extraVolumes | default list) }}
+      {{- end }}
+      {{- with $volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}

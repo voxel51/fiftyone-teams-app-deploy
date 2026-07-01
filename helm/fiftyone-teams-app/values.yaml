@@ -1425,7 +1425,7 @@ teamsAppSettings:
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.20.0
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.21.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
@@ -1628,6 +1628,17 @@ telemetry:
   # -- When `false`, no telemetry resources or sidecars are rendered and the
   # FiftyOne UI's delegated-operator log viewer will be empty.
   enabled: true
+  rbac:
+    # -- When `false`, the telemetry `Role`/`RoleBinding` granting the sidecar
+    # `pods/log` read access are not rendered. Set `false` only when the
+    # install identity cannot create namespaced RBAC AND `serviceAccounts`
+    # points at an existing account that already carries `pods/log` (e.g. the
+    # teams-api RBAC SA). On Kubernetes the sidecar tails container logs via the
+    # `pods/log` API; without this grant those calls return `403`, so the
+    # delegated-operator log viewer stays empty. The Settings → Metrics
+    # dashboard is unaffected — metrics use the pod's shared process namespace,
+    # not the Kubernetes API.
+    create: true
   redis:
     # -- Container image for the telemetry Redis Deployment.
     image: redis:7-alpine
@@ -1684,6 +1695,13 @@ telemetry:
       # (e.g. `redis://my-redis.example.com:6379`).
       url: ""
   sidecar:
+    # -- Additional volume mounts for the `telemetry-sidecar` container, e.g. to
+    # mount the same CA certs the app containers use. [Reference][volumes].
+    extraVolumeMounts: []
+    # -- Additional pod volumes available to the `telemetry-sidecar`. Omit any
+    # volume already defined on the workload (`*.volumes`) to avoid name
+    # collisions. [Reference][volumes].
+    extraVolumes: []
     image:
       # @schema
       # oneOf:

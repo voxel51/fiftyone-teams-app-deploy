@@ -90,6 +90,8 @@ Inputs (dict):
   podName          — value for POD_NAME env var (defaults to fieldRef metadata.name)
   executor         — bool, when true emit EXECUTOR_SIDECAR=true and TELEMETRY_SOCKET env
   targetContainer  — when set, emit TARGET_CONTAINER env var (used by job sidecars)
+  sidecarEnv       — optional map of extra env vars to append (e.g. NVIDIA_* so a
+                     sidecar on a GPU node can read NVML/GPU metrics)
 */}}
 {{- define "telemetry.sidecar-env" -}}
 {{- $secretName := .ctx.Values.secret.name -}}
@@ -127,6 +129,10 @@ Inputs (dict):
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- range $name, $value := .sidecarEnv }}
+- name: {{ $name }}
+  value: {{ $value | quote }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -150,10 +156,16 @@ Inputs: same dict as telemetry.sidecar-env.
       {{- if .executor }}
       add: ["SYS_PTRACE"]
       {{- end }}
+  {{- $mounts := list }}
   {{- if .executor }}
+  {{- $mounts = append $mounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+  {{- end }}
+  {{- with .ctx.Values.telemetry.sidecar.extraVolumeMounts }}
+  {{- $mounts = concat $mounts . }}
+  {{- end }}
+  {{- with $mounts }}
   volumeMounts:
-    - name: telemetry-socket
-      mountPath: /tmp/telemetry
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
 
@@ -188,9 +200,12 @@ would block Job completion.
       {{- if .executor }}
       add: ["SYS_PTRACE"]
       {{- end }}
+  {{- $mounts := list (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+  {{- with .ctx.Values.telemetry.sidecar.extraVolumeMounts }}
+  {{- $mounts = concat $mounts . }}
+  {{- end }}
   volumeMounts:
-    - name: telemetry-socket
-      mountPath: /tmp/telemetry
+    {{- toYaml $mounts | nindent 4 }}
 {{- end }}
 
 {{/*
