@@ -560,7 +560,7 @@ Afterwards, access the FiftyOne Enterprise app via
 
     ```shell
     $ curl http://localhost:3000/api/hello
-    {"name":"John Doe"}
+    {"status":"available"}
     ```
 
 #### Port Forward to the `teams-api` Service
