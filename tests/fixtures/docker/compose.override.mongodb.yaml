@@ -5,6 +5,11 @@ services:
   teams-api:
     depends_on: [mongodb]
     image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-api:${FIFTYONE_TEAMS_API_VERSION}
+    # Force unbuffered stdout so the startup log line is flushed immediately
+    # rather than sitting in a block buffer. Prevents flaky log assertions in
+    # the integration tests (see checkContainerLogsWithRetries).
+    environment:
+      PYTHONUNBUFFERED: "1"
   teams-app:
     depends_on: [mongodb]
     image: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-app:${FIFTYONE_TEAMS_APP_VERSION}

@@ -42,8 +42,14 @@ func get_logs(t *testing.T, dockerOptions *docker.Options, container string) str
 }
 
 func checkContainerLogsWithRetries(subT *testing.T, dockerOptions *docker.Options, container string, tc string, expected string) {
-	maxRetries := 6
-	retryDelay := 2 * time.Second
+	// Give the log assertion at least as much headroom as validate_endpoint
+	// (10 x 3s = 30s), plus margin. On loaded CI runners the larger compose
+	// stacks (e.g. dedicated plugins) can take longer to emit their startup
+	// line than the previous 6 x 2s (~12s) budget allowed, which caused
+	// non-deterministic failures where an otherwise-healthy container's log
+	// line had not yet surfaced within the window.
+	maxRetries := 15
+	retryDelay := 3 * time.Second
 
 	var log string
 
