@@ -5711,16 +5711,6 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySocketInj
 		}
 		return n
 	}
-	// findContainer returns the named container (the main DO container,
-	// not the telemetry-sidecar) from a pod spec.
-	findContainer := func(containers []corev1.Container, name string) *corev1.Container {
-		for i, c := range containers {
-			if c.Name == name {
-				return &containers[i]
-			}
-		}
-		return nil
-	}
 
 	testCases := []struct {
 		name      string
@@ -5780,6 +5770,126 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySocketInj
 				countMounts(main.VolumeMounts, socketName),
 				"telemetry-socket volumeMount count mismatch on main container",
 			)
+		})
+	}
+}
+
+// TestTelemetryDisabledOmitsSidecar verifies that when telemetry is disabled
+// the rendered DO deployment carries neither the telemetry-sidecar container nor
+// the telemetry-socket volume/mount. The disabled shape is also covered
+// indirectly by TestContainerCount (container count is 1, not 2) and the
+// disableTelemetry-based volume/mount tests; this is the focused negative
+// assertion living next to the positive cases above.
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetryDisabledOmitsSidecar() {
+	const socketName = "telemetry-socket"
+
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.enabled": "false",
+		"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	docs := strings.Split(output, "---")
+	s.Require().GreaterOrEqual(len(docs), 2, "expected at least one rendered deployment")
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), docs[1], &deployment)
+
+	s.Nil(findContainer(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar"),
+		"telemetry-sidecar container should be absent when telemetry is disabled")
+	s.Nil(findVolume(deployment.Spec.Template.Spec.Volumes, socketName),
+		"telemetry-socket volume should be absent when telemetry is disabled")
+
+	main := findContainer(deployment.Spec.Template.Spec.Containers, "teams-do-cpu-default")
+	s.Require().NotNil(main, "main DO container not found")
+	s.Nil(findVolumeMount(main.VolumeMounts, socketName),
+		"telemetry-socket volumeMount should be absent when telemetry is disabled")
+}
+
+// TestTelemetrySidecarGpuEnv verifies that when a delegated-operator executor
+// requests a GPU (via resources.limits or resources.requests), its
+// telemetry-sidecar is given the NVIDIA_* env vars needed to read GPU metrics,
+// without the sidecar requesting its own nvidia.com/gpu allocation. When no GPU
+// is requested, the sidecar receives no NVIDIA_* env vars.
+func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySidecarGpuEnv() {
+	const gpuResource = "nvidia.com/gpu"
+
+	// gpuKey escapes the dot in nvidia.com/gpu so helm --set treats the whole
+	// string as a single map key rather than a nested path.
+	gpuKey := func(section string) string {
+		return "delegatedOperatorDeployments.deployments.teamsDoCpuDefault.resources." +
+			section + ".nvidia\\.com/gpu"
+	}
+
+	testCases := []struct {
+		name      string
+		values    map[string]string
+		expectGpu bool
+	}{
+		{
+			name: "gpuInLimitsExposesEnvToSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				gpuKey("limits"): "1",
+			},
+			expectGpu: true,
+		},
+		{
+			name: "gpuInRequestsExposesEnvToSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+				gpuKey("requests"): "1",
+			},
+			expectGpu: true,
+		},
+		{
+			name: "noGpuOmitsEnvFromSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+			},
+			expectGpu: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		s.Run(tc.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: tc.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			docs := strings.Split(output, "---")
+			s.Require().GreaterOrEqual(len(docs), 2, "expected at least one rendered deployment")
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, docs[1], &deployment)
+
+			sidecar := findContainer(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar, "telemetry-sidecar container not found")
+
+			visibleDevices, hasVisibleDevices := envValue(sidecar.Env, "NVIDIA_VISIBLE_DEVICES")
+			driverCaps, hasDriverCaps := envValue(sidecar.Env, "NVIDIA_DRIVER_CAPABILITIES")
+
+			if tc.expectGpu {
+				s.True(hasVisibleDevices, "sidecar should have NVIDIA_VISIBLE_DEVICES")
+				s.Equal("all", visibleDevices, "NVIDIA_VISIBLE_DEVICES value mismatch")
+				s.True(hasDriverCaps, "sidecar should have NVIDIA_DRIVER_CAPABILITIES")
+				s.Equal("compute,utility", driverCaps, "NVIDIA_DRIVER_CAPABILITIES value mismatch")
+
+				// The sidecar reads the executor's GPU; it must not request its own.
+				_, limitsHasGpu := sidecar.Resources.Limits[corev1.ResourceName(gpuResource)]
+				_, requestsHasGpu := sidecar.Resources.Requests[corev1.ResourceName(gpuResource)]
+				s.False(limitsHasGpu, "sidecar must not request nvidia.com/gpu in limits")
+				s.False(requestsHasGpu, "sidecar must not request nvidia.com/gpu in requests")
+			} else {
+				s.False(hasVisibleDevices, "sidecar should not have NVIDIA_VISIBLE_DEVICES when no GPU requested")
+				s.False(hasDriverCaps, "sidecar should not have NVIDIA_DRIVER_CAPABILITIES when no GPU requested")
+			}
 		})
 	}
 }
