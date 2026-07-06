@@ -1,0 +1,123 @@
+{{- if and .Values.serviceOrchestrator.enabled .Values.serviceOrchestrator.podTemplate.configMap.create -}}
+# Jinja2 Pod template for the kubernetes-service broker (on-demand service
+# pods). Mounted into teams-api; service orchestrators reference it via
+# config.execution_tmpl_uri, so the broker renders service pods from this
+# file instead of building the spec in code. That lets the deployment own the
+# pod shape: the telemetry native sidecar (when enabled) plus the same
+# env/secret wiring the delegated-operator pods use.
+#
+# helm renders the deployment-owned values; the broker renders the per-task
+# jinja variables (escaped below as backtick literals):
+#   _id, _name, _namespace, _image, _command, _args, _env, _port,
+#   _health_path, _health_port, _cpu, _memory, _ephemeral_storage,
+#   _gpu_count, _gpu_type
+{{- $secretName := .Values.secret.name }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "service-orchestrator.pod-template-config-map-name" . }}
+  namespace: {{ .Values.namespace.name }}
+  {{- with .Values.serviceOrchestrator.podTemplate.configMap.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "service-orchestrator.pod-template-config-map-labels" . | nindent 4 }}
+data:
+  pod.yaml.j2: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: {{ `{{ _name }}` }}
+      namespace: {{ `{{ _namespace }}` }}
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      {{- if .Values.telemetry.enabled }}
+      shareProcessNamespace: true
+      initContainers:
+        {{- /* Process matcher: the sidecar finds the target by substring of
+               its cmdline. This matches the in-pod service launcher
+               (python -m fiftyone.operators.delegated_executors.service) and
+               the sidecar then tracks it plus its children (the model
+               server). */}}
+        {{- include "telemetry.native-sidecar" (dict "ctx" . "serviceType" "service" "targetName" "delegated_executors.service" "executor" true "targetContainer" "service") | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: service
+          image: {{ `{{ _image }}` }}
+          imagePullPolicy: Always
+          command:
+            - {{ `{{ _command }}` }}
+          args:
+          {{ `{% for arg in _args %}` }}
+            - "{{ `{{ arg }}` }}"
+          {{ `{% endfor %}` }}
+          ports:
+            - containerPort: {{ `{{ _port }}` }}
+              name: http
+          {{ `{% if _health_path %}` }}
+          readinessProbe:
+            httpGet:
+              path: "{{ `{{ _health_path }}` }}"
+              port: {{ `{{ _health_port }}` }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 24
+          {{ `{% endif %}` }}
+          env:
+            - name: API_URL
+              value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
+            - name: FIFTYONE_INTERNAL_SERVICE
+              value: "1"
+            - name: FIFTYONE_DATABASE_ADMIN
+              value: "false"
+            - name: FIFTYONE_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: encryptionKey
+            - name: FIFTYONE_DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: mongodbConnectionString
+            - name: FIFTYONE_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: fiftyoneDatabaseName
+            {{- if .Values.telemetry.enabled }}
+            - name: TELEMETRY_SOCKET
+              value: /tmp/telemetry/agent.sock
+            {{- end }}
+          {{ `{% for var in _env %}` }}
+            - name: {{ `{{ var.name }}` }}
+              value: "{{ `{{ var.value }}` }}"
+          {{ `{% endfor %}` }}
+          resources:
+            limits:
+              {{ `{% if _cpu %}` }}cpu: "{{ `{{ _cpu }}` }}"{{ `{% endif %}` }}
+              {{ `{% if _memory %}` }}memory: "{{ `{{ _memory }}` }}"{{ `{% endif %}` }}
+              {{ `{% if _ephemeral_storage %}` }}ephemeral-storage: "{{ `{{ _ephemeral_storage }}` }}"{{ `{% endif %}` }}
+              {{ `{% if _gpu_count %}` }}nvidia.com/gpu: "{{ `{{ _gpu_count }}` }}"{{ `{% endif %}` }}
+            requests:
+              {{ `{% if _cpu %}` }}cpu: "{{ `{{ _cpu }}` }}"{{ `{% endif %}` }}
+              {{ `{% if _memory %}` }}memory: "{{ `{{ _memory }}` }}"{{ `{% endif %}` }}
+              {{ `{% if _ephemeral_storage %}` }}ephemeral-storage: "{{ `{{ _ephemeral_storage }}` }}"{{ `{% endif %}` }}
+          {{- if .Values.telemetry.enabled }}
+          volumeMounts:
+            - name: telemetry-socket
+              mountPath: /tmp/telemetry
+          {{- end }}
+      {{- if .Values.telemetry.enabled }}
+      volumes:
+        - name: telemetry-socket
+          emptyDir: {}
+      {{- end }}
+      {{ `{% if _gpu_type %}` }}
+      nodeSelector:
+        cloud.google.com/gke-accelerator: "{{ `{{ _gpu_type }}` }}"
+      {{ `{% endif %}` }}
+{{- end }}

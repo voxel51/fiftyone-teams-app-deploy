@@ -1378,6 +1378,41 @@ secret:
   # -- Additional labels for the generated secret. [Reference][labels-and-selectors].
   labels: {}
 
+# Orchestrator registration seeding configurations
+seedOrchestrators:
+  # -- Controls whether to create a post-install/post-upgrade `Job` that
+  # upserts the orchestrator registrations below in Mongo (by `instance_id`),
+  # so they are versioned here instead of hand-created. Covers any
+  # orchestrator environment (kubernetes delegated-operator jobs,
+  # kubernetes-service pods, ...). See files/seed_orchestrators.py.
+  enabled: false
+  # -- Orchestrator registrations to upsert. Each entry requires
+  # `instance_id`, `description`, `environment`, and `config`; `secrets`
+  # and `available_operators` are optional.
+  orchestrators: []
+  # -- Container image for the seeding job. Empty fields default to
+  # `delegatedOperatorJobTemplates.template.image`.
+  image: {}
+  # -- Number of retries before the seeding job is marked "Failed". [Reference][job-backoff-failure-policy].
+  backoffLimit: 2
+  # -- Seconds the finished job is retained. [Reference][job-termination-and-cleanup].
+  ttlSecondsAfterFinished: 600
+  # -- Pod-level security attributes for the seeding job pod. [Reference][security-context].
+  podSecurityContext:
+    runAsNonRoot: false
+  # -- Container security configuration for the seeding job container. [Reference][container-security-context].
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+  # -- Resources for the seeding job container. [Reference][resources].
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
 serviceAccount:
   # -- Service Account annotations. [Reference][annotations].
   annotations: {}
@@ -1388,6 +1423,48 @@ serviceAccount:
   name: "fiftyone-teams"
   # -- Additional labels for the generated service account. [Reference][labels-and-selectors].
   labels: {}
+
+# Service orchestrator (on-demand service pods) configurations
+serviceOrchestrator:
+  # -- Controls whether to create the service-orchestrator resources below
+  # (builtin services overrides and the service pod template) and wire them
+  # into `teams-api`.
+  enabled: false
+
+  # Per-deployment overrides for the builtin services packaged in fiftyone.
+  # teams-api mounts the generated file and reads it via
+  # `FIFTYONE_BUILTIN_SERVICES_PATH`; entries deep-merge by `id` onto the
+  # packaged defaults at reconcile time.
+  builtinServices:
+    configMap:
+      # -- ConfigMap annotations. [Reference][annotations].
+      annotations: {}
+      # -- Controls whether to create the `ConfigMap` named `serviceOrchestrator.builtinServices.configMap.name`.
+      create: true
+      # -- Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` holding the builtin services overrides.
+      # Defaults to `release-name-fiftyone-teams-app-builtin-services`.
+      name: ""
+      # -- Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].
+      labels: {}
+    # -- Builtin service overrides, deep-merged by `id` onto the defaults
+    # packaged in fiftyone (`builtin_version` must be bumped for a changed
+    # entry to re-apply to an environment that already stores the builtin).
+    services: []
+
+  # Jinja2 Pod template for the kubernetes-service broker. Mounted into
+  # teams-api; service orchestrators reference it via
+  # `config.execution_tmpl_uri` (`/opt/service-pod-template/pod.yaml.j2`).
+  podTemplate:
+    configMap:
+      # -- ConfigMap annotations. [Reference][annotations].
+      annotations: {}
+      # -- Controls whether to create the `ConfigMap` named `serviceOrchestrator.podTemplate.configMap.name`.
+      create: true
+      # -- Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` holding the service pod template.
+      # Defaults to `release-name-fiftyone-teams-app-service-pod-template`.
+      name: ""
+      # -- Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].
+      labels: {}
 
 # FiftyOne Enterprise App (teams-app) configurations
 teamsAppSettings:

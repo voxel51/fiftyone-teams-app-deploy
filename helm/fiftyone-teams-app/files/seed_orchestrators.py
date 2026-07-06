@@ -1,0 +1,55 @@
+"""Seeds a deployment's orchestrator registrations in Mongo, so they are
+versioned in the deployment's values instead of hand-created.
+
+Runs as a helm post-install/post-upgrade Job (see
+seed-orchestrators-job.yaml). Upserts by instance_id: config,
+description, environment, and secrets are re-applied on every run;
+created_at and available_operators are only written when the document is
+first created (the Refresh action in the app re-discovers operators for job
+targets). Talks directly to Mongo with the deployment's existing teams
+secrets, so no API key is required.
+
+The orchestrator list arrives as JSON in the ORCHESTRATORS env var, rendered
+by helm from `seedOrchestrators.orchestrators`. An entry may set its
+`config.image` to "" to have it filled from DEFAULT_WORKER_IMAGE (the
+deployment's delegated-operator worker image), so the registration tracks
+image bumps instead of pinning a tag in values.
+"""
+
+import datetime
+import json
+import os
+
+import pymongo
+
+orchestrators = json.loads(os.environ["ORCHESTRATORS"])
+
+client = pymongo.MongoClient(os.environ["FIFTYONE_DATABASE_URI"])
+coll = client[os.environ["FIFTYONE_DATABASE_NAME"]]["orchestrators"]
+now = datetime.datetime.now(datetime.timezone.utc)
+
+for orc in orchestrators:
+    if orc.get("config", {}).get("image") == "":
+        orc["config"]["image"] = os.environ["DEFAULT_WORKER_IMAGE"]
+    set_fields = {
+        "description": orc["description"],
+        "environment": orc["environment"],
+        "config": orc["config"],
+        "secrets": orc.get("secrets", {}),
+        "updated_at": now,
+    }
+    if "available_operators" in orc:
+        set_fields["available_operators"] = orc["available_operators"]
+    insert_fields = {
+        "instance_id": orc["instance_id"],
+        "created_at": now,
+    }
+    result = coll.update_one(
+        {"instance_id": orc["instance_id"]},
+        {"$set": set_fields, "$setOnInsert": insert_fields},
+        upsert=True,
+    )
+    action = "created" if result.upserted_id else "updated"
+    print(f"{action} orchestrator {orc['instance_id']}")
+
+print("orchestrator seeding complete")

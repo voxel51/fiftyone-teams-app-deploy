@@ -1,0 +1,81 @@
+{{- if .Values.seedOrchestrators.enabled -}}
+# Seeds the deployment's orchestrator registrations in Mongo, so they are
+# versioned in values instead of hand-created. Covers any orchestrator
+# environment (kubernetes delegated-operator jobs, kubernetes-service pods,
+# ...). The script lives in files/seed_orchestrators.py; the orchestrator
+# list is rendered from `seedOrchestrators.orchestrators` and passed as JSON.
+#
+# Uses helm hooks so it works under plain helm and under ArgoCD (which maps
+# post-install/post-upgrade to PostSync). Talks directly to Mongo with the
+# deployment's existing teams secrets, so no API key is required.
+{{- $seed := .Values.seedOrchestrators }}
+{{- $image := merge (deepCopy ($seed.image | default dict)) .Values.delegatedOperatorJobTemplates.template.image }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-seed-orchestrators" (include "fiftyone-teams-app.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Values.namespace.name }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    {{- include "fiftyone-teams-app.commonLabels" . | nindent 4 }}
+    app.voxel51.com/component: orchestrator-seeding
+spec:
+  ttlSecondsAfterFinished: {{ $seed.ttlSecondsAfterFinished }}
+  backoffLimit: {{ $seed.backoffLimit }}
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $seed.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: seed-orchestrators
+          image: "{{ $image.repository }}:{{ $image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ $image.pullPolicy | default "Always" }}
+          env:
+            - name: FIFTYONE_DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: mongodbConnectionString
+            - name: FIFTYONE_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: fiftyoneDatabaseName
+            - name: ORCHESTRATORS
+              value: |-
+                {{- toJson ($seed.orchestrators | default list) | nindent 16 }}
+            # Fills any orchestrator whose `config.image` is the empty-string
+            # sentinel, so registrations can track the CI-managed image
+            # instead of hardcoding a tag in values.
+            - name: DEFAULT_WORKER_IMAGE
+              value: "{{ $image.repository }}:{{ $image.tag | default .Chart.AppVersion }}"
+          {{- with $seed.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $seed.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmpdir
+          command: [python, -c]
+          args:
+            - |
+{{ .Files.Get "files/seed_orchestrators.py" | indent 14 }}
+      volumes:
+        - emptyDir:
+            sizeLimit: 100Mi
+          name: tmpdir
+{{- end }}

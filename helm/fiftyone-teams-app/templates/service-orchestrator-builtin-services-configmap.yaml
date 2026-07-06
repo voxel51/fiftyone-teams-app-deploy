@@ -1,0 +1,22 @@
+{{- if and .Values.serviceOrchestrator.enabled .Values.serviceOrchestrator.builtinServices.configMap.create -}}
+# Per-deployment overrides for the builtin services packaged in fiftyone
+# (fiftyone/operators/builtin_services.yaml). teams-api mounts this file and
+# reads it via FIFTYONE_BUILTIN_SERVICES_PATH; entries deep-merge by `id` onto
+# the packaged defaults at reconcile time. `builtin_version` must be bumped
+# for a changed entry to re-apply to an environment that already has the
+# builtin in its config store.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "service-orchestrator.builtin-services-config-map-name" . }}
+  namespace: {{ .Values.namespace.name }}
+  {{- with .Values.serviceOrchestrator.builtinServices.configMap.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "service-orchestrator.builtin-services-config-map-labels" . | nindent 4 }}
+data:
+  builtin_services.yaml: |
+    {{- toYaml (.Values.serviceOrchestrator.builtinServices.services | default list) | nindent 4 }}
+{{- end }}

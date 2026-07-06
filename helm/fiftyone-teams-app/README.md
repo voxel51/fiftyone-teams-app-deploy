@@ -1036,10 +1036,28 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | secret.fiftyone.mongodbConnectionString | string | `""` | MongoDB Connection String. [Reference][mongodb-connection-string]. |
 | secret.labels | object | `{}` | Additional labels for the generated secret. [Reference][labels-and-selectors]. |
 | secret.name | string | `"fiftyone-teams-secrets"` | Name of the secret (existing or to be created) in the namespace `namespace.name`. |
+| seedOrchestrators.backoffLimit | int | `2` | Number of retries before the seeding job is marked "Failed". [Reference][job-backoff-failure-policy]. |
+| seedOrchestrators.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true}` | Container security configuration for the seeding job container. [Reference][container-security-context]. |
+| seedOrchestrators.enabled | bool | `false` | Controls whether to create a post-install/post-upgrade `Job` that upserts the orchestrator registrations below in Mongo (by `instance_id`), so they are versioned here instead of hand-created. Covers any orchestrator environment (kubernetes delegated-operator jobs, kubernetes-service pods, ...). See files/seed_orchestrators.py. |
+| seedOrchestrators.image | object | `{}` | Container image for the seeding job. Empty fields default to `delegatedOperatorJobTemplates.template.image`. |
+| seedOrchestrators.orchestrators | list | `[]` | Orchestrator registrations to upsert. Each entry requires `instance_id`, `description`, `environment`, and `config`; `secrets` and `available_operators` are optional. |
+| seedOrchestrators.podSecurityContext | object | `{"runAsNonRoot":false}` | Pod-level security attributes for the seeding job pod. [Reference][security-context]. |
+| seedOrchestrators.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"512Mi"}}` | Resources for the seeding job container. [Reference][resources]. |
+| seedOrchestrators.ttlSecondsAfterFinished | int | `600` | Seconds the finished job is retained. [Reference][job-termination-and-cleanup]. |
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
 | serviceAccount.create | bool | `true` | Controls whether to create the service account named `serviceAccount.name`. |
 | serviceAccount.labels | object | `{}` | Additional labels for the generated service account. [Reference][labels-and-selectors]. |
 | serviceAccount.name | string | `"fiftyone-teams"` | Name of the service account (existing or to be created) in the namespace `namespace.name` used for deployments. [Reference][service-account]. |
+| serviceOrchestrator.builtinServices.configMap.annotations | object | `{}` | ConfigMap annotations. [Reference][annotations]. |
+| serviceOrchestrator.builtinServices.configMap.create | bool | `true` | Controls whether to create the `ConfigMap` named `serviceOrchestrator.builtinServices.configMap.name`. |
+| serviceOrchestrator.builtinServices.configMap.labels | object | `{}` | Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors]. |
+| serviceOrchestrator.builtinServices.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` holding the builtin services overrides. Defaults to `release-name-fiftyone-teams-app-builtin-services`. |
+| serviceOrchestrator.builtinServices.services | list | `[]` | Builtin service overrides, deep-merged by `id` onto the defaults packaged in fiftyone (`builtin_version` must be bumped for a changed entry to re-apply to an environment that already stores the builtin). |
+| serviceOrchestrator.enabled | bool | `false` | Controls whether to create the service-orchestrator resources below (builtin services overrides and the service pod template) and wire them into `teams-api`. |
+| serviceOrchestrator.podTemplate.configMap.annotations | object | `{}` | ConfigMap annotations. [Reference][annotations]. |
+| serviceOrchestrator.podTemplate.configMap.create | bool | `true` | Controls whether to create the `ConfigMap` named `serviceOrchestrator.podTemplate.configMap.name`. |
+| serviceOrchestrator.podTemplate.configMap.labels | object | `{}` | Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors]. |
+| serviceOrchestrator.podTemplate.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` holding the service pod template. Defaults to `release-name-fiftyone-teams-app-service-pod-template`. |
 | teamsAppSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-app`.  [Reference][affinity]. |
 | teamsAppSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for `teams-app`.  [Reference][autoscaling]. |
 | teamsAppSettings.autoscaling.maxReplicas | int | `5` | Maximum Replicas for horizontal autoscaling for `teams-app`. |
