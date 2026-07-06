@@ -4,9 +4,11 @@ versioned in the deployment's values instead of hand-created.
 Runs as a helm post-install/post-upgrade Job (see
 seed-orchestrators-job.yaml). Upserts by instance_id: config,
 description, environment, and secrets are re-applied on every run;
-created_at and available_operators are only written when the document is
-first created (the Refresh action in the app re-discovers operators for job
-targets). Talks directly to Mongo with the deployment's existing teams
+created_at is only written when the document is first created.
+available_operators is re-applied on every run for entries that pin it
+(e.g. restricting a service orchestrator to run_service) and never
+touched for entries that omit it, so the app's Refresh action owns the
+discovered list for job targets. Talks directly to Mongo with the deployment's existing teams
 secrets, so no API key is required.
 
 The orchestrator list arrives as JSON in the ORCHESTRATORS env var, rendered

@@ -3468,12 +3468,27 @@
           "type": "array"
         },
         "podSecurityContext": {
-          "description": "Pod-level security attributes for the seeding job pod. [Reference][security-context].",
+          "description": "Pod-level security attributes for the seeding job pod. [Reference][security-context].\nUID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`.",
           "properties": {
+            "fsGroup": {
+              "default": 1000,
+              "title": "fsGroup",
+              "type": "integer"
+            },
+            "runAsGroup": {
+              "default": 1000,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
             "runAsNonRoot": {
-              "default": false,
+              "default": true,
               "title": "runAsNonRoot",
               "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 1000,
+              "title": "runAsUser",
+              "type": "integer"
             }
           },
           "required": [],

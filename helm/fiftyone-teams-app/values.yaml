@@ -1398,8 +1398,12 @@ seedOrchestrators:
   # -- Seconds the finished job is retained. [Reference][job-termination-and-cleanup].
   ttlSecondsAfterFinished: 600
   # -- Pod-level security attributes for the seeding job pod. [Reference][security-context].
+  # UID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`.
   podSecurityContext:
-    runAsNonRoot: false
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
   # -- Container security configuration for the seeding job container. [Reference][container-security-context].
   containerSecurityContext:
     allowPrivilegeEscalation: false

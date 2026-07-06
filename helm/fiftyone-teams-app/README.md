@@ -1041,7 +1041,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | seedOrchestrators.enabled | bool | `false` | Controls whether to create a post-install/post-upgrade `Job` that upserts the orchestrator registrations below in Mongo (by `instance_id`), so they are versioned here instead of hand-created. Covers any orchestrator environment (kubernetes delegated-operator jobs, kubernetes-service pods, ...). See files/seed_orchestrators.py. |
 | seedOrchestrators.image | object | `{}` | Container image for the seeding job. Empty fields default to `delegatedOperatorJobTemplates.template.image`. |
 | seedOrchestrators.orchestrators | list | `[]` | Orchestrator registrations to upsert. Each entry requires `instance_id`, `description`, `environment`, and `config`; `secrets` and `available_operators` are optional. |
-| seedOrchestrators.podSecurityContext | object | `{"runAsNonRoot":false}` | Pod-level security attributes for the seeding job pod. [Reference][security-context]. |
+| seedOrchestrators.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | Pod-level security attributes for the seeding job pod. [Reference][security-context]. UID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`. |
 | seedOrchestrators.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"512Mi"}}` | Resources for the seeding job container. [Reference][resources]. |
 | seedOrchestrators.ttlSecondsAfterFinished | int | `600` | Seconds the finished job is retained. [Reference][job-termination-and-cleanup]. |
 | serviceAccount.annotations | object | `{}` | Service Account annotations. [Reference][annotations]. |
