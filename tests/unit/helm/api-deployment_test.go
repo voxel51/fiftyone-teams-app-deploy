@@ -2875,3 +2875,110 @@ func (s *deploymentApiTemplateTest) TestDeploymentUpdateStrategy() {
 		})
 	}
 }
+
+func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(podSpec corev1.PodSpec)
+	}{
+		{
+			// Feature off (default): no env, no mounts, no volumes.
+			"defaultValues",
+			nil,
+			func(podSpec corev1.PodSpec) {
+				for _, env := range podSpec.Containers[0].Env {
+					s.NotEqual("FIFTYONE_BUILTIN_SERVICES_PATH", env.Name)
+				}
+				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
+					s.NotEqual("builtin-services", volumeMount.Name)
+					s.NotEqual("service-pod-template", volumeMount.Name)
+				}
+				for _, volume := range podSpec.Volumes {
+					s.NotEqual("builtin-services", volume.Name)
+					s.NotEqual("service-pod-template", volume.Name)
+				}
+			},
+		},
+		{
+			// Feature on: the env var points at the mounted overrides file,
+			// and both configmaps are mounted with their generated names.
+			"serviceOrchestratorEnabled",
+			map[string]string{
+				"serviceOrchestrator.enabled": "true",
+			},
+			func(podSpec corev1.PodSpec) {
+				env := map[string]string{}
+				for _, envVar := range podSpec.Containers[0].Env {
+					env[envVar.Name] = envVar.Value
+				}
+				s.Equal(
+					"/opt/builtin-services/builtin_services.yaml",
+					env["FIFTYONE_BUILTIN_SERVICES_PATH"],
+				)
+
+				mounts := map[string]string{}
+				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
+					mounts[volumeMount.Name] = volumeMount.MountPath
+				}
+				s.Equal("/opt/builtin-services", mounts["builtin-services"])
+				s.Equal("/opt/service-pod-template", mounts["service-pod-template"])
+
+				volumes := map[string]string{}
+				for _, volume := range podSpec.Volumes {
+					if volume.ConfigMap != nil {
+						volumes[volume.Name] = volume.ConfigMap.Name
+					}
+				}
+				s.Equal(
+					"fiftyone-test-fiftyone-teams-app-builtin-services",
+					volumes["builtin-services"],
+				)
+				s.Equal(
+					"fiftyone-test-fiftyone-teams-app-service-pod-template",
+					volumes["service-pod-template"],
+				)
+			},
+		},
+		{
+			// Per-configmap opt-out: no create and no external name means
+			// no mount, no volume, no env for that piece.
+			"enabledWithBuiltinServicesConfigMapDisabled",
+			map[string]string{
+				"serviceOrchestrator.enabled":                          "true",
+				"serviceOrchestrator.builtinServices.configMap.create": "false",
+			},
+			func(podSpec corev1.PodSpec) {
+				for _, env := range podSpec.Containers[0].Env {
+					s.NotEqual("FIFTYONE_BUILTIN_SERVICES_PATH", env.Name)
+				}
+				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
+					s.NotEqual("builtin-services", volumeMount.Name)
+				}
+				mounts := []string{}
+				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
+					mounts = append(mounts, volumeMount.Name)
+				}
+				s.Contains(mounts, "service-pod-template")
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec)
+		})
+	}
+}
