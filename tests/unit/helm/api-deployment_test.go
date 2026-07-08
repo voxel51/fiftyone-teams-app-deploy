@@ -2960,6 +2960,21 @@ func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
 					mounts = append(mounts, volumeMount.Name)
 				}
 				s.Contains(mounts, "service-pod-template")
+
+				// The still-enabled pod-template configmap keeps its volume;
+				// only builtin-services is dropped.
+				volumes := map[string]string{}
+				for _, volume := range podSpec.Volumes {
+					if volume.ConfigMap != nil {
+						volumes[volume.Name] = volume.ConfigMap.Name
+					}
+				}
+				_, builtinPresent := volumes["builtin-services"]
+				s.False(builtinPresent, "builtin-services volume should be dropped")
+				s.Equal(
+					"fiftyone-test-fiftyone-teams-app-service-pod-template",
+					volumes["service-pod-template"],
+				)
 			},
 		},
 	}
