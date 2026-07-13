@@ -3501,7 +3501,7 @@
               "type": "object"
             },
             "services": {
-              "description": "Builtin service overrides, deep-merged by `id` onto the defaults\npackaged in fiftyone (`builtin_version` must be bumped for a changed\nentry to re-apply to an environment that already stores the builtin).",
+              "description": "Builtin service overrides, deep-merged by `id` onto the defaults\npackaged in fiftyone (`builtin_version` must be bumped for a changed\nentry to re-apply to an environment that already stores the builtin).\nAn `entrypoint.container.image` without a tag defaults to the chart's\nappVersion.",
               "items": {
                 "required": []
               },

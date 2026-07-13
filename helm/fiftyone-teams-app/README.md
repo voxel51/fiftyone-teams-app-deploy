@@ -1046,7 +1046,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | serviceOrchestrator.builtinServices.configMap.create | bool | `true` | Controls whether to create the `ConfigMap` named `serviceOrchestrator.builtinServices.configMap.name`. |
 | serviceOrchestrator.builtinServices.configMap.labels | object | `{}` | Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors]. |
 | serviceOrchestrator.builtinServices.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` holding the builtin services overrides. Defaults to `release-name-fiftyone-teams-app-builtin-services`. |
-| serviceOrchestrator.builtinServices.services | list | `[]` | Builtin service overrides, deep-merged by `id` onto the defaults packaged in fiftyone (`builtin_version` must be bumped for a changed entry to re-apply to an environment that already stores the builtin). |
+| serviceOrchestrator.builtinServices.services | list | `[]` | Builtin service overrides, deep-merged by `id` onto the defaults packaged in fiftyone (`builtin_version` must be bumped for a changed entry to re-apply to an environment that already stores the builtin). An `entrypoint.container.image` without a tag defaults to the chart's appVersion. |
 | serviceOrchestrator.enabled | bool | `false` | Controls whether to create the builtin services overrides `ConfigMap` below and wire it into `teams-api`. |
 | teamsAppSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-app`.  [Reference][affinity]. |
 | teamsAppSettings.autoscaling.enabled | bool | `false` | Controls horizontal pod autoscaling for `teams-app`.  [Reference][autoscaling]. |

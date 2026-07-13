@@ -1433,6 +1433,8 @@ serviceOrchestrator:
     # -- Builtin service overrides, deep-merged by `id` onto the defaults
     # packaged in fiftyone (`builtin_version` must be bumped for a changed
     # entry to re-apply to an environment that already stores the builtin).
+    # An `entrypoint.container.image` without a tag defaults to the chart's
+    # appVersion.
     services: []
 
 # FiftyOne Enterprise App (teams-app) configurations

@@ -156,6 +156,47 @@ func (s *builtinServicesConfigMapTemplateTest) TestServicesPayload() {
 				s.Equal("registry:5000/sam2-video:tag", container["image"])
 			},
 		},
+		{
+			// An entrypoint image without a tag defaults to the chart's
+			// appVersion; a registry port is not mistaken for a tag and
+			// digest-pinned images are left alone.
+			"enabledWithImageTagDefaulting",
+			map[string]string{
+				"serviceOrchestrator.enabled": "true",
+			},
+			map[string]string{
+				"serviceOrchestrator.builtinServices.services": `[
+          {
+            "id": "builtin:untagged",
+            "builtin_version": 1,
+            "entrypoint": {"container": {"image": "registry:5000/sam2-video"}}
+          },
+          {
+            "id": "builtin:digest",
+            "builtin_version": 1,
+            "entrypoint": {"container": {"image": "registry:5000/sam2-video@sha256:abc123"}}
+          }
+        ]`,
+			},
+			2,
+			func(services []map[string]interface{}) {
+				cInfo, err := chartInfo(s.T(), s.chartPath)
+				s.NoError(err)
+				appVersion, exists := cInfo["appVersion"]
+				s.True(exists)
+
+				entrypoint := services[0]["entrypoint"].(map[string]interface{})
+				container := entrypoint["container"].(map[string]interface{})
+				s.Equal(
+					fmt.Sprintf("registry:5000/sam2-video:%s", appVersion),
+					container["image"],
+				)
+
+				entrypoint = services[1]["entrypoint"].(map[string]interface{})
+				container = entrypoint["container"].(map[string]interface{})
+				s.Equal("registry:5000/sam2-video@sha256:abc123", container["image"])
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
