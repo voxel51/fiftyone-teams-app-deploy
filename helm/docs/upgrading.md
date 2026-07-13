@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Cluster Requirements](#cluster-requirements)
       - [Opting out of Telemetry](#opting-out-of-telemetry)
@@ -143,6 +144,27 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.22+ Multimodal Datasets
+
+FiftyOne Enterprise v2.22.0 introduces multimodal dataset support: large,
+non-sample-centric modalities stored as Parquet-backed Iceberg tables and
+ingested/compacted via a background delegated-operator pipeline.
+
+Multimodal datasets require:
+
+- The `VFF_MULTIMODAL` feature flag, set on `teams-api`, `fiftyone-app`,
+  delegated-operator workloads, `teams-app`, and `teams-plugins`.
+- Sufficient `ephemeral-storage` and `/tmp` scratch space on
+  delegated-operator workloads for projection compaction to complete
+  successfully.
+- Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` on `teams-api` to pin
+  projection processing to a specific orchestrator.
+
+See the
+[Configuring Multimodal Datasets](./configuring-multimodal.md)
+documentation for full details, required workloads, and example
+configuration.
 
 #### FiftyOne Enterprise v2.19+ Telemetry Sidecars
 
