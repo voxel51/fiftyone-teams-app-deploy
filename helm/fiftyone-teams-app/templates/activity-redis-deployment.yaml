@@ -1,0 +1,64 @@
+{{- /*
+Activity Analytics: an in-cluster Redis for the fiftyone.mq queue (BullMQ).
+The chart's convention is "bring your own datastore via connection string"
+(Mongo is external), but the teams stack ships no Redis today, so for the
+Activity proof we bundle a single, ephemeral Redis. Point workers/producers at
+an external Redis instead by setting activitySettings.redis.url and
+activitySettings.redis.enabled=false.
+*/}}
+{{- if and .Values.activitySettings.enabled .Values.activitySettings.redis.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activity-redis
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app.kubernetes.io/name: fiftyone-activity
+    app.kubernetes.io/component: activity-redis
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fiftyone-activity
+      app.kubernetes.io/component: activity-redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fiftyone-activity
+        app.kubernetes.io/component: activity-redis
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: redis
+          image: {{ .Values.activitySettings.redis.image | default "redis:7" | quote }}
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: activity-redis
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app.kubernetes.io/name: fiftyone-activity
+    app.kubernetes.io/component: activity-redis
+spec:
+  selector:
+    app.kubernetes.io/name: fiftyone-activity
+    app.kubernetes.io/component: activity-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+{{- end }}

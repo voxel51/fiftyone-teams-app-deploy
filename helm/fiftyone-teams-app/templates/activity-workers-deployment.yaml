@@ -1,0 +1,63 @@
+{{- /*
+Activity Analytics workers: one published image, N Deployments differing only
+by entrypoint (ingest = queue-depth drain, idempotent; rollup = single-flight
+scheduler). Rendered from the activitySettings.workers map. Mongo comes from
+the shared teams secret (its own fiftyone_activity database); Redis from the
+in-cluster activity-redis (or activitySettings.redis.url).
+*/}}
+{{- if .Values.activitySettings.enabled }}
+{{- $a := .Values.activitySettings }}
+{{- $redisUrl := $a.redis.url | default "redis://activity-redis:6379/0" }}
+{{- range $name, $w := $a.workers }}
+{{- if ne $w.enabled false }}
+{{- $full := printf "activity-%s-worker" $name }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}
+  namespace: {{ $.Values.namespace.name }}
+  labels:
+    app.kubernetes.io/name: fiftyone-activity
+    app.kubernetes.io/component: {{ $full }}
+spec:
+  replicas: {{ $w.replicaCount | default 1 }}
+  {{- if $w.recreate }}
+  strategy:
+    type: Recreate
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fiftyone-activity
+      app.kubernetes.io/component: {{ $full }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fiftyone-activity
+        app.kubernetes.io/component: {{ $full }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $full }}
+          image: "{{ $a.image.repository }}:{{ $a.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $a.image.pullPolicy | default "IfNotPresent" }}
+          command:
+            {{- toYaml $w.command | nindent 12 }}
+          env:
+            - name: FIFTYONE_MQ_REDIS_URL
+              value: {{ $redisUrl | quote }}
+            - name: FIFTYONE_ACTIVITY_MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secret.name }}
+                  key: mongodbConnectionString
+            - name: FIFTYONE_ACTIVITY_MONGO_DB
+              value: {{ $a.mongo.database | default "fiftyone_activity" | quote }}
+          resources:
+            {{- toYaml $a.resources | nindent 12 }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

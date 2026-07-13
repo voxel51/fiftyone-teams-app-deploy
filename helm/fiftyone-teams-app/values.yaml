@@ -1595,3 +1595,47 @@ teamsAppSettings:
   volumeMounts: []
   # -- Volumes for `teams-app` pods. [Reference][volumes].
   volumes: []
+
+# -----------------------------------------------------------------------------
+# Activity Analytics (proof / opt-in)
+#
+# Ingest + rollup workers off a single published fiftyone-activity image, plus
+# an in-cluster Redis for the fiftyone.mq queue. Disabled by default. The
+# workers write to the fiftyone_activity database on the SAME Mongo as teams
+# (connection string reused from the shared secret); teams-api reads it back.
+# -----------------------------------------------------------------------------
+activitySettings:
+  # -- Master toggle for the Activity workers + Redis.
+  enabled: false
+  image:
+    # -- Pinned worker image published from the fiftyone-activity repo.
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
+    # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
+    tag: ""
+    pullPolicy: IfNotPresent
+  mongo:
+    # -- Activity's own database on the shared Mongo instance.
+    database: fiftyone_activity
+  redis:
+    # -- Bundle an ephemeral in-cluster Redis (set false to use an external one).
+    enabled: true
+    image: redis:7
+    # -- Override to point at an external Redis; default targets the bundled one.
+    url: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  # -- One Deployment per entry; command selects the entrypoint in the image.
+  workers:
+    ingest:
+      command: ["fiftyone-activity-ingest-worker"]
+      replicaCount: 2
+    rollup:
+      command: ["fiftyone-activity-rollup-worker"]
+      replicaCount: 1
+      # Single-flight: it owns the repeatable rollup schedule.
+      recreate: true
