@@ -2876,14 +2876,18 @@ func (s *deploymentApiTemplateTest) TestDeploymentUpdateStrategy() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
+// TestBuiltinServicesWiring verifies the builtin-services overrides file
+// wiring: the env var pointing at the mounted file, the volumeMount, and
+// the ConfigMap volume, present exactly when serviceOrchestrator is
+// enabled and the ConfigMap is created (or externally named).
+func (s *deploymentApiTemplateTest) TestBuiltinServicesWiring() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
 		expected func(podSpec corev1.PodSpec)
 	}{
 		{
-			// Feature off (default): no env, no mounts, no volumes.
+			// Feature off (default): no env, no mount, no volume.
 			"defaultValues",
 			nil,
 			func(podSpec corev1.PodSpec) {
@@ -2892,17 +2896,15 @@ func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
 				}
 				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
 					s.NotEqual("builtin-services", volumeMount.Name)
-					s.NotEqual("service-pod-template", volumeMount.Name)
 				}
 				for _, volume := range podSpec.Volumes {
 					s.NotEqual("builtin-services", volume.Name)
-					s.NotEqual("service-pod-template", volume.Name)
 				}
 			},
 		},
 		{
-			// Feature on: the env var points at the mounted overrides file,
-			// and both configmaps are mounted with their generated names.
+			// Feature on: the env var points at the mounted overrides file
+			// and the ConfigMap is mounted with its generated name.
 			"serviceOrchestratorEnabled",
 			map[string]string{
 				"serviceOrchestrator.enabled": "true",
@@ -2922,7 +2924,6 @@ func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
 					mounts[volumeMount.Name] = volumeMount.MountPath
 				}
 				s.Equal("/opt/builtin-services", mounts["builtin-services"])
-				s.Equal("/opt/service-pod-template", mounts["service-pod-template"])
 
 				volumes := map[string]string{}
 				for _, volume := range podSpec.Volumes {
@@ -2934,16 +2935,12 @@ func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
 					"fiftyone-test-fiftyone-teams-app-builtin-services",
 					volumes["builtin-services"],
 				)
-				s.Equal(
-					"fiftyone-test-fiftyone-teams-app-service-pod-template",
-					volumes["service-pod-template"],
-				)
 			},
 		},
 		{
-			// Per-configmap opt-out: no create and no external name means
-			// no mount, no volume, no env for that piece.
-			"enabledWithBuiltinServicesConfigMapDisabled",
+			// Enabled but no create and no external name: no env, no
+			// mount, no volume.
+			"enabledWithConfigMapDisabled",
 			map[string]string{
 				"serviceOrchestrator.enabled":                          "true",
 				"serviceOrchestrator.builtinServices.configMap.create": "false",
@@ -2955,26 +2952,37 @@ func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
 				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
 					s.NotEqual("builtin-services", volumeMount.Name)
 				}
-				mounts := []string{}
-				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
-					mounts = append(mounts, volumeMount.Name)
+				for _, volume := range podSpec.Volumes {
+					s.NotEqual("builtin-services", volume.Name)
 				}
-				s.Contains(mounts, "service-pod-template")
+			},
+		},
+		{
+			// An externally managed ConfigMap keeps the wiring with the
+			// provided name.
+			"enabledWithExternalConfigMap",
+			map[string]string{
+				"serviceOrchestrator.enabled":                          "true",
+				"serviceOrchestrator.builtinServices.configMap.create": "false",
+				"serviceOrchestrator.builtinServices.configMap.name":   "custom-builtin-services",
+			},
+			func(podSpec corev1.PodSpec) {
+				env := map[string]string{}
+				for _, envVar := range podSpec.Containers[0].Env {
+					env[envVar.Name] = envVar.Value
+				}
+				s.Equal(
+					"/opt/builtin-services/builtin_services.yaml",
+					env["FIFTYONE_BUILTIN_SERVICES_PATH"],
+				)
 
-				// The still-enabled pod-template configmap keeps its volume;
-				// only builtin-services is dropped.
 				volumes := map[string]string{}
 				for _, volume := range podSpec.Volumes {
 					if volume.ConfigMap != nil {
 						volumes[volume.Name] = volume.ConfigMap.Name
 					}
 				}
-				_, builtinPresent := volumes["builtin-services"]
-				s.False(builtinPresent, "builtin-services volume should be dropped")
-				s.Equal(
-					"fiftyone-test-fiftyone-teams-app-service-pod-template",
-					volumes["service-pod-template"],
-				)
+				s.Equal("custom-builtin-services", volumes["builtin-services"])
 			},
 		},
 	}

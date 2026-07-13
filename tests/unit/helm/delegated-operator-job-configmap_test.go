@@ -879,3 +879,241 @@ func (s *doK8sConfigMapTemplateTest) loadTestFile(filename, chartVersion string)
 	result = strings.TrimSpace(result)
 	return strings.TrimSpace(result)
 }
+
+// brokerServiceVars returns the per-task variables the kubernetes-service
+// broker renders into a service pod template. The sizing vars (_cpu,
+// _memory, ...) are part of the broker's contract but chart templates
+// deliberately ignore them — sizing comes from the values merge.
+func brokerServiceVars() map[string]interface{} {
+	return map[string]interface{}{
+		"_id":                "task1",
+		"_name":              "svc-task1",
+		"_namespace":         "svc-ns",
+		"_image":             "registry:5000/svc:tag",
+		"_command":           "python",
+		"_args":              []string{"-m", "some.module"},
+		"_env":               []map[string]interface{}{{"name": "SVC_VAR", "value": "svc-val"}},
+		"_port":              8000,
+		"_health_path":       "/healthz",
+		"_health_port":       8000,
+		"_cpu":               "",
+		"_memory":            "",
+		"_ephemeral_storage": "",
+		"_gpu_count":         0,
+		"_gpu_type":          "",
+	}
+}
+
+// renderServicePod renders a single service pod template from the rendered
+// ConfigMap data with the given broker variables and returns it as a
+// corev1.Pod for introspection.
+func (s *doK8sConfigMapTemplateTest) renderServicePod(data map[string]string, key string, vars map[string]interface{}) corev1.Pod {
+	s.T().Helper()
+	s.Require().Contains(data, key, "ConfigMap should contain key %q", key)
+
+	podYAML, err := convertJinjaToYAML(data[key], vars)
+	s.Require().NoError(err)
+
+	var pod corev1.Pod
+	helm.UnmarshalK8SYaml(s.T(), podYAML, &pod)
+	return pod
+}
+
+// TestServiceData verifies that entries under
+// delegatedOperatorJobTemplates.services render jinja2 Pod manifests into
+// the same ConfigMap as the job entries, shaped by the broker's per-task
+// variables.
+func (s *doK8sConfigMapTemplateTest) TestServiceData() {
+	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
+		"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":      "nil",
+		"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
+	})}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	// Jobs and services share the ConfigMap, one file per entry
+	s.Contains(configMap.Data, "cpuDefault.yaml")
+	s.Contains(configMap.Data, "cpuServices.yaml")
+
+	pod := s.renderServicePod(configMap.Data, "cpuServices.yaml", brokerServiceVars())
+
+	// Broker-owned fields
+	s.Equal("svc-task1", pod.ObjectMeta.Name)
+	s.Equal("svc-ns", pod.ObjectMeta.Namespace)
+	s.Require().Len(pod.Spec.Containers, 1)
+	container := pod.Spec.Containers[0]
+	s.Equal("service", container.Name)
+	s.Equal("registry:5000/svc:tag", container.Image)
+	s.Equal([]string{"python"}, container.Command)
+	s.Equal([]string{"-m", "some.module"}, container.Args)
+	s.Require().Len(container.Ports, 1)
+	s.Equal(int32(8000), container.Ports[0].ContainerPort)
+
+	// Health-checked service gets a readiness probe on the health port
+	s.Require().NotNil(container.ReadinessProbe)
+	s.Equal("/healthz", container.ReadinessProbe.HTTPGet.Path)
+
+	// Chart-owned fields, merged like jobs
+	s.Equal("fiftyone-teams", pod.Spec.ServiceAccountName)
+	s.Equal(
+		"cpuServices",
+		pod.ObjectMeta.Labels["app.voxel51.com/delegate-operator-template-name"],
+	)
+	s.Require().NotNil(pod.Spec.SecurityContext)
+	s.True(*pod.Spec.SecurityContext.RunAsNonRoot)
+
+	// Both the shared env wiring and the broker's per-task _env land
+	apiURL, ok := envValue(container.Env, "API_URL")
+	s.True(ok)
+	s.Equal("http://teams-api:80", apiURL)
+	internal, ok := envValue(container.Env, "FIFTYONE_INTERNAL_SERVICE")
+	s.True(ok)
+	s.Equal("true", internal)
+	svcVar, ok := envValue(container.Env, "SVC_VAR")
+	s.True(ok)
+	s.Equal("svc-val", svcVar)
+}
+
+func (s *doK8sConfigMapTemplateTest) TestServiceWithoutHealthcheck() {
+	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
+		"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
+	})}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	vars := brokerServiceVars()
+	vars["_health_path"] = ""
+	pod := s.renderServicePod(configMap.Data, "cpuServices.yaml", vars)
+
+	s.Nil(pod.Spec.Containers[0].ReadinessProbe, "No probe without a health path")
+}
+
+func (s *doK8sConfigMapTemplateTest) TestServiceDisabled() {
+	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
+		"delegatedOperatorJobTemplates.services.cpuServices.enabled": "false",
+	})}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	s.NotContains(configMap.Data, "cpuServices.yaml")
+}
+
+// TestServiceResources verifies that service pod sizing comes from the
+// chart's values merge (template merged with the entry's override), and
+// that the broker's per-task sizing vars — an orchestrator record with
+// resource_requests — are ignored: the deployment owns the pod shape,
+// same as jobs.
+func (s *doK8sConfigMapTemplateTest) TestServiceResources() {
+	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
+		"delegatedOperatorJobTemplates.template.resources.requests.cpu":                "1",
+		"delegatedOperatorJobTemplates.services.cpuServices.unused":                    "nil",
+		"delegatedOperatorJobTemplates.services.gpuServices.resources.requests.cpu":    "2",
+		"delegatedOperatorJobTemplates.services.gpuServices.resources.requests.memory": "8Gi",
+	})}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	// Entry override merged over the template resources
+	pod := s.renderServicePod(configMap.Data, "gpuServices.yaml", brokerServiceVars())
+	requests := pod.Spec.Containers[0].Resources.Requests
+	s.Equal("2", requests.Cpu().String())
+	s.Equal("8Gi", requests.Memory().String())
+
+	// Entry without an override inherits the template resources
+	pod = s.renderServicePod(configMap.Data, "cpuServices.yaml", brokerServiceVars())
+	s.Equal("1", pod.Spec.Containers[0].Resources.Requests.Cpu().String())
+
+	// Broker sizing vars do not affect the chart-owned sizing
+	vars := brokerServiceVars()
+	vars["_cpu"] = "4"
+	vars["_memory"] = "16Gi"
+	vars["_ephemeral_storage"] = "9Gi"
+	vars["_gpu_count"] = 1
+	pod = s.renderServicePod(configMap.Data, "gpuServices.yaml", vars)
+	requests = pod.Spec.Containers[0].Resources.Requests
+	s.Equal("2", requests.Cpu().String())
+	s.Equal("8Gi", requests.Memory().String())
+	_, limitsHaveGpu := pod.Spec.Containers[0].Resources.Limits[corev1.ResourceName("nvidia.com/gpu")]
+	s.False(limitsHaveGpu, "broker _gpu_count must not size the pod")
+}
+
+// TestServiceNodeSelector verifies the merged nodeSelector applies and the
+// broker's gpu_type var is ignored: node targeting is chart-owned, same
+// as sizing.
+func (s *doK8sConfigMapTemplateTest) TestServiceNodeSelector() {
+	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
+		"delegatedOperatorJobTemplates.services.gpuServices.nodeSelector.cloud\\.google\\.com/gke-accelerator": "nvidia-tesla-t4",
+		"delegatedOperatorJobTemplates.services.gpuServices.nodeSelector.disktype":                             "ssd",
+	})}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	pod := s.renderServicePod(configMap.Data, "gpuServices.yaml", brokerServiceVars())
+	s.Equal("nvidia-tesla-t4", pod.Spec.NodeSelector["cloud.google.com/gke-accelerator"])
+	s.Equal("ssd", pod.Spec.NodeSelector["disktype"])
+
+	vars := brokerServiceVars()
+	vars["_gpu_type"] = "nvidia-h100-80gb"
+	pod = s.renderServicePod(configMap.Data, "gpuServices.yaml", vars)
+	s.Equal("nvidia-tesla-t4", pod.Spec.NodeSelector["cloud.google.com/gke-accelerator"])
+	s.Equal("ssd", pod.Spec.NodeSelector["disktype"])
+}
+
+// TestServiceTelemetry verifies the telemetry wiring on service pods: the
+// native sidecar targeting the in-pod service launcher, the shared socket,
+// and their absence when telemetry is disabled.
+func (s *doK8sConfigMapTemplateTest) TestServiceTelemetry() {
+	const socketName = "telemetry-socket"
+
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.enabled": "true",
+		"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	pod := s.renderServicePod(configMap.Data, "cpuServices.yaml", brokerServiceVars())
+
+	s.Require().NotNil(pod.Spec.ShareProcessNamespace)
+	s.True(*pod.Spec.ShareProcessNamespace)
+
+	sidecar := findContainer(pod.Spec.InitContainers, "telemetry-sidecar")
+	s.Require().NotNil(sidecar, "telemetry-sidecar initContainer not found")
+	targetContainer, ok := envValue(sidecar.Env, "TARGET_CONTAINER")
+	s.True(ok)
+	s.Equal("service", targetContainer)
+	serviceType, ok := envValue(sidecar.Env, "SERVICE_TYPE")
+	s.True(ok)
+	s.Equal("service", serviceType)
+
+	s.NotNil(findVolume(pod.Spec.Volumes, socketName))
+	s.NotNil(findVolumeMount(pod.Spec.Containers[0].VolumeMounts, socketName))
+	socket, ok := envValue(pod.Spec.Containers[0].Env, "TELEMETRY_SOCKET")
+	s.True(ok)
+	s.Equal("/tmp/telemetry/agent.sock", socket)
+
+	// Disabled: no sidecar, no socket plumbing
+	options = &helm.Options{SetValues: disableTelemetry(map[string]string{
+		"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
+	})}
+	output = helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	pod = s.renderServicePod(configMap.Data, "cpuServices.yaml", brokerServiceVars())
+	s.Empty(pod.Spec.InitContainers, "No sidecar with telemetry disabled")
+	s.Nil(findVolume(pod.Spec.Volumes, socketName))
+	_, ok = envValue(pod.Spec.Containers[0].Env, "TELEMETRY_SOCKET")
+	s.False(ok)
+}

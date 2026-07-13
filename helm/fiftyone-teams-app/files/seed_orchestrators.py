@@ -2,20 +2,18 @@
 versioned in the deployment's values instead of hand-created.
 
 Runs as a helm post-install/post-upgrade Job (see
-seed-orchestrators-job.yaml). Upserts by instance_id: config,
-description, environment, and secrets are re-applied on every run;
-created_at is only written when the document is first created.
-available_operators is re-applied on every run for entries that pin it
-(e.g. restricting a service orchestrator to run_service) and never
-touched for entries that omit it, so the app's Refresh action owns the
-discovered list for job targets. Talks directly to Mongo with the deployment's existing teams
-secrets, so no API key is required.
+seed-orchestrators-job.yaml). The orchestrator list arrives as JSON in the
+ORCHESTRATORS env var, derived by helm from the entries under
+`delegatedOperatorJobTemplates.jobs` and `.services` that resolve
+`registerOrchestrator` to true.
 
-The orchestrator list arrives as JSON in the ORCHESTRATORS env var, rendered
-by helm from `seedOrchestrators.orchestrators`. An entry may set its
-`config.image` to "" to have it filled from DEFAULT_WORKER_IMAGE (the
-deployment's delegated-operator worker image), so the registration tracks
-image bumps instead of pinning a tag in values.
+Upserts by instance_id: config, description, environment, and secrets are
+re-applied on every run; created_at is only written when the document is
+first created. available_operators is re-applied on every run for entries
+that pin it (service orchestrators, restricted to run_service) and never
+touched for entries that omit it (job orchestrators), so the app's Refresh
+action owns the discovered list for job targets. Talks directly to Mongo
+with the deployment's existing teams secrets, so no API key is required.
 """
 
 import datetime
@@ -31,8 +29,6 @@ coll = client[os.environ["FIFTYONE_DATABASE_NAME"]]["orchestrators"]
 now = datetime.datetime.now(datetime.timezone.utc)
 
 for orc in orchestrators:
-    if orc.get("config", {}).get("image") == "":
-        orc["config"]["image"] = os.environ["DEFAULT_WORKER_IMAGE"]
     set_fields = {
         "description": orc["description"],
         "environment": orc["environment"],

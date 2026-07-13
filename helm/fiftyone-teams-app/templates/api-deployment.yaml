@@ -89,15 +89,9 @@ spec:
             - name: do-targets
               mountPath: /tmp/do-targets
             {{- end }}
-            {{- if .Values.serviceOrchestrator.enabled }}
-            {{- if or (.Values.serviceOrchestrator.builtinServices.configMap.create) (.Values.serviceOrchestrator.builtinServices.configMap.name) }}
+            {{- if and .Values.serviceOrchestrator.enabled (or .Values.serviceOrchestrator.builtinServices.configMap.create .Values.serviceOrchestrator.builtinServices.configMap.name) }}
             - name: builtin-services
               mountPath: /opt/builtin-services
-            {{- end }}
-            {{- if or (.Values.serviceOrchestrator.podTemplate.configMap.create) (.Values.serviceOrchestrator.podTemplate.configMap.name) }}
-            - name: service-pod-template
-              mountPath: /opt/service-pod-template
-            {{- end }}
             {{- end }}
             {{- with .Values.apiSettings.volumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -140,17 +134,10 @@ spec:
           configMap:
             name: {{ include "delegated-operator-templates.config-map-name" . }}
         {{- end }}
-        {{- if .Values.serviceOrchestrator.enabled }}
-        {{- if or (.Values.serviceOrchestrator.builtinServices.configMap.create) (.Values.serviceOrchestrator.builtinServices.configMap.name) }}
+        {{- if and .Values.serviceOrchestrator.enabled (or .Values.serviceOrchestrator.builtinServices.configMap.create .Values.serviceOrchestrator.builtinServices.configMap.name) }}
         - name: builtin-services
           configMap:
             name: {{ include "service-orchestrator.builtin-services-config-map-name" . }}
-        {{- end }}
-        {{- if or (.Values.serviceOrchestrator.podTemplate.configMap.create) (.Values.serviceOrchestrator.podTemplate.configMap.name) }}
-        - name: service-pod-template
-          configMap:
-            name: {{ include "service-orchestrator.pod-template-config-map-name" . }}
-        {{- end }}
         {{- end }}
         {{- with .Values.apiSettings.volumes }}
         {{- toYaml . | nindent 8 }}

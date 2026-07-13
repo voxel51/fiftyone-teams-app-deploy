@@ -2382,6 +2382,12 @@
           "title": "jobs",
           "type": "object"
         },
+        "services": {
+          "description": "On-Demand Service Orchestrator Pod templates for the\n`kubernetes-service` environment (long-lived push services). Each entry\nrenders a jinja2 `Pod` manifest into the same `ConfigMap` as `jobs`,\nmerged over `template` with the same logic. Job-only fields (`image`,\n`jobAnnotations`, and the Job spec fields) do not apply: the\nkubernetes-service broker provides the image and command per task.\nEntries also accept `description` and `registerOrchestrator`.",
+          "required": [],
+          "title": "services",
+          "type": "object"
+        },
         "template": {
           "description": "A common template applied to all deployments. Each deployment can\nthen override individual fields as needed by the operator.",
           "properties": {
@@ -2537,6 +2543,12 @@
               "required": [],
               "title": "podSecurityContext",
               "type": "object"
+            },
+            "registerOrchestrator": {
+              "default": true,
+              "description": "Controls whether a post-install/post-upgrade seeding Job registers\nan orchestrator in MongoDB for each entry under `jobs` and `services`\n(upserted by `instance_id` = entry name). Individual entries can\noverride this with their own `registerOrchestrator` key. See\ntemplates/seed-orchestrators-job.yaml and files/seed_orchestrators.py.",
+              "title": "registerOrchestrator",
+              "type": "boolean"
             },
             "resources": {
               "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `delegated-operator-executor`. [Reference][resources].",
@@ -3420,134 +3432,6 @@
       "title": "secret",
       "type": "object"
     },
-    "seedOrchestrators": {
-      "description": "Orchestrator registration seeding configurations",
-      "properties": {
-        "backoffLimit": {
-          "default": 2,
-          "description": "Number of retries before the seeding job is marked \"Failed\". [Reference][job-backoff-failure-policy].",
-          "title": "backoffLimit",
-          "type": "integer"
-        },
-        "containerSecurityContext": {
-          "description": "Container security configuration for the seeding job container. [Reference][container-security-context].",
-          "properties": {
-            "allowPrivilegeEscalation": {
-              "default": false,
-              "title": "allowPrivilegeEscalation",
-              "type": "boolean"
-            },
-            "readOnlyRootFilesystem": {
-              "default": true,
-              "title": "readOnlyRootFilesystem",
-              "type": "boolean"
-            }
-          },
-          "required": [],
-          "title": "containerSecurityContext",
-          "type": "object"
-        },
-        "enabled": {
-          "default": false,
-          "description": "Controls whether to create a post-install/post-upgrade `Job` that\nupserts the orchestrator registrations below in Mongo (by `instance_id`),\nso they are versioned here instead of hand-created. Covers any\norchestrator environment (kubernetes delegated-operator jobs,\nkubernetes-service pods, ...). See files/seed_orchestrators.py.",
-          "title": "enabled",
-          "type": "boolean"
-        },
-        "image": {
-          "description": "Container image for the seeding job. Empty fields default to\n`delegatedOperatorJobTemplates.template.image`.",
-          "required": [],
-          "title": "image",
-          "type": "object"
-        },
-        "orchestrators": {
-          "description": "Orchestrator registrations to upsert. Each entry requires\n`instance_id`, `description`, `environment`, and `config`; `secrets`\nand `available_operators` are optional.",
-          "items": {
-            "required": []
-          },
-          "title": "orchestrators",
-          "type": "array"
-        },
-        "podSecurityContext": {
-          "description": "Pod-level security attributes for the seeding job pod. [Reference][security-context].\nUID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`.",
-          "properties": {
-            "fsGroup": {
-              "default": 1000,
-              "title": "fsGroup",
-              "type": "integer"
-            },
-            "runAsGroup": {
-              "default": 1000,
-              "title": "runAsGroup",
-              "type": "integer"
-            },
-            "runAsNonRoot": {
-              "default": true,
-              "title": "runAsNonRoot",
-              "type": "boolean"
-            },
-            "runAsUser": {
-              "default": 1000,
-              "title": "runAsUser",
-              "type": "integer"
-            }
-          },
-          "required": [],
-          "title": "podSecurityContext",
-          "type": "object"
-        },
-        "resources": {
-          "description": "Resources for the seeding job container. [Reference][resources].",
-          "properties": {
-            "limits": {
-              "properties": {
-                "cpu": {
-                  "default": "250m",
-                  "title": "cpu",
-                  "type": "string"
-                },
-                "memory": {
-                  "default": "512Mi",
-                  "title": "memory",
-                  "type": "string"
-                }
-              },
-              "required": [],
-              "title": "limits",
-              "type": "object"
-            },
-            "requests": {
-              "properties": {
-                "cpu": {
-                  "default": "250m",
-                  "title": "cpu",
-                  "type": "string"
-                },
-                "memory": {
-                  "default": "512Mi",
-                  "title": "memory",
-                  "type": "string"
-                }
-              },
-              "required": [],
-              "title": "requests",
-              "type": "object"
-            }
-          },
-          "required": [],
-          "title": "resources",
-          "type": "object"
-        },
-        "ttlSecondsAfterFinished": {
-          "default": 600,
-          "description": "Seconds the finished job is retained. [Reference][job-termination-and-cleanup].",
-          "title": "ttlSecondsAfterFinished",
-          "type": "integer"
-        }
-      },
-      "required": [],
-      "title": "seedOrchestrators",
-      "type": "object"
-    },
     "serviceAccount": {
       "properties": {
         "annotations": {
@@ -3631,48 +3515,9 @@
         },
         "enabled": {
           "default": false,
-          "description": "Controls whether to create the service-orchestrator resources below\n(builtin services overrides and the service pod template) and wire them\ninto `teams-api`.",
+          "description": "Controls whether to create the builtin services overrides `ConfigMap`\nbelow and wire it into `teams-api`.",
           "title": "enabled",
           "type": "boolean"
-        },
-        "podTemplate": {
-          "description": "Jinja2 Pod template for the kubernetes-service broker. Mounted into\nteams-api; service orchestrators reference it via\n`config.execution_tmpl_uri` (`/opt/service-pod-template/pod.yaml.j2`).",
-          "properties": {
-            "configMap": {
-              "properties": {
-                "annotations": {
-                  "description": "ConfigMap annotations. [Reference][annotations].",
-                  "required": [],
-                  "title": "annotations",
-                  "type": "object"
-                },
-                "create": {
-                  "default": true,
-                  "description": "Controls whether to create the `ConfigMap` named `serviceOrchestrator.podTemplate.configMap.name`.",
-                  "title": "create",
-                  "type": "boolean"
-                },
-                "labels": {
-                  "description": "Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].",
-                  "required": [],
-                  "title": "labels",
-                  "type": "object"
-                },
-                "name": {
-                  "default": "",
-                  "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` holding the service pod template.\nDefaults to `release-name-fiftyone-teams-app-service-pod-template`.",
-                  "title": "name",
-                  "type": "string"
-                }
-              },
-              "required": [],
-              "title": "configMap",
-              "type": "object"
-            }
-          },
-          "required": [],
-          "title": "podTemplate",
-          "type": "object"
         }
       },
       "required": [],

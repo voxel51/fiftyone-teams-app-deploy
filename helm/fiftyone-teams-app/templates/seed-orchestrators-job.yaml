@@ -1,15 +1,15 @@
-{{- if .Values.seedOrchestrators.enabled -}}
+{{- $orchestratorsJson := include "delegated-operator-templates.seed-orchestrators" . -}}
+{{- if ne $orchestratorsJson "[]" -}}
 # Seeds the deployment's orchestrator registrations in Mongo, so they are
-# versioned in values instead of hand-created. Covers any orchestrator
-# environment (kubernetes delegated-operator jobs, kubernetes-service pods,
-# ...). The script lives in files/seed_orchestrators.py; the orchestrator
-# list is rendered from `seedOrchestrators.orchestrators` and passed as JSON.
+# versioned in values instead of hand-created. The registrations are derived
+# from the `delegatedOperatorJobTemplates.jobs` and `.services` entries that
+# resolve `registerOrchestrator` to true; the script lives in
+# files/seed_orchestrators.py.
 #
 # Uses helm hooks so it works under plain helm and under ArgoCD (which maps
 # post-install/post-upgrade to PostSync). Talks directly to Mongo with the
 # deployment's existing teams secrets, so no API key is required.
-{{- $seed := .Values.seedOrchestrators }}
-{{- $image := merge (deepCopy ($seed.image | default dict)) .Values.delegatedOperatorJobTemplates.template.image }}
+{{- $image := .Values.delegatedOperatorJobTemplates.template.image }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -22,8 +22,8 @@ metadata:
     {{- include "fiftyone-teams-app.commonLabels" . | nindent 4 }}
     app.voxel51.com/component: orchestrator-seeding
 spec:
-  ttlSecondsAfterFinished: {{ $seed.ttlSecondsAfterFinished }}
-  backoffLimit: {{ $seed.backoffLimit }}
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 2
   template:
     spec:
       restartPolicy: Never
@@ -32,10 +32,13 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $seed.podSecurityContext }}
+      # UID/GID 1000 matches the image; set explicitly to satisfy PSA
+      # `restricted`.
       securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: seed-orchestrators
           image: "{{ $image.repository }}:{{ $image.tag | default .Chart.AppVersion }}"
@@ -53,20 +56,17 @@ spec:
                   key: fiftyoneDatabaseName
             - name: ORCHESTRATORS
               value: |-
-                {{- toJson ($seed.orchestrators | default list) | nindent 16 }}
-            # Fills any orchestrator whose `config.image` is the empty-string
-            # sentinel, so registrations can track the CI-managed image
-            # instead of hardcoding a tag in values.
-            - name: DEFAULT_WORKER_IMAGE
-              value: "{{ $image.repository }}:{{ $image.tag | default .Chart.AppVersion }}"
-          {{- with $seed.resources }}
+                {{- $orchestratorsJson | nindent 16 }}
           resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with $seed.containerSecurityContext }}
+            limits:
+              cpu: 250m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 512Mi
           securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
           volumeMounts:
             - mountPath: /tmp
               name: tmpdir

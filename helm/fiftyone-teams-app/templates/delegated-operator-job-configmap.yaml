@@ -177,4 +177,158 @@ data:
           {{- end }}
     {{- end }}
 {{- end }}
+{{- range $serviceName, $serviceConfig := .Values.delegatedOperatorJobTemplates.services }}
+  {{- /* Allows someone to explicitly disable a service template. */ -}}
+  {{- if ne $serviceConfig.enabled false }}
+
+  {{- /* environment context with better merging for helpers. */ -}}
+  {{- $envContext := dict
+      "secretName" $.Values.secret.name
+      "apiServiceName" $.Values.apiSettings.service.name
+      "apiServicePort" (float64 $.Values.apiSettings.service.port)
+      "env" (merge (deepCopy ($serviceConfig.env | default dict)) ($baseTpl.env))
+      "secretEnv" (merge (deepCopy ($serviceConfig.secretEnv | default dict)) ($baseTpl.secretEnv))
+      "ctx" $
+  }}
+
+  {{- /* label context for helpers. */ -}}
+  {{- $labelContext := merge (dict "jobTemplateName" $serviceName) ($)  }}
+
+  {{- /* merged configurations, same merge logic as the jobs above. Job-only
+         fields (image, jobAnnotations, backoffLimit, ...) do not apply: the
+         kubernetes-service broker provides the image per task and the
+         rendered manifest is a bare Pod, not a Job. */ -}}
+  {{- $mergedAffinity := merge (deepCopy ($serviceConfig.affinity | default dict)) ($baseTpl.affinity | default dict) }}
+  {{- $mergedContainerSecurityContext := merge (deepCopy ($serviceConfig.containerSecurityContext | default dict)) ($baseTpl.containerSecurityContext | default dict) }}
+  {{- $mergedLabels := merge (deepCopy ($serviceConfig.labels | default dict)) ($baseTpl.labels | default dict) }}
+  {{- $mergedNodeSelector := merge (deepCopy ($serviceConfig.nodeSelector | default dict)) ($baseTpl.nodeSelector | default dict) }}
+  {{- $mergedPodAnnotations := merge (deepCopy ($serviceConfig.podAnnotations | default dict)) ($baseTpl.podAnnotations | default dict) }}
+  {{- $mergedPodSecurityContext := merge (deepCopy ($serviceConfig.podSecurityContext | default dict)) ($baseTpl.podSecurityContext | default dict) }}
+  {{- $mergedResources := merge (deepCopy ($serviceConfig.resources | default dict)) ($baseTpl.resources) }}
+  {{- $mergedTolerations := $serviceConfig.tolerations | default $baseTpl.tolerations }}
+  {{- $mergedVolumeMounts := $serviceConfig.volumeMounts | default $baseTpl.volumeMounts | default list }}
+  {{- $mergedVolumes := $serviceConfig.volumes | default $baseTpl.volumes | default list }}
+
+  {{- if $.Values.telemetry.enabled }}
+    {{- $hasSocketVolume := false }}
+    {{- range $vol := $mergedVolumes }}
+      {{- if eq $vol.name "telemetry-socket" }}{{- $hasSocketVolume = true }}{{- end }}
+    {{- end }}
+    {{- if not $hasSocketVolume }}
+      {{- $mergedVolumes = append $mergedVolumes (dict "name" "telemetry-socket" "emptyDir" dict) }}
+    {{- end }}
+    {{- $hasSocketMount := false }}
+    {{- range $vm := $mergedVolumeMounts }}
+      {{- if eq $vm.name "telemetry-socket" }}{{- $hasSocketMount = true }}{{- end }}
+    {{- end }}
+    {{- if not $hasSocketMount }}
+      {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+    {{- end }}
+    {{- with $.Values.telemetry.sidecar.extraVolumes }}
+      {{- $mergedVolumes = concat $mergedVolumes . }}
+    {{- end }}
+  {{- end }}
+
+  {{- /* Jinja2 Pod template for the kubernetes-service broker (on-demand
+         service pods). The broker renders the per-task jinja variables
+         (escaped below as backtick literals): _id, _name, _namespace,
+         _image, _command, _args, _env, _port, _health_path, _health_port.
+         The broker also passes sizing vars (_cpu, _memory, _gpu_count, ...)
+         from the record's resource_requests; this template deliberately
+         ignores them — sizing comes from the values merge, like jobs. */}}
+  {{ $serviceName }}.yaml: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: {{ `{{ _name }}` }}
+      namespace: {{ `{{ _namespace }}` }}
+      {{- with $mergedPodAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "delegated-operator-templates.labels" $labelContext | nindent 8 }}
+        {{- with $mergedLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: {{ $serviceConfig.restartPolicy | default $baseTpl.restartPolicy | default "Never" }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
+      {{- if $.Values.telemetry.enabled }}
+      shareProcessNamespace: true
+      initContainers:
+        {{- /* Process matcher: the sidecar finds the target by substring of
+               its cmdline. This matches the in-pod service launcher
+               (python -m fiftyone.operators.delegated_executors.service) and
+               the sidecar then tracks it plus its children (the model
+               server). */}}
+        {{- include "telemetry.native-sidecar" (dict "ctx" $ "serviceType" "service" "targetName" "delegated_executors.service" "executor" true "targetContainer" "service") | nindent 8 }}
+      {{- end }}
+      {{- with $mergedPodSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: service
+          image: {{ `{{ _image }}` }}
+          imagePullPolicy: Always
+          command:
+            - {{ `{{ _command }}` }}
+          args:
+          {{ `{% for arg in _args %}` }}
+            - "{{ `{{ arg }}` }}"
+          {{ `{% endfor %}` }}
+          ports:
+            - containerPort: {{ `{{ _port }}` }}
+              name: http
+          {{ `{% if _health_path %}` }}
+          readinessProbe:
+            httpGet:
+              path: "{{ `{{ _health_path }}` }}"
+              port: {{ `{{ _health_port }}` }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 24
+          {{ `{% endif %}` }}
+          {{- with $mergedContainerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- include "delegated-operator-templates.env-vars-list" $envContext | nindent 12 }}
+          {{ `{% for var in _env %}` }}
+            - name: {{ `{{ var.name }}` }}
+              value: "{{ `{{ var.value }}` }}"
+          {{ `{% endfor %}` }}
+          {{- with $mergedResources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with $mergedNodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $mergedAffinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $mergedTolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $mergedVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end }}
 {{- end }}

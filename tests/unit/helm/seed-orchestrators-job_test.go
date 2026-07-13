@@ -1,5 +1,5 @@
-//go:build kubeall || helm || unit || unitServiceOrchestrator
-// +build kubeall helm unit unitServiceOrchestrator
+//go:build kubeall || helm || unit || unitSeedOrchestrators
+// +build kubeall helm unit unitSeedOrchestrators
 
 package unit
 
@@ -41,14 +41,25 @@ func TestSeedOrchestratorsJobTemplate(t *testing.T) {
 	})
 }
 
-func seedJobEnv(job batchv1.Job) map[string]string {
-	env := map[string]string{}
+// seedJobOrchestrators unmarshals the derived ORCHESTRATORS env var from
+// the rendered job.
+func (s *seedOrchestratorsJobTemplateTest) seedJobOrchestrators(job batchv1.Job) []map[string]interface{} {
+	s.T().Helper()
 	for _, envVar := range job.Spec.Template.Spec.Containers[0].Env {
-		env[envVar.Name] = envVar.Value
+		if envVar.Name == "ORCHESTRATORS" {
+			var orchestrators []map[string]interface{}
+			err := json.Unmarshal([]byte(envVar.Value), &orchestrators)
+			s.Require().NoError(err, "ORCHESTRATORS should be valid JSON")
+			return orchestrators
+		}
 	}
-	return env
+	s.Require().Fail("ORCHESTRATORS env var not found")
+	return nil
 }
 
+// TestGating verifies that the job renders exactly when at least one
+// enabled jobs/services entry resolves registerOrchestrator to true (its
+// own key when present, otherwise template.registerOrchestrator).
 func (s *seedOrchestratorsJobTemplateTest) TestGating() {
 	testCases := []struct {
 		name     string
@@ -56,18 +67,56 @@ func (s *seedOrchestratorsJobTemplateTest) TestGating() {
 		expected string // empty => the template must not render
 	}{
 		{
+			// No entries at all: nothing to register
 			"defaultValues",
 			nil,
 			"",
 		},
 		{
-			// Seeding is independent of serviceOrchestrator: it covers any
-			// orchestrator environment, so its own flag alone enables it.
-			"enabledAloneWithoutServiceOrchestrator",
+			// Entries register by default (template.registerOrchestrator
+			// defaults to true)
+			"entriesRegisterByDefault",
 			map[string]string{
-				"seedOrchestrators.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":      "nil",
+				"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
 			},
 			fmt.Sprintf("%s-fiftyone-teams-app-seed-orchestrators", s.releaseName),
+		},
+		{
+			// A template-level opt-out disables seeding for all entries
+			"templateLevelOptOut",
+			map[string]string{
+				"delegatedOperatorJobTemplates.template.registerOrchestrator": "false",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":        "nil",
+				"delegatedOperatorJobTemplates.services.cpuServices.unused":   "nil",
+			},
+			"",
+		},
+		{
+			// An entry-level opt-in beats the template-level opt-out
+			"entryTrueOverridesTemplateFalse",
+			map[string]string{
+				"delegatedOperatorJobTemplates.template.registerOrchestrator":        "false",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "true",
+			},
+			fmt.Sprintf("%s-fiftyone-teams-app-seed-orchestrators", s.releaseName),
+		},
+		{
+			// An entry-level opt-out beats the template-level default
+			"entryFalseOverridesTemplateDefault",
+			map[string]string{
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "false",
+			},
+			"",
+		},
+		{
+			// A disabled entry is not registered even when it opts in
+			"disabledEntryNotRegistered",
+			map[string]string{
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.enabled":              "false",
+			},
+			"",
 		},
 	}
 
@@ -98,7 +147,7 @@ func (s *seedOrchestratorsJobTemplateTest) TestGating() {
 func (s *seedOrchestratorsJobTemplateTest) TestHelmHooks() {
 	options := &helm.Options{
 		SetValues: disableTelemetry(map[string]string{
-			"seedOrchestrators.enabled": "true",
+			"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "true",
 		}),
 	}
 
@@ -117,38 +166,20 @@ func (s *seedOrchestratorsJobTemplateTest) TestHelmHooks() {
 	)
 }
 
-func (s *seedOrchestratorsJobTemplateTest) TestOrchestratorsEnv() {
+// TestDerivedOrchestrators verifies the registration derived for a job and
+// a service entry: instance_id from the entry name, environment by map,
+// execution_tmpl_uri pointing at the entry's file in the do-templates
+// mount, the merged worker image for jobs, and available_operators pinned
+// to run_service for services only.
+func (s *seedOrchestratorsJobTemplateTest) TestDerivedOrchestrators() {
 	options := &helm.Options{
 		SetValues: disableTelemetry(map[string]string{
-			"seedOrchestrators.enabled": "true",
+			"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                     "nil",
+			"delegatedOperatorJobTemplates.services.cpuServices.description":           "Service orchestrator (CPU)",
+			"delegatedOperatorJobTemplates.services.unregistered.registerOrchestrator": "false",
+			"delegatedOperatorJobTemplates.jobs.disabledJob.registerOrchestrator":      "true",
+			"delegatedOperatorJobTemplates.jobs.disabledJob.enabled":                   "false",
 		}),
-		SetJsonValues: map[string]string{
-			"seedOrchestrators.orchestrators": `[
-        {
-          "instance_id": "service-orchestrator-cpu",
-          "description": "Service orchestrator (CPU)",
-          "environment": "kubernetes-service",
-          "config": {
-            "namespace": "svc-ns",
-            "execution_tmpl_uri": "/opt/service-pod-template/pod.yaml.j2",
-            "resource_requests": {"cpu": "2", "memory": "8Gi"}
-          },
-          "secrets": {"kube_config": ""},
-          "available_operators": ["@voxel51/operators/run_service"]
-        },
-        {
-          "instance_id": "kubernetes-cpu",
-          "description": "Kubernetes CPU",
-          "environment": "kubernetes",
-          "config": {
-            "image": "",
-            "execution_tmpl_uri": "/tmp/do-targets/teamsDoK8sCpu.yaml",
-            "namespace": "svc-ns"
-          },
-          "secrets": {"kube_config": ""}
-        }
-      ]`,
-		},
 	}
 
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
@@ -156,38 +187,68 @@ func (s *seedOrchestratorsJobTemplateTest) TestOrchestratorsEnv() {
 	var job batchv1.Job
 	helm.UnmarshalK8SYaml(s.T(), output, &job)
 
-	env := seedJobEnv(job)
-
-	// The orchestrator list round-trips as JSON the seeding script consumes
-	var orchestrators []map[string]interface{}
-	err := json.Unmarshal([]byte(env["ORCHESTRATORS"]), &orchestrators)
-	s.NoError(err, "ORCHESTRATORS should be valid JSON")
+	orchestrators := s.seedJobOrchestrators(job)
 	s.Require().Len(orchestrators, 2)
-	s.Equal("service-orchestrator-cpu", orchestrators[0]["instance_id"])
-	config := orchestrators[0]["config"].(map[string]interface{})
-	s.Equal("/opt/service-pod-template/pod.yaml.j2", config["execution_tmpl_uri"])
-	// The empty-string image sentinel survives for the script to fill from
-	// DEFAULT_WORKER_IMAGE
-	kubernetesConfig := orchestrators[1]["config"].(map[string]interface{})
-	s.Equal("", kubernetesConfig["image"])
 
-	// DEFAULT_WORKER_IMAGE defaults to the delegated-operator worker image
-	// at the chart's appVersion
+	// Sorted by map key within each of jobs then services
+	jobOrc := orchestrators[0]
+	s.Equal("cpuDefault", jobOrc["instance_id"])
+	s.Equal("kubernetes", jobOrc["environment"])
+	s.Equal("Chart-managed job orchestrator cpuDefault", jobOrc["description"])
+	jobConfig := jobOrc["config"].(map[string]interface{})
+	s.Equal("/tmp/do-targets/cpuDefault.yaml", jobConfig["execution_tmpl_uri"])
+	s.Equal(s.namespaceFromConfig(jobConfig), jobConfig["namespace"])
+	// Job orchestrators omit available_operators so the app's Refresh
+	// action owns the discovered list
+	_, hasAvailableOperators := jobOrc["available_operators"]
+	s.False(hasAvailableOperators)
+	s.Equal(map[string]interface{}{"kube_config": ""}, jobOrc["secrets"])
+
+	// The job registration tracks the merged worker image at the chart's
+	// appVersion
 	cInfo, err := chartInfo(s.T(), s.chartPath)
 	s.NoError(err)
 	appVersion, exists := cInfo["appVersion"]
 	s.True(exists)
 	s.Equal(
 		fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", appVersion),
-		env["DEFAULT_WORKER_IMAGE"],
+		jobConfig["image"],
 	)
+
+	serviceOrc := orchestrators[1]
+	s.Equal("cpuServices", serviceOrc["instance_id"])
+	s.Equal("kubernetes-service", serviceOrc["environment"])
+	s.Equal("Service orchestrator (CPU)", serviceOrc["description"])
+	serviceConfig := serviceOrc["config"].(map[string]interface{})
+	s.Equal("/tmp/do-targets/cpuServices.yaml", serviceConfig["execution_tmpl_uri"])
+	// Service orchestrators run only the run_service operator
+	s.Equal(
+		[]interface{}{"@voxel51/operators/run_service"},
+		serviceOrc["available_operators"],
+	)
+	// Services have no chart-owned image: the broker provides it per task
+	_, hasImage := serviceConfig["image"]
+	s.False(hasImage)
 }
 
+// namespaceFromConfig asserts the config carries a non-empty namespace and
+// returns it (the chart default is fiftyone-teams).
+func (s *seedOrchestratorsJobTemplateTest) namespaceFromConfig(config map[string]interface{}) interface{} {
+	s.T().Helper()
+	namespace, ok := config["namespace"]
+	s.Require().True(ok, "config should carry a namespace")
+	s.Require().NotEmpty(namespace)
+	return namespace
+}
+
+// TestImageFollowsDelegatedOperatorTemplate verifies both the seeding
+// container image and the derived job registrations track the
+// delegated-operator worker image.
 func (s *seedOrchestratorsJobTemplateTest) TestImageFollowsDelegatedOperatorTemplate() {
 	options := &helm.Options{
 		SetValues: disableTelemetry(map[string]string{
-			"seedOrchestrators.enabled":                        "true",
-			"delegatedOperatorJobTemplates.template.image.tag": "v9.9.9",
+			"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "true",
+			"delegatedOperatorJobTemplates.template.image.tag":                   "v9.9.9",
 		}),
 	}
 
@@ -198,33 +259,17 @@ func (s *seedOrchestratorsJobTemplateTest) TestImageFollowsDelegatedOperatorTemp
 
 	container := job.Spec.Template.Spec.Containers[0]
 	s.Equal("voxel51/fiftyone-teams-cv-full:v9.9.9", container.Image)
-	s.Equal(
-		"voxel51/fiftyone-teams-cv-full:v9.9.9",
-		seedJobEnv(job)["DEFAULT_WORKER_IMAGE"],
-	)
-}
 
-func (s *seedOrchestratorsJobTemplateTest) TestImageOverride() {
-	options := &helm.Options{
-		SetValues: disableTelemetry(map[string]string{
-			"seedOrchestrators.enabled":          "true",
-			"seedOrchestrators.image.repository": "custom/seeder",
-			"seedOrchestrators.image.tag":        "v1.2.3",
-		}),
-	}
-
-	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
-
-	var job batchv1.Job
-	helm.UnmarshalK8SYaml(s.T(), output, &job)
-
-	s.Equal("custom/seeder:v1.2.3", job.Spec.Template.Spec.Containers[0].Image)
+	orchestrators := s.seedJobOrchestrators(job)
+	s.Require().Len(orchestrators, 1)
+	config := orchestrators[0]["config"].(map[string]interface{})
+	s.Equal("voxel51/fiftyone-teams-cv-full:v9.9.9", config["image"])
 }
 
 func (s *seedOrchestratorsJobTemplateTest) TestPodSpec() {
 	options := &helm.Options{
 		SetValues: disableTelemetry(map[string]string{
-			"seedOrchestrators.enabled": "true",
+			"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "true",
 		}),
 	}
 
@@ -252,5 +297,5 @@ func (s *seedOrchestratorsJobTemplateTest) TestPodSpec() {
 	s.Equal([]string{"python", "-c"}, container.Command)
 	s.Require().Len(container.Args, 1)
 	s.Contains(container.Args[0], "ORCHESTRATORS")
-	s.Contains(container.Args[0], "DEFAULT_WORKER_IMAGE")
+	s.Contains(container.Args[0], "instance_id")
 }
