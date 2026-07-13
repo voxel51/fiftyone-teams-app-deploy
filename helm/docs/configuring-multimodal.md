@@ -22,10 +22,10 @@
 - [Delegated Operator Storage Requirements](#delegated-operator-storage-requirements)
   - [Why Multimodal Needs Extra Scratch Space](#why-multimodal-needs-extra-scratch-space)
   - [Minimum Recommended Sizing](#minimum-recommended-sizing)
-  - [Example Configuration](#example-configuration)
+  - [Example Storage Configuration](#example-storage-configuration)
 - [Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`](#pinning-projection-processing-with-fiftyone_projection_delegation_target)
   - [Behavior When Set](#behavior-when-set)
-  - [Example Configuration](#example-configuration-1)
+  - [Example Delegation Target Configuration](#example-delegation-target-configuration)
 
 <!-- tocstop -->
 
@@ -81,7 +81,8 @@ locations (`gs://`, `s3://`, `az://`), both the download of source files and
 the write of the compacted output stage through the pod's local `/tmp`
 before being uploaded.
 
-If your delegated-operator workloads run with `securityContext.readOnlyRootFilesystem: true`
+If your delegated-operator workloads run with
+`securityContext.readOnlyRootFilesystem: true`
 (recommended for Pod Security Admission `restricted` compliance), `/tmp`
 is not writable at all unless you explicitly mount a writable volume there.
 An `emptyDir` volume mounted at `/tmp` without its own `sizeLimit` draws
@@ -104,7 +105,7 @@ size up further if your projections accumulate a large backlog of
 unconsolidated data between compaction runs (for example, if compaction has
 been disabled or failing for a period of time).
 
-### Example Configuration
+### Example Storage Configuration
 
 ```yaml
 delegatedOperatorDeployments:
@@ -163,7 +164,7 @@ operator, `teams-api` logs an error and skips queuing any projection
 delegated operations that cycle — pending datasets simply won't be
 processed until the value is corrected or removed.
 
-### Example Configuration
+### Example Delegation Target Configuration
 
 ```yaml
 delegatedOperatorDeployments:
