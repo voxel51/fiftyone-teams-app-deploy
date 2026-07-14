@@ -1628,7 +1628,7 @@ activitySettings:
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
     # 0.0.9: snapshot worker (state metrics) + per-metric rollup isolation (one bad
     # metric, e.g. op_duration_p95 on Mongo <7, no longer aborts the batch).
-    tag: "7b0cf27736522e9a5045f7d7cf49445164a7a6c4"
+    tag: "7bc0657389d05faebc196744e4d7c4644c857dc3"
     pullPolicy: IfNotPresent
   mongo:
     # -- Activity's own database on the shared Mongo instance.
