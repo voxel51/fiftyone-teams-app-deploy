@@ -368,13 +368,20 @@ appSettings:
   # (like Minikube). To set resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `fiftyone-app`. [Reference][resources].
+  # ephemeral-storage is set explicitly: the fiftyone-app-torch image is ~5.4GB
+  # compressed / ~15-20GB unpacked, but GKE Autopilot injects a 1Gi default when
+  # unset and bin-packs by request — so the app landed on a full node and was
+  # evicted ("node was low on resource: ephemeral-storage"). 10Gi is Autopilot's
+  # per-workload max (it rejects >10Gi). Harmless on non-Autopilot clusters.
   resources:
-    limits: {}
-    #   cpu: 2
-    #   memory: 6Gi
-    requests: {}
-    #   cpu: 500m
-    #   memory: 512Mi
+    limits:
+      cpu: 2
+      memory: 6Gi
+      ephemeral-storage: 10Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 10Gi
   service:
     # -- Service annotations for `fiftyone-app`. [Reference][annotations].
     annotations: {}
@@ -1619,7 +1626,9 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    tag: "e95ba92bde3f59366311c7b8a59d83563a20cb40"
+    # 0.0.7: per-metric rollup isolation (one bad metric, e.g. op_duration_p95
+    # on Mongo <7, no longer aborts the whole scheduled batch).
+    tag: "20402a643be3dfba17b8281de0a42bee81ac558f"
     pullPolicy: IfNotPresent
   mongo:
     # -- Activity's own database on the shared Mongo instance.
