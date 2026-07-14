@@ -1615,7 +1615,7 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    tag: "15e878fe29c4a28a6fa55d964805efb58388aa9e"
+    tag: "fb9a0fd70c1172cfd4338cc68c8964e824e69a44"
     pullPolicy: IfNotPresent
   mongo:
     # -- Activity's own database on the shared Mongo instance.
