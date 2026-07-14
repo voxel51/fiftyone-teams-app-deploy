@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Host Requirements](#host-requirements)
       - [Opting out of Telemetry](#opting-out-of-telemetry)
@@ -101,6 +102,29 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.22+ Multimodal Datasets
+
+FiftyOne Enterprise v2.22.0 introduces multimodal dataset support: large
+modalities associated with each sample, stored as Parquet-backed Iceberg
+tables rather than as fields on the sample document, ingested/compacted via
+a background delegated-operator pipeline.
+
+Multimodal datasets require:
+
+- The `VFF_MULTIMODAL` feature flag, set on `teams-api`, `fiftyone-app`,
+  `teams-do` workers, `teams-app`, and `teams-plugins`.
+- Sufficient host disk space for `teams-do` containers to stage projection
+  compaction files in `/tmp`.
+- Enough memory on `fiftyone-app` to serve multimodal grid queries, which
+  run DuckDB in-process; size it and `HYPERCORN_WORKERS` accordingly.
+- Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` on `teams-api` to pin
+  projection processing to a specific `teams-do` worker.
+
+See the
+[Configuring Multimodal Datasets](./configuring-multimodal.md)
+documentation for full details, required services, and example
+configuration.
 
 #### FiftyOne Enterprise v2.19+ Telemetry Sidecars
 
