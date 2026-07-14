@@ -15,7 +15,6 @@
 <!-- toc -->
 
 - [Introduction](#introduction)
-- [Prerequisites](#prerequisites)
 - [Kubernetes Credentials](#kubernetes-credentials)
 - [Create Job Template](#create-job-template)
 - [Container Image](#container-image)
