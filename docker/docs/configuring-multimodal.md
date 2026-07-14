@@ -22,6 +22,9 @@
 - [Delegated Operator Scratch Space Requirements](#delegated-operator-scratch-space-requirements)
   - [Why Multimodal Needs Extra Scratch Space](#why-multimodal-needs-extra-scratch-space)
   - [Sizing Guidance](#sizing-guidance)
+- [Redirecting Compaction Scratch Space With `FIFTYONE_COMPACTION_TEMP_LOCATION`](#redirecting-compaction-scratch-space-with-fiftyone_compaction_temp_location)
+  - [Default Behavior](#default-behavior)
+  - [Example Volume Configuration](#example-volume-configuration)
 - [`fiftyone-app` Memory Sizing](#fiftyone-app-memory-sizing)
   - [Recommended Starting Point](#recommended-starting-point)
 - [Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`](#pinning-projection-processing-with-fiftyone_projection_delegation_target)
@@ -46,7 +49,8 @@ Running multimodal datasets requires:
 1. The `VFF_MULTIMODAL` feature flag, set on every service that serves or
    processes multimodal data.
 1. Enough scratch disk space on `teams-do` (delegated operator) containers
-   for projection compaction to succeed.
+   for projection compaction to succeed — optionally redirected to a
+   mounted volume via `FIFTYONE_COMPACTION_TEMP_LOCATION`.
 1. Enough memory on `fiftyone-app` to serve multimodal grid queries, which
    run DuckDB in-process.
 1. Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` to pin projection
@@ -105,6 +109,53 @@ raise here; the practical requirement is simply:
   named volume) with enough capacity for the above — a read-only root
   filesystem with no `/tmp` mount will make compaction fail outright, not
   just run low on space.
+
+## Redirecting Compaction Scratch Space With `FIFTYONE_COMPACTION_TEMP_LOCATION`
+
+`compact_projections` stages all of its local scratch files — downloaded
+and re-uploaded Parquet, plus a local copy of the Iceberg catalog metadata —
+under a single directory. Set `FIFTYONE_COMPACTION_TEMP_LOCATION` in each
+`teams-do` service's `environment:` block to point that directory at a
+mounted volume instead of relying on the container's default writable
+filesystem.
+
+### Default Behavior
+
+If unset, compaction stages files under the system temp directory (`/tmp`
+inside the container), sized per "Delegated Operator Scratch Space
+Requirements" above. The configured directory is created automatically if
+it doesn't already exist.
+
+### Example Volume Configuration
+
+```yaml
+services:
+  teams-do-multimodal:
+    image: voxel51/fiftyone-teams-cv-full:v2.22.0
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote -m -n teams-do-multimodal"
+    environment:
+      VFF_MULTIMODAL: 1
+      FIFTYONE_COMPACTION_TEMP_LOCATION: /mnt/compaction-scratch/compaction
+      # ... plus the other teams-do environment variables
+    volumes:
+      - compaction-scratch:/mnt/compaction-scratch
+
+volumes:
+  compaction-scratch:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=<nfs-host>,rw
+      device: ":/path/to/export"
+```
+
+> [!NOTE]
+> The mounted volume must support concurrent writes from every `teams-do`
+> worker that can run compaction. A plain local Docker volume only works if
+> exactly one worker (on one host) ever runs the projection pipeline; use
+> an NFS-backed volume (as shown above) or another shared filesystem for
+> multi-worker or multi-host setups.
 
 ## `fiftyone-app` Memory Sizing
 

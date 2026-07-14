@@ -23,6 +23,9 @@
   - [Why Multimodal Needs Extra Scratch Space](#why-multimodal-needs-extra-scratch-space)
   - [Minimum Recommended Sizing](#minimum-recommended-sizing)
   - [Example Storage Configuration](#example-storage-configuration)
+- [Redirecting Compaction Scratch Space With `FIFTYONE_COMPACTION_TEMP_LOCATION`](#redirecting-compaction-scratch-space-with-fiftyone_compaction_temp_location)
+  - [Default Behavior](#default-behavior)
+  - [Example Volume Configuration](#example-volume-configuration)
 - [`fiftyone-app` Memory Sizing](#fiftyone-app-memory-sizing)
   - [Recommended Starting Point](#recommended-starting-point)
 - [Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`](#pinning-projection-processing-with-fiftyone_projection_delegation_target)
@@ -47,7 +50,8 @@ standard install:
 1. The `VFF_MULTIMODAL` feature flag, set on every workload that serves or
    processes multimodal data.
 1. Enough ephemeral/scratch storage on delegated-operator workloads for
-   projection compaction to succeed.
+   projection compaction to succeed — optionally redirected to a mounted
+   volume via `FIFTYONE_COMPACTION_TEMP_LOCATION`.
 1. Enough memory on `fiftyone-app` to serve multimodal grid queries, which
    run DuckDB in-process.
 1. Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` to pin projection
@@ -144,6 +148,48 @@ processing.
 > writable filesystem and draws directly from the pod's `ephemeral-storage`
 > limit with no separate cap — you only need the explicit `tmpdir` volume
 > and `sizeLimit` when the root filesystem is read-only.
+
+## Redirecting Compaction Scratch Space With `FIFTYONE_COMPACTION_TEMP_LOCATION`
+
+`compact_projections` stages all of its local scratch files — downloaded
+and re-uploaded Parquet, plus a local copy of the Iceberg catalog metadata —
+under a single directory. Set `FIFTYONE_COMPACTION_TEMP_LOCATION` on
+`delegatedOperatorDeployments.template.env` and/or
+`delegatedOperatorJobTemplates.template.env` to point that directory at a
+mounted volume instead of the `tmpdir` `emptyDir` described above.
+
+### Default Behavior
+
+If unset, compaction stages files under the system temp directory (`/tmp`
+inside the container) — the `tmpdir` volume sized per "Delegated Operator
+Storage Requirements" above. The configured directory is created
+automatically if it doesn't already exist.
+
+### Example Volume Configuration
+
+```yaml
+delegatedOperatorDeployments:
+  template:
+    env:
+      FIFTYONE_COMPACTION_TEMP_LOCATION: /mnt/compaction-scratch/compaction
+    volumeMounts:
+      - name: compaction-scratch-vol
+        mountPath: /mnt/compaction-scratch
+    volumes:
+      - name: compaction-scratch-vol
+        persistentVolumeClaim:
+          claimName: my-shared-compaction-scratch-pvc
+```
+
+Apply the equivalent `env`, `volumeMounts`, and `volumes` settings under
+`delegatedOperatorJobTemplates.template` if you also use on-demand
+(Kubernetes `Job`-based) delegated operators for projection processing.
+
+> [!NOTE]
+> The mounted volume must support concurrent writes from every
+> delegated-operator replica that can run compaction (e.g. an NFS-backed
+> `ReadWriteMany` PVC). A `ReadWriteOnce` volume only works if exactly one
+> replica ever runs the projection pipeline.
 
 ## `fiftyone-app` Memory Sizing
 
