@@ -31,9 +31,10 @@
 
 ## Overview
 
-FiftyOne Enterprise's multimodal datasets store large, non-sample-centric
-modalities (e.g. sensor streams, point clouds, telemetry) as Parquet-backed
-Iceberg tables rather than as ordinary Mongo-backed samples.
+FiftyOne Enterprise's multimodal datasets store large modalities associated
+with each sample (e.g. sensor streams, point clouds, telemetry) as
+Parquet-backed Iceberg tables rather than as fields directly on the
+Mongo-backed sample document.
 A background delegated-operator pipeline (`run_projections` followed by
 `compact_projections`) continuously ingests new data and periodically
 compacts it into larger, size-bounded files.

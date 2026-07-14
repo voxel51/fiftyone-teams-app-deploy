@@ -31,9 +31,10 @@
 
 ## Overview
 
-FiftyOne Enterprise's multimodal datasets store large, non-sample-centric
-modalities (e.g. sensor streams, point clouds, telemetry) as Parquet-backed
-Iceberg tables rather than as ordinary Mongo-backed samples.
+FiftyOne Enterprise's multimodal datasets store large modalities associated
+with each sample (e.g. sensor streams, point clouds, telemetry) as
+Parquet-backed Iceberg tables rather than as fields directly on the
+Mongo-backed sample document.
 A background delegated-operator pipeline (`run_projections` followed by
 `compact_projections`) continuously ingests new data and periodically
 compacts it into larger, size-bounded files.
@@ -85,12 +86,12 @@ If your delegated-operator workloads run with
 `securityContext.readOnlyRootFilesystem: true`
 (recommended for Pod Security Admission `restricted` compliance), `/tmp`
 is not writable at all unless you explicitly mount a writable volume there.
-An `emptyDir` volume mounted at `/tmp` without its own `sizeLimit` draws
-from the pod's overall `ephemeral-storage` resource budget; an `emptyDir`
-with an explicit `sizeLimit` is capped separately, on top of that shared
-budget. A `sizeLimit` that's too small for the amount of unconsolidated
-data will cause compaction to be evicted or fail before it can complete,
-even if the pod's aggregate `ephemeral-storage` limit is otherwise generous.
+An `emptyDir` mounted at `/tmp` still counts against the pod's
+`ephemeral-storage` limit; an explicit `sizeLimit` adds a second, per-volume
+cap on that same usage — it does not grant capacity beyond the
+`ephemeral-storage` budget. Compaction fails if it hits either cap, so size
+both for the same target: whichever of the two is smaller is the effective
+ceiling.
 
 ### Minimum Recommended Sizing
 
@@ -169,7 +170,7 @@ processed until the value is corrected or removed.
 ```yaml
 delegatedOperatorDeployments:
   deployments:
-    teamsDoMultimodal:
+    teams-do-multimodal:
       # ... sized per "Delegated Operator Storage Requirements" above
 
 apiSettings:
