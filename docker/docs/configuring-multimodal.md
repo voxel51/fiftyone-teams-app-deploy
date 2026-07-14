@@ -112,11 +112,11 @@ projection Parquet/Iceberg tables to compute the grid and its sidebar
 filters. This is a **memory** requirement on `fiftyone-app`, separate from
 the `teams-do` scratch space above.
 
-As of v2.22.0, `fiftyone-app` limits each DuckDB query to the memory
-available to the container automatically — there is no DuckDB memory setting
-to configure. `fiftyone-app` serves requests with multiple Hypercorn
-workers, and each worker runs its own DuckDB connection, so the container's
-memory is divided among them. The approximate per-query ceiling is:
+`fiftyone-app` limits each DuckDB query to the memory available to the
+container automatically — there is no DuckDB memory setting to configure.
+`fiftyone-app` serves requests with multiple Hypercorn workers, and each
+worker runs its own DuckDB connection, so the container's memory is divided
+among them. The approximate per-query ceiling is:
 
 ```text
 ceiling ≈ (fiftyone-app memory limit × 0.8) ÷ number of Hypercorn workers
@@ -132,10 +132,9 @@ each query only ~0.8Gi. Whether that's enough depends entirely on your
 datasets and projections; as a concrete example, 4 workers on a 500m CPU /
 1.5Gi container — only ~0.3Gi per query — proved far too small for wide
 projections. Set `HYPERCORN_WORKERS` in the service's `environment:` block
-to lower the worker count and give each query more headroom; any
-`HYPERCORN_*` variable is passed straight through to Hypercorn. Fewer
-workers also reduces the app's overall request concurrency, so balance it
-against your traffic.
+to lower the worker count and give each query more headroom. Fewer workers
+also reduce the app's overall request concurrency, so balance it against
+your traffic.
 
 ### Recommended Starting Point
 
@@ -150,8 +149,8 @@ services:
 ```
 
 This gives ≈1.6Gi per DuckDB query (`4Gi × 0.8 ÷ 2`). If your widest
-projections (many `*_mean`/`*_max` columns) return empty sidebar filters,
-raise `fiftyone-app` memory or lower `HYPERCORN_WORKERS` further.
+projections (many columns) return empty sidebar filters, raise
+`fiftyone-app` memory or lower `HYPERCORN_WORKERS` further.
 
 ## Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`
 
