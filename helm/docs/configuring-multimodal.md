@@ -23,6 +23,8 @@
   - [Why Multimodal Needs Extra Scratch Space](#why-multimodal-needs-extra-scratch-space)
   - [Minimum Recommended Sizing](#minimum-recommended-sizing)
   - [Example Storage Configuration](#example-storage-configuration)
+- [`fiftyone-app` Memory Sizing](#fiftyone-app-memory-sizing)
+  - [Recommended Starting Point](#recommended-starting-point)
 - [Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`](#pinning-projection-processing-with-fiftyone_projection_delegation_target)
   - [Behavior When Set](#behavior-when-set)
   - [Example Delegation Target Configuration](#example-delegation-target-configuration)
@@ -39,13 +41,15 @@ A background delegated-operator pipeline (`run_projections` followed by
 `compact_projections`) continuously ingests new data and periodically
 compacts it into larger, size-bounded files.
 
-Running multimodal datasets requires three pieces of configuration beyond a
+Running multimodal datasets requires the following configuration beyond a
 standard install:
 
 1. The `VFF_MULTIMODAL` feature flag, set on every workload that serves or
    processes multimodal data.
 1. Enough ephemeral/scratch storage on delegated-operator workloads for
    projection compaction to succeed.
+1. Enough memory on `fiftyone-app` to serve multimodal grid queries, which
+   run DuckDB in-process.
 1. Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` to pin projection
    processing to a specific orchestrator instead of relying on automatic
    selection.
@@ -140,6 +144,57 @@ processing.
 > writable filesystem and draws directly from the pod's `ephemeral-storage`
 > limit with no separate cap — you only need the explicit `tmpdir` volume
 > and `sizeLimit` when the root filesystem is read-only.
+
+## `fiftyone-app` Memory Sizing
+
+Serving a multimodal grid runs DuckDB inside `fiftyone-app` — it reads the
+projection Parquet/Iceberg tables to compute the grid and its sidebar
+filters. This is a **memory** requirement on `fiftyone-app`, separate from
+the delegated-operator scratch space above.
+
+`fiftyone-app` limits each DuckDB query to the memory available to the pod
+automatically — there is no DuckDB memory setting to configure.
+`fiftyone-app` serves requests with multiple Hypercorn workers, and each
+worker runs its own DuckDB connection, so the pod's memory is divided among
+them. The approximate per-query ceiling is:
+
+```text
+ceiling ≈ (fiftyone-app memory limit × 0.8) ÷ number of Hypercorn workers
+```
+
+Disk spill is disabled, so a query that needs more than its ceiling returns
+an empty filter widget (logged as an out-of-memory) rather than crashing
+the pod.
+
+The worker count defaults to **4** (an `ENV` baked into the `fiftyone-app`
+image, so it's the runtime default). At that default a 4Gi pod leaves each
+query only ~0.8Gi. Whether that's enough depends entirely on your datasets
+and projections; as a concrete example, 4 workers on a 500m CPU / 1.5Gi pod
+— only ~0.3Gi per query — proved far too small for wide projections. Set
+`HYPERCORN_WORKERS` in the app's environment to lower the worker count and
+give each query more headroom. Fewer workers also reduce the app's overall
+request concurrency, so balance it against your traffic.
+
+### Recommended Starting Point
+
+```yaml
+appSettings:
+  env:
+    VFF_MULTIMODAL: 1
+    HYPERCORN_WORKERS: 2
+  resources:
+    limits:
+      cpu: 1
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 4Gi
+```
+
+This gives ≈1.6Gi per DuckDB query (`4Gi × 0.8 ÷ 2`). If your widest
+projections (many columns) return empty sidebar filters, raise
+`fiftyone-app` memory or lower `HYPERCORN_WORKERS` further. Keep `requests`
+equal to `limits` so the scheduler reserves what DuckDB will actually use.
 
 ## Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`
 

@@ -116,6 +116,8 @@ Multimodal datasets require:
   `teams-do` workers, `teams-app`, and `teams-plugins`.
 - Sufficient host disk space for `teams-do` containers to stage projection
   compaction files in `/tmp`.
+- Enough memory on `fiftyone-app` to serve multimodal grid queries, which
+  run DuckDB in-process; size it and `HYPERCORN_WORKERS` accordingly.
 - Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` on `teams-api` to pin
   projection processing to a specific `teams-do` worker.
 
