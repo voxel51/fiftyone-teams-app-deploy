@@ -58,8 +58,7 @@ jobs:
 
   helm-integration:
     needs: modified-files
-    # TESTING ONLY — do not merge: force-skip so charts publish without tests
-    if: ${{ needs.modified-files.outputs.helm-integration-required == 'never' }}
+    if: ${{ needs.modified-files.outputs.helm-integration-required == 'true' }}
     uses: ./.github/workflows/test-integration-helm.yml
     secrets:
       ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
@@ -67,8 +66,7 @@ jobs:
 
   helm-unit:
     needs: modified-files
-    # TESTING ONLY — do not merge: force-skip so charts publish without tests
-    if: ${{ needs.modified-files.outputs.helm-unit-required == 'never' }}
+    if: ${{ needs.modified-files.outputs.helm-unit-required == 'true' }}
     uses: ./.github/workflows/test-helm.yml
     secrets:
       ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
@@ -90,13 +88,11 @@ jobs:
 
   helm-pre-release:
     needs: [all-tests, helm-unit, helm-integration, validate-chart-version]
-    # TESTING ONLY — do not merge: accept skipped helm tests so the chart
-    # still publishes
     if: |
       always() &&
-      (needs.helm-unit.result == 'success' || needs.helm-unit.result == 'skipped') &&
-      (needs.helm-integration.result == 'success' || needs.helm-integration.result == 'skipped') &&
-      (needs.validate-chart-version.result == 'success')
+      (needs.helm-unit.result == 'success' &&
+       needs.helm-integration.result == 'success' &&
+       needs.validate-chart-version.result == 'success')
     uses: ./.github/workflows/pre-release-internal-env.yml
     secrets:
       REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
