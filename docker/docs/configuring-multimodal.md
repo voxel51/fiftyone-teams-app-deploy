@@ -43,8 +43,8 @@ and periodically compacts it into larger, size-bounded files.
 
 Running multimodal datasets requires:
 
-1. Setting the `VFF_MULTIMODAL` environment variable (feature flag) on every service that serves or
-   processes multimodal data.
+1. Setting the `VFF_MULTIMODAL` environment variable (feature flag) on
+   every service that serves or processes multimodal data.
 1. Providing sufficient disk space on `teams-do` (delegated operator) containers
    for projection compaction to succeed — optionally redirected to a
    mounted volume via the `FIFTYONE_COMPACTION_TEMP_LOCATION` environment variable.
