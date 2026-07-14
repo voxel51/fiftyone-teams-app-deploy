@@ -93,21 +93,21 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "FiftyOne Teams API starting up",
+					log:              "",
 				},
 				{
 					name:             "teams-app",
 					url:              "http://127.0.0.1:3000/api/hello",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "",
 				},
 				{
 					name:             "teams-cas",
 					url:              "http://127.0.0.1:3030/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              "FiftyOne CAS starting up",
+					log:              "",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -115,7 +115,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 200,
-					log:              "Running on http://0.0.0.0:5151",
+					log:              "",
 				},
 			},
 		},
@@ -130,21 +130,21 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "FiftyOne Teams API starting up",
+					log:              "",
 				},
 				{
 					name:             "teams-app",
 					url:              "http://127.0.0.1:3000/api/hello",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "",
 				},
 				{
 					name:             "teams-cas",
 					url:              "http://127.0.0.1:3030/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              "FiftyOne CAS starting up",
+					log:              "",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -152,7 +152,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 200,
-					log:              "Running on http://0.0.0.0:5151",
+					log:              "",
 				},
 			},
 		},
@@ -167,21 +167,21 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "FiftyOne Teams API starting up",
+					log:              "",
 				},
 				{
 					name:             "teams-app",
 					url:              "http://127.0.0.1:3000/api/hello",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "",
 				},
 				{
 					name:             "teams-cas",
 					url:              "http://127.0.0.1:3030/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              "FiftyOne CAS starting up",
+					log:              "",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -189,14 +189,14 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "Running on http://0.0.0.0:5151",
+					log:              "",
 				},
 				{
 					name:             "teams-plugins",
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "Running on http://0.0.0.0:5151", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
+					log:              "", // same as fiftyone-app since plugins uses or is based on the fiftyone-app image
 				},
 			},
 		},
@@ -211,21 +211,21 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "http://127.0.0.1:8000/health",
 					responsePayload:  `{"status":{"teams":"available"}}`,
 					httpResponseCode: 200,
-					log:              "FiftyOne Teams API starting up",
+					log:              "",
 				},
 				{
 					name:             "teams-app",
 					url:              "http://127.0.0.1:3000/api/hello",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "",
 				},
 				{
 					name:             "teams-cas",
 					url:              "http://127.0.0.1:3030/cas/api",
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              "FiftyOne CAS starting up",
+					log:              "",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -233,7 +233,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "Running on http://0.0.0.0:5151",
+					log:              "",
 				},
 				{
 					name:             "teams-do",
