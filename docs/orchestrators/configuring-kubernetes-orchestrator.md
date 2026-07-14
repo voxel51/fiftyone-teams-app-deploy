@@ -45,13 +45,6 @@ for execution, on-demand. Jobs are submitted as Kubernetes
 [Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/)
 using a Jinja2 template that you provide.
 
-## Prerequisites
-
-Your FiftyOne API deployment must have the `kubernetes` Python package
-installed. This is not included by default, so you will need to add it as an
-extra dependency. See the
-[Custom Plugins Images docs](../custom-plugins.md#custom-plugins-images).
-
 ## Kubernetes Credentials
 
 The orchestrator can authenticate to Kubernetes in two ways:
