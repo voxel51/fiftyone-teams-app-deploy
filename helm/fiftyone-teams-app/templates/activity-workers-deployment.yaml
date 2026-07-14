@@ -55,6 +55,22 @@ spec:
                   key: mongodbConnectionString
             - name: FIFTYONE_ACTIVITY_MONGO_DB
               value: {{ $a.mongo.database | default "fiftyone_activity" | quote }}
+            {{- /* The snapshot worker reads the FiftyOne (datasets) database —
+                   a DIFFERENT database from the activity store, though the same
+                   Mongo instance — and stamps its org onto the snapshot event,
+                   since the rollups are tenant-scoped. The database name comes
+                   from the same secret every other service reads it from. */}}
+            - name: FIFTYONE_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secret.name }}
+                  key: fiftyoneDatabaseName
+            - name: FIFTYONE_ACTIVITY_ORG_ID
+              value: {{ $a.orgId | default $.Values.appSettings.env.FIFTYONE_ACTIVITY_ORG_ID | quote }}
+            {{- if $a.snapshotIntervalMs }}
+            - name: FIFTYONE_ACTIVITY_SNAPSHOT_INTERVAL_MS
+              value: {{ $a.snapshotIntervalMs | quote }}
+            {{- end }}
           resources:
             {{- toYaml $a.resources | nindent 12 }}
 ---

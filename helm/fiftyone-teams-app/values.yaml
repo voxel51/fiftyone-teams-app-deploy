@@ -1626,9 +1626,9 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    # 0.0.7: per-metric rollup isolation (one bad metric, e.g. op_duration_p95
-    # on Mongo <7, no longer aborts the whole scheduled batch).
-    tag: "20402a643be3dfba17b8281de0a42bee81ac558f"
+    # 0.0.9: snapshot worker (state metrics) + per-metric rollup isolation (one bad
+    # metric, e.g. op_duration_p95 on Mongo <7, no longer aborts the batch).
+    tag: "67693359765b95f2372b6ee97aeb89b603169b62"
     pullPolicy: IfNotPresent
   mongo:
     # -- Activity's own database on the shared Mongo instance.
@@ -1646,6 +1646,13 @@ activitySettings:
     limits:
       cpu: 500m
       memory: 512Mi
+  # -- Override the org the snapshot worker stamps its events with; defaults to
+  # appSettings.env.FIFTYONE_ACTIVITY_ORG_ID (rollups are tenant-scoped, so an
+  # org-less snapshot would never surface).
+  orgId: ""
+  # -- Snapshot cadence in ms. Defaults to hourly, matching the HOUR bucket the
+  # state metrics (dataset_count/sample_count/label_density) roll up by.
+  snapshotIntervalMs: ""
   # -- One Deployment per entry; command selects the entrypoint in the image.
   workers:
     ingest:
@@ -1655,4 +1662,10 @@ activitySettings:
       command: ["fiftyone-activity-rollup-worker"]
       replicaCount: 1
       # Single-flight: it owns the repeatable rollup schedule.
+      recreate: true
+    snapshot:
+      command: ["fiftyone-activity-snapshot-worker"]
+      replicaCount: 1
+      # Single-flight: it owns the repeatable snapshot schedule, and a double
+      # snapshot in one bucket would be a duplicate point.
       recreate: true
