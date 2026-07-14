@@ -158,6 +158,8 @@ Multimodal datasets require:
 - Sufficient `ephemeral-storage` and `/tmp` scratch space on
   delegated-operator workloads for projection compaction to complete
   successfully.
+- Enough memory on `fiftyone-app` to serve multimodal grid queries, which
+  run DuckDB in-process; size it and `HYPERCORN_WORKERS` accordingly.
 - Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` on `teams-api` to pin
   projection processing to a specific orchestrator.
 

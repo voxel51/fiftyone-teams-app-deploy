@@ -22,6 +22,8 @@
 - [Delegated Operator Scratch Space Requirements](#delegated-operator-scratch-space-requirements)
   - [Why Multimodal Needs Extra Scratch Space](#why-multimodal-needs-extra-scratch-space)
   - [Sizing Guidance](#sizing-guidance)
+- [`fiftyone-app` Memory Sizing](#fiftyone-app-memory-sizing)
+  - [Recommended Starting Point](#recommended-starting-point)
 - [Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`](#pinning-projection-processing-with-fiftyone_projection_delegation_target)
   - [Behavior When Set](#behavior-when-set)
   - [Naming Your `teams-do` Worker](#naming-your-teams-do-worker)
@@ -44,6 +46,8 @@ Running multimodal datasets requires:
    processes multimodal data.
 1. Enough scratch disk space on `teams-do` (delegated operator) containers
    for projection compaction to succeed.
+1. Enough memory on `fiftyone-app` to serve multimodal grid queries, which
+   run DuckDB in-process.
 1. Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` to pin projection
    processing to a specific `teams-do` worker instead of relying on
    automatic selection.
@@ -100,6 +104,54 @@ raise here; the practical requirement is simply:
   named volume) with enough capacity for the above — a read-only root
   filesystem with no `/tmp` mount will make compaction fail outright, not
   just run low on space.
+
+## `fiftyone-app` Memory Sizing
+
+Serving a multimodal grid runs DuckDB inside `fiftyone-app` — it reads the
+projection Parquet/Iceberg tables to compute the grid and its sidebar
+filters. This is a **memory** requirement on `fiftyone-app`, separate from
+the `teams-do` scratch space above.
+
+As of v2.22.0, `fiftyone-app` limits each DuckDB query to the memory
+available to the container automatically — there is no DuckDB memory setting
+to configure. `fiftyone-app` serves requests with multiple Hypercorn
+workers, and each worker runs its own DuckDB connection, so the container's
+memory is divided among them. The approximate per-query ceiling is:
+
+```text
+ceiling ≈ (fiftyone-app memory limit × 0.8) ÷ number of Hypercorn workers
+```
+
+Disk spill is disabled, so a query that needs more than its ceiling returns
+an empty filter widget (logged as an out-of-memory) rather than crashing
+the container.
+
+The worker count defaults to **4** (an `ENV` baked into the `fiftyone-app`
+image, so it's the runtime default). At that default a 4Gi container leaves
+each query only ~0.8Gi. Whether that's enough depends entirely on your
+datasets and projections; as a concrete example, 4 workers on a 500m CPU /
+1.5Gi container — only ~0.3Gi per query — proved far too small for wide
+projections. Set `HYPERCORN_WORKERS` in the service's `environment:` block
+to lower the worker count and give each query more headroom; any
+`HYPERCORN_*` variable is passed straight through to Hypercorn. Fewer
+workers also reduces the app's overall request concurrency, so balance it
+against your traffic.
+
+### Recommended Starting Point
+
+```yaml
+services:
+  fiftyone-app:
+    mem_limit: 4g
+    cpus: "1"
+    environment:
+      VFF_MULTIMODAL: 1
+      HYPERCORN_WORKERS: 2
+```
+
+This gives ≈1.6Gi per DuckDB query (`4Gi × 0.8 ÷ 2`). If your widest
+projections (many `*_mean`/`*_max` columns) return empty sidebar filters,
+raise `fiftyone-app` memory or lower `HYPERCORN_WORKERS` further.
 
 ## Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`
 
