@@ -278,6 +278,10 @@ appSettings:
   deploymentAnnotations: {}
   # Environment Variables are passed to the `fiftyone-app` containers
   env:
+    # -- Activity Analytics: where the workflows-plugin emit() enqueues events
+    # (the bundled in-cluster Redis). Emit is fire-and-forget; if unset the
+    # review_submitted events simply don't flow.
+    FIFTYONE_MQ_REDIS_URL: "redis://activity-redis:6379/0"
     # @schema
     # type: ["string", "boolean"]
     # @schema
@@ -1606,12 +1610,12 @@ teamsAppSettings:
 # -----------------------------------------------------------------------------
 activitySettings:
   # -- Master toggle for the Activity workers + Redis.
-  enabled: false
+  enabled: true
   image:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    tag: ""
+    tag: "15e878fe29c4a28a6fa55d964805efb58388aa9e"
     pullPolicy: IfNotPresent
   mongo:
     # -- Activity's own database on the shared Mongo instance.
