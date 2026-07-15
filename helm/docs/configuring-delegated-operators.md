@@ -45,13 +45,6 @@ to create on-demand delegated operators utilizing
 `delegatedOperatorJobTemplates` enables you to create multiple job
 templates that FiftyOne Enterprise can use to create Kubernetes jobs.
 
-> [!NOTE]
-> Using `delegatedOperatorJobTemplates` and on-demand kubernetes orchestration
-> requires that you install the `kubernetes` python client into your
-> `teams-api` image.
-> See
-> [the kubernetes orchestrator docs](../../docs/orchestrators/configuring-kubernetes-orchestrator.md)
-
 FiftyOne Enterprise 2.14+ pre-populates a `teams-do-cpu-default`
 delegated operator `Deployment` by default.
 Configuring the delegated operator has
