@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Host Requirements](#host-requirements)
       - [Opting out of Telemetry](#opting-out-of-telemetry)
@@ -84,9 +85,9 @@ quickstart  0.21.2
 
 ### From FiftyOne Enterprise Version 2.0.0 and Later
 
-1. [Upgrade to FiftyOne Enterprise version 2.21.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise version 2.22.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
-   version 2.21.0
+   version 2.22.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
@@ -101,6 +102,29 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.22+ Multimodal Datasets
+
+FiftyOne Enterprise v2.22.0 introduces multimodal dataset support: large
+modalities associated with each sample, stored as Parquet-backed Iceberg
+tables rather than as fields on the sample document, ingested/compacted via
+a background delegated-operator pipeline.
+
+Multimodal datasets require:
+
+- The `VFF_MULTIMODAL` feature flag, set on `teams-api`, `fiftyone-app`,
+  `teams-do` workers, `teams-app`, and `teams-plugins`.
+- Sufficient host disk space for `teams-do` containers to stage projection
+  compaction files in `/tmp`.
+- Enough memory on `fiftyone-app` to serve multimodal grid queries, which
+  run DuckDB in-process; size it and `HYPERCORN_WORKERS` accordingly.
+- Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` on `teams-api` to pin
+  projection processing to a specific `teams-do` worker.
+
+See the
+[Configuring Multimodal Datasets](./configuring-multimodal.md)
+documentation for full details, required services, and example
+configuration.
 
 #### FiftyOne Enterprise v2.19+ Telemetry Sidecars
 
@@ -285,7 +309,7 @@ To utilize the prior image, update your `common-services.yaml` similar to the be
 
 ```yaml
 teams-do-common:
-  image: voxel51/fiftyone-app:v2.21.0
+  image: voxel51/fiftyone-app:v2.22.0
 ```
 
 #### FiftyOne Enterprise v2.2+ Delegated Operator Changes
@@ -320,7 +344,7 @@ Additionally,
 
 ### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.21.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -355,15 +379,15 @@ Additionally,
    mv license.key "${LOCAL_LICENSE_FILE_DIR}/license"
    ```
 
-1. [Upgrade to FiftyOne Enterprise version 2.21.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.21.0
+1. [Upgrade to FiftyOne Enterprise version 2.22.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.22.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE**: Any FiftyOne SDK less than 2.21.0
+    > **NOTE**: Any FiftyOne SDK less than 2.22.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.21.0` is required.
+    > Upgrading to `fiftyone==2.22.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -377,7 +401,7 @@ Additionally,
 
 ### From FiftyOne Enterprise Version 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.21.0 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.0 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -395,7 +419,7 @@ Additionally,
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.21.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -447,15 +471,15 @@ Additionally,
         unset FIFTYONE_DATABASE_ADMIN
         ```
 
-1. [Upgrade to FiftyOne Enterprise version 2.21.0](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.21.0
+1. [Upgrade to FiftyOne Enterprise version 2.22.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.22.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
-    > **NOTE**: Any FiftyOne SDK less than 2.21.0
+    > **NOTE**: Any FiftyOne SDK less than 2.22.0
     > will lose connectivity at this point.
-    > Upgrading to `fiftyone==2.21.0` is required.
+    > Upgrading to `fiftyone==2.22.0` is required.
 
     ```shell
     FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
@@ -486,14 +510,14 @@ Additionally,
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.21.0 _requires_ your users to
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.0 _requires_ your users to
 > log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.21.0 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.0 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -524,13 +548,13 @@ Additionally,
 1. Update your web server routes to include routing
    `/cas/*` traffic to the `teams-cas` service.
    Please see our [example nginx configurations](../) for more information.
-1. [Upgrade to FiftyOne Enterprise v2.21.0](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise v2.22.0](#upgrading-from-previous-versions)
    with `FIFTYONE_DATABASE_ADMIN=true`
    (this is not the default for this release).
     > **NOTE**: FiftyOne SDK users will lose access to the FiftyOne
-    > Enterprise Database at this step until they upgrade to `fiftyone==2.21.0`
+    > Enterprise Database at this step until they upgrade to `fiftyone==2.22.0`
 
-1. Upgrade your FiftyOne SDKs to version 2.21.0
+1. Upgrade your FiftyOne SDKs to version 2.22.0
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to
