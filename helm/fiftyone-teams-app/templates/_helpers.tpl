@@ -427,6 +427,17 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
+{{- /* Activity Analytics: the workflows plugin's read operator
+       (get_workflow_activity_metrics) reads the activity event store
+       directly, so the operator-executing service needs the store's
+       connection — same secret + database the activity workers use. */}}
+- name: FIFTYONE_ACTIVITY_MONGO_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: mongodbConnectionString
+- name: FIFTYONE_ACTIVITY_MONGO_DB
+  value: {{ .Values.activitySettings.mongo.database | default "fiftyone_activity" | quote }}
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -543,6 +554,14 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
+{{- /* Activity Analytics read path — see the app helper above. */}}
+- name: FIFTYONE_ACTIVITY_MONGO_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: mongodbConnectionString
+- name: FIFTYONE_ACTIVITY_MONGO_DB
+  value: {{ .Values.activitySettings.mongo.database | default "fiftyone_activity" | quote }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
