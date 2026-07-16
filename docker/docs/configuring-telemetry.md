@@ -122,8 +122,9 @@ docker compose --profile gpu \
         [Scaling teams-do with telemetry](#scaling-teams-do-with-telemetry)
   - `teams-do-gpu-telemetry`
     - Only with `compose.delegated-operators.gpu.yaml` and `--profile gpu`
-    - The sidecar reads GPU metrics via NVML and requires its own GPU
-      reservation.
+    - The paired sidecar for the GPU worker. Collects the same
+      CPU/memory/log metrics as any other sidecar; it does not access
+      the GPU.
 - Environment Variables
   - `FIFTYONE_TELEMETRY_REDIS_URL` environment variable is set on these services
     so the telemetry blueprint and server-sent events endpoints can read from Redis
@@ -225,8 +226,8 @@ All knobs live in your `.env` — see `env.template` for the full list:
 | `TEAMS_API_TARGET_NAME`            | `fiftyone-teams-api`                   | Substring used to locate the teams-api process                                                     |
 | `TEAMS_PLUGINS_TARGET_NAME`        | `hypercorn`                            | Substring used to locate the teams-plugins process                                                 |
 | `TEAMS_DO_TARGET_NAME`             | `fiftyone delegated`                   | Substring used to locate the teams-do process                                                      |
-| `NVIDIA_GPU_COUNT`                 | `1`                                    | GPU reservation for the GPU DO worker + sidecar                                                    |
-| `NVIDIA_VISIBLE_DEVICES`           | `all`                                  | Pass-through to teams-do-gpu / sidecar                                                             |
+| `NVIDIA_GPU_COUNT`                 | `1`                                    | GPU reservation for the GPU DO worker                                                              |
+| `NVIDIA_VISIBLE_DEVICES`           | `all`                                  | Pass-through to teams-do-gpu                                                                       |
 | `NVIDIA_DRIVER_CAPABILITIES`       | `compute,utility`                      | Must include `utility` so NVML is available                                                        |
 
 ## Resource limits

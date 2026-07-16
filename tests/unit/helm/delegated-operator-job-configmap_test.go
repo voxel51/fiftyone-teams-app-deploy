@@ -783,12 +783,11 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetryDisabledOmitsSidecar() {
 		"telemetry-socket volumeMount should be absent when telemetry is disabled")
 }
 
-// TestTelemetrySidecarGpuEnv verifies that when a delegated-operator job's
-// executor requests a GPU (via resources.limits or resources.requests), its
-// telemetry native-sidecar is given the NVIDIA_* env vars needed to read GPU
-// metrics, without the sidecar requesting its own nvidia.com/gpu allocation.
-// When no GPU is requested, the sidecar receives no NVIDIA_* env vars.
-func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarGpuEnv() {
+// TestTelemetrySidecarNoGpu verifies that the delegated-operator job's
+// telemetry native-sidecar never receives GPU access — no NVIDIA_* env vars and
+// no nvidia.com/gpu resource request — even when the executor itself requests a
+// GPU. GPU metrics are collected by the executor process, not the sidecar.
+func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarNoGpu() {
 	const gpuResource = "nvidia.com/gpu"
 	jobKey := "cpuDefault.yaml"
 
@@ -800,35 +799,31 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarGpuEnv() {
 	}
 
 	testCases := []struct {
-		name      string
-		values    map[string]string
-		expectGpu bool
+		name   string
+		values map[string]string
 	}{
 		{
-			name: "gpuInLimitsExposesEnvToSidecar",
+			name: "gpuInLimits",
 			values: map[string]string{
 				"telemetry.enabled": "true",
 				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
 				gpuKey("limits"): "1",
 			},
-			expectGpu: true,
 		},
 		{
-			name: "gpuInRequestsExposesEnvToSidecar",
+			name: "gpuInRequests",
 			values: map[string]string{
 				"telemetry.enabled": "true",
 				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
 				gpuKey("requests"): "1",
 			},
-			expectGpu: true,
 		},
 		{
-			name: "noGpuOmitsEnvFromSidecar",
+			name: "noGpu",
 			values: map[string]string{
 				"telemetry.enabled": "true",
 				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
 			},
-			expectGpu: false,
 		},
 	}
 
@@ -850,24 +845,15 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarGpuEnv() {
 			sidecar := findContainer(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar")
 			s.Require().NotNil(sidecar, "telemetry-sidecar initContainer not found")
 
-			visibleDevices, hasVisibleDevices := envValue(sidecar.Env, "NVIDIA_VISIBLE_DEVICES")
-			driverCaps, hasDriverCaps := envValue(sidecar.Env, "NVIDIA_DRIVER_CAPABILITIES")
+			_, hasVisibleDevices := envValue(sidecar.Env, "NVIDIA_VISIBLE_DEVICES")
+			_, hasDriverCaps := envValue(sidecar.Env, "NVIDIA_DRIVER_CAPABILITIES")
+			s.False(hasVisibleDevices, "sidecar must not have NVIDIA_VISIBLE_DEVICES")
+			s.False(hasDriverCaps, "sidecar must not have NVIDIA_DRIVER_CAPABILITIES")
 
-			if testCase.expectGpu {
-				s.True(hasVisibleDevices, "sidecar should have NVIDIA_VISIBLE_DEVICES")
-				s.Equal("all", visibleDevices, "NVIDIA_VISIBLE_DEVICES value mismatch")
-				s.True(hasDriverCaps, "sidecar should have NVIDIA_DRIVER_CAPABILITIES")
-				s.Equal("compute,utility", driverCaps, "NVIDIA_DRIVER_CAPABILITIES value mismatch")
-
-				// The sidecar reads the executor's GPU; it must not request its own.
-				_, limitsHasGpu := sidecar.Resources.Limits[corev1.ResourceName(gpuResource)]
-				_, requestsHasGpu := sidecar.Resources.Requests[corev1.ResourceName(gpuResource)]
-				s.False(limitsHasGpu, "sidecar must not request nvidia.com/gpu in limits")
-				s.False(requestsHasGpu, "sidecar must not request nvidia.com/gpu in requests")
-			} else {
-				s.False(hasVisibleDevices, "sidecar should not have NVIDIA_VISIBLE_DEVICES when no GPU requested")
-				s.False(hasDriverCaps, "sidecar should not have NVIDIA_DRIVER_CAPABILITIES when no GPU requested")
-			}
+			_, limitsHasGpu := sidecar.Resources.Limits[corev1.ResourceName(gpuResource)]
+			_, requestsHasGpu := sidecar.Resources.Requests[corev1.ResourceName(gpuResource)]
+			s.False(limitsHasGpu, "sidecar must not request nvidia.com/gpu in limits")
+			s.False(requestsHasGpu, "sidecar must not request nvidia.com/gpu in requests")
 		})
 	}
 }

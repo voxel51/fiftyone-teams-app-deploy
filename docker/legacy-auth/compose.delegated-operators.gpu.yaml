@@ -65,13 +65,7 @@ services:
         reservations:
           cpus: "0.10"
           memory: 512M
-          devices:
-            - driver: nvidia
-              count: ${NVIDIA_GPU_COUNT:-1}
-              capabilities: ["gpu"]
     environment:
-      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
-      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
       POD_NAME: teams-do-gpu
       POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
       SERVICE_TYPE: delegated-operator

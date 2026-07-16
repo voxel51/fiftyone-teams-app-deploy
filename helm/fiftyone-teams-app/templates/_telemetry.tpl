@@ -90,8 +90,6 @@ Inputs (dict):
   podName          — value for POD_NAME env var (defaults to fieldRef metadata.name)
   executor         — bool, when true emit EXECUTOR_SIDECAR=true and TELEMETRY_SOCKET env
   targetContainer  — when set, emit TARGET_CONTAINER env var (used by job sidecars)
-  sidecarEnv       — optional map of extra env vars to append (e.g. NVIDIA_* so a
-                     sidecar on a GPU node can read NVML/GPU metrics)
 */}}
 {{- define "telemetry.sidecar-env" -}}
 {{- $secretName := .ctx.Values.secret.name -}}
@@ -129,10 +127,6 @@ Inputs (dict):
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- range $name, $value := .sidecarEnv }}
-- name: {{ $name }}
-  value: {{ $value | quote }}
-{{- end }}
 {{- end }}
 
 {{/*
