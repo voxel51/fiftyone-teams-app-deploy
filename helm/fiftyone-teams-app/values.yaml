@@ -1645,9 +1645,9 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    # 0.0.9: snapshot worker (state metrics) + per-metric rollup isolation (one bad
-    # metric, e.g. op_duration_p95 on Mongo <7, no longer aborts the batch).
-    tag: "682c1cabb7e3fe8f35229c6de0b87f29dff711d1"
+    # 0.0.16: browser time-tracking events (sample.*_started/_ended) +
+    # COUNT_DISTINCT + annotation_time/review_time/review_decisions rollups.
+    tag: "57cce235b5e1bb12e02302aa497af424cb372c32"
     pullPolicy: IfNotPresent
   mongo:
     # -- Database for the activity_* collections. EMPTY (default) co-locates
