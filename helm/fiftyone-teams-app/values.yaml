@@ -287,6 +287,12 @@ appSettings:
     # (the bundled in-cluster Redis). Emit is fire-and-forget; if unset the
     # review_submitted events simply don't flow.
     FIFTYONE_MQ_REDIS_URL: "redis://activity-redis:6379/0"
+    # -- DEV ENV ONLY: bypass the teams-api builtin-operator allowlist. That
+    # list is enumerated from the fiftyone.yml bundled in teams-api's OWN SDK
+    # install, so newly added plugin operators 403 until the hub image ships
+    # an SDK containing them. Remove once the hub pin includes the declared
+    # activity operators.
+    SKIP_OPERATOR_PERMISSION_CHECK: "true"
     # -- The org id the activity feed is scoped by (matches user.organization.id).
     # Single-org deployments set this so the review-submit emit stamps the org
     # the reader queries. REPLACE with your org id.
