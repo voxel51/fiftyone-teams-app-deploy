@@ -1651,9 +1651,10 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    # 0.0.16: browser time-tracking events (sample.*_started/_ended) +
-    # COUNT_DISTINCT + annotation_time/review_time/review_decisions rollups.
-    tag: "57cce235b5e1bb12e02302aa497af424cb372c32"
+    # 0.0.17: delivery-loop fix in the emit client (server-side emits were
+    # silently lost from threaded contexts); includes 0.0.16's time-tracking
+    # events + COUNT_DISTINCT + time rollups.
+    tag: "070cdcdbb4d4739381f582a74b58f509bfe2eeb5"
     pullPolicy: IfNotPresent
   mongo:
     # -- Database for the activity_* collections. EMPTY (default) co-locates
