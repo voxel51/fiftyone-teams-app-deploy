@@ -371,10 +371,14 @@ Create a merged list of environment variables for fiftyone-teams-api
        point it at the per-deployment FiftyOne DB so teams-api reads the SAME
        co-located activity_* collections the workers write. */}}
 - name: FIFTYONE_ACTIVITY_MONGO_DB
+{{- if .Values.activitySettings.mongo.database }}
+  value: {{ .Values.activitySettings.mongo.database | quote }}
+{{- else }}
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- end }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -429,10 +433,14 @@ Create a merged list of environment variables for fiftyone-app
        point it at the per-deployment FiftyOne DB so teams-api reads the SAME
        co-located activity_* collections the workers write. */}}
 - name: FIFTYONE_ACTIVITY_MONGO_DB
+{{- if .Values.activitySettings.mongo.database }}
+  value: {{ .Values.activitySettings.mongo.database | quote }}
+{{- else }}
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- end }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -452,8 +460,6 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
-- name: FIFTYONE_ACTIVITY_MONGO_DB
-  value: {{ .Values.activitySettings.mongo.database | default "fiftyone_activity" | quote }}
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -564,10 +570,14 @@ Create a merged list of environment variables for fiftyone-teams-plugins
        point it at the per-deployment FiftyOne DB so teams-api reads the SAME
        co-located activity_* collections the workers write. */}}
 - name: FIFTYONE_ACTIVITY_MONGO_DB
+{{- if .Values.activitySettings.mongo.database }}
+  value: {{ .Values.activitySettings.mongo.database | quote }}
+{{- else }}
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- end }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -584,8 +594,6 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: mongodbConnectionString
-- name: FIFTYONE_ACTIVITY_MONGO_DB
-  value: {{ .Values.activitySettings.mongo.database | default "fiftyone_activity" | quote }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
