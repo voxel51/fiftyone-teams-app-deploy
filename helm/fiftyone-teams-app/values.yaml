@@ -1633,11 +1633,13 @@ activitySettings:
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
     # 0.0.9: snapshot worker (state metrics) + per-metric rollup isolation (one bad
     # metric, e.g. op_duration_p95 on Mongo <7, no longer aborts the batch).
-    tag: "5cf3028186fad24e9591291175bc5e5aaba81169"
+    tag: "682c1cabb7e3fe8f35229c6de0b87f29dff711d1"
     pullPolicy: IfNotPresent
   mongo:
-    # -- Activity's own database on the shared Mongo instance.
-    database: fiftyone_activity
+    # -- Database for the activity_* collections. EMPTY (default) co-locates
+    # them in the per-deployment FiftyOne database (isolated per instance on a
+    # shared Mongo). Set a name only to force a dedicated database.
+    database: ""
   redis:
     # -- Bundle an ephemeral in-cluster Redis (set false to use an external one).
     enabled: true

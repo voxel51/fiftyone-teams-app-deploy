@@ -53,8 +53,22 @@ spec:
                 secretKeyRef:
                   name: {{ $.Values.secret.name }}
                   key: mongodbConnectionString
+            {{- /* Co-locate the activity_* collections in the per-deployment
+                   FiftyOne database (the same one teams metadata uses), NOT a
+                   fixed shared "fiftyone_activity" DB. On a shared Mongo (e.g.
+                   the ephem cluster) a fixed name collides across every
+                   Enterprise instance; using the deployment's own DB name
+                   isolates each one. An explicit activitySettings.mongo.database
+                   still wins if a deployment wants a dedicated DB. */}}
             - name: FIFTYONE_ACTIVITY_MONGO_DB
-              value: {{ $a.mongo.database | default "fiftyone_activity" | quote }}
+              {{- if $a.mongo.database }}
+              value: {{ $a.mongo.database | quote }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secret.name }}
+                  key: fiftyoneDatabaseName
+              {{- end }}
             {{- /* The snapshot worker reads the FiftyOne (datasets) database —
                    a DIFFERENT database from the activity store, though the same
                    Mongo instance — and stamps its org onto the snapshot event,

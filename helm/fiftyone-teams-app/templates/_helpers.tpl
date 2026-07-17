@@ -367,6 +367,14 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
+       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
+       co-located activity_* collections the workers write. */}}
+- name: FIFTYONE_ACTIVITY_MONGO_DB
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneDatabaseName
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -413,6 +421,14 @@ Create a merged list of environment variables for fiftyone-app
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
 - name: FIFTYONE_DATABASE_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneDatabaseName
+{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
+       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
+       co-located activity_* collections the workers write. */}}
+- name: FIFTYONE_ACTIVITY_MONGO_DB
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
@@ -529,6 +545,14 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 - name: FIFTYONE_DATABASE_ADMIN
   value: "false"
 - name: FIFTYONE_DATABASE_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: fiftyoneDatabaseName
+{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
+       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
+       co-located activity_* collections the workers write. */}}
+- name: FIFTYONE_ACTIVITY_MONGO_DB
   valueFrom:
     secretKeyRef:
       name: {{ $secretName }}
