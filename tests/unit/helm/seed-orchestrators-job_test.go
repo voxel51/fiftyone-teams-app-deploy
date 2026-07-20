@@ -241,14 +241,17 @@ func (s *seedOrchestratorsJobTemplateTest) namespaceFromConfig(config map[string
 	return namespace
 }
 
-// TestImageFollowsDelegatedOperatorTemplate verifies both the seeding
-// container image and the derived job registrations track the
-// delegated-operator worker image.
-func (s *seedOrchestratorsJobTemplateTest) TestImageFollowsDelegatedOperatorTemplate() {
+// TestImages verifies the seeding container runs the teams-api image (the
+// script only needs pymongo; the worker image is multi-GB), while the
+// derived job registrations still track the delegated-operator worker
+// image the rendered Job templates actually run. Distinct sentinel tags
+// prove each image flows from its own value.
+func (s *seedOrchestratorsJobTemplateTest) TestImages() {
 	options := &helm.Options{
 		SetValues: disableTelemetry(map[string]string{
 			"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "true",
 			"delegatedOperatorJobTemplates.template.image.tag":                   "v9.9.9",
+			"apiSettings.image.tag": "v8.8.8",
 		}),
 	}
 
@@ -258,7 +261,7 @@ func (s *seedOrchestratorsJobTemplateTest) TestImageFollowsDelegatedOperatorTemp
 	helm.UnmarshalK8SYaml(s.T(), output, &job)
 
 	container := job.Spec.Template.Spec.Containers[0]
-	s.Equal("voxel51/fiftyone-teams-cv-full:v9.9.9", container.Image)
+	s.Equal("voxel51/fiftyone-teams-api:v8.8.8", container.Image)
 
 	orchestrators := s.seedJobOrchestrators(job)
 	s.Require().Len(orchestrators, 1)

@@ -9,7 +9,11 @@
 # Uses helm hooks so it works under plain helm and under ArgoCD (which maps
 # post-install/post-upgrade to PostSync). Talks directly to Mongo with the
 # deployment's existing teams secrets, so no API key is required.
-{{- $image := .Values.delegatedOperatorJobTemplates.template.image }}
+{{- /* The script only needs pymongo. The teams-api image ships it and is
+       already pulled for every install; the delegated-operator worker image
+       is multi-GB and may never be pulled otherwise (the job templates are
+       ConfigMap text until a task runs). */}}
+{{- $image := .Values.apiSettings.image }}
 apiVersion: batch/v1
 kind: Job
 metadata:
