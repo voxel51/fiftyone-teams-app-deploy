@@ -2383,7 +2383,7 @@
           "type": "object"
         },
         "services": {
-          "description": "On-Demand Service Orchestrator Pod templates for the\n`kubernetes-service` environment (long-lived push services). Each entry\nrenders a jinja2 `Pod` manifest into the same `ConfigMap` as `jobs`,\nmerged over `template` with the same logic. Job-only fields (`image`,\n`jobAnnotations`, and the Job spec fields) do not apply: the\nkubernetes-service broker provides the image and command per task.\nEntries also accept `description` and `registerOrchestrator`.",
+          "description": "On-Demand Service Orchestrator Pod templates for the\n`kubernetes-service` environment (long-lived push services). Each entry\nrenders a jinja2 `Pod` manifest into the same `ConfigMap` as `jobs`,\nmerged over `template` with the same logic. Job-only fields (`image`,\n`jobAnnotations`, and the Job spec fields) do not apply. The\nkubernetes-service broker provides the image and command per task.\nEntries also accept `description` and `registerOrchestrator`.",
           "required": [],
           "title": "services",
           "type": "object"
@@ -2546,7 +2546,7 @@
             },
             "registerOrchestrator": {
               "default": true,
-              "description": "Controls whether a post-install/post-upgrade seeding Job registers\nan orchestrator in MongoDB for each entry under `jobs` and `services`\n(upserted by `instance_id` = entry name). Individual entries can\noverride this with their own `registerOrchestrator` key. See\ntemplates/seed-orchestrators-job.yaml and files/seed_orchestrators.py.",
+              "description": "Controls whether a post-install/post-upgrade hook seeding Job registers\nan orchestrator in MongoDB for each entry under `jobs` and `services`\nIndividual entries may override this with their own `registerOrchestrator` key.\nSee `./templates/seed-orchestrators-job.yaml` and `./files/seed_orchestrators.py`.",
               "title": "registerOrchestrator",
               "type": "boolean"
             },
@@ -3515,7 +3515,7 @@
         },
         "enabled": {
           "default": false,
-          "description": "Controls whether to create the builtin services overrides `ConfigMap`\nbelow and wire it into `teams-api`.",
+          "description": "Controls whether to create the builtin services overrides `ConfigMap`\nbelow and volume mount it into `teams-api` container.",
           "title": "enabled",
           "type": "boolean"
         }

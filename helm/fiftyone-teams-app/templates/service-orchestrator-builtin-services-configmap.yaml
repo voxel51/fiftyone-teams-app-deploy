@@ -17,9 +17,8 @@ metadata:
   labels:
     {{- include "service-orchestrator.builtin-services-config-map-labels" . | nindent 4 }}
 {{- /* An entrypoint.container.image without a tag defaults to the chart's
-       appVersion, so entries track image bumps instead of pinning a tag —
-       same convention as the chart's other images. Tag detection looks at
-       the segment after the last "/" so a registry port
+       appVersion, so entries track image bumps instead of pinning a tag.
+       Tag detection looks at the segment after the last "/" so a registry port
        (registry:5000/image) is not mistaken for a tag, and digests
        (image@sha256:...) are left alone. */}}
 {{- $services := list }}
