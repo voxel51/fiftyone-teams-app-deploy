@@ -958,7 +958,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "./builtin_services.yaml",
+					Source:      builtinServicesSource,
 					Target:      "/opt/builtin-services/builtin_services.yaml",
 					ReadOnly:    true,
 					Consistency: "",
@@ -1010,7 +1010,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "./builtin_services.yaml",
+					Source:      builtinServicesSource,
 					Target:      "/opt/builtin-services/builtin_services.yaml",
 					ReadOnly:    true,
 					Consistency: "",
@@ -1062,7 +1062,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "./builtin_services.yaml",
+					Source:      builtinServicesSource,
 					Target:      "/opt/builtin-services/builtin_services.yaml",
 					ReadOnly:    true,
 					Consistency: "",
