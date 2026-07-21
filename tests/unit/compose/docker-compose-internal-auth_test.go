@@ -870,7 +870,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "./builtin_services.yaml",
+					Source:      builtinServicesSource,
 					Target:      "/opt/builtin-services/builtin_services.yaml",
 					ReadOnly:    true,
 					Consistency: "",
@@ -922,7 +922,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "./builtin_services.yaml",
+					Source:      builtinServicesSource,
 					Target:      "/opt/builtin-services/builtin_services.yaml",
 					ReadOnly:    true,
 					Consistency: "",
@@ -974,7 +974,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			[]types.ServiceVolumeConfig{
 				{
 					Type:        "bind",
-					Source:      "./builtin_services.yaml",
+					Source:      builtinServicesSource,
 					Target:      "/opt/builtin-services/builtin_services.yaml",
 					ReadOnly:    true,
 					Consistency: "",
