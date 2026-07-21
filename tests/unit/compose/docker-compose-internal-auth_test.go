@@ -348,6 +348,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_BUILTIN_SERVICES_PATH=/opt/builtin-services/builtin_services.yaml",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
@@ -435,6 +436,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_BUILTIN_SERVICES_PATH=/opt/builtin-services/builtin_services.yaml",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
@@ -522,6 +524,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
 				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_BUILTIN_SERVICES_PATH=/opt/builtin-services/builtin_services.yaml",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
@@ -864,7 +867,15 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			"teams-api",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			nil,
+			[]types.ServiceVolumeConfig{
+				{
+					Type:        "bind",
+					Source:      "./builtin_services.yaml",
+					Target:      "/opt/builtin-services/builtin_services.yaml",
+					ReadOnly:    true,
+					Consistency: "",
+				},
+			},
 		},
 		{
 			"defaultTeamsApp",
@@ -910,6 +921,13 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
 				{
+					Type:        "bind",
+					Source:      "./builtin_services.yaml",
+					Target:      "/opt/builtin-services/builtin_services.yaml",
+					ReadOnly:    true,
+					Consistency: "",
+				},
+				{
 					Type:     "volume",
 					Source:   "plugins-vol",
 					Target:   "/opt/plugins",
@@ -954,6 +972,13 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceVolumes() {
 			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]types.ServiceVolumeConfig{
+				{
+					Type:        "bind",
+					Source:      "./builtin_services.yaml",
+					Target:      "/opt/builtin-services/builtin_services.yaml",
+					ReadOnly:    true,
+					Consistency: "",
+				},
 				{
 					Type:     "volume",
 					Source:   "plugins-vol",
