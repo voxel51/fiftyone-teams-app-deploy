@@ -1,0 +1,61 @@
+---
+# Builtin services list for this deployment, mounted into teams-api by
+# common-services.yaml (via FIFTYONE_BUILTIN_SERVICES_PATH) and reconciled at
+# startup so the services show up in Settings -> Services. Entries deep-merge
+# by `id` onto the packaged defaults. Both services are created stopped
+# (enabled: false). An admin starts them from the Services page.
+#
+# `entrypoint.container.port` is the port the teams-api /service proxy dials,
+# and is required even on compose, where no container is provisioned and the
+# shell command is what runs. Bump `builtin_version` to re-apply a changed entry
+# to an environment that already stored it.
+
+# annotation-ai (SAM2 image masks + whole-video mask propagation). Targeted at
+# the default teams-do worker (`builtin`, the name teams-do registers under) for
+# convenience. SAM2 needs a GPU, so that worker must have GPU access. Retarget
+# delegation_target to another worker if the default does not.
+- id: builtin:annotation-ai
+  builtin_version: 1
+  kind: annotation-ai
+  scope: shared
+  builtin: true
+  enabled: false
+  label: Annotation AI
+  name: annotation-ai
+  description: SAM2 point-prompt image masks and whole-video mask propagation.
+  entrypoint:
+    kind: shell
+    command: python -m fiftyone.annotation.endpoints.sam2 --mode all --host 0.0.0.0 --port 8000
+    container:
+      port: 8000
+      healthcheck:
+        path: /healthz
+  delegation_target: builtin
+
+# agentic-labeler (few-shot VLM inference via vLLM). Runs on the dedicated GPU
+# worker from compose.agenticlabeler.yaml. `delegation_target` matches that
+# worker's `-n agentic-labeler` name. Health is on 8001, the API on 8000. Tune
+# the LABELER_* values for your model and GPU. LABELER_DISABLE_AUTH turns off
+# the service's built-in auth.
+- id: builtin:agentic-labeler
+  builtin_version: 1
+  kind: agentic-labeler
+  scope: shared
+  builtin: true
+  enabled: false
+  label: Agentic Labeler
+  name: agentic-labeler
+  description: Agentic labeler (few-shot VLM inference via vLLM).
+  entrypoint:
+    kind: shell
+    command: uvicorn agentic_labeler.app:app --host 0.0.0.0 --port 8000
+    container:
+      port: 8000
+      healthcheck:
+        path: /healthz
+        port: 8001
+  env: |
+    LABELER_TENSOR_PARALLEL_SIZE=1
+    LABELER_MAX_MODEL_LEN=6144
+    LABELER_DISABLE_AUTH=1
+  delegation_target: agentic-labeler
