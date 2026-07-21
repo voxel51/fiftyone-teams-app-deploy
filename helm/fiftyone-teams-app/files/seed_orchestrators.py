@@ -1,19 +1,21 @@
 """Seeds a deployment's orchestrator registrations in Mongo, so they are
 versioned in the deployment's values instead of hand-created.
 
-Runs as a helm post-install/post-upgrade Job (see
-seed-orchestrators-job.yaml). The orchestrator list arrives as JSON in the
-ORCHESTRATORS env var, derived by helm from the entries under
-`delegatedOperatorJobTemplates.jobs` and `.services` that resolve
-`registerOrchestrator` to true.
+Runs as a helm post-install/post-upgrade hook (see
+`../templates/seed-orchestrators-job.yaml`).
+Helm provides the `ORCHESTRATORS` env var
+containing a JSON list of orchestrators (key names under
+`delegatedOperatorJobTemplates.jobs` and `.services` with
+`registerOrchestrator=true`).
 
-Upserts by instance_id: config, description, environment, and secrets are
-re-applied on every run; created_at is only written when the document is
-first created. available_operators is re-applied on every run for entries
+Upserts by instance_id: config. The fields `description`, `environment`,
+and `secrets` are re-applied on every run.
+The `created_at` field is only written when the document is first created.
+`available_operators` is re-applied on every run for entries
 that pin it (service orchestrators, restricted to run_service) and never
-touched for entries that omit it (job orchestrators), so the app's Refresh
-action owns the discovered list for job targets. Talks directly to Mongo
-with the deployment's existing teams secrets, so no API key is required.
+touched for entries that omit it (job orchestrators).
+The app's Refresh action owns the discovered list for job targets.
+Connects to Mongo using the deployment's existing teams secrets.
 """
 
 import datetime

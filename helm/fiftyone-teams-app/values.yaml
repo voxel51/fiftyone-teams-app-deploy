@@ -993,11 +993,10 @@ delegatedOperatorJobTemplates:
       runAsUser: 1000
       runAsGroup: 1000
       fsGroup: 1000
-    # -- Controls whether a post-install/post-upgrade seeding Job registers
+    # -- Controls whether a post-install/post-upgrade hook seeding Job registers
     # an orchestrator in MongoDB for each entry under `jobs` and `services`
-    # (upserted by `instance_id` = entry name). Individual entries can
-    # override this with their own `registerOrchestrator` key. See
-    # templates/seed-orchestrators-job.yaml and files/seed_orchestrators.py.
+    # Individual entries may override this with their own `registerOrchestrator` key.
+    # See `./templates/seed-orchestrators-job.yaml` and `./files/seed_orchestrators.py`.
     registerOrchestrator: true
     # Instead of setting default resources, we require the user define them
     # This enables running on resource constrained environments
@@ -1091,7 +1090,7 @@ delegatedOperatorJobTemplates:
   # `kubernetes-service` environment (long-lived push services). Each entry
   # renders a jinja2 `Pod` manifest into the same `ConfigMap` as `jobs`,
   # merged over `template` with the same logic. Job-only fields (`image`,
-  # `jobAnnotations`, and the Job spec fields) do not apply: the
+  # `jobAnnotations`, and the Job spec fields) do not apply. The
   # kubernetes-service broker provides the image and command per task.
   # Entries also accept `description` and `registerOrchestrator`.
   services: {}
@@ -1412,7 +1411,7 @@ serviceAccount:
 # Service orchestrator (on-demand service pods) configurations
 serviceOrchestrator:
   # -- Controls whether to create the builtin services overrides `ConfigMap`
-  # below and wire it into `teams-api`.
+  # below and volume mount it into `teams-api` container.
   enabled: false
 
   # Per-deployment overrides for the builtin services packaged in fiftyone.

@@ -84,17 +84,21 @@ app.voxel51.com/delegate-operator-template-name: {{ .jobTemplateName }}
 {{- end }}
 
 {{/*
-Orchestrator registrations derived from the delegated-operator template
+Orchestrator registrations are derived from the delegated-operator template
 maps, as a JSON list consumed by the seeding job (see
-files/seed_orchestrators.py and seed-orchestrators-job.yaml).
+`../../files/seed_orchestrators.py` and `./seed-orchestrators-job.yaml).`
 
-An enabled entry under `delegatedOperatorJobTemplates.jobs` or `.services`
-is included when it resolves `registerOrchestrator` to true (its own key
-when present, otherwise `template.registerOrchestrator`). `instance_id` is
-the entry name and `config.execution_tmpl_uri` points at the entry's
-rendered template file, mounted in teams-api from the do-templates
-ConfigMap. Job entries omit `available_operators` so the app's Refresh
-action owns the discovered list; service entries pin it to run_service.
+When `delegatedOperatorJobTemplates.[jobs|services].*.enabled=true`
+and `delegatedOperatorJobTemplates.[jobs|services].*.registerOrchestrator=true`
+(or inherited via `delegatedOperatorJobTemplates.template.registerOrchestrator=true`),
+the orchestrator will be registered via the `seed_orchestrators.py` script.
+The job or service key name is used as the `instance_id`.
+`config.execution_tmpl_uri` contains the path to the entry's
+rendered template file (mounted in teams-api from the do-templates
+ConfigMap).
+`job` entries omit `available_operators` because the app's Refresh
+action owns the discovered job list.
+`service` entries pin it to run_service.
 */}}
 {{- define "delegated-operator-templates.seed-orchestrators" -}}
 {{- $baseTpl := .Values.delegatedOperatorJobTemplates.template }}
