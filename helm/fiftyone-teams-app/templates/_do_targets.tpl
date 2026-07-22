@@ -88,8 +88,8 @@ Orchestrator registrations are derived from the delegated-operator template
 maps, as a JSON list consumed by the seeding job (see
 `../../files/seed_orchestrators.py` and `./seed-orchestrators-job.yaml).`
 
-When `delegatedOperatorJobTemplates.[jobs|services].*.enabled=true`
-and `delegatedOperatorJobTemplates.[jobs|services].*.registerOrchestrator=true`
+When `delegatedOperatorJobTemplates.[jobs|serviceOrchestrators].*.enabled=true`
+and `delegatedOperatorJobTemplates.[jobs|serviceOrchestrators].*.registerOrchestrator=true`
 (or inherited via `delegatedOperatorJobTemplates.template.registerOrchestrator=true`),
 the orchestrator will be registered via the `seed_orchestrators.py` script.
 The job or service key name is used as the `instance_id`.
@@ -122,7 +122,7 @@ so seeding writes that single-entry list and re-applies it on every run.
     "secrets" (dict "kube_config" "")) }}
 {{- end }}
 {{- end }}
-{{- range $name, $config := .Values.delegatedOperatorJobTemplates.services }}
+{{- range $name, $config := .Values.delegatedOperatorJobTemplates.serviceOrchestrators }}
 {{- $register := ternary $config.registerOrchestrator ($baseTpl.registerOrchestrator | default false) (hasKey $config "registerOrchestrator") }}
 {{- if and (ne $config.enabled false) $register }}
 {{- $orchestrators = append $orchestrators (dict

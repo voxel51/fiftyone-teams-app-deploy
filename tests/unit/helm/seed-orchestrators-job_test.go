@@ -67,28 +67,34 @@ func (s *seedOrchestratorsJobTemplateTest) TestGating() {
 		expected string // empty => the template must not render
 	}{
 		{
-			// No entries at all: nothing to register
+			// The chart's default serviceOrchestrators register out of
+			// the box (template.registerOrchestrator defaults to true)
 			"defaultValues",
 			nil,
+			fmt.Sprintf("%s-fiftyone-teams-app-seed-orchestrators", s.releaseName),
+		},
+		{
+			// No entries at all: nothing to register
+			"noEntries",
+			disableDefaultServiceOrchestrators(nil),
 			"",
 		},
 		{
-			// Entries register by default (template.registerOrchestrator
-			// defaults to true)
+			// Entries register by default
 			"entriesRegisterByDefault",
-			map[string]string{
-				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":      "nil",
-				"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
-			},
+			disableDefaultServiceOrchestrators(map[string]string{
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                  "nil",
+				"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.unused": "nil",
+			}),
 			fmt.Sprintf("%s-fiftyone-teams-app-seed-orchestrators", s.releaseName),
 		},
 		{
 			// A template-level opt-out disables seeding for all entries
 			"templateLevelOptOut",
 			map[string]string{
-				"delegatedOperatorJobTemplates.template.registerOrchestrator": "false",
-				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":        "nil",
-				"delegatedOperatorJobTemplates.services.cpuServices.unused":   "nil",
+				"delegatedOperatorJobTemplates.template.registerOrchestrator":           "false",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                  "nil",
+				"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.unused": "nil",
 			},
 			"",
 		},
@@ -104,18 +110,18 @@ func (s *seedOrchestratorsJobTemplateTest) TestGating() {
 		{
 			// An entry-level opt-out beats the template-level default
 			"entryFalseOverridesTemplateDefault",
-			map[string]string{
+			disableDefaultServiceOrchestrators(map[string]string{
 				"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "false",
-			},
+			}),
 			"",
 		},
 		{
 			// A disabled entry is not registered even when it opts in
 			"disabledEntryNotRegistered",
-			map[string]string{
+			disableDefaultServiceOrchestrators(map[string]string{
 				"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "true",
 				"delegatedOperatorJobTemplates.jobs.cpuDefault.enabled":              "false",
-			},
+			}),
 			"",
 		},
 	}
@@ -173,13 +179,13 @@ func (s *seedOrchestratorsJobTemplateTest) TestHelmHooks() {
 // to run_service for services only.
 func (s *seedOrchestratorsJobTemplateTest) TestDerivedOrchestrators() {
 	options := &helm.Options{
-		SetValues: disableTelemetry(map[string]string{
-			"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                     "nil",
-			"delegatedOperatorJobTemplates.services.cpuServices.description":           "Service orchestrator (CPU)",
-			"delegatedOperatorJobTemplates.services.unregistered.registerOrchestrator": "false",
-			"delegatedOperatorJobTemplates.jobs.disabledJob.registerOrchestrator":      "true",
-			"delegatedOperatorJobTemplates.jobs.disabledJob.enabled":                   "false",
-		}),
+		SetValues: disableTelemetry(disableDefaultServiceOrchestrators(map[string]string{
+			"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                                 "nil",
+			"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.description":           "Service orchestrator (CPU)",
+			"delegatedOperatorJobTemplates.serviceOrchestrators.unregistered.registerOrchestrator": "false",
+			"delegatedOperatorJobTemplates.jobs.disabledJob.registerOrchestrator":                  "true",
+			"delegatedOperatorJobTemplates.jobs.disabledJob.enabled":                               "false",
+		})),
 	}
 
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
@@ -248,11 +254,11 @@ func (s *seedOrchestratorsJobTemplateTest) namespaceFromConfig(config map[string
 // prove each image flows from its own value.
 func (s *seedOrchestratorsJobTemplateTest) TestImages() {
 	options := &helm.Options{
-		SetValues: disableTelemetry(map[string]string{
+		SetValues: disableTelemetry(disableDefaultServiceOrchestrators(map[string]string{
 			"delegatedOperatorJobTemplates.jobs.cpuDefault.registerOrchestrator": "true",
 			"delegatedOperatorJobTemplates.template.image.tag":                   "v9.9.9",
 			"apiSettings.image.tag": "v8.8.8",
-		}),
+		})),
 	}
 
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)

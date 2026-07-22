@@ -89,7 +89,7 @@ spec:
             - name: do-targets
               mountPath: /tmp/do-targets
             {{- end }}
-            {{- if and .Values.serviceOrchestrator.enabled (or .Values.serviceOrchestrator.builtinServices.configMap.create .Values.serviceOrchestrator.builtinServices.configMap.name) }}
+            {{- if ne (trim (include "service-orchestrator.builtin-services" .)) "[]" }}
             - name: builtin-services
               mountPath: /opt/builtin-services
             {{- end }}
@@ -134,7 +134,7 @@ spec:
           configMap:
             name: {{ include "delegated-operator-templates.config-map-name" . }}
         {{- end }}
-        {{- if and .Values.serviceOrchestrator.enabled (or .Values.serviceOrchestrator.builtinServices.configMap.create .Values.serviceOrchestrator.builtinServices.configMap.name) }}
+        {{- if ne (trim (include "service-orchestrator.builtin-services" .)) "[]" }}
         - name: builtin-services
           configMap:
             name: {{ include "service-orchestrator.builtin-services-config-map-name" . }}

@@ -1086,19 +1086,80 @@ delegatedOperatorJobTemplates:
     #     requests:
     #       nvidia.com/gpu: "1"
 
-  # -- On-Demand Service Orchestrator Pod templates for the
-  # `kubernetes-service` environment (long-lived push services). Each entry
-  # renders a jinja2 `Pod` manifest into the same `ConfigMap` as `jobs`,
-  # merged over `template` with the same logic. Job-only fields (`image`,
-  # `jobAnnotations`, and the Job spec fields) do not apply. The
-  # kubernetes-service broker provides the image and command per task.
-  # Entries also accept `description` and `registerOrchestrator`.
-  services: {}
-    # cpuServices:
-    #   description: "Service orchestrator (CPU)"
-    # gpuServices:
-    #   nodeSelector:
-    #     cloud.google.com/gke-accelerator: "nvidia-tesla-t4"
+  # -- On-Demand Service Orchestrators for the `kubernetes-service`
+  # environment (long-lived push services).
+  # Each entry renders a jinja2 `Pod` manifest into the same `ConfigMap`
+  # as `jobs`, merged over `template` with the same logic
+  # (job-only fields do not apply).
+  # Entries also accept `description`, `registerOrchestrator`,
+  # and a `services` map of the service definitions the orchestrator runs,
+  # whose identity fields are derived from the map keys.
+  # @default -- two chart-managed orchestrators (see values.yaml)
+  # @schema
+  # type: object
+  # properties: {}
+  # @schema
+  serviceOrchestrators:
+    cpuServiceOrc:
+      description: "Service orchestrator (CPU)"
+    gpuServiceOrc:
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+        requests:
+          nvidia.com/gpu: 1
+      secretEnv:
+        FIFTYONE_AUTH_SECRET:
+          secretName: fiftyone-teams-secrets
+          secretKey: fiftyoneAuthSecret
+      services:
+        annotation-ai:
+          builtin: true
+          builtin_version: 1
+          description: SAM2 point-prompt image masks and whole-video mask propagation.
+          autoStart: false
+          entrypoint:
+            command: python -m fiftyone.annotation.endpoints.sam2 --mode all --host 0.0.0.0 --port 8000
+            container:
+              env:
+                - name: LD_LIBRARY_PATH
+                  value: /usr/local/nvidia/lib64:/usr/local/nvidia/lib
+              healthcheck:
+                path: /healthz
+              image: voxel51/fiftyone-teams-cv-full
+              port: 8000
+            kind: shell
+          label: Annotation AI
+          scope: shared
+          secrets: ""
+        agentic-labeler:
+          builtin: true
+          builtin_version: 1
+          description: Agentic labeler (few-shot VLM inference via vLLM).
+          autoStart: false
+          entrypoint:
+            command: uvicorn agentic_labeler.app:app --host 0.0.0.0 --port 8000
+            container:
+              healthcheck:
+                path: /healthz
+                port: 8001
+              image: voxel51/agentic-labeler
+              port: 8000
+            kind: shell
+          env:
+            LABELER_CONFIG_FILE: /app/configs/gemma4-31B-qat-maxvision.json
+            LABELER_TENSOR_PARALLEL_SIZE: 1
+            LABELER_ENFORCE_EAGER: true
+            LABELER_ENGINE_KWARGS: '{"max_num_batched_tokens": 8192, "enable_prefix_caching": true, "mm_processor_cache_gb": 0}'
+            USER: fiftyone
+          label: Agentic Labeler
+          scope: shared
+          secrets: ""
+      tolerations:
+        - key: nvidia.com/gpu
+          effect: NoSchedule
+          operator: Exists
+
 # -- List of secrets for FiftyOne Enterprise Licenses (one per org)
 fiftyoneLicenseSecrets:
   - fiftyone-license
@@ -1407,34 +1468,6 @@ serviceAccount:
   name: "fiftyone-teams"
   # -- Additional labels for the generated service account. [Reference][labels-and-selectors].
   labels: {}
-
-# Service orchestrator (on-demand service pods) configurations
-serviceOrchestrator:
-  # -- Controls whether to create the builtin services overrides `ConfigMap`
-  # below and volume mount it into `teams-api` container.
-  enabled: false
-
-  # Per-deployment overrides for the builtin services packaged in fiftyone.
-  # teams-api mounts the generated file and reads it via
-  # `FIFTYONE_BUILTIN_SERVICES_PATH`; entries deep-merge by `id` onto the
-  # packaged defaults at reconcile time.
-  builtinServices:
-    configMap:
-      # -- ConfigMap annotations. [Reference][annotations].
-      annotations: {}
-      # -- Controls whether to create the `ConfigMap` named `serviceOrchestrator.builtinServices.configMap.name`.
-      create: true
-      # -- Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` holding the builtin services overrides.
-      # Defaults to `release-name-fiftyone-teams-app-builtin-services`.
-      name: ""
-      # -- Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].
-      labels: {}
-    # -- Builtin service overrides, deep-merged by `id` onto the defaults
-    # packaged in fiftyone (`builtin_version` must be bumped for a changed
-    # entry to re-apply to an environment that already stores the builtin).
-    # An `entrypoint.container.image` without a tag defaults to the chart's
-    # appVersion.
-    services: []
 
 # FiftyOne Enterprise App (teams-app) configurations
 teamsAppSettings:

@@ -2,7 +2,7 @@
 {{- if ne $orchestratorsJson "[]" -}}
 # Seeds the deployment's orchestrator registrations in Mongo, so they are
 # versioned in values instead of hand-created. The registrations are derived
-# from the `delegatedOperatorJobTemplates.[jobs|services]` entries that
+# from the `delegatedOperatorJobTemplates.[jobs|serviceOrchestrators]` entries that
 # contain `registerOrchestrator=true`. See the script in
 # `../files/seed_orchestrators.py`.
 #

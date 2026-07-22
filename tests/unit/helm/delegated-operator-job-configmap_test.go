@@ -638,7 +638,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -925,8 +925,8 @@ func (s *doK8sConfigMapTemplateTest) renderServicePod(data map[string]string, ke
 // variables.
 func (s *doK8sConfigMapTemplateTest) TestServiceData() {
 	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
-		"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":      "nil",
-		"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
+		"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                  "nil",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.unused": "nil",
 	})}
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
 
@@ -978,7 +978,7 @@ func (s *doK8sConfigMapTemplateTest) TestServiceData() {
 
 func (s *doK8sConfigMapTemplateTest) TestServiceWithoutHealthcheck() {
 	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
-		"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.unused": "nil",
 	})}
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
 
@@ -994,7 +994,7 @@ func (s *doK8sConfigMapTemplateTest) TestServiceWithoutHealthcheck() {
 
 func (s *doK8sConfigMapTemplateTest) TestServiceDisabled() {
 	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
-		"delegatedOperatorJobTemplates.services.cpuServices.enabled": "false",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.enabled": "false",
 	})}
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
 
@@ -1011,10 +1011,10 @@ func (s *doK8sConfigMapTemplateTest) TestServiceDisabled() {
 // same as jobs.
 func (s *doK8sConfigMapTemplateTest) TestServiceResources() {
 	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
-		"delegatedOperatorJobTemplates.template.resources.requests.cpu":                "1",
-		"delegatedOperatorJobTemplates.services.cpuServices.unused":                    "nil",
-		"delegatedOperatorJobTemplates.services.gpuServices.resources.requests.cpu":    "2",
-		"delegatedOperatorJobTemplates.services.gpuServices.resources.requests.memory": "8Gi",
+		"delegatedOperatorJobTemplates.template.resources.requests.cpu":                            "1",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.unused":                    "nil",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.gpuServices.resources.requests.cpu":    "2",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.gpuServices.resources.requests.memory": "8Gi",
 	})}
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
 
@@ -1050,8 +1050,8 @@ func (s *doK8sConfigMapTemplateTest) TestServiceResources() {
 // as sizing.
 func (s *doK8sConfigMapTemplateTest) TestServiceNodeSelector() {
 	options := &helm.Options{SetValues: disableTelemetry(map[string]string{
-		"delegatedOperatorJobTemplates.services.gpuServices.nodeSelector.cloud\\.google\\.com/gke-accelerator": "nvidia-tesla-t4",
-		"delegatedOperatorJobTemplates.services.gpuServices.nodeSelector.disktype":                             "ssd",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.gpuServices.nodeSelector.cloud\\.google\\.com/gke-accelerator": "nvidia-tesla-t4",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.gpuServices.nodeSelector.disktype":                             "ssd",
 	})}
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
 
@@ -1077,7 +1077,7 @@ func (s *doK8sConfigMapTemplateTest) TestServiceTelemetry() {
 
 	options := &helm.Options{SetValues: map[string]string{
 		"telemetry.enabled": "true",
-		"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.unused": "nil",
 	}}
 	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
 
@@ -1106,7 +1106,7 @@ func (s *doK8sConfigMapTemplateTest) TestServiceTelemetry() {
 
 	// Disabled: no sidecar, no socket plumbing
 	options = &helm.Options{SetValues: disableTelemetry(map[string]string{
-		"delegatedOperatorJobTemplates.services.cpuServices.unused": "nil",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.unused": "nil",
 	})}
 	output = helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
 	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
@@ -1132,7 +1132,7 @@ func (s *doK8sConfigMapTemplateTest) TestServiceTelemetrySidecarGpuEnv() {
 			name: "gpuInLimitsExposesEnvToSidecar",
 			values: map[string]string{
 				"telemetry.enabled": "true",
-				"delegatedOperatorJobTemplates.services.gpuServices.resources.limits.nvidia\\.com/gpu": "1",
+				"delegatedOperatorJobTemplates.serviceOrchestrators.gpuServices.resources.limits.nvidia\\.com/gpu": "1",
 			},
 			expectGpu: true,
 		},
@@ -1140,7 +1140,7 @@ func (s *doK8sConfigMapTemplateTest) TestServiceTelemetrySidecarGpuEnv() {
 			name: "noGpuOmitsEnvFromSidecar",
 			values: map[string]string{
 				"telemetry.enabled": "true",
-				"delegatedOperatorJobTemplates.services.gpuServices.unused": "nil",
+				"delegatedOperatorJobTemplates.serviceOrchestrators.gpuServices.unused": "nil",
 			},
 			expectGpu: false,
 		},
@@ -1174,4 +1174,30 @@ func (s *doK8sConfigMapTemplateTest) TestServiceTelemetrySidecarGpuEnv() {
 			}
 		})
 	}
+}
+
+// TestDefaultGpuServiceOrcAuthSecret pins the chart default: the
+// gpuServiceOrc pod template delivers FIFTYONE_AUTH_SECRET by reference
+// (secretEnv), so its services authenticate to teams-api without a
+// plaintext value in the service definition.
+func (s *doK8sConfigMapTemplateTest) TestDefaultGpuServiceOrcAuthSecret() {
+	options := &helm.Options{SetValues: disableTelemetry(nil)}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	pod := s.renderServicePod(configMap.Data, "gpuServiceOrc.yaml", brokerServiceVars())
+
+	container := pod.Spec.Containers[0]
+	for _, envVar := range container.Env {
+		if envVar.Name == "FIFTYONE_AUTH_SECRET" {
+			s.Require().NotNil(envVar.ValueFrom, "must be a reference, not a literal")
+			s.Require().NotNil(envVar.ValueFrom.SecretKeyRef)
+			s.Equal("fiftyone-teams-secrets", envVar.ValueFrom.SecretKeyRef.Name)
+			s.Equal("fiftyoneAuthSecret", envVar.ValueFrom.SecretKeyRef.Key)
+			return
+		}
+	}
+	s.Fail("FIFTYONE_AUTH_SECRET not found in gpuServiceOrc pod env")
 }

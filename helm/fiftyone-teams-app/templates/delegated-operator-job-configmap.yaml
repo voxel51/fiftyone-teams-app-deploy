@@ -177,7 +177,7 @@ data:
           {{- end }}
     {{- end }}
 {{- end }}
-{{- range $serviceName, $serviceConfig := .Values.delegatedOperatorJobTemplates.services }}
+{{- range $serviceName, $serviceConfig := .Values.delegatedOperatorJobTemplates.serviceOrchestrators }}
   {{- /* Allows someone to explicitly disable a service template. */ -}}
   {{- if ne $serviceConfig.enabled false }}
 

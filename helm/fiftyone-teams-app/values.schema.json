@@ -2382,10 +2382,10 @@
           "title": "jobs",
           "type": "object"
         },
-        "services": {
-          "description": "On-Demand Service Orchestrator Pod templates for the\n`kubernetes-service` environment (long-lived push services). Each entry\nrenders a jinja2 `Pod` manifest into the same `ConfigMap` as `jobs`,\nmerged over `template` with the same logic. Job-only fields (`image`,\n`jobAnnotations`, and the Job spec fields) do not apply. The\nkubernetes-service broker provides the image and command per task.\nEntries also accept `description` and `registerOrchestrator`.",
+        "serviceOrchestrators": {
+          "description": "On-Demand Service Orchestrators for the `kubernetes-service`\nenvironment (long-lived push services).\nEach entry renders a jinja2 `Pod` manifest into the same `ConfigMap`\nas `jobs`, merged over `template` with the same logic\n(job-only fields do not apply).\nEntries also accept `description`, `registerOrchestrator`,\nand a `services` map of the service definitions the orchestrator runs,\nwhose identity fields are derived from the map keys.",
           "required": [],
-          "title": "services",
+          "title": "serviceOrchestrators",
           "type": "object"
         },
         "template": {
@@ -3461,67 +3461,6 @@
       },
       "required": [],
       "title": "serviceAccount",
-      "type": "object"
-    },
-    "serviceOrchestrator": {
-      "description": "Service orchestrator (on-demand service pods) configurations",
-      "properties": {
-        "builtinServices": {
-          "description": "Per-deployment overrides for the builtin services packaged in fiftyone.\nteams-api mounts the generated file and reads it via\n`FIFTYONE_BUILTIN_SERVICES_PATH`; entries deep-merge by `id` onto the\npackaged defaults at reconcile time.",
-          "properties": {
-            "configMap": {
-              "properties": {
-                "annotations": {
-                  "description": "ConfigMap annotations. [Reference][annotations].",
-                  "required": [],
-                  "title": "annotations",
-                  "type": "object"
-                },
-                "create": {
-                  "default": true,
-                  "description": "Controls whether to create the `ConfigMap` named `serviceOrchestrator.builtinServices.configMap.name`.",
-                  "title": "create",
-                  "type": "boolean"
-                },
-                "labels": {
-                  "description": "Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors].",
-                  "required": [],
-                  "title": "labels",
-                  "type": "object"
-                },
-                "name": {
-                  "default": "",
-                  "description": "Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` holding the builtin services overrides.\nDefaults to `release-name-fiftyone-teams-app-builtin-services`.",
-                  "title": "name",
-                  "type": "string"
-                }
-              },
-              "required": [],
-              "title": "configMap",
-              "type": "object"
-            },
-            "services": {
-              "description": "Builtin service overrides, deep-merged by `id` onto the defaults\npackaged in fiftyone (`builtin_version` must be bumped for a changed\nentry to re-apply to an environment that already stores the builtin).\nAn `entrypoint.container.image` without a tag defaults to the chart's\nappVersion.",
-              "items": {
-                "required": []
-              },
-              "title": "services",
-              "type": "array"
-            }
-          },
-          "required": [],
-          "title": "builtinServices",
-          "type": "object"
-        },
-        "enabled": {
-          "default": false,
-          "description": "Controls whether to create the builtin services overrides `ConfigMap`\nbelow and volume mount it into `teams-api` container.",
-          "title": "enabled",
-          "type": "boolean"
-        }
-      },
-      "required": [],
-      "title": "serviceOrchestrator",
       "type": "object"
     },
     "teamsAppSettings": {

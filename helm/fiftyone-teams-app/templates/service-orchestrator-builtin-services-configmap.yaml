@@ -1,36 +1,21 @@
-{{- if and .Values.serviceOrchestrator.enabled .Values.serviceOrchestrator.builtinServices.configMap.create -}}
-# Per-deployment overrides for the builtin services packaged in fiftyone
-# (fiftyone/operators/builtin_services.yaml). teams-api mounts this file and
-# reads it via FIFTYONE_BUILTIN_SERVICES_PATH; entries deep-merge by `id` onto
-# the packaged defaults at reconcile time. `builtin_version` must be bumped
-# for a changed entry to re-apply to an environment that already has the
-# builtin in its config store.
+{{- $builtinServices := include "service-orchestrator.builtin-services" . }}
+{{- if ne (trim $builtinServices) "[]" -}}
+# Builtin service definitions derived from the entries under
+# `delegatedOperatorJobTemplates.serviceOrchestrators.<name>.services`.
+# teams-api mounts this file and reads it via
+# FIFTYONE_BUILTIN_SERVICES_PATH;
+# entries deep-merge by `id` onto the service definitions packaged in
+# fiftyone (fiftyone/operators/builtin_services.yaml) at reconcile time.
+# `builtin_version` must be bumped for a changed entry to re-apply to an
+# environment that already has the builtin in its config store.
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "service-orchestrator.builtin-services-config-map-name" . }}
   namespace: {{ .Values.namespace.name }}
-  {{- with .Values.serviceOrchestrator.builtinServices.configMap.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   labels:
     {{- include "service-orchestrator.builtin-services-config-map-labels" . | nindent 4 }}
-{{- /* An entrypoint.container.image without a tag defaults to the chart's
-       appVersion, so entries track image bumps instead of pinning a tag.
-       Tag detection looks at the segment after the last "/" so a registry port
-       (registry:5000/image) is not mistaken for a tag, and digests
-       (image@sha256:...) are left alone. */}}
-{{- $services := list }}
-{{- range $service := (.Values.serviceOrchestrator.builtinServices.services | default list) }}
-{{- $service = deepCopy $service }}
-{{- $image := dig "entrypoint" "container" "image" "" $service }}
-{{- if and $image (not (contains ":" (last (splitList "/" $image)))) }}
-{{- $_ := set $service.entrypoint.container "image" (printf "%s:%s" $image $.Chart.AppVersion) }}
-{{- end }}
-{{- $services = append $services $service }}
-{{- end }}
 data:
   builtin_services.yaml: |
-    {{- toYaml $services | nindent 4 }}
+    {{- $builtinServices | nindent 4 }}
 {{- end }}

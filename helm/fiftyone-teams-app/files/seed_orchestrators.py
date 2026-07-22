@@ -5,7 +5,7 @@ Runs as a helm post-install/post-upgrade hook (see
 `../templates/seed-orchestrators-job.yaml`).
 Helm provides the `ORCHESTRATORS` env var
 containing a JSON list of orchestrators (key names under
-`delegatedOperatorJobTemplates.jobs` and `.services` with
+`delegatedOperatorJobTemplates.jobs` and `.serviceOrchestrators` with
 `registerOrchestrator=true`).
 
 Upserts by instance_id: config. The fields `description`, `environment`,
