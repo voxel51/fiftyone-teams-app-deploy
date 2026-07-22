@@ -1651,8 +1651,8 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    # 0.0.20: work.judged attribution facts + SUM-only work_judged rollup
-    tag: "3f0d95ef82b7cf3f8501b98b09b72027883263e4"
+    # 0.0.21: allowDiskUse on aggregate reads; aclose loop teardown
+    tag: "5613c29aee74653e893f0dd27eb717e5f4235f37"
     pullPolicy: IfNotPresent
   mongo:
     # -- Database for the activity_* collections. EMPTY (default) co-locates
