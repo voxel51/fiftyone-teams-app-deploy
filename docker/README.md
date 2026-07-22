@@ -471,6 +471,8 @@ To set up containers with GPU resources, see the
 Run the builtin Agentic Labeler service (few-shot VLM inference via vLLM) on a
 dedicated GPU worker. See the
 [configuring Agentic Labeler documentation](./docs/configuring-agentic-labeler.md).
+For an overview of builtin services and the service orchestrator, see the
+[service orchestrator documentation](../docs/configuring-service-orchestrator.md).
 
 ### :bricks: Custom Plugin Images
 
