@@ -215,8 +215,9 @@ Opt into a `PersistentVolumeClaim` with
    [Pod Security Admission][psa] `restricted` out of the box.
    Clusters enforcing additional admission policies (OPA/Gatekeeper,
    Kyverno) that explicitly block `SYS_PTRACE` on the
-   delegated-operator namespace can either allow that single capability
-   or disable telemetry with `telemetry.enabled: false`.
+   delegated-operator namespace set `telemetry.sidecar.stackSampling: false`,
+   which drops only the`py-spy` stack sampling. To turn off telemetry
+   entirely, set `telemetry.enabled: false`.
 
 **External Redis:**
 To point at a managed Redis (ElastiCache, MemoryStore, an existing

@@ -153,7 +153,7 @@ Inputs: same dict as telemetry.sidecar-env.
     allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
-      {{- if .executor }}
+      {{- if and .executor .ctx.Values.telemetry.sidecar.stackSampling }}
       add: ["SYS_PTRACE"]
       {{- end }}
   {{- $mounts := list }}
@@ -197,7 +197,7 @@ would block Job completion.
     allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
-      {{- if .executor }}
+      {{- if and .executor .ctx.Values.telemetry.sidecar.stackSampling }}
       add: ["SYS_PTRACE"]
       {{- end }}
   {{- $mounts := list (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}

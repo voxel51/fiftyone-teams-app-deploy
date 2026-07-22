@@ -1722,6 +1722,10 @@ telemetry:
       limits:
         cpu: 200m
         memory: 512Mi
+    # -- Set `false` if your cluster's admission policy won't permit the
+    # `SYS_PTRACE` capability that the delegated-operator sidecar uses for
+    # `py-spy` stack sampling; the rest of telemetry keeps working without it.
+    stackSampling: true
   # -- ServiceAccount names (in `namespace.name`) bound to the telemetry
   # pod-logs Role. When empty, the RoleBinding binds the chart's main app
   # service account. The teams-api sidecar uses the teams-api RBAC service
