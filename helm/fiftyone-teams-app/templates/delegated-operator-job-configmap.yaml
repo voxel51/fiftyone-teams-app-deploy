@@ -209,6 +209,13 @@ data:
   {{- $mergedVolumeMounts := $serviceConfig.volumeMounts | default $baseTpl.volumeMounts | default list }}
   {{- $mergedVolumes := $serviceConfig.volumes | default $baseTpl.volumes | default list }}
 
+  {{- /* Same GPU passthrough to the telemetry sidecar as the jobs above. */}}
+  {{- $gpuRequested := or (not (empty (dig "limits" "nvidia.com/gpu" "" $mergedResources))) (not (empty (dig "requests" "nvidia.com/gpu" "" $mergedResources))) }}
+  {{- $sidecarEnv := dict }}
+  {{- if $gpuRequested }}
+  {{- $sidecarEnv = dict "NVIDIA_VISIBLE_DEVICES" "all" "NVIDIA_DRIVER_CAPABILITIES" "compute,utility" }}
+  {{- end }}
+
   {{- if $.Values.telemetry.enabled }}
     {{- $hasSocketVolume := false }}
     {{- range $vol := $mergedVolumes }}
@@ -262,7 +269,7 @@ data:
                (python -m fiftyone.operators.delegated_executors.service) and
                the sidecar then tracks it plus its children (the model
                server). */}}
-        {{- include "telemetry.native-sidecar" (dict "ctx" $ "serviceType" "service" "targetName" "delegated_executors.service" "executor" true "targetContainer" "service") | nindent 8 }}
+        {{- include "telemetry.native-sidecar" (dict "ctx" $ "serviceType" "service" "targetName" "delegated_executors.service" "executor" true "targetContainer" "service" "sidecarEnv" $sidecarEnv) | nindent 8 }}
       {{- end }}
       {{- with $mergedPodSecurityContext }}
       securityContext:

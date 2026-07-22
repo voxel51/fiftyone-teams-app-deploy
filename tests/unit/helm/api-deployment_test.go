@@ -2876,11 +2876,15 @@ func (s *deploymentApiTemplateTest) TestDeploymentUpdateStrategy() {
 	}
 }
 
-// TestBuiltinServicesWiring verifies the builtin-services overrides file
-// wiring: the env var pointing at the mounted file, the volumeMount, and
-// the ConfigMap volume, present exactly when serviceOrchestrator is
-// enabled and the ConfigMap is created (or externally named).
-func (s *deploymentApiTemplateTest) TestBuiltinServicesWiring() {
+// TestBuiltinServicesEnvAndMount verifies how the builtin-services
+// ConfigMap reaches teams-api.
+// The file holds per-deployment overrides that fiftyone deep-merges
+// by `id` onto the builtin service definitions it packages.
+// teams-api locates it via FIFTYONE_BUILTIN_SERVICES_PATH,
+// a volumeMount, and the ConfigMap volume —
+// present exactly when serviceOrchestrator is enabled
+// and the ConfigMap is created (or externally named).
+func (s *deploymentApiTemplateTest) TestBuiltinServicesEnvAndMount() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -2903,8 +2907,9 @@ func (s *deploymentApiTemplateTest) TestBuiltinServicesWiring() {
 			},
 		},
 		{
-			// Feature on: the env var points at the mounted overrides file
-			// and the ConfigMap is mounted with its generated name.
+			// Feature on: the env var points at the mounted file of
+			// builtin-service overrides and the ConfigMap is mounted
+			// with its generated name.
 			"serviceOrchestratorEnabled",
 			map[string]string{
 				"serviceOrchestrator.enabled": "true",
@@ -2958,8 +2963,8 @@ func (s *deploymentApiTemplateTest) TestBuiltinServicesWiring() {
 			},
 		},
 		{
-			// An externally managed ConfigMap keeps the wiring with the
-			// provided name.
+			// An externally managed ConfigMap keeps the env var and
+			// volume, with the provided name.
 			"enabledWithExternalConfigMap",
 			map[string]string{
 				"serviceOrchestrator.enabled":                          "true",

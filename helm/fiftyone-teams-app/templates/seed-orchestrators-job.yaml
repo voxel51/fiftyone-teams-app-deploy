@@ -33,13 +33,12 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      # UID/GID 1000 matches the image; set explicitly to satisfy PSA
-      # `restricted`.
+      {{- /* The pod runs the teams-api image, so it follows the api pod's
+             security attributes. */}}
+      {{- with .Values.apiSettings.podSecurityContext }}
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: seed-orchestrators
           image: "{{ $image.repository }}:{{ $image.tag | default .Chart.AppVersion }}"

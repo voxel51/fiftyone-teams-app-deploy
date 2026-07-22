@@ -14,6 +14,9 @@ rules:
   - apiGroups: ["batch"]
     resources: ["jobs"]
     verbs: ["create", "get", "list", "watch", "update", "delete"]
+  {{- /* The kubernetes-service broker runs inside teams-api and
+         provisions a bare Pod plus a ClusterIP Service per service task
+         (and deletes them on stop). */}}
   - apiGroups: [""]
     resources: ["pods", "services"]
     verbs: ["create", "get", "list", "watch", "delete"]

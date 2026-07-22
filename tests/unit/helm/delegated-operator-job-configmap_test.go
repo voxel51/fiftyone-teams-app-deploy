@@ -1117,3 +1117,61 @@ func (s *doK8sConfigMapTemplateTest) TestServiceTelemetry() {
 	_, ok = envValue(pod.Spec.Containers[0].Env, "TELEMETRY_SOCKET")
 	s.False(ok)
 }
+
+// TestServiceTelemetrySidecarGpuEnv verifies GPU passthrough to the
+// telemetry sidecar on service pods, matching the jobs behavior:
+// a GPU in the merged resources gives the sidecar the NVIDIA_* env vars
+// for read-only metrics, without its own nvidia.com/gpu request.
+func (s *doK8sConfigMapTemplateTest) TestServiceTelemetrySidecarGpuEnv() {
+	testCases := []struct {
+		name      string
+		values    map[string]string
+		expectGpu bool
+	}{
+		{
+			name: "gpuInLimitsExposesEnvToSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.services.gpuServices.resources.limits.nvidia\\.com/gpu": "1",
+			},
+			expectGpu: true,
+		},
+		{
+			name: "noGpuOmitsEnvFromSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.services.gpuServices.unused": "nil",
+			},
+			expectGpu: false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			pod := s.renderServicePod(configMap.Data, "gpuServices.yaml", brokerServiceVars())
+
+			sidecar := findContainer(pod.Spec.InitContainers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar, "telemetry-sidecar initContainer not found")
+
+			visibleDevices, hasVisibleDevices := envValue(sidecar.Env, "NVIDIA_VISIBLE_DEVICES")
+			if testCase.expectGpu {
+				s.True(hasVisibleDevices)
+				s.Equal("all", visibleDevices)
+				_, limitsHaveGpu := sidecar.Resources.Limits[corev1.ResourceName("nvidia.com/gpu")]
+				s.False(limitsHaveGpu, "sidecar must not request its own GPU")
+			} else {
+				s.False(hasVisibleDevices)
+			}
+		})
+	}
+}

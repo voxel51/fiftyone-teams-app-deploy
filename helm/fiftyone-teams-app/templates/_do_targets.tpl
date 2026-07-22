@@ -96,9 +96,12 @@ The job or service key name is used as the `instance_id`.
 `config.execution_tmpl_uri` contains the path to the entry's
 rendered template file (mounted in teams-api from the do-templates
 ConfigMap).
-`job` entries omit `available_operators` because the app's Refresh
-action owns the discovered job list.
-`service` entries pin it to run_service.
+`available_operators` is the list of operator URIs an orchestrator may execute.
+`job` entries omit it because the app's Refresh action discovers
+the operators installed in the worker image and owns the list.
+`service` orchestrators only ever execute one operator —
+the builtin @voxel51/operators/run_service, which launches a service —
+so seeding writes that single-entry list and re-applies it on every run.
 */}}
 {{- define "delegated-operator-templates.seed-orchestrators" -}}
 {{- $baseTpl := .Values.delegatedOperatorJobTemplates.template }}
