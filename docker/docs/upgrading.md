@@ -105,7 +105,7 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.22+ Multimodal Datasets
 
-FiftyOne Enterprise v2.22.1 introduces multimodal dataset support: large
+FiftyOne Enterprise v2.22.0 introduces multimodal dataset support: large
 modalities associated with each sample, stored as Parquet-backed Iceberg
 tables rather than as fields on the sample document, ingested/compacted via
 a background delegated-operator pipeline.
