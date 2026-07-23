@@ -11,10 +11,43 @@
     "apiServicePort" (float64 $.Values.apiSettings.service.port)
     "env" (merge (dict) ($v.env | default dict) ($baseTpl.env))
     "secretEnv" (merge (dict) ($v.secretEnv | default dict) ($baseTpl.secretEnv))
+    "ctx" $
   )
 }}
 {{- $defaultDescription := printf "Long running operations delegated to %s" $name }}
 {{- $updateStrategy := merge (dict) ($v.updateStrategy|default dict) ($baseTpl.updateStrategy) }}
+{{- $mergedResources := merge (dict) ($v.resources | default dict) ($baseTpl.resources | default dict) }}
+{{- /* When the executor requests a GPU, expose that same GPU to its telemetry
+       sidecar for read-only metrics. This sets env vars only — the sidecar never
+       requests its own nvidia.com/gpu, so it consumes no GPU quota and the
+       executor keeps the allocated GPU. Honored where the NVIDIA runtime accepts
+       NVIDIA_VISIBLE_DEVICES (most setups; GKE blocks env-based exposure). */}}
+{{- $gpuRequested := or (not (empty (dig "limits" "nvidia.com/gpu" "" $mergedResources))) (not (empty (dig "requests" "nvidia.com/gpu" "" $mergedResources))) }}
+{{- $sidecarEnv := dict }}
+{{- if $gpuRequested }}
+{{- $sidecarEnv = dict "NVIDIA_VISIBLE_DEVICES" "all" "NVIDIA_DRIVER_CAPABILITIES" "compute,utility" }}
+{{- end }}
+{{- $mergedVolumeMounts := $v.volumeMounts | default $baseTpl.volumeMounts | default list }}
+{{- $mergedVolumes := $v.volumes | default $baseTpl.volumes | default list }}
+{{- if $.Values.telemetry.enabled }}
+  {{- $hasSocketVolume := false }}
+  {{- range $vol := $mergedVolumes }}
+    {{- if eq $vol.name "telemetry-socket" }}{{- $hasSocketVolume = true }}{{- end }}
+  {{- end }}
+  {{- if not $hasSocketVolume }}
+    {{- $mergedVolumes = append $mergedVolumes (dict "name" "telemetry-socket" "emptyDir" dict) }}
+  {{- end }}
+  {{- $hasSocketMount := false }}
+  {{- range $vm := $mergedVolumeMounts }}
+    {{- if eq $vm.name "telemetry-socket" }}{{- $hasSocketMount = true }}{{- end }}
+  {{- end }}
+  {{- if not $hasSocketMount }}
+    {{- $mergedVolumeMounts = append $mergedVolumeMounts (dict "name" "telemetry-socket" "mountPath" "/tmp/telemetry") }}
+  {{- end }}
+  {{- with $.Values.telemetry.sidecar.extraVolumes }}
+    {{- $mergedVolumes = concat $mergedVolumes . }}
+  {{- end }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,6 +83,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" $ }}
+      {{- if $.Values.telemetry.enabled }}
+      shareProcessNamespace: true
+      {{- end }}
       securityContext:
         {{- toYaml (merge (dict) ($v.podSecurityContext | default dict) ($baseTpl.podSecurityContext)) | nindent 8 }}
       containers:
@@ -74,8 +110,8 @@ spec:
           env:
             {{- include "delegated-operator-deployments.env-vars-list" $envContext | indent 12 }}
           resources:
-            {{- toYaml (merge (dict) ($v.resources | default dict) ($baseTpl.resources)) | nindent 12 }}
-          {{- with $v.volumeMounts | default $baseTpl.volumeMounts }}
+            {{- toYaml $mergedResources | nindent 12 }}
+          {{- with $mergedVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -106,6 +142,9 @@ spec:
             failureThreshold: {{ ($v.startup).failureThreshold | default $baseTpl.startup.failureThreshold }}
             periodSeconds: {{ ($v.startup).periodSeconds | default $baseTpl.startup.periodSeconds }}
             timeoutSeconds: {{ ($v.startup).timeoutSeconds | default $baseTpl.startup.timeoutSeconds }}
+        {{- if $.Values.telemetry.enabled }}
+        {{- include "telemetry.sidecar" (dict "ctx" $ "serviceType" "delegated-operator" "targetName" "fiftyone delegated" "executor" true "sidecarEnv" $sidecarEnv) | nindent 8 }}
+        {{- end }}
       {{- with (merge (dict) ($v.nodeSelector | default dict) ($baseTpl.nodeSelector)) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -129,7 +168,7 @@ spec:
           ) | nindent 8
         }}
       {{- end }}
-      {{- with $v.volumes | default $baseTpl.volumes }}
+      {{- with $mergedVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}

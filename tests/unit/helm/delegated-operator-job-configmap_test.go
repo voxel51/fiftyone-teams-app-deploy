@@ -89,7 +89,7 @@ func (s *doK8sConfigMapTemplateTest) TestDisabled() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			if testCase.expected == "" {
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -138,7 +138,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -177,7 +177,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataNamespace() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -218,7 +218,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataAnnotations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap
@@ -291,7 +291,7 @@ func (s *doK8sConfigMapTemplateTest) TestMetadataLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var configMap corev1.ConfigMap
@@ -638,7 +638,7 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
@@ -646,6 +646,228 @@ func (s *doK8sConfigMapTemplateTest) TestData() {
 			helm.UnmarshalK8SYaml(subT, output, &configMap)
 
 			testCase.expected(subT, configMap.Data)
+		})
+	}
+}
+
+// renderJob renders a single job from the rendered ConfigMap data and
+// returns it as a batchv1.Job for introspection. The job template body
+// in the ConfigMap is Jinja, which we render with placeholder values so
+// the result is valid YAML.
+func (s *doK8sConfigMapTemplateTest) renderJob(data map[string]string, key string) batchv1.Job {
+	s.T().Helper()
+	s.Require().Contains(data, key, "ConfigMap should contain key %q", key)
+
+	jinjaArgs := map[string]interface{}{
+		"_id":      "test-id",
+		"_command": "fiftyone",
+		"_args":    []string{"test"},
+	}
+	jobYAML, err := convertJinjaToYAML(data[key], jinjaArgs)
+	s.Require().NoError(err)
+
+	var job batchv1.Job
+	helm.UnmarshalK8SYaml(s.T(), jobYAML, &job)
+	return job
+}
+
+func (s *doK8sConfigMapTemplateTest) TestTelemetrySocketInjection() {
+	const socketName = "telemetry-socket"
+	jobKey := "cpuDefault.yaml"
+
+	// helper: count entries with the given name
+	countByName := func(volumes []corev1.Volume, name string) int {
+		n := 0
+		for _, v := range volumes {
+			if v.Name == name {
+				n++
+			}
+		}
+		return n
+	}
+	countMountsByName := func(mounts []corev1.VolumeMount, name string) int {
+		n := 0
+		for _, m := range mounts {
+			if m.Name == name {
+				n++
+			}
+		}
+		return n
+	}
+
+	testCases := []struct {
+		name      string
+		values    map[string]string
+		expectVol int // expected occurrences of telemetry-socket volume
+		expectMnt int // expected occurrences of telemetry-socket mount
+	}{
+		{
+			name: "autoInjectsWhenUserHasNoTelemetrySocket",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			expectVol: 1,
+			expectMnt: 1,
+		},
+		{
+			name: "doesNotDuplicateWhenUserDeclaresTelemetrySocket",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused":                     "nil",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumes[0].name":            socketName,
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumes[0].emptyDir.medium": "Memory",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumeMounts[0].name":       socketName,
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.volumeMounts[0].mountPath":  "/custom/path",
+			},
+			expectVol: 1,
+			expectMnt: 1,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			job := s.renderJob(configMap.Data, jobKey)
+
+			s.Equal(
+				testCase.expectVol,
+				countByName(job.Spec.Template.Spec.Volumes, socketName),
+				"telemetry-socket volume count mismatch",
+			)
+			s.Require().NotEmpty(job.Spec.Template.Spec.Containers, "expected at least one container")
+			s.Equal(
+				testCase.expectMnt,
+				countMountsByName(job.Spec.Template.Spec.Containers[0].VolumeMounts, socketName),
+				"telemetry-socket volumeMount count mismatch",
+			)
+		})
+	}
+}
+
+// TestTelemetryDisabledOmitsSidecar verifies that when telemetry is disabled
+// the rendered job carries neither the telemetry-sidecar initContainer nor the
+// telemetry-socket volume/mount. The full disabled-telemetry job shape is also
+// covered by golden files in TestData; this is the focused negative assertion
+// living next to the positive cases above.
+func (s *doK8sConfigMapTemplateTest) TestTelemetryDisabledOmitsSidecar() {
+	const socketName = "telemetry-socket"
+	jobKey := "cpuDefault.yaml"
+
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.enabled": "false",
+		"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+	}}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	job := s.renderJob(configMap.Data, jobKey)
+
+	s.Nil(findContainer(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar"),
+		"telemetry-sidecar initContainer should be absent when telemetry is disabled")
+	s.Nil(findVolume(job.Spec.Template.Spec.Volumes, socketName),
+		"telemetry-socket volume should be absent when telemetry is disabled")
+	s.Require().NotEmpty(job.Spec.Template.Spec.Containers, "expected at least one container")
+	s.Nil(findVolumeMount(job.Spec.Template.Spec.Containers[0].VolumeMounts, socketName),
+		"telemetry-socket volumeMount should be absent when telemetry is disabled")
+}
+
+// TestTelemetrySidecarGpuEnv verifies that when a delegated-operator job's
+// executor requests a GPU (via resources.limits or resources.requests), its
+// telemetry native-sidecar is given the NVIDIA_* env vars needed to read GPU
+// metrics, without the sidecar requesting its own nvidia.com/gpu allocation.
+// When no GPU is requested, the sidecar receives no NVIDIA_* env vars.
+func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarGpuEnv() {
+	const gpuResource = "nvidia.com/gpu"
+	jobKey := "cpuDefault.yaml"
+
+	// gpuKey escapes the dot in nvidia.com/gpu so helm --set treats the whole
+	// string as a single map key rather than a nested path.
+	gpuKey := func(section string) string {
+		return "delegatedOperatorJobTemplates.jobs.cpuDefault.resources." +
+			section + ".nvidia\\.com/gpu"
+	}
+
+	testCases := []struct {
+		name      string
+		values    map[string]string
+		expectGpu bool
+	}{
+		{
+			name: "gpuInLimitsExposesEnvToSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+				gpuKey("limits"): "1",
+			},
+			expectGpu: true,
+		},
+		{
+			name: "gpuInRequestsExposesEnvToSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+				gpuKey("requests"): "1",
+			},
+			expectGpu: true,
+		},
+		{
+			name: "noGpuOmitsEnvFromSidecar",
+			values: map[string]string{
+				"telemetry.enabled": "true",
+				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
+			},
+			expectGpu: false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var configMap corev1.ConfigMap
+			helm.UnmarshalK8SYaml(subT, output, &configMap)
+
+			job := s.renderJob(configMap.Data, jobKey)
+
+			// The native-sidecar runs as an initContainer (restartPolicy: Always).
+			sidecar := findContainer(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar")
+			s.Require().NotNil(sidecar, "telemetry-sidecar initContainer not found")
+
+			visibleDevices, hasVisibleDevices := envValue(sidecar.Env, "NVIDIA_VISIBLE_DEVICES")
+			driverCaps, hasDriverCaps := envValue(sidecar.Env, "NVIDIA_DRIVER_CAPABILITIES")
+
+			if testCase.expectGpu {
+				s.True(hasVisibleDevices, "sidecar should have NVIDIA_VISIBLE_DEVICES")
+				s.Equal("all", visibleDevices, "NVIDIA_VISIBLE_DEVICES value mismatch")
+				s.True(hasDriverCaps, "sidecar should have NVIDIA_DRIVER_CAPABILITIES")
+				s.Equal("compute,utility", driverCaps, "NVIDIA_DRIVER_CAPABILITIES value mismatch")
+
+				// The sidecar reads the executor's GPU; it must not request its own.
+				_, limitsHasGpu := sidecar.Resources.Limits[corev1.ResourceName(gpuResource)]
+				_, requestsHasGpu := sidecar.Resources.Requests[corev1.ResourceName(gpuResource)]
+				s.False(limitsHasGpu, "sidecar must not request nvidia.com/gpu in limits")
+				s.False(requestsHasGpu, "sidecar must not request nvidia.com/gpu in requests")
+			} else {
+				s.False(hasVisibleDevices, "sidecar should not have NVIDIA_VISIBLE_DEVICES when no GPU requested")
+				s.False(hasDriverCaps, "sidecar should not have NVIDIA_DRIVER_CAPABILITIES when no GPU requested")
+			}
 		})
 	}
 }

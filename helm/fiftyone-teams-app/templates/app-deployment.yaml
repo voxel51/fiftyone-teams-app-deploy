@@ -35,6 +35,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      {{- if .Values.telemetry.enabled }}
+      shareProcessNamespace: true
+      {{- end }}
       securityContext:
         {{- toYaml .Values.appSettings.podSecurityContext | nindent 8 }}
       containers:
@@ -73,6 +76,9 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- if .Values.telemetry.enabled }}
+        {{- include "telemetry.sidecar" (dict "ctx" . "serviceType" "fiftyone-app" "targetName" "hypercorn") | nindent 8 }}
+        {{- end }}
       {{- if .Values.appSettings.initContainers.enabled }}
       initContainers:
         {{-
@@ -102,7 +108,11 @@ spec:
       topologySpreadConstraints:
         {{- include "fiftyone-teams-app.commonTopologySpreadConstraints" (dict "constraints" .Values.appSettings.topologySpreadConstraints "selectorLabels" "teams-app.selectorLabels" "context" $) | nindent 8 }}
       {{- end }}
-      {{- with .Values.appSettings.volumes }}
+      {{- $volumes := .Values.appSettings.volumes | default list }}
+      {{- if .Values.telemetry.enabled }}
+      {{- $volumes = concat $volumes (.Values.telemetry.sidecar.extraVolumes | default list) }}
+      {{- end }}
+      {{- with $volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}

@@ -77,6 +77,7 @@ repos:
           - '-'
           - -i
           - docker/README.md
+          - helm/docs/post-install-recommended-configuration.md
           - helm/fiftyone-teams-app/README.md.gotmpl
           - helm/README.md
           - CONTRIBUTING.md
