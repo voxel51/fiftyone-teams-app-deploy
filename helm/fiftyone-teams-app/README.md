@@ -1115,6 +1115,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.sidecar.image.repository | string | `"voxel51/telemetry-sidecar"` | Container image for `telemetry-sidecar`. |
 | telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to `Chart.AppVersion`. |
 | telemetry.sidecar.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"512Mi"}}` | Resource requests/limits for each `telemetry-sidecar` container. |
+| telemetry.sidecar.stackSampling | bool | `true` | Set `false` if your cluster's admission policy won't permit the `SYS_PTRACE` capability that the delegated-operator sidecar uses for `py-spy` stack sampling; the rest of telemetry keeps working without it. |
 
 <!-- markdownlint-enable MD060 -->
 

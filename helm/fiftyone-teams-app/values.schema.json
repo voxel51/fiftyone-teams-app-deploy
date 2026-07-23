@@ -4338,6 +4338,12 @@
               "required": [],
               "title": "resources",
               "type": "object"
+            },
+            "stackSampling": {
+              "default": true,
+              "description": "Set `false` if your cluster's admission policy won't permit the\n`SYS_PTRACE` capability that the delegated-operator sidecar uses for\n`py-spy` stack sampling; the rest of telemetry keeps working without it.",
+              "title": "stackSampling",
+              "type": "boolean"
             }
           },
           "required": [],

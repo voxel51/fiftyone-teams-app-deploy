@@ -145,6 +145,27 @@ To run without telemetry
 1. Add a `compose.override.yaml` that scales the
    telemetry services to zero replicas:
 
+### If your environment disallows `SYS_PTRACE`
+
+The delegated-operator sidecars add the `SYS_PTRACE` capability for additional
+`py-spy` stack sampling, enabled by default.
+If your host or Docker policy won't permit the capability, you can drop it and
+keep the rest of telemetry using the [`!reset` tag][compose-merge]
+(Docker Compose v2.24+) in a `compose.override.yaml`, with one entry per
+delegated-operator sidecar you run:
+
+```yaml
+services:
+  teams-do-telemetry:
+    cap_add: !reset []
+  # add these only when running the matching profile/overlay:
+  # teams-do-2-telemetry: {cap_add: !reset []}   # COMPOSE_PROFILES=do-2|do-3
+  # teams-do-3-telemetry: {cap_add: !reset []}   # COMPOSE_PROFILES=do-3
+  # teams-do-gpu-telemetry: {cap_add: !reset []} # compose.delegated-operators.gpu.yaml
+```
+
+[compose-merge]: https://docs.docker.com/reference/compose-file/merge/#reset-value
+
 ### Scaling teams-do with telemetry
 
 Docker Compose's `pid: "service:<name>"` only joins a single replica's PID namespace.
