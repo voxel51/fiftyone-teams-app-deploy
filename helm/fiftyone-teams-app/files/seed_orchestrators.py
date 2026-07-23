@@ -11,9 +11,8 @@ containing a JSON list of orchestrators (key names under
 Upserts by instance_id: config. The fields `description`, `environment`,
 and `secrets` are re-applied on every run.
 The `created_at` field is only written when the document is first created.
-`available_operators` is re-applied on every run for entries
-that pin it (service orchestrators, restricted to run_service) and never
-touched for entries that omit it (job orchestrators).
+Service orchestrators with `available_operators` are reset on every run.
+Job orchestrators (that never contain `available_operators`) are never modified.
 The app's Refresh action owns the discovered list for job targets.
 Connects to Mongo using the deployment's existing teams secrets.
 """
