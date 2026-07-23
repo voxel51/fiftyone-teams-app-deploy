@@ -387,7 +387,7 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- if and .Values.serviceOrchestrator.enabled (or .Values.serviceOrchestrator.builtinServices.configMap.create .Values.serviceOrchestrator.builtinServices.configMap.name) }}
+{{- if ne (trim (include "service-orchestrator.builtin-services" .)) "[]" }}
 - name: FIFTYONE_BUILTIN_SERVICES_PATH
   value: /opt/builtin-services/builtin_services.yaml
 {{- end }}

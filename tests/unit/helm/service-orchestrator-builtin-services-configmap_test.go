@@ -43,39 +43,60 @@ func TestBuiltinServicesConfigMapTemplate(t *testing.T) {
 	})
 }
 
-func (s *builtinServicesConfigMapTemplateTest) TestGatingAndName() {
+// builtinServices renders the ConfigMap and parses its payload.
+func (s *builtinServicesConfigMapTemplateTest) builtinServices(values map[string]string) []map[string]interface{} {
+	s.T().Helper()
+
+	options := &helm.Options{SetValues: disableTelemetry(values)}
+	output := helm.RenderTemplate(s.T(), options, s.chartPath, s.releaseName, s.templates)
+
+	var configMap corev1.ConfigMap
+	helm.UnmarshalK8SYaml(s.T(), output, &configMap)
+
+	payload, ok := configMap.Data["builtin_services.yaml"]
+	s.Require().True(ok, "ConfigMap should carry builtin_services.yaml")
+
+	var services []map[string]interface{}
+	err := yaml.Unmarshal([]byte(payload), &services)
+	s.Require().NoError(err, "Payload should parse as a YAML list")
+	return services
+}
+
+// TestGating verifies the ConfigMap renders exactly when at least one
+// enabled serviceOrchestrators entry carries a service.
+func (s *builtinServicesConfigMapTemplateTest) TestGating() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
-		expected string // empty => the template must not render
+		rendered bool
 	}{
 		{
+			// The chart's default gpuServiceOrc ships a service
 			"defaultValues",
 			nil,
-			"",
+			true,
 		},
 		{
-			"enabledButCreateDisabled",
-			map[string]string{
-				"serviceOrchestrator.enabled":                          "true",
-				"serviceOrchestrator.builtinServices.configMap.create": "false",
-			},
-			"",
+			"noServiceOrchestrators",
+			disableDefaultServiceOrchestrators(nil),
+			false,
 		},
 		{
-			"enabled",
-			map[string]string{
-				"serviceOrchestrator.enabled": "true",
-			},
-			fmt.Sprintf("%s-fiftyone-teams-app-builtin-services", s.releaseName),
+			// Orchestrators without services have nothing to publish
+			"orchestratorsWithoutServices",
+			disableDefaultServiceOrchestrators(map[string]string{
+				"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServices.unused": "nil",
+			}),
+			false,
 		},
 		{
-			"enabledWithNameOverride",
+			// A disabled orchestrator does not publish its services
+			"disabledOrchestrator",
 			map[string]string{
-				"serviceOrchestrator.enabled":                        "true",
-				"serviceOrchestrator.builtinServices.configMap.name": "custom-builtin-services",
+				"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServiceOrc":         "null",
+				"delegatedOperatorJobTemplates.serviceOrchestrators.gpuServiceOrc.enabled": "false",
 			},
-			"custom-builtin-services",
+			false,
 		},
 	}
 
@@ -88,104 +109,139 @@ func (s *builtinServicesConfigMapTemplateTest) TestGatingAndName() {
 
 			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 
-			if testCase.expected == "" {
-				_, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
-				s.ErrorContains(err, "could not find template templates/service-orchestrator-builtin-services-configmap.yaml in chart")
-			} else {
+			if testCase.rendered {
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var configMap corev1.ConfigMap
 				helm.UnmarshalK8SYaml(subT, output, &configMap)
 
-				s.Equal(testCase.expected, configMap.ObjectMeta.Name, "Name should be set")
+				s.Equal(
+					fmt.Sprintf("%s-fiftyone-teams-app-builtin-services", s.releaseName),
+					configMap.ObjectMeta.Name,
+				)
+			} else {
+				_, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
+				s.ErrorContains(err, "could not find template templates/service-orchestrator-builtin-services-configmap.yaml in chart")
 			}
 		})
 	}
 }
 
-func (s *builtinServicesConfigMapTemplateTest) TestServicesPayload() {
-	testCases := []struct {
-		name          string
-		values        map[string]string
-		jsonValues    map[string]string
-		expectedCount int
-		expected      func(services []map[string]interface{})
-	}{
-		{
-			// Empty by default: reconcile deep-merges nothing and the
-			// packaged defaults apply unchanged.
-			"enabledDefaultsToEmptyList",
-			map[string]string{
-				"serviceOrchestrator.enabled": "true",
-			},
-			nil,
-			0,
-			nil,
-		},
-		{
-			"enabledWithServiceOverrides",
-			map[string]string{
-				"serviceOrchestrator.enabled": "true",
-			},
-			map[string]string{
-				"serviceOrchestrator.builtinServices.services": `[
-          {
-            "id": "builtin:image-segmentation-ai",
-            "builtin_version": 2,
-            "delegation_target": "teams-do"
-          },
-          {
-            "id": "builtin:video-propagation-ai",
-            "builtin_version": 2,
-            "entrypoint": {
-              "container": {
-                "image": "registry:5000/sam2-video:tag",
-                "command": ["python", "-m", "fiftyone.annotation.endpoints.sam2_video"]
-              }
-            }
-          }
-        ]`,
-			},
-			2,
-			func(services []map[string]interface{}) {
-				s.Equal("builtin:image-segmentation-ai", services[0]["id"])
-				s.Equal("teams-do", services[0]["delegation_target"])
-				s.Equal("builtin:video-propagation-ai", services[1]["id"])
-				entrypoint := services[1]["entrypoint"].(map[string]interface{})
-				container := entrypoint["container"].(map[string]interface{})
-				s.Equal("registry:5000/sam2-video:tag", container["image"])
-			},
-		},
-	}
+// TestDefaultServiceDerivation verifies the chart's default agentic-labeler
+// service: identity fields derived from the map keys, `enabled` mapped
+// from `autoStart`, the env map flattened to KEY=VALUE lines, and the
+// untagged image defaulting to the chart's appVersion.
+func (s *builtinServicesConfigMapTemplateTest) TestDefaultServiceDerivation() {
+	services := s.builtinServices(nil)
+	// Sorted by service key within the orchestrator
+	s.Require().Len(services, 2)
+	service := services[0]
 
-	for _, testCase := range testCases {
-		testCase := testCase
+	// Identity fields derived from the service and orchestrator keys;
+	// the explicit label wins over the derived default
+	s.Equal("builtin:agentic-labeler", service["id"])
+	s.Equal("agentic-labeler", service["kind"])
+	s.Equal("agentic-labeler", service["name"])
+	s.Equal("Agentic Labeler", service["label"])
+	s.Equal("gpuServiceOrc", service["delegation_target"])
 
-		s.Run(testCase.name, func() {
-			subT := s.T()
-			subT.Parallel()
+	s.Equal(true, service["builtin"])
+	s.Equal(1, service["builtin_version"])
+	s.Equal("shared", service["scope"])
+	s.Equal("", service["secrets"])
 
-			options := &helm.Options{
-				SetValues:     disableTelemetry(testCase.values),
-				SetJsonValues: testCase.jsonValues,
-			}
+	// autoStart maps to the definition's enabled field
+	s.Equal(false, service["enabled"])
+	_, hasAutoStart := service["autoStart"]
+	s.False(hasAutoStart, "autoStart is a values-side key only")
 
-			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+	// The env map flattens to KEY=VALUE lines
+	env, ok := service["env"].(string)
+	s.Require().True(ok, "env should flatten to a string")
+	s.Contains(env, "LABELER_CONFIG_FILE=/app/configs/gemma4-31B-qat-maxvision.json\n")
+	s.Contains(env, "LABELER_TENSOR_PARALLEL_SIZE=1\n")
+	s.Contains(env, "LABELER_ENFORCE_EAGER=true\n")
 
-			var configMap corev1.ConfigMap
-			helm.UnmarshalK8SYaml(subT, output, &configMap)
+	// The untagged image gets the chart's appVersion
+	cInfo, err := chartInfo(s.T(), s.chartPath)
+	s.NoError(err)
+	appVersion, exists := cInfo["appVersion"]
+	s.True(exists)
+	entrypoint := service["entrypoint"].(map[string]interface{})
+	container := entrypoint["container"].(map[string]interface{})
+	s.Equal(
+		fmt.Sprintf("voxel51/agentic-labeler:%s", appVersion),
+		container["image"],
+	)
+	s.Equal("shell", entrypoint["kind"])
+	s.Equal(8000, container["port"])
 
-			payload, ok := configMap.Data["builtin_services.yaml"]
-			s.True(ok, "ConfigMap should carry builtin_services.yaml")
+	// The default annotation-ai (SAM2) service
+	service = services[1]
+	s.Equal("builtin:annotation-ai", service["id"])
+	s.Equal("annotation-ai", service["kind"])
+	s.Equal("annotation-ai", service["name"])
+	s.Equal("Annotation AI", service["label"])
+	s.Equal("gpuServiceOrc", service["delegation_target"])
+	s.Equal(false, service["enabled"])
 
-			var services []map[string]interface{}
-			err := yaml.Unmarshal([]byte(payload), &services)
-			s.NoError(err, "Payload should parse as a YAML list")
-			s.Len(services, testCase.expectedCount)
+	// An omitted env flattens to the empty string
+	s.Equal("", service["env"])
 
-			if testCase.expected != nil {
-				testCase.expected(services)
-			}
-		})
-	}
+	entrypoint = service["entrypoint"].(map[string]interface{})
+	container = entrypoint["container"].(map[string]interface{})
+	s.Equal(
+		fmt.Sprintf("voxel51/fiftyone-teams-cv-full:%s", appVersion),
+		container["image"],
+	)
+
+	// The per-task container env list passes through untouched
+	containerEnv := container["env"].([]interface{})
+	s.Require().Len(containerEnv, 1)
+	envVar := containerEnv[0].(map[string]interface{})
+	s.Equal("LD_LIBRARY_PATH", envVar["name"])
+	s.Equal("/usr/local/nvidia/lib64:/usr/local/nvidia/lib", envVar["value"])
+}
+
+// TestServiceOverrides verifies explicitly set fields win over the derived
+// defaults, string env passes through, digest images are left alone, and
+// only a `builtin: true` service gets the builtin: id prefix.
+func (s *builtinServicesConfigMapTemplateTest) TestServiceOverrides() {
+	services := s.builtinServices(disableDefaultServiceOrchestrators(map[string]string{
+		"delegatedOperatorJobTemplates.serviceOrchestrators.customOrc.services.my-service.id":                         "custom:id",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.customOrc.services.my-service.builtin_version":            "7",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.customOrc.services.my-service.autoStart":                  "true",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.customOrc.services.my-service.env":                        "A=b",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.customOrc.services.my-service.entrypoint.container.image": "registry:5000/svc@sha256:abc123",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.customOrc.services.prefixed-service.builtin":              "true",
+	}))
+	s.Require().Len(services, 2)
+	service := services[0]
+
+	// Explicit fields win over derived defaults
+	s.Equal("custom:id", service["id"])
+	s.Equal(7, service["builtin_version"])
+	s.Equal(true, service["enabled"])
+
+	// Absent fields still get their derived defaults
+	s.Equal("my-service", service["kind"])
+	s.Equal("my-service", service["name"])
+	s.Equal("my-service", service["label"])
+	s.Equal("customOrc", service["delegation_target"])
+	s.Equal(false, service["builtin"])
+	s.Equal("shared", service["scope"])
+	s.Equal("", service["secrets"])
+
+	// String env passes through unchanged
+	s.Equal("A=b", service["env"])
+
+	// Digest-pinned images are left alone
+	entrypoint := service["entrypoint"].(map[string]interface{})
+	container := entrypoint["container"].(map[string]interface{})
+	s.Equal("registry:5000/svc@sha256:abc123", container["image"])
+
+	// Only a builtin service gets the prefixed id
+	service = services[1]
+	s.Equal(true, service["builtin"])
+	s.Equal("builtin:prefixed-service", service["id"])
 }

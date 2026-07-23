@@ -1169,7 +1169,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1870,7 +1870,7 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2792,7 +2792,7 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2876,37 +2876,26 @@ func (s *deploymentApiTemplateTest) TestDeploymentUpdateStrategy() {
 	}
 }
 
-func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
+// TestBuiltinServicesEnvAndMount verifies how the builtin-services
+// ConfigMap reaches teams-api.
+// The file holds the service definitions derived from the
+// `delegatedOperatorJobTemplates.serviceOrchestrators.*.services` entries;
+// fiftyone deep-merges them by `id` onto the definitions it packages.
+// teams-api locates it via FIFTYONE_BUILTIN_SERVICES_PATH,
+// a volumeMount, and the ConfigMap volume —
+// present exactly when at least one service is defined.
+func (s *deploymentApiTemplateTest) TestBuiltinServicesEnvAndMount() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
 		expected func(podSpec corev1.PodSpec)
 	}{
 		{
-			// Feature off (default): no env, no mounts, no volumes.
+			// The chart's default gpuServiceOrc ships a service, so the
+			// env var points at the mounted file and the ConfigMap is
+			// mounted with its generated name.
 			"defaultValues",
 			nil,
-			func(podSpec corev1.PodSpec) {
-				for _, env := range podSpec.Containers[0].Env {
-					s.NotEqual("FIFTYONE_BUILTIN_SERVICES_PATH", env.Name)
-				}
-				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
-					s.NotEqual("builtin-services", volumeMount.Name)
-					s.NotEqual("service-pod-template", volumeMount.Name)
-				}
-				for _, volume := range podSpec.Volumes {
-					s.NotEqual("builtin-services", volume.Name)
-					s.NotEqual("service-pod-template", volume.Name)
-				}
-			},
-		},
-		{
-			// Feature on: the env var points at the mounted overrides file,
-			// and both configmaps are mounted with their generated names.
-			"serviceOrchestratorEnabled",
-			map[string]string{
-				"serviceOrchestrator.enabled": "true",
-			},
 			func(podSpec corev1.PodSpec) {
 				env := map[string]string{}
 				for _, envVar := range podSpec.Containers[0].Env {
@@ -2922,7 +2911,6 @@ func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
 					mounts[volumeMount.Name] = volumeMount.MountPath
 				}
 				s.Equal("/opt/builtin-services", mounts["builtin-services"])
-				s.Equal("/opt/service-pod-template", mounts["service-pod-template"])
 
 				volumes := map[string]string{}
 				for _, volume := range podSpec.Volumes {
@@ -2934,20 +2922,12 @@ func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
 					"fiftyone-test-fiftyone-teams-app-builtin-services",
 					volumes["builtin-services"],
 				)
-				s.Equal(
-					"fiftyone-test-fiftyone-teams-app-service-pod-template",
-					volumes["service-pod-template"],
-				)
 			},
 		},
 		{
-			// Per-configmap opt-out: no create and no external name means
-			// no mount, no volume, no env for that piece.
-			"enabledWithBuiltinServicesConfigMapDisabled",
-			map[string]string{
-				"serviceOrchestrator.enabled":                          "true",
-				"serviceOrchestrator.builtinServices.configMap.create": "false",
-			},
+			// No services defined: no env, no mount, no volume.
+			"noServices",
+			disableDefaultServiceOrchestrators(nil),
 			func(podSpec corev1.PodSpec) {
 				for _, env := range podSpec.Containers[0].Env {
 					s.NotEqual("FIFTYONE_BUILTIN_SERVICES_PATH", env.Name)
@@ -2955,26 +2935,9 @@ func (s *deploymentApiTemplateTest) TestServiceOrchestratorWiring() {
 				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
 					s.NotEqual("builtin-services", volumeMount.Name)
 				}
-				mounts := []string{}
-				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
-					mounts = append(mounts, volumeMount.Name)
-				}
-				s.Contains(mounts, "service-pod-template")
-
-				// The still-enabled pod-template configmap keeps its volume;
-				// only builtin-services is dropped.
-				volumes := map[string]string{}
 				for _, volume := range podSpec.Volumes {
-					if volume.ConfigMap != nil {
-						volumes[volume.Name] = volume.ConfigMap.Name
-					}
+					s.NotEqual("builtin-services", volume.Name)
 				}
-				_, builtinPresent := volumes["builtin-services"]
-				s.False(builtinPresent, "builtin-services volume should be dropped")
-				s.Equal(
-					"fiftyone-test-fiftyone-teams-app-service-pod-template",
-					volumes["service-pod-template"],
-				)
 			},
 		},
 	}

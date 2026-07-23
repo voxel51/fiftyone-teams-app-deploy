@@ -82,3 +82,59 @@ app.voxel51.com/delegate-operator-task-type: delegated_operation
 {{ include "delegated-operator-templates.templateLabels" . }}
 app.voxel51.com/delegate-operator-template-name: {{ .jobTemplateName }}
 {{- end }}
+
+{{/*
+Orchestrator registrations are derived from the delegated-operator template
+maps, as a JSON list consumed by the seeding job (see
+`../../files/seed_orchestrators.py` and `./seed-orchestrators-job.yaml).`
+
+When `delegatedOperatorJobTemplates.[jobs|serviceOrchestrators].*.enabled=true`
+and `delegatedOperatorJobTemplates.[jobs|serviceOrchestrators].*.registerOrchestrator=true`
+(or inherited via `delegatedOperatorJobTemplates.template.registerOrchestrator=true`),
+the orchestrator will be registered via the `seed_orchestrators.py` script.
+The job or service key name is used as the `instance_id`.
+`config.execution_tmpl_uri` contains the path to the entry's
+rendered template file (mounted in teams-api from the do-templates
+ConfigMap).
+`available_operators` is the list of operator URIs an orchestrator may execute.
+`job` entries omit it because the app's Refresh action discovers
+the operators installed in the worker image and owns the list.
+`service` orchestrators only ever execute one operator —
+the builtin @voxel51/operators/run_service, which launches a service —
+so seeding writes that single-entry list and re-applies it on every run.
+*/}}
+{{- define "delegated-operator-templates.seed-orchestrators" -}}
+{{- $baseTpl := .Values.delegatedOperatorJobTemplates.template }}
+{{- $namespace := .Values.namespace.name }}
+{{- $orchestrators := list }}
+{{- range $name, $config := .Values.delegatedOperatorJobTemplates.jobs }}
+{{- $register := ternary $config.registerOrchestrator ($baseTpl.registerOrchestrator | default false) (hasKey $config "registerOrchestrator") }}
+{{- if and (ne $config.enabled false) $register }}
+{{- $mergedImage := merge (deepCopy ($config.image | default dict)) ($baseTpl.image) }}
+{{- $orchestrators = append $orchestrators (dict
+    "instance_id" $name
+    "description" ($config.description | default (printf "Chart-managed job orchestrator %s" $name))
+    "environment" "kubernetes"
+    "config" (dict
+      "image" (printf "%s:%s" $mergedImage.repository ($mergedImage.tag | default $.Chart.AppVersion))
+      "execution_tmpl_uri" (printf "/tmp/do-targets/%s.yaml" $name)
+      "namespace" $namespace)
+    "secrets" (dict "kube_config" "")) }}
+{{- end }}
+{{- end }}
+{{- range $name, $config := .Values.delegatedOperatorJobTemplates.serviceOrchestrators }}
+{{- $register := ternary $config.registerOrchestrator ($baseTpl.registerOrchestrator | default false) (hasKey $config "registerOrchestrator") }}
+{{- if and (ne $config.enabled false) $register }}
+{{- $orchestrators = append $orchestrators (dict
+    "instance_id" $name
+    "description" ($config.description | default (printf "Chart-managed service orchestrator %s" $name))
+    "environment" "kubernetes-service"
+    "config" (dict
+      "execution_tmpl_uri" (printf "/tmp/do-targets/%s.yaml" $name)
+      "namespace" $namespace)
+    "secrets" (dict "kube_config" "")
+    "available_operators" (list "@voxel51/operators/run_service")) }}
+{{- end }}
+{{- end }}
+{{- toJson $orchestrators -}}
+{{- end }}
