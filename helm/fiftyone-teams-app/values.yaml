@@ -292,6 +292,12 @@ appSettings:
     # (the bundled in-cluster Redis). Emit is fire-and-forget; if unset the
     # review_submitted events simply don't flow.
     FIFTYONE_MQ_REDIS_URL: "redis://activity-redis:6379/0"
+    # -- DEV ENV ONLY: bypass the teams-api builtin-operator allowlist. That
+    # list is enumerated from the fiftyone.yml bundled in teams-api's OWN SDK
+    # install, so newly added plugin operators 403 until the hub image ships
+    # an SDK containing them. Remove once the hub pin includes the declared
+    # activity operators.
+    SKIP_OPERATOR_PERMISSION_CHECK: "true"
     # -- The org id the activity feed is scoped by (matches user.organization.id).
     # Single-org deployments set this so the review-submit emit stamps the org
     # the reader queries. REPLACE with your org id.
@@ -1670,9 +1676,8 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    # 0.0.9: snapshot worker (state metrics) + per-metric rollup isolation (one bad
-    # metric, e.g. op_duration_p95 on Mongo <7, no longer aborts the batch).
-    tag: "682c1cabb7e3fe8f35229c6de0b87f29dff711d1"
+    # 0.0.21: allowDiskUse on aggregate reads; aclose loop teardown
+    tag: "5613c29aee74653e893f0dd27eb717e5f4235f37"
     pullPolicy: IfNotPresent
   mongo:
     # -- Database for the activity_* collections. EMPTY (default) co-locates
