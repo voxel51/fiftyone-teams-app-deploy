@@ -2382,6 +2382,12 @@
           "title": "jobs",
           "type": "object"
         },
+        "serviceOrchestrators": {
+          "description": "On-Demand Service Orchestrators for the `kubernetes-service`\nenvironment (long-lived push services).\nEach entry renders a jinja2 `Pod` manifest into the same `ConfigMap`\nas `jobs`, merged over `template` with the same logic\n(job-only fields do not apply).\nEntries also accept `description`, `registerOrchestrator`,\nand a `services` map of the service definitions the orchestrator runs,\nwhose identity fields are derived from the map keys.",
+          "required": [],
+          "title": "serviceOrchestrators",
+          "type": "object"
+        },
         "template": {
           "description": "A common template applied to all deployments. Each deployment can\nthen override individual fields as needed by the operator.",
           "properties": {
@@ -2537,6 +2543,12 @@
               "required": [],
               "title": "podSecurityContext",
               "type": "object"
+            },
+            "registerOrchestrator": {
+              "default": true,
+              "description": "Controls whether a post-install/post-upgrade hook seeding Job registers\nan orchestrator in MongoDB for each entry under `jobs` and `services`\nIndividual entries may override this with their own `registerOrchestrator` key.\nSee `./templates/seed-orchestrators-job.yaml` and `./files/seed_orchestrators.py`.",
+              "title": "registerOrchestrator",
+              "type": "boolean"
             },
             "resources": {
               "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `delegated-operator-executor`. [Reference][resources].",
