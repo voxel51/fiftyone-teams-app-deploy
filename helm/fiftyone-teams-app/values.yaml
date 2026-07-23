@@ -993,6 +993,11 @@ delegatedOperatorJobTemplates:
       runAsUser: 1000
       runAsGroup: 1000
       fsGroup: 1000
+    # -- Controls whether a post-install/post-upgrade hook seeding Job registers
+    # an orchestrator in MongoDB for each entry under `jobs` and `services`
+    # Individual entries may override this with their own `registerOrchestrator` key.
+    # See `./templates/seed-orchestrators-job.yaml` and `./files/seed_orchestrators.py`.
+    registerOrchestrator: true
     # Instead of setting default resources, we require the user define them
     # This enables running on resource constrained environments
     # (like Minikube). To set resources, uncomment the following
@@ -1080,6 +1085,81 @@ delegatedOperatorJobTemplates:
     #       nvidia.com/gpu: "1"
     #     requests:
     #       nvidia.com/gpu: "1"
+
+  # -- On-Demand Service Orchestrators for the `kubernetes-service`
+  # environment (long-lived push services).
+  # Each entry renders a jinja2 `Pod` manifest into the same `ConfigMap`
+  # as `jobs`, merged over `template` with the same logic
+  # (job-only fields do not apply).
+  # Entries also accept `description`, `registerOrchestrator`,
+  # and a `services` map of the service definitions the orchestrator runs,
+  # whose identity fields are derived from the map keys.
+  # @default -- two chart-managed orchestrators (see values.yaml)
+  # @schema
+  # type: object
+  # properties: {}
+  # @schema
+  serviceOrchestrators:
+    cpuServiceOrc:
+      description: "Service orchestrator (CPU)"
+    gpuServiceOrc:
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+        requests:
+          nvidia.com/gpu: 1
+      secretEnv:
+        FIFTYONE_AUTH_SECRET:
+          secretName: fiftyone-teams-secrets
+          secretKey: fiftyoneAuthSecret
+      services:
+        annotation-ai:
+          builtin: true
+          builtin_version: 1
+          description: SAM2 point-prompt image masks and whole-video mask propagation.
+          autoStart: false
+          entrypoint:
+            command: python -m fiftyone.annotation.endpoints.sam2 --mode all --host 0.0.0.0 --port 8000
+            container:
+              env:
+                - name: LD_LIBRARY_PATH
+                  value: /usr/local/nvidia/lib64:/usr/local/nvidia/lib
+              healthcheck:
+                path: /healthz
+              image: voxel51/fiftyone-teams-cv-full
+              port: 8000
+            kind: shell
+          label: Annotation AI
+          scope: shared
+          secrets: ""
+        agentic-labeler:
+          builtin: true
+          builtin_version: 1
+          description: Agentic labeler (few-shot VLM inference via vLLM).
+          autoStart: false
+          entrypoint:
+            command: uvicorn agentic_labeler.app:app --host 0.0.0.0 --port 8000
+            container:
+              healthcheck:
+                path: /healthz
+                port: 8001
+              image: voxel51/agentic-labeler
+              port: 8000
+            kind: shell
+          env:
+            LABELER_CONFIG_FILE: /app/configs/gemma4-31B-qat-maxvision.json
+            LABELER_TENSOR_PARALLEL_SIZE: 1
+            LABELER_ENFORCE_EAGER: true
+            LABELER_ENGINE_KWARGS: '{"max_num_batched_tokens": 8192, "enable_prefix_caching": true, "mm_processor_cache_gb": 0}'
+            USER: fiftyone
+          label: Agentic Labeler
+          scope: shared
+          secrets: ""
+      tolerations:
+        - key: nvidia.com/gpu
+          effect: NoSchedule
+          operator: Exists
+
 # -- List of secrets for FiftyOne Enterprise Licenses (one per org)
 fiftyoneLicenseSecrets:
   - fiftyone-license

@@ -387,6 +387,10 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- if ne (trim (include "service-orchestrator.builtin-services" .)) "[]" }}
+- name: FIFTYONE_BUILTIN_SERVICES_PATH
+  value: /opt/builtin-services/builtin_services.yaml
+{{- end }}
 {{- include "telemetry.redis-url-env" . }}
 {{- range $key, $val := .Values.apiSettings.env }}
 - name: {{ $key }}
