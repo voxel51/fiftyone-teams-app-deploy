@@ -19,6 +19,10 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
+    - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
+      - [Cluster Requirements](#cluster-requirements)
+      - [Opting out of Telemetry](#opting-out-of-telemetry)
     - [FiftyOne Enterprise v2.16+ Additional API Routes](#fiftyone-enterprise-v216-additional-api-routes)
     - [FiftyOne Enterprise v2.15+ Additional API Routes](#fiftyone-enterprise-v215-additional-api-routes)
     - [FiftyOne Enterprise v2.9+ Startup Probe Changes](#fiftyone-enterprise-v29-startup-probe-changes)
@@ -121,9 +125,9 @@ quickstart  0.21.2
 
 ### From FiftyOne Enterprise Version 2.0.0 or Higher
 
-1. [Upgrade to FiftyOne Enterprise version 2.18.1](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise version 2.22.1](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
-   version 2.18.1
+   version 2.22.1
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
@@ -140,6 +144,111 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.22+ Multimodal Datasets
+
+FiftyOne Enterprise v2.22.0 introduces multimodal dataset support: large
+modalities associated with each sample, stored as Parquet-backed Iceberg
+tables rather than as fields on the sample document, ingested/compacted via
+a background delegated-operator pipeline.
+
+Multimodal datasets require:
+
+- The `VFF_MULTIMODAL` feature flag, set on `teams-api`, `fiftyone-app`,
+  delegated-operator workloads, `teams-app`, and `teams-plugins`.
+- Sufficient `ephemeral-storage` and `/tmp` scratch space on
+  delegated-operator workloads for projection compaction to complete
+  successfully.
+- Enough memory on `fiftyone-app` to serve multimodal grid queries, which
+  run DuckDB in-process; size it and `HYPERCORN_WORKERS` accordingly.
+- Optionally, `FIFTYONE_PROJECTION_DELEGATION_TARGET` on `teams-api` to pin
+  projection processing to a specific orchestrator.
+
+See the
+[Configuring Multimodal Datasets](./configuring-multimodal.md)
+documentation for full details, required workloads, and example
+configuration.
+
+#### FiftyOne Enterprise v2.19+ Telemetry Sidecars
+
+FiftyOne Enterprise v2.19.0 adds observability features viewable by
+admins directly in the FiftyOne UI.
+These are powered by a `telemetry-sidecar` container injected into the
+`teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator
+workloads (and as a native sidecar on on-demand delegated-operator
+`Job` pods), plus an in-cluster Redis `Deployment` + `Service` that
+buffers the streamed metrics and logs.
+
+**Resource impact:**
+Each sidecar requests `200m` CPU and `512Mi` memory (request == limit).
+A default deploy adds three sidecars
+(`teams-api` + 2 x `fiftyone-app`),
+so expect roughly **+600m CPU** and **+1.5 GiB memory** in additional
+resource usage, plus the bundled Redis
+(`250m` CPU / `512Mi` memory, request == limit)
+By default the telemetry requires an additional `850m` CPU and `2Gi` of
+resources used by:
+
+- `telemetry-sidecar` container
+  - `200m` CPU and `512Mi` memory per each replica of
+    - `teams-api` x 1
+    - `fiftyone-app` x 2
+- Redis container
+  - `250m` CPU and `512Mi` memory
+
+The additional required resources depends of replica count for each
+deployment.
+The optional deployments may also increase this amount.
+Tune via `telemetry.sidecar.resources` and `telemetry.redis.resources`.
+Opt into a `PersistentVolumeClaim` with
+`telemetry.redis.persistence.enabled: true`.
+
+##### Cluster Requirements
+
+1. **`shareProcessNamespace: true`** is set on all four workloads so
+   the sidecar can read `/proc/<pid>/fd/1` of the target container.
+1. **Sidecars run as UID/GID 1000** (matching the workload image's
+   user) with `cap_drop: ALL`. The delegated-operator sidecar
+   additionally has `SYS_PTRACE` added (required for `py-spy` stack
+   sampling); the other three sidecars run with no capabilities. This
+   posture is compatible with
+   [Pod Security Admission][psa] `restricted` out of the box.
+   Clusters enforcing additional admission policies (OPA/Gatekeeper,
+   Kyverno) that explicitly block `SYS_PTRACE` on the
+   delegated-operator namespace can either allow that single capability
+   or disable telemetry with `telemetry.enabled: false`.
+
+**External Redis:**
+To point at a managed Redis (ElastiCache, MemoryStore, an existing
+cluster) instead of running the bundled one, set:
+
+```yaml
+telemetry:
+  redis:
+    external:
+      url: redis://my-managed-redis.example.com:6379
+```
+
+The chart skips the bundled Redis' `Deployment` and `Service` and wires
+every consumer at this URL.
+
+##### Opting out of Telemetry
+
+Telemetry is enabled by default.
+To disable it, set the following in your `values.yaml` file:
+
+```yaml
+telemetry:
+  enabled: false
+```
+
+> [!IMPORTANT]
+> The telemetry sidecars power the FiftyOne UI's delegated-operator log viewer.
+> Disabling telemetry (`telemetry.enabled: false`) will leave that log
+> viewer empty.
+
+This skips every telemetry resource (Redis, sidecars, Role/RoleBinding)
+and renders the workloads without telemetry containers or env vars.
 
 #### FiftyOne Enterprise v2.16+ Additional API Routes
 
@@ -354,7 +463,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.18.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -394,17 +503,17 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Enterprise version 2.18.1](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.18.1
+1. [Upgrade to FiftyOne Enterprise version 2.22.1](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.22.1
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. Upgrade all the datasets
 
-    > **NOTE**: Any FiftyOne SDK less than 2.18.1 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.22.1 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.18.1` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.22.1` is recommended before migrating
     > your database.
 
     ```shell
@@ -419,7 +528,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.18.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -438,7 +547,7 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.18.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -478,17 +587,17 @@ For a full list of settings, please refer to the
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Enterprise version 2.18.1](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.18.1
+1. [Upgrade to FiftyOne Enterprise version 2.22.1](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.22.1
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. Upgrade all the datasets
 
-    > **NOTE**: Any FiftyOne SDK less than 2.18.1 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.22.1 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.18.1` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.22.1` is recommended before migrating
     > your database.
 
     ```shell
@@ -520,14 +629,14 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.18.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.1 _requires_
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.18.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.22.1 _requires_ a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -566,10 +675,10 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Enterprise v2.18.1](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise v2.22.1](#upgrading-from-previous-versions)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.18.1`
-1. Upgrade your FiftyOne SDKs to version 2.18.1
+    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.22.1`
+1. Upgrade your FiftyOne SDKs to version 2.22.1
     1. Login to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to
@@ -596,3 +705,4 @@ existing configuration to migrate to a new Auth0 Tenant.
 
 <!-- Reference Links -->
 [init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+[psa]: https://kubernetes.io/docs/concepts/security/pod-security-admission/

@@ -17,9 +17,9 @@ jobs:
   unit-compose:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Checkout voxel51/aloha-github-workflows
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: voxel51/aloha-github-workflows
           ref: main
@@ -34,7 +34,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v6.2.0
+      - uses: actions/setup-python@v6.3.0
       - name: Install asdf & tools
         uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
       - name: Run unit tests
@@ -47,11 +47,11 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Free Disk Space (Ubuntu) # standard runner's 14 GB available disk size isn't enough. Need at least 22 GB free.
         uses: jlumbroso/free-disk-space@v1.3.1
       - name: Checkout voxel51/aloha-github-workflows
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: voxel51/aloha-github-workflows
           ref: main
@@ -66,7 +66,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v6.2.0
+      - uses: actions/setup-python@v6.3.0
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: Install asdf & tools
@@ -88,7 +88,7 @@ jobs:
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
       - name: Create Local License From Secret
-        uses: mobiledevops/secret-to-file-action@v1
+        uses: mobiledevops/secret-to-file-action@v2
         with:
           base64-encoded-secret: ${{ secrets.FO_INTERNAL_LICENSE }}
           filename: 'internal-license.key'
@@ -104,11 +104,11 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Free Disk Space (Ubuntu) # standard runner's 14 GB available disk size isn't enough. Need at least 22 GB free.
         uses: jlumbroso/free-disk-space@v1.3.1
       - name: Checkout voxel51/aloha-github-workflows
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: voxel51/aloha-github-workflows
           ref: main
@@ -123,7 +123,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v6.2.0
+      - uses: actions/setup-python@v6.3.0
       - name: Install asdf & tools
         uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
       - name: Authenticate to Google Cloud
@@ -143,7 +143,7 @@ jobs:
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
       - name: Create Local License From Secret
-        uses: mobiledevops/secret-to-file-action@v1
+        uses: mobiledevops/secret-to-file-action@v2
         with:
           base64-encoded-secret: ${{ secrets.FO_LEGACY_LICENSE }}
           filename: 'legacy-license.key'

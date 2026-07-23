@@ -14,8 +14,11 @@ set -euo pipefail
 
 # These are images we expect to be pullable in an
 # exhaustive set.
+# Images with an explicit `:tag` are taken as-is; voxel51/ images without
+# a tag get the chart appVersion appended automatically.
 EXPECTED_IMAGES=(
   "docker.io/busybox:stable-glibc" # For initContainers
+  "docker.io/redis:7-alpine"       # For telemetry redis (telemetry.enabled defaults to true)
   "voxel51/fiftyone-app"
   "voxel51/fiftyone-app-gpt"
   "voxel51/fiftyone-app-torch"
@@ -23,6 +26,7 @@ EXPECTED_IMAGES=(
   "voxel51/fiftyone-teams-app"
   "voxel51/fiftyone-teams-cas"
   "voxel51/fiftyone-teams-cv-full"
+  "voxel51/telemetry-sidecar"
 )
 
 . "$(dirname "$0")/common.sh"

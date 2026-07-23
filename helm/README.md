@@ -25,6 +25,7 @@
       - [Set up http to https Forwarding](#set-up-http-to-https-forwarding)
       - [Install FiftyOne Enterprise App](#install-fiftyone-enterprise-app)
       - [Installation Complete](#installation-complete)
+  - [Recommended Next Steps](#recommended-next-steps)
 
 <!-- tocstop -->
 
@@ -279,3 +280,19 @@ and add your storage credentials to access sample data.
 Congratulations! You should now be able to access your
 FiftyOne Enterprise installation at the DNS address you created
 [earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+
+## Recommended Next Steps
+
+The base `helm install` above starts FiftyOne Enterprise with
+**built-in only plugins** and **no delegated operator workers**.
+While sufficient to get started, we recommend enabling
+the following features for a production-ready deployment:
+
+| Step | What it enables |
+| --- | --- |
+| **Dedicated Plugins** | Install and run custom plugins in an isolated `teams-plugins` pod, keeping plugin workloads separate from the main app |
+| **Delegated Operators** | Schedule compute-heavy tasks — embeddings, model evaluation, dataset import, annotation — from the UI and run them on dedicated background workers |
+| **On-Demand Orchestrator** | *(Optional)* Spin up Kubernetes pods on demand per job instead of maintaining always-on workers; more cost-efficient for infrequent or GPU-heavy workloads |
+
+For step-by-step configuration instructions, see
+[Recommended Post-Installation Configuration](./docs/post-install-recommended-configuration.md).

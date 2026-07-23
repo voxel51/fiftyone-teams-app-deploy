@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.18.1](https://img.shields.io/badge/Version-2.18.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18.1](https://img.shields.io/badge/AppVersion-v2.18.1-informational?style=flat-square)
+![Version: 2.22.1](https://img.shields.io/badge/Version-2.22.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.22.1](https://img.shields.io/badge/AppVersion-v2.22.1-informational?style=flat-square)
 
 FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
@@ -142,6 +142,7 @@ for steps on how to add your license file.
 - [Estimated Completion Time](#estimated-completion-time)
 - [Sizing](#sizing)
 - [Usage](#usage)
+- [Recommended Next Steps](#recommended-next-steps)
 - [Upgrades](#upgrades)
 - [Advanced Configuration](#advanced-configuration)
   - [Backup And Recovery](#backup-and-recovery)
@@ -339,6 +340,16 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 
 A minimal example `values.yaml` may be found
 [in the repository](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml).
+
+## Recommended Next Steps
+
+The base installation enables FiftyOne Enterprise with
+**built-in only plugins** and **no delegated operator workers**.
+For a production-ready deployment, we recommend enabling **dedicated plugins**
+and **delegated operators** after completing the install above.
+
+See [Recommended Post-Installation Configuration](../docs/post-install-recommended-configuration.md)
+for step-by-step instructions.
 
 ## Upgrades
 
@@ -712,6 +723,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 ## Values
 
 <!-- markdownlint-disable MD060 -->
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
@@ -744,7 +756,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | apiSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":null}` | Pod Disruption Budget for pods for `teams-api`. [Reference][pod-disruption-budget]. |
 | apiSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-api`. |
 | apiSettings.podDisruptionBudget.minAvailable | string | `nil` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
-| apiSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. |
+| apiSettings.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | Pod-level security attributes and common container settings for `teams-api`. [Reference][security-context]. UID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`. |
 | apiSettings.rbac | object | `{"create":true,"role":{"annotations":{},"labels":{},"name":""},"roleBinding":{"annotations":{},"create":true,"labels":{},"name":""},"serviceAccount":{"annotations":{},"create":true,"labels":{},"name":""}}` | RBAC roles, bindings, and service accounts which will be used to submit on-demand delegated operators to the kubernetes API. If `apiSettings.rbac.create=true`, these will be used by the `teams-api` pods. |
 | apiSettings.rbac.create | bool | `true` | Controls whether to create the `Role`, `RoleBinding`, and `ServiceAccount` for on-demand delegated-operator submission. |
 | apiSettings.rbac.role.annotations | object | `{}` | `Role` annotations. [Reference][annotations]. |
@@ -811,7 +823,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | appSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":null}` | Pod Disruption Budget for pods for `fiftyone-app`. [Reference][pod-disruption-budget]. |
 | appSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `fiftyone-app`. |
 | appSettings.podDisruptionBudget.minAvailable | string | `nil` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
-| appSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context]. |
+| appSettings.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | Pod-level security attributes and common container settings for `fiftyone-app`. [Reference][security-context]. UID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`. |
 | appSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `fiftyone-app`. [Reference][probes]. |
 | appSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes]. |
@@ -884,7 +896,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | casSettings.volumes | list | `[]` | Volumes for `teams-cas`. [Reference][volumes]. |
 | delegatedOperatorDeployments.deployments | object | `{"teamsDoCpuDefault":{"enabled":false,"env":{"FIFTYONE_MEDIA_CACHE_DIR":"/opt/media_cache","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":"2147483648"},"replicaCount":1,"resources":{"limits":{"cpu":4,"ephemeral-storage":"1Gi","memory":"16Gi"},"requests":{"cpu":4,"ephemeral-storage":"1Gi","memory":"16Gi"}},"volumeMounts":[{"mountPath":"/dev/shm","name":"shm-vol"},{"mountPath":"/opt/media_cache","name":"memory-media-cache-vol"}],"volumes":[{"emptyDir":{"medium":"Memory","sizeLimit":"2Gi"},"name":"shm-vol"},{"emptyDir":{"medium":"Memory","sizeLimit":"2.5Gi"},"name":"memory-media-cache-vol"}]}}` | Additional deployments to configure. Each template will use .Values.delegatedOperatorDeployments.template as a base. Each template value may be overridden. Maps/dictionaries will be merged key-wise, with the deployment instance taking precedence. List values will not be merged, but be overridden completely by the deployment instance. |
 | delegatedOperatorDeployments.deployments.teamsDoCpuDefault | object | `{"enabled":false,"env":{"FIFTYONE_MEDIA_CACHE_DIR":"/opt/media_cache","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":"2147483648"},"replicaCount":1,"resources":{"limits":{"cpu":4,"ephemeral-storage":"1Gi","memory":"16Gi"},"requests":{"cpu":4,"ephemeral-storage":"1Gi","memory":"16Gi"}},"volumeMounts":[{"mountPath":"/dev/shm","name":"shm-vol"},{"mountPath":"/opt/media_cache","name":"memory-media-cache-vol"}],"volumes":[{"emptyDir":{"medium":"Memory","sizeLimit":"2Gi"},"name":"shm-vol"},{"emptyDir":{"medium":"Memory","sizeLimit":"2.5Gi"},"name":"memory-media-cache-vol"}]}` | Default (CPU-only) delegated operator runner. Defaults to an 4vCPU, 16Gi RAM runner. The deployment is backed with a 2.5Gi in-memory volume for caching media and an extra 2Gi of shared memory. |
-| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":null},"podSecurityContext":{},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"updateStrategy":{"type":"RollingUpdate"},"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
+| delegatedOperatorDeployments.template | object | `{"affinity":{},"deploymentAnnotations":{},"description":"","env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_INTERNAL_SERVICE":true,"FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"labels":{},"liveness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"minAvailable":null},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000},"readiness":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"replicaCount":3,"resources":{"limits":{},"requests":{}},"secretEnv":{},"securityContext":{},"startup":{"failureThreshold":5,"periodSeconds":30,"timeoutSeconds":30},"tolerations":[],"topologySpreadConstraints":[],"updateStrategy":{"type":"RollingUpdate"},"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorDeployments.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
 | delegatedOperatorDeployments.template.deploymentAnnotations | object | `{}` | Annotations for the `teams-do` deployment. [Reference][annotations]. |
 | delegatedOperatorDeployments.template.description | string | `""` | A description for the delegated operator instance. This is unused in the template context. Each operator should either set their own description or, optionally, use the default. If unset at the operator context, it will be defaulted to `Long running operations delegated to $name` where `$name` is the name of the Deployment object. |
@@ -902,7 +914,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorDeployments.template.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
 | delegatedOperatorDeployments.template.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
 | delegatedOperatorDeployments.template.podDisruptionBudget.minAvailable | string | `nil` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
-| delegatedOperatorDeployments.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
+| delegatedOperatorDeployments.template.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. UID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`. |
 | delegatedOperatorDeployments.template.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.periodSeconds | int | `30` | How often (in seconds) to perform the readiness probe for `teams-do`. [Reference][probes]. |
 | delegatedOperatorDeployments.template.readiness.timeoutSeconds | int | `30` | Timeout for the readiness probe for the `teams-do`. [Reference][probes]. |
@@ -923,7 +935,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.configMap.labels | object | `{}` | Additional labels for the generated `ConfigMap`. [Reference][labels-and-selectors]. |
 | delegatedOperatorJobTemplates.configMap.name | string | `""` | Name of the `ConfigMap` (existing or to be created) in the namespace `namespace.name` used for DO templates. Defaults to `release-name-fiftyone-teams-app-do-templates`. |
 | delegatedOperatorJobTemplates.jobs | object | `{}` | On-Demand Delegated Operator Jobs. |
-| delegatedOperatorJobTemplates.template | object | `{"activeDeadlineSeconds":null,"affinity":{},"backoffLimit":null,"completions":null,"containerSecurityContext":{},"env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"jobAnnotations":{},"labels":{},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{},"resources":{"limits":{},"requests":{}},"secretEnv":{},"tolerations":[],"ttlSecondsAfterFinished":null,"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
+| delegatedOperatorJobTemplates.template | object | `{"activeDeadlineSeconds":null,"affinity":{},"backoffLimit":null,"completions":null,"containerSecurityContext":{},"env":{"FIFTYONE_DELEGATED_OPERATION_LOG_PATH":"","FIFTYONE_MEDIA_CACHE_SIZE_BYTES":-1},"image":{"pullPolicy":"Always","repository":"voxel51/fiftyone-teams-cv-full","tag":""},"jobAnnotations":{},"labels":{},"nodeSelector":{},"podAnnotations":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000},"resources":{"limits":{},"requests":{}},"secretEnv":{},"tolerations":[],"ttlSecondsAfterFinished":null,"volumeMounts":[],"volumes":[]}` | A common template applied to all deployments. Each deployment can then override individual fields as needed by the operator. |
 | delegatedOperatorJobTemplates.template.activeDeadlineSeconds | optional | `nil` | Maximum of seconds a job should be able to run. [Reference][job-termination-and-cleanup]. |
 | delegatedOperatorJobTemplates.template.affinity | object | `{}` | Affinity and anti-affinity for `delegated-operator-executor`. [Reference][affinity]. |
 | delegatedOperatorJobTemplates.template.backoffLimit | optional | `nil` | Amount of retries for the job to try before being marked as "Failed". [Reference][job-backoff-failure-policy]. |
@@ -938,7 +950,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.template.labels | object | `{}` | Additional labels for the `delegated-operator-executor` related objects. [Reference][labels-and-selectors]. |
 | delegatedOperatorJobTemplates.template.nodeSelector | object | `{}` | nodeSelector for `delegated-operator-executor`. [Reference][node-selector]. |
 | delegatedOperatorJobTemplates.template.podAnnotations | object | `{}` | Annotations for delegated-operator-executor pods. [Reference][annotations]. |
-| delegatedOperatorJobTemplates.template.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. |
+| delegatedOperatorJobTemplates.template.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | Pod-level security attributes and common container settings for `delegated-operator-executor`. [Reference][security-context]. UID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`. |
 | delegatedOperatorJobTemplates.template.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `delegated-operator-executor`. [Reference][resources]. |
 | delegatedOperatorJobTemplates.template.secretEnv | object | `{}` | Secret variables to be passed to the delegated-operator-executor containers. |
 | delegatedOperatorJobTemplates.template.tolerations | list | `[]` | Allow the k8s scheduler to schedule delegated-operator-executor pods with matching taints. [Reference][taints-and-tolerations]. |
@@ -993,7 +1005,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | pluginsSettings.podDisruptionBudget | object | `{"enabled":false,"minAvailable":null}` | Pod Disruption Budget for pods for `teams-plugins`. [Reference][pod-disruption-budget]. |
 | pluginsSettings.podDisruptionBudget.enabled | bool | `false` | Whether a pod disruption budget is enabled for `teams-plugins`. |
 | pluginsSettings.podDisruptionBudget.minAvailable | string | `nil` | Sets the minimum available or maximum unavailable replicas for the deployment object. Either integers or percentages supported. `maxUnavailable` is also supported, however, only one setting can be used at a time. If both are set, `minAvailable` will be preferred. |
-| pluginsSettings.podSecurityContext | object | `{}` | Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context]. |
+| pluginsSettings.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | Pod-level security attributes and common container settings for `teams-plugins`. [Reference][security-context]. UID/GID 1000 matches the image; set explicitly to satisfy PSA `restricted`. |
 | pluginsSettings.readiness.failureThreshold | int | `5` | Number of times to retry the readiness probe for the `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-plugins`. [Reference][probes]. |
 | pluginsSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `teams-plugins`. [Reference][probes]. |
@@ -1040,7 +1052,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS | string | `"kubernetes"` | Deployment characteristics for the `teams-app`. `kubernetes`: Indicates the app is running in a Kubernetes environment. `docker`: Indicates the app is running in a Docker environment. `kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.18.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.22.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==0.11.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
@@ -1084,6 +1096,26 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.updateStrategy | object | `{"type":"RollingUpdate"}` | Control how `teams-app` pods are redeployed during an upgrade. [Reference][upgrade-strategies] |
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
+| telemetry.enabled | bool | `true` | When `false`, no telemetry resources or sidecars are rendered and the FiftyOne UI's delegated-operator log viewer will be empty. |
+| telemetry.rbac.create | bool | `true` | When `false`, the telemetry `Role`/`RoleBinding` granting the sidecar `pods/log` read access are not rendered. Set `false` only when the install identity cannot create namespaced RBAC AND `serviceAccounts` points at an existing account that already carries `pods/log` (e.g. the teams-api RBAC SA). On Kubernetes the sidecar tails container logs via the `pods/log` API; without this grant those calls return `403`, so the delegated-operator log viewer stays empty. The Settings → Metrics dashboard is unaffected — metrics use the pod's shared process namespace, not the Kubernetes API. |
+| telemetry.redis.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Container-level security attributes for the telemetry Redis. `readOnlyRootFilesystem` is safe because writes go to the `/data` volume. [Reference][container-security-context]. |
+| telemetry.redis.external.url | string | `""` | URL of an external Redis to use instead of the bundled one (e.g. `redis://my-redis.example.com:6379`). |
+| telemetry.redis.image | string | `"redis:7-alpine"` | Container image for the telemetry Redis Deployment. |
+| telemetry.redis.maxmemory | string | `"400mb"` | `--maxmemory` flag passed to `redis-server`. |
+| telemetry.redis.persistence.enabled | bool | `false` | Whether to provision a `PersistentVolumeClaim` for the bundled telemetry Redis. Defaults to `false` (emptyDir) so the chart installs without a default `StorageClass`. Archives flush to MongoDB every ~10 minutes, so a Redis pod restart only drops the in-window dashboard backscroll and any live op buffers. |
+| telemetry.redis.persistence.existingClaim | string | `""` | Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to bind the telemetry Redis to. When set, `size` and `storageClass` above are ignored. Has no effect when `persistence.enabled` is `false`. |
+| telemetry.redis.persistence.size | string | `"1Gi"` | Storage size for the telemetry Redis `PersistentVolumeClaim`. |
+| telemetry.redis.persistence.storageClass | string | `""` | `StorageClass` name for the telemetry Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |
+| telemetry.redis.podSecurityContext | object | `{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999}` | Pod-level security attributes for the telemetry Redis. UID/GID 999 matches the `redis` user in the `redis:7-alpine` image; `fsGroup` keeps the mounted `/data` volume group-writable. [Reference][security-context]. |
+| telemetry.redis.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"512Mi"}}` | Resource requests/limits for the telemetry Redis container. [Reference][resources]. |
+| telemetry.serviceAccounts | list | `[]` | ServiceAccount names (in `namespace.name`) bound to the telemetry pod-logs Role. When empty, the RoleBinding binds the chart's main app service account. The teams-api sidecar uses the teams-api RBAC service account, which already grants `pods/log` GET via `api-role.yaml`. |
+| telemetry.sidecar.extraVolumeMounts | list | `[]` | Additional volume mounts for the `telemetry-sidecar` container, e.g. to mount the same CA certs the app containers use. [Reference][volumes]. |
+| telemetry.sidecar.extraVolumes | list | `[]` | Additional pod volumes available to the `telemetry-sidecar`. Omit any volume already defined on the workload (`*.volumes`) to avoid name collisions. [Reference][volumes]. |
+| telemetry.sidecar.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
+| telemetry.sidecar.image.repository | string | `"voxel51/telemetry-sidecar"` | Container image for `telemetry-sidecar`. |
+| telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to `Chart.AppVersion`. |
+| telemetry.sidecar.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"512Mi"}}` | Resource requests/limits for each `telemetry-sidecar` container. |
+
 <!-- markdownlint-enable MD060 -->
 
 <!-- Reference Links -->
