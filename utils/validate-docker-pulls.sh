@@ -19,6 +19,7 @@ set -euo pipefail
 EXPECTED_IMAGES=(
   "docker.io/busybox:stable-glibc" # For initContainers
   "docker.io/redis:7-alpine"       # For telemetry redis (telemetry.enabled defaults to true)
+  "voxel51/agentic-labeler"
   "voxel51/fiftyone-app"
   "voxel51/fiftyone-app-gpt"
   "voxel51/fiftyone-app-torch"
