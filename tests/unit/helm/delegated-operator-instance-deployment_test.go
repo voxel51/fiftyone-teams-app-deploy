@@ -5821,8 +5821,10 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySidecarNo
 	}
 
 	testCases := []struct {
-		name   string
-		values map[string]string
+		name          string
+		values        map[string]string
+		gpuInLimits   bool
+		gpuInRequests bool
 	}{
 		{
 			name: "gpuInLimits",
@@ -5831,6 +5833,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySidecarNo
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 				gpuKey("limits"): "1",
 			},
+			gpuInLimits: true,
 		},
 		{
 			name: "gpuInRequests",
@@ -5839,6 +5842,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySidecarNo
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
 				gpuKey("requests"): "1",
 			},
+			gpuInRequests: true,
 		},
 		{
 			name: "noGpu",
@@ -5863,6 +5867,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestTelemetrySidecarNo
 
 			var deployment appsv1.Deployment
 			helm.UnmarshalK8SYaml(subT, docs[1], &deployment)
+
+			// The configured GPU must reach the primary executor container.
+			main := findContainer(deployment.Spec.Template.Spec.Containers, "teams-do-cpu-default")
+			s.Require().NotNil(main, "main DO container not found")
+			_, mainLimitsGpu := main.Resources.Limits[corev1.ResourceName(gpuResource)]
+			_, mainRequestsGpu := main.Resources.Requests[corev1.ResourceName(gpuResource)]
+			s.Equal(tc.gpuInLimits, mainLimitsGpu, "primary executor nvidia.com/gpu limits mismatch")
+			s.Equal(tc.gpuInRequests, mainRequestsGpu, "primary executor nvidia.com/gpu requests mismatch")
 
 			sidecar := findContainer(deployment.Spec.Template.Spec.Containers, "telemetry-sidecar")
 			s.Require().NotNil(sidecar, "telemetry-sidecar container not found")

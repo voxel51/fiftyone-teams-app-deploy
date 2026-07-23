@@ -799,8 +799,10 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarNoGpu() {
 	}
 
 	testCases := []struct {
-		name   string
-		values map[string]string
+		name          string
+		values        map[string]string
+		gpuInLimits   bool
+		gpuInRequests bool
 	}{
 		{
 			name: "gpuInLimits",
@@ -809,6 +811,7 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarNoGpu() {
 				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
 				gpuKey("limits"): "1",
 			},
+			gpuInLimits: true,
 		},
 		{
 			name: "gpuInRequests",
@@ -817,6 +820,7 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarNoGpu() {
 				"delegatedOperatorJobTemplates.jobs.cpuDefault.unused": "nil",
 				gpuKey("requests"): "1",
 			},
+			gpuInRequests: true,
 		},
 		{
 			name: "noGpu",
@@ -840,6 +844,14 @@ func (s *doK8sConfigMapTemplateTest) TestTelemetrySidecarNoGpu() {
 			helm.UnmarshalK8SYaml(subT, output, &configMap)
 
 			job := s.renderJob(configMap.Data, jobKey)
+
+			// The configured GPU must reach the primary executor container.
+			s.Require().NotEmpty(job.Spec.Template.Spec.Containers, "expected at least one container")
+			main := job.Spec.Template.Spec.Containers[0]
+			_, mainLimitsGpu := main.Resources.Limits[corev1.ResourceName(gpuResource)]
+			_, mainRequestsGpu := main.Resources.Requests[corev1.ResourceName(gpuResource)]
+			s.Equal(testCase.gpuInLimits, mainLimitsGpu, "primary executor nvidia.com/gpu limits mismatch")
+			s.Equal(testCase.gpuInRequests, mainRequestsGpu, "primary executor nvidia.com/gpu requests mismatch")
 
 			// The native-sidecar runs as an initContainer (restartPolicy: Always).
 			sidecar := findContainer(job.Spec.Template.Spec.InitContainers, "telemetry-sidecar")
