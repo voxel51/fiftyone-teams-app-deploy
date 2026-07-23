@@ -1,0 +1,112 @@
+---
+# Agentic Labeler service orchestrator: a dedicated GPU delegated-operator
+# worker that hosts the builtin `agentic-labeler` service (few-shot VLM
+# inference via vLLM). Unlike teams-do, it runs ONLY work delegated to its
+# `-n agentic-labeler` orchestrator name. Point the Agentic Labeler service's
+# delegation target at it (Settings -> Services). See
+# docker/docs/configuring-agentic-labeler.md.
+#
+# Requires a Linux host with the NVIDIA driver, nvidia-container-toolkit, and
+# the `nvidia` runtime configured in dockerd. vLLM needs a GPU and has no CPU
+# fallback. Docker Desktop on macOS / Windows does not support GPU passthrough.
+#
+# Gated behind the `agentic-labeler` profile. Activate with:
+#
+#   docker compose --profile agentic-labeler \
+#     -f compose.dedicated-plugins.yaml \
+#     -f compose.delegated-operators.yaml \
+#     -f compose.agenticlabeler.yaml \
+#     -f compose.override.yaml \
+#     up -d
+#
+# For Proxy Server instructions please see
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+services:
+  agentic-labeler:
+    image: voxel51/fiftyone-teams-agentic-labeler:v2.23.0
+    profiles: ["agentic-labeler"]
+    shm_size: "8g"
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote -m -n agentic-labeler"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: "false"
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: "true"
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+      # The worker hosts the service in-process and publishes the address the
+      # teams-api proxy dials to reach it. It auto-detects its own container
+      # IP. Override only on multi-homed / non-default-network hosts where
+      # auto-detect picks the wrong interface (see
+      # docker/docs/configuring-agentic-labeler.md).
+      # FIFTYONE_SERVICE_POD_IP: agentic-labeler
+    deploy:
+      replicas: 1
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${NVIDIA_GPU_COUNT:-1}
+              capabilities: ["gpu"]
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+      - telemetry-socket-agentic:/tmp/telemetry
+    restart: always
+
+  agentic-labeler-telemetry:
+    image: voxel51/telemetry-sidecar:v2.23.0
+    pid: "service:agentic-labeler"
+    profiles: ["agentic-labeler"]
+    user: "1000:1000"
+    cap_add:
+      - SYS_PTRACE  # required for profiling metrics (sampled stacks via py-spy)
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 512M
+        reservations:
+          cpus: "0.10"
+          memory: 512M
+          devices:
+            - driver: nvidia
+              count: ${NVIDIA_GPU_COUNT:-1}
+              capabilities: ["gpu"]
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
+      POD_NAME: agentic-labeler
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: delegated-operator
+      TARGET_NAME: ${TEAMS_DO_TARGET_NAME:-fiftyone delegated}
+      EXECUTOR_SIDECAR: "true"
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+    volumes:
+      - telemetry-socket-agentic:/tmp/telemetry
+    depends_on:
+      agentic-labeler:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+    restart: always
+
+# tmpfs-backed named volume with uid/gid set at mount time so the
+# non-root sidecar can bind agent.sock.
+volumes:
+  plugins-vol:
+  telemetry-socket-agentic:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "uid=1000,gid=1000,mode=0755"

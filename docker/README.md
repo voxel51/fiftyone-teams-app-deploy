@@ -60,6 +60,7 @@ regarding FiftyOne Enterprise.
 - [Step 10: Test End User Login](#step-10-test-end-user-login)
 - [Advanced DO Settings](#advanced-do-settings)
   - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
+  - [:robot: Agentic Labeler Service](#robot-agentic-labeler-service)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
   - [:on: On-Demand Delegated Operator Executors](#on-on-demand-delegated-operator-executors)
 - [Upgrades](#upgrades)
@@ -247,6 +248,7 @@ Hub:
 - `voxel51/fiftyone-teams-app`
 - `voxel51/fiftyone-teams-cas`
 - `voxel51/fiftyone-teams-cv-full` ← full CV/ML environment
+- `voxel51/fiftyone-teams-agentic-labeler` ← Agentic Labeler service (VLM inference)
 
 > :closed_lock_with_key: For access, contact your Voxel51 support team to obtain
 > Docker Hub credentials.
@@ -463,6 +465,14 @@ FiftyOne services like Delegated Operators can be scheduled on
 
 To set up containers with GPU resources, see the
 [configuring GPU workloads documentation](./docs/configuring-gpu-workloads.md).
+
+### :robot: Agentic Labeler Service
+
+Run the builtin Agentic Labeler service (few-shot VLM inference via vLLM) on a
+dedicated GPU worker. See the
+[configuring Agentic Labeler documentation](./docs/configuring-agentic-labeler.md).
+For an overview of builtin services and the service orchestrator, see the
+[service orchestrator documentation](../docs/configuring-service-orchestrator.md).
 
 ### :bricks: Custom Plugin Images
 

@@ -38,6 +38,7 @@ services:
       API_EXTERNAL_URL: ${FIFTYONE_API_URI}
       CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
+      FIFTYONE_BUILTIN_SERVICES_PATH: /opt/builtin-services/builtin_services.yaml
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
       FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
@@ -61,6 +62,15 @@ services:
     ports:
       - ${API_BIND_ADDRESS}:${API_BIND_PORT}:8000
     restart: always
+    # Builtin services list, reconciled at startup so the services show up in
+    # Settings -> Services (created stopped). Source is builtin_services.yaml in
+    # this file's directory (docker/). Edit it to add, remove, or retarget
+    # services. See docker/docs/configuring-agentic-labeler.md.
+    volumes:
+      - type: bind
+        source: ./builtin_services.yaml
+        target: /opt/builtin-services/builtin_services.yaml
+        read_only: true
 
   teams-app-common:
     image: voxel51/fiftyone-teams-app:v2.23.0
