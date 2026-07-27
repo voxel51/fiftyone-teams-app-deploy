@@ -385,12 +385,30 @@ appSettings:
   # per-workload max (it rejects >10Gi). Harmless on non-Autopilot clusters.
   resources:
     limits:
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       cpu: 2
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       memory: 6Gi
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       ephemeral-storage: 10Gi
     requests:
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       cpu: 500m
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       memory: 512Mi
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       ephemeral-storage: 10Gi
   service:
     # -- Service annotations for `fiftyone-app`. [Reference][annotations].
@@ -1686,10 +1704,22 @@ activitySettings:
     url: ""
   resources:
     requests:
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       cpu: 100m
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       memory: 128Mi
     limits:
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       cpu: 500m
+      # @schema
+      # type: ["string", "integer", "number"]
+      # @schema
       memory: 512Mi
   # -- Override the org the snapshot worker stamps its events with; defaults to
   # appSettings.env.FIFTYONE_ACTIVITY_ORG_ID (rollups are tenant-scoped, so an
