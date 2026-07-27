@@ -83,13 +83,23 @@
               "properties": {
                 "cpu": {
                   "default": "500m",
+                  "required": [],
                   "title": "cpu",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 },
                 "memory": {
                   "default": "512Mi",
+                  "required": [],
                   "title": "memory",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 }
               },
               "required": [],
@@ -100,13 +110,23 @@
               "properties": {
                 "cpu": {
                   "default": "100m",
+                  "required": [],
                   "title": "cpu",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 },
                 "memory": {
                   "default": "128Mi",
+                  "required": [],
                   "title": "memory",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 }
               },
               "required": [],
@@ -1381,18 +1401,33 @@
               "properties": {
                 "cpu": {
                   "default": 2,
+                  "required": [],
                   "title": "cpu",
-                  "type": "integer"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 },
                 "ephemeral-storage": {
                   "default": "10Gi",
+                  "required": [],
                   "title": "ephemeral-storage",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 },
                 "memory": {
                   "default": "6Gi",
+                  "required": [],
                   "title": "memory",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 }
               },
               "required": [],
@@ -1403,18 +1438,33 @@
               "properties": {
                 "cpu": {
                   "default": "500m",
+                  "required": [],
                   "title": "cpu",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 },
                 "ephemeral-storage": {
                   "default": "10Gi",
+                  "required": [],
                   "title": "ephemeral-storage",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 },
                 "memory": {
                   "default": "512Mi",
+                  "required": [],
                   "title": "memory",
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
                 }
               },
               "required": [],
