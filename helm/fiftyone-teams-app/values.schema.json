@@ -1048,12 +1048,6 @@
                 "string",
                 "integer"
               ]
-            },
-            "SKIP_OPERATOR_PERMISSION_CHECK": {
-              "default": "true",
-              "description": "DEV ENV ONLY: bypass the teams-api builtin-operator allowlist. That\nlist is enumerated from the fiftyone.yml bundled in teams-api's OWN SDK\ninstall, so newly added plugin operators 403 until the hub image ships\nan SDK containing them. Remove once the hub pin includes the declared\nactivity operators.",
-              "title": "SKIP_OPERATOR_PERMISSION_CHECK",
-              "type": "string"
             }
           },
           "required": [],
