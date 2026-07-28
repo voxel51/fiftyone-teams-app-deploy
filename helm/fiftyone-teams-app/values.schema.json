@@ -1395,7 +1395,7 @@
           "type": "integer"
         },
         "resources": {
-          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `fiftyone-app`. [Reference][resources].\nephemeral-storage is set explicitly: the fiftyone-app-torch image is ~5.4GB\ncompressed / ~15-20GB unpacked, but GKE Autopilot injects a 1Gi default when\nunset and bin-packs by request — so the app landed on a full node and was\nevicted (\"node was low on resource: ephemeral-storage\"). 10Gi is Autopilot's\nper-workload max (it rejects \u003e10Gi). Harmless on non-Autopilot clusters.",
+          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `fiftyone-app`. [Reference][resources].\nephemeral-storage is set explicitly: the fiftyone-app-torch image is ~5.4GB\ncompressed / ~15-20GB unpacked, but GKE Autopilot injects a 1Gi default when\nunset and bin-packs by request — so the app landed on a full node and was\nevicted (\"node was low on resource: ephemeral-storage\"). Autopilot caps the\nPOD SUM at 10Gi (warden rejects above it, counting every container), so\nleave headroom for injected sidecars — the ephem envs add a 1Gi telemetry\nsidecar, and 10Gi here made the pod 11Gi and unschedulable (Argo sync\nbounced silently for days). 8Gi + sidecars fits. Harmless on non-Autopilot.",
           "properties": {
             "limits": {
               "properties": {
@@ -1410,7 +1410,7 @@
                   ]
                 },
                 "ephemeral-storage": {
-                  "default": "10Gi",
+                  "default": "8Gi",
                   "required": [],
                   "title": "ephemeral-storage",
                   "type": [
@@ -1447,7 +1447,7 @@
                   ]
                 },
                 "ephemeral-storage": {
-                  "default": "10Gi",
+                  "default": "8Gi",
                   "required": [],
                   "title": "ephemeral-storage",
                   "type": [

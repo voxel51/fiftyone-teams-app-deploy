@@ -381,8 +381,11 @@ appSettings:
   # ephemeral-storage is set explicitly: the fiftyone-app-torch image is ~5.4GB
   # compressed / ~15-20GB unpacked, but GKE Autopilot injects a 1Gi default when
   # unset and bin-packs by request — so the app landed on a full node and was
-  # evicted ("node was low on resource: ephemeral-storage"). 10Gi is Autopilot's
-  # per-workload max (it rejects >10Gi). Harmless on non-Autopilot clusters.
+  # evicted ("node was low on resource: ephemeral-storage"). Autopilot caps the
+  # POD SUM at 10Gi (warden rejects above it, counting every container), so
+  # leave headroom for injected sidecars — the ephem envs add a 1Gi telemetry
+  # sidecar, and 10Gi here made the pod 11Gi and unschedulable (Argo sync
+  # bounced silently for days). 8Gi + sidecars fits. Harmless on non-Autopilot.
   resources:
     limits:
       # @schema
@@ -396,7 +399,7 @@ appSettings:
       # @schema
       # type: ["string", "integer", "number"]
       # @schema
-      ephemeral-storage: 10Gi
+      ephemeral-storage: 8Gi
     requests:
       # @schema
       # type: ["string", "integer", "number"]
@@ -409,7 +412,7 @@ appSettings:
       # @schema
       # type: ["string", "integer", "number"]
       # @schema
-      ephemeral-storage: 10Gi
+      ephemeral-storage: 8Gi
   service:
     # -- Service annotations for `fiftyone-app`. [Reference][annotations].
     annotations: {}
