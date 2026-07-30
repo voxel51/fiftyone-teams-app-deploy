@@ -1710,7 +1710,12 @@ activitySettings:
     # -- Bundle an ephemeral in-cluster Redis (set false to use an external one).
     enabled: true
     image: redis:7
-    # -- Override to point at an external Redis; default targets the bundled one.
+    # -- Override to point the WORKERS at an external Redis; default targets
+    # the bundled one. NOT a global override: the event PRODUCERS (teams-api,
+    # fiftyone-app, teams-plugins, delegated operators) each carry their own
+    # FIFTYONE_MQ_REDIS_URL env default — override those alongside this or
+    # producers keep pointing at the (absent) bundled Redis and their events
+    # are silently dropped.
     url: ""
   resources:
     requests:

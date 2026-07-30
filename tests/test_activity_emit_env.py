@@ -42,6 +42,14 @@ CHART = os.path.join(
 # drops every event. The org id is required for the rollups to be readable.
 REQUIRED_EMIT_ENV = ["FIFTYONE_MQ_REDIS_URL", "FIFTYONE_ACTIVITY_ORG_ID"]
 
+#: teams-api hosts the domain-event bridge: it needs the QUEUE, but reads
+#: its org from the request context (no FIFTYONE_ACTIVITY_ORG_ID needed).
+REQUIRED_BRIDGE_ENV = ["FIFTYONE_MQ_REDIS_URL"]
+
+#: The rendered defaults must be REAL values, not empty strings — an empty
+#: url would fall back to fiftyone.mq's localhost default and drop events.
+EXPECTED_REDIS_URL = "redis://activity-redis:6379/0"
+
 # A delegated-operator deployment we inject so the DO env path is exercised.
 # Its rendered Deployment name is the values key, so we know it exactly.
 _DO_PROBE_KEY = "activityemitprobe"
@@ -50,6 +58,9 @@ _DO_PROBE_KEY = "activityemitprobe"
 # the ones the incident showed were missing the queue wiring. Matched by exact
 # rendered name (DO deployment name == the injected values key).
 EMIT_POD_NAMES = {"teams-plugins", _DO_PROBE_KEY}
+
+#: Queue-only producers (the domain-event bridge).
+BRIDGE_POD_NAMES = {"teams-api"}
 
 
 def _render():
@@ -84,6 +95,15 @@ def _env_names(deployment):
     return {e["name"] for e in (container.get("env") or [])}
 
 
+def _env_values(deployment):
+    container = deployment["spec"]["template"]["spec"]["containers"][0]
+    return {
+        e["name"]: e.get("value")
+        for e in (container.get("env") or [])
+        if "value" in e
+    }
+
+
 def _emit_deployments(deployments):
     """The emit-running Deployments (teams-plugins + the delegated operator)."""
     return [d for d in deployments if d["metadata"]["name"] in EMIT_POD_NAMES]
@@ -106,12 +126,44 @@ def _check():
         missing = [v for v in REQUIRED_EMIT_ENV if v not in env]
         if missing:
             failures.append(f"{name} is missing {missing}")
+        values = _env_values(d)
+        # Names alone are not enough: an EMPTY url or org id passes a
+        # presence check and still drops every event.
+        if values.get("FIFTYONE_MQ_REDIS_URL") != EXPECTED_REDIS_URL:
+            failures.append(
+                f"{name} FIFTYONE_MQ_REDIS_URL != {EXPECTED_REDIS_URL!r}: "
+                f"{values.get('FIFTYONE_MQ_REDIS_URL')!r}"
+            )
+        if not values.get("FIFTYONE_ACTIVITY_ORG_ID"):
+            failures.append(f"{name} FIFTYONE_ACTIVITY_ORG_ID is empty")
+
+    bridge_pods = [
+        d for d in deployments if d["metadata"]["name"] in BRIDGE_POD_NAMES
+    ]
+    missing_bridge = BRIDGE_POD_NAMES - {
+        d["metadata"]["name"] for d in bridge_pods
+    }
+    assert not missing_bridge, (
+        f"expected bridge deployments {sorted(BRIDGE_POD_NAMES)} to render, "
+        f"missing {sorted(missing_bridge)}"
+    )
+    for d in bridge_pods:
+        name = d["metadata"]["name"]
+        values = _env_values(d)
+        env = _env_names(d)
+        missing = [v for v in REQUIRED_BRIDGE_ENV if v not in env]
+        if missing:
+            failures.append(f"{name} is missing {missing}")
+        elif values.get("FIFTYONE_MQ_REDIS_URL") != EXPECTED_REDIS_URL:
+            failures.append(
+                f"{name} FIFTYONE_MQ_REDIS_URL != {EXPECTED_REDIS_URL!r}"
+            )
 
     assert not failures, (
         "Activity emit pods cannot reach the queue (events would be silently "
         "dropped):\n  " + "\n  ".join(failures)
     )
-    return [d["metadata"]["name"] for d in emit_pods]
+    return [d["metadata"]["name"] for d in emit_pods + bridge_pods]
 
 
 def test_activity_emit_pods_have_queue_env():

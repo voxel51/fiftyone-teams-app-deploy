@@ -68,7 +68,7 @@
             },
             "url": {
               "default": "",
-              "description": "Override to point at an external Redis; default targets the bundled one.",
+              "description": "Override to point the WORKERS at an external Redis; default targets\nthe bundled one. NOT a global override: the event PRODUCERS (teams-api,\nfiftyone-app, teams-plugins, delegated operators) each carry their own\nFIFTYONE_MQ_REDIS_URL env default — override those alongside this or\nproducers keep pointing at the (absent) bundled Redis and their events\nare silently dropped.",
               "title": "url",
               "type": "string"
             }
