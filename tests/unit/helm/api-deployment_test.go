@@ -533,6 +533,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -649,6 +653,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
+          },
+          {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
@@ -783,6 +791,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -912,6 +924,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -1029,6 +1045,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -1144,6 +1164,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
+          },
+          {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",

@@ -54,6 +54,8 @@ apiSettings:
     # -- (int) The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated.
     # Overrides `FIFTYONE_DO_EXPIRATION_DAYS` if provided.
     FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES:
+    # -- (int) The number of seconds to wait for service orchestrator pods to start passing their healthchecks before marking the service with an Error state.
+    FIFTYONE_SERVICE_POD_READY_TIMEOUT_S: 1800
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
