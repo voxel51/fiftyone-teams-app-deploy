@@ -1478,6 +1478,12 @@ teamsAppSettings:
     # @schema
     # -- When `false`, disables media export options
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
+    # -- TEMPORARY dev flag: shows the workflow Activity tab (raw event
+    # tail, manager-only) for verifying event capture. Remove with the tab.
+    VFF_Workflow_ACTIVITY: "true"
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
     FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.22.1
@@ -1691,8 +1697,9 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    # 0.0.21: allowDiskUse on aggregate reads; aclose loop teardown
-    tag: "5613c29aee74653e893f0dd27eb717e5f4235f37" # pragma: allowlist secret
+    # 0.0.22: work.judged renamed workflow.decision_attributed (+ rollup
+    # decisions_attributed)
+    tag: "6ab5164b4bbcd5b277c6a640a9e7e1c3799dfeb6" # pragma: allowlist secret
     pullPolicy: IfNotPresent
   mongo:
     # -- Database for the activity_* collections. EMPTY (default) co-locates
