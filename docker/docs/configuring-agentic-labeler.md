@@ -32,12 +32,11 @@ reconciles at startup.
 
 ## Run the worker
 
-The worker is gated behind the `agentic-labeler` Compose profile. From your
-auth-mode directory, add `compose.agenticlabeler.yaml` to your usual `-f` set
-and set the profile:
+From your auth-mode directory, add `compose.agenticlabeler.yaml` to your usual
+`-f` set:
 
 ```shell
-docker compose --profile agentic-labeler \
+docker compose \
   -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.agenticlabeler.yaml \
@@ -45,8 +44,8 @@ docker compose --profile agentic-labeler \
   up -d
 ```
 
-On upgrade, add the same file and profile to your existing `down` and `up`
-commands (see [Upgrades](../README.md#upgrades)).
+On upgrade, add the same file to your existing `down` and `up` commands (see
+[Upgrades](../README.md#upgrades)).
 
 ## Builtin services
 

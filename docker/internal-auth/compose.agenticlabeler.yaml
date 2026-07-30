@@ -10,9 +10,9 @@
 # the `nvidia` runtime configured in dockerd. vLLM needs a GPU and has no CPU
 # fallback. Docker Desktop on macOS / Windows does not support GPU passthrough.
 #
-# Gated behind the `agentic-labeler` profile. Activate with:
+# Activate with:
 #
-#   docker compose --profile agentic-labeler \
+#   docker compose \
 #     -f compose.dedicated-plugins.yaml \
 #     -f compose.delegated-operators.yaml \
 #     -f compose.agenticlabeler.yaml \
@@ -24,12 +24,12 @@
 services:
   agentic-labeler:
     image: voxel51/fiftyone-teams-agentic-labeler:v2.23.0
-    profiles: ["agentic-labeler"]
     shm_size: "8g"
     command: >
       /bin/sh -c "fiftyone delegated launch -t remote -m -n agentic-labeler"
     environment:
       API_URL: ${API_URL}
+      FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_DATABASE_ADMIN: "false"
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
@@ -63,7 +63,6 @@ services:
   agentic-labeler-telemetry:
     image: voxel51/telemetry-sidecar:v2.23.0
     pid: "service:agentic-labeler"
-    profiles: ["agentic-labeler"]
     user: "1000:1000"
     cap_add:
       - SYS_PTRACE  # required for profiling metrics (sampled stacks via py-spy)
