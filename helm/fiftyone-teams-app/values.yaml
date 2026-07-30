@@ -1478,6 +1478,12 @@ teamsAppSettings:
     # @schema
     # -- When `false`, disables media export options
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
+    # -- TEMPORARY dev flag: shows the workflow Activity tab (raw event
+    # tail, manager-only) for verifying event capture. Remove with the tab.
+    VFF_Workflow_ACTIVITY: "true"
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
     FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.22.1

@@ -24,8 +24,8 @@
               "type": "string"
             },
             "tag": {
-              "default": "5613c29aee74653e893f0dd27eb717e5f4235f37",
-              "description": "REQUIRED when enabled: the published image tag (e.g. a commit SHA).\n0.0.21: allowDiskUse on aggregate reads; aclose loop teardown",
+              "default": "6ab5164b4bbcd5b277c6a640a9e7e1c3799dfeb6",
+              "description": "REQUIRED when enabled: the published image tag (e.g. a commit SHA).\n0.0.22: work.judged renamed workflow.decision_attributed (+ rollup\ndecisions_attributed)",
               "title": "tag",
               "type": "string"
             }
@@ -3909,6 +3909,16 @@
               "description": "Disable duplicate atom/selector key checking that generated false-positive errors.\n[Reference][recoil-env].",
               "required": [],
               "title": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
+            "VFF_Workflow_ACTIVITY": {
+              "default": true,
+              "description": "TEMPORARY dev flag: shows the workflow Activity tab (raw event\ntail, manager-only) for verifying event capture. Remove with the tab.",
+              "required": [],
+              "title": "VFF_Workflow_ACTIVITY",
               "type": [
                 "string",
                 "boolean"
