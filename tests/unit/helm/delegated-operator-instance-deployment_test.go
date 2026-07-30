@@ -945,6 +945,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
@@ -960,7 +961,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "2147483648"
-          }
+          },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" }
         ]`
 					var expectedEnvVars []corev1.EnvVar
 					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
@@ -1021,6 +1023,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
@@ -1032,7 +1035,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
-          }
+          },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" }
         ]`
 					var expectedEnvVars []corev1.EnvVar
 					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
@@ -1094,6 +1098,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
@@ -1109,7 +1114,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "2147483648"
-          }
+          },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" }
         ]`
 					var expectedEnvVars []corev1.EnvVar
 					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
@@ -1162,6 +1168,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
@@ -1173,7 +1180,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
-          }
+          },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" }
         ]`
 					var expectedEnvVars []corev1.EnvVar
 					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
@@ -1239,6 +1247,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": "gs://template"
@@ -1255,6 +1264,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "2147483648"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "TEST_KEY",
             "value": "TEMPLATE_TEST_VALUE"
@@ -1320,6 +1330,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": "gs://template"
@@ -1332,6 +1343,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "TEST_KEY",
             "value": "TEMPLATE_TEST_VALUE"
@@ -1410,6 +1422,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                       }
                     }
                   },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
                   {
                     "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
                     "value": "gs://foo.com"
@@ -1426,6 +1439,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
                     "value": "2147483648"
                   },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
                   {
                     "name": "TEST_KEY",
                     "value": "INSTANCE_TEST_VALUE"
@@ -1491,6 +1505,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                       }
                     }
                   },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
                   {
                     "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
                     "value": ""
@@ -1502,7 +1517,8 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                   {
                     "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
                     "value": "-1"
-                  }
+                  },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" }
                 ]`
 					var expectedEnvVars []corev1.EnvVar
 					err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
@@ -1572,6 +1588,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                       }
                     }
                   },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
                   {
                     "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
                     "value": "gs://foo.com"
@@ -1588,6 +1605,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
                     "value": "2147483648"
                   },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
                   {
                     "name": "TEST_KEY",
                     "value": "INSTANCE_TEST_VALUE"
@@ -1653,6 +1671,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                       }
                     }
                   },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
                   {
                     "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
                     "value": "gs://template"
@@ -1665,6 +1684,7 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
                     "value": "-1"
                   },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
                   {
                     "name": "TEST_KEY",
                     "value": "TEMPLATE_TEST_VALUE"

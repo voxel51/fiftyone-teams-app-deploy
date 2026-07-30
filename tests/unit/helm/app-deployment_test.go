@@ -454,6 +454,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -472,6 +473,8 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_URI", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "mongodbConnectionString" } } },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
             "value": "true"
@@ -496,6 +499,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
             "value": "24"
@@ -547,6 +551,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -565,6 +570,8 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_URI", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "mongodbConnectionString" } } },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
             "value": "true"
@@ -589,6 +596,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
             "value": "24"
@@ -654,6 +662,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -672,6 +681,8 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_URI", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "mongodbConnectionString" } } },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
             "value": "true"
@@ -696,6 +707,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
             "value": "24"
@@ -758,6 +770,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "override-secret-name", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -776,6 +789,8 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_URI", "valueFrom": { "secretKeyRef": { "name": "override-secret-name", "key": "mongodbConnectionString" } } },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
             "value": "true"
@@ -800,6 +815,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
             "value": "24"
@@ -850,6 +866,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -868,6 +885,8 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_URI", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "mongodbConnectionString" } } },
+          { "name": "FIFTYONE_ACTIVITY_ORG_ID", "value": "dev-internal-env" },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
             "value": "true"
@@ -892,6 +911,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
             "value": "-1"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
             "value": "24"
@@ -1393,8 +1413,19 @@ func (s *deploymentAppTemplateTest) TestContainerResourceRequirements() {
 			"defaultValues",
 			nil,
 			func(resourceRequirements corev1.ResourceRequirements) {
-				s.Equal(resourceRequirements.Limits, corev1.ResourceList{}, "Limits should be equal")
-				s.Equal(resourceRequirements.Requests, corev1.ResourceList{}, "Requests should be equal")
+				// The chart ships real fiftyone-app defaults: sized for the
+				// plugin/operator workload, with ephemeral-storage 8Gi to fit
+				// GKE Autopilot's 10Gi pod cap beside the telemetry sidecar.
+				s.Equal(corev1.ResourceList{
+					"cpu":               resource.MustParse("2"),
+					"ephemeral-storage": resource.MustParse("8Gi"),
+					"memory":            resource.MustParse("6Gi"),
+				}, resourceRequirements.Limits, "Limits should be equal")
+				s.Equal(corev1.ResourceList{
+					"cpu":               resource.MustParse("500m"),
+					"ephemeral-storage": resource.MustParse("8Gi"),
+					"memory":            resource.MustParse("512Mi"),
+				}, resourceRequirements.Requests, "Requests should be equal")
 				s.Nil(resourceRequirements.Claims, "should be nil")
 			},
 		},
@@ -1407,14 +1438,18 @@ func (s *deploymentAppTemplateTest) TestContainerResourceRequirements() {
 				"appSettings.resources.requests.memory": "512Mi",
 			},
 			func(resourceRequirements corev1.ResourceRequirements) {
+				// Per-key --set overrides merge with the chart defaults, so
+				// the ephemeral-storage default rides along.
 				resourceExpected := corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
-						"cpu":    resource.MustParse("1"),
-						"memory": resource.MustParse("1Gi"),
+						"cpu":               resource.MustParse("1"),
+						"ephemeral-storage": resource.MustParse("8Gi"),
+						"memory":            resource.MustParse("1Gi"),
 					},
 					Requests: corev1.ResourceList{
-						"cpu":    resource.MustParse("500m"),
-						"memory": resource.MustParse("512Mi"),
+						"cpu":               resource.MustParse("500m"),
+						"ephemeral-storage": resource.MustParse("8Gi"),
+						"memory":            resource.MustParse("512Mi"),
 					},
 				}
 				s.Equal(resourceExpected, resourceRequirements, "should be equal")

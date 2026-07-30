@@ -507,6 +507,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_Workflow_ACTIVITY",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -597,6 +601,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          },
+          {
+            "name": "VFF_Workflow_ACTIVITY",
+            "value": "true"
           },
           {
             "name": "AN_ADDITIONAL_SECRET_ENV",
@@ -692,6 +700,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_Workflow_ACTIVITY",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -777,6 +789,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_Workflow_ACTIVITY",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -861,6 +877,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_Workflow_ACTIVITY",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -945,6 +965,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_Workflow_ACTIVITY",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -1029,6 +1053,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_Workflow_ACTIVITY",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar

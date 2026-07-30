@@ -473,6 +473,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -532,6 +533,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
@@ -591,6 +593,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -650,6 +653,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
@@ -723,6 +727,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -782,6 +787,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
@@ -852,6 +858,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "override-secret-name", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -911,6 +918,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
@@ -969,6 +977,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -1028,6 +1037,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
@@ -1086,6 +1096,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
+          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -1145,6 +1156,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
           },
+          { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
