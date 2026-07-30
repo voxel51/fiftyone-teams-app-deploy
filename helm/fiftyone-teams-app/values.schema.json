@@ -5,8 +5,8 @@
       "description": "---------------------------------------------------------------------------\nActivity Analytics (proof / opt-in)\n\nIngest + rollup workers off a single published fiftyone-activity image, plus\nan in-cluster Redis for the fiftyone.mq queue. Disabled by default. The\nworkers write to the fiftyone_activity database on the SAME Mongo as teams\n(connection string reused from the shared secret); teams-api reads it back.\n---------------------------------------------------------------------------",
       "properties": {
         "enabled": {
-          "default": true,
-          "description": "Master toggle for the Activity workers + Redis.",
+          "default": false,
+          "description": "Master toggle for the Activity workers + Redis. OFF by default:\nthe fiftyone-activity worker image is not yet published publicly\n(the main-chart docker-pulls gate), so deployments opt in per env.",
           "title": "enabled",
           "type": "boolean"
         },

@@ -1691,8 +1691,10 @@ teamsAppSettings:
 # (connection string reused from the shared secret); teams-api reads it back.
 # -----------------------------------------------------------------------------
 activitySettings:
-  # -- Master toggle for the Activity workers + Redis.
-  enabled: true
+  # -- Master toggle for the Activity workers + Redis. OFF by default:
+  # the fiftyone-activity worker image is not yet published publicly
+  # (the main-chart docker-pulls gate), so deployments opt in per env.
+  enabled: false
   image:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
