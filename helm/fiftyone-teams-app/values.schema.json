@@ -81,6 +81,12 @@
               "title": "FIFTYONE_LOGGING_FORMAT",
               "type": "string"
             },
+            "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S": {
+              "default": 1800,
+              "description": "(int) The number of seconds to wait for service orchestrator pods to start passing their healthchecks before marking the service with an Error state.",
+              "title": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+              "type": "integer"
+            },
             "GRAPHQL_DEFAULT_LIMIT": {
               "default": 10,
               "description": "Default number of returned items when listing in GraphQL queries.\nCan be overridden in the request.",
