@@ -372,17 +372,12 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
-       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
-       co-located activity_* collections the workers write. */}}
-- name: FIFTYONE_ACTIVITY_MONGO_DB
+{{- /* Activity readers fall back to the standard FIFTYONE_DATABASE_*
+       pair (same co-located database), so the activity-specific var is
+       only set for the dedicated-DB override. */}}
 {{- if .Values.activitySettings.mongo.database }}
+- name: FIFTYONE_ACTIVITY_MONGO_DB
   value: {{ .Values.activitySettings.mongo.database | quote }}
-{{- else }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneDatabaseName
 {{- end }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
@@ -435,17 +430,12 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
-       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
-       co-located activity_* collections the workers write. */}}
-- name: FIFTYONE_ACTIVITY_MONGO_DB
+{{- /* Activity readers fall back to the standard FIFTYONE_DATABASE_*
+       pair (same co-located database), so the activity-specific var is
+       only set for the dedicated-DB override. */}}
 {{- if .Values.activitySettings.mongo.database }}
+- name: FIFTYONE_ACTIVITY_MONGO_DB
   value: {{ .Values.activitySettings.mongo.database | quote }}
-{{- else }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneDatabaseName
 {{- end }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
@@ -457,15 +447,6 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-{{- /* Activity Analytics: the workflows plugin's read operator
-       (get_workflow_activity_metrics) reads the activity event store
-       directly, so the operator-executing service needs the store's
-       connection — same secret + database the activity workers use. */}}
-- name: FIFTYONE_ACTIVITY_MONGO_URI
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: mongodbConnectionString
 {{- include "telemetry.redis-url-env" . }}
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
@@ -573,17 +554,12 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
-       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
-       co-located activity_* collections the workers write. */}}
-- name: FIFTYONE_ACTIVITY_MONGO_DB
+{{- /* Activity readers fall back to the standard FIFTYONE_DATABASE_*
+       pair (same co-located database), so the activity-specific var is
+       only set for the dedicated-DB override. */}}
 {{- if .Values.activitySettings.mongo.database }}
+- name: FIFTYONE_ACTIVITY_MONGO_DB
   value: {{ .Values.activitySettings.mongo.database | quote }}
-{{- else }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneDatabaseName
 {{- end }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
@@ -595,12 +571,6 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: encryptionKey
-{{- /* Activity Analytics read path — see the app helper above. */}}
-- name: FIFTYONE_ACTIVITY_MONGO_URI
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: mongodbConnectionString
 {{- include "telemetry.redis-url-env" . }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}

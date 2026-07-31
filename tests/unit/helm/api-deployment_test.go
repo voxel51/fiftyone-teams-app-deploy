@@ -473,7 +473,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -593,7 +592,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -727,7 +725,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -858,7 +855,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "override-secret-name", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -977,7 +973,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
@@ -1096,7 +1091,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
               }
             }
           },
-          { "name": "FIFTYONE_ACTIVITY_MONGO_DB", "valueFrom": { "secretKeyRef": { "name": "fiftyone-teams-secrets", "key": "fiftyoneDatabaseName" } } },
           {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
