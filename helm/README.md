@@ -328,35 +328,35 @@ embeddings, model evaluation, dataset import, annotation workflows) to be
 scheduled from the FiftyOne UI and executed in the background. Choose the
 mode that fits your workload:
 
-| Mode                    | Use when                                                                                | Configuration                                   |
-| ----------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| **Always-On Workers**   | Steady or unpredictable delegated-operation volume; workers should be ready immediately | `delegatedOperatorDeployments` in `values.yaml` |
-| **On-Demand Executors** | Infrequent or GPU-heavy jobs; avoid paying for idle workers                             | Kubernetes Jobs spun up per run                 |
+| Mode                    | Use when                                                                                |
+| ----------------------- | --------------------------------------------------------------------------------------- |
+| **Always-On Workers**   | Steady or unpredictable delegated-operation volume; workers should be ready immediately |
+| **On-Demand Executors** | Infrequent or GPU-heavy jobs; avoid paying for idle workers                             |
 
-For **Always-On Workers**, add the following to your `values.yaml`:
+FiftyOne Enterprise 2.14+ pre-populates a `teams-do-cpu-default` delegated
+operator `Deployment` by default. Enable **Always-On Workers** by setting
+`delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled` to
+`true` in your `values.yaml`:
 
 ```yaml
 delegatedOperatorDeployments:
   deployments:
     teamsDoCpuDefault:
       enabled: true
-      env:
-        FIFTYONE_PLUGINS_DIR: /opt/plugins
-      volumes:
-        - name: plugins-vol
-          persistentVolumeClaim:
-            claimName: teams-plugins-pvc
-            readOnly: true
-      volumeMounts:
-        - name: plugins-vol
-          mountPath: /opt/plugins
 ```
+
+To run always-on **GPU-enabled** workers instead of CPU workers, see
+[Leveraging GPU Workloads](./docs/configuring-gpu-workloads.md):
+
+- [AWS EKS](./docs/configuring-gpu-workloads.md#deploying-gpu-enabled-delegated-operator-pods-2)
+- [GKE](./docs/configuring-gpu-workloads.md#deploying-gpu-enabled-delegated-operator-pods)
+- [Azure AKS](./docs/configuring-gpu-workloads.md#deploying-gpu-enabled-delegated-operator-pods-1)
 
 For **On-Demand Executors**, see
 [Configuring On-Demand Orchestrator](../docs/configuring-on-demand-orchestrator.md)
 for setup instructions.
 
-For full always-on delegated operator configuration options, see
+For full delegated operator configuration options, see
 [Configuring Delegated Operators](./docs/configuring-delegated-operators.md).
 
 ## :rocket: Step 8: Initial Deployment
