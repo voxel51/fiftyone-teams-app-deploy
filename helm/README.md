@@ -33,8 +33,6 @@ FiftyOne Enterprise.
 
 - [:green_book: Prerequisites Skills and Knowledge](#green_book-prerequisites-skills-and-knowledge)
 - [:white_check_mark: Technical Requirements](#white_check_mark-technical-requirements)
-  - [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
-  - [Helm](#helm)
 - [:clock10: Estimated Completion Time](#clock10-estimated-completion-time)
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
 - [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-1-set-up-mongodb-database)
@@ -76,9 +74,9 @@ for the full list.
 The following technical requirements are required for a successful and
 properly secured deployment of FiftyOne Enterprise.
 
-1. [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
+1. Kubernetes Cluster and Kubectl
 
-1. [Helm](#helm)
+1. Helm
 
 1. A MongoDB Database that meets FiftyOne's
    [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
@@ -93,8 +91,6 @@ properly secured deployment of FiftyOne Enterprise.
    and
    [API high-availability](./fiftyone-teams-app/README.md#highly-available-fiftyone-teams-api-deployments)
 
-### Kubernetes Cluster And Kubectl
-
 A kubernetes cluster and `kubectl` installation are required.
 The following kubernetes/kubectl versions are required:
 
@@ -105,8 +101,6 @@ However, it is recommended to use a
 Please refer to the
 [kubernetes installation documentation](https://kubernetes.io/docs/tasks/tools/)
 for steps on installing kubernetes and kubectl.
-
-### Helm
 
 Helm version >= 3.14 is required.
 
