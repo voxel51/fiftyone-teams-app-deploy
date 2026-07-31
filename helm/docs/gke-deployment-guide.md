@@ -233,6 +233,6 @@ FiftyOne Enterprise installation at the DNS address you created
 
 Next, continue with the remaining steps in the
 [Helm README](../README.md), starting from
-[Step 7: Configure Delegated Operation Logs](../README.md#page_facing_up-step-7-configure-delegated-operation-logs)
+[Step 7: Identity Provider (IdP) and Authentication (CAS)](../README.md#step-7-identity-provider-idp-and-authentication-cas)
 (ingress/TLS is already handled by this guide),
 to finish setting up authentication and CAS.

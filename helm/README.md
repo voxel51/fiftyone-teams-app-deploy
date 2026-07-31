@@ -31,27 +31,28 @@ FiftyOne Enterprise.
 
 <!-- toc -->
 
-- [:open_file_folder: Directory Contents](#open_file_folder-directory-contents)
 - [:green_book: Prerequisites Skills and Knowledge](#green_book-prerequisites-skills-and-knowledge)
 - [:white_check_mark: Technical Requirements](#white_check_mark-technical-requirements)
+  - [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
+  - [Helm](#helm)
 - [:clock10: Estimated Completion Time](#clock10-estimated-completion-time)
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
 - [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-1-set-up-mongodb-database)
 - [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-2-prepare-license-file)
 - [:file_folder: Step 3: Choose Authentication Mode](#file_folder-step-3-choose-authentication-mode)
 - [:gear: Step 4: Configure `values.yaml`](#gear-step-4-configure-valuesyaml)
-  - [Enable Dedicated Plugins (required)](#enable-dedicated-plugins-required)
-  - [Configure Delegated Operators (required)](#configure-delegated-operators-required)
+  - [Create a Persistent Volume Claim for Shared Storage](#create-a-persistent-volume-claim-for-shared-storage)
+  - [Enable Dedicated Plugins Mode](#enable-dedicated-plugins-mode)
+  - [Choose Delegated Operator Compute](#choose-delegated-operator-compute)
 - [:rocket: Step 5: Initial Deployment](#rocket-step-5-initial-deployment)
 - [:globe_with_meridians: Step 6: Configure Ingress & TLS](#globe_with_meridians-step-6-configure-ingress--tls)
   - [:compass: Routing Overview (Path-Based Ingress)](#compass-routing-overview-path-based-ingress)
   - [:memo: Notes](#memo-notes)
-- [:page_facing_up: Step 7: Configure Delegated Operation Logs](#page_facing_up-step-7-configure-delegated-operation-logs)
-- [Step 8: Identity Provider (IdP) and Authentication (CAS)](#step-8-identity-provider-idp-and-authentication-cas)
-- [Step 9: Initial CAS Setup](#step-9-initial-cas-setup)
+- [Step 7: Identity Provider (IdP) and Authentication (CAS)](#step-7-identity-provider-idp-and-authentication-cas)
+- [Step 8: Initial CAS Setup](#step-8-initial-cas-setup)
   - [Add First Admin User](#add-first-admin-user)
   - [Enable Auto Join](#enable-auto-join)
-- [Step 10: Test End User Login](#step-10-test-end-user-login)
+- [Step 9: Test End User Login](#step-9-test-end-user-login)
 - [:books: Full Worked Example](#books-full-worked-example)
 - [Recommended Enhancements](#recommended-enhancements)
 - [Upgrades](#upgrades)
@@ -63,25 +64,6 @@ FiftyOne Enterprise.
 
 <!-- tocstop -->
 
-## :open_file_folder: Directory Contents
-
-This directory contains resources and information related to Helm deployments.
-
-- Directories
-  - `docs` contains additional documentation, including cloud-specific
-    deployment guides and configuration references.
-  - `fiftyone-teams-app` contains the Helm chart `voxel51/fiftyone-teams-app`.
-    For the full chart documentation (prerequisites, sizing, advanced
-    configuration, and the complete values reference), see
-    [`fiftyone-teams-app/README.md`](./fiftyone-teams-app/README.md).
-  - `gke-example` contains example Kubernetes resources used in the
-    [GKE Deployment Guide](./docs/gke-deployment-guide.md).
-  - `local-self-signed-example` contains resources for a local, self-signed
-    development setup.
-- Files
-  - `values.yaml` is an example of overrides for the chart's defaults for a
-    deployment.
-
 ## :green_book: Prerequisites Skills and Knowledge
 
 A successful, properly secured deployment of FiftyOne Enterprise requires
@@ -92,24 +74,66 @@ for the full list.
 
 ## :white_check_mark: Technical Requirements
 
-See the chart's
-[Technical Requirements](./fiftyone-teams-app/README.md#technical-requirements)
-for the full list of required tooling and versions (Kubernetes, `kubectl`,
-Helm, MongoDB, DNS, TLS/SSL, and optionally NFS/`ReadWriteMany` storage).
+The following technical requirements are required for a successful and
+properly secured deployment of FiftyOne Enterprise.
+
+1. [Kubernetes Cluster And Kubectl](#kubernetes-cluster-and-kubectl)
+
+1. [Helm](#helm)
+
+1. A MongoDB Database that meets FiftyOne's
+   [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+
+1. A DNS record or records for ingress.
+
+1. A TLS/SSL certificate or certificates for HTTPS ingress.
+
+1. (optional) An NFS server or `ReadWriteMany` compatible storage medium for
+   [delegated operators](./fiftyone-teams-app/README.md#builtin-delegated-operator-orchestrator),
+   [plugins](./fiftyone-teams-app/README.md#plugins),
+   and
+   [API high-availability](./fiftyone-teams-app/README.md#highly-available-fiftyone-teams-api-deployments)
+
+### Kubernetes Cluster And Kubectl
+
+A kubernetes cluster and `kubectl` installation are required.
+The following kubernetes/kubectl versions are required:
+
+Kubernetes: `>=1.31-0`
+
+However, it is recommended to use a
+[supported kubernetes version](https://kubernetes.io/releases/).
+Please refer to the
+[kubernetes installation documentation](https://kubernetes.io/docs/tasks/tools/)
+for steps on installing kubernetes and kubectl.
+
+### Helm
+
+Helm version >= 3.14 is required.
+
+Please refer to the
+[helm installation documentation](https://helm.sh/docs/intro/install/)
+for steps on installing helm.
 
 ## :clock10: Estimated Completion Time
 
 The estimated time to deploy FiftyOne Enterprise is approximately 2 hours.
-See the chart's
-[Estimated Completion Time](./fiftyone-teams-app/README.md#estimated-completion-time)
-section for details.
 
 ## :floppy_disk: Sizing
 
-See the chart's
-[Sizing](./fiftyone-teams-app/README.md#sizing)
-recommendations for MongoDB, `fiftyone-app`, `teams-api`, `teams-app`,
-`teams-cas`, dedicated plugins, and delegated operator pods.
+Voxel51 recommends the following resource sizing:
+
+- MongoDB: 4 CPU, 16GB RAM, 256GB Storage
+- FiftyOne App: 1 CPU, 6GB RAM, 1GB Storage per pod
+- Teams API: 1 CPU, 2GB RAM, 1GB Storage per pod
+- Teams App: 500 mCPU, 512MB RAM, 512MB Storage per pod
+- Teams CAS: 500 mCPU, 512MB RAM, 512MB Storage per pod
+- Delegated Operators: 8 CPU, 16GB RAM, 1GB Storage per pod
+
+Voxel51 also recommends monitoring resource consumption across
+the applications.
+Resource usage varies dramatically with operations, use cases,
+and dataset sizes.
 
 ## :wrench: Step 1: Set Up MongoDB Database
 
@@ -223,14 +247,53 @@ kubectl --namespace your-namespace-here create secret generic regcred \
 For the full list of available settings, see
 [Values](./fiftyone-teams-app/README.md#values).
 
-### Enable Dedicated Plugins (required)
+### Create a Persistent Volume Claim for Shared Storage
 
 Dedicated plugins and delegated operators (below) share a common plugin
 directory backed by a Kubernetes PersistentVolume (PV) and
-PersistentVolumeClaim (PVC). If you do not already have shared storage
-configured, see
-[Adding Shared Storage for FiftyOne Enterprise Plugins](./docs/plugins-storage.md)
-before continuing.
+PersistentVolumeClaim (PVC).
+
+```yaml
+# teams-plugins-pv-pvc.yaml
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: teams-plugins-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+    - ReadOnlyMany
+  nfs:
+    server: nfs-server
+    path: "/fiftyone_teams_app/plugins"
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: teams-plugins-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+    - ReadOnlyMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 10Gi
+```
+
+```shell
+kubectl apply -f teams-plugins-pv-pvc.yaml
+```
+
+For NFS export configuration and cloud-provider alternatives (Google
+Filestore, AWS EFS, Azure Files), see
+[Adding Shared Storage for FiftyOne Enterprise Plugins](./docs/plugins-storage.md).
+
+### Enable Dedicated Plugins Mode
 
 Add the following to your `values.yaml` to run plugins in a dedicated
 `teams-plugins` pod, isolated from `fiftyone-app`:
@@ -240,17 +303,32 @@ pluginsSettings:
   enabled: true
   env:
     FIFTYONE_PLUGINS_DIR: /opt/plugins
+  volumes:
+    - name: plugins-vol
+      persistentVolumeClaim:
+        claimName: teams-plugins-pvc
+        readOnly: true
+  volumeMounts:
+    - name: plugins-vol
+      mountPath: /opt/plugins
 
-# teams-api also requires access to the plugins directory
+# teams-api also requires read-write access to the plugins directory
 apiSettings:
   env:
     FIFTYONE_PLUGINS_DIR: /opt/plugins
+  volumes:
+    - name: plugins-vol
+      persistentVolumeClaim:
+        claimName: teams-plugins-pvc
+  volumeMounts:
+    - name: plugins-vol
+      mountPath: /opt/plugins
 ```
 
 For full configuration options, see
 [Configuring Plugins](./docs/configuring-plugins.md).
 
-### Configure Delegated Operators (required)
+### Choose Delegated Operator Compute
 
 Delegated operators allow long-running or compute-heavy tasks (computing
 embeddings, model evaluation, dataset import, annotation workflows) to be
@@ -274,7 +352,7 @@ delegatedOperatorDeployments:
       volumes:
         - name: plugins-vol
           persistentVolumeClaim:
-            claimName: plugins-pvc
+            claimName: teams-plugins-pvc
             readOnly: true
       volumeMounts:
         - name: plugins-vol
@@ -358,28 +436,7 @@ controller or load balancer.
   [GKE Deployment Guide](./docs/gke-deployment-guide.md) or the
   [AWS Deployment Guide](./docs/aws-deployment-guide.md).
 
-## :page_facing_up: Step 7: Configure Delegated Operation Logs
-
-Add the log path for delegated operation runs to your `values.yaml`:
-
-```yaml
-delegatedOperatorDeployments:
-  deployments:
-    teamsDoCpuDefault:
-      env:
-        FIFTYONE_DELEGATED_OPERATION_LOG_PATH: "gs://your-bucket/logs"
-```
-
-Logs are stored in the format:
-
-```text
-/mnt/shared/logs/do_logs/<YYYY>/<MM>/<DD>/<RUN_ID>.log
-```
-
-This is useful for auditing, debugging, or monitoring delegated operator
-executions in shared storage or cloud buckets.
-
-## Step 8: Identity Provider (IdP) and Authentication (CAS)
+## Step 7: Identity Provider (IdP) and Authentication (CAS)
 
 FiftyOne Enterprise uses a Central Authentication Service (CAS), introduced
 in v1.6, for centralized login, roles, and user management. You chose your
@@ -400,7 +457,7 @@ documentation and the
 [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 docs.
 
-## Step 9: Initial CAS Setup
+## Step 8: Initial CAS Setup
 
 1. Navigate to the CAS Super Admin UI at
    `https://<ENVIRONMENT>.fiftyone.ai/cas/configurations`.
@@ -422,7 +479,7 @@ docs.
 1. Select **Allow auto join**.
 1. Select **Save**.
 
-## Step 10: Test End User Login
+## Step 9: Test End User Login
 
 Verify the deployment's IdP setup by logging in as a regular user.
 
