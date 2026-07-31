@@ -299,8 +299,8 @@ func (s *apiRoleTemplateTest) TestRules() {
       },
       {
         "apiGroups": [""],
-        "resources": ["pods"],
-        "verbs": ["get", "list", "watch", "delete"]
+        "resources": ["pods", "services"],
+        "verbs": ["create", "get", "list", "watch", "delete"]
       },
       {
         "apiGroups": [""],

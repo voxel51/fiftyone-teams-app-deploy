@@ -1,0 +1,21 @@
+{{- $builtinServices := include "service-orchestrator.builtin-services" . }}
+{{- if ne (trim $builtinServices) "[]" -}}
+# Builtin service definitions derived from the entries under
+# `delegatedOperatorJobTemplates.serviceOrchestrators.<name>.services`.
+# teams-api mounts this file and reads it via
+# FIFTYONE_BUILTIN_SERVICES_PATH;
+# entries deep-merge by `id` onto the service definitions packaged in
+# fiftyone (fiftyone/operators/builtin_services.yaml) at reconcile time.
+# `builtin_version` must be bumped for a changed entry to re-apply to an
+# environment that already has the builtin in its config store.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "service-orchestrator.builtin-services-config-map-name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "service-orchestrator.builtin-services-config-map-labels" . | nindent 4 }}
+data:
+  builtin_services.yaml: |
+    {{- $builtinServices | nindent 4 }}
+{{- end }}

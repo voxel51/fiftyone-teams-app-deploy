@@ -29,3 +29,19 @@ func disableTelemetry(values map[string]string) map[string]string {
 	}
 	return out
 }
+
+// disableDefaultServiceOrchestrators returns a copy of the given helm
+// SetValues map that removes the chart's default serviceOrchestrators
+// entries (cpuServiceOrc, gpuServiceOrc). Use this in tests that assert
+// exact counts or the absence of orchestrator-derived resources, so the
+// shipped defaults don't skew their expectations.
+func disableDefaultServiceOrchestrators(values map[string]string) map[string]string {
+	out := map[string]string{
+		"delegatedOperatorJobTemplates.serviceOrchestrators.cpuServiceOrc": "null",
+		"delegatedOperatorJobTemplates.serviceOrchestrators.gpuServiceOrc": "null",
+	}
+	for k, v := range values {
+		out[k] = v
+	}
+	return out
+}
