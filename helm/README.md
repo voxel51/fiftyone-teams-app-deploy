@@ -41,19 +41,18 @@ FiftyOne Enterprise.
 - [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-2-prepare-license-file)
 - [:file_folder: Step 3: Choose Authentication Mode](#file_folder-step-3-choose-authentication-mode)
 - [:gear: Step 4: Configure `values.yaml`](#gear-step-4-configure-valuesyaml)
-  - [Create a Persistent Volume Claim for Shared Storage](#create-a-persistent-volume-claim-for-shared-storage)
-  - [Enable Dedicated Plugins Mode](#enable-dedicated-plugins-mode)
-  - [Choose Delegated Operator Compute](#choose-delegated-operator-compute)
-- [:rocket: Step 5: Initial Deployment](#rocket-step-5-initial-deployment)
-- [:globe_with_meridians: Step 6: Configure Ingress & TLS](#globe_with_meridians-step-6-configure-ingress--tls)
+- [:file_cabinet: Step 5: Enable Shared Storage](#file_cabinet-step-5-enable-shared-storage)
+- [:jigsaw: Step 6: Enable Dedicated Plugins Mode](#jigsaw-step-6-enable-dedicated-plugins-mode)
+- [:robot: Step 7: Configure Delegated Operators](#robot-step-7-configure-delegated-operators)
+- [:rocket: Step 8: Initial Deployment](#rocket-step-8-initial-deployment)
+- [:globe_with_meridians: Step 9: Configure Ingress & TLS](#globe_with_meridians-step-9-configure-ingress--tls)
   - [:compass: Routing Overview (Path-Based Ingress)](#compass-routing-overview-path-based-ingress)
   - [:memo: Notes](#memo-notes)
-- [Step 7: Identity Provider (IdP) and Authentication (CAS)](#step-7-identity-provider-idp-and-authentication-cas)
-- [Step 8: Initial CAS Setup](#step-8-initial-cas-setup)
+- [Step 10: Identity Provider (IdP) and Authentication (CAS)](#step-10-identity-provider-idp-and-authentication-cas)
+- [Step 11: Initial CAS Setup](#step-11-initial-cas-setup)
   - [Add First Admin User](#add-first-admin-user)
   - [Enable Auto Join](#enable-auto-join)
-- [Step 9: Test End User Login](#step-9-test-end-user-login)
-- [:books: Full Worked Example](#books-full-worked-example)
+- [Step 12: Test End User Login](#step-12-test-end-user-login)
 - [Recommended Enhancements](#recommended-enhancements)
 - [Upgrades](#upgrades)
 - [Known Issues](#known-issues)
@@ -247,7 +246,7 @@ kubectl --namespace your-namespace-here create secret generic regcred \
 For the full list of available settings, see
 [Values](./fiftyone-teams-app/README.md#values).
 
-### Create a Persistent Volume Claim for Shared Storage
+## :file_cabinet: Step 5: Enable Shared Storage
 
 Dedicated plugins and delegated operators (below) share a common plugin
 directory backed by a Kubernetes PersistentVolume (PV) and
@@ -293,7 +292,7 @@ For NFS export configuration and cloud-provider alternatives (Google
 Filestore, AWS EFS, Azure Files), see
 [Adding Shared Storage for FiftyOne Enterprise Plugins](./docs/plugins-storage.md).
 
-### Enable Dedicated Plugins Mode
+## :jigsaw: Step 6: Enable Dedicated Plugins Mode
 
 Add the following to your `values.yaml` to run plugins in a dedicated
 `teams-plugins` pod, isolated from `fiftyone-app`:
@@ -328,7 +327,7 @@ apiSettings:
 For full configuration options, see
 [Configuring Plugins](./docs/configuring-plugins.md).
 
-### Choose Delegated Operator Compute
+## :robot: Step 7: Configure Delegated Operators
 
 Delegated operators allow long-running or compute-heavy tasks (computing
 embeddings, model evaluation, dataset import, annotation workflows) to be
@@ -366,7 +365,7 @@ for setup instructions.
 For full always-on delegated operator configuration options, see
 [Configuring Delegated Operators](./docs/configuring-delegated-operators.md).
 
-## :rocket: Step 5: Initial Deployment
+## :rocket: Step 8: Initial Deployment
 
 Add the Voxel51 Helm repository and install FiftyOne Enterprise:
 
@@ -396,15 +395,16 @@ helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
 > helm diff --context 1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
 > ```
 
-Confirm all pods are running, including `teams-plugins` and your chosen
-delegated operator workers, both configured in
-[Step 4](#gear-step-4-configure-valuesyaml):
+Confirm all pods are running, including `teams-plugins` (from
+[Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode)) and your chosen
+delegated operator workers (from
+[Step 7](#robot-step-7-configure-delegated-operators)):
 
 ```shell
 kubectl get pods --namespace your-namespace-here
 ```
 
-## :globe_with_meridians: Step 6: Configure Ingress & TLS
+## :globe_with_meridians: Step 9: Configure Ingress & TLS
 
 Next, configure an **Ingress controller** and **TLS termination** in front of
 your FiftyOne Enterprise services — for example, using
@@ -436,7 +436,7 @@ controller or load balancer.
   [GKE Deployment Guide](./docs/gke-deployment-guide.md) or the
   [AWS Deployment Guide](./docs/aws-deployment-guide.md).
 
-## Step 7: Identity Provider (IdP) and Authentication (CAS)
+## Step 10: Identity Provider (IdP) and Authentication (CAS)
 
 FiftyOne Enterprise uses a Central Authentication Service (CAS), introduced
 in v1.6, for centralized login, roles, and user management. You chose your
@@ -449,7 +449,7 @@ The CAS service requires the following in your `values.yaml`:
   [Step 4](#gear-step-4-configure-valuesyaml))
 - When using path-based routing, an ingress rule for `/cas` routed to
   `teams-cas` (see
-  [Step 6](#globe_with_meridians-step-6-configure-ingress--tls))
+  [Step 9](#globe_with_meridians-step-9-configure-ingress--tls))
 
 For more detail, see the chart's
 [Central Authentication Service](./fiftyone-teams-app/README.md#central-authentication-service)
@@ -457,7 +457,7 @@ documentation and the
 [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 docs.
 
-## Step 8: Initial CAS Setup
+## Step 11: Initial CAS Setup
 
 1. Navigate to the CAS Super Admin UI at
    `https://<ENVIRONMENT>.fiftyone.ai/cas/configurations`.
@@ -479,7 +479,7 @@ docs.
 1. Select **Allow auto join**.
 1. Select **Save**.
 
-## Step 9: Test End User Login
+## Step 12: Test End User Login
 
 Verify the deployment's IdP setup by logging in as a regular user.
 
@@ -488,19 +488,12 @@ Verify the deployment's IdP setup by logging in as a regular user.
    Super Admin UI.
 1. Confirm you are redirected to the FiftyOne Enterprise home page.
 
-## :books: Full Worked Example
-
-The generic steps above apply to any Kubernetes cluster. For a complete,
-cloud-specific walkthrough that combines all of the steps above, see:
-
-- [GKE Deployment Guide](./docs/gke-deployment-guide.md)
-- [AWS Deployment Guide](./docs/aws-deployment-guide.md)
-
 ## Recommended Enhancements
 
 With dedicated plugins and delegated operators configured in
-[Step 4](#gear-step-4-configure-valuesyaml), consider these additional
-enhancements for a production-ready deployment:
+[Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode) and
+[Step 7](#robot-step-7-configure-delegated-operators), consider these
+additional enhancements for a production-ready deployment:
 
 | Enhancement | What it enables |
 | --- | --- |
