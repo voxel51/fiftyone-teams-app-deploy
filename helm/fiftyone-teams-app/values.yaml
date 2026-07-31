@@ -1645,9 +1645,9 @@ activitySettings:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- REQUIRED when enabled: the published image tag (e.g. a commit SHA).
-    # 0.0.17: op.executed registry event (server operator-run capture for the
-    # audit log). Prior (0.0.16): labels_submitted + labor_time metrics.
-    tag: "c2ec972d292376e5683afca9733fdd4c5c70ac73"
+    # 0.0.18: bounded 24h job retention (mq 0.0.5) behind the Jobs page's run
+    # strip. 0.0.17: op.executed registry event (audit-log operator capture).
+    tag: "d76cdc9a4c7f2be2d6d5ce4ac7540e61faf104d4"
     pullPolicy: IfNotPresent
   mongo:
     # -- Database for the activity_* collections. EMPTY (default) co-locates
