@@ -1694,7 +1694,8 @@ activitySettings:
   # -- Master toggle for the Activity workers + Redis. OFF by default:
   # the fiftyone-activity worker image is not yet published publicly
   # (the main-chart docker-pulls gate), so deployments opt in per env.
-  enabled: false
+  # DEPLOY-ONLY BRANCH: forced on for lanzhen1 until argocd#840 merges.
+  enabled: true
   image:
     # -- Pinned worker image published from the fiftyone-activity repo.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
