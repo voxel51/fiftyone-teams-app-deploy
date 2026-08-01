@@ -356,9 +356,6 @@ For **On-Demand Executors**, see
 [Configuring the Kubernetes On-Demand Orchestrator](../docs/orchestrators/configuring-kubernetes-orchestrator.md)
 for setup instructions.
 
-For full delegated operator configuration options, see
-[Configuring Delegated Operators](./docs/configuring-delegated-operators.md).
-
 ## :rocket: Step 8: Initial Deployment
 
 Add the Voxel51 Helm repository and install FiftyOne Enterprise:
