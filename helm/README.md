@@ -353,7 +353,7 @@ To run always-on **GPU-enabled** workers instead of CPU workers, see
 - [Azure AKS](./docs/configuring-gpu-workloads.md#deploying-gpu-enabled-delegated-operator-pods-1)
 
 For **On-Demand Executors**, see
-[Configuring On-Demand Orchestrator](../docs/configuring-on-demand-orchestrator.md)
+[Configuring the Kubernetes On-Demand Orchestrator](../docs/orchestrators/configuring-kubernetes-orchestrator.md)
 for setup instructions.
 
 For full delegated operator configuration options, see
