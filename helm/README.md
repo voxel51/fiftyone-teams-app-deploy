@@ -52,11 +52,8 @@ FiftyOne Enterprise.
   - [Enable Auto Join](#enable-auto-join)
 - [Step 12: Test End User Login](#step-12-test-end-user-login)
 - [Recommended Enhancements](#recommended-enhancements)
-  - [:desktop_computer: GPU-Scheduled Workers](#desktop_computer-gpu-scheduled-workers)
   - [:label: Agentic Labeling](#label-agentic-labeling)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
-  - [:on: Multiple Orchestrators](#on-multiple-orchestrators)
-  - [:clipboard: Custom Job Priorities](#clipboard-custom-job-priorities)
 - [Upgrades](#upgrades)
 - [Known Issues](#known-issues)
 - [Advanced Configuration](#advanced-configuration)
@@ -491,17 +488,11 @@ With dedicated plugins and delegated operators configured in
 [Step 7](#robot-step-7-configure-delegated-operators), consider these
 additional enhancements for a production-ready deployment.
 
-### :desktop_computer: GPU-Scheduled Workers
-
-*(Optional)* Schedule delegated operator pods on GPU-enabled nodes for
-compute-heavy tasks like embeddings or model evaluation. See
-[Leveraging GPU Workloads](./docs/configuring-gpu-workloads.md).
-
 ### :label: Agentic Labeling
 
 Run the builtin Agentic Labeler service (few-shot VLM inference via vLLM) on
 a dedicated GPU delegated-operator worker (see
-[GPU-Scheduled Workers](#desktop_computer-gpu-scheduled-workers) above), then
+[Leveraging GPU Workloads](./docs/configuring-gpu-workloads.md)), then
 start it from the FiftyOne Enterprise UI under `Settings -> Services`. For an
 overview of builtin services and the service orchestrator, see the
 [service orchestrator documentation](../docs/configuring-service-orchestrator.md).
@@ -526,18 +517,6 @@ delegatedOperatorDeployments:
         repository: fiftyone-cv-full-custom
         tag: v2.19.0
 ```
-
-### :on: Multiple Orchestrators
-
-*(Optional)* Register separate CPU- and GPU-targeted delegated operator
-orchestrators for mixed workloads. See
-[Configuring Delegated Operators](./docs/configuring-delegated-operators.md).
-
-### :clipboard: Custom Job Priorities
-
-*(Advanced)* Use Kubernetes PriorityClasses with on-demand delegated operator
-Jobs. See
-[Configuring the Kubernetes On-Demand Orchestrator](../docs/orchestrators/configuring-kubernetes-orchestrator.md).
 
 For step-by-step configuration instructions, see
 [Recommended Post-Installation Configuration](./docs/post-install-recommended-configuration.md).
