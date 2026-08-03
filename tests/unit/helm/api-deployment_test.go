@@ -534,6 +534,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -652,6 +656,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
+          {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
@@ -786,6 +794,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -916,6 +928,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -1033,6 +1049,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
+          {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
@@ -1152,6 +1172,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           },
           { "name": "FIFTYONE_MQ_REDIS_URL", "value": "redis://activity-redis:6379/0" },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -1175,7 +1199,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1876,7 +1900,7 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2798,7 +2822,7 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2878,6 +2902,91 @@ func (s *deploymentApiTemplateTest) TestDeploymentUpdateStrategy() {
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Strategy)
+		})
+	}
+}
+
+// TestBuiltinServicesEnvAndMount verifies how the builtin-services
+// ConfigMap reaches teams-api.
+// The file holds the service definitions derived from the
+// `delegatedOperatorJobTemplates.serviceOrchestrators.*.services` entries;
+// fiftyone deep-merges them by `id` onto the definitions it packages.
+// teams-api locates it via FIFTYONE_BUILTIN_SERVICES_PATH,
+// a volumeMount, and the ConfigMap volume —
+// present exactly when at least one service is defined.
+func (s *deploymentApiTemplateTest) TestBuiltinServicesEnvAndMount() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(podSpec corev1.PodSpec)
+	}{
+		{
+			// The chart's default gpuServiceOrc ships a service, so the
+			// env var points at the mounted file and the ConfigMap is
+			// mounted with its generated name.
+			"defaultValues",
+			nil,
+			func(podSpec corev1.PodSpec) {
+				env := map[string]string{}
+				for _, envVar := range podSpec.Containers[0].Env {
+					env[envVar.Name] = envVar.Value
+				}
+				s.Equal(
+					"/opt/builtin-services/builtin_services.yaml",
+					env["FIFTYONE_BUILTIN_SERVICES_PATH"],
+				)
+
+				mounts := map[string]string{}
+				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
+					mounts[volumeMount.Name] = volumeMount.MountPath
+				}
+				s.Equal("/opt/builtin-services", mounts["builtin-services"])
+
+				volumes := map[string]string{}
+				for _, volume := range podSpec.Volumes {
+					if volume.ConfigMap != nil {
+						volumes[volume.Name] = volume.ConfigMap.Name
+					}
+				}
+				s.Equal(
+					"fiftyone-test-fiftyone-teams-app-builtin-services",
+					volumes["builtin-services"],
+				)
+			},
+		},
+		{
+			// No services defined: no env, no mount, no volume.
+			"noServices",
+			disableDefaultServiceOrchestrators(nil),
+			func(podSpec corev1.PodSpec) {
+				for _, env := range podSpec.Containers[0].Env {
+					s.NotEqual("FIFTYONE_BUILTIN_SERVICES_PATH", env.Name)
+				}
+				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
+					s.NotEqual("builtin-services", volumeMount.Name)
+				}
+				for _, volume := range podSpec.Volumes {
+					s.NotEqual("builtin-services", volume.Name)
+				}
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec)
 		})
 	}
 }

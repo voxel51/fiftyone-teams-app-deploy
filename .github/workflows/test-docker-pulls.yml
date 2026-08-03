@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6.3.0
+      - uses: actions/setup-python@v7.0.0
       - name: Checkout voxel51/aloha-github-workflows
         uses: actions/checkout@v7
         with:

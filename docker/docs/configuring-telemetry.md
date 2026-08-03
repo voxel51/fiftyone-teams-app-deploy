@@ -122,8 +122,9 @@ docker compose --profile gpu \
         [Scaling teams-do with telemetry](#scaling-teams-do-with-telemetry)
   - `teams-do-gpu-telemetry`
     - Only with `compose.delegated-operators.gpu.yaml` and `--profile gpu`
-    - The sidecar reads GPU metrics via NVML and requires its own GPU
-      reservation.
+    - The paired sidecar for the GPU worker. Collects the same
+      CPU/memory/log metrics as any other sidecar; it does not access
+      the GPU.
 - Environment Variables
   - `FIFTYONE_TELEMETRY_REDIS_URL` environment variable is set on these services
     so the telemetry blueprint and server-sent events endpoints can read from Redis
@@ -144,6 +145,27 @@ To run without telemetry
 
 1. Add a `compose.override.yaml` that scales the
    telemetry services to zero replicas:
+
+### If your environment disallows `SYS_PTRACE`
+
+The delegated-operator sidecars add the `SYS_PTRACE` capability for additional
+`py-spy` stack sampling, enabled by default.
+If your host or Docker policy won't permit the capability, you can drop it and
+keep the rest of telemetry using the [`!reset` tag][compose-merge]
+(Docker Compose v2.24+) in a `compose.override.yaml`, with one entry per
+delegated-operator sidecar you run:
+
+```yaml
+services:
+  teams-do-telemetry:
+    cap_add: !reset []
+  # add these only when running the matching profile/overlay:
+  # teams-do-2-telemetry: {cap_add: !reset []}   # COMPOSE_PROFILES=do-2|do-3
+  # teams-do-3-telemetry: {cap_add: !reset []}   # COMPOSE_PROFILES=do-3
+  # teams-do-gpu-telemetry: {cap_add: !reset []} # compose.delegated-operators.gpu.yaml
+```
+
+[compose-merge]: https://docs.docker.com/reference/compose-file/merge/#reset-value
 
 ### Scaling teams-do with telemetry
 
@@ -225,8 +247,8 @@ All knobs live in your `.env` — see `env.template` for the full list:
 | `TEAMS_API_TARGET_NAME`            | `fiftyone-teams-api`                   | Substring used to locate the teams-api process                                                     |
 | `TEAMS_PLUGINS_TARGET_NAME`        | `hypercorn`                            | Substring used to locate the teams-plugins process                                                 |
 | `TEAMS_DO_TARGET_NAME`             | `fiftyone delegated`                   | Substring used to locate the teams-do process                                                      |
-| `NVIDIA_GPU_COUNT`                 | `1`                                    | GPU reservation for the GPU DO worker + sidecar                                                    |
-| `NVIDIA_VISIBLE_DEVICES`           | `all`                                  | Pass-through to teams-do-gpu / sidecar                                                             |
+| `NVIDIA_GPU_COUNT`                 | `1`                                    | GPU reservation for the GPU DO worker                                                              |
+| `NVIDIA_VISIBLE_DEVICES`           | `all`                                  | Pass-through to teams-do-gpu                                                                       |
 | `NVIDIA_DRIVER_CAPABILITIES`       | `compute,utility`                      | Must include `utility` so NVML is available                                                        |
 
 ## Resource limits
