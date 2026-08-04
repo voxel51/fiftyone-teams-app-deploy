@@ -222,6 +222,8 @@ Edit your `values.yaml` file (see the example
 - `casSettings.env.FIFTYONE_AUTH_MODE` — the mode chosen in
   [Step 3](#file_folder-step-3-choose-authentication-mode)
 - `teamsAppSettings.dnsName` — your ingress hostname
+- `namespace.name` — set to match your target namespace (e.g.
+  `your-namespace-here`); see the note below
 
 If you are using the Voxel51 Docker Hub registry to pull container images,
 create an image pull secret and reference it in `imagePullSecrets`:
@@ -281,7 +283,7 @@ spec:
 ```
 
 ```shell
-kubectl apply -f teams-plugins-pv-pvc.yaml
+kubectl apply -f teams-plugins-pv-pvc.yaml --namespace your-namespace-here
 ```
 
 For NFS export configuration and cloud-provider alternatives (Google
@@ -385,7 +387,9 @@ helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
 > (Voxel51 is not affiliated with the author of this plugin):
 >
 > ```shell
-> helm diff --context 1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
+> helm diff --context 1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+>   --namespace your-namespace-here \
+>   -f values.yaml
 > ```
 
 Confirm all pods are running, including `teams-plugins` (from
@@ -452,22 +456,25 @@ docs.
 
 ## Step 11: Initial CAS Setup
 
+In the steps below, `<DNS_NAME>` is the ingress hostname you set for
+`teamsAppSettings.dnsName` in [Step 4](#gear-step-4-configure-valuesyaml).
+
 1. Navigate to the CAS Super Admin UI at
-   `https://<ENVIRONMENT>.fiftyone.ai/cas/configurations`.
+   `https://<DNS_NAME>/cas/configurations`.
 1. In the **API Key** field (upper right corner), enter the value of
    `secret.fiftyone.fiftyoneAuthSecret` (from your `values.yaml`).
 
 ### Add First Admin User
 
 1. Navigate to the **Admins** tab at
-   `https://<ENVIRONMENT>.fiftyone.ai/cas/admins`.
+   `https://<DNS_NAME>/cas/admins`.
 1. Select **Add admin**.
 1. Provide **Name** and **Email**.
 1. Select **Add**.
 
 ### Enable Auto Join
 
-1. Navigate to `https://<ENVIRONMENT>.fiftyone.ai/cas/providers`.
+1. Navigate to `https://<DNS_NAME>/cas/providers`.
 1. Select **+ Edit**.
 1. Select **Allow auto join**.
 1. Select **Save**.
@@ -476,7 +483,7 @@ docs.
 
 Verify the deployment's IdP setup by logging in as a regular user.
 
-1. In a browser, open `https://<ENVIRONMENT>.fiftyone.ai`.
+1. In a browser, open `https://<DNS_NAME>`.
 1. Log in with the user credentials of the admin you created in the CAS
    Super Admin UI.
 1. Confirm you are redirected to the FiftyOne Enterprise home page.
