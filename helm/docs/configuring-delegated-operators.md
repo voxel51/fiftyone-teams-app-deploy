@@ -21,6 +21,7 @@
 - [Using `delegatedOperatorJobTemplates` for on-demand executors](#using-delegatedoperatorjobtemplates-for-on-demand-executors)
   - [Built-in Plugins](#built-in-plugins)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins)
+  - [Long-lived services with `serviceOrchestrators`](#long-lived-services-with-serviceorchestrators)
 - [Using `delegatedOperatorDeployments` for always-on executors](#using-delegatedoperatordeployments-for-always-on-executors)
   - [Built-in Plugins](#built-in-plugins-1)
   - [Shared/Dedicated Plugins](#shareddedicated-plugins-1)
@@ -227,6 +228,54 @@ In `values.yaml`, set the environment variable
 
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](../../docs/custom-plugins.md).
+
+### Long-lived services with `serviceOrchestrators`
+
+Some builtin operators run as long-lived services (always-on model
+servers) rather than as tasks that exit.
+`delegatedOperatorJobTemplates.serviceOrchestrators` declares the workers
+that host them.
+
+Entries are siblings of `jobs` and behave the same way.
+They inherit `delegatedOperatorJobTemplates.template`,
+follow the same map and list merge rules
+(see [examples](#examples)),
+and render into the same `ConfigMap`,
+mounted onto the API at `/tmp/do-targets/<NAME>.yaml`.
+
+Three things differ from `jobs`:
+
+1. The rendered manifest is a `Pod` rather than a `Job`,
+   because the service broker creates one pod per service and keeps it
+   running.
+   Job-only fields are ignored
+   (`image`, `backoffLimit`, `ttlSecondsAfterFinished`, `completions`,
+   `parallelism`, and `jobAnnotations`);
+   the broker supplies the image for each service.
+
+1. Each entry takes a `services` map naming the services it hosts.
+   A service's identity fields are derived from its map key.
+
+1. `registerOrchestrator`,
+   inherited from `template` where it defaults to `true`,
+   controls whether a post-install and post-upgrade hook registers the
+   orchestrator so it is selectable in the FiftyOne Enterprise UI.
+
+The chart ships a CPU and a GPU orchestrator:
+
+```yaml
+delegatedOperatorJobTemplates:
+  serviceOrchestrators:
+    cpuServiceOrc:
+      description: "Service orchestrator (CPU)"
+    gpuServiceOrc: {}  # requests a GPU and hosts the builtin GPU services
+```
+
+See
+[Configuring Service Orchestrators](../../docs/configuring-service-orchestrator.md)
+for the services themselves,
+their GPU requirements,
+and how to disable the GPU orchestrator on a CPU-only cluster.
 
 ## Using `delegatedOperatorDeployments` for always-on executors
 

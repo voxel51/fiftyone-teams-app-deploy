@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.23+ Service Orchestrators](#fiftyone-enterprise-v223-service-orchestrators)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Cluster Requirements](#cluster-requirements)
@@ -144,6 +145,48 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.23+ Service Orchestrators
+
+FiftyOne Enterprise v2.23.0 introduces service orchestrators: delegated-operator
+workers that host long-lived services (always-on model servers) rather than
+tasks that exit. Two builtin services ship with it, `annotation-ai` (SAM2) and
+`agentic-labeler` (few-shot VLM labeling). Both need a GPU.
+
+This upgrade changes behavior on every deployment, whether or not you intend
+to use the services:
+
+- A `post-install` and `post-upgrade` hook `Job` runs on each `helm upgrade`
+  and connects to MongoDB with the deployment's existing secrets to register
+  the orchestrators. Under ArgoCD this maps to `PostSync`.
+- The chart's two orchestrators, `cpuServiceOrc` and `gpuServiceOrc`, are
+  registered by default, so both builtin services appear under
+  `Settings -> Services`. Both are created stopped and neither starts on its
+  own.
+- `apiSettings.env.FIFTYONE_SERVICE_POD_READY_TIMEOUT_S` now defaults to
+  `1800`.
+
+`gpuServiceOrc` requests `nvidia.com/gpu` without a cloud-specific
+`nodeSelector`. On a cluster with no GPU nodes, starting a GPU service leaves
+the pod `Pending` for the full readiness timeout before the service reports an
+error. On CPU-only clusters, stop registering it:
+
+```yaml
+delegatedOperatorJobTemplates:
+  serviceOrchestrators:
+    gpuServiceOrc:
+      enabled: false
+```
+
+To set `registerOrchestrator: false` for every entry instead, including the
+`jobs` templates, override it on
+`delegatedOperatorJobTemplates.template`.
+
+See the
+[Configuring Service Orchestrators](../../docs/configuring-service-orchestrator.md)
+documentation for GPU requirements and accelerator sizing, and
+[Leveraging GPU Workloads](./configuring-gpu-workloads.md)
+for per-cloud node scheduling.
 
 #### FiftyOne Enterprise v2.22+ Multimodal Datasets
 
@@ -380,7 +423,7 @@ FiftyOne Enterprise v2.7.0 introduces numerous changes to delegated operators.
 1. The `delegatedOperatorExecutorSettings` setting in `values.yaml` has
    been deprecated in favor of `delegatedOperatorDeployments`.
    Please refer to
-   [the delegated operator documentation](./configuring-delegated-operators.md#v270)
+   [the delegated operator documentation](./configuring-delegated-operators.md#migrating-from-delegatedoperatorexecutorsettings-to-delegatedoperatordeployments)
    for migrating to the new setting.
 
 #### FiftyOne Enterprise v2.5+ Delegated Operator Changes

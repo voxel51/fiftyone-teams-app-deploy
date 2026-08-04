@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.23+ Service Orchestrators](#fiftyone-enterprise-v223-service-orchestrators)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Host Requirements](#host-requirements)
@@ -102,6 +103,39 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.23+ Service Orchestrators
+
+FiftyOne Enterprise v2.23.0 introduces service orchestrators: delegated-operator
+workers that host long-lived services (always-on model servers) rather than
+tasks that exit. Two builtin services ship with it, `annotation-ai` (SAM2) and
+`agentic-labeler` (few-shot VLM labeling). Both need a GPU.
+
+This upgrade adds a `builtin_services.yaml` bind mount to `teams-api` in
+`common-services.yaml`. `teams-api` reconciles that list at startup, so both
+services appear under `Settings -> Services`. Both are created stopped and
+neither starts on its own.
+
+The two services target different workers by default:
+
+- `annotation-ai` targets the default `teams-do` worker
+  (`delegation_target: builtin`). That worker needs GPU access before the
+  service can start, or retarget the service to a worker that has one.
+- `agentic-labeler` targets the dedicated GPU worker added by
+  `compose.agenticlabeler.yaml`, which is not part of the default `-f` set.
+
+Edit
+[builtin_services.yaml](../builtin_services.yaml)
+to add, remove, or retarget services, and bump an entry's `builtin_version`
+so a change re-applies to an environment that has already stored it.
+
+See the
+[Configuring Service Orchestrators](../../docs/configuring-service-orchestrator.md)
+documentation for the builtin services list and accelerator sizing,
+[Configuring the Agentic Labeler Service](./configuring-agentic-labeler.md)
+for the dedicated GPU worker, and
+[Leveraging GPU Workloads](./configuring-gpu-workloads.md)
+for host GPU setup.
 
 #### FiftyOne Enterprise v2.22+ Multimodal Datasets
 
@@ -503,7 +537,7 @@ Additionally,
 > (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
-> [Central Authentication Service](../README.md#central-authentication-service)
+> [Central Authentication Service](../README.md#step-7-identity-provider-idp-and-authentication-cas)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 > documentation before completing your upgrade.
