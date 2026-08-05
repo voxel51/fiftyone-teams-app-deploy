@@ -11,6 +11,18 @@ services:
     volumes:
       - plugins-vol:/opt/plugins:ro
 
+  activity-redis:
+    extends:
+      file: ../common-services.yaml
+      service: activity-redis-common
+
+  activity-worker:
+    depends_on:
+      - activity-redis
+    extends:
+      file: ../common-services.yaml
+      service: activity-worker-common
+
   teams-api:
     environment:
       FIFTYONE_PLUGINS_DIR: /opt/plugins

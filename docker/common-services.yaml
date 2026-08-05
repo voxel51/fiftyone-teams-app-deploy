@@ -17,6 +17,10 @@ services:
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_SIGNED_URL_EXPIRATION: ${FIFTYONE_SIGNED_URL_EXPIRATION:-24}
+      # Activity Analytics: where operator/annotation emits enqueue events.
+      # Emit is fire-and-forget; unset = those events simply don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://activity-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
@@ -45,6 +49,10 @@ services:
       FIFTYONE_ENV: ${FIFTYONE_ENV}
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_LOGGING_FORMAT: ${FIFTYONE_LOGGING_FORMAT:-text}
+      # Activity Analytics: teams-api hosts the domain-event bridge, which
+      # enqueues activity events here. Unset = bridged events are dropped.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://activity-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_SERVICE_POD_READY_TIMEOUT_S: ${FIFTYONE_SERVICE_POD_READY_TIMEOUT_S:-1800}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
@@ -169,6 +177,41 @@ services:
       # http_proxy: ${HTTP_PROXY_URL}
       # https_proxy: ${HTTPS_PROXY_URL}
       # no_proxy: ${NO_PROXY_LIST}
+    restart: always
+
+  # Activity Analytics: a Redis-backed queue (fiftyone.mq) carries activity
+  # events from the emitting services to the worker, which ingests them into
+  # the activity_* collections (co-located in the FiftyOne database) and
+  # maintains the rollups behind the Audit Log and Jobs pages. The workload
+  # is queue-only and lightweight; the queue drains in seconds, so Redis
+  # needs no persistence.
+  activity-redis-common:
+    image: redis:7
+    restart: always
+
+  # One container runs all four activity workers (ingest + rollup + snapshot
+  # + prune) via the combined entrypoint. MUST stay at one replica: the
+  # rollup/snapshot/prune schedulers are single-flight.
+  activity-worker-common:
+    # Published from the fiftyone-activity repo alongside each Enterprise
+    # release; keep the tag in lockstep with the other service images.
+    image: voxel51/fiftyone-activity:v2.24.0
+    command: ["fiftyone-activity-worker"]
+    environment:
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://activity-redis:6379/0}
+      FIFTYONE_ACTIVITY_MONGO_URI: ${FIFTYONE_DATABASE_URI}
+      # Co-locate the activity_* collections in the deployment's own
+      # FiftyOne database rather than a fixed shared name.
+      FIFTYONE_ACTIVITY_MONGO_DB: ${FIFTYONE_DATABASE_NAME}
+      # The snapshot worker reads the datasets database and stamps its org
+      # onto the snapshot events (rollups are tenant-scoped).
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
+      # Retention: raw events are kept 365 days by default; rollups are kept
+      # indefinitely. The size cap (10 GiB default) prunes oldest-first if a
+      # runaway emitter outpaces the TTL horizon. Override in .env.
+      FIFTYONE_ACTIVITY_RETENTION_DAYS: ${FIFTYONE_ACTIVITY_RETENTION_DAYS:-365}
+      FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES: ${FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES:-10737418240}
     restart: always
 
   teams-do-common:
