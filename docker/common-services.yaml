@@ -187,6 +187,17 @@ services:
   # needs no persistence.
   activity-redis-common:
     image: redis:7
+    # noeviction is REQUIRED for the queue: an evicting policy (like
+    # telemetry-redis's allkeys-lru) would silently drop queued jobs under
+    # memory pressure. With noeviction, writes fail loudly instead — and the
+    # emit path is best-effort, so a full queue degrades to dropped events,
+    # never to a wedged operator.
+    command:
+      - redis-server
+      - --maxmemory
+      - ${ACTIVITY_REDIS_MAXMEMORY:-200mb}
+      - --maxmemory-policy
+      - noeviction
     restart: always
 
   # One container runs all four activity workers (ingest + rollup + snapshot
