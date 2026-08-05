@@ -1658,7 +1658,12 @@ activitySettings:
     # -- Bundle an ephemeral in-cluster Redis (set false to use an external one).
     enabled: true
     image: redis:7
-    # -- Override to point at an external Redis; default targets the bundled one.
+    # -- Memory bound for the bundled Redis (runs with noeviction: a full
+    # queue rejects writes loudly rather than silently evicting jobs).
+    maxmemory: 200mb
+    # -- Override to point at an external Redis; default targets the bundled
+    # one. External instances MUST use maxmemory-policy noeviction — an
+    # evicting policy silently drops queued activity jobs.
     url: ""
   resources:
     requests:

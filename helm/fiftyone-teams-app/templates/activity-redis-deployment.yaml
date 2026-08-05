@@ -36,6 +36,17 @@ spec:
       containers:
         - name: redis
           image: {{ .Values.activitySettings.redis.image | default "redis:7" | quote }}
+          {{- /* noeviction is REQUIRED for the queue: an evicting policy
+                 would silently drop queued jobs under memory pressure.
+                 Bounded maxmemory (under the container limit) makes the
+                 failure mode a clean write rejection, not an OOM kill —
+                 and the emit path is best-effort, so a full queue degrades
+                 to dropped events, never a wedged operator. */}}
+          args:
+            - --maxmemory
+            - {{ .Values.activitySettings.redis.maxmemory | default "200mb" | quote }}
+            - --maxmemory-policy
+            - noeviction
           ports:
             - containerPort: 6379
           resources:
