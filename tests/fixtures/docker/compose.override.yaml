@@ -2,3 +2,9 @@ services:
   fiftyone-app:
     environment:
       FIFTYONE_DATABASE_ADMIN: false
+  # voxel51/fiftyone-activity publishes to Docker Hub with the 2.24.0
+  # release; until then CI substitutes an idle container so the stack can
+  # come up. Remove this override once the image exists.
+  activity-worker:
+    image: alpine:3
+    command: ["sleep", "infinity"]

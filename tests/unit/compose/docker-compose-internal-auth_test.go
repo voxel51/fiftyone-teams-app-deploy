@@ -69,6 +69,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
+				"activity-redis",
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
 				"teams-api",
@@ -84,6 +86,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
+				"activity-redis",
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
 				"teams-api",
@@ -99,6 +103,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
+				"activity-redis",
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
 				"teams-api",
@@ -116,6 +122,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
+				"activity-redis",
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
 				"teams-api",
@@ -137,6 +145,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			[]string{"gpu"},
 			[]string{
+				"activity-redis",
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
 				"teams-api",
@@ -193,6 +203,20 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 		envFiles    []string // file paths to ".env" files with additional environment variable data
 		expected    string
 	}{
+		{
+			"defaultActivityRedis",
+			"activity-redis",
+			[]string{internalAuthComposeFile},
+			s.dotEnvFiles,
+			"redis:7",
+		},
+		{
+			"defaultActivityWorker",
+			"activity-worker",
+			[]string{internalAuthComposeFile},
+			s.dotEnvFiles,
+			"voxel51/fiftyone-activity:v2.24.0",
+		},
 		{
 			"defaultFiftyoneApp",
 			"fiftyone-app",
@@ -317,6 +341,21 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 		expected    []string
 	}{
 		{
+			"defaultActivityWorker",
+			"activity-worker",
+			[]string{internalAuthComposeFile},
+			s.dotEnvFiles,
+			[]string{
+				"FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES=10737418240",
+				"FIFTYONE_ACTIVITY_MONGO_DB=fiftyone",
+				"FIFTYONE_ACTIVITY_MONGO_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_ACTIVITY_RETENTION_DAYS=365",
+				"FIFTYONE_DATABASE_NAME=fiftyone",
+				"FIFTYONE_MQ_REDIS_URL=redis://activity-redis:6379/0",
+			},
+		},
+		{
 			"defaultFiftyoneApp",
 			"fiftyone-app",
 			[]string{internalAuthComposeFile},
@@ -335,6 +374,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://activity-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
@@ -355,6 +396,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://activity-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"GRAPHQL_DEFAULT_LIMIT=10",
@@ -424,6 +467,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://activity-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
@@ -444,6 +489,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://activity-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"GRAPHQL_DEFAULT_LIMIT=10",
@@ -513,6 +560,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://activity-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
@@ -533,6 +582,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://activity-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"GRAPHQL_DEFAULT_LIMIT=10",
@@ -773,6 +824,20 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceRestart() {
 		envFiles    []string // file paths to ".env" files with additional environment variable data
 		expected    string
 	}{
+		{
+			"defaultActivityRedis",
+			"activity-redis",
+			[]string{internalAuthComposeFile},
+			s.dotEnvFiles,
+			types.RestartPolicyAlways,
+		},
+		{
+			"defaultActivityWorker",
+			"activity-worker",
+			[]string{internalAuthComposeFile},
+			s.dotEnvFiles,
+			types.RestartPolicyAlways,
+		},
 		{
 			"defaultFiftyoneApp",
 			"fiftyone-app",
