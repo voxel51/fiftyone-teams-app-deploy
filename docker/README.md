@@ -240,6 +240,7 @@ services:
 Voxel51 publishes the following private FiftyOne Enterprise images to Docker
 Hub:
 
+- `voxel51/agentic-labeler` ← Agentic Labeler service (VLM inference)
 - `voxel51/fiftyone-app`
 - `voxel51/fiftyone-app-gpt`
 - `voxel51/fiftyone-app-torch` ← for text similarity / PyTorch support
@@ -247,7 +248,7 @@ Hub:
 - `voxel51/fiftyone-teams-app`
 - `voxel51/fiftyone-teams-cas`
 - `voxel51/fiftyone-teams-cv-full` ← full CV/ML environment
-- `voxel51/fiftyone-teams-agentic-labeler` ← Agentic Labeler service (VLM inference)
+- `voxel51/telemetry-sidecar` ← supports logs and metrics throughout the deployment
 
 > :closed_lock_with_key: For access, contact your Voxel51 support team to obtain
 > Docker Hub credentials.

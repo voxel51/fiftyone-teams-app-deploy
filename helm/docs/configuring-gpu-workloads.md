@@ -217,7 +217,8 @@ which fails at model load rather than at scheduling time.
 
 The chart already sets `LD_LIBRARY_PATH` on the `annotation-ai` service
 for the
-[google GPU driver][gpu-gcp-gke-standard-cuda].
+[google GPU driver][gpu-gcp-gke-standard-cuda],
+and the `agentic-labeler` service has it built into its image.
 A service whose image does not resolve the driver libraries itself needs
 the same variable under its `entrypoint.container.env`.
 

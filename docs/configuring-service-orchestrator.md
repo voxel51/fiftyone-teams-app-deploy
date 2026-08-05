@@ -37,18 +37,18 @@ Configuration is deployment-specific:
 ## Accelerator sizing
 
 Both services need a GPU.
-A GPU reservation on Compose,
-and `nvidia.com/gpu: 1` on Kubernetes,
-express a device count and say nothing about VRAM,
+The default configurations
+(GPU reservation on Compose, and `nvidia.com/gpu: 1` on Kubernetes)
+express a device count and cannot specify VRAM requirements,
 so neither prevents a service from starting on an accelerator too small
 for its model.
-That failure surfaces as an out-of-memory error during model load rather
-than as a scheduling error.
+To prevent GPU out of memory errors,
+please note the following minimum recommended GPU requirements:
 
 | Service | Minimum accelerator | Notes |
 | --- | --- | --- |
 | `annotation-ai` | 16 GB VRAM (T4, L4) | SAM2 is a small model. |
-| `agentic-labeler` | 24 GB VRAM, Ampere or newer (L4, A10G, L40S, A100) | The Kubernetes default `gemma4-31B-qat-maxvision` config is roughly 17-20 GB of int4 weights before KV cache, and vLLM's int4 kernels require compute capability 8.0+, so a T4 is unsuitable on both counts. |
+| `agentic-labeler` | 24 GB VRAM, Ampere or newer (L4, A10G, L40S, A100) | The default `gemma4-31B-qat-maxvision` config is roughly 17-20 GB of int4 weights before KV cache, and vLLM's int4 kernels require compute capability 8.0+, so a T4 is unsuitable on both counts. |
 
 Host memory matters as much as VRAM,
 because weights are read into host memory before they reach the device.
@@ -123,7 +123,10 @@ so both builtin services appear under `Settings -> Services`
 whether or not the cluster has GPU nodes.
 Neither starts on its own.
 For the values structure, see
-[`serviceOrchestrators`](../helm/docs/configuring-delegated-operators.md#long-lived-services-with-serviceorchestrators).
+[`serviceOrchestrators`](../helm/docs/configuring-delegated-operators.md#long-lived-services-with-serviceorchestrators)
+and the default service specs in
+[`values.yaml`](../helm/fiftyone-teams-app/values.yaml)
+under `serviceOrchestrators.services`.
 
 `gpuServiceOrc` hosts both services.
 It requests one GPU through the standard Kubernetes extended resource and
@@ -134,8 +137,6 @@ resources:
   limits:
     nvidia.com/gpu: 1
   requests:
-    cpu: 2
-    memory: 12Gi
     nvidia.com/gpu: 1
 tolerations:
   - key: nvidia.com/gpu
@@ -153,7 +154,8 @@ EKS,
 GKE Standard with an existing GPU node pool,
 and on-premises GPU Operator installs.
 
-Three cases need more than the generic request:
+However, some cases require more than the generic request.
+For example:
 
 - **GKE Autopilot** rejects GPU pods that do not set
   `cloud.google.com/gke-accelerator`.
@@ -163,13 +165,6 @@ Three cases need more than the generic request:
 - **Mixed-accelerator clusters** cannot be steered by a device count.
   Pin the accelerator with a `nodeSelector` to meet the
   [minimums above](#accelerator-sizing).
-
-Because both services share `gpuServiceOrc`,
-its single `resources` block applies to whichever one is running.
-The shipped `memory` request is a floor sized for `annotation-ai`;
-raise it for `agentic-labeler`.
-To size the two independently,
-declare a second orchestrator and move one service's entry under it.
 
 ### Targeting specific GPU nodes
 
@@ -200,7 +195,8 @@ the pod `Pending` until `FIFTYONE_SERVICE_POD_READY_TIMEOUT_S` expires,
 30 minutes by default,
 before the service is marked with an error.
 On clusters that will never have GPU nodes,
-stop registering the orchestrator:
+stop registering the orchestrator,
+and delete them from the Settings -> Orchestrators UI in FiftyOne Enterprise:
 
 ```yaml
 delegatedOperatorJobTemplates:

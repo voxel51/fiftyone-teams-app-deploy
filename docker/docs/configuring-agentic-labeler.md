@@ -30,8 +30,8 @@ worker each one runs on, and accelerator sizing, see
   CPU fallback.
 - An accelerator meeting the
   [minimum for `agentic-labeler`](../../docs/configuring-service-orchestrator.md#accelerator-sizing).
-- The `voxel51/fiftyone-teams-agentic-labeler` image. Contact your Voxel51
-  support team for Docker Hub access.
+- The `voxel51/agentic-labeler` image. Contact your Voxel51 support team for
+  Docker Hub access.
 
 ## Run the worker
 
@@ -52,8 +52,9 @@ On upgrade, add the same file to your existing `down` and `up` commands (see
 
 ## Start the service
 
-The service is created stopped. In the FiftyOne Enterprise UI, go to
-`Settings -> Services` and start `agentic-labeler`.
+Once the service is running at the Docker Compose-level, the service also
+needs to be started within FiftyOne Enterprise. In the FiftyOne Enterprise
+UI, go to `Settings -> Services` and start `agentic-labeler`.
 
 The model loads into GPU memory and needs substantial host RAM. Size the host
 accordingly. An undersized `memory` limit is OOM-killed during inference.

@@ -19,7 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
-    - [FiftyOne Enterprise v2.23+ Service Orchestrators](#fiftyone-enterprise-v223-service-orchestrators)
+    - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Cluster Requirements](#cluster-requirements)
@@ -146,16 +146,21 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
-#### FiftyOne Enterprise v2.23+ Service Orchestrators
+#### FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration
 
 FiftyOne Enterprise v2.23.0 introduces service orchestrators: delegated-operator
 workers that host long-lived services (always-on model servers) rather than
 tasks that exit. Two builtin services ship with it, `annotation-ai` (SAM2) and
 `agentic-labeler` (few-shot VLM labeling). Both need a GPU.
 
-This upgrade changes behavior on every deployment, whether or not you intend
-to use the services:
+Please note the following changes to the deployment:
 
+- All orchestrators defined as keys under
+  `delegatedOperatorJobTemplates.jobs` and
+  `delegatedOperatorJobTemplates.serviceOrchestrators` are now registered
+  automatically, and are available within FiftyOne Enterprise *without* the
+  [manual registration process](../../docs/orchestrators/configuring-kubernetes-orchestrator.md)
+  that was previously required.
 - A `post-install` and `post-upgrade` hook `Job` runs on each `helm upgrade`
   and connects to MongoDB with the deployment's existing secrets to register
   the orchestrators. Under ArgoCD this maps to `PostSync`.
@@ -163,8 +168,6 @@ to use the services:
   registered by default, so both builtin services appear under
   `Settings -> Services`. Both are created stopped and neither starts on its
   own.
-- `apiSettings.env.FIFTYONE_SERVICE_POD_READY_TIMEOUT_S` now defaults to
-  `1800`.
 
 `gpuServiceOrc` requests `nvidia.com/gpu` without a cloud-specific
 `nodeSelector`. On a cluster with no GPU nodes, starting a GPU service leaves

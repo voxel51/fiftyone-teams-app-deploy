@@ -27,6 +27,64 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.23+
+
+#### Service Orchestrators and Auto-registration
+
+FiftyOne Enterprise 2.23+ introduces service orchestrators, delegated-operator
+workers that host long-lived services (always-on model servers) rather than
+tasks that exit.
+Two builtin services ship with it, `annotation-ai` (SAM2) and
+`agentic-labeler` (few-shot VLM labeling), and both need a GPU.
+
+Orchestrators defined under `delegatedOperatorJobTemplates.jobs` and
+`delegatedOperatorJobTemplates.serviceOrchestrators` are now registered
+automatically by a `post-install` and `post-upgrade` hook `Job`, replacing the
+manual registration previously required.
+The chart's `cpuServiceOrc` and `gpuServiceOrc` are registered by default, so
+both builtin services appear in the FiftyOne Enterprise UI, created stopped.
+On clusters without GPU nodes, disable the GPU orchestrator.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
+for what changes on upgrade, and
+[configuring service orchestrators](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-service-orchestrator.md)
+for GPU requirements and accelerator sizing.
+
+### Version 2.22+
+
+#### Multimodal Datasets
+
+FiftyOne Enterprise 2.22+ introduces multimodal dataset support, storing large
+modalities as Parquet-backed Iceberg tables rather than as fields on the sample
+document, ingested and compacted by a background delegated-operator pipeline.
+
+This requires the `VFF_MULTIMODAL` feature flag on several components, along
+with additional `ephemeral-storage` for delegated-operator workloads and
+additional memory for `fiftyone-app`.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v222-multimodal-datasets)
+for the required configuration, and
+[configuring multimodal datasets](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-multimodal.md)
+for full details.
+
+### Version 2.19+
+
+#### Telemetry Sidecars
+
+FiftyOne Enterprise 2.19+ adds observability features viewable by admins
+directly in the FiftyOne UI.
+These are powered by a `telemetry-sidecar` container injected into the
+`teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator workloads,
+plus an in-cluster Redis `Deployment` and `Service` that buffers the streamed
+metrics and logs.
+
+Telemetry is enabled by default and increases the resources a default deploy
+requires by roughly `850m` CPU and `2Gi` memory.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v219-telemetry-sidecars)
+for the resource impact, cluster requirements, pointing at an external Redis,
+and how to opt out.
+
 ### Version 2.16+
 
 #### Additional Cloud Credential HTTP Endpoints
@@ -99,6 +157,18 @@ appSettings:
   env:
     FIFTYONE_DATABASE_ADMIN: true
 ```
+
+### Version 2.8+ `initContainer` Changes
+
+FiftyOne Enterprise v2.8.2 introduces changes to the default settings for each
+component's `initContainers`.
+They now default to a container security context that prevents privilege
+escalation and runs the initialization processes as a non-root user (UID 1000),
+and to small resource requests and limits (`10m` CPU and `128Mi` memory)
+instead of a cluster's defaults.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v28-initcontainer-changes)
+for the new default values.
 
 ### Version 2.7+ Delegated Operator Changes
 
