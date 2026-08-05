@@ -479,12 +479,13 @@ Upgrade your deployment via `helm upgrade` and wait for the
 
 The chart's `gpuServiceOrc`
 [service orchestrator](../../docs/configuring-service-orchestrator.md)
-already carries the resource request and the toleration that EKS GPU
-nodes use,
+already carries the `nvidia.com/gpu` request and the toleration that EKS
+GPU nodes use,
 so no scheduling changes are required beyond having GPU nodes that
 advertise `nvidia.com/gpu`.
 
-Raise the memory request when running a larger model,
+The chart sets no cpu or memory request on the orchestrator, so set them
+for the model you intend to run,
 and add a `nodeSelector` on a cluster with more than one instance type
 so the pod lands on an accelerator that meets the
 [minimum for the service](../../docs/configuring-service-orchestrator.md#accelerator-sizing):

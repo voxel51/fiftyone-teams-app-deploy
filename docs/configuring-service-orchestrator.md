@@ -52,10 +52,11 @@ please note the following minimum recommended GPU requirements:
 
 Host memory matters as much as VRAM,
 because weights are read into host memory before they reach the device.
-Size it with the
-[Kubernetes resource requests](#gpu-requirements)
-or the
-[Compose worker requirements](../docker/docs/configuring-agentic-labeler.md#requirements).
+On Kubernetes the chart sets no cpu or memory request on the
+orchestrator, so
+[set them for the model you run](#gpu-requirements).
+On Compose, size the host itself; see the
+[worker requirements](../docker/docs/configuring-agentic-labeler.md#requirements).
 
 ## Docker Compose
 
@@ -165,6 +166,33 @@ For example:
 - **Mixed-accelerator clusters** cannot be steered by a device count.
   Pin the accelerator with a `nodeSelector` to meet the
   [minimums above](#accelerator-sizing).
+
+The chart also sets no cpu or memory request on `gpuServiceOrc`,
+so a service pod is placed on GPU availability alone.
+Consider setting both:
+a pod with no memory request is an early eviction candidate under node
+memory pressure,
+the cluster autoscaler has nothing to size a node from when scaling up
+for a service,
+and a namespace with a `LimitRange` or `ResourceQuota` that requires
+requests will reject the pod outright.
+
+```yaml
+delegatedOperatorJobTemplates:
+  serviceOrchestrators:
+    gpuServiceOrc:
+      resources:
+        requests:
+          cpu: 2        # Modify For Your Needs
+          memory: 12Gi  # Modify For Your Needs
+```
+
+Leaving the memory limit unset avoids OOMKilling a model server that
+grows past its request.
+Both services share `gpuServiceOrc`,
+so one `resources` block covers whichever service is running.
+To size them independently,
+declare a second orchestrator and move one service's entry under it.
 
 ### Targeting specific GPU nodes
 

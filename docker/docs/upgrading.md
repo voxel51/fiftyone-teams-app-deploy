@@ -124,6 +124,13 @@ The two services target different workers by default:
 - `agentic-labeler` targets the dedicated GPU worker added by
   `compose.agenticlabeler.yaml`, which is not part of the default `-f` set.
 
+> **NOTE**: `compose.agenticlabeler.yaml` initially referenced
+> `voxel51/fiftyone-teams-agentic-labeler`, which is not a published image, so
+> the worker could not pull it. The published name is `voxel51/agentic-labeler`,
+> which the Helm chart already used. If you copied that file or pinned the image
+> in an override, correct the name and confirm your Docker Hub credentials grant
+> access to that repository.
+
 Edit
 [builtin_services.yaml](../builtin_services.yaml)
 to add, remove, or retarget services, and bump an entry's `builtin_version`
