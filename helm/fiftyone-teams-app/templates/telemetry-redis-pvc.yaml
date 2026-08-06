@@ -1,0 +1,20 @@
+{{- if and .Values.telemetry.enabled (not .Values.telemetry.redis.external.url) }}
+{{- if and .Values.telemetry.redis.persistence.enabled (not .Values.telemetry.redis.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "telemetry.redis.name" . }}-data
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "telemetry.redis.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- with .Values.telemetry.redis.persistence.storageClass }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.telemetry.redis.persistence.size | default "1Gi" }}
+{{- end }}
+{{- end }}

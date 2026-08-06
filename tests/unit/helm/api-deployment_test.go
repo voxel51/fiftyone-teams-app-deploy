@@ -96,7 +96,7 @@ func (s *deploymentApiTemplateTest) TestMetadataLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -137,7 +137,7 @@ func (s *deploymentApiTemplateTest) TestMetadataName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -175,7 +175,7 @@ func (s *deploymentApiTemplateTest) TestMetadataNamespace() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -221,7 +221,7 @@ func (s *deploymentApiTemplateTest) TestReplicas() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -380,7 +380,7 @@ func (s *deploymentApiTemplateTest) TestTopologySpreadConstraints() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -399,8 +399,13 @@ func (s *deploymentApiTemplateTest) TestContainerCount() {
 	}{
 		{
 			"defaultValues",
-			nil,
+			map[string]string{"telemetry.enabled": "false"},
 			1,
+		},
+		{
+			"telemetryEnabled",
+			map[string]string{"telemetry.enabled": "true"},
+			2, // main + telemetry-sidecar
 		},
 	}
 
@@ -411,7 +416,7 @@ func (s *deploymentApiTemplateTest) TestContainerCount() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -526,6 +531,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
+          },
+          {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
@@ -644,6 +653,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
+          },
+          {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
@@ -778,6 +791,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -907,6 +924,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -1022,6 +1043,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_LOGGING_FORMAT",
             "value": "text"
+          },
+          {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
           },
           {
             "name": "GRAPHQL_DEFAULT_LIMIT",
@@ -1141,6 +1166,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "text"
           },
           {
+            "name": "FIFTYONE_SERVICE_POD_READY_TIMEOUT_S",
+            "value": "1800"
+          },
+          {
             "name": "GRAPHQL_DEFAULT_LIMIT",
             "value": "10"
           },
@@ -1164,7 +1193,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1226,7 +1255,7 @@ func (s *deploymentApiTemplateTest) TestContainerImage() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1264,7 +1293,7 @@ func (s *deploymentApiTemplateTest) TestContainerImagePullPolicy() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1303,7 +1332,7 @@ func (s *deploymentApiTemplateTest) TestContainerName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1392,7 +1421,7 @@ func (s *deploymentApiTemplateTest) TestContainerLivenessProbe() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1455,7 +1484,7 @@ func (s *deploymentApiTemplateTest) TestContainerPorts() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1544,7 +1573,7 @@ func (s *deploymentApiTemplateTest) TestContainerReadinessProbe() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1633,7 +1662,7 @@ func (s *deploymentApiTemplateTest) TestContainerStartupProbe() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1691,7 +1720,7 @@ func (s *deploymentApiTemplateTest) TestContainerResourceRequirements() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1745,7 +1774,7 @@ func (s *deploymentApiTemplateTest) TestContainerSecurityContext() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1865,7 +1894,7 @@ func (s *deploymentApiTemplateTest) TestContainerVolumeMounts() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1903,7 +1932,7 @@ func (s *deploymentApiTemplateTest) TestInitContainerCount() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1942,7 +1971,7 @@ func (s *deploymentApiTemplateTest) TestInitContainerImage() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -1994,7 +2023,7 @@ func (s *deploymentApiTemplateTest) TestInitContainerCommand() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2067,7 +2096,7 @@ func (s *deploymentApiTemplateTest) TestInitContainerResourceRequirements() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2128,7 +2157,7 @@ func (s *deploymentApiTemplateTest) TestInitContainerSecurityContext() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2195,7 +2224,7 @@ func (s *deploymentApiTemplateTest) TestAffinity() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2233,7 +2262,7 @@ func (s *deploymentApiTemplateTest) TestImagePullSecrets() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2277,7 +2306,7 @@ func (s *deploymentApiTemplateTest) TestNodeSelector() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2320,7 +2349,7 @@ func (s *deploymentApiTemplateTest) TestDeploymentAnnotations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2367,7 +2396,7 @@ func (s *deploymentApiTemplateTest) TestPodAnnotations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2395,11 +2424,11 @@ func (s *deploymentApiTemplateTest) TestPodSecurityContext() {
 			"defaultValues",
 			nil,
 			func(podSecurityContext *corev1.PodSecurityContext) {
-				s.Nil(podSecurityContext.FSGroup, "should be nil")
+				s.Equal(int64(1000), *podSecurityContext.FSGroup, "fsGroup should be 1000 (image UID)")
+				s.Equal(int64(1000), *podSecurityContext.RunAsGroup, "runAsGroup should be 1000")
+				s.True(*podSecurityContext.RunAsNonRoot, "runAsNonRoot should be true")
+				s.Equal(int64(1000), *podSecurityContext.RunAsUser, "runAsUser should be 1000")
 				s.Nil(podSecurityContext.FSGroupChangePolicy, "should be nil")
-				s.Nil(podSecurityContext.RunAsGroup, "should be nil")
-				s.Nil(podSecurityContext.RunAsNonRoot, "should be nil")
-				s.Nil(podSecurityContext.RunAsUser, "should be nil")
 				s.Nil(podSecurityContext.SeccompProfile, "should be nil")
 				s.Nil(podSecurityContext.SELinuxOptions, "should be nil")
 				s.Nil(podSecurityContext.SupplementalGroups, "should be nil")
@@ -2429,7 +2458,7 @@ func (s *deploymentApiTemplateTest) TestPodSecurityContext() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2504,7 +2533,7 @@ func (s *deploymentApiTemplateTest) TestTemplateLabels() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2575,7 +2604,7 @@ func (s *deploymentApiTemplateTest) TestServiceAccountName() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2631,7 +2660,7 @@ func (s *deploymentApiTemplateTest) TestTolerations() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2787,7 +2816,7 @@ func (s *deploymentApiTemplateTest) TestVolumes() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2860,13 +2889,98 @@ func (s *deploymentApiTemplateTest) TestDeploymentUpdateStrategy() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: testCase.values}
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
 			helm.UnmarshalK8SYaml(subT, output, &deployment)
 
 			testCase.expected(deployment.Spec.Strategy)
+		})
+	}
+}
+
+// TestBuiltinServicesEnvAndMount verifies how the builtin-services
+// ConfigMap reaches teams-api.
+// The file holds the service definitions derived from the
+// `delegatedOperatorJobTemplates.serviceOrchestrators.*.services` entries;
+// fiftyone deep-merges them by `id` onto the definitions it packages.
+// teams-api locates it via FIFTYONE_BUILTIN_SERVICES_PATH,
+// a volumeMount, and the ConfigMap volume —
+// present exactly when at least one service is defined.
+func (s *deploymentApiTemplateTest) TestBuiltinServicesEnvAndMount() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected func(podSpec corev1.PodSpec)
+	}{
+		{
+			// The chart's default gpuServiceOrc ships a service, so the
+			// env var points at the mounted file and the ConfigMap is
+			// mounted with its generated name.
+			"defaultValues",
+			nil,
+			func(podSpec corev1.PodSpec) {
+				env := map[string]string{}
+				for _, envVar := range podSpec.Containers[0].Env {
+					env[envVar.Name] = envVar.Value
+				}
+				s.Equal(
+					"/opt/builtin-services/builtin_services.yaml",
+					env["FIFTYONE_BUILTIN_SERVICES_PATH"],
+				)
+
+				mounts := map[string]string{}
+				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
+					mounts[volumeMount.Name] = volumeMount.MountPath
+				}
+				s.Equal("/opt/builtin-services", mounts["builtin-services"])
+
+				volumes := map[string]string{}
+				for _, volume := range podSpec.Volumes {
+					if volume.ConfigMap != nil {
+						volumes[volume.Name] = volume.ConfigMap.Name
+					}
+				}
+				s.Equal(
+					"fiftyone-test-fiftyone-teams-app-builtin-services",
+					volumes["builtin-services"],
+				)
+			},
+		},
+		{
+			// No services defined: no env, no mount, no volume.
+			"noServices",
+			disableDefaultServiceOrchestrators(nil),
+			func(podSpec corev1.PodSpec) {
+				for _, env := range podSpec.Containers[0].Env {
+					s.NotEqual("FIFTYONE_BUILTIN_SERVICES_PATH", env.Name)
+				}
+				for _, volumeMount := range podSpec.Containers[0].VolumeMounts {
+					s.NotEqual("builtin-services", volumeMount.Name)
+				}
+				for _, volume := range podSpec.Volumes {
+					s.NotEqual("builtin-services", volume.Name)
+				}
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			testCase.expected(deployment.Spec.Template.Spec)
 		})
 	}
 }

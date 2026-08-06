@@ -25,3 +25,33 @@ services:
     extends:
       file: ../common-services.yaml
       service: teams-cas-common
+
+  telemetry-redis:
+    extends:
+      file: ../common-services.yaml
+      service: telemetry-redis-common
+
+  fiftyone-app-telemetry:
+    extends:
+      file: ../common-services.yaml
+      service: fiftyone-app-telemetry-common
+    depends_on:
+      fiftyone-app:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+
+  teams-api-telemetry:
+    extends:
+      file: ../common-services.yaml
+      service: teams-api-telemetry-common
+    depends_on:
+      teams-api:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+
+volumes:
+  telemetry-redis-data:

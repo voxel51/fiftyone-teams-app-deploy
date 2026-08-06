@@ -23,6 +23,11 @@ spec:
     spec:
       restartPolicy: Never
       serviceAccountName: fiftyone-teams
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
         - name: executor
           image: "voxel51/fiftyone-teams-cv-full:v{{CHART_VERSION}}"
