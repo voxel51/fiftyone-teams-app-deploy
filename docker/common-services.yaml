@@ -179,19 +179,19 @@ services:
       # no_proxy: ${NO_PROXY_LIST}
     restart: always
 
-  # Activity Analytics: a Redis-backed queue (fiftyone.mq) carries activity
-  # events from the emitting services to the worker, which ingests them into
-  # the activity_* collections (co-located in the FiftyOne database) and
-  # maintains the rollups behind the Audit Log and Jobs pages. The workload
-  # is queue-only and lightweight; the queue drains in seconds, so Redis
-  # needs no persistence.
+  # Redis-backed queue (fiftyone.mq) for Activity Analytics events.
+  # Emitting services enqueue here. The activity worker consumes.
+  # The worker writes the activity_* collections in the FiftyOne database
+  # and maintains the rollups behind the Audit Log and Jobs pages.
+  # The queue is transient. Redis runs without persistence.
+  # See docker/docs/configuring-activity-analytics.md.
   fiftyone-mq-redis-common:
     image: redis:7
-    # noeviction is REQUIRED for the queue: an evicting policy (like
-    # telemetry-redis's allkeys-lru) would silently drop queued jobs under
-    # memory pressure. With noeviction, writes fail loudly instead — and the
-    # emit path is best-effort, so a full queue degrades to dropped events,
-    # never to a wedged operator.
+    # The queue requires `maxmemory-policy noeviction`.
+    # An evicting policy (such as telemetry-redis's allkeys-lru) silently
+    # drops queued jobs under memory pressure.
+    # With noeviction, writes fail loudly and the best-effort emit path
+    # degrades to dropped events.
     command:
       - redis-server
       - --maxmemory
@@ -200,12 +200,14 @@ services:
       - noeviction
     restart: always
 
-  # One container runs all four activity workers (ingest + rollup + snapshot
-  # + prune) via the combined entrypoint. MUST stay at one replica: the
-  # rollup/snapshot/prune schedulers are single-flight.
+  # One container runs all four activity workers (ingest, rollup, snapshot,
+  # prune) via the combined entrypoint.
+  # Keep this service at one replica.
+  # The rollup, snapshot, and prune schedulers are single-flight.
+  # See docker/docs/configuring-activity-analytics.md.
   activity-worker-common:
-    # Published from the fiftyone-activity repo alongside each Enterprise
-    # release; keep the tag in lockstep with the other service images.
+    # Published from the fiftyone-activity repo with each Enterprise release.
+    # Keep the tag in lockstep with the other service images.
     image: voxel51/fiftyone-activity:v2.24.0
     command: ["fiftyone-activity-worker"]
     environment:
@@ -214,13 +216,13 @@ services:
       # Co-locate the activity_* collections in the deployment's own
       # FiftyOne database rather than a fixed shared name.
       FIFTYONE_ACTIVITY_MONGO_DB: ${FIFTYONE_DATABASE_NAME}
-      # The snapshot worker reads the datasets database and stamps its org
-      # onto the snapshot events (rollups are tenant-scoped).
+      # The snapshot worker reads the datasets database.
+      # It stamps its org onto the snapshot events. Rollups are tenant-scoped.
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
-      # Retention: raw events are kept 365 days by default; rollups are kept
-      # indefinitely. The size cap (10 GiB default) prunes oldest-first if a
-      # runaway emitter outpaces the TTL horizon. Override in .env.
+      # Raw events are kept 365 days by default. Rollups are kept indefinitely.
+      # The size cap (10 GiB default) prunes oldest-first.
+      # Override both in .env.
       FIFTYONE_ACTIVITY_RETENTION_DAYS: ${FIFTYONE_ACTIVITY_RETENTION_DAYS:-365}
       FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES: ${FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES:-10737418240}
     restart: always
