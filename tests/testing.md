@@ -90,12 +90,16 @@ tag (found at the top of the test file).
       -tags unit \
       plugins-service_test.go \
       common_test.go \
+      yaml_helpers.go \
+      k8s_helpers.go \
       chartInfo.go \
       -testify.m '^(TestMetadataLabels|)$'
     ```
 
-    > **Note:** Include the files `common_test.go` and `chartInfo.go`
-    > to avoid `undefined` errors for `chartPath` and `chartInfo`
+    > **Note:** Include the files `common_test.go`, `yaml_helpers.go`,
+    > `k8s_helpers.go`, and `chartInfo.go` to avoid `undefined` errors for
+    > `chartPath`, `chartInfo`,`disableTelemetry`, `disableDefaultServiceOrchestrators`,
+    > `findContainer`, `findVolume`, and`findVolumeMount`.
     > **Note:** We pass `-count=1` to disable test caching.
 
 ### Writing Unit Tests
