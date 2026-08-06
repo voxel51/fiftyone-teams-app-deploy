@@ -373,13 +373,8 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Points activity reads at the per-deployment FiftyOne database,
-       where the workers write the activity_* collections. */}}
-- name: FIFTYONE_ACTIVITY_MONGO_DB
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneDatabaseName
+{{- include "activity.mongo-db-env" . }}
+{{- include "activity.org-id-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -436,13 +431,8 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Points activity reads at the per-deployment FiftyOne database,
-       where the workers write the activity_* collections. */}}
-- name: FIFTYONE_ACTIVITY_MONGO_DB
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneDatabaseName
+{{- include "activity.mongo-db-env" . }}
+{{- include "activity.org-id-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -561,13 +551,8 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Points activity reads at the per-deployment FiftyOne database,
-       where the workers write the activity_* collections. */}}
-- name: FIFTYONE_ACTIVITY_MONGO_DB
-  valueFrom:
-    secretKeyRef:
-      name: {{ $secretName }}
-      key: fiftyoneDatabaseName
+{{- include "activity.mongo-db-env" . }}
+{{- include "activity.org-id-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:

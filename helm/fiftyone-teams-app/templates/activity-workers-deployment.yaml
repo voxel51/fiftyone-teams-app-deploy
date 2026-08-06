@@ -74,7 +74,7 @@ spec:
                   name: {{ $.Values.secret.name }}
                   key: fiftyoneDatabaseName
             - name: FIFTYONE_ACTIVITY_ORG_ID
-              value: {{ $a.orgId | default $.Values.appSettings.env.FIFTYONE_ACTIVITY_ORG_ID | quote }}
+              value: {{ $a.orgId | quote }}
             {{- if $a.snapshotIntervalMs }}
             - name: FIFTYONE_ACTIVITY_SNAPSHOT_INTERVAL_MS
               value: {{ $a.snapshotIntervalMs | quote }}
