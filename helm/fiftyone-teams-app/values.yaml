@@ -1913,3 +1913,11 @@ activitySettings:
       # Single-flight: it owns the repeatable snapshot schedule, and a double
       # snapshot in one bucket would be a duplicate point.
       recreate: true
+    prune:
+      command: ["fiftyone-activity-prune-worker"]
+      replicaCount: 1
+      # Single-flight: it owns the repeatable daily prune schedule. Without
+      # this Deployment the storage size cap is never enforced — the TTL still
+      # ages events out by time, but nothing bounds activity_events by BYTES,
+      # so a burst can grow the collection past its budget unchecked.
+      recreate: true
