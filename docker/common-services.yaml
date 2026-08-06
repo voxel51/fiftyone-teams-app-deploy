@@ -19,7 +19,7 @@ services:
       FIFTYONE_SIGNED_URL_EXPIRATION: ${FIFTYONE_SIGNED_URL_EXPIRATION:-24}
       # Activity Analytics: where operator/annotation emits enqueue events.
       # Emit is fire-and-forget; unset = those events simply don't flow.
-      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://activity-redis:6379/0}
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
       FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       # If you are routing through a proxy server you will want to set
@@ -51,7 +51,7 @@ services:
       FIFTYONE_LOGGING_FORMAT: ${FIFTYONE_LOGGING_FORMAT:-text}
       # Activity Analytics: teams-api hosts the domain-event bridge, which
       # enqueues activity events here. Unset = bridged events are dropped.
-      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://activity-redis:6379/0}
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
       FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_SERVICE_POD_READY_TIMEOUT_S: ${FIFTYONE_SERVICE_POD_READY_TIMEOUT_S:-1800}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
@@ -185,7 +185,7 @@ services:
   # maintains the rollups behind the Audit Log and Jobs pages. The workload
   # is queue-only and lightweight; the queue drains in seconds, so Redis
   # needs no persistence.
-  activity-redis-common:
+  fiftyone-mq-redis-common:
     image: redis:7
     # noeviction is REQUIRED for the queue: an evicting policy (like
     # telemetry-redis's allkeys-lru) would silently drop queued jobs under
@@ -209,7 +209,7 @@ services:
     image: voxel51/fiftyone-activity:v2.24.0
     command: ["fiftyone-activity-worker"]
     environment:
-      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://activity-redis:6379/0}
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
       FIFTYONE_ACTIVITY_MONGO_URI: ${FIFTYONE_DATABASE_URI}
       # Co-locate the activity_* collections in the deployment's own
       # FiftyOne database rather than a fixed shared name.

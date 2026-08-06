@@ -9,14 +9,14 @@ services:
       file: ../common-services.yaml
       service: fiftyone-app-common
 
-  activity-redis:
+  fiftyone-mq-redis:
     extends:
       file: ../common-services.yaml
-      service: activity-redis-common
+      service: fiftyone-mq-redis-common
 
   activity-worker:
     depends_on:
-      - activity-redis
+      - fiftyone-mq-redis
     extends:
       file: ../common-services.yaml
       service: activity-worker-common
