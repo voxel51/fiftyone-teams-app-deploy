@@ -195,7 +195,7 @@ services:
     command:
       - redis-server
       - --maxmemory
-      - ${ACTIVITY_REDIS_MAXMEMORY:-200mb}
+      - ${FIFTYONE_MQ_REDIS_MAXMEMORY:-200mb}
       - --maxmemory-policy
       - noeviction
     restart: always

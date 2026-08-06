@@ -41,12 +41,12 @@ succeeds. An unset `FIFTYONE_MQ_REDIS_URL` means no events flow.
 One `activity-worker` container runs four workers via the combined
 `fiftyone-activity-worker` entrypoint:
 
-| Worker   | Responsibility                                            |
-| -------- | --------------------------------------------------------- |
-| ingest   | Drains the queue into the raw `activity_*` collections    |
-| rollup   | Aggregates raw events into the rollups the app reads      |
-| snapshot | Periodically records dataset and deployment state         |
-| prune    | Enforces the retention window and the storage size cap    |
+| Worker   | Responsibility                                         |
+| -------- | ------------------------------------------------------ |
+| ingest   | Drains the queue into the raw `activity_*` collections |
+| rollup   | Aggregates raw events into the rollups the app reads   |
+| snapshot | Periodically records dataset and deployment state      |
+| prune    | Enforces the retention window and the storage size cap |
 
 ## Default deployment
 
@@ -67,13 +67,13 @@ files are overlays and inherit them from whichever base file you use.
 Set these in your `.env` file. See the Activity Analytics section of
 `env.template` for the same list with defaults.
 
-| Variable                              | Default                              | Description                                                                       |
-| ------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------- |
-| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                                | Organization id that activity events are scoped by. Set it for single-org deployments. |
-| `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0`   | Queue connection string. Point it at an external Redis to replace the bundled service. |
-| `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                                | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry. |
-| `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES` | `10737418240`                        | Size cap on raw events. The prune worker removes oldest-first when exceeded. `0` disables. |
-| `ACTIVITY_REDIS_MAXMEMORY`            | `200mb`                              | `maxmemory` for the bundled queue Redis. Raise it if the queue backs up under load. |
+| Variable                              | Default                            | Description                                                                                |
+| ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------ |
+| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id that activity events are scoped by. Set it for single-org deployments.     |
+| `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0` | Queue connection string. Point it at an external Redis to replace the bundled service.     |
+| `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                              | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry.       |
+| `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES` | `10737418240`                      | Size cap on raw events. The prune worker removes oldest-first when exceeded. `0` disables. |
+| `FIFTYONE_MQ_REDIS_MAXMEMORY`         | `200mb`                            | `maxmemory` for the bundled queue Redis. Raise it if the queue backs up under load.        |
 
 `activity-worker` derives its MongoDB connection from
 `FIFTYONE_DATABASE_URI` and `FIFTYONE_DATABASE_NAME`. You do not
