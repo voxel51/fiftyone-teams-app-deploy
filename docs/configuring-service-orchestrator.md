@@ -29,60 +29,57 @@ The builtin services are:
   editor. Needs a GPU.
 - `agentic-labeler` powers few-shot VLM labeling. Needs a GPU.
 
-Configuration is deployment-specific:
+Configuration is deployment specific:
 
 - [Docker Compose](#docker-compose)
 - [Kubernetes](#kubernetes)
 
 ## Accelerator sizing
 
-Both services need a GPU.
-The default configurations
-(GPU reservation on Compose, and `nvidia.com/gpu: 1` on Kubernetes)
-express a device count and cannot specify VRAM requirements,
-so neither prevents a service from starting on an accelerator too small
-for its model.
-To prevent GPU out of memory errors,
-please note the following minimum recommended GPU requirements:
+The builtin services services need a GPU.
+The default configurations (Compose GPU reservation and Kubernetes
+`nvidia.com/gpu: 1`) define device count but cannot specify VRAM requirements.
+The resulting accelerator may be too small for its model.
+To prevent GPU out of memory errors, please specify
+an accelerator that exceeds the minimum recommended requirements:
 
 | Service | Minimum accelerator | Notes |
 | --- | --- | --- |
 | `annotation-ai` | 16 GB VRAM (T4, L4) | SAM2 is a small model. |
-| `agentic-labeler` | 24 GB VRAM, Ampere or newer (L4, A10G, L40S, A100) | The default `gemma4-31B-qat-maxvision` config is roughly 17-20 GB of int4 weights before KV cache, and vLLM's int4 kernels require compute capability 8.0+, so a T4 is unsuitable on both counts. |
+| `agentic-labeler` | 24 GB VRAM, Ampere or newer (L4, A10G, L40S, A100) | The default `gemma4-31B-qat-maxvision` config is ~17-20 GB of int4 weights before KV cache, and vLLM's int4 kernels require compute capability 8.0+. |
 
-Host memory matters as much as VRAM,
-because weights are read into host memory before they reach the device.
-On Kubernetes the chart sets no cpu or memory request on the
-orchestrator, so
+Host memory matters as much as VRAM.
+The weights are read into host memory before they reach the device.
+On Kubernetes the chart sets no cpu or memory request on the orchestrator, so
 [set them for the model you run](#gpu-requirements).
-On Compose, size the host itself; see the
+On Docker Compose, size the host itself; see the
 [worker requirements](../docker/docs/configuring-agentic-labeler.md#requirements).
 
 ## Docker Compose
 
 ### The builtin services list
 
-The deployment's services are declared in
-[builtin_services.yaml](../docker/builtin_services.yaml),
-which `common-services.yaml` mounts into `teams-api` and which
-`teams-api` reconciles at startup.
-Entries deep-merge by `id` onto the definitions packaged in `fiftyone`,
-so that file is the deployment's full list.
-Add, remove, or retarget services by editing it.
+The builtin services are declared in
+[docker/builtin_services.yaml](../docker/builtin_services.yaml)
+and bind mounted into the `teams-api`service
+(see [docker/common-services.yaml](../docker/common-services.yaml)).
+At startup, the `teams-api` container performs a reconciliation where
+entries are deep-merged by `id` onto the definitions packaged in `fiftyone`.
+Edit
+[docker/builtin_services.yaml](../docker/builtin_services.yaml)
+to add, remove, or retarget services.
 
-Bump an entry's `builtin_version` to re-apply a change to an environment
-that has already stored that service.
-Without the bump, reconciliation keeps the stored definition.
+To update a builtin service's definition, you must
+increment the service's `builtin_version`.
+Otherwise the cached definition will not be updated.
 
-`entrypoint.container.port` is the port the `teams-api` `/service` proxy
-dials.
-It is required even on Compose,
-where no container is provisioned and the shell command is what runs.
+The `teams-api`'s `/service` proxy connects to the builtin service's `entrypoint.container.port`.
+This is required even when `entrypoint.kind=shell`.
 
 ### Where each service runs
 
-A service's `delegation_target` names the worker that hosts it,
-and the two builtin services target different workers by default:
+A service's `delegation_target` sets the host worker.
+The builtin services target different workers by default:
 
 | Service | `delegation_target` | Worker |
 | --- | --- | --- |
@@ -90,39 +87,30 @@ and the two builtin services target different workers by default:
 | `agentic-labeler` | `agentic-labeler` | The dedicated GPU worker added by [`compose.agenticlabeler.yaml`](../docker/docs/configuring-agentic-labeler.md) |
 
 `annotation-ai` therefore lands on the default `teams-do` worker, which
-needs GPU access before the service can start.
-Either give that worker GPU access, see
-[configuring GPU workloads](../docker/docs/configuring-gpu-workloads.md),
-or retarget the service by pointing its `delegation_target` at a worker
-that already has one.
-
-This differs from Kubernetes,
-where both services target the chart's `gpuServiceOrc` and so both get a
-GPU by default.
+needs a GPU (before the service can start).
+Either give that worker a GPU (see
+[configuring GPU workloads](../docker/docs/configuring-gpu-workloads.md))
+or retarget the service by pointing its `delegation_target` at a GPU worker.
 
 ### `FIFTYONE_SERVICE_POD_IP`
 
-The worker hosts the service in-process and publishes the address the
-`teams-api` proxy uses to reach it.
-It auto-detects its own container IP at runtime,
-which is correct on a standard single-network Compose host.
-On multi-homed or non-default-network hosts,
-where auto-detect can pick the wrong interface,
-set `FIFTYONE_SERVICE_POD_IP` on the worker to the reachable address.
-This mirrors the Kubernetes path,
-where the resolver reads the injected `POD_IP`.
+On a single network Compose host, the service publishes its
+(auto-detected) IP address to which the `teams-api` proxy connects.
+On multi-homed or non-default-network hosts
+(where auto-detect can pick the wrong interface),
+set the `FIFTYONE_SERVICE_POD_IP` to the reachable address.
 
 ## Kubernetes
 
 ### GPU requirements
 
-The chart ships two service orchestrators,
-`cpuServiceOrc` and `gpuServiceOrc`,
+The chart provides two service orchestrators (`cpuServiceOrc` and `gpuServiceOrc`)
 under `delegatedOperatorJobTemplates.serviceOrchestrators`.
-Both are registered on every `helm install` and `helm upgrade`,
-so both builtin services appear under `Settings -> Services`
-whether or not the cluster has GPU nodes.
-Neither starts on its own.
+Both service orchestrators are registered on every
+`helm install` and `helm upgrade` invocation.
+Both builtin services appear under `Settings -> Services`
+(even when the cluster has no GPU nodes).
+Neither service orchestrator automatically starts.
 For the values structure, see
 [`serviceOrchestrators`](../helm/docs/configuring-delegated-operators.md#long-lived-services-with-serviceorchestrators)
 and the default service specs in
@@ -150,81 +138,74 @@ so the pod schedules onto any node advertising `nvidia.com/gpu`.
 The cluster must already have GPU nodes running the NVIDIA driver
 and either the device plugin or the GPU Operator to advertise that
 resource.
-This is enough for AKS GPU node pools,
-EKS,
-GKE Standard with an existing GPU node pool,
-and on-premises GPU Operator installs.
+This supports AKS GPU node pools, EKS, GKE Standard (with
+an existing GPU node pool), and on-premises GPU Operator.
 
-However, some cases require more than the generic request.
+Some cases may require configurations beyond the generic request.
 For example:
 
-- **GKE Autopilot** rejects GPU pods that do not set
-  `cloud.google.com/gke-accelerator`.
-- **Scaling from zero**,
-  including GKE node auto-provisioning,
+- **GKE Autopilot** rejects GPU pods that do not contain
+  `nodeSelector.cloud.google.com/gke-accelerator`.
+- **Scaling from zero**
+  (including GKE node auto-provisioning)
   needs the accelerator label to decide which node pool to grow.
 - **Mixed-accelerator clusters** cannot be steered by a device count.
-  Pin the accelerator with a `nodeSelector` to meet the
-  [minimums above](#accelerator-sizing).
+  Set the accelerator with a `nodeSelector` that meets the
+  [Accelerator sizing](#accelerator-sizing) minimums.
 
-The chart also sets no cpu or memory request on `gpuServiceOrc`,
-so a service pod is placed on GPU availability alone.
-Consider setting both:
-a pod with no memory request is an early eviction candidate under node
-memory pressure,
-the cluster autoscaler has nothing to size a node from when scaling up
-for a service,
-and a namespace with a `LimitRange` or `ResourceQuota` that requires
-requests will reject the pod outright.
+The chart does not set no cpu or memory request on `gpuServiceOrc`.
+A service pod placement is based on GPU availability alone.
+We recommend setting both cpu and memory requests.
+Pods with out memory requests are early eviction candidates (under node memory
+pressure [the cluster autoscaler has nothing to size a node from when scaling up
+for a service]).
+A namespace (with a `LimitRange` policy or `ResourceQuota` policy) requiring
+`requests` will reject the pod.
 
 ```yaml
 delegatedOperatorJobTemplates:
   serviceOrchestrators:
     gpuServiceOrc:
       resources:
+        # Modify as needed
         requests:
-          cpu: 2        # Modify For Your Needs
-          memory: 12Gi  # Modify For Your Needs
+          cpu: 2
+          memory: 12Gi
 ```
 
-Leaving the memory limit unset avoids OOMKilling a model server that
-grows past its request.
-Both services share `gpuServiceOrc`,
-so one `resources` block covers whichever service is running.
-To size them independently,
-declare a second orchestrator and move one service's entry under it.
+Unset memory limits avoids OOMKilling a model server that grows beyond its request.
+By default, both builtin services consume the `gpuServiceOrc` setting.
+To set service specific values, declare a second
+orchestrator and nest the service entry under it.
 
 ### Targeting specific GPU nodes
 
-Add the cloud-specific settings to the shipped `gpuServiceOrc` rather
-than declaring a replacement,
-so the `services` entries are inherited instead of restated.
-Per-cloud examples are in
+`services` entries inherit from `gpuServiceOrc`.
+Set your cloud specific GPU settings in `gpuServiceOrc`.
+For cloud specific examples, see
 [Leveraging GPU Workloads](../helm/docs/configuring-gpu-workloads.md).
 
 Overrides follow the same rules as the rest of
-`delegatedOperatorJobTemplates`:
-maps merge key-wise and lists are replaced wholesale, see
-[merge examples](../helm/docs/configuring-delegated-operators.md#examples).
-For GPU settings that means:
+`delegatedOperatorJobTemplates`
+(maps merge key-wise and lists are replaced wholesale, see
+[merge examples](../helm/docs/configuring-delegated-operators.md#examples)).
+For the GPU settings,
 
 - Adding `cloud.google.com/gke-accelerator` to `nodeSelector` merges with
-  the shipped value.
-- Supplying `tolerations` replaces the chart's `nvidia.com/gpu`
-  toleration entirely.
-  Restate it if the cluster still needs it.
+  the default values.
+- Overriding `tolerations` replaces the chart default's `nvidia.com/gpu` toleration.
+  - If your cluster requires, restate it.
 - `nvidia.com/gpu` survives a partial `resources` override.
-  Removing it requires setting it to `null` explicitly.
+  - To remove it, set it to `null`.
 
 ### CPU-only clusters
 
-Starting a GPU service where no node advertises `nvidia.com/gpu` leaves
-the pod `Pending` until `FIFTYONE_SERVICE_POD_READY_TIMEOUT_S` expires,
-30 minutes by default,
-before the service is marked with an error.
-On clusters that will never have GPU nodes,
-stop registering the orchestrator,
-and delete them from the Settings -> Orchestrators UI in FiftyOne Enterprise:
+When no kubernetes node advertises `nvidia.com/gpu`, the service pod will be stuck
+in a `Pending` state until the `FIFTYONE_SERVICE_POD_READY_TIMEOUT_S` duration
+(30 minutes by default) expires.
+After expiry, the service will be marked with an error.
+For clusters without GPU nodes,
+you may disable the service orchestrator registration.
 
 ```yaml
 delegatedOperatorJobTemplates:
@@ -233,8 +214,10 @@ delegatedOperatorJobTemplates:
       enabled: false
 ```
 
-This drops the pod template and the orchestrator registration.
-Services that `teams-api` has already reconciled into the deployment
+When you disable the service orchestrator registration,
+delete them in the FiftyOne Enterprise UI via Settings -> Orchestrators.
+
+Services already reconciled by the `teams-api`
 remain in the `Settings -> Services` list.
 
 ## Broker settings

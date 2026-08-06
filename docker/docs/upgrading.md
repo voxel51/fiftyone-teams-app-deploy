@@ -107,34 +107,39 @@ quickstart  0.21.2
 #### FiftyOne Enterprise v2.23+ Service Orchestrators
 
 FiftyOne Enterprise v2.23.0 introduces service orchestrators: delegated-operator
-workers that host long-lived services (always-on model servers) rather than
-tasks that exit. Two builtin services ship with it, `annotation-ai` (SAM2) and
-`agentic-labeler` (few-shot VLM labeling). Both need a GPU.
+workers that host long-lived services (always-on model servers)
+rather than tasks that exit.
+Two builtin services (requiring GPU(s)) are provided:
+`annotation-ai` (SAM2) and `agentic-labeler` (few-shot VLM labeling).
 
 This upgrade adds a `builtin_services.yaml` bind mount to `teams-api` in
-`common-services.yaml`. `teams-api` reconciles that list at startup, so both
-services appear under `Settings -> Services`. Both are created stopped and
-neither starts on its own.
+`common-services.yaml`.
+`teams-api` reconciles the `builtin_services.yaml` service list entries at startup.
+The two builtin services will appear in the
+FiftyOne Enterprise UI under *Settings* -> *Services*.
 
 The two services target different workers by default:
 
-- `annotation-ai` targets the default `teams-do` worker
-  (`delegation_target: builtin`). That worker needs GPU access before the
-  service can start, or retarget the service to a worker that has one.
-- `agentic-labeler` targets the dedicated GPU worker added by
-  `compose.agenticlabeler.yaml`, which is not part of the default `-f` set.
+- `annotation-ai`
+  - Targets the default `teams-do` worker (`delegation_target: builtin`).
+  - Needs GPU access before the service can start,
+    or retarget the service to a worker that has one.
+- `agentic-labeler`
+  - Targets the dedicated GPU worker added by `compose.agenticlabeler.yaml`,
+    which is not part of the default `-f` set.
 
-> **NOTE**: `compose.agenticlabeler.yaml` initially referenced
-> `voxel51/fiftyone-teams-agentic-labeler`, which is not a published image, so
-> the worker could not pull it. The published name is `voxel51/agentic-labeler`,
-> which the Helm chart already used. If you copied that file or pinned the image
-> in an override, correct the name and confirm your Docker Hub credentials grant
-> access to that repository.
+> **NOTE**: In `v2.23.0`, `compose.agenticlabeler.yaml` errantly contained
+> `voxel51/fiftyone-teams-agentic-labeler`.
+> This image doesn't exist and an error occurred when pulled.
+> In `v2.23.1`, image is fixed (set to `voxel51/agentic-labeler`).
+> If you copied that file or pinned the image in an override, correct the name.
 
 Edit
 [builtin_services.yaml](../builtin_services.yaml)
-to add, remove, or retarget services, and bump an entry's `builtin_version`
-so a change re-applies to an environment that has already stored it.
+to add, remove, or retarget services.
+To update a builtin service's definition, you must
+increment the service's `builtin_version`.
+Otherwise the cached definition will not be updated.
 
 See the
 [Configuring Service Orchestrators](../../docs/configuring-service-orchestrator.md)
@@ -385,7 +390,7 @@ Additionally,
 
 ### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -442,7 +447,7 @@ Additionally,
 
 ### From FiftyOne Enterprise Version 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires*
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -460,7 +465,7 @@ Additionally,
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -551,14 +556,14 @@ Additionally,
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ your users to
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* your users to
 > log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
