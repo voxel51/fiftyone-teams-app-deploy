@@ -1,0 +1,44 @@
+{{- if and .Values.fiftyoneMq.enabled .Values.fiftyoneMq.redis.enabled (not .Values.fiftyoneMq.redis.external.url) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fiftyone-mq.redis.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-mq.redis.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "fiftyone-mq.redis.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "fiftyone-mq.redis.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.fiftyoneMq.redis.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: redis
+          image: {{ .Values.fiftyoneMq.redis.image | default "redis:7-alpine" }}
+          {{- with .Values.fiftyoneMq.redis.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          args:
+            - redis-server
+            - --maxmemory
+            - {{ .Values.fiftyoneMq.redis.maxmemory | default "200mb" | quote }}
+            - --maxmemory-policy
+            - noeviction
+          ports:
+            - containerPort: 6379
+          {{- with .Values.fiftyoneMq.redis.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

@@ -1,6 +1,242 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "properties": {
+    "activitySettings": {
+      "description": "FiftyOne Activity Analytics workers. Reads the queue populated by the\nproducers and writes the activity_* collections.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Controls whether the Activity Analytics worker Deployments are rendered.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "image": {
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Worker image pull policy. [Reference][image-pull-policy].",
+              "title": "pullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity",
+              "description": "Worker image published from the fiftyone-activity repository.",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "d76cdc9a4c7f2be2d6d5ce4ac7540e61faf104d4",
+              "description": "Worker image tag. Required when `activitySettings.enabled` is `true`.",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "mongo": {
+          "properties": {
+            "database": {
+              "default": "",
+              "description": "Database holding the activity_* collections. When empty, they are\nco-located in the per-deployment FiftyOne database. Set a name to use a\ndedicated database.",
+              "title": "database",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "mongo",
+          "type": "object"
+        },
+        "orgId": {
+          "default": "",
+          "description": "Organization the snapshot worker stamps on its events. Defaults to\n`appSettings.env.FIFTYONE_ACTIVITY_ORG_ID`. Rollups are scoped per\norganization, so an unset value hides the snapshot metrics.",
+          "title": "orgId",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Resources for the worker containers. [Reference][resources].",
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "500m",
+                  "title": "cpu",
+                  "type": "string"
+                },
+                "memory": {
+                  "default": "512Mi",
+                  "title": "memory",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "title": "cpu",
+                  "type": "string"
+                },
+                "memory": {
+                  "default": "128Mi",
+                  "title": "memory",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "snapshotIntervalMs": {
+          "default": "",
+          "description": "Snapshot interval in milliseconds. Defaults to hourly, matching the\nbucket the state metrics roll up by.",
+          "title": "snapshotIntervalMs",
+          "type": "string"
+        },
+        "workers": {
+          "description": "One Deployment is rendered per entry.",
+          "properties": {
+            "ingest": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the ingest worker.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "replicaCount": {
+                  "default": 2,
+                  "description": "Number of ingest worker replicas.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "ingest",
+              "type": "object"
+            },
+            "prune": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the prune worker, which enforces the event store\nsize cap. Without it only the time-based TTL applies.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "recreate": {
+                  "default": true,
+                  "description": "Use the `Recreate` strategy. The prune worker owns a repeatable\nschedule, so only one replica may reconcile it.",
+                  "title": "recreate",
+                  "type": "boolean"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "description": "Number of prune worker replicas. Keep at 1.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "prune",
+              "type": "object"
+            },
+            "rollup": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the rollup worker.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "recreate": {
+                  "default": true,
+                  "description": "Use the `Recreate` strategy. The rollup worker owns a repeatable\nschedule, so only one replica may reconcile it.",
+                  "title": "recreate",
+                  "type": "boolean"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "description": "Number of rollup worker replicas. Keep at 1.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "rollup",
+              "type": "object"
+            },
+            "snapshot": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the snapshot worker.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "recreate": {
+                  "default": true,
+                  "description": "Use the `Recreate` strategy. The snapshot worker owns a repeatable\nschedule, and two replicas would double-count a bucket.",
+                  "title": "recreate",
+                  "type": "boolean"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "description": "Number of snapshot worker replicas. Keep at 1.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "snapshot",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "workers",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "activitySettings",
+      "type": "object"
+    },
     "apiSettings": {
       "description": "yaml-language-server: $schema=values.schema.json\nFiftyOne Enterprise API (`teams-api`)",
       "properties": {
@@ -747,6 +983,12 @@
         "env": {
           "description": "Environment Variables are passed to the `fiftyone-app` containers",
           "properties": {
+            "FIFTYONE_ACTIVITY_ORG_ID": {
+              "default": "dev-internal-env",
+              "description": "The org id the activity feed is scoped by (matches user.organization.id).\nSingle-org deployments set this so the review-submit emit stamps the org\nthe reader queries. REPLACE with your org id.",
+              "title": "FIFTYONE_ACTIVITY_ORG_ID",
+              "type": "string"
+            },
             "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE": {
               "default": true,
               "description": "Controls whether Query Performance mode is enabled by default for\nevery dataset for the teams application. Set to false to set default mode to off.",
@@ -1143,15 +1385,48 @@
           "type": "integer"
         },
         "resources": {
-          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `fiftyone-app`. [Reference][resources].",
+          "description": "Instead of setting default resources, we require the user define them\nThis enables running on resource constrained environments\n(like Minikube). To set resources, uncomment the following\nlines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.\nContainer resource requests and limits for `fiftyone-app`. [Reference][resources].\nephemeral-storage is set explicitly: the fiftyone-app-torch image is ~5.4GB\ncompressed / ~15-20GB unpacked, but GKE Autopilot injects a 1Gi default when\nunset and bin-packs by request — so the app landed on a full node and was\nevicted (\"node was low on resource: ephemeral-storage\"). 10Gi is Autopilot's\nper-workload max (it rejects \u003e10Gi). Harmless on non-Autopilot clusters.",
           "properties": {
             "limits": {
+              "properties": {
+                "cpu": {
+                  "default": 2,
+                  "title": "cpu",
+                  "type": "integer"
+                },
+                "ephemeral-storage": {
+                  "default": "10Gi",
+                  "title": "ephemeral-storage",
+                  "type": "string"
+                },
+                "memory": {
+                  "default": "6Gi",
+                  "title": "memory",
+                  "type": "string"
+                }
+              },
               "required": [],
               "title": "limits",
               "type": "object"
             },
             "requests": {
-              "description": "  cpu: 2\n  memory: 6Gi",
+              "properties": {
+                "cpu": {
+                  "default": "500m",
+                  "title": "cpu",
+                  "type": "string"
+                },
+                "ephemeral-storage": {
+                  "default": "10Gi",
+                  "title": "ephemeral-storage",
+                  "type": "string"
+                },
+                "memory": {
+                  "default": "512Mi",
+                  "title": "memory",
+                  "type": "string"
+                }
+              },
               "required": [],
               "title": "requests",
               "type": "object"
@@ -2044,6 +2319,11 @@
             "env": {
               "description": "Environment Variables are passed to the delegated-operator-executor containers.",
               "properties": {
+                "FIFTYONE_ACTIVITY_ORG_ID": {
+                  "default": "dev-internal-env",
+                  "title": "FIFTYONE_ACTIVITY_ORG_ID",
+                  "type": "string"
+                },
                 "FIFTYONE_DELEGATED_OPERATION_LOG_PATH": {
                   "default": "",
                   "description": "Full path to a network-mounted file system or a cloud storage path to\nuse for storing logs generated by delegated operation runs, one file\nper job. The default `\"\"` means log upload is disabled.",
@@ -2638,6 +2918,76 @@
       "title": "fiftyoneLicenseSecrets",
       "type": "array"
     },
+    "fiftyoneMq": {
+      "description": "In-cluster queue for fiftyone-mq. Renders a Redis Deployment and Service, and\nsets `FIFTYONE_MQ_REDIS_URL` on the workloads that publish to the queue.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`\nenvironment variable are rendered.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "redis": {
+          "properties": {
+            "containerSecurityContext": {
+              "description": "Security context for the Redis container. [Reference][container-security-context].",
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Controls whether the bundled Redis Deployment and Service are\nrendered. Set to `false` when using `fiftyoneMq.redis.external.url`.",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "external": {
+              "properties": {
+                "url": {
+                  "default": "",
+                  "description": "URL of an external Redis. When set, the bundled Redis is not\nrendered and the workloads are wired to this URL instead. The instance\nmust use the `noeviction` maxmemory policy. An evicting policy drops\nqueued jobs.",
+                  "title": "url",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "external",
+              "type": "object"
+            },
+            "image": {
+              "default": "redis:7-alpine",
+              "description": "Redis image for the bundled queue backend.",
+              "title": "image",
+              "type": "string"
+            },
+            "maxmemory": {
+              "default": "200mb",
+              "description": "Memory limit for the bundled Redis.",
+              "title": "maxmemory",
+              "type": "string"
+            },
+            "podSecurityContext": {
+              "description": "Security context for the Redis pod. [Reference][security-context].",
+              "required": [],
+              "title": "podSecurityContext",
+              "type": "object"
+            },
+            "resources": {
+              "description": "Resources for the Redis container. [Reference][resources].",
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "redis",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "fiftyoneMq",
+      "type": "object"
+    },
     "global": {
       "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
       "required": [],
@@ -2862,6 +3212,11 @@
         "env": {
           "description": "Environment Variables are passed to the `teams-plugins` containers.",
           "properties": {
+            "FIFTYONE_ACTIVITY_ORG_ID": {
+              "default": "dev-internal-env",
+              "title": "FIFTYONE_ACTIVITY_ORG_ID",
+              "type": "string"
+            },
             "FIFTYONE_INTERNAL_SERVICE": {
               "default": true,
               "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",

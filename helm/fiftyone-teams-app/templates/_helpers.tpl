@@ -326,6 +326,7 @@ Create a merged list of environment variables for delegated-operator-executor
       key: encryptionKey
 {{- if and .ctx .ctx.Values.telemetry.enabled }}
 {{- include "telemetry.redis-url-env" .ctx }}
+{{- include "fiftyone-mq.redis-url-env" .ctx }}
 - name: TELEMETRY_SOCKET
   value: /tmp/telemetry/agent.sock
 {{- end }}
@@ -372,9 +373,8 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
-       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
-       co-located activity_* collections the workers write. */}}
+{{- /* Points activity reads at the per-deployment FiftyOne database,
+       where the workers write the activity_* collections. */}}
 - name: FIFTYONE_ACTIVITY_MONGO_DB
   valueFrom:
     secretKeyRef:
@@ -400,6 +400,7 @@ Create a merged list of environment variables for fiftyone-teams-api
   value: /opt/builtin-services/builtin_services.yaml
 {{- end }}
 {{- include "telemetry.redis-url-env" . }}
+{{- include "fiftyone-mq.redis-url-env" . }}
 {{- range $key, $val := .Values.apiSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -435,9 +436,8 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
-       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
-       co-located activity_* collections the workers write. */}}
+{{- /* Points activity reads at the per-deployment FiftyOne database,
+       where the workers write the activity_* collections. */}}
 - name: FIFTYONE_ACTIVITY_MONGO_DB
   valueFrom:
     secretKeyRef:
@@ -454,6 +454,7 @@ Create a merged list of environment variables for fiftyone-app
       name: {{ $secretName }}
       key: encryptionKey
 {{- include "telemetry.redis-url-env" . }}
+{{- include "fiftyone-mq.redis-url-env" . }}
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -560,9 +561,8 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
-{{- /* Activity read resolvers build their store from FIFTYONE_ACTIVITY_MONGO_DB;
-       point it at the per-deployment FiftyOne DB so teams-api reads the SAME
-       co-located activity_* collections the workers write. */}}
+{{- /* Points activity reads at the per-deployment FiftyOne database,
+       where the workers write the activity_* collections. */}}
 - name: FIFTYONE_ACTIVITY_MONGO_DB
   valueFrom:
     secretKeyRef:
@@ -579,6 +579,7 @@ Create a merged list of environment variables for fiftyone-teams-plugins
       name: {{ $secretName }}
       key: encryptionKey
 {{- include "telemetry.redis-url-env" . }}
+{{- include "fiftyone-mq.redis-url-env" . }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -631,6 +632,7 @@ Create a merged list of environment variables for fiftyone-teams-app
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
 {{- end }}
 {{- include "telemetry.redis-url-env" . }}
+{{- include "fiftyone-mq.redis-url-env" . }}
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

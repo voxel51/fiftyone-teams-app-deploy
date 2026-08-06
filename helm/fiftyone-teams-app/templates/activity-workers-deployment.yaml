@@ -1,24 +1,21 @@
 {{- /*
-Activity Analytics workers: one published image, N Deployments differing only
-by entrypoint (ingest = queue-depth drain, idempotent; rollup = single-flight
-scheduler). Rendered from the activitySettings.workers map. Mongo comes from
-the shared teams secret (its own fiftyone_activity database); Redis from the
-in-cluster activity-redis (or activitySettings.redis.url).
+One Deployment per entry in `activitySettings.workers`, differing only by
+entrypoint. Mongo comes from the shared teams secret. The queue URL comes from
+the fiftyone-mq helper.
 */}}
 {{- if .Values.activitySettings.enabled }}
 {{- $a := .Values.activitySettings }}
-{{- $redisUrl := $a.redis.url | default "redis://activity-redis:6379/0" }}
 {{- range $name, $w := $a.workers }}
 {{- if ne $w.enabled false }}
-{{- $full := printf "activity-%s-worker" $name }}
+{{- $args := dict "ctx" $ "worker" $name }}
+{{- $full := include "activity.worker.name" $args }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $full }}
   namespace: {{ $.Values.namespace.name }}
   labels:
-    app.kubernetes.io/name: fiftyone-activity
-    app.kubernetes.io/component: {{ $full }}
+    {{- include "activity.worker.labels" $args | nindent 4 }}
 spec:
   replicas: {{ $w.replicaCount | default 1 }}
   {{- if $w.recreate }}
@@ -27,13 +24,11 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: fiftyone-activity
-      app.kubernetes.io/component: {{ $full }}
+      {{- include "activity.worker.selectorLabels" $args | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: fiftyone-activity
-        app.kubernetes.io/component: {{ $full }}
+        {{- include "activity.worker.labels" $args | nindent 8 }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
@@ -46,8 +41,7 @@ spec:
           command:
             {{- toYaml $w.command | nindent 12 }}
           env:
-            - name: FIFTYONE_MQ_REDIS_URL
-              value: {{ $redisUrl | quote }}
+            {{- include "fiftyone-mq.redis-url-env" $ | nindent 12 }}
             - name: FIFTYONE_ACTIVITY_MONGO_URI
               valueFrom:
                 secretKeyRef:
