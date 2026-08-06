@@ -68,6 +68,7 @@ regarding FiftyOne Enterprise.
   - [Backup And Recovery](#backup-and-recovery)
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Telemetry](#telemetry)
+  - [Activity Analytics](#activity-analytics)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -604,6 +605,18 @@ metrics (CPU, memory, FDs, thread counts) and tailed logs.
 Please refer to the
 [telemetry configuration documentation](./docs/configuring-telemetry.md)
 for full details.
+
+### Activity Analytics
+
+FiftyOne Enterprise bundles an activity worker and a queue Redis by
+default in every compose file.
+The Audit Log and Jobs pages in teams-app are built from the activity
+events those services record.
+
+Please refer to the
+[Activity Analytics configuration documentation](./docs/configuring-activity-analytics.md)
+for full details, including the queue Redis `noeviction` requirement and
+the single-replica constraint on the worker.
 
 ### Snapshot Archival
 
