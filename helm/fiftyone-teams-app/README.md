@@ -726,12 +726,12 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| activitySettings.enabled | bool | `false` | Controls whether the Activity Analytics worker Deployments are rendered. |
+| activitySettings.enabled | bool | `true` | Controls whether the Activity Analytics worker Deployments are rendered. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity"` | Worker image published from the fiftyone-activity repository. |
 | activitySettings.image.tag | string | `"d76cdc9a4c7f2be2d6d5ce4ac7540e61faf104d4"` | Worker image tag. Required when `activitySettings.enabled` is `true`. |
 | activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
-| activitySettings.orgId | string | `""` | Organization the workers and producers stamp on their events. Rollups are scoped per organization, so events emitted without one are not returned by the read path. Required when `activitySettings.enabled` is `true`. |
+| activitySettings.orgId | string | `"dev-internal-env"` | Organization the workers and producers stamp on their events. Rollups are scoped per organization, so events emitted without one are not returned by the read path. Required when `activitySettings.enabled` is `true`. |
 | activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
 | activitySettings.snapshotIntervalMs | string | `""` | Snapshot interval in milliseconds. Defaults to hourly, matching the bucket the state metrics roll up by. |
 | activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
@@ -794,7 +794,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | apiSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes]. |
 | apiSettings.readiness.timeoutSeconds | int | `5` | Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.replicaCount | int | `1` | Number of pods in the `teams-api` deployment's ReplicaSet. When > 1, you must also configure volumes, volumeMounts and set `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`. For more information see [the documentation][configure-ha-teams-api]. |
-| apiSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
+| apiSettings.resources | object | `{"limits":{"cpu":2,"ephemeral-storage":"10Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"10Gi","memory":"512Mi"}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
 | apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-api` containers. |
 | apiSettings.securityContext | object | `{}` | Container security configuration for `teams-api`. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for `teams-api`. [Reference][annotations]. |
@@ -848,7 +848,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | appSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `fiftyone-app`. [Reference][probes]. |
 | appSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.replicaCount | int | `2` | Number of pods in the `fiftyone-app` deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
-| appSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
+| appSettings.resources | object | `{"limits":{"cpu":2,"ephemeral-storage":"10Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"10Gi","memory":"512Mi"}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
 | appSettings.secretEnv | object | `{}` | Secret variables to be passed to the `fiftyone-app` containers. |
 | appSettings.securityContext | object | `{}` | Container security configuration for `fiftyone-app`. [Reference][container-security-context]. |
 | appSettings.service.annotations | object | `{}` | Service annotations for `fiftyone-app`. [Reference][annotations]. |
@@ -896,7 +896,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | casSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-cas`. [Reference][probes]. |
 | casSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.replicaCount | int | `2` | Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment]. |
-| casSettings.resources | object | `{"limits":{},"requests":{}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
+| casSettings.resources | object | `{"limits":{"cpu":2,"ephemeral-storage":"10Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"10Gi","memory":"512Mi"}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
 | casSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-cas` containers. |
 | casSettings.securityContext | object | `{}` | Container security configuration for `teams-cas`. [Reference][container-security-context]. |
 | casSettings.service.annotations | object | `{}` | Service annotations for `teams-cas`. [Reference][annotations]. |
@@ -980,7 +980,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorJobTemplates.template.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
-| fiftyoneMq.enabled | bool | `false` | Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL` environment variable are rendered. |
+| fiftyoneMq.enabled | bool | `true` | Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL` environment variable are rendered. |
 | fiftyoneMq.redis.containerSecurityContext | object | `{}` | Security context for the Redis container. [Reference][container-security-context]. |
 | fiftyoneMq.redis.enabled | bool | `true` | Controls whether the bundled Redis Deployment and Service are rendered. Set to `false` when using `fiftyoneMq.redis.external.url`. |
 | fiftyoneMq.redis.external.url | string | `""` | URL of an external Redis. When set, the bundled Redis is not rendered and the workloads are wired to this URL instead. The instance must use the `noeviction` maxmemory policy. An evicting policy drops queued jobs. |

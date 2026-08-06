@@ -3,7 +3,7 @@
 # producers and writes the activity_* collections.
 activitySettings:
   # -- Controls whether the Activity Analytics worker Deployments are rendered.
-  enabled: false
+  enabled: true
   image:
     # -- Worker image published from the fiftyone-activity repository.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
@@ -19,7 +19,7 @@ activitySettings:
   # -- Organization the workers and producers stamp on their events. Rollups are
   # scoped per organization, so events emitted without one are not returned by
   # the read path. Required when `activitySettings.enabled` is `true`.
-  orgId: ""
+  orgId: "dev-internal-env"
   # -- Resources for the worker containers. [Reference][resources].
   resources:
     requests:
@@ -158,12 +158,14 @@ apiSettings:
   # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-api`. [Reference][resources].
   resources:
-    limits: {}
-    #   cpu: 2
-    #   memory: 6Gi
-    requests: {}
-    #   cpu: 500m
-    #   memory: 512Mi
+    limits:
+      cpu: 2
+      memory: 6Gi
+      ephemeral-storage: 10Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 10Gi
   service:
     # -- Service annotations for `teams-api`. [Reference][annotations].
     annotations: {}
@@ -433,12 +435,14 @@ appSettings:
   # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `fiftyone-app`. [Reference][resources].
   resources:
-    limits: {}
-    #   cpu: 2
-    #   memory: 6Gi
-    requests: {}
-    #   cpu: 500m
-    #   memory: 512Mi
+    limits:
+      cpu: 2
+      memory: 6Gi
+      ephemeral-storage: 10Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 10Gi
   service:
     # -- Service annotations for `fiftyone-app`. [Reference][annotations].
     annotations: {}
@@ -630,12 +634,14 @@ casSettings:
   # lines, adjust them as necessary, and remove the curly braces (`{}`) after 'resources:'.
   # -- Container resource requests and limits for `teams-cas`. [Reference][resources].
   resources:
-    limits: {}
-    #   cpu: 2
-    #   memory: 6Gi
-    requests: {}
-    #   cpu: 500m
-    #   memory: 512Mi
+    limits:
+      cpu: 2
+      memory: 6Gi
+      ephemeral-storage: 10Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 10Gi
   service:
     # -- Service annotations for `teams-cas`. [Reference][annotations].
     annotations: {}
@@ -1236,7 +1242,7 @@ fiftyoneLicenseSecrets:
 fiftyoneMq:
   # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
   # environment variable are rendered.
-  enabled: false
+  enabled: true
   redis:
     # -- Controls whether the bundled Redis Deployment and Service are
     # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.
