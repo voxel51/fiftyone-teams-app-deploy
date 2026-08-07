@@ -31,24 +31,33 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 #### Service Orchestrators and Auto-registration
 
-FiftyOne Enterprise 2.23+ introduces service orchestrators, delegated-operator
-workers that host long-lived services (always-on model servers) rather than
-tasks that exit.
-Two builtin services ship with it, `annotation-ai` (SAM2) and
-`agentic-labeler` (few-shot VLM labeling), and both need a GPU.
+FiftyOne Enterprise 2.23+ introduces service orchestrators: delegated-operator
+workers that host long-lived services (always-on model servers)
+rather than tasks that exit.
+Two builtin services (requiring GPU(s)) are provided:
+`annotation-ai` (SAM2) and `agentic-labeler` (few-shot VLM labeling).
 
-Orchestrators defined under `delegatedOperatorJobTemplates.jobs` and
-`delegatedOperatorJobTemplates.serviceOrchestrators` are now registered
-automatically by a `post-install` and `post-upgrade` hook `Job`, replacing the
-manual registration previously required.
-The chart's `cpuServiceOrc` and `gpuServiceOrc` are registered by default, so
-both builtin services appear in the FiftyOne Enterprise UI, created stopped.
+- Orchestrators (`delegatedOperatorJobTemplates.jobs.*` and
+  `delegatedOperatorJobTemplates.serviceOrchestrators.*`) are automatically
+  registered and are available within the FiftyOne Enterprise UI under
+  *Settings* -> *Orchestrators*.
+  - Registration is triggered via Helm hooks (`post-install` and `post-upgrade`).
+    Every `helm install` or `helm upgrade` runs a job that connects to MongoDB
+    (with the deployment's existing secrets) and registers the orchestrators.
+    - This replaces the previously required
+      [manual registration process](../../docs/orchestrators/configuring-kubernetes-orchestrator.md).
+- The chart provides two service orchestrators
+  (`cpuServiceOrc` and `gpuServiceOrc`), both registered by default,
+  so both builtin services appear under *Settings* -> *Services*.
+  - Both services are created stopped and neither starts on its own.
+
 On clusters without GPU nodes, disable the GPU orchestrator.
-Please refer to the
-[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
-for what changes on upgrade, and
-[configuring service orchestrators](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-service-orchestrator.md)
-for GPU requirements and accelerator sizing.
+Please refer to
+
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
+  for what changes on upgrade
+- [configuring service orchestrators](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-service-orchestrator.md)
+  for GPU requirements and accelerator sizing
 
 ### Version 2.22+
 

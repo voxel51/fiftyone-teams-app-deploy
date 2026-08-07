@@ -14,29 +14,31 @@
 
 # Configuring the Agentic Labeler Service
 
-The Agentic Labeler is a builtin service (few-shot VLM inference via vLLM). It
-runs on a dedicated GPU delegated-operator worker added by
-[compose.agenticlabeler.yaml](../internal-auth/compose.agenticlabeler.yaml).
+The Agentic Labeler is a builtin service (few-shot VLM inference via vLLM).
+It runs on a dedicated GPU delegated-operator worker added by
+[internal-auth/compose.agenticlabeler.yaml](../internal-auth/compose.agenticlabeler.yaml)
+and
+[legacy-auth/compose.agenticlabeler.yaml](../legacy-auth/compose.agenticlabeler.yaml).
 
-This page covers that worker. For how builtin services are declared, which
-worker each one runs on, and accelerator sizing, see
+For how builtin services are declared, which worker
+each one runs on, and accelerator sizing, see
 [Configuring Service Orchestrators](../../docs/configuring-service-orchestrator.md).
 
 ## Requirements
 
-- A GPU host. See
-  [configuring GPU workloads](./configuring-gpu-workloads.md) for the NVIDIA
-  driver, `nvidia-container-toolkit`, and `nvidia` runtime setup. vLLM has no
-  CPU fallback.
+- A GPU host.
+  See
+  [configuring GPU workloads](./configuring-gpu-workloads.md)
+  for the NVIDIA driver, `nvidia-container-toolkit`, and `nvidia` runtime setup.
+  vLLM has no CPU fallback.
 - An accelerator meeting the
   [minimum for `agentic-labeler`](../../docs/configuring-service-orchestrator.md#accelerator-sizing).
-- The `voxel51/agentic-labeler` image. Contact your Voxel51 support team for
-  Docker Hub access.
+- The `voxel51/agentic-labeler` image.
 
 ## Run the worker
 
-From your auth-mode directory, add `compose.agenticlabeler.yaml` to your usual
-`-f` set:
+From your auth mode directory,
+add `-f compose.agenticlabeler.yaml` to your usual `-f` set:
 
 ```shell
 docker compose \
@@ -52,14 +54,16 @@ On upgrade, add the same file to your existing `down` and `up` commands (see
 
 ## Start the service
 
-Once the service is running at the Docker Compose-level, the service also
-needs to be started within FiftyOne Enterprise. In the FiftyOne Enterprise
-UI, go to `Settings -> Services` and start `agentic-labeler`.
+After the `agentic-labeler` Docker Compose service is running,
+the service also needs to be started within FiftyOne Enterprise.
+In the FiftyOne Enterprise UI, go to *Settings* -> *Services*,
+and start `agentic-labeler`.
 
-The model loads into GPU memory and needs substantial host RAM. Size the host
-accordingly. An undersized `memory` limit is OOM-killed during inference.
+The service's model loads into GPU memory
+and needs substantial host memory.
+Size the host accordingly.
+An undersized `memory` limit will result in OOM-killing during inference.
 
 Tune the `LABELER_*` values in
-[builtin_services.yaml](../builtin_services.yaml) for your model and GPU. Bump
-that entry's `builtin_version` so a changed value re-applies to an environment
-that has already stored the service.
+[builtin_services.yaml](../builtin_services.yaml) for your model and GPU.
+When changing values, increment the `builtin_version` to trigger a refresh.

@@ -149,30 +149,32 @@ quickstart  0.21.2
 #### FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration
 
 FiftyOne Enterprise v2.23.0 introduces service orchestrators: delegated-operator
-workers that host long-lived services (always-on model servers) rather than
-tasks that exit. Two builtin services ship with it, `annotation-ai` (SAM2) and
-`agentic-labeler` (few-shot VLM labeling). Both need a GPU.
+workers that host long-lived services (always-on model servers)
+rather than tasks that exit.
+Two builtin services (requiring GPU(s)) are provided:
+`annotation-ai` (SAM2) and `agentic-labeler` (few-shot VLM labeling).
 
 Please note the following changes to the deployment:
 
-- All orchestrators defined as keys under
-  `delegatedOperatorJobTemplates.jobs` and
-  `delegatedOperatorJobTemplates.serviceOrchestrators` are now registered
-  automatically, and are available within FiftyOne Enterprise *without* the
-  [manual registration process](../../docs/orchestrators/configuring-kubernetes-orchestrator.md)
-  that was previously required.
-- A `post-install` and `post-upgrade` hook `Job` runs on each `helm upgrade`
-  and connects to MongoDB with the deployment's existing secrets to register
-  the orchestrators. Under ArgoCD this maps to `PostSync`.
-- The chart's two orchestrators, `cpuServiceOrc` and `gpuServiceOrc`, are
-  registered by default, so both builtin services appear under
-  `Settings -> Services`. Both are created stopped and neither starts on its
-  own.
+- Orchestrators (`delegatedOperatorJobTemplates.jobs.*` and
+  `delegatedOperatorJobTemplates.serviceOrchestrators.*`) are automatically
+  registered and are available within the FiftyOne Enterprise UI under
+  *Settings* -> *Orchestrators*.
+  - Registration is triggered via Helm hooks (`post-install` and `post-upgrade`).
+    Every `helm install` or `helm upgrade` runs a job that connects to MongoDB
+    (with the deployment's existing secrets) and registers the orchestrators.
+    - This replaces the previously required
+      [manual registration process](../../docs/orchestrators/configuring-kubernetes-orchestrator.md).
+- The chart provides two service orchestrators
+  (`cpuServiceOrc` and `gpuServiceOrc`), both registered by default,
+  so both builtin services appear under *Settings* -> *Services*.
+  - Both are registered in a stopped state and neither starts on its own.
 
-`gpuServiceOrc` requests `nvidia.com/gpu` without a cloud-specific
-`nodeSelector`. On a cluster with no GPU nodes, starting a GPU service leaves
-the pod `Pending` for the full readiness timeout before the service reports an
-error. On CPU-only clusters, stop registering it:
+The `gpuServiceOrc` requests `nvidia.com/gpu` without setting a `nodeSelector`.
+`nodeSelectors` are specific to each cloud provider.
+On clusters without GPU nodes, starting a GPU service leaves the pod `Pending`
+for the full readiness timeout period (before the service reports an error).
+To disable `gpuServiceOrc` registration, set:
 
 ```yaml
 delegatedOperatorJobTemplates:
@@ -181,9 +183,13 @@ delegatedOperatorJobTemplates:
       enabled: false
 ```
 
-To set `registerOrchestrator: false` for every entry instead, including the
-`jobs` templates, override it on
-`delegatedOperatorJobTemplates.template`.
+To disable registering all orchestrators (service and job), set
+
+```yaml
+delegatedOperatorJobTemplates:
+  template:
+    registerOrchestrator: false
+```
 
 See the
 [Configuring Service Orchestrators](../../docs/configuring-service-orchestrator.md)
