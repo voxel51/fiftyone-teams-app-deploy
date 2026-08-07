@@ -11,18 +11,6 @@ services:
     volumes:
       - plugins-vol:/opt/plugins:ro
 
-  fiftyone-mq-redis:
-    extends:
-      file: ../common-services.yaml
-      service: fiftyone-mq-redis-common
-
-  activity-worker:
-    depends_on:
-      - fiftyone-mq-redis
-    extends:
-      file: ../common-services.yaml
-      service: activity-worker-common
-
   teams-api:
     environment:
       FIFTYONE_PLUGINS_DIR: /opt/plugins

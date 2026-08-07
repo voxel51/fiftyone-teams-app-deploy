@@ -7,18 +7,6 @@ services:
       file: ../common-services.yaml
       service: fiftyone-app-common
 
-  fiftyone-mq-redis:
-    extends:
-      file: ../common-services.yaml
-      service: fiftyone-mq-redis-common
-
-  activity-worker:
-    depends_on:
-      - fiftyone-mq-redis
-    extends:
-      file: ../common-services.yaml
-      service: activity-worker-common
-
   teams-api:
     environment:
       FIFTYONE_PLUGINS_DIR: /opt/plugins

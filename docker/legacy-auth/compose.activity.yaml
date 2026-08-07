@@ -1,0 +1,32 @@
+---
+# Activity Analytics: the `fiftyone.mq` queue Redis and the activity worker
+# that consumes it. The worker writes the `activity_*` collections in the
+# deployment's own FiftyOne database and maintains the rollups behind the
+# Audit Log and Jobs pages in teams-app. See
+# docker/docs/configuring-activity-analytics.md.
+#
+# Activity Analytics is opt-in. Without this overlay the emit path in
+# teams-api and fiftyone-app is a no-op, and no activity is recorded.
+#
+# Activate by adding this file to your usual `-f` set, for example:
+#
+#   docker compose \
+#     -f compose.yaml \
+#     -f compose.activity.yaml \
+#     -f compose.override.yaml \
+#     up -d
+#
+# For Proxy Server instructions please see
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+services:
+  fiftyone-mq-redis:
+    extends:
+      file: ../common-services.yaml
+      service: fiftyone-mq-redis-common
+
+  activity-worker:
+    depends_on:
+      - fiftyone-mq-redis
+    extends:
+      file: ../common-services.yaml
+      service: activity-worker-common
