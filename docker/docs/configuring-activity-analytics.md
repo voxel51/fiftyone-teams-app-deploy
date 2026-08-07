@@ -17,9 +17,12 @@
 Activity Analytics records what happens in a deployment and aggregates it
 for the Audit Log and Jobs pages in the app.
 
-**Activity Analytics is enabled by default.**
-The base compose files contain the `fiftyone-mq-redis` and
-`activity-worker` services.
+**Activity Analytics is opt-in.**
+The `fiftyone-mq-redis` and `activity-worker` services live in the
+`compose.activity.yaml` overlay, not in the base compose files. A plain
+`docker compose up` does not start them, and no activity is recorded.
+This matches the Helm chart, where `activitySettings.enabled` and
+`fiftyoneMq.enabled` both default to `false`.
 
 ## How it works
 
@@ -48,19 +51,44 @@ One `activity-worker` container runs four workers via the combined
 | snapshot | Periodically records dataset and deployment state      |
 | prune    | Enforces the retention window and the storage size cap |
 
-## Default deployment
+## Enabling Activity Analytics
 
-Running
+From your auth-mode directory, add `compose.activity.yaml` to your usual
+`-f` set:
 
 ```shell
-docker compose -f compose.yaml up -d
+docker compose \
+  -f compose.yaml \
+  -f compose.activity.yaml \
+  -f compose.override.yaml \
+  up -d
 ```
 
-renders `fiftyone-mq-redis` and `activity-worker` alongside the other
-services. `activity-worker` declares `depends_on: fiftyone-mq-redis`.
-The `compose.plugins.yaml` and `compose.dedicated-plugins.yaml` base
-files include both services as well. The delegated-operator and GPU
-files are overlays and inherit them from whichever base file you use.
+That renders `fiftyone-mq-redis` and `activity-worker` alongside the
+other services. `activity-worker` declares
+`depends_on: fiftyone-mq-redis`.
+
+The overlay layers onto any base file, so substitute
+`compose.plugins.yaml` or `compose.dedicated-plugins.yaml` for
+`compose.yaml` if that is what you deploy. It also composes with the
+delegated-operator and GPU overlays:
+
+```shell
+docker compose \
+  -f compose.dedicated-plugins.yaml \
+  -f compose.delegated-operators.yaml \
+  -f compose.activity.yaml \
+  -f compose.override.yaml \
+  up -d
+```
+
+No `.env` change is needed to turn the feature on. `teams-api` and
+`fiftyone-app` already default `FIFTYONE_MQ_REDIS_URL` to the bundled
+queue Redis, so they find it as soon as the overlay starts it.
+
+Include the same `-f` set on every subsequent `docker compose` command
+for the deployment. Omitting `compose.activity.yaml` on a later
+`up -d` removes the two services from the project.
 
 ## Environment variables
 
@@ -123,10 +151,15 @@ deployment.
 
 ## Verifying
 
+The commands below need `compose.activity.yaml` in the `-f` set, the
+same as the `up -d` above. Without it compose does not know the two
+services exist.
+
 Confirm both services are running:
 
 ```shell
-docker compose ps fiftyone-mq-redis activity-worker
+docker compose -f compose.yaml -f compose.activity.yaml \
+  ps fiftyone-mq-redis activity-worker
 ```
 
 Confirm the queue Redis has the expected policy:

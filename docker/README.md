@@ -608,10 +608,21 @@ for full details.
 
 ### Activity Analytics
 
-FiftyOne Enterprise bundles an activity worker and a queue Redis by
-default in every compose file.
+Activity Analytics is opt-in. FiftyOne Enterprise ships an activity
+worker and a queue Redis in the `compose.activity.yaml` overlay, which
+is not part of any base compose file.
 The Audit Log and Jobs pages in teams-app are built from the activity
 events those services record.
+
+Enable it by adding the overlay to your usual `-f` set:
+
+```shell
+docker compose \
+  -f compose.yaml \
+  -f compose.activity.yaml \
+  -f compose.override.yaml \
+  up -d
+```
 
 Please refer to the
 [Activity Analytics configuration documentation](./docs/configuring-activity-analytics.md)
