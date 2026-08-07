@@ -183,10 +183,16 @@ services:
   # Emitting services enqueue here. The activity worker consumes.
   # The worker writes the activity_* collections in the FiftyOne database
   # and maintains the rollups behind the Audit Log and Jobs pages.
-  # The queue is transient. Redis runs without persistence.
+  # The queue is persisted with AOF onto the fiftyone-mq-redis-data volume,
+  # so restarting the container replays queued jobs instead of losing them.
   # See docker/docs/configuring-activity-analytics.md.
   fiftyone-mq-redis-common:
     image: redis:7
+    # AOF (`--appendonly yes`) with `--appendfsync everysec` bounds queue
+    # loss on a restart to roughly one second of writes.
+    # RDB snapshots (what telemetry-redis uses) would lose up to a whole
+    # snapshot interval, which is the wrong trade for a work queue.
+    #
     # The queue requires `maxmemory-policy noeviction`.
     # An evicting policy (such as telemetry-redis's allkeys-lru) silently
     # drops queued jobs under memory pressure.
@@ -194,11 +200,19 @@ services:
     # degrades to dropped events.
     command:
       - redis-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+      - --dir
+      - /data
       - --maxmemory
       - ${FIFTYONE_MQ_REDIS_MAXMEMORY:-200mb}
       - --maxmemory-policy
       - noeviction
     restart: always
+    volumes:
+      - fiftyone-mq-redis-data:/data
 
   # One container runs all four activity workers (ingest, rollup, snapshot,
   # prune) via the combined entrypoint.

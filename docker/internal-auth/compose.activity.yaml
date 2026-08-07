@@ -30,3 +30,8 @@ services:
     extends:
       file: ../common-services.yaml
       service: activity-worker-common
+
+# Backs the queue Redis AOF at /data. Declared here rather than in the base
+# compose files so the volume only exists when the overlay is in the `-f` set.
+volumes:
+  fiftyone-mq-redis-data:

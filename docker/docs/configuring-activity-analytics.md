@@ -31,8 +31,11 @@ Activity events travel over a Redis-backed queue (`fiftyone.mq`):
 1. `teams-api` and `fiftyone-app` enqueue events. `teams-api` hosts the
    domain-event bridge, and `fiftyone-app` emits operator and annotation
    activity. Both read `FIFTYONE_MQ_REDIS_URL`.
-1. `fiftyone-mq-redis` holds the queue. It is a stock `redis:7` with no
-   persistence, because the queue is transient.
+1. `fiftyone-mq-redis` holds the queue. It is a stock `redis:7` that
+   persists the queue with AOF onto the `fiftyone-mq-redis-data` volume,
+   so a restart replays queued jobs instead of losing them. See
+   [Queue durability](#queue-durability) for what that does and does not
+   cover.
 1. `activity-worker` consumes the queue and writes the `activity_*`
    collections. They are co-located in the deployment's own FiftyOne
    database, so they are covered by your existing MongoDB backups.
@@ -107,6 +110,44 @@ Set these in your `.env` file. See the Activity Analytics section of
 `FIFTYONE_DATABASE_URI` and `FIFTYONE_DATABASE_NAME`. You do not
 configure it separately.
 
+## Queue durability
+
+The `fiftyone-mq-redis` service starts with `--appendonly yes` and
+`--appendfsync everysec`, and mounts the named volume
+`fiftyone-mq-redis-data` at `/data`. Redis appends every write to an
+append-only file (AOF) there and flushes it once per second.
+
+**What this covers.** Restarting or recreating the container, and
+restarting the Docker host, no longer empty the queue. Redis replays the
+AOF on startup and the `activity-worker` picks up where it left off.
+Loss on an unclean stop is bounded to roughly the last second of writes.
+
+**What this does not cover.** A persisted queue is not an end-to-end
+durability guarantee, and there are still ways to lose events:
+
+- The emit path buffers events in the emitting process. That buffer is
+  cleared when an enqueue fails, so events dropped there never reach
+  Redis and are not recoverable from the AOF.
+- Enqueuing is not atomic with the change it describes. An operation can
+  commit to MongoDB while its activity event fails to enqueue, so the
+  queue is not a complete record of what happened.
+- Removing the volume removes the queue. `docker compose down -v` and
+  `docker volume rm` delete `fiftyone-mq-redis-data` along with any jobs
+  that had not been consumed yet.
+
+Treat Activity Analytics data in MongoDB as the durable copy — it is
+covered by your existing MongoDB backups. The queue is the transport, and
+AOF narrows one window in that transport rather than making it lossless.
+Writing events to MongoDB directly and keeping only the work queue in
+Redis is tracked as `FOEPD-4411`.
+
+Confirm persistence is on:
+
+```shell
+docker compose exec fiftyone-mq-redis \
+  redis-cli config get appendonly appendfsync
+```
+
 ## The queue Redis requires `noeviction`
 
 The bundled `fiftyone-mq-redis` service starts with
@@ -128,10 +169,12 @@ Do not copy that setting onto the queue Redis, and do not point
 `FIFTYONE_MQ_REDIS_URL` at `telemetry-redis`.
 
 If you supply an external Redis through `FIFTYONE_MQ_REDIS_URL`, verify
-its policy:
+its policy and its persistence — the compose file only configures the
+bundled service:
 
 ```shell
-redis-cli -u "${FIFTYONE_MQ_REDIS_URL}" config get maxmemory-policy
+redis-cli -u "${FIFTYONE_MQ_REDIS_URL}" \
+  config get maxmemory-policy appendonly appendfsync
 ```
 
 ## Keep `activity-worker` at one replica
