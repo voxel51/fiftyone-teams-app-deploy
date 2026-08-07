@@ -775,9 +775,9 @@
             "limits": {
               "properties": {
                 "cpu": {
-                  "default": 2,
+                  "default": "2",
                   "title": "cpu",
-                  "type": "integer"
+                  "type": "string"
                 },
                 "ephemeral-storage": {
                   "default": "10Gi",
@@ -1417,9 +1417,9 @@
             "limits": {
               "properties": {
                 "cpu": {
-                  "default": 2,
+                  "default": "2",
                   "title": "cpu",
-                  "type": "integer"
+                  "type": "string"
                 },
                 "ephemeral-storage": {
                   "default": "10Gi",
@@ -1966,9 +1966,9 @@
             "limits": {
               "properties": {
                 "cpu": {
-                  "default": 2,
+                  "default": "2",
                   "title": "cpu",
-                  "type": "integer"
+                  "type": "string"
                 },
                 "ephemeral-storage": {
                   "default": "10Gi",

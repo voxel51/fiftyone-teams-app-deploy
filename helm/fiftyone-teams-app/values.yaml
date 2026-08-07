@@ -159,7 +159,7 @@ apiSettings:
   # -- Container resource requests and limits for `teams-api`. [Reference][resources].
   resources:
     limits:
-      cpu: 2
+      cpu: "2"
       memory: 6Gi
       ephemeral-storage: 10Gi
     requests:
@@ -436,7 +436,7 @@ appSettings:
   # -- Container resource requests and limits for `fiftyone-app`. [Reference][resources].
   resources:
     limits:
-      cpu: 2
+      cpu: "2"
       memory: 6Gi
       ephemeral-storage: 10Gi
     requests:
@@ -635,7 +635,7 @@ casSettings:
   # -- Container resource requests and limits for `teams-cas`. [Reference][resources].
   resources:
     limits:
-      cpu: 2
+      cpu: "2"
       memory: 6Gi
       ephemeral-storage: 10Gi
     requests:
