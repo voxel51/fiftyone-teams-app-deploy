@@ -117,6 +117,7 @@ This upgrade adds a `builtin_services.yaml` bind mount to `teams-api` in
 `teams-api` reconciles the `builtin_services.yaml` service list entries at startup.
 The two builtin services will appear in the
 FiftyOne Enterprise UI under *Settings* -> *Services*.
+Both are created stopped and neither starts on its own.
 
 The two services target different workers by default:
 
@@ -128,7 +129,7 @@ The two services target different workers by default:
   - Targets the dedicated GPU worker added by `compose.agenticlabeler.yaml`,
     which is not part of the default `-f` set.
 
-> **NOTE**: In `v2.23.0`, `compose.agenticlabeler.yaml` errantly contained
+> **NOTE**: In `v2.23.0`, `compose.agenticlabeler.yaml` errantly referenced
 > `voxel51/fiftyone-teams-agentic-labeler`.
 > This image doesn't exist and an error occurred when pulled.
 > In `v2.23.1`, image is fixed (set to `voxel51/agentic-labeler`).

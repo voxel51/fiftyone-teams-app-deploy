@@ -32,13 +32,13 @@ each one runs on, and accelerator sizing, see
   for the NVIDIA driver, `nvidia-container-toolkit`, and `nvidia` runtime setup.
   vLLM has no CPU fallback.
 - An accelerator meeting the
-  [minimum for `agentic-labeler`](..../docs/configuring-service-orchestrator.md#accelerator-sizing).
+  [minimum for `agentic-labeler`](../../docs/configuring-service-orchestrator.md#accelerator-sizing).
 - The `voxel51/agentic-labeler` image.
 
 ## Run the worker
 
 From your auth mode directory,
-add the `-f compose.agenticlabeler.yaml` parameter
+add `-f compose.agenticlabeler.yaml` to your usual `-f` set:
 
 ```shell
 docker compose \
@@ -55,15 +55,15 @@ On upgrade, add the same file to your existing `down` and `up` commands (see
 ## Start the service
 
 After the `agentic-labeler` Docker Compose service is running,
-start the FiftyOne Enterprise Service Orchestrator.
+the service also needs to be started within FiftyOne Enterprise.
 In the FiftyOne Enterprise UI, go to *Settings* -> *Services*,
 and start `agentic-labeler`.
 
-The Service Orchestrator's model loads into GPU memory
+The service's model loads into GPU memory
 and needs substantial host memory.
-Increase the host memory host accordingly.
+Size the host accordingly.
 An undersized `memory` limit will result in OOM-killing during inference.
 
 Tune the `LABELER_*` values in
 [builtin_services.yaml](../builtin_services.yaml) for your model and GPU.
-When changing values, incrementing the `builtin_version` to trigger a refresh.
+When changing values, increment the `builtin_version` to trigger a refresh.
