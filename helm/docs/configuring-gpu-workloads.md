@@ -328,7 +328,7 @@ AKS GPU node pools are conventionally tainted `sku=gpu`.
 The orchestrator needs that toleration to schedule.
 
 The `tolerations` list is replaced (rather than merged).
-The value below supersedes the chart's default `nvidia.com/gpu` toleration.
+The value below replaces the chart's default `nvidia.com/gpu` toleration.
 Include both entries if the cluster has node pools using either taint:
 
 ```yaml

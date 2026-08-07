@@ -129,7 +129,7 @@ The two services target different workers by default:
   - Targets the dedicated GPU worker added by `compose.agenticlabeler.yaml`,
     which is not part of the default `-f` set.
 
-> **NOTE**: In `v2.23.0`, `compose.agenticlabeler.yaml` errantly referenced
+> **NOTE**: In `v2.23.0`, `compose.agenticlabeler.yaml` errantly contained
 > `voxel51/fiftyone-teams-agentic-labeler`.
 > This image doesn't exist and an error occurred when pulled.
 > In `v2.23.1`, image is fixed (set to `voxel51/agentic-labeler`).

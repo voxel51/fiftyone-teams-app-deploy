@@ -218,7 +218,7 @@ delegatedOperatorJobTemplates:
 ```
 
 When you disable the service orchestrator registration,
-delete them in the FiftyOne Enterprise UI via `Settings -> Orchestrators`.
+delete them in the FiftyOne Enterprise UI via *Settings* -> *Orchestrators*.
 
 Services already reconciled by the `teams-api`
 remain in the `Settings -> Services` list.
