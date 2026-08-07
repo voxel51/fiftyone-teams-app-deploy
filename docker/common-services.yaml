@@ -66,7 +66,7 @@ services:
     # Builtin services list, reconciled at startup so the services show up in
     # Settings -> Services (created stopped). Source is builtin_services.yaml in
     # this file's directory (docker/). Edit it to add, remove, or retarget
-    # services. See docker/docs/configuring-agentic-labeler.md.
+    # services. See docs/configuring-service-orchestrator.md.
     volumes:
       - type: bind
         source: ./builtin_services.yaml

@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.23+ Service Orchestrators](#fiftyone-enterprise-v223-service-orchestrators)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Host Requirements](#host-requirements)
@@ -102,6 +103,52 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.23+ Service Orchestrators
+
+FiftyOne Enterprise v2.23.0 introduces service orchestrators: delegated-operator
+workers that host long-lived services (always-on model servers)
+rather than tasks that exit.
+Two builtin services (requiring GPU(s)) are provided:
+`annotation-ai` (SAM2) and `agentic-labeler` (few-shot VLM labeling).
+
+This upgrade adds a `builtin_services.yaml` bind mount to `teams-api` in
+`common-services.yaml`.
+`teams-api` reconciles the `builtin_services.yaml` service list entries at startup.
+The two builtin services will appear in the
+FiftyOne Enterprise UI under *Settings* -> *Services*.
+Both are registered in a stopped state and neither starts on its own.
+
+The two services target different workers by default:
+
+- `annotation-ai`
+  - Targets the default `teams-do` worker (`delegation_target: builtin`).
+  - Needs GPU access before the service can start,
+    or retarget the service to a worker that has one.
+- `agentic-labeler`
+  - Targets the dedicated GPU worker added by `compose.agenticlabeler.yaml`,
+    which is not part of the default `-f` set.
+
+> **NOTE**: In `v2.23.0`, `compose.agenticlabeler.yaml` errantly contained
+> `voxel51/fiftyone-teams-agentic-labeler`.
+> This image doesn't exist and an error occurred when pulled.
+> In `v2.23.1`, image is fixed (set to `voxel51/agentic-labeler`).
+> If you copied that file or pinned the image in an override, correct the name.
+
+Edit
+[builtin_services.yaml](../builtin_services.yaml)
+to add, remove, or retarget services.
+To update a builtin service's definition, you must
+increment the service's `builtin_version`.
+Otherwise the cached definition will not be updated.
+
+See the
+[Configuring Service Orchestrators](../../docs/configuring-service-orchestrator.md)
+documentation for the builtin services list and accelerator sizing,
+[Configuring the Agentic Labeler Service](./configuring-agentic-labeler.md)
+for the dedicated GPU worker, and
+[Leveraging GPU Workloads](./configuring-gpu-workloads.md)
+for host GPU setup.
 
 #### FiftyOne Enterprise v2.22+ Multimodal Datasets
 
@@ -344,7 +391,7 @@ Additionally,
 
 ### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -401,7 +448,7 @@ Additionally,
 
 ### From FiftyOne Enterprise Version 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires*
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
@@ -419,7 +466,7 @@ Additionally,
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -503,21 +550,21 @@ Additionally,
 > (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
-> [Central Authentication Service](../README.md#central-authentication-service)
+> [Central Authentication Service](../README.md#step-7-identity-provider-idp-and-authentication-cas)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 > documentation before completing your upgrade.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ your users to
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* your users to
 > log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
