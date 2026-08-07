@@ -1253,6 +1253,44 @@ fiftyoneMq:
     image: redis:7-alpine
     # -- Memory limit for the bundled Redis.
     maxmemory: 200mb
+    persistence:
+      # -- Whether to provision a `PersistentVolumeClaim` for the bundled queue
+      # Redis `/data` directory, where its append-only file (AOF) lives.
+      # Defaults to `false` so the chart installs without a default
+      # `StorageClass`.
+      #
+      # READ THIS BEFORE LEAVING IT `false`: the queue Redis always runs with
+      # `--appendonly yes --appendfsync everysec`, but with persistence
+      # disabled the AOF is written to an `emptyDir`. An `emptyDir` is tied to
+      # the pod rather than the container, so the AOF survives a **container**
+      # restart (crash, OOM-kill, liveness restart) but is **lost** on a
+      # **pod** reschedule (node drain, eviction, `kubectl delete pod`, chart
+      # upgrade). Set this to `true` for the queue to survive rescheduling.
+      #
+      # When enabling this alongside a non-empty
+      # `fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's
+      # redis GID so the mounted `/data` stays writable.
+      #
+      # Either way, this bounds one loss window rather than making the pipeline
+      # durable end to end: the in-process emit buffer is cleared when an
+      # enqueue fails, and enqueuing is not atomic with the domain change the
+      # event describes. Tracked as `FOEPD-4411` (write events to MongoDB
+      # directly and keep only the work queue in Redis).
+      enabled: false
+      # -- Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to
+      # bind the queue Redis to. When set, `size` and `storageClass` are
+      # ignored. Has no effect when `persistence.enabled` is `false`.
+      existingClaim: ""
+      # -- Storage size for the queue Redis `PersistentVolumeClaim`. The AOF
+      # holds in-flight jobs rather than event history, so this only needs to
+      # cover the queue's peak backlog.
+      size: 1Gi
+      # @schema
+      # type: ["string", "null"]
+      # @schema
+      # -- `StorageClass` name for the queue Redis `PersistentVolumeClaim`.
+      # Leave unset to use the cluster's default `StorageClass`.
+      storageClass: ""
     # -- Security context for the Redis pod. [Reference][security-context].
     podSecurityContext: {}
     # -- Resources for the Redis container. [Reference][resources].

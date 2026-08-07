@@ -2922,6 +2922,41 @@
               "title": "maxmemory",
               "type": "string"
             },
+            "persistence": {
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "description": "Whether to provision a `PersistentVolumeClaim` for the bundled queue\nRedis `/data` directory, where its append-only file (AOF) lives.\nDefaults to `false` so the chart installs without a default\n`StorageClass`.\n\nREAD THIS BEFORE LEAVING IT `false`: the queue Redis always runs with\n`--appendonly yes --appendfsync everysec`, but with persistence\ndisabled the AOF is written to an `emptyDir`. An `emptyDir` is tied to\nthe pod rather than the container, so the AOF survives a **container**\nrestart (crash, OOM-kill, liveness restart) but is **lost** on a\n**pod** reschedule (node drain, eviction, `kubectl delete pod`, chart\nupgrade). Set this to `true` for the queue to survive rescheduling.\n\nWhen enabling this alongside a non-empty\n`fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's\nredis GID so the mounted `/data` stays writable.\n\nEither way, this bounds one loss window rather than making the pipeline\ndurable end to end: the in-process emit buffer is cleared when an\nenqueue fails, and enqueuing is not atomic with the domain change the\nevent describes. Tracked as `FOEPD-4411` (write events to MongoDB\ndirectly and keep only the work queue in Redis).",
+                  "title": "enabled",
+                  "type": "boolean"
+                },
+                "existingClaim": {
+                  "default": "",
+                  "description": "Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to\nbind the queue Redis to. When set, `size` and `storageClass` are\nignored. Has no effect when `persistence.enabled` is `false`.",
+                  "title": "existingClaim",
+                  "type": "string"
+                },
+                "size": {
+                  "default": "1Gi",
+                  "description": "Storage size for the queue Redis `PersistentVolumeClaim`. The AOF\nholds in-flight jobs rather than event history, so this only needs to\ncover the queue's peak backlog.",
+                  "title": "size",
+                  "type": "string"
+                },
+                "storageClass": {
+                  "default": "",
+                  "description": "`StorageClass` name for the queue Redis `PersistentVolumeClaim`.\nLeave unset to use the cluster's default `StorageClass`.",
+                  "required": [],
+                  "title": "storageClass",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [],
+              "title": "persistence",
+              "type": "object"
+            },
             "podSecurityContext": {
               "description": "Security context for the Redis pod. [Reference][security-context].",
               "required": [],
