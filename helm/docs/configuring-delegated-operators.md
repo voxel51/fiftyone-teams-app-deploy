@@ -247,11 +247,10 @@ declare the workers that host the long-lived services.
 
 How `serviceOrchestrators` differ from `jobs`:
 
-1. The rendered manifest is `kind: Pod` rather than `kind: Job`,
-   because the service broker creates one pod per service and keeps it
-   running.
-   The `job`-specific fields are ignored (`image`, `backoffLimit`,
-   `ttlSecondsAfterFinished`, `completions`, `parallelism`, and `jobAnnotations`).
+1. The rendered manifest is `kind: Pod` rather than `kind: Job`.
+   The `job`-specific fields are ignored
+   (`image`, `backoffLimit`, `ttlSecondsAfterFinished`, `completions`,
+   `parallelism`, and `jobAnnotations`).
    The service broker sets the `image` for each service.
 1. Each entry accepts a `services` map naming the services it hosts.
    The service identity fields are derived from its map key.

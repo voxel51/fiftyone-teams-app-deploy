@@ -29,11 +29,6 @@ The builtin services are:
   editor. Needs a GPU.
 - `agentic-labeler` powers few-shot VLM labeling. Needs a GPU.
 
-Configuration is deployment-specific:
-
-- [Docker Compose](#docker-compose)
-- [Kubernetes](#kubernetes)
-
 ## Accelerator sizing
 
 The builtin services need a GPU.
@@ -78,8 +73,8 @@ This is required even when `entrypoint.kind=shell`.
 
 ### Where each service runs
 
-A service's `delegation_target` sets the host worker.
-The builtin services target different workers by default:
+A service's `delegation_target` specifies the worker,
+and the builtin services have different targets by default:
 
 | Service | `delegation_target` | Worker |
 | --- | --- | --- |
@@ -94,11 +89,11 @@ or retarget the service by pointing its `delegation_target` at a GPU worker.
 
 ### `FIFTYONE_SERVICE_POD_IP`
 
-On a single-network Compose host, the service publishes its
-(auto-detected) IP address to which the `teams-api` proxy connects.
-On multi-homed or non-default-network hosts
-(where auto-detect can pick the wrong interface),
-set the `FIFTYONE_SERVICE_POD_IP` to the reachable address.
+The service attempts to auto-detect its own container IP at runtime,
+which is reliable on a standard single-network Compose host.
+On multi-homed or non-default-network hosts,
+where auto-detect can pick the wrong interface,
+set `FIFTYONE_SERVICE_POD_IP` on the worker to the reachable address.
 
 ## Kubernetes
 
@@ -198,8 +193,6 @@ For the GPU settings,
   the default values.
 - Overriding `tolerations` replaces the chart default's `nvidia.com/gpu` toleration.
   - If your cluster requires this toleration, restate it.
-- `nvidia.com/gpu` survives a partial `resources` override.
-  - To remove it, set it to `null`.
 
 ### CPU-only clusters
 
