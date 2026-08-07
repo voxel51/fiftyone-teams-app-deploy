@@ -25,6 +25,7 @@ const (
 )
 
 var legacyAuthComposeFile = filepath.Join(dockerLegacyAuthDir, "compose.yaml")
+var legacyAuthComposeActivityFile = filepath.Join(dockerLegacyAuthDir, "compose.activity.yaml")
 var legacyAuthComposePluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.plugins.yaml")
 var legacyAuthComposeDedicatedPluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.dedicated-plugins.yaml")
 var legacyAuthComposeDelegatedOperationsFile = filepath.Join(dockerLegacyAuthDir, "compose.delegated-operators.yaml")
@@ -69,10 +70,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -86,10 +85,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -103,10 +100,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -122,10 +117,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -145,10 +138,8 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			[]string{"gpu"},
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -157,6 +148,61 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 				"teams-do-gpu",
 				"teams-do-gpu-telemetry",
 				"teams-do-telemetry",
+				"telemetry-redis",
+			},
+		},
+		// Activity Analytics is opt-in. The two services only render when
+		// compose.activity.yaml is layered onto a base file.
+		{
+			"composeActivity",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composePluginsActivity",
+			[]string{legacyAuthComposePluginsFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composeDedicatedPluginsActivity",
+			[]string{legacyAuthComposeDedicatedPluginsFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"teams-plugins",
+				"teams-plugins-telemetry",
 				"telemetry-redis",
 			},
 		},
@@ -204,16 +250,16 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 		expected    string
 	}{
 		{
-			"defaultFiftyoneMqRedis",
+			"activityFiftyoneMqRedis",
 			"fiftyone-mq-redis",
-			[]string{legacyAuthComposeFile},
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
 			s.dotEnvFiles,
 			"redis:7",
 		},
 		{
-			"defaultActivityWorker",
+			"activityWorker",
 			"activity-worker",
-			[]string{legacyAuthComposeFile},
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
 			s.dotEnvFiles,
 			"voxel51/fiftyone-activity:v2.24.0",
 		},
@@ -341,9 +387,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 		expected    []string
 	}{
 		{
-			"defaultActivityWorker",
+			"activityWorker",
 			"activity-worker",
-			[]string{legacyAuthComposeFile},
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
 			s.dotEnvFiles,
 			[]string{
 				"FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES=10737418240",
@@ -918,16 +964,16 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceRestart() {
 		expected    string
 	}{
 		{
-			"defaultFiftyoneMqRedis",
+			"activityFiftyoneMqRedis",
 			"fiftyone-mq-redis",
-			[]string{legacyAuthComposeFile},
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
 		{
-			"defaultActivityWorker",
+			"activityWorker",
 			"activity-worker",
-			[]string{legacyAuthComposeFile},
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},

@@ -25,6 +25,7 @@ const (
 )
 
 var internalAuthComposeFile = filepath.Join(dockerInternalAuthDir, "compose.yaml")
+var internalAuthComposeActivityFile = filepath.Join(dockerInternalAuthDir, "compose.activity.yaml")
 var internalAuthComposePluginsFile = filepath.Join(dockerInternalAuthDir, "compose.plugins.yaml")
 var internalAuthComposeDedicatedPluginsFile = filepath.Join(dockerInternalAuthDir, "compose.dedicated-plugins.yaml")
 var internalAuthComposeDelegatedOperationsFile = filepath.Join(dockerInternalAuthDir, "compose.delegated-operators.yaml")
@@ -69,10 +70,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -86,10 +85,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -103,10 +100,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -122,10 +117,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -145,10 +138,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			[]string{"gpu"},
 			[]string{
-				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
-				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -157,6 +148,61 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 				"teams-do-gpu",
 				"teams-do-gpu-telemetry",
 				"teams-do-telemetry",
+				"telemetry-redis",
+			},
+		},
+		// Activity Analytics is opt-in. The two services only render when
+		// compose.activity.yaml is layered onto a base file.
+		{
+			"composeActivity",
+			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composePluginsActivity",
+			[]string{internalAuthComposePluginsFile, internalAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composeDedicatedPluginsActivity",
+			[]string{internalAuthComposeDedicatedPluginsFile, internalAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"teams-plugins",
+				"teams-plugins-telemetry",
 				"telemetry-redis",
 			},
 		},
@@ -204,16 +250,16 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 		expected    string
 	}{
 		{
-			"defaultFiftyoneMqRedis",
+			"activityFiftyoneMqRedis",
 			"fiftyone-mq-redis",
-			[]string{internalAuthComposeFile},
+			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
 			s.dotEnvFiles,
 			"redis:7",
 		},
 		{
-			"defaultActivityWorker",
+			"activityWorker",
 			"activity-worker",
-			[]string{internalAuthComposeFile},
+			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
 			s.dotEnvFiles,
 			"voxel51/fiftyone-activity:v2.24.0",
 		},
@@ -341,9 +387,9 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 		expected    []string
 	}{
 		{
-			"defaultActivityWorker",
+			"activityWorker",
 			"activity-worker",
-			[]string{internalAuthComposeFile},
+			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
 			s.dotEnvFiles,
 			[]string{
 				"FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES=10737418240",
@@ -825,16 +871,16 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceRestart() {
 		expected    string
 	}{
 		{
-			"defaultFiftyoneMqRedis",
+			"activityFiftyoneMqRedis",
 			"fiftyone-mq-redis",
-			[]string{internalAuthComposeFile},
+			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
 		{
-			"defaultActivityWorker",
+			"activityWorker",
 			"activity-worker",
-			[]string{internalAuthComposeFile},
+			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
 			s.dotEnvFiles,
 			types.RestartPolicyAlways,
 		},
