@@ -110,7 +110,7 @@ Both service orchestrators are registered on every
 `helm install` and `helm upgrade` invocation.
 Both builtin services appear under `Settings -> Services`
 (even when the cluster has no GPU nodes).
-Neither service starts on its own.
+Neither service automatically starts.
 For the values structure, see
 [`serviceOrchestrators`](../helm/docs/configuring-delegated-operators.md#long-lived-services-with-serviceorchestrators)
 and the default service specs in
@@ -153,7 +153,7 @@ For example:
   Set the accelerator with a `nodeSelector` that meets the
   [Accelerator sizing](#accelerator-sizing) minimums.
 
-The chart sets no cpu or memory request on `gpuServiceOrc`,
+The chart does not set no cpu or memory request on `gpuServiceOrc`.
 so a service pod is placed on GPU availability alone.
 We recommend setting both, because:
 
@@ -197,7 +197,7 @@ For the GPU settings,
 - Adding `cloud.google.com/gke-accelerator` to `nodeSelector` merges with
   the default values.
 - Overriding `tolerations` replaces the chart default's `nvidia.com/gpu` toleration.
-  - Restate it if the cluster still needs it.
+  - If your cluster requires this toleration, restate it.
 - `nvidia.com/gpu` survives a partial `resources` override.
   - To remove it, set it to `null`.
 

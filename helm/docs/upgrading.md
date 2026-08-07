@@ -168,7 +168,7 @@ Please note the following changes to the deployment:
 - The chart provides two service orchestrators
   (`cpuServiceOrc` and `gpuServiceOrc`), both registered by default,
   so both builtin services appear under *Settings* -> *Services*.
-  - Both services are created stopped and neither starts on its own.
+  - Both are registered in a stopped state and neither starts on its own.
 
 The `gpuServiceOrc` requests `nvidia.com/gpu` without setting a `nodeSelector`.
 `nodeSelectors` are specific to each cloud provider.

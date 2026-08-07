@@ -253,7 +253,7 @@ How `serviceOrchestrators` differ from `jobs`:
    The `job`-specific fields are ignored (`image`, `backoffLimit`,
    `ttlSecondsAfterFinished`, `completions`, `parallelism`, and `jobAnnotations`).
    The service broker sets the `image` for each service.
-1. Each entry takes a `services` map naming the services it hosts.
+1. Each entry accepts a `services` map naming the services it hosts.
    The service identity fields are derived from its map key.
 1. `registerOrchestrator` (inherited from `delegatedOperatorJobTemplates.template.registerOrchestrator=true`)
    controls whether the Helm chart hooks (post-install and post-upgrade) register
