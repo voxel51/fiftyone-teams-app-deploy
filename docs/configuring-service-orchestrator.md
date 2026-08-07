@@ -29,14 +29,14 @@ The builtin services are:
   editor. Needs a GPU.
 - `agentic-labeler` powers few-shot VLM labeling. Needs a GPU.
 
-Configuration is deployment specific:
+Configuration is deployment-specific:
 
 - [Docker Compose](#docker-compose)
 - [Kubernetes](#kubernetes)
 
 ## Accelerator sizing
 
-The builtin services services need a GPU.
+The builtin services need a GPU.
 The default configurations (Compose GPU reservation and Kubernetes
 `nvidia.com/gpu: 1`) define device count but cannot specify VRAM requirements.
 The resulting accelerator may be too small for its model.
@@ -61,7 +61,7 @@ On Docker Compose, size the host itself; see the
 
 The builtin services are declared in
 [docker/builtin_services.yaml](../docker/builtin_services.yaml)
-and bind mounted into the `teams-api`service
+and bind mounted into the `teams-api` service
 (see [docker/common-services.yaml](../docker/common-services.yaml)).
 At startup, the `teams-api` container performs a reconciliation where
 entries are deep-merged by `id` onto the definitions packaged in `fiftyone`.
@@ -94,7 +94,7 @@ or retarget the service by pointing its `delegation_target` at a GPU worker.
 
 ### `FIFTYONE_SERVICE_POD_IP`
 
-On a single network Compose host, the service publishes its
+On a single-network Compose host, the service publishes its
 (auto-detected) IP address to which the `teams-api` proxy connects.
 On multi-homed or non-default-network hosts
 (where auto-detect can pick the wrong interface),
@@ -110,7 +110,7 @@ Both service orchestrators are registered on every
 `helm install` and `helm upgrade` invocation.
 Both builtin services appear under `Settings -> Services`
 (even when the cluster has no GPU nodes).
-Neither service orchestrator automatically starts.
+Neither service automatically starts.
 For the values structure, see
 [`serviceOrchestrators`](../helm/docs/configuring-delegated-operators.md#long-lived-services-with-serviceorchestrators)
 and the default service specs in
@@ -154,13 +154,15 @@ For example:
   [Accelerator sizing](#accelerator-sizing) minimums.
 
 The chart does not set no cpu or memory request on `gpuServiceOrc`.
-A service pod placement is based on GPU availability alone.
-We recommend setting both cpu and memory requests.
-Pods with out memory requests are early eviction candidates (under node memory
-pressure [the cluster autoscaler has nothing to size a node from when scaling up
-for a service]).
-A namespace (with a `LimitRange` policy or `ResourceQuota` policy) requiring
-`requests` will reject the pod.
+so a service pod is placed on GPU availability alone.
+We recommend setting both, because:
+
+- A pod with no memory request is an early eviction candidate
+  under node memory pressure.
+- The cluster autoscaler has nothing to size a node from
+  when scaling up for a service.
+- A namespace with a `LimitRange` or `ResourceQuota` that requires
+  requests will reject the pod outright.
 
 ```yaml
 delegatedOperatorJobTemplates:
@@ -173,16 +175,17 @@ delegatedOperatorJobTemplates:
           memory: 12Gi
 ```
 
-Unset memory limits avoids OOMKilling a model server that grows beyond its request.
-By default, both builtin services consume the `gpuServiceOrc` setting.
-To set service specific values, declare a second
-orchestrator and nest the service entry under it.
+Leaving the memory limit unset avoids OOMKilling a model server
+that grows beyond its request.
+By default, both builtin services share the `gpuServiceOrc` `resources` block.
+To set service-specific values, declare a second
+orchestrator and move one service's entry under it.
 
 ### Targeting specific GPU nodes
 
 `services` entries inherit from `gpuServiceOrc`.
-Set your cloud specific GPU settings in `gpuServiceOrc`.
-For cloud specific examples, see
+Set your cloud-specific GPU settings in `gpuServiceOrc`.
+For cloud-specific examples, see
 [Leveraging GPU Workloads](../helm/docs/configuring-gpu-workloads.md).
 
 Overrides follow the same rules as the rest of
@@ -194,13 +197,13 @@ For the GPU settings,
 - Adding `cloud.google.com/gke-accelerator` to `nodeSelector` merges with
   the default values.
 - Overriding `tolerations` replaces the chart default's `nvidia.com/gpu` toleration.
-  - If your cluster requires, restate it.
+  - If your cluster requires this toleration, restate it.
 - `nvidia.com/gpu` survives a partial `resources` override.
   - To remove it, set it to `null`.
 
 ### CPU-only clusters
 
-When no kubernetes node advertises `nvidia.com/gpu`, the service pod will be stuck
+When no Kubernetes node advertises `nvidia.com/gpu`, the service pod will be stuck
 in a `Pending` state until the `FIFTYONE_SERVICE_POD_READY_TIMEOUT_S` duration
 (30 minutes by default) expires.
 After expiry, the service will be marked with an error.
@@ -215,7 +218,7 @@ delegatedOperatorJobTemplates:
 ```
 
 When you disable the service orchestrator registration,
-delete them in the FiftyOne Enterprise UI via Settings -> Orchestrators.
+delete them in the FiftyOne Enterprise UI via *Settings* -> *Orchestrators*.
 
 Services already reconciled by the `teams-api`
 remain in the `Settings -> Services` list.

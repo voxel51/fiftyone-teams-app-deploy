@@ -117,6 +117,7 @@ This upgrade adds a `builtin_services.yaml` bind mount to `teams-api` in
 `teams-api` reconciles the `builtin_services.yaml` service list entries at startup.
 The two builtin services will appear in the
 FiftyOne Enterprise UI under *Settings* -> *Services*.
+Both are registered in a stopped state and neither starts on its own.
 
 The two services target different workers by default:
 

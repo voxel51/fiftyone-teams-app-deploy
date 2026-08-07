@@ -239,9 +239,9 @@ declare the workers that host the long-lived services.
 `serviceOrchestrators` entries are siblings of `jobs` and behave similarly.
 `serviceOrchestrators`:
 
-- Inherit from `delegatedOperatorJobTemplates.template`,
+- Inherit from `delegatedOperatorJobTemplates.template`.
 - Follow the same map and list merge rules
-  (see [examples](#examples)),
+  (see [examples](#examples)).
 - Render into the same `ConfigMap`
   (mounted onto the API at `/tmp/do-targets/<NAME>.yaml`).
 
@@ -250,13 +250,13 @@ How `serviceOrchestrators` differ from `jobs`:
 1. The rendered manifest is `kind: Pod` rather than `kind: Job`,
    because the service broker creates one pod per service and keeps it
    running.
-   The `job` specific fields are ignored (`image`, `backoffLimit`,
-   `ttlSecondsAfterFinished`, `completions`,`parallelism`, and `jobAnnotations`).
+   The `job`-specific fields are ignored (`image`, `backoffLimit`,
+   `ttlSecondsAfterFinished`, `completions`, `parallelism`, and `jobAnnotations`).
    The service broker sets the `image` for each service.
-1. Each entry is a `services` map naming the services it hosts.
+1. Each entry accepts a `services` map naming the services it hosts.
    The service identity fields are derived from its map key.
-1. `registerOrchestrator` (inherited from `delegatedOperatorJobTemplates.template.registerOrchestrator=true`),
-   controls whether Helm chart hooks (post-install and post-upgrade) registers
+1. `registerOrchestrator` (inherited from `delegatedOperatorJobTemplates.template.registerOrchestrator=true`)
+   controls whether the Helm chart hooks (post-install and post-upgrade) register
    the orchestrator (so it is selectable in the FiftyOne Enterprise UI).
 
 The chart ships a CPU and a GPU orchestrator:

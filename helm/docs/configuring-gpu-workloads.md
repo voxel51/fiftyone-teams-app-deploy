@@ -40,15 +40,16 @@
 Many machine learning applications utilize GPU hardware for
 intensive computations.
 The FiftyOne Enterprise Helm chart allows users to schedule pods on
-GPU-enabled nodes using the `nodeSelector`, `resource`, and `toleration`
+GPU-enabled nodes using the `nodeSelector`, `resources`, and `tolerations`
 settings for individual services.
 
-These three settings apply to delegated operators
-(always running, on-demand jobs, and
-[service orchestrators](../../docs/configuring-service-orchestrator.md)).
+These three settings apply to always-running delegated operators,
+on-demand jobs, and
+[service orchestrators](../../docs/configuring-service-orchestrator.md).
 The chart provides a `gpuServiceOrc` service orchestrator that requests a
-GPU generically (without cloud specific `nodeSelector`).
-For cloud provider specific section for settings.
+GPU generically (without a cloud-specific `nodeSelector`).
+The service orchestrator section for each cloud below
+covers what to add.
 
 ## Utilizing GKE GPUs For Delegated Operations
 
@@ -184,11 +185,13 @@ On GKE Standard with an existing GPU node pool, a `nodeSelector` is not required
 Two GKE configurations need the accelerator labels:
 
 - Autopilot rejects GPU pods that do not set
-  `cloud.google.com/gke-accelerator`
+  `cloud.google.com/gke-accelerator`.
 - Node auto-provisioning needs the label to decide which node pool
-  to create or grow when scaling from zero
+  to create or grow when scaling from zero.
 
-Add the nodeSelector labels like:
+Add the labels to the shipped orchestrator instead of declaring a new one,
+so its `services` entries are inherited rather than restated.
+`nodeSelector` is a map, so these keys merge into the chart's value:
 
 ```yaml
 delegatedOperatorJobTemplates:
@@ -205,7 +208,7 @@ delegatedOperatorJobTemplates:
 
 Select an accelerator from the
 [minimums for each service](../../docs/configuring-service-orchestrator.md#accelerator-sizing).
-`nvidia.com/gpu: 1` define a device count but cannot specify VRAM requirements.
+`nvidia.com/gpu: 1` defines a device count but cannot specify VRAM requirements.
 Without the `nodeSelector` labels, a pod can be scheduled onto
 an accelerator with insufficient VRAM for the model.
 The model will fail to load (instead of failing at scheduling time).
@@ -215,8 +218,9 @@ the chart sets the `LD_LIBRARY_PATH` environment variable
 according to the
 [google GPU driver][gpu-gcp-gke-standard-cuda].
 The `agentic-labeler` service image contains this environment variable.
-Additional service images that do not resolve the driver libraries, need
-to `LD_LIBRARY_PATH` variable set in `entrypoint.container.env`.
+A service whose image does not resolve the driver libraries itself needs
+the same variable set under its `entrypoint.container.env`
+(or under its orchestrator's `env`).
 
 Upgrade your deployment via `helm upgrade` and wait for the
 `k8s-job-manifests` ConfigMap to be updated.
@@ -324,7 +328,7 @@ AKS GPU node pools are conventionally tainted `sku=gpu`.
 The orchestrator needs that toleration to schedule.
 
 The `tolerations` list is replaced (rather than merged).
-The value below clobbers the chart's `nvidia.com/gpu`default toleration.
+The value below replaces the chart's default `nvidia.com/gpu` toleration.
 Include both entries if the cluster has node pools using either taint:
 
 ```yaml
@@ -346,7 +350,7 @@ Select an accelerator from the
 [minimums for each service](../../docs/configuring-service-orchestrator.md#accelerator-sizing).
 On clusters with more than one accelerator type,
 add a `nodeSelector` for the node pool.
-`nvidia.com/gpu: 1` define a device count but cannot specify VRAM requirements.
+`nvidia.com/gpu: 1` defines a device count but cannot specify VRAM requirements.
 
 Upgrade your deployment via `helm upgrade` and wait for the
 `k8s-job-manifests` ConfigMap to be updated.

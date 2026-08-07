@@ -158,14 +158,17 @@ Please note the following changes to the deployment:
 
 - Orchestrators (`delegatedOperatorJobTemplates.jobs.*` and
   `delegatedOperatorJobTemplates.serviceOrchestrators.*`) are automatically
-  registered and are available within FiftyOne Enterprise UI's *Settings* -> *Services*
+  registered and are available within the FiftyOne Enterprise UI under
+  *Settings* -> *Orchestrators*.
   - Registration is triggered via Helm hooks (`post-install` and `post-upgrade`).
     Every `helm install` or `helm upgrade` runs a job that connects to MongoDB
     (with the deployment's existing secrets) and registers the orchestrators.
     - This replaces the previously required
-      [manual registration process](../../docs/orchestrators/configuring-kubernetes-orchestrator.md)
-- The chart provides two orchestrators (`cpuServiceOrc` and `gpuServiceOrc`), are
-  They are "stopped" and must be manually started.
+      [manual registration process](../../docs/orchestrators/configuring-kubernetes-orchestrator.md).
+- The chart provides two service orchestrators
+  (`cpuServiceOrc` and `gpuServiceOrc`), both registered by default,
+  so both builtin services appear under *Settings* -> *Services*.
+  - Both are registered in a stopped state and neither starts on its own.
 
 The `gpuServiceOrc` requests `nvidia.com/gpu` without setting a `nodeSelector`.
 `nodeSelectors` are specific to each cloud provider.
