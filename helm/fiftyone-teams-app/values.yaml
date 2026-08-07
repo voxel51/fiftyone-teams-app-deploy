@@ -161,11 +161,11 @@ apiSettings:
     limits:
       cpu: "2"
       memory: 6Gi
-      ephemeral-storage: 10Gi
+      ephemeral-storage: 8Gi
     requests:
       cpu: 500m
       memory: 512Mi
-      ephemeral-storage: 10Gi
+      ephemeral-storage: 8Gi
   service:
     # -- Service annotations for `teams-api`. [Reference][annotations].
     annotations: {}
@@ -438,11 +438,11 @@ appSettings:
     limits:
       cpu: "2"
       memory: 6Gi
-      ephemeral-storage: 10Gi
+      ephemeral-storage: 8Gi
     requests:
       cpu: 500m
       memory: 512Mi
-      ephemeral-storage: 10Gi
+      ephemeral-storage: 8Gi
   service:
     # -- Service annotations for `fiftyone-app`. [Reference][annotations].
     annotations: {}
@@ -637,11 +637,11 @@ casSettings:
     limits:
       cpu: "2"
       memory: 6Gi
-      ephemeral-storage: 10Gi
+      ephemeral-storage: 8Gi
     requests:
       cpu: 500m
       memory: 512Mi
-      ephemeral-storage: 10Gi
+      ephemeral-storage: 8Gi
   service:
     # -- Service annotations for `teams-cas`. [Reference][annotations].
     annotations: {}

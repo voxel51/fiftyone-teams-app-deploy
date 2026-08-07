@@ -794,7 +794,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | apiSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-api`. [Reference][probes]. |
 | apiSettings.readiness.timeoutSeconds | int | `5` | Number of seconds after which the readiness probe times out for the `teams-api`. [Reference][probes]. |
 | apiSettings.replicaCount | int | `1` | Number of pods in the `teams-api` deployment's ReplicaSet. When > 1, you must also configure volumes, volumeMounts and set `apiSettings.env.FIFTYONE_SHARED_ROOT_DIR`. For more information see [the documentation][configure-ha-teams-api]. |
-| apiSettings.resources | object | `{"limits":{"cpu":2,"ephemeral-storage":"10Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"10Gi","memory":"512Mi"}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
+| apiSettings.resources | object | `{"limits":{"cpu":"2","ephemeral-storage":"8Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"8Gi","memory":"512Mi"}}` | Container resource requests and limits for `teams-api`. [Reference][resources]. |
 | apiSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-api` containers. |
 | apiSettings.securityContext | object | `{}` | Container security configuration for `teams-api`. [Reference][container-security-context]. |
 | apiSettings.service.annotations | object | `{}` | Service annotations for `teams-api`. [Reference][annotations]. |
@@ -848,7 +848,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | appSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `fiftyone-app`. [Reference][probes]. |
 | appSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `fiftyone-app`. [Reference][probes]. |
 | appSettings.replicaCount | int | `2` | Number of pods in the `fiftyone-app` deployment's ReplicaSet. Ignored when `appSettings.autoscaling.enabled: true`. [Reference][deployment]. |
-| appSettings.resources | object | `{"limits":{"cpu":2,"ephemeral-storage":"10Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"10Gi","memory":"512Mi"}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
+| appSettings.resources | object | `{"limits":{"cpu":"2","ephemeral-storage":"8Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"8Gi","memory":"512Mi"}}` | Container resource requests and limits for `fiftyone-app`. [Reference][resources]. |
 | appSettings.secretEnv | object | `{}` | Secret variables to be passed to the `fiftyone-app` containers. |
 | appSettings.securityContext | object | `{}` | Container security configuration for `fiftyone-app`. [Reference][container-security-context]. |
 | appSettings.service.annotations | object | `{}` | Service annotations for `fiftyone-app`. [Reference][annotations]. |
@@ -896,7 +896,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | casSettings.readiness.periodSeconds | int | `15` | How often (in seconds) to perform the readiness probe for `teams-cas`. [Reference][probes]. |
 | casSettings.readiness.timeoutSeconds | int | `5` | Timeout for the readiness probe for the `teams-cas`. [Reference][probes]. |
 | casSettings.replicaCount | int | `2` | Number of pods in the `teams-cas` deployment's ReplicaSet. [Reference][deployment]. |
-| casSettings.resources | object | `{"limits":{"cpu":2,"ephemeral-storage":"10Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"10Gi","memory":"512Mi"}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
+| casSettings.resources | object | `{"limits":{"cpu":"2","ephemeral-storage":"8Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"8Gi","memory":"512Mi"}}` | Container resource requests and limits for `teams-cas`. [Reference][resources]. |
 | casSettings.secretEnv | object | `{}` | Secret variables to be passed to the `teams-cas` containers. |
 | casSettings.securityContext | object | `{}` | Container security configuration for `teams-cas`. [Reference][container-security-context]. |
 | casSettings.service.annotations | object | `{}` | Service annotations for `teams-cas`. [Reference][annotations]. |

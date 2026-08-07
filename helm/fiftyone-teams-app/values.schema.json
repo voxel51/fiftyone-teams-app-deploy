@@ -780,7 +780,7 @@
                   "type": "string"
                 },
                 "ephemeral-storage": {
-                  "default": "10Gi",
+                  "default": "8Gi",
                   "title": "ephemeral-storage",
                   "type": "string"
                 },
@@ -802,7 +802,7 @@
                   "type": "string"
                 },
                 "ephemeral-storage": {
-                  "default": "10Gi",
+                  "default": "8Gi",
                   "title": "ephemeral-storage",
                   "type": "string"
                 },
@@ -1422,7 +1422,7 @@
                   "type": "string"
                 },
                 "ephemeral-storage": {
-                  "default": "10Gi",
+                  "default": "8Gi",
                   "title": "ephemeral-storage",
                   "type": "string"
                 },
@@ -1444,7 +1444,7 @@
                   "type": "string"
                 },
                 "ephemeral-storage": {
-                  "default": "10Gi",
+                  "default": "8Gi",
                   "title": "ephemeral-storage",
                   "type": "string"
                 },
@@ -1971,7 +1971,7 @@
                   "type": "string"
                 },
                 "ephemeral-storage": {
-                  "default": "10Gi",
+                  "default": "8Gi",
                   "title": "ephemeral-storage",
                   "type": "string"
                 },
@@ -1993,7 +1993,7 @@
                   "type": "string"
                 },
                 "ephemeral-storage": {
-                  "default": "10Gi",
+                  "default": "8Gi",
                   "title": "ephemeral-storage",
                   "type": "string"
                 },
