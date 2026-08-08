@@ -23,7 +23,7 @@
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 services:
   agentic-labeler:
-    image: voxel51/fiftyone-teams-agentic-labeler:v2.23.1
+    image: voxel51/agentic-labeler:v2.23.1
     shm_size: "8g"
     command: >
       /bin/sh -c "fiftyone delegated launch -t remote -m -n agentic-labeler"

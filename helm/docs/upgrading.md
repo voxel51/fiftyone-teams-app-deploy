@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
       - [Cluster Requirements](#cluster-requirements)
@@ -144,6 +145,57 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration
+
+FiftyOne Enterprise v2.23.0 introduces service orchestrators: delegated-operator
+workers that host long-lived services (always-on model servers)
+rather than tasks that exit.
+Two builtin services (requiring GPU(s)) are provided:
+`annotation-ai` (SAM2) and `agentic-labeler` (few-shot VLM labeling).
+
+Please note the following changes to the deployment:
+
+- Orchestrators (`delegatedOperatorJobTemplates.jobs.*` and
+  `delegatedOperatorJobTemplates.serviceOrchestrators.*`) are automatically
+  registered and are available within the FiftyOne Enterprise UI under
+  *Settings* -> *Orchestrators*.
+  - Registration is triggered via Helm hooks (`post-install` and `post-upgrade`).
+    Every `helm install` or `helm upgrade` runs a job that connects to MongoDB
+    (with the deployment's existing secrets) and registers the orchestrators.
+    - This replaces the previously required
+      [manual registration process](../../docs/orchestrators/configuring-kubernetes-orchestrator.md).
+- The chart provides two service orchestrators
+  (`cpuServiceOrc` and `gpuServiceOrc`), both registered by default,
+  so both builtin services appear under *Settings* -> *Services*.
+  - Both are registered in a stopped state and neither starts on its own.
+
+The `gpuServiceOrc` requests `nvidia.com/gpu` without setting a `nodeSelector`.
+`nodeSelectors` are specific to each cloud provider.
+On clusters without GPU nodes, starting a GPU service leaves the pod `Pending`
+for the full readiness timeout period (before the service reports an error).
+To disable `gpuServiceOrc` registration, set:
+
+```yaml
+delegatedOperatorJobTemplates:
+  serviceOrchestrators:
+    gpuServiceOrc:
+      enabled: false
+```
+
+To disable registering all orchestrators (service and job), set
+
+```yaml
+delegatedOperatorJobTemplates:
+  template:
+    registerOrchestrator: false
+```
+
+See the
+[Configuring Service Orchestrators](../../docs/configuring-service-orchestrator.md)
+documentation for GPU requirements and accelerator sizing, and
+[Leveraging GPU Workloads](./configuring-gpu-workloads.md)
+for per-cloud node scheduling.
 
 #### FiftyOne Enterprise v2.22+ Multimodal Datasets
 
@@ -380,7 +432,7 @@ FiftyOne Enterprise v2.7.0 introduces numerous changes to delegated operators.
 1. The `delegatedOperatorExecutorSettings` setting in `values.yaml` has
    been deprecated in favor of `delegatedOperatorDeployments`.
    Please refer to
-   [the delegated operator documentation](./configuring-delegated-operators.md#v270)
+   [the delegated operator documentation](./configuring-delegated-operators.md#migrating-from-delegatedoperatorexecutorsettings-to-delegatedoperatordeployments)
    for migrating to the new setting.
 
 #### FiftyOne Enterprise v2.5+ Delegated Operator Changes
@@ -464,7 +516,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -529,7 +581,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires*
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -548,7 +600,7 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -630,14 +682,14 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires*
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 _requires_ a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >

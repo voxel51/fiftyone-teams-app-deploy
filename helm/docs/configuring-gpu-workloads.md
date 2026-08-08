@@ -21,14 +21,17 @@
   - [Prerequisites](#prerequisites)
   - [Deploying GPU-enabled Delegated Operator Pods](#deploying-gpu-enabled-delegated-operator-pods)
   - [Deploying GPU-enabled On-Demand Jobs](#deploying-gpu-enabled-on-demand-jobs)
+  - [Deploying GPU-enabled Service Orchestrators](#deploying-gpu-enabled-service-orchestrators)
 - [Utilizing Azure AKS GPUs For Delegated Operations](#utilizing-azure-aks-gpus-for-delegated-operations)
   - [Prerequisites](#prerequisites-1)
   - [Deploying GPU-enabled Delegated Operator Pods](#deploying-gpu-enabled-delegated-operator-pods-1)
   - [Deploying GPU-enabled On-Demand Jobs](#deploying-gpu-enabled-on-demand-jobs-1)
+  - [Deploying GPU-enabled Service Orchestrators](#deploying-gpu-enabled-service-orchestrators-1)
 - [Utilizing AWS EKS GPUs For Delegated Operations](#utilizing-aws-eks-gpus-for-delegated-operations)
   - [Prerequisites](#prerequisites-2)
   - [Deploying GPU-enabled Delegated Operator Pods](#deploying-gpu-enabled-delegated-operator-pods-2)
   - [Deploying GPU-enabled On-Demand Jobs](#deploying-gpu-enabled-on-demand-jobs-2)
+  - [Deploying GPU-enabled Service Orchestrators](#deploying-gpu-enabled-service-orchestrators-2)
 
 <!-- tocstop -->
 
@@ -36,9 +39,17 @@
 
 Many machine learning applications utilize GPU hardware for
 intensive computations.
-The FiftyOne Enterprise helm chart allows users to schedule pods on
-GPU-enabled nodes using the `nodeSelector`, `resource`, and `toleration`
+The FiftyOne Enterprise Helm chart allows users to schedule pods on
+GPU-enabled nodes using the `nodeSelector`, `resources`, and `tolerations`
 settings for individual services.
+
+These three settings apply to always-running delegated operators,
+on-demand jobs, and
+[service orchestrators](../../docs/configuring-service-orchestrator.md).
+The chart provides a `gpuServiceOrc` service orchestrator that requests a
+GPU generically (without a cloud-specific `nodeSelector`).
+The service orchestrator section for each cloud below
+covers what to add.
 
 ## Utilizing GKE GPUs For Delegated Operations
 
@@ -163,6 +174,57 @@ delegatedOperatorJobTemplates:
 Upgrade your deployment via `helm upgrade` and wait for the
 `k8s-job-manifests` ConfigMap to be updated.
 
+### Deploying GPU-enabled Service Orchestrators
+
+The chart provides a `gpuServiceOrc`
+[service orchestrator](../../docs/configuring-service-orchestrator.md)
+that requests `nvidia.com/gpu: 1` without a `nodeSelector`.
+On GKE Standard with an existing GPU node pool, a `nodeSelector` is not required
+(GPU taint is tolerated automatically).
+
+Two GKE configurations need the accelerator labels:
+
+- Autopilot rejects GPU pods that do not set
+  `cloud.google.com/gke-accelerator`.
+- Node auto-provisioning needs the label to decide which node pool
+  to create or grow when scaling from zero.
+
+Add the labels to the shipped orchestrator instead of declaring a new one,
+so its `services` entries are inherited rather than restated.
+`nodeSelector` is a map, so these keys merge into the chart's value:
+
+```yaml
+delegatedOperatorJobTemplates:
+  serviceOrchestrators:
+    gpuServiceOrc:
+      nodeSelector:
+        cloud.google.com/gke-accelerator: nvidia-l4  # Modify as needed
+        cloud.google.com/gke-accelerator-count: "1"  # Modify as needed
+      resources:
+        requests:
+          cpu: 4        # Modify as needed
+          memory: 32Gi  # Modify as needed
+```
+
+Select an accelerator from the
+[minimums for each service](../../docs/configuring-service-orchestrator.md#accelerator-sizing).
+`nvidia.com/gpu: 1` defines a device count but cannot specify VRAM requirements.
+Without the `nodeSelector` labels, a pod can be scheduled onto
+an accelerator with insufficient VRAM for the model.
+The model will fail to load (instead of failing at scheduling time).
+
+For the `annotation-ai` service,
+the chart sets the `LD_LIBRARY_PATH` environment variable
+according to the
+[google GPU driver][gpu-gcp-gke-standard-cuda].
+The `agentic-labeler` service image contains this environment variable.
+A service whose image does not resolve the driver libraries itself needs
+the same variable set under its `entrypoint.container.env`
+(or under its orchestrator's `env`).
+
+Upgrade your deployment via `helm upgrade` and wait for the
+`k8s-job-manifests` ConfigMap to be updated.
+
 ## Utilizing Azure AKS GPUs For Delegated Operations
 
 <!-- markdownlint-disable-next-line no-duplicate-heading -->
@@ -252,6 +314,43 @@ delegatedOperatorJobTemplates:
           operator: Equal
           value: gpu
 ```
+
+Upgrade your deployment via `helm upgrade` and wait for the
+`k8s-job-manifests` ConfigMap to be updated.
+
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
+### Deploying GPU-enabled Service Orchestrators
+
+The chart provides a `gpuServiceOrc`
+[service orchestrator](../../docs/configuring-service-orchestrator.md)
+that tolerates the `nvidia.com/gpu` taint.
+AKS GPU node pools are conventionally tainted `sku=gpu`.
+The orchestrator needs that toleration to schedule.
+
+The `tolerations` list is replaced (rather than merged).
+The value below replaces the chart's default `nvidia.com/gpu` toleration.
+Include both entries if the cluster has node pools using either taint:
+
+```yaml
+delegatedOperatorJobTemplates:
+  serviceOrchestrators:
+    gpuServiceOrc:
+      tolerations:
+        - effect: NoSchedule
+          key: sku
+          operator: Equal
+          value: gpu
+      resources:
+        requests:
+          cpu: 4        # Modify as needed
+          memory: 32Gi  # Modify as needed
+```
+
+Select an accelerator from the
+[minimums for each service](../../docs/configuring-service-orchestrator.md#accelerator-sizing).
+On clusters with more than one accelerator type,
+add a `nodeSelector` for the node pool.
+`nvidia.com/gpu: 1` defines a device count but cannot specify VRAM requirements.
 
 Upgrade your deployment via `helm upgrade` and wait for the
 `k8s-job-manifests` ConfigMap to be updated.
@@ -369,6 +468,36 @@ delegatedOperatorJobTemplates:
           cpu: 4               # Modify For Your Needs
           memory: 12Gi         # Modify For Your Needs
           nvidia.com/gpu: 1    # Modify For Your Needs
+```
+
+Upgrade your deployment via `helm upgrade` and wait for the
+`k8s-job-manifests` ConfigMap to be updated.
+
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
+### Deploying GPU-enabled Service Orchestrators
+
+The chart provides a `gpuServiceOrc`
+[service orchestrator](../../docs/configuring-service-orchestrator.md)
+that requests `nvidia.com/gpu: 1` and the toleration that EKS GPU nodes use.
+No scheduling changes are required beyond having GPU nodes that
+advertise `nvidia.com/gpu`.
+
+The chart sets no cpu or memory request on the orchestrator, so set them
+for the model you intend to run,
+and add a `nodeSelector` on a cluster with more than one instance type
+so the pod lands on an accelerator that meets the
+[minimum for the service](../../docs/configuring-service-orchestrator.md#accelerator-sizing):
+
+```yaml
+delegatedOperatorJobTemplates:
+  serviceOrchestrators:
+    gpuServiceOrc:
+      nodeSelector:
+        node.kubernetes.io/instance-type: g6.2xlarge  # Modify as needed
+      resources:
+        requests:
+          cpu: 4        # Modify as needed
+          memory: 32Gi  # Modify as needed
 ```
 
 Upgrade your deployment via `helm upgrade` and wait for the
