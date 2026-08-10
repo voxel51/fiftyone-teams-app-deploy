@@ -808,7 +808,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.enabled | bool | `false` | Controls whether the Activity Analytics worker Deployments are rendered. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity"` | Worker image published from the fiftyone-activity repository. |
-| activitySettings.image.tag | string | `"d76cdc9a4c7f2be2d6d5ce4ac7540e61faf104d4"` | Worker image tag. Required when `activitySettings.enabled` is `true`. |
+| activitySettings.image.tag | string | `"6ab5164b4bbcd5b277c6a640a9e7e1c3799dfeb6"` | Worker image tag. Required when `activitySettings.enabled` is `true`. v0.0.22 — the newest published build that folds `workflow.decision_attributed` (the pinned predecessor predated the rename and folded no decisions). Bump to >=0.0.26 when FOEPD-4410 publishes it. |
 | activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
 | activitySettings.orgId | string | `""` | Organization the workers and producers stamp on their events. Rollups are scoped per organization, so events emitted without one are not returned by the read path. Required when `activitySettings.enabled` is `true`. |
 | activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
@@ -816,6 +816,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
 | activitySettings.workers.ingest.replicaCount | int | `2` | Number of ingest worker replicas. |
 | activitySettings.workers.prune.command | list | `["fiftyone-activity-prune-worker"]` | Entrypoint for the prune worker, which enforces the event store size cap. Without it only the time-based TTL applies. |
+| activitySettings.workers.prune.enabled | bool | `false` | Controls whether the prune worker Deployment is rendered. Default OFF: its entrypoint first ships in fiftyone-activity >=0.0.26 (FOEPD-4410) — with the current image pin the container cannot start. Flip on when the tag is bumped. |
 | activitySettings.workers.prune.recreate | bool | `true` | Use the `Recreate` strategy. The prune worker owns a repeatable schedule, so only one replica may reconcile it. |
 | activitySettings.workers.prune.replicaCount | int | `1` | Number of prune worker replicas. Keep at 1. |
 | activitySettings.workers.rollup.command | list | `["fiftyone-activity-rollup-worker"]` | Entrypoint for the rollup worker. |

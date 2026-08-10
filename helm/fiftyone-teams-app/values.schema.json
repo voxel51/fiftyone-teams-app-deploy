@@ -25,8 +25,8 @@
               "type": "string"
             },
             "tag": {
-              "default": "d76cdc9a4c7f2be2d6d5ce4ac7540e61faf104d4",
-              "description": "Worker image tag. Required when `activitySettings.enabled` is `true`.",
+              "default": "6ab5164b4bbcd5b277c6a640a9e7e1c3799dfeb6",
+              "description": "Worker image tag. Required when `activitySettings.enabled` is `true`.\nv0.0.22 — the newest published build that folds\n`workflow.decision_attributed` (the pinned predecessor predated the\nrename and folded no decisions). Bump to \u003e=0.0.26 when FOEPD-4410\npublishes it.",
               "title": "tag",
               "type": "string"
             }
@@ -145,6 +145,12 @@
                   },
                   "title": "command",
                   "type": "array"
+                },
+                "enabled": {
+                  "default": false,
+                  "description": "Controls whether the prune worker Deployment is rendered.\nDefault OFF: its entrypoint first ships in fiftyone-activity\n\u003e=0.0.26 (FOEPD-4410) — with the current image pin the container\ncannot start. Flip on when the tag is bumped.",
+                  "title": "enabled",
+                  "type": "boolean"
                 },
                 "recreate": {
                   "default": true,
