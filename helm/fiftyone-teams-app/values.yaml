@@ -1565,7 +1565,13 @@ teamsAppSettings:
     # @schema
     # -- TEMPORARY dev flag: shows the workflow Activity tab (raw event
     # tail, manager-only) for verifying event capture. Remove with the tab.
-    VFF_Workflow_ACTIVITY: "true"
+    VFF_WF_ACTIVITY: "true"
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
+    # -- Dev flag: shows the workflow Metrics tab (FOEPD-4342 pre-release
+    # gate).
+    VFF_WF_METRIC: "true"
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==0.11.0`).
     FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.23.0

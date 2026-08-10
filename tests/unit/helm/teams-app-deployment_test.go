@@ -509,7 +509,11 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "false"
           },
           {
-            "name": "VFF_Workflow_ACTIVITY",
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
             "value": "true"
           }
         ]`, chartVersion)
@@ -603,7 +607,11 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "TEST_VALUE"
           },
           {
-            "name": "VFF_Workflow_ACTIVITY",
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
             "value": "true"
           },
           {
@@ -702,7 +710,11 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "false"
           },
           {
-            "name": "VFF_Workflow_ACTIVITY",
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
             "value": "true"
           }
         ]`, chartVersion)
@@ -791,7 +803,11 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "false"
           },
           {
-            "name": "VFF_Workflow_ACTIVITY",
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
             "value": "true"
           }
         ]`, chartVersion)
@@ -879,7 +895,11 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "false"
           },
           {
-            "name": "VFF_Workflow_ACTIVITY",
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
             "value": "true"
           }
         ]`, chartVersion)
@@ -967,7 +987,11 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "false"
           },
           {
-            "name": "VFF_Workflow_ACTIVITY",
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
             "value": "true"
           }
         ]`, chartVersion)
@@ -1055,7 +1079,11 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "false"
           },
           {
-            "name": "VFF_Workflow_ACTIVITY",
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
             "value": "true"
           }
         ]`, chartVersion)
