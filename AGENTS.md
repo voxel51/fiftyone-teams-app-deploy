@@ -67,7 +67,7 @@ plugin installs, and delegated operators entirely).
 | Deployment target? | Docker Compose / Kubernetes (Helm) | Which of Step 2's two paths to follow |
 | Identity provider protocol? | SAML → `legacy-auth`; OIDC or air-gapped (no external IdP) → `internal-auth` | `docker/README.md` Step 3 / `helm/fiftyone-teams-app/README.md` |
 | Plugins? | Builtin only / Shared / **Dedicated (standard — see below)** | `docker/docs/configuring-plugins.md`, `helm/docs/configuring-plugins.md` |
-| Delegated operators (background compute)? | None / **Always-on `teams-do` (standard — see below)** / On-demand (Anyscale, Databricks, or in-cluster Kubernetes Jobs) | `docs/configuring-on-demand-orchestrator.md` + `docs/orchestrators/*` |
+| Delegated operators (background compute)? | **Some form is standard — see below.** Ask the customer which: always-on `teams-do` workers, or on-demand (Anyscale, Databricks, or in-cluster Kubernetes Jobs) | `docs/configuring-on-demand-orchestrator.md` + `docs/orchestrators/*` |
 | GPU-backed workloads? | Yes/No — needed for delegated operators doing embeddings/inference, and *required* for either builtin service below | `docker/docs/configuring-gpu-workloads.md`, `helm/docs/configuring-gpu-workloads.md` |
 | Agentic Labeler (few-shot VLM auto-labeling)? | On/Off — builtin GPU service, needs 24GB+ VRAM (Ampere or newer) | `docker/docs/configuring-agentic-labeler.md`, `docs/configuring-service-orchestrator.md` |
 | Annotation AI (SAM2-assisted segmentation)? | On/Off — builtin GPU service, needs 16GB+ VRAM | `docs/configuring-service-orchestrator.md` |
@@ -81,12 +81,14 @@ plugin installs, and delegated operators entirely).
 | Corporate proxy in the network path? | Yes/No | `docker/docs/configuring-proxies.md`, `helm/docs/configuring-proxies.md` |
 | Air-gapped (no egress to Docker Hub / GHCR / public PyPI)? | Yes/No | Adds items to Step 1's gate — see below |
 
-**Standard recommendation:** default the plugins and delegated-operators
-answers to **Dedicated Plugins** and **Always-on Delegated Operators** unless
-the customer states a specific reason not to (e.g. no long-running or
-compute-heavy background jobs planned, or a hard resource constraint on the
-host/cluster). Both are already the recommended production configuration
-according to the docs themselves — as of the current Docker Compose flow they
+**Standard recommendation:** default the plugins answer to **Dedicated
+Plugins**, and set up **some form of delegated operators** — the customer's
+call whether that's always-on `teams-do` workers or an on-demand executor —
+unless the customer states a specific reason to run with none at all (e.g. no
+long-running or compute-heavy background jobs planned, or a hard resource
+constraint on the host/cluster). Both are already the recommended production
+configuration according to the docs themselves — as of the current Docker
+Compose flow they
 are in fact the *default* first-launch command (see Step 2). Configure both by
 default; only skip one on an explicit stated reason.
 
@@ -139,7 +141,10 @@ command/flag detail; this is the ordered checklist with gates.
 5. Initial deployment (Docker README Step 5). A fresh install does **not**
    need `FIFTYONE_DATABASE_ADMIN=true` (v2.9+ auto-initializes) — leave it
    `false`. Launch with dedicated plugins **and** delegated operators per the
-   Step 0 standard recommendation:
+   Step 0 standard recommendation. This is the always-on `teams-do` path; if
+   the customer instead prefers an on-demand executor (Step 0), skip
+   `compose.delegated-operators.yaml` here and follow
+   `docs/configuring-on-demand-orchestrator.md` instead:
 
    ```shell
    docker compose \
@@ -224,7 +229,7 @@ proactively configure features nobody asked for.
 | Feature | Docker doc | Helm doc |
 | --- | --- | --- |
 | Dedicated plugins (standard) | `docker/docs/configuring-plugins.md` | `helm/docs/configuring-plugins.md` |
-| Always-on delegated operators (standard) | `docker/docs/configuring-delegated-operators.md` | `helm/docs/configuring-delegated-operators.md` |
+| Delegated operators — always-on (standard; on-demand is a customer preference, see Step 0) | `docker/docs/configuring-delegated-operators.md` | `helm/docs/configuring-delegated-operators.md` |
 | On-demand orchestrators (Anyscale/Databricks/K8s Jobs) | `docs/configuring-on-demand-orchestrator.md` + `docs/orchestrators/*` | `helm/docs/configuring-delegated-operators.md` (`delegatedOperatorJobTemplates`) |
 | GPU workloads | `docker/docs/configuring-gpu-workloads.md` | `helm/docs/configuring-gpu-workloads.md` |
 | Agentic Labeler (GPU builtin service) | `docker/docs/configuring-agentic-labeler.md` | `docs/configuring-service-orchestrator.md` (`serviceOrchestrators.gpuServiceOrc`) |
