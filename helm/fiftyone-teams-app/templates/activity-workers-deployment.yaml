@@ -73,8 +73,12 @@ spec:
                 secretKeyRef:
                   name: {{ $.Values.secret.name }}
                   key: fiftyoneDatabaseName
+            {{- /* Enforced, not just documented: rollups are org-scoped,
+                   so an empty org id makes the snapshot worker skip every
+                   cycle and every emitted event invisible to the readers —
+                   a "successful" install of a silently empty pipeline. */}}
             - name: FIFTYONE_ACTIVITY_ORG_ID
-              value: {{ $a.orgId | quote }}
+              value: {{ required "activitySettings.orgId is required when activitySettings.enabled is true" $a.orgId | quote }}
             {{- if $a.snapshotIntervalMs }}
             - name: FIFTYONE_ACTIVITY_SNAPSHOT_INTERVAL_MS
               value: {{ $a.snapshotIntervalMs | quote }}

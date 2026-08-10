@@ -29,19 +29,21 @@ app.voxel51.com/component: {{ printf "activity-%s-worker" .worker }}
 
 {{/*
 Emit a `FIFTYONE_ACTIVITY_MONGO_DB` env entry for a main workload container.
-Renders empty when Activity Analytics is disabled, allowing safe inclusion from
-env-vars-list helpers.
+Renders empty when Activity Analytics is disabled OR when no dedicated
+database is configured, allowing safe inclusion from env-vars-list helpers.
 
-Points activity reads at the per-deployment FiftyOne database, where the workers
-write the activity_* collections.
+Only the dedicated-database override is ever emitted: when
+`activitySettings.mongo.database` is unset the activity collections are
+co-located in the per-deployment FiftyOne database, and the readers fall
+back to the standard `FIFTYONE_DATABASE_NAME` on their own. Emitting the
+var unconditionally would pin readers to a value that can drift from what
+the workers template resolves (it honors `mongo.database`) — a dedicated-DB
+deployment would then write database X and read database Y with no error.
 */}}
 {{- define "activity.mongo-db-env" -}}
-{{- if .Values.activitySettings.enabled }}
+{{- if and .Values.activitySettings.enabled .Values.activitySettings.mongo.database }}
 - name: FIFTYONE_ACTIVITY_MONGO_DB
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.secret.name }}
-      key: fiftyoneDatabaseName
+  value: {{ .Values.activitySettings.mongo.database | quote }}
 {{- end }}
 {{- end }}
 

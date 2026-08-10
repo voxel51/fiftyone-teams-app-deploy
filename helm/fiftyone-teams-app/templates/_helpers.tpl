@@ -326,9 +326,17 @@ Create a merged list of environment variables for delegated-operator-executor
       key: encryptionKey
 {{- if and .ctx .ctx.Values.telemetry.enabled }}
 {{- include "telemetry.redis-url-env" .ctx }}
-{{- include "fiftyone-mq.redis-url-env" .ctx }}
 - name: TELEMETRY_SOCKET
   value: /tmp/telemetry/agent.sock
+{{- end }}
+{{- /* Queue + activity env are independent of telemetry: delegated
+operators are activity producers (op lifecycle + sample CRUD events),
+so gating their queue URL on the telemetry toggle silently dropped
+their emits whenever telemetry was off. */}}
+{{- if .ctx }}
+{{- include "fiftyone-mq.redis-url-env" .ctx }}
+{{- include "activity.org-id-env" .ctx }}
+{{- include "activity.mongo-db-env" .ctx }}
 {{- end }}
 {{- range $key, $val := .env }}
 - name: {{ $key }}
