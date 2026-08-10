@@ -3,7 +3,8 @@
 # producers and writes the activity_* collections.
 activitySettings:
   # -- Controls whether the Activity Analytics worker Deployments are rendered.
-  enabled: false
+  # DEPLOY-ONLY BRANCH: forced on for lanzhen.ephem testing.
+  enabled: true
   image:
     # -- Worker image published from the fiftyone-activity repository.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
@@ -1236,7 +1237,8 @@ fiftyoneLicenseSecrets:
 fiftyoneMq:
   # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
   # environment variable are rendered.
-  enabled: false
+  # DEPLOY-ONLY BRANCH: forced on for lanzhen.ephem testing.
+  enabled: true
   redis:
     # -- Controls whether the bundled Redis Deployment and Service are
     # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.
