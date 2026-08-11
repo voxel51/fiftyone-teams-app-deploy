@@ -11,6 +11,48 @@ hasn't passed.
 
 If you are a human maintaining this repo, see [Maintaining this file](#maintaining-this-file).
 
+## How to invoke this runbook
+
+Point your agent's working directory at this repo (or the relevant
+`docker/`/`helm/` subdirectory), start a fresh session so it actually loads
+this file, and give it a prompt like one of these — they tell it which entry
+point to use.
+
+### Agent-guided deployment
+
+> Using AGENTS.md in this repo as your runbook, help me deploy FiftyOne
+> Enterprise from scratch. Start at Step 0 and ask me the intake questions
+> before touching any file.
+
+The agent should start at [Step 0](#step-0--determine-deployment-shape) and
+work through Steps 0-4 in order, gate by gate.
+
+### Agent-guided upgrade
+
+> Using AGENTS.md in this repo as your runbook, help me upgrade our existing
+> FiftyOne Enterprise deployment. We're currently running \<current version\>
+> on \<Docker Compose / Helm\> and want to move to \<target version\>.
+
+An upgrade is **not** Step 0 run again from a blank slate — the deployment
+shape already exists. Instead the agent should:
+
+1. Confirm the *current* feature set (plugins mode, delegated-operator
+   count/type, GPU services, telemetry, etc.) by reading the live
+   `.env`/`compose.override.yaml` or `helm get values` — not by re-asking
+   Step 0's questions as if nothing were deployed yet — and flag anything
+   that looks like drift from what Step 3 recommends.
+2. Read [`docker/docs/upgrading.md`](./docker/docs/upgrading.md) or
+   [`helm/docs/upgrading.md`](./helm/docs/upgrading.md) for the specific
+   version jump and apply every version-specific step it calls out.
+3. Set `FIFTYONE_DATABASE_ADMIN=true` only for the duration of the migration
+   window, then set it back to `false` (see
+   [Non-negotiable rules](#non-negotiable-rules)).
+4. For Helm, preview the change first — e.g. the `helm diff` plugin already
+   noted in [`helm/README.md`](./helm/README.md#example-with-valuesyaml) —
+   rather than applying blind.
+5. Re-run [Step 4 — Final validation](#step-4--final-validation) once the
+   upgrade completes.
+
 ## Non-negotiable rules
 
 Read these before touching any file. They exist because violating them has
@@ -65,9 +107,9 @@ plugin installs, and delegated operators entirely).
 | Question | Options | Where it matters later |
 | --- | --- | --- |
 | Deployment target? | Docker Compose / Kubernetes (Helm) | Which of Step 2's two paths to follow |
-| Identity provider protocol? | SAML → `legacy-auth`; OIDC or air-gapped (no external IdP) → `internal-auth` | `docker/README.md` Step 3 / `helm/fiftyone-teams-app/README.md` |
+| Identity provider? | Which IdP do you use — Okta, Azure AD/Entra ID, Google Workspace, PingIdentity, ADFS, something else — or none at all (air-gapped/self-contained)? See "Auth mode, explained" below | `docker/README.md` Step 3 / `helm/fiftyone-teams-app/README.md` |
 | Plugins? | Builtin only / Shared / **Dedicated (standard — see below)** | `docker/docs/configuring-plugins.md`, `helm/docs/configuring-plugins.md` |
-| Delegated operators (background compute)? | **Some form is standard — see below.** Ask the customer which: always-on `teams-do` workers, or on-demand (Anyscale, Databricks, or in-cluster Kubernetes Jobs) | `docs/configuring-on-demand-orchestrator.md` + `docs/orchestrators/*` |
+| Delegated operators (background compute)? | **Some form is standard — see below.** Ask: how many orchestrators do you want, and what type/where should each run? E.g. always-on `teams-do` workers on a VM/on-prem host or in Kubernetes, or on-demand executors on Anyscale, Databricks, or whichever cloud (AWS/GCP/Azure) Kubernetes you already run | `docs/configuring-on-demand-orchestrator.md` + `docs/orchestrators/*` |
 | GPU-backed workloads? | Yes/No — needed for delegated operators doing embeddings/inference, and *required* for either builtin service below | `docker/docs/configuring-gpu-workloads.md`, `helm/docs/configuring-gpu-workloads.md` |
 | Agentic Labeler (few-shot VLM auto-labeling)? | On/Off — builtin GPU service, needs 24GB+ VRAM (Ampere or newer) | `docker/docs/configuring-agentic-labeler.md`, `docs/configuring-service-orchestrator.md` |
 | Annotation AI (SAM2-assisted segmentation)? | On/Off — builtin GPU service, needs 16GB+ VRAM | `docs/configuring-service-orchestrator.md` |
@@ -81,16 +123,37 @@ plugin installs, and delegated operators entirely).
 | Corporate proxy in the network path? | Yes/No | `docker/docs/configuring-proxies.md`, `helm/docs/configuring-proxies.md` |
 | Air-gapped (no egress to Docker Hub / GHCR / public PyPI)? | Yes/No | Adds items to Step 1's gate — see below |
 
+**Auth mode, explained:** this isn't a vendor choice — almost any IdP (Okta,
+Azure AD/Entra ID, Google Workspace, PingIdentity, OneLogin, ADFS, etc.) can
+work with either mode. The actual decision comes down to:
+
+- **Do you need SAML?** Only `legacy-auth` supports it — it's brokered
+  through Auth0, which supports SAML plus a wide range of OIDC/OAuth2
+  providers. If the customer's identity team says "we're connecting via
+  SAML," they need `legacy-auth`.
+- **Do you need to avoid depending on Auth0's cloud service** — air-gapped,
+  or a policy against external auth dependencies? Use `internal-auth` — CAS
+  handles authentication directly, with no external Auth0 hop. It only
+  supports OIDC/OAuth2 connections, **not SAML**.
+- **Otherwise** (network egress is fine, the IdP will connect via OIDC/OAuth2,
+  and SAML isn't required): either mode works technically, but
+  `internal-auth` is simpler to operate since it has no external dependency.
+
+If the customer doesn't already know which protocol their IdP will use,
+that's a question for their identity/IT team — don't guess at it.
+
 **Standard recommendation:** default the plugins answer to **Dedicated
-Plugins**, and set up **some form of delegated operators** — the customer's
-call whether that's always-on `teams-do` workers or an on-demand executor —
+Plugins**, and plan on setting up **some form of delegated operators** —
 unless the customer states a specific reason to run with none at all (e.g. no
 long-running or compute-heavy background jobs planned, or a hard resource
 constraint on the host/cluster). Both are already the recommended production
-configuration according to the docs themselves — as of the current Docker
-Compose flow they
-are in fact the *default* first-launch command (see Step 2). Configure both by
-default; only skip one on an explicit stated reason.
+configuration according to the docs themselves. But *how many* orchestrators
+and *what type/where* each runs (always-on vs. on-demand; on-prem/VM vs.
+their existing cloud's Kubernetes vs. Databricks/Anyscale) is entirely the
+customer's call — ask, don't assume. Docker Compose's default first-launch
+command (see Step 2) happens to include always-on workers; treat that as a
+starting point to confirm with the customer, not a decision already made on
+their behalf.
 
 ## Step 1 — Prerequisites & access gate
 
@@ -131,7 +194,9 @@ command/flag detail; this is the ordered checklist with gates.
    of this file.
 2. Prepare the license file (Docker README Step 2) → **Gate:** file exists at
    `LOCAL_LICENSE_FILE_DIR/license`, mode `644`.
-3. Choose auth mode per Step 0's answer, `cd legacy-auth` or `cd internal-auth`
+3. Choose auth mode per Step 0's answer (see
+   ["Auth mode, explained"](#step-0--determine-deployment-shape) above if it
+   hasn't been nailed down yet), `cd legacy-auth` or `cd internal-auth`
    (Docker README Step 3).
 4. Configure `.env` (from `env.template`) and `compose.override.yaml` (Docker
    README Step 4) → **Gate:** `BASE_URL`/`AUTH0_BASE_URL`, `FIFTYONE_API_URI`,
@@ -140,11 +205,19 @@ command/flag detail; this is the ordered checklist with gates.
    placeholders.
 5. Initial deployment (Docker README Step 5). A fresh install does **not**
    need `FIFTYONE_DATABASE_ADMIN=true` (v2.9+ auto-initializes) — leave it
-   `false`. Launch with dedicated plugins **and** delegated operators per the
-   Step 0 standard recommendation. This is the always-on `teams-do` path; if
-   the customer instead prefers an on-demand executor (Step 0), skip
-   `compose.delegated-operators.yaml` here and follow
-   `docs/configuring-on-demand-orchestrator.md` instead:
+   `false`. Launch with dedicated plugins per the Step 0 standard
+   recommendation. For delegated operators, use whatever Step 0 settled on —
+   don't default to always-on without checking:
+   - **Always-on `teams-do` workers** (the customer wants one or more
+     always-on workers, on their VM/on-prem host or in Kubernetes): include
+     `compose.delegated-operators.yaml` below.
+   - **On-demand executors only** (Anyscale, Databricks, or in-cluster
+     Kubernetes Jobs): omit `compose.delegated-operators.yaml` and follow
+     `docs/configuring-on-demand-orchestrator.md` instead.
+   - **Both**: include `compose.delegated-operators.yaml` for the always-on
+     workers, then layer the on-demand executor on top per its doc.
+   - **None** (the customer stated a specific reason): omit
+     `compose.delegated-operators.yaml` and skip the on-demand docs too.
 
    ```shell
    docker compose \
@@ -153,6 +226,9 @@ command/flag detail; this is the ordered checklist with gates.
      -f compose.override.yaml \
      up -d
    ```
+
+   (omit `-f compose.delegated-operators.yaml` if the customer chose
+   on-demand-only or none)
 
    → **Gate:** `docker compose ps` shows every expected container `Up`
    (`fiftyone-app`, `teams-app`, `teams-api`, `teams-cas`, `teams-do-*`,
@@ -212,9 +288,10 @@ explicitly in item 5 below, per the Step 0 standard recommendation.
    let cert-manager recreate it).
 5. **Close the plugins/DO gap** — apply
    [Recommended Post-Installation Configuration](./helm/docs/post-install-recommended-configuration.md)
-   to turn on Dedicated Plugins and (per Step 0) Delegated Operators
-   (always-on or on-demand) via a `helm upgrade` with your overlay updated,
-   not a fresh `values.yaml` copy → **Gate:**
+   to turn on Dedicated Plugins, plus whatever delegated-operator count and
+   type Step 0 settled on (always-on, on-demand, or both), via a
+   `helm upgrade` with your overlay updated, not a fresh `values.yaml` copy →
+   **Gate:**
    [Verifying Your Setup](./helm/docs/post-install-recommended-configuration.md#verifying-your-setup)
    passes (a `teams-plugins` pod is `Running`, and a test delegated operation
    completes instead of sitting `QUEUED`).
@@ -229,8 +306,8 @@ proactively configure features nobody asked for.
 | Feature | Docker doc | Helm doc |
 | --- | --- | --- |
 | Dedicated plugins (standard) | `docker/docs/configuring-plugins.md` | `helm/docs/configuring-plugins.md` |
-| Delegated operators — always-on (standard; on-demand is a customer preference, see Step 0) | `docker/docs/configuring-delegated-operators.md` | `helm/docs/configuring-delegated-operators.md` |
-| On-demand orchestrators (Anyscale/Databricks/K8s Jobs) | `docs/configuring-on-demand-orchestrator.md` + `docs/orchestrators/*` | `helm/docs/configuring-delegated-operators.md` (`delegatedOperatorJobTemplates`) |
+| Delegated operators — always-on workers (count/platform per Step 0: VM, on-prem host, or Kubernetes) | `docker/docs/configuring-delegated-operators.md` | `helm/docs/configuring-delegated-operators.md` |
+| Delegated operators — on-demand executors (count/platform per Step 0: Anyscale, Databricks, or K8s Jobs) | `docs/configuring-on-demand-orchestrator.md` + `docs/orchestrators/*` | `helm/docs/configuring-delegated-operators.md` (`delegatedOperatorJobTemplates`) |
 | GPU workloads | `docker/docs/configuring-gpu-workloads.md` | `helm/docs/configuring-gpu-workloads.md` |
 | Agentic Labeler (GPU builtin service) | `docker/docs/configuring-agentic-labeler.md` | `docs/configuring-service-orchestrator.md` (`serviceOrchestrators.gpuServiceOrc`) |
 | Annotation AI / SAM2 (GPU builtin service) | `docs/configuring-service-orchestrator.md` | `docs/configuring-service-orchestrator.md` |
