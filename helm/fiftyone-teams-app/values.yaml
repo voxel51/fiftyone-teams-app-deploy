@@ -3,7 +3,8 @@
 # producers and writes the activity_* collections.
 activitySettings:
   # -- Controls whether the Activity Analytics worker Deployments are rendered.
-  enabled: false
+  # DEPLOY-ONLY BRANCH: forced on for lanny.ephem.
+  enabled: true
   image:
     # -- Worker image published from the fiftyone-activity repository.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
@@ -359,6 +360,8 @@ appSettings:
   deploymentAnnotations: {}
   # Environment Variables are passed to the `fiftyone-app` containers
   env:
+    # DEPLOY-ONLY BRANCH: /features flag for the History gate (lanny.ephem).
+    VFF_WF_ACTIVITY: "true"
     # @schema
     # type: ["string", "boolean"]
     # @schema
@@ -1245,7 +1248,8 @@ fiftyoneLicenseSecrets:
 fiftyoneMq:
   # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
   # environment variable are rendered.
-  enabled: false
+  # DEPLOY-ONLY BRANCH: forced on for lanny.ephem.
+  enabled: true
   redis:
     # -- Controls whether the bundled Redis Deployment and Service are
     # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.
@@ -1384,6 +1388,8 @@ pluginsSettings:
     targetMemoryUtilizationPercentage: 80
   # Environment Variables are passed to the `teams-plugins` containers.
   env:
+    # DEPLOY-ONLY BRANCH: /features flag for the History gate (lanny.ephem).
+    VFF_WF_ACTIVITY: "true"
     # @schema
     # type: ["string", "boolean"]
     # @schema
@@ -1644,6 +1650,9 @@ teamsAppSettings:
     # @schema
     # -- When `false`, disables media export options
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
+    # DEPLOY-ONLY BRANCH: activity/metrics UI flags for lanny.ephem.
+    VFF_WF_ACTIVITY: "true"
+    VFF_WF_METRIC: "true"
     # -- The recommended fiftyone SDK version that will be displayed in the
     # install modal (i.e. `pip install ... fiftyone==2.23.1`).
     FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.23.1
