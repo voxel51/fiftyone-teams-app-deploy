@@ -85,9 +85,15 @@ docker compose \
   up -d
 ```
 
-No `.env` change is needed to turn the feature on. `teams-api` and
-`fiftyone-app` already default `FIFTYONE_MQ_REDIS_URL` to the bundled
-queue Redis, so they find it as soon as the overlay starts it.
+No `.env` change is needed to turn the feature on. Every service that
+emits activity events — `teams-api`, `fiftyone-app`, `teams-plugins`,
+and the `teams-do*` workers — already defaults
+`FIFTYONE_MQ_REDIS_URL` to the bundled queue Redis, so they find it as
+soon as the overlay starts it. That matters under the
+dedicated-plugins layering, where the workflows plugin (the
+annotation and review event producer) executes in `teams-plugins`
+rather than in `fiftyone-app`, and under the delegated-operator
+overlays, where operator runs execute in `teams-do`.
 
 Include the same `-f` set on every subsequent `docker compose` command
 for the deployment. Omitting `compose.activity.yaml` on a later

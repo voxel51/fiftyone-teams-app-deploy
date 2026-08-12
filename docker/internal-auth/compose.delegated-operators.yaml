@@ -43,6 +43,11 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Activity Analytics: delegated operator runs execute here, so the
+      # `op.executed` and `samples.modified` seams enqueue from this service.
+      # Emit is fire-and-forget; unset = those events simply don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
     restart: always
@@ -107,6 +112,11 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Activity Analytics: delegated operator runs execute here, so the
+      # `op.executed` and `samples.modified` seams enqueue from this service.
+      # Emit is fire-and-forget; unset = those events simply don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
     restart: always
