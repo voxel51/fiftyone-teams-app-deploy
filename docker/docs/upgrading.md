@@ -132,7 +132,7 @@ The two services target different workers by default:
 > **NOTE**: In `v2.23.0`, `compose.agenticlabeler.yaml` errantly contained
 > `voxel51/fiftyone-teams-agentic-labeler`.
 > This image doesn't exist and an error occurred when pulled.
-> In `v2.24.0`, image is fixed (set to `voxel51/agentic-labeler`).
+> In `v2.23.1`, image is fixed (set to `voxel51/agentic-labeler`).
 > If you copied that file or pinned the image in an override, correct the name.
 
 Edit
