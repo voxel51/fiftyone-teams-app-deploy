@@ -89,7 +89,7 @@ quickstart  0.21.2
 1. [Upgrade to FiftyOne Enterprise version 2.24.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
    version 2.24.0
-    1. Login to the FiftyOne Enterprise UI
+    1. Log in to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Voxel51 recommends that you upgrade all your datasets.
@@ -428,7 +428,7 @@ Additionally,
 
 1. [Upgrade to FiftyOne Enterprise version 2.24.0](#upgrading-from-previous-versions)
 1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.24.0
-    1. Login to the FiftyOne Enterprise UI
+    1. Log in to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
@@ -520,7 +520,7 @@ Additionally,
 
 1. [Upgrade to FiftyOne Enterprise version 2.24.0](#upgrading-from-previous-versions)
 1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.24.0
-    1. Login to the FiftyOne Enterprise UI
+    1. Log in to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 1. Upgrade all the datasets
@@ -602,7 +602,7 @@ Additionally,
     > Enterprise Database at this step until they upgrade to `fiftyone==2.24.0`
 
 1. Upgrade your FiftyOne SDKs to version 2.24.0
-    1. Login to the FiftyOne Enterprise UI
+    1. Log in to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to
       `Account > Install FiftyOne`
