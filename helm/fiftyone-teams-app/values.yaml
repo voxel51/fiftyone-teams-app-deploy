@@ -8,11 +8,11 @@ activitySettings:
     # -- Worker image published from the fiftyone-activity repository.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- Worker image tag. Required when `activitySettings.enabled` is `true`.
-    # v0.0.22 — the newest published build that folds
-    # `workflow.decision_attributed` (the pinned predecessor predated the
-    # rename and folded no decisions). Bump to >=0.0.26 when FOEPD-4410
-    # publishes it.
-    tag: "6ab5164b4bbcd5b277c6a640a9e7e1c3799dfeb6"
+    # v0.0.26 — the build that first carries the prune worker entrypoint and
+    # the `workflow.decision_attributed` rename. Commit SHA rather than a
+    # semver tag because fiftyone-activity publishes SHA tags only; FOEPD-4410
+    # covers giving it semver tags like the other four images.
+    tag: "8a6f61730c86b306d67fca4f1ca836f24aeb43a7"
     # -- Worker image pull policy. [Reference][image-pull-policy].
     pullPolicy: IfNotPresent
   mongo:
@@ -44,10 +44,10 @@ activitySettings:
       replicaCount: 2
     prune:
       # -- Controls whether the prune worker Deployment is rendered.
-      # Default OFF: its entrypoint first ships in fiftyone-activity
-      # >=0.0.26 (FOEPD-4410) — with the current image pin the container
-      # cannot start. Flip on when the tag is bumped.
-      enabled: false
+      # On by default now that the image pin carries the entrypoint: without
+      # this worker the storage size cap is never enforced and only the
+      # time-based TTL bounds the event store.
+      enabled: true
       # -- Entrypoint for the prune worker, which enforces the event store
       # size cap. Without it only the time-based TTL applies.
       command: ["fiftyone-activity-prune-worker"]

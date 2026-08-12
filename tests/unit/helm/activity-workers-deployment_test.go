@@ -87,11 +87,23 @@ func envByName(container corev1.Container) map[string]corev1.EnvVar {
 	return byName
 }
 
-// The prune worker's entrypoint first ships in fiftyone-activity >=0.0.26
-// (FOEPD-4410); until the image pin is bumped, rendering its Deployment by
-// default would CrashLoopBackOff on every install that enables activity.
-func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerDisabledByDefault() {
+// The prune worker enforces the storage size cap. Without it only the
+// time-based TTL bounds the event store, so it renders by default now that
+// the image pin carries its entrypoint.
+func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerEnabledByDefault() {
 	deployments := s.renderWorkers(activityEnabled(nil))
+	names := []string{}
+	for _, d := range deployments {
+		names = append(names, d.ObjectMeta.Name)
+	}
+	s.Len(deployments, 4, "expected ingest, prune, rollup, snapshot; got %v", names)
+	s.Contains(strings.Join(names, ","), "prune")
+}
+
+func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerOptOut() {
+	deployments := s.renderWorkers(activityEnabled(map[string]string{
+		"activitySettings.workers.prune.enabled": "false",
+	}))
 	names := []string{}
 	for _, d := range deployments {
 		names = append(names, d.ObjectMeta.Name)
@@ -100,13 +112,6 @@ func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerDisabledByDefault
 	for _, d := range deployments {
 		s.NotContains(d.ObjectMeta.Name, "prune")
 	}
-}
-
-func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerOptIn() {
-	deployments := s.renderWorkers(activityEnabled(map[string]string{
-		"activitySettings.workers.prune.enabled": "true",
-	}))
-	s.Len(deployments, 4)
 }
 
 // Rollups are org-scoped: an empty org id yields a "successful" install of a

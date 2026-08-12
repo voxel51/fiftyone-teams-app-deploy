@@ -25,8 +25,8 @@
               "type": "string"
             },
             "tag": {
-              "default": "6ab5164b4bbcd5b277c6a640a9e7e1c3799dfeb6",
-              "description": "Worker image tag. Required when `activitySettings.enabled` is `true`.\nv0.0.22 — the newest published build that folds\n`workflow.decision_attributed` (the pinned predecessor predated the\nrename and folded no decisions). Bump to \u003e=0.0.26 when FOEPD-4410\npublishes it.",
+              "default": "8a6f61730c86b306d67fca4f1ca836f24aeb43a7",
+              "description": "Worker image tag. Required when `activitySettings.enabled` is `true`.\nv0.0.26 — the build that first carries the prune worker entrypoint and\nthe `workflow.decision_attributed` rename. Commit SHA rather than a\nsemver tag because fiftyone-activity publishes SHA tags only; FOEPD-4410\ncovers giving it semver tags like the other four images.",
               "title": "tag",
               "type": "string"
             }
@@ -147,8 +147,8 @@
                   "type": "array"
                 },
                 "enabled": {
-                  "default": false,
-                  "description": "Controls whether the prune worker Deployment is rendered.\nDefault OFF: its entrypoint first ships in fiftyone-activity\n\u003e=0.0.26 (FOEPD-4410) — with the current image pin the container\ncannot start. Flip on when the tag is bumped.",
+                  "default": true,
+                  "description": "Controls whether the prune worker Deployment is rendered.\nOn by default now that the image pin carries the entrypoint: without\nthis worker the storage size cap is never enforced and only the\ntime-based TTL bounds the event store.",
                   "title": "enabled",
                   "type": "boolean"
                 },
