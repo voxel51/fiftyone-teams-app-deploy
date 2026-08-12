@@ -507,14 +507,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
-          },
-          {
-            "name": "VFF_WF_ACTIVITY",
-            "value": "true"
-          },
-          {
-            "name": "VFF_WF_METRIC",
-            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -605,14 +597,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
-          },
-          {
-            "name": "VFF_WF_ACTIVITY",
-            "value": "true"
-          },
-          {
-            "name": "VFF_WF_METRIC",
-            "value": "true"
           },
           {
             "name": "AN_ADDITIONAL_SECRET_ENV",
@@ -708,14 +692,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
-          },
-          {
-            "name": "VFF_WF_ACTIVITY",
-            "value": "true"
-          },
-          {
-            "name": "VFF_WF_METRIC",
-            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -801,14 +777,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
-          },
-          {
-            "name": "VFF_WF_ACTIVITY",
-            "value": "true"
-          },
-          {
-            "name": "VFF_WF_METRIC",
-            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -893,14 +861,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
-          },
-          {
-            "name": "VFF_WF_ACTIVITY",
-            "value": "true"
-          },
-          {
-            "name": "VFF_WF_METRIC",
-            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -985,14 +945,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
-          },
-          {
-            "name": "VFF_WF_ACTIVITY",
-            "value": "true"
-          },
-          {
-            "name": "VFF_WF_METRIC",
-            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -1077,14 +1029,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
-          },
-          {
-            "name": "VFF_WF_ACTIVITY",
-            "value": "true"
-          },
-          {
-            "name": "VFF_WF_METRIC",
-            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -2663,5 +2607,28 @@ func (s *deploymentTeamsAppTemplateTest) TestDeploymentUpdateStrategy() {
 
 			testCase.expected(deployment.Spec.Strategy)
 		})
+	}
+}
+
+// TestNoActivityDebugFlagDefaults pins the policy that the SHIPPING chart
+// never enables the activity/metrics debug flags by default: VFF_WF_ACTIVITY
+// gates internal debug surfaces (the workflow Activity tab + label History)
+// and VFF_WF_METRIC gates the pre-release Metrics tab — deployments opt in
+// per environment, customers never get them implicitly.
+func (s *deploymentTeamsAppTemplateTest) TestNoActivityDebugFlagDefaults() {
+	options := &helm.Options{SetValues: map[string]string{}}
+	output := helm.RenderTemplate(
+		s.T(), options, s.chartPath, s.releaseName, s.templates,
+	)
+	for _, flag := range []string{
+		"VFF_WF_ACTIVITY",
+		"VFF_WF_METRIC",
+		"VFF_Workflow_ACTIVITY",
+	} {
+		s.NotContains(
+			output, flag,
+			"the default chart render must not set %s — debug flags are per-env opt-ins",
+			flag,
+		)
 	}
 }
