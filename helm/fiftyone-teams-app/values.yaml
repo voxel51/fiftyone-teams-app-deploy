@@ -24,7 +24,7 @@ activitySettings:
   # -- Organization the workers and producers stamp on their events. Rollups are
   # scoped per organization, so events emitted without one are not returned by
   # the read path. Required when `activitySettings.enabled` is `true`.
-  orgId: ""
+  orgId: dev-internal-env  # DEPLOY-ONLY BRANCH: lanny.ephem org
   # -- Resources for the worker containers. [Reference][resources].
   resources:
     requests:
