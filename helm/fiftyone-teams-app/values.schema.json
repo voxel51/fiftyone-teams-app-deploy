@@ -3568,8 +3568,8 @@
               "type": "string"
             },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
-              "default": "2.23.1",
-              "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==2.23.1`).",
+              "default": "2.24.0",
+              "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==2.24.0`).",
               "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
               "type": "string"
             },
