@@ -33,6 +33,10 @@ services:
       FIFTYONE_INTERNAL_SERVICE: "true"
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # The activity gate. compose.activity.yaml cannot reach this
+      # service (it is not in every -f set, so declaring it there
+      # would create the container), so arm it from .env instead.
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
       # Activity Analytics: delegated operator runs execute here, so the
       # `op.executed` and `samples.modified` seams enqueue from this service.
       # Emit is fire-and-forget; unset = those events simply don't flow.

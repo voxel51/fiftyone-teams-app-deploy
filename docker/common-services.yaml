@@ -17,6 +17,15 @@ services:
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_SIGNED_URL_EXPIRATION: ${FIFTYONE_SIGNED_URL_EXPIRATION:-24}
+      # Activity Analytics is opt-in and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # compose.activity.yaml flips it to true; set it in .env to arm
+      # services that overlay does not reach (teams-plugins, teams-do).
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
       # Activity Analytics: where operator/annotation emits enqueue events.
       # Emit is fire-and-forget; unset = those events simply don't flow.
       FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
@@ -49,6 +58,15 @@ services:
       FIFTYONE_ENV: ${FIFTYONE_ENV}
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_LOGGING_FORMAT: ${FIFTYONE_LOGGING_FORMAT:-text}
+      # Activity Analytics is opt-in and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # compose.activity.yaml flips it to true; set it in .env to arm
+      # services that overlay does not reach (teams-plugins, teams-do).
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
       # Activity Analytics: teams-api hosts the domain-event bridge, which
       # enqueues activity events here. Unset = bridged events are dropped.
       FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
@@ -166,6 +184,15 @@ services:
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Activity Analytics is opt-in and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # compose.activity.yaml flips it to true; set it in .env to arm
+      # services that overlay does not reach (teams-plugins, teams-do).
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
       # Activity Analytics: under the dedicated-plugins layering the plugins
       # (including workflows, the annotation/review event producer) execute
       # here rather than in fiftyone-app, so this service has to reach the
@@ -231,6 +258,10 @@ services:
     image: voxel51/fiftyone-activity:v2.24.0
     command: ["fiftyone-activity-worker"]
     environment:
+      # This service only exists under compose.activity.yaml, so the
+      # default is true here: the rollup and snapshot workers emit
+      # derived events through the same flag-gated path they consume.
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
       FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
       FIFTYONE_ACTIVITY_MONGO_URI: ${FIFTYONE_DATABASE_URI}
       # Co-locate the activity_* collections in the deployment's own
@@ -266,6 +297,15 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Activity Analytics is opt-in and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # compose.activity.yaml flips it to true; set it in .env to arm
+      # services that overlay does not reach (teams-plugins, teams-do).
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
       # Activity Analytics: delegated operator runs execute here, so the
       # `op.executed` and `samples.modified` seams enqueue from this service.
       # Emit is fire-and-forget; unset = those events simply don't flow.

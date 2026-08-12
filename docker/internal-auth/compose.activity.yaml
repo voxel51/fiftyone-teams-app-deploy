@@ -19,6 +19,31 @@
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 services:
+# Arm the emit path. `FIFTYONE_ACTIVITY_ENABLED` defaults to false in
+# common-services.yaml, and adding this overlay to the `-f` set is what flips
+# it — the overlay's presence IS the opt-in signal, so a base stack needs no
+# .env edit to stay off and this stack needs none to come on. An explicit
+# FIFTYONE_ACTIVITY_ENABLED in .env still wins in both directions.
+#
+# These two stanzas carry no `image`/`extends` on purpose: they only add
+# environment to services the base compose file already defines. Every base
+# layering (compose.yaml, compose.plugins.yaml, compose.dedicated-plugins.yaml)
+# defines both, so this merges cleanly onto all of them.
+#
+# Only fiftyone-app and teams-api are listed. teams-plugins, teams-do, and the
+# GPU/agentic workers are not in every `-f` set, and naming a service that the
+# base layering omits would CREATE it here rather than annotate it. Those
+# services read the same var from .env — set FIFTYONE_ACTIVITY_ENABLED=true
+# there when you run a dedicated-plugins or delegated-operator stack. They
+# already need FIFTYONE_ACTIVITY_ORG_ID from .env regardless.
+  fiftyone-app:
+    environment:
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
+
+  teams-api:
+    environment:
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
+
   fiftyone-mq-redis:
     extends:
       file: ../common-services.yaml

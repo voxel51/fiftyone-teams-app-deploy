@@ -21,8 +21,11 @@ for the Audit Log and Jobs pages in the app.
 The `fiftyone-mq-redis` and `activity-worker` services live in the
 `compose.activity.yaml` overlay, not in the base compose files. A plain
 `docker compose up` does not start them, and no activity is recorded.
-This matches the Helm chart, where `activitySettings.enabled` and
-`fiftyoneMq.enabled` both default to `false`.
+`FIFTYONE_ACTIVITY_ENABLED` defaults to `false` besides, so the emit
+seams in the services that do start are no-ops. This matches the Helm
+chart, where `activitySettings.enabled` and `fiftyoneMq.enabled` both
+default to `false` and the chart renders no activity env at all until
+they are on.
 
 ## How it works
 
@@ -30,7 +33,8 @@ Activity events travel over a Redis-backed queue (`fiftyone.mq`):
 
 1. `teams-api` and `fiftyone-app` enqueue events. `teams-api` hosts the
    domain-event bridge, and `fiftyone-app` emits operator and annotation
-   activity. Both read `FIFTYONE_MQ_REDIS_URL`.
+   activity. Both emit only while `FIFTYONE_ACTIVITY_ENABLED` is true, and
+   read `FIFTYONE_MQ_REDIS_URL` to find the queue once it is.
 1. `fiftyone-mq-redis` holds the queue. It is a stock `redis:7` that
    persists the queue with AOF onto the `fiftyone-mq-redis-data` volume,
    so a restart replays queued jobs instead of losing them. See
@@ -42,7 +46,9 @@ Activity events travel over a Redis-backed queue (`fiftyone.mq`):
 
 The emit path is best-effort and fire-and-forget. If the queue is
 unavailable, events are dropped and the emitting operation still
-succeeds. An unset `FIFTYONE_MQ_REDIS_URL` means no events flow.
+succeeds. To stop events flowing, leave `FIFTYONE_ACTIVITY_ENABLED`
+false — that short-circuits before a client is built, rather than
+relying on a connection failing.
 
 One `activity-worker` container runs four workers via the combined
 `fiftyone-activity-worker` entrypoint:
@@ -85,15 +91,45 @@ docker compose \
   up -d
 ```
 
-No `.env` change is needed to turn the feature on. Every service that
-emits activity events — `teams-api`, `fiftyone-app`, `teams-plugins`,
-and the `teams-do*` workers — already defaults
-`FIFTYONE_MQ_REDIS_URL` to the bundled queue Redis, so they find it as
-soon as the overlay starts it. That matters under the
-dedicated-plugins layering, where the workflows plugin (the
-annotation and review event producer) executes in `teams-plugins`
-rather than in `fiftyone-app`, and under the delegated-operator
-overlays, where operator runs execute in `teams-do`.
+### `FIFTYONE_ACTIVITY_ENABLED` is the gate
+
+`FIFTYONE_ACTIVITY_ENABLED` decides whether a service emits at all. It
+defaults to `false`, and `emit`, `flush`, and the operator mutation
+capture are no-ops while it is — checked before any queue client is
+constructed. `FIFTYONE_MQ_REDIS_URL` says only *where* to reach the
+queue once enabled; it is not the switch, because it carries a default
+of its own and so cannot distinguish "unset" from "deliberately pointed
+at localhost".
+
+For the base, `compose.plugins.yaml`, and `compose.dedicated-plugins.yaml`
+layerings, adding `compose.activity.yaml` to the `-f` set flips the flag
+to `true` for `fiftyone-app` and `teams-api`. No `.env` change is needed
+for those two.
+
+**Set `FIFTYONE_ACTIVITY_ENABLED=true` in `.env` if you run a
+dedicated-plugins or delegated-operator stack.** The overlay cannot flip
+`teams-plugins` or the `teams-do*` workers: those services are absent
+from some `-f` sets, and naming a service in an overlay creates it rather
+than annotating it, so the overlay would start containers a base stack
+never asked for. They read the flag from `.env` instead, and without it
+they stay off while `fiftyone-app` and `teams-api` are on. That gap
+matters precisely where those services do the work — under the
+dedicated-plugins layering the workflows plugin (the annotation and
+review event producer) executes in `teams-plugins` rather than in
+`fiftyone-app`, and under the delegated-operator overlays operator runs
+execute in `teams-do`.
+
+Setting it in `.env` is the belt-and-braces option for every layering: an
+explicit value there wins over the overlay in both directions. You are
+already editing `.env` to set `FIFTYONE_ACTIVITY_ORG_ID`, without which
+the tenant-scoped read path returns nothing.
+
+Verify what a given `-f` set resolves to before bringing it up:
+
+```shell
+docker compose -f compose.yaml -f compose.activity.yaml config \
+  | grep FIFTYONE_ACTIVITY_ENABLED
+```
 
 Include the same `-f` set on every subsequent `docker compose` command
 for the deployment. Omitting `compose.activity.yaml` on a later
@@ -104,13 +140,14 @@ for the deployment. Omitting `compose.activity.yaml` on a later
 Set these in your `.env` file. See the Activity Analytics section of
 `env.template` for the same list with defaults.
 
-| Variable                              | Default                            | Description                                                                                |
-| ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------ |
-| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id that activity events are scoped by. Set it for single-org deployments.     |
-| `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0` | Queue connection string. Point it at an external Redis to replace the bundled service.     |
-| `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                              | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry.       |
-| `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES` | `10737418240`                      | Size cap on raw events. The prune worker removes oldest-first when exceeded. `0` disables. |
-| `FIFTYONE_MQ_REDIS_MAXMEMORY`         | `200mb`                            | `maxmemory` for the bundled queue Redis. Raise it if the queue backs up under load.        |
+| Variable                              | Default                            | Description                                                                                                                          |
+| ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `FIFTYONE_ACTIVITY_ENABLED`           | `false`                            | The gate: nothing emits while false. `compose.activity.yaml` sets it for `fiftyone-app` and `teams-api`; set it here for the others. |
+| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id that activity events are scoped by. Set it for single-org deployments.                                               |
+| `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0` | Queue connection string. Point it at an external Redis to replace the bundled service.                                               |
+| `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                              | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry.                                                 |
+| `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES` | `10737418240`                      | Size cap on raw events. The prune worker removes oldest-first when exceeded. `0` disables.                                           |
+| `FIFTYONE_MQ_REDIS_MAXMEMORY`         | `200mb`                            | `maxmemory` for the bundled queue Redis. Raise it if the queue backs up under load.                                                  |
 
 `activity-worker` derives its MongoDB connection from
 `FIFTYONE_DATABASE_URI` and `FIFTYONE_DATABASE_NAME`. You do not
