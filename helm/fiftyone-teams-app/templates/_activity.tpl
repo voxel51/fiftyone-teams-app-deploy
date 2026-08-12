@@ -28,6 +28,30 @@ app.voxel51.com/component: {{ printf "activity-%s-worker" .worker }}
 {{- end }}
 
 {{/*
+Emit a `FIFTYONE_ACTIVITY_ENABLED` env entry for a main workload container.
+Renders empty when Activity Analytics is disabled, allowing safe inclusion
+from env-vars-list helpers.
+
+This is the single gate the producer side reads: `emit()`, `flush()`, and the
+operator mutation capture all no-op when it is unset or false, before any
+queue client is constructed. It deliberately carries no default in the chart
+— the var is either rendered as "true" or not rendered at all, so an absent
+var and an explicit "false" mean the same thing to the workload.
+
+Prior to this the producers inferred enablement from `FIFTYONE_MQ_REDIS_URL`
+being set. That signal cannot distinguish "unset" from "explicitly pointed at
+localhost", because the URL carries a default of its own downstream; and it
+conflated *whether* to emit with *where* to emit. The flag is the gate; the
+URL is only how the queue is reached once enabled.
+*/}}
+{{- define "activity.enabled-env" -}}
+{{- if .Values.activitySettings.enabled }}
+- name: FIFTYONE_ACTIVITY_ENABLED
+  value: "true"
+{{- end }}
+{{- end }}
+
+{{/*
 Emit a `FIFTYONE_ACTIVITY_MONGO_DB` env entry for a main workload container.
 Renders empty when Activity Analytics is disabled OR when no dedicated
 database is configured, allowing safe inclusion from env-vars-list helpers.

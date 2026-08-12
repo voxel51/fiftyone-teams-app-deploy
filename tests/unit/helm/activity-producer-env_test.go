@@ -82,6 +82,138 @@ var activityOn = map[string]string{
 	"fiftyoneMq.enabled":       "true",
 }
 
+// Every workload that carries the gated activity env, and the values it
+// needs before its Deployment renders at all.
+var activityProducerTemplates = []struct {
+	name     string
+	template string
+	values   map[string]string
+}{
+	{
+		"teams-api",
+		"templates/api-deployment.yaml",
+		map[string]string{},
+	},
+	{
+		"fiftyone-app",
+		"templates/app-deployment.yaml",
+		map[string]string{},
+	},
+	{
+		"teams-plugins",
+		"templates/plugins-deployment.yaml",
+		map[string]string{"pluginsSettings.enabled": "true"},
+	},
+	{
+		"delegated-operators",
+		"templates/delegated-operator-instance-deployment.yaml",
+		map[string]string{
+			"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled": "true",
+		},
+	},
+}
+
+// FIFTYONE_ACTIVITY_ENABLED is the single producer-side gate: emit, flush,
+// and the operator mutation capture all no-op without it, checked before any
+// queue client is constructed. Two properties matter and neither is visible
+// at install time, so both get template-level tests:
+//
+//  1. It reaches EVERY workload that already gets the gated activity env. A
+//     producer that emits but is not told it is enabled drops silently.
+//  2. It is ABSENT at default values. This is the half that regresses: the
+//     var replaced "is FIFTYONE_MQ_REDIS_URL set" as the gate precisely
+//     because that signal could not distinguish unset from explicitly-local,
+//     so a default render that leaked the flag would recreate the bug it
+//     was added to fix. Absent and "false" mean the same thing to the
+//     workload, so the chart renders nothing rather than "false".
+func (s *activityProducerEnvTemplateTest) TestActivityEnabledPresentWhenEnabled() {
+	for _, tc := range activityProducerTemplates {
+		s.Run(tc.name, func() {
+			values := map[string]string{}
+			for k, v := range tc.values {
+				values[k] = v
+			}
+			for k, v := range activityOn {
+				values[k] = v
+			}
+			d := s.renderFirstDeployment(tc.template, disableTelemetry(values))
+			env := producerEnv(d)
+
+			e, ok := env["FIFTYONE_ACTIVITY_ENABLED"]
+			s.True(ok, tc.name+" producer needs the activity gate")
+			s.Equal("true", e.Value, tc.name+" gate must be the string \"true\"")
+		})
+	}
+}
+
+func (s *activityProducerEnvTemplateTest) TestActivityEnabledAbsentWhenDisabled() {
+	for _, tc := range activityProducerTemplates {
+		s.Run(tc.name, func() {
+			// Chart defaults for activitySettings/fiftyoneMq — only the
+			// values that make the Deployment render are set.
+			values := map[string]string{}
+			for k, v := range tc.values {
+				values[k] = v
+			}
+			d := s.renderFirstDeployment(tc.template, disableTelemetry(values))
+			env := producerEnv(d)
+
+			_, ok := env["FIFTYONE_ACTIVITY_ENABLED"]
+			s.False(ok, tc.name+" must not carry the activity gate at defaults")
+		})
+	}
+}
+
+// Explicitly disabling activity while the queue Redis is enabled must still
+// leave the gate off. This is the disagreement the flag exists to prevent:
+// the queue being reachable is not consent to emit.
+func (s *activityProducerEnvTemplateTest) TestActivityEnabledOffWithQueueOn() {
+	values := map[string]string{
+		"activitySettings.enabled": "false",
+		"activitySettings.orgId":   "test-org",
+		"fiftyoneMq.enabled":       "true",
+	}
+	d := s.renderFirstDeployment(
+		"templates/api-deployment.yaml", disableTelemetry(values),
+	)
+	env := producerEnv(d)
+
+	_, ok := env["FIFTYONE_MQ_REDIS_URL"]
+	s.True(ok, "queue URL still renders from fiftyoneMq.enabled")
+	_, ok = env["FIFTYONE_ACTIVITY_ENABLED"]
+	s.False(ok, "a reachable queue must not imply the activity gate")
+	_, ok = env["FIFTYONE_ACTIVITY_ORG_ID"]
+	s.False(ok, "org id stays gated on activitySettings.enabled")
+}
+
+// teams-app is the frontend, not a producer: it must never be handed the
+// gate, otherwise the env list becomes a fourth signal that can disagree.
+func (s *activityProducerEnvTemplateTest) TestTeamsAppNeverCarriesActivityGate() {
+	values := map[string]string{}
+	for k, v := range activityOn {
+		values[k] = v
+	}
+	d := s.renderFirstDeployment(
+		"templates/teams-app-deployment.yaml", disableTelemetry(values),
+	)
+	_, ok := producerEnv(d)["FIFTYONE_ACTIVITY_ENABLED"]
+	s.False(ok, "teams-app is not an activity producer")
+}
+
+// The worker Deployments only render when activity is enabled, but they emit
+// derived rollup/snapshot events through the same gated path, so they need
+// the flag too.
+func (s *activityProducerEnvTemplateTest) TestActivityWorkersCarryTheGate() {
+	values := map[string]string{}
+	for k, v := range activityOn {
+		values[k] = v
+	}
+	d := s.renderFirstDeployment(
+		"templates/activity-workers-deployment.yaml", disableTelemetry(values),
+	)
+	s.Equal("true", producerEnv(d)["FIFTYONE_ACTIVITY_ENABLED"].Value)
+}
+
 // teams-plugins runs the workflow producers in dedicated-plugins
 // deployments — it must carry the queue URL and org id.
 func (s *activityProducerEnvTemplateTest) TestPluginsProducerEnv() {

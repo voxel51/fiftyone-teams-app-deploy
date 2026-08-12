@@ -61,6 +61,7 @@ note in delegated-operator-deployments.env-vars-list): job-dispatched
 delegated operators are activity producers too. */}}
 {{- if .ctx }}
 {{- include "fiftyone-mq.redis-url-env" .ctx }}
+{{- include "activity.enabled-env" .ctx }}
 {{- include "activity.org-id-env" .ctx }}
 {{- include "activity.mongo-db-env" .ctx }}
 {{- end }}

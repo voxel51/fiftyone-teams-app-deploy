@@ -335,6 +335,7 @@ so gating their queue URL on the telemetry toggle silently dropped
 their emits whenever telemetry was off. */}}
 {{- if .ctx }}
 {{- include "fiftyone-mq.redis-url-env" .ctx }}
+{{- include "activity.enabled-env" .ctx }}
 {{- include "activity.org-id-env" .ctx }}
 {{- include "activity.mongo-db-env" .ctx }}
 {{- end }}
@@ -381,6 +382,7 @@ Create a merged list of environment variables for fiftyone-teams-api
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- include "activity.enabled-env" . }}
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
 - name: FIFTYONE_DATABASE_URI
@@ -439,6 +441,7 @@ Create a merged list of environment variables for fiftyone-app
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- include "activity.enabled-env" . }}
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
 - name: FIFTYONE_DATABASE_URI
@@ -559,6 +562,7 @@ Create a merged list of environment variables for fiftyone-teams-plugins
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- include "activity.enabled-env" . }}
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
 - name: FIFTYONE_DATABASE_URI

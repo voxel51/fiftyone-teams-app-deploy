@@ -6,7 +6,7 @@
       "properties": {
         "enabled": {
           "default": false,
-          "description": "Controls whether the Activity Analytics worker Deployments are rendered.",
+          "description": "Controls whether the Activity Analytics worker Deployments are rendered,\nand whether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit. This is the single gate: it\nrenders `FIFTYONE_ACTIVITY_ENABLED=true` on those workloads, and nothing\ninfers enablement from `FIFTYONE_MQ_REDIS_URL` any more. Left `false`, the\nproducers render no activity env at all and every emit seam is a no-op.",
           "title": "enabled",
           "type": "boolean"
         },

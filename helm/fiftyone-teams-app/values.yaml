@@ -2,7 +2,12 @@
 # FiftyOne Activity Analytics workers. Reads the queue populated by the
 # producers and writes the activity_* collections.
 activitySettings:
-  # -- Controls whether the Activity Analytics worker Deployments are rendered.
+  # -- Controls whether the Activity Analytics worker Deployments are rendered,
+  # and whether the producer workloads (teams-api, fiftyone-app, teams-plugins,
+  # and the delegated operators) are told to emit. This is the single gate: it
+  # renders `FIFTYONE_ACTIVITY_ENABLED=true` on those workloads, and nothing
+  # infers enablement from `FIFTYONE_MQ_REDIS_URL` any more. Left `false`, the
+  # producers render no activity env at all and every emit seam is a no-op.
   enabled: false
   image:
     # -- Worker image published from the fiftyone-activity repository.

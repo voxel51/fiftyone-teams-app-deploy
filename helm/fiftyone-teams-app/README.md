@@ -805,7 +805,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| activitySettings.enabled | bool | `false` | Controls whether the Activity Analytics worker Deployments are rendered. |
+| activitySettings.enabled | bool | `false` | Controls whether the Activity Analytics worker Deployments are rendered, and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. This is the single gate: it renders `FIFTYONE_ACTIVITY_ENABLED=true` on those workloads, and nothing infers enablement from `FIFTYONE_MQ_REDIS_URL` any more. Left `false`, the producers render no activity env at all and every emit seam is a no-op. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity"` | Worker image published from the fiftyone-activity repository. |
 | activitySettings.image.tag | string | `"8a6f61730c86b306d67fca4f1ca836f24aeb43a7"` | Worker image tag. Required when `activitySettings.enabled` is `true`. v0.0.26 — the build that first carries the prune worker entrypoint and the `workflow.decision_attributed` rename. Commit SHA rather than a semver tag because fiftyone-activity publishes SHA tags only; FOEPD-4410 covers giving it semver tags like the other four images. |

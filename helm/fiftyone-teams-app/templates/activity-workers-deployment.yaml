@@ -41,6 +41,14 @@ spec:
           command:
             {{- toYaml $w.command | nindent 12 }}
           env:
+            {{- /* These Deployments only render when activitySettings.enabled
+                   is true, so the helper always emits here. It is included
+                   anyway rather than hard-coded: the rollup and snapshot
+                   workers emit derived events of their own, and those emits
+                   go through the same flag-gated path as the producers. A
+                   worker that consumed the queue but could not emit would
+                   silently drop the derived rollup events. */}}
+            {{- include "activity.enabled-env" $ | nindent 12 }}
             {{- include "fiftyone-mq.redis-url-env" $ | nindent 12 }}
             - name: FIFTYONE_ACTIVITY_MONGO_URI
               valueFrom:
