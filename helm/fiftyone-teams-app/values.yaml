@@ -25,9 +25,13 @@ activitySettings:
     # co-located in the per-deployment FiftyOne database. Set a name to use a
     # dedicated database.
     database: ""
-  # -- Organization the workers and producers stamp on their events. Rollups are
-  # scoped per organization, so events emitted without one are not returned by
-  # the read path. Required when `activitySettings.enabled` is `true`.
+  # -- Organization the workers and producers stamp on their events, as an
+  # override. Leave empty: the producers stamp the authenticated organization
+  # from the request, and the workers discover a single-org deployment's
+  # organization from the deployment itself. Set this only for a deployment
+  # holding several organizations, where the deployment-wide state counts
+  # cannot be attributed to one of them — the workers log which one to name.
+  # This is the organization's `id` FIELD (its slug), not the Mongo `_id`.
   orgId: ""
   # -- Resources for the worker containers. [Reference][resources].
   resources:

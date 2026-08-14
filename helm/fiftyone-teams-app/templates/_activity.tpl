@@ -76,8 +76,11 @@ Emit a `FIFTYONE_ACTIVITY_ORG_ID` env entry for a main workload container.
 Renders empty when Activity Analytics is disabled or no organization is set,
 allowing safe inclusion from env-vars-list helpers.
 
-Rollups are scoped per organization, so events emitted without one are not
-returned by the read path.
+Unset is the normal case, and is NOT a misconfiguration: the producers stamp
+the authenticated organization carried on the request, and the workers — which
+have no request to read — discover a single-org deployment's organization from
+CAS. The value is an override for a deployment holding several organizations,
+where the deployment-wide state counts cannot be attributed to one of them.
 */}}
 {{- define "activity.org-id-env" -}}
 {{- if and .Values.activitySettings.enabled .Values.activitySettings.orgId }}
