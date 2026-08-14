@@ -81,12 +81,23 @@ spec:
                 secretKeyRef:
                   name: {{ $.Values.secret.name }}
                   key: fiftyoneDatabaseName
-            {{- /* Enforced, not just documented: rollups are org-scoped,
-                   so an empty org id makes the snapshot worker skip every
-                   cycle and every emitted event invisible to the readers —
-                   a "successful" install of a silently empty pipeline. */}}
-            - name: FIFTYONE_ACTIVITY_ORG_ID
-              value: {{ required "activitySettings.orgId is required when activitySettings.enabled is true" $a.orgId | quote }}
+            {{- /* Rendered only when set, and deliberately through the same
+                   helper the producers use (`activity.org-id-env`) so the
+                   condition lives in one place instead of a second variant
+                   here. An unset org id must not render as an empty string:
+                   the workers cannot tell that apart from a deliberate blank.
+
+                   Unset is the intended normal case, but NOT yet with the
+                   image pinned in values.yaml. Org discovery lands in
+                   fiftyone-activity 0.0.27 (voxel51/fiftyone-activity#17);
+                   the pinned v0.0.26 build still requires the org id, and
+                   rollups are org-scoped, so without one the snapshot worker
+                   skips every cycle — a "successful" install of a silently
+                   empty pipeline. Until the pin moves, orgId must be set;
+                   the values.yaml comment says so too. */}}
+            {{- with (include "activity.org-id-env" $ | trim) }}
+            {{- . | nindent 12 }}
+            {{- end }}
             {{- if $a.snapshotIntervalMs }}
             - name: FIFTYONE_ACTIVITY_SNAPSHOT_INTERVAL_MS
               value: {{ $a.snapshotIntervalMs | quote }}

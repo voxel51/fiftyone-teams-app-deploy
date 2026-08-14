@@ -114,17 +114,49 @@ func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerOptOut() {
 	}
 }
 
-// Rollups are org-scoped: an empty org id yields a "successful" install of a
-// silently empty pipeline, so the template must refuse to render without one.
-func (s *activityWorkersDeploymentTemplateTest) TestOrgIdRequired() {
+// An unset org id renders, and renders no org var at all. It is an override,
+// not a requirement: the producers stamp the authenticated organization from
+// the request, and from fiftyone-activity 0.0.27 the workers discover a
+// single-org deployment's organization for themselves. The var must be absent
+// rather than an empty string, which the workers cannot tell apart from a
+// deliberate blank. (With the currently pinned v0.0.26 image the snapshot
+// worker still needs the value — that is a documented deployment caveat in
+// values.yaml, not a chart-render constraint.)
+func (s *activityWorkersDeploymentTemplateTest) TestOrgIdOmittedWhenUnset() {
 	values := activityEnabled(nil)
 	delete(values, "activitySettings.orgId")
 	options := &helm.Options{SetValues: values}
 	_, err := helm.RenderTemplateE(
 		s.T(), options, s.chartPath, s.releaseName, s.templates,
 	)
-	s.Error(err)
-	s.Contains(err.Error(), "activitySettings.orgId is required")
+	s.NoError(err, "an unset orgId must not fail the render")
+
+	deployments := s.renderWorkers(values)
+	s.Len(deployments, 4)
+	for _, d := range deployments {
+		env := envByName(d.Spec.Template.Spec.Containers[0])
+		_, ok := env["FIFTYONE_ACTIVITY_ORG_ID"]
+		s.False(
+			ok,
+			"%s must not carry FIFTYONE_ACTIVITY_ORG_ID when orgId is unset",
+			d.ObjectMeta.Name,
+		)
+	}
+}
+
+// The other half of the contract: when set, every worker carries it verbatim.
+func (s *activityWorkersDeploymentTemplateTest) TestOrgIdRenderedWhenSet() {
+	deployments := s.renderWorkers(activityEnabled(map[string]string{
+		"activitySettings.orgId": "acme-org",
+	}))
+	s.Len(deployments, 4)
+	for _, d := range deployments {
+		env := envByName(d.Spec.Template.Spec.Containers[0])
+		orgId, ok := env["FIFTYONE_ACTIVITY_ORG_ID"]
+		s.True(ok, "%s must carry FIFTYONE_ACTIVITY_ORG_ID", d.ObjectMeta.Name)
+		s.Equal("acme-org", orgId.Value)
+		s.Nil(orgId.ValueFrom, "org id is a literal value, not a secret ref")
+	}
 }
 
 // Workers have no FIFTYONE_DATABASE_* fallback of their own, so the chart
