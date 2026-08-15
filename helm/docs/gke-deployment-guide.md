@@ -32,8 +32,8 @@
 
 ## Introduction
 
-This guide walks through a full Google Kubernetes Engine [GKE] deployment of
-FiftyOne Enterprise combining the following Helm charts:
+This guide walks through a full Google Kubernetes Engine [GKE] deployment
+of FiftyOne Enterprise combining the following Helm charts:
 
 - [jetstack/cert-manager](https://github.com/cert-manager/cert-manager)
   - For Let's Encrypt SSL certificates
@@ -42,7 +42,8 @@ FiftyOne Enterprise combining the following Helm charts:
 - voxel51/fiftyone-teams-app
 
 This guide is a complete, cloud-specific worked example of the generic steps
-in the [Helm README](../README.md). If you are deploying to AWS EKS instead,
+in the [Helm README](../README.md).
+If you are deploying to AWS EKS instead,
 see the [AWS Deployment Guide](./aws-deployment-guide.md).
 
 ## Prerequisites
@@ -59,11 +60,12 @@ These instructions assume you have
     - If `voxel51-docker.json` is not in the current directory,
       please update the command line accordingly.
 - Your license file from the Voxel51 Customer Success Team
-  - If you have not received this information, please contact your
-    Voxel51 Support Team via your agreed-upon mechanism (Slack, email, etc.)
+  - If you have not received this information,
+    please contact your Voxel51 Support Team
+    via your agreed-upon mechanism (Slack, email, etc.)
 
-> **NOTE**: Anytime a license file secret is updated, you
-> must restart the `teams-cas` and `teams-api` services.
+> **NOTE**: Anytime a license file secret is updated,
+> you must restart the `teams-cas` and `teams-api` services.
 > You may delete the pods, or run
 >
 > ```shell
@@ -118,7 +120,8 @@ helm repo update
 
 ## Install and Configure cert-manager
 
-If you are using a GKE Autopilot cluster, please review the information
+If you are using a GKE Autopilot cluster,
+please review the information
 [provided by cert-manager](https://github.com/cert-manager/cert-manager/issues/3717#issuecomment-919299192)
 and adjust your installation accordingly.
 
@@ -133,12 +136,14 @@ You can use the cert-manager instructions to
 
 ### Create a ClusterIssuer
 
-`ClusterIssuers` are Kubernetes resources that represent certificate authorities
-that are able to generate signed certificates by honoring certificate signing requests.
-You must create either an `Issuer` in each namespace or a `ClusterIssuer`
-as part of your cert-manager configuration.
-Voxel51 has provided an example `ClusterIssuer` configuration (downloaded
-[earlier](#download-the-example-configuration-files)
+`ClusterIssuers` are Kubernetes resources
+that represent certificate authorities
+that are able to generate signed certificates
+by honoring certificate signing requests.
+You must create either an `Issuer` in each namespace
+or a `ClusterIssuer` as part of your cert-manager configuration.
+Voxel51 has provided an example `ClusterIssuer` configuration
+(downloaded [earlier](#download-the-example-configuration-files)
 in this guide).
 
 ```shell
@@ -151,8 +156,8 @@ These
 [instructions](https://github.com/mongodb/helm-charts/tree/main/charts/community-operator#deploying-a-mongodb-replica-set)
 can be used to deploy a MongoDB replicaset in your GKE cluster.
 
-Wait until the MongoDB pods are in the `Ready` state before
-beginning the "Install FiftyOne Enterprise App" instructions.
+Wait until the MongoDB pods are in the `Ready` state
+before beginning the "Install FiftyOne Enterprise App" instructions.
 
 While waiting,
 [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
@@ -174,8 +179,10 @@ gcloud compute addresses describe \
   fiftyone-teams-static-ip --global
 ```
 
-Record the IP address and either create a DNS entry or contact your Voxel51
-support team to have them create an appropriate `fiftyone.ai` DNS entry for you.
+Record the IP address
+and either create a DNS entry
+or contact your Voxel51 support team
+to have them create an appropriate `fiftyone.ai` DNS entry for you.
 
 ## Set up HTTP to HTTPS Forwarding
 
@@ -201,18 +208,18 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 Issuing SSL Certificates can take up to 15 minutes.
 Be patient while Let's Encrypt and GKE negotiate.
 
-You can verify that your SSL certificates have been
-properly issued with the following curl command:
+You can verify that your SSL certificates have been properly issued
+with the following curl command:
 
 ```shell
 curl -I https://replace.this.dns.name
 ```
 
-Your SSL certificates have been correctly issued when
-you see `HTTP/2 200` at the top of the response.
+Your SSL certificates have been correctly issued
+when you see `HTTP/2 200` at the top of the response.
 If, however, you encounter a
-`SSL certificate problem: unable to get local issuer certificate`
-message you should delete the certificate and allow it to recreate.
+`SSL certificate problem: unable to get local issuer certificate` message
+you should delete the certificate and allow it to recreate.
 
 ```shell
 kubectl delete secret fiftyone-teams-cert-secret
@@ -221,17 +228,19 @@ kubectl delete secret fiftyone-teams-cert-secret
 Further instructions for debugging ACME certificates are on the
 [cert-manager docs site](https://cert-manager.io/docs/faq/acme/).
 
-Once your installation is complete, browse to
-`/settings/cloud_storage_credentials`
+Once your installation is complete,
+browse to `/settings/cloud_storage_credentials`
 and add your storage credentials to access sample data.
 
 ## Installation Complete
 
-Congratulations! You should now be able to access your
-FiftyOne Enterprise installation at the DNS address you created
+Congratulations!
+You should now be able to access your FiftyOne Enterprise installation
+at the DNS address you created
 [earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
 
-Next, continue with the remaining steps in the
+Next,
+continue with the remaining steps in the
 [Helm README](../README.md), starting from
 [Step 10: Identity Provider (IdP) and Authentication (CAS)](../README.md#step-10-identity-provider-idp-and-authentication-cas)
 (ingress/TLS is already handled by this guide),
