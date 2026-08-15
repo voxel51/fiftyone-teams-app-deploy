@@ -55,18 +55,18 @@ These instructions assume you have
   - [Helm](https://helm.sh/docs/intro/install/)
 - An existing
   [GKE Cluster available](https://cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview)
-- Received Docker Hub credentials from Voxel51
+- A Docker Hub credentials provided by us
   - Have `voxel51-docker.json` file in the current directory
     - If `voxel51-docker.json` is not in the current directory,
-      please update the command line accordingly.
-- Your license file from the Voxel51 Customer Success Team
-  - If you have not received this information,
+      please update the command line accordingly
+- A license file provide by us (Voxel51 Customer Success Team)
+  - To obtain a license file,
     please contact your Voxel51 Support Team
-    via your agreed-upon mechanism (Slack, email, etc.)
+    via Slack or email
 
-> **NOTE**: Anytime a license file secret is updated,
-> you must restart the `teams-cas` and `teams-api` services.
-> You may delete the pods, or run
+> **NOTE**: When you update a license file secret,
+> restart the `teams-cas` and `teams-api` services.
+> Run
 >
 > ```shell
 > kubectl rollout restart deploy \
@@ -77,35 +77,33 @@ These instructions assume you have
 
 ## Download the Example Configuration Files
 
-Download the example configuration files from the
-[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/gke-example)
-GitHub repository.
-
-For example
+Clone the this repository
+[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy)
 
 ```shell
-curl -o values.yaml \
-  https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/values.yaml
-curl -o cluster-issuer.yaml \
-  https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/cluster-issuer.yaml
-curl -o frontend-config.yaml \
-  https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/frontend-config.yaml
+# clone using ssh
+git clone git@github.com:voxel51/fiftyone-teams-app-deploy.git
+
+# clone using https
+git clone https://github.com/voxel51/fiftyone-teams-app-deploy.git
+
+# navigate to the example directory
+cd fiftyone-teams-app-deploy/helm/gke-example
 ```
 
-Update the `values.yaml` file with
+Update the `values.yaml` file setting
 
-- In `secret.fiftyone`
-  - MongoDB
-    - Set `mongodbConnectionString` containing your MongoDB username and password
-  - Set `cookieSecret`
-  - Set `encryptionKey`
-  - Set `fiftyoneAuthSecret`
-- In `teamsAppSettings.dnsName`
-  - Set ingress `host` values
-
-Assuming you follow these directions your MongoDB host will be
-`fiftyone-teams-mongodb.fiftyone-teams-mongodb.svc.cluster.local`.
-<!-- Please modify this hostname if you modify these instructions. -->
+```yaml
+secret:
+  fiftyone:
+    # Update the hostname when necessary
+    mongodbConnectionString: mongodb://<YOUR_USERNAME>:<YOUR_PASSWORD>@fiftyone-teams-mongodb.fiftyone-teams-mongodb.svc.cluster.local/?authSource=admin
+    cookieSecret: <YOUR_COOKIE_SECRET>
+    encryptionKey: <YOUR_ENCRYPTION_KEY>
+    fiftyoneAuthSecret: <YOUR_FIFTYONE_AUTH_SECRET>
+teamsAppSettings:
+  dnsName: <YOUR_DNS_HOST>
+```
 
 ## Create the Necessary Helm Repos
 
@@ -137,14 +135,12 @@ You can use the cert-manager instructions to
 ### Create a ClusterIssuer
 
 `ClusterIssuers` are Kubernetes resources
-that represent certificate authorities
-that are able to generate signed certificates
-by honoring certificate signing requests.
+that represent certificate authorities.
+They generate signed certificates by honoring certificate signing requests.
 You must create either an `Issuer` in each namespace
 or a `ClusterIssuer` as part of your cert-manager configuration.
-Voxel51 has provided an example `ClusterIssuer` configuration
-(downloaded [earlier](#download-the-example-configuration-files)
-in this guide).
+Apply the example `ClusterIssuer` configuration in
+[cluster-issuer.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/cluster-issuer.yaml).
 
 ```shell
 kubectl apply -f ./cluster-issuer.yaml
@@ -152,12 +148,12 @@ kubectl apply -f ./cluster-issuer.yaml
 
 ## Install and Configure MongoDB
 
-These
-[instructions](https://github.com/mongodb/helm-charts/tree/main/charts/community-operator#deploying-a-mongodb-replica-set)
-can be used to deploy a MongoDB replicaset in your GKE cluster.
+Use these
+[Deploying a MongoDB Replica Set](https://github.com/mongodb/helm-charts/tree/main/charts/community-operator#deploying-a-mongodb-replica-set)
+instructions to deploy a MongoDB Replica Set in your GKE cluster.
 
 Wait until the MongoDB pods are in the `Ready` state
-before beginning the "Install FiftyOne Enterprise App" instructions.
+before following [Install FiftyOne Enterprise App](#install-fiftyone-enterprise-app).
 
 While waiting,
 [configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
@@ -180,17 +176,18 @@ gcloud compute addresses describe \
 ```
 
 Record the IP address
-and either create a DNS entry
-or contact your Voxel51 support team
-to have them create an appropriate `fiftyone.ai` DNS entry for you.
+and either create a DNS entry.
 
 ## Set up HTTP to HTTPS Forwarding
+
+Apply the example `FrontendConfig` in
+[frontend-config.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/frontend-config.yaml).
 
 ```shell
 kubectl apply -f frontend-config.yaml
 ```
 
-For more information, see
+For more information about `FrontendConfig`s, see
 [HTTP to HTTPS redirects](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#https_redirect).
 
 ## Install FiftyOne Enterprise App
@@ -205,43 +202,42 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
   --values ./values.yaml
 ```
 
-Issuing SSL Certificates can take up to 15 minutes.
+Issuing SSL Certificates may take up to 15 minutes.
 Be patient while Let's Encrypt and GKE negotiate.
 
-You can verify that your SSL certificates have been properly issued
-with the following curl command:
+Run this curl command to check that your SSL certificates were issued:
 
 ```shell
-curl -I https://replace.this.dns.name
+curl -I https://<YOUR_DNS_NAME>
 ```
 
-Your SSL certificates have been correctly issued
+You'll know your SSL certificates were issued correctly
 when you see `HTTP/2 200` at the top of the response.
 If, however, you encounter a
-`SSL certificate problem: unable to get local issuer certificate` message
-you should delete the certificate and allow it to recreate.
+`SSL certificate problem: unable to get local issuer certificate` message,
+delete the certificate.
+It will recreate automatically.
 
 ```shell
 kubectl delete secret fiftyone-teams-cert-secret
 ```
 
-Further instructions for debugging ACME certificates are on the
-[cert-manager docs site](https://cert-manager.io/docs/faq/acme/).
+For further instructions for debugging ACME certificates,
+see
+[Troubleshooting Problems with ACME / Let's Encrypt Certificates](https://cert-manager.io/docs/faq/acme/).
 
 Once your installation is complete,
-browse to `/settings/cloud_storage_credentials`
-and add your storage credentials to access sample data.
+browse to `https://<YOUR_DNS_NAME>/settings/cloud_storage_credentials`.
+Add your storage credentials to access sample data.
 
 ## Installation Complete
 
 Congratulations!
-You should now be able to access your FiftyOne Enterprise installation
-at the DNS address you created
-[earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+You may now access your FiftyOne Enterprise installation
+at the DNS address you created in
+[Obtain a Global Static IP Address and Configure a DNS Entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
 
-Next,
-continue with the remaining steps in the
-[Helm README](../README.md), starting from
-[Step 10: Identity Provider (IdP) and Authentication (CAS)](../README.md#step-10-identity-provider-idp-and-authentication-cas)
-(ingress/TLS is already handled by this guide),
-to finish setting up authentication and CAS.
+Proceed to
+[Helm README](../README.md)
+and follow the rest of the document starting at
+[Step 10: Identity Provider (IdP) and Authentication (CAS)](../README.md#step-10-identity-provider-idp-and-authentication-cas).
