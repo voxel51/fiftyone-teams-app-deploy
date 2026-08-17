@@ -372,26 +372,6 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
   -f ./values.yaml
 ```
 
-For upgrades, run:
-
-```shell
-helm repo update voxel51
-helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
-  --namespace your-namespace-here \
-  -f ./values.yaml
-```
-
-> [!TIP]
-> Prior to running `helm upgrade`, you may view the changes Helm would apply
-> using the [helm diff](https://github.com/databus23/helm-diff) plugin
-> (Voxel51 is not affiliated with the author of this plugin):
->
-> ```shell
-> helm diff --context 1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
->   --namespace your-namespace-here \
->   -f values.yaml
-> ```
-
 Confirm all pods are running, including `teams-plugins` (from
 [Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode)) and your chosen
 delegated operator workers (from
@@ -530,8 +510,63 @@ For step-by-step configuration instructions, see
 
 ## Upgrades
 
-When performing an upgrade, please review
-[Upgrading From Previous Versions](./docs/upgrading.md).
+The recommended upgrade path is:
+
+1. Pull the latest reference files from this repo:
+
+   ```shell
+   git pull origin main
+   ```
+
+   > This provides the latest example `values.yaml` and upgrade notes for
+   > any version-specific changes.
+
+1. Confirm `appSettings.env.FIFTYONE_DATABASE_ADMIN` is set to `false` (or
+   unset) in your `values.yaml`:
+
+   ```yaml
+   appSettings:
+     env:
+       FIFTYONE_DATABASE_ADMIN: false
+   ```
+
+   > This prevents automatic database migrations from running on startup and
+   > breaking active SDK sessions.
+
+1. When using [Custom Plugin Images](#bricks-custom-plugin-images),
+   rebuild them using the updated base image version.
+   Update their tags in `values.yaml` to match the new release.
+
+1. Update your kubectl configuration to set your current namespace for your
+   kubectl context:
+
+   ```shell
+   kubectl config set-context --current --namespace your-namespace-here
+   ```
+
+1. Update your Voxel51 Helm repository and upgrade your FiftyOne Enterprise
+   deployment:
+
+   ```shell
+   helm repo update voxel51
+   helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+     --namespace your-namespace-here \
+     -f ./values.yaml
+   ```
+
+   > [!TIP]
+   > Prior to running `helm upgrade`, you may view the changes Helm would apply
+   > using the [helm diff](https://github.com/databus23/helm-diff) plugin
+   > (Voxel51 is not affiliated with the author of this plugin):
+   >
+   > ```shell
+   > helm diff --context 1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+   >   --namespace your-namespace-here \
+   >   -f values.yaml
+   > ```
+
+For full upgrade guidance, including version-specific migration notes, refer
+to [Upgrading](./docs/upgrading.md).
 
 ## Known Issues
 

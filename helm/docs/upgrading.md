@@ -53,38 +53,10 @@ and update your deployment accordingly.
 Voxel51 provides a
 [minimum example `values.yaml`](../values.yaml).
 
-1. Edit the `values.yaml` file
-1. To upgrade an existing helm installation
-
-    1. Make sure you have followed the appropriate directions for
-       [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-
-    1. Update your kubectl configuration to set your current namespace for
-       your kubectl context
-
-        ```shell
-        kubectl config set-context --current --namespace your-namespace-here
-        ```
-
-    1. Update your Voxel51 Helm repository and upgrade your FiftyOne Enterprise
-       deployment
-
-        ```shell
-        helm repo update voxel51
-        helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
-          -f ./values.yaml
-        ```
-
-    > **NOTE**: To view the changes Helm would apply during installations
-    > and upgrades, consider using
-    > [helm diff](https://github.com/databus23/helm-diff).
-    > Voxel51 is not affiliated with the author of this plugin.
-    >
-    > For example:
-    >
-    > ```shell
-    > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
-    > ```
+For the general upgrade procedure, see the
+[Upgrades](../README.md#upgrades) section of the Helm Deployment Guide.
+The version-specific notes below cover additional changes required when
+upgrading from particular FiftyOne Enterprise versions.
 
 ### A Note On Database Migrations
 
