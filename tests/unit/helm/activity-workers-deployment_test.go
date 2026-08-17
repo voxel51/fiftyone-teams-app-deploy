@@ -177,8 +177,8 @@ func (s *activityWorkersDeploymentTemplateTest) TestWorkerEnvDefaults() {
 			mongoDb.ValueFrom.SecretKeyRef.Key,
 		)
 
-		_, ok = env["FIFTYONE_MQ_REDIS_URL"]
-		s.True(ok, "workers consume the fiftyone-mq queue")
+		requireMqRedisURL(s.T(), env, s.releaseName,
+			"workers consume the fiftyone-mq queue")
 	}
 }
 

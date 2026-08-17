@@ -178,9 +178,9 @@ func (s *activityProducerEnvTemplateTest) TestActivityEnabledOffWithQueueOn() {
 	)
 	env := producerEnv(d)
 
-	_, ok := env["FIFTYONE_MQ_REDIS_URL"]
-	s.True(ok, "queue URL still renders from fiftyoneMq.enabled")
-	_, ok = env["FIFTYONE_ACTIVITY_ENABLED"]
+	requireMqRedisURL(s.T(), env, s.releaseName,
+		"queue URL still renders from fiftyoneMq.enabled")
+	_, ok := env["FIFTYONE_ACTIVITY_ENABLED"]
 	s.False(ok, "a reachable queue must not imply the activity gate")
 	_, ok = env["FIFTYONE_ACTIVITY_ORG_ID"]
 	s.False(ok, "org id stays gated on activitySettings.enabled")
@@ -226,14 +226,14 @@ func (s *activityProducerEnvTemplateTest) TestPluginsProducerEnv() {
 	)
 	env := producerEnv(d)
 
-	_, ok := env["FIFTYONE_MQ_REDIS_URL"]
-	s.True(ok, "plugins producer needs the queue URL")
+	requireMqRedisURL(s.T(), env, s.releaseName,
+		"plugins producer needs the queue URL")
 	s.Equal("test-org", env["FIFTYONE_ACTIVITY_ORG_ID"].Value)
 
 	// Co-located default: the readers fall back to FIFTYONE_DATABASE_NAME
 	// on their own; pinning FIFTYONE_ACTIVITY_MONGO_DB here would defeat
 	// that fallback and can diverge from what the workers resolve.
-	_, ok = env["FIFTYONE_ACTIVITY_MONGO_DB"]
+	_, ok := env["FIFTYONE_ACTIVITY_MONGO_DB"]
 	s.False(ok, "no dedicated DB configured -> no override env")
 }
 
@@ -268,7 +268,7 @@ func (s *activityProducerEnvTemplateTest) TestDelegatedOperatorEnvWithTelemetryD
 	)
 	env := producerEnv(d)
 
-	_, ok := env["FIFTYONE_MQ_REDIS_URL"]
-	s.True(ok, "DO queue URL must not depend on the telemetry toggle")
+	requireMqRedisURL(s.T(), env, s.releaseName,
+		"DO queue URL must not depend on the telemetry toggle")
 	s.Equal("test-org", env["FIFTYONE_ACTIVITY_ORG_ID"].Value)
 }

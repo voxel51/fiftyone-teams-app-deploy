@@ -1,6 +1,42 @@
 package unit
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+)
+
+// expectedMqRedisURL is the bundled queue URL the `fiftyone-mq.redis.url`
+// helper renders for a release in the default namespace.
+func expectedMqRedisURL(releaseName string) string {
+	return fmt.Sprintf(
+		"redis://%s-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0",
+		releaseName,
+	)
+}
+
+// requireMqRedisURL asserts that a workload carries the queue URL AND that
+// its value is the one the helper renders.
+//
+// Asserting only the NAME is not enough: a producer handed an empty
+// FIFTYONE_MQ_REDIS_URL, or one wired to the wrong Service, drops every
+// emit silently — the same invisible failure the name-only check was
+// written to catch, so it has to check the value the workload actually
+// connects to.
+func requireMqRedisURL(
+	t require.TestingT,
+	env map[string]corev1.EnvVar,
+	releaseName string,
+	msg string,
+) {
+	v, ok := env["FIFTYONE_MQ_REDIS_URL"]
+	require.True(t, ok, msg)
+	require.Empty(t, v.ValueFrom,
+		"the queue URL is a literal value, not a secret/config reference")
+	require.Equal(t, expectedMqRedisURL(releaseName), v.Value, msg)
+}
 
 // splitYAMLDocs splits a multi-doc YAML string on `---` separators.
 // Empty/whitespace-only docs are dropped.
