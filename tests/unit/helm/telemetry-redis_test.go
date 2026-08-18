@@ -242,6 +242,55 @@ func (s *telemetryRedisTemplateTest) TestDeploymentNamespaceOverride() {
 	s.Equal("my-ns", deployment.ObjectMeta.Namespace)
 }
 
+func (s *telemetryRedisTemplateTest) TestImagePullSecrets() {
+	testCases := []struct {
+		name     string
+		values   map[string]string
+		expected string
+	}{
+		{
+			"defaultValues",
+			map[string]string{
+				"telemetry.enabled": "true",
+			},
+			"",
+		},
+		{
+			"overrideImagePullSecrets",
+			map[string]string{
+				"imagePullSecrets[0].name": "test-pull-secret",
+				"telemetry.enabled":        "true",
+			},
+			"test-pull-secret",
+		},
+	}
+
+	for _, testCase := range testCases {
+		testCase := testCase
+
+		s.Run(testCase.name, func() {
+			subT := s.T()
+			subT.Parallel()
+
+			options := &helm.Options{SetValues: testCase.values}
+			// options := &helm.Options{SetValues: map[string]string{
+			// 	"telemetry.enabled": "true",
+			// }}
+
+			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, []string{s.deploymentTpl})
+
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(subT, output, &deployment)
+
+			if testCase.expected == "" {
+				s.Nil(deployment.Spec.Template.Spec.ImagePullSecrets, "Image pull secret should be nil")
+			} else {
+				s.Equal(testCase.expected, deployment.Spec.Template.Spec.ImagePullSecrets[0].Name, "Image pull secret should be equal.")
+			}
+		})
+	}
+}
+
 func (s *telemetryRedisTemplateTest) TestDeploymentDefaultImage() {
 	options := &helm.Options{SetValues: map[string]string{
 		"telemetry.enabled": "true",
