@@ -27,6 +27,31 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.24+
+
+#### Activity Analytics
+
+FiftyOne Enterprise 2.24+ records operator runs, annotation and review
+decisions, and sample/label mutations, and rolls them up into the data behind
+the Audit Log and Jobs pages.
+
+Activity Analytics is opt-in; nothing changes on upgrade unless you enable it.
+It requires two settings together — `activitySettings.enabled` (tells the
+existing workloads to emit, and adds the worker `Deployment`s) and
+`fiftyoneMq.enabled` (the queue Redis carrying events between them).
+Enabling one without the other fails the render.
+
+The bundled queue Redis claims a `PersistentVolumeClaim` by default, so a
+default `StorageClass` is required unless you disable persistence or supply
+your own claim.
+Please refer to
+
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v224-activity-analytics)
+  for what changes on upgrade, cluster requirements, and resource impact
+- [configuring activity analytics](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-activity-analytics.md)
+  for full details, including external Redis and multi-organization
+  deployments
+
 ### Version 2.23+
 
 #### Service Orchestrators and Auto-registration

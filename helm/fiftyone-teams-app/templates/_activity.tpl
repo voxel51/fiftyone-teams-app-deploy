@@ -1,4 +1,23 @@
 {{/*
+Fail the render when activity is enabled without a queue to reach.
+
+Turning activity on while `fiftyoneMq.enabled` is false renders the
+workers and the producer env with nothing to connect to, so every event is
+dropped. That looks like a healthy install recording nothing, which is why
+it is a hard failure rather than a note in values.yaml.
+
+Deliberately one-directional. The reverse — queue on, activity off — is a
+supported state: the queue being reachable is not consent to emit, which
+is the whole reason the gate is a flag rather than an inference from
+`FIFTYONE_MQ_REDIS_URL`.
+*/}}
+{{- define "activity.validate" -}}
+{{- if and .Values.activitySettings.enabled (not .Values.fiftyoneMq.enabled) }}
+{{- fail "activitySettings.enabled is true but fiftyoneMq.enabled is false: the activity workers and producers have no queue to reach, so every event is dropped. Enable fiftyoneMq, or disable activitySettings." }}
+{{- end }}
+{{- end }}
+
+{{/*
 Name of an Activity Analytics worker Deployment.
 Inputs (dict):
   ctx     — root context (.)

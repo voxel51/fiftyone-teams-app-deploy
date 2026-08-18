@@ -329,10 +329,7 @@ Create a merged list of environment variables for delegated-operator-executor
 - name: TELEMETRY_SOCKET
   value: /tmp/telemetry/agent.sock
 {{- end }}
-{{- /* Queue + activity env are independent of telemetry: delegated
-operators are activity producers (op lifecycle + sample CRUD events),
-so gating their queue URL on the telemetry toggle silently dropped
-their emits whenever telemetry was off. */}}
+{{- /* Independent of telemetry: nesting these under it drops DO emits. */}}
 {{- if .ctx }}
 {{- include "fiftyone-mq.redis-url-env" .ctx }}
 {{- include "activity.enabled-env" .ctx }}

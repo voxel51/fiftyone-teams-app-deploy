@@ -27,6 +27,31 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.24+
+
+#### Activity Analytics
+
+FiftyOne Enterprise 2.24+ records operator runs, annotation and review
+decisions, and sample/label mutations, and rolls them up into the data behind
+the Audit Log and Jobs pages.
+
+Activity Analytics is opt-in; nothing changes on upgrade unless you enable it.
+It requires two settings together — `activitySettings.enabled` (tells the
+existing workloads to emit, and adds the worker `Deployment`s) and
+`fiftyoneMq.enabled` (the queue Redis carrying events between them).
+Enabling one without the other fails the render.
+
+The bundled queue Redis claims a `PersistentVolumeClaim` by default, so a
+default `StorageClass` is required unless you disable persistence or supply
+your own claim.
+Please refer to
+
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v224-activity-analytics)
+  for what changes on upgrade, cluster requirements, and resource impact
+- [configuring activity analytics](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-activity-analytics.md)
+  for full details, including external Redis and multi-organization
+  deployments
+
 ### Version 2.23+
 
 #### Service Orchestrators and Auto-registration
@@ -805,12 +830,12 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| activitySettings.enabled | bool | `false` | Controls whether the Activity Analytics worker Deployments are rendered, and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. It renders `FIFTYONE_ACTIVITY_ENABLED=true` on those workloads, so that enablement is read from one flag rather than inferred from `FIFTYONE_MQ_REDIS_URL`. Left `false`, the chart renders no activity env on the producers and no worker Deployments. The chart half of that gate is what ships here; the images that READ the flag do not. `false` makes every producer emit seam a no-op only with `fiftyone-teams` >= v2.25 (voxel51/fiftyone-teams#3737) and `fiftyone-activity` >= 0.0.27 (voxel51/fiftyone-activity#15). On the images this release targets the producers still emit whenever the package is imported and ignore the flag, so `false` withholds the workers and the env but does not by itself silence the producers. Do not set this `false` while `fiftyoneMq.enabled` is `true`: that stands up the queue and leaves the producers filling it with nothing draining it, so it grows until `noeviction` starts refusing writes. Enable both or neither — nothing in the chart enforces the pairing. |
+| activitySettings.enabled | bool | `false` | Controls whether the Activity Analytics worker Deployments are rendered, and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
-| activitySettings.image.repository | string | `"us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity"` | Worker image published from the fiftyone-activity repository. |
-| activitySettings.image.tag | string | `"8a6f61730c86b306d67fca4f1ca836f24aeb43a7"` | Worker image tag. Required when `activitySettings.enabled` is `true`. v0.0.26 — the build that first carries the prune worker entrypoint and the `workflow.decision_attributed` rename. Commit SHA rather than a semver tag because fiftyone-activity publishes SHA tags only; FOEPD-4410 covers giving it semver tags like the other four images. |
+| activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
+| activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |
 | activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
-| activitySettings.orgId | string | `""` | Organization the workers and producers stamp on their events. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. The chart renders `FIFTYONE_ACTIVITY_ORG_ID` only when this is set — an empty value is never rendered as an empty string. Set it. With the worker image pinned above (v0.0.26) the snapshot worker has no way to discover the organization: rollups are org-scoped, so an empty value makes it skip every cycle and the install looks healthy while recording nothing. Producers are unaffected — they stamp the authenticated organization carried on the request — so this is specifically about the deployment-wide state counts the snapshot worker produces. It becomes a true override, safe to leave empty, once the pin moves to `fiftyone-activity` >= 0.0.27, which teaches the workers to discover a single-org deployment's organization for themselves (voxel51/fiftyone-activity#17). From then on it is only needed for a deployment holding several organizations, where the deployment-wide counts cannot be attributed to one of them — the workers log which one to name. |
+| activitySettings.orgId | string | `""` | Organization that the deployment-wide rollups are attributed to. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Leave empty: a single-org deployment is discovered automatically. Set it only when the deployment holds several organizations, where the deployment-wide counts cannot be attributed to one of them — the workers log which one to name. |
 | activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
 | activitySettings.snapshotIntervalMs | string | `""` | Snapshot interval in milliseconds. Defaults to hourly, matching the bucket the state metrics roll up by. |
 | activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
@@ -1066,7 +1091,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | fiftyoneMq.redis.external.url | string | `""` | URL of an external Redis. When set, the bundled Redis is not rendered and the workloads are wired to this URL instead. The instance must use the `noeviction` maxmemory policy. An evicting policy drops queued jobs. |
 | fiftyoneMq.redis.image | string | `"redis:7-alpine"` | Redis image for the bundled queue backend. |
 | fiftyoneMq.redis.maxmemory | string | `"200mb"` | Memory limit for the bundled Redis. |
-| fiftyoneMq.redis.persistence.enabled | bool | `false` | Whether to provision a `PersistentVolumeClaim` for the bundled queue Redis `/data` directory, where its append-only file (AOF) lives. Defaults to `false` so the chart installs without a default `StorageClass`.  READ THIS BEFORE LEAVING IT `false`: the queue Redis always runs with `--appendonly yes --appendfsync everysec`, but with persistence disabled the AOF is written to an `emptyDir`. An `emptyDir` is tied to the pod rather than the container, so the AOF survives a **container** restart (crash, OOM-kill, liveness restart) but is **lost** on a **pod** reschedule (node drain, eviction, `kubectl delete pod`, chart upgrade). Set this to `true` for the queue to survive rescheduling.  When enabling this alongside a non-empty `fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's redis GID so the mounted `/data` stays writable.  Either way, this bounds one loss window rather than making the pipeline durable end to end: the in-process emit buffer is cleared when an enqueue fails, and enqueuing is not atomic with the domain change the event describes. Tracked as `FOEPD-4411` (write events to MongoDB directly and keep only the work queue in Redis). |
+| fiftyoneMq.redis.persistence.enabled | bool | `true` | Whether to provision a `PersistentVolumeClaim` for the bundled queue Redis `/data` directory, where its append-only file (AOF) lives. Defaults to `true` to prevent queued activities from being lost on pod reschedules. Disabling it writes the AOF to an `emptyDir`, which survives a container restart but is lost on a pod reschedule (node drain, eviction, `kubectl delete pod`, chart upgrade). Requires a default `StorageClass`, or set `storageClass` / `existingClaim`.  When enabling this alongside a non-empty `fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's redis GID so the mounted `/data` stays writable.  This bounds one loss window rather than making the pipeline durable end to end: the in-process emit buffer is cleared when an enqueue fails, and enqueuing is not atomic with the domain change the event describes. Tracked as `FOEPD-4411`. |
 | fiftyoneMq.redis.persistence.existingClaim | string | `""` | Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to bind the queue Redis to. When set, `size` and `storageClass` are ignored. Has no effect when `persistence.enabled` is `false`. |
 | fiftyoneMq.redis.persistence.size | string | `"1Gi"` | Storage size for the queue Redis `PersistentVolumeClaim`. The AOF holds in-flight jobs rather than event history, so this only needs to cover the queue's peak backlog. |
 | fiftyoneMq.redis.persistence.storageClass | string | `""` | `StorageClass` name for the queue Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |

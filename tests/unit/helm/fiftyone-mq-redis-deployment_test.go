@@ -336,20 +336,44 @@ func (s *fiftyoneMqRedisDeploymentTemplateTest) TestAofDirIsMountedPath() {
 	}
 }
 
-// TestPersistenceDisabledByDefault pins the shipped default: a plain install
-// must not demand a PVC, so it never blocks on a cluster lacking a default
-// StorageClass. The AOF still works, on an emptyDir.
-func (s *fiftyoneMqRedisDeploymentTemplateTest) TestPersistenceDisabledByDefault() {
+// TestPersistenceEnabledByDefault pins the shipped default: queued activity
+// must survive a pod reschedule, so a plain install provisions the PVC.
+// Disabling it is the explicit opt-out, covered below.
+func (s *fiftyoneMqRedisDeploymentTemplateTest) TestPersistenceEnabledByDefault() {
 	options := &helm.Options{SetValues: mqRedisEnabled(nil)}
 
-	s.assertPvcNotRendered(options, "PVC should not be rendered by default")
+	pvc := s.renderPvc(options)
+	s.Equal(
+		fmt.Sprintf("%s-fiftyone-mq-redis-data", s.releaseName),
+		pvc.ObjectMeta.Name,
+		"PVC should be rendered by default",
+	)
+
+	deployment := s.renderDeployment(options)
+	volumes := deployment.Spec.Template.Spec.Volumes
+	s.Require().Len(volumes, 1, "Deployment should have exactly one volume")
+	s.Equal("redis-data", volumes[0].Name)
+	s.Require().NotNil(volumes[0].PersistentVolumeClaim,
+		"redis-data should be PVC-backed by default so the AOF survives a pod reschedule")
+	s.Nil(volumes[0].EmptyDir)
+}
+
+// TestPersistenceOptOutUsesEmptyDir covers the explicit disable: no PVC, so
+// the chart still installs on a cluster with no default StorageClass. The AOF
+// then survives a container restart but not a pod reschedule.
+func (s *fiftyoneMqRedisDeploymentTemplateTest) TestPersistenceOptOutUsesEmptyDir() {
+	options := &helm.Options{SetValues: mqRedisEnabled(map[string]string{
+		"fiftyoneMq.redis.persistence.enabled": "false",
+	})}
+
+	s.assertPvcNotRendered(options, "PVC should not be rendered when persistence is disabled")
 
 	deployment := s.renderDeployment(options)
 	volumes := deployment.Spec.Template.Spec.Volumes
 	s.Require().Len(volumes, 1, "Deployment should have exactly one volume")
 	s.Equal("redis-data", volumes[0].Name)
 	s.NotNil(volumes[0].EmptyDir,
-		"redis-data should be an emptyDir by default; the AOF then survives a container restart but not a pod reschedule")
+		"redis-data should fall back to an emptyDir when persistence is disabled")
 	s.Nil(volumes[0].PersistentVolumeClaim,
 		"redis-data must not reference a PVC when persistence is disabled")
 }

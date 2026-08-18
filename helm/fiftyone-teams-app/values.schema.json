@@ -6,7 +6,7 @@
       "properties": {
         "enabled": {
           "default": false,
-          "description": "Controls whether the Activity Analytics worker Deployments are rendered,\nand whether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit. It renders\n`FIFTYONE_ACTIVITY_ENABLED=true` on those workloads, so that enablement is\nread from one flag rather than inferred from `FIFTYONE_MQ_REDIS_URL`.\nLeft `false`, the chart renders no activity env on the producers and no\nworker Deployments.\nThe chart half of that gate is what ships here; the images that READ the\nflag do not. `false` makes every producer emit seam a no-op only with\n`fiftyone-teams` \u003e= v2.25 (voxel51/fiftyone-teams#3737) and\n`fiftyone-activity` \u003e= 0.0.27 (voxel51/fiftyone-activity#15). On the images\nthis release targets the producers still emit whenever the package is\nimported and ignore the flag, so `false` withholds the workers and the env\nbut does not by itself silence the producers.\nDo not set this `false` while `fiftyoneMq.enabled` is `true`: that stands up\nthe queue and leaves the producers filling it with nothing draining it, so\nit grows until `noeviction` starts refusing writes. Enable both or neither\n— nothing in the chart enforces the pairing.",
+          "description": "Controls whether the Activity Analytics worker Deployments are rendered,\nand whether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit.\nEnable `fiftyoneMq.enabled` alongside this; the chart fails the render if\nonly one of the two is on.",
           "title": "enabled",
           "type": "boolean"
         },
@@ -19,14 +19,14 @@
               "type": "string"
             },
             "repository": {
-              "default": "us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity",
-              "description": "Worker image published from the fiftyone-activity repository.",
+              "default": "voxel51/fiftyone-activity",
+              "description": "Worker image.",
               "title": "repository",
               "type": "string"
             },
             "tag": {
-              "default": "8a6f61730c86b306d67fca4f1ca836f24aeb43a7",
-              "description": "Worker image tag. Required when `activitySettings.enabled` is `true`.\nv0.0.26 — the build that first carries the prune worker entrypoint and\nthe `workflow.decision_attributed` rename. Commit SHA rather than a\nsemver tag because fiftyone-activity publishes SHA tags only; FOEPD-4410\ncovers giving it semver tags like the other four images.",
+              "default": "",
+              "description": "Worker image tag. Defaults to the chart `appVersion`.",
               "title": "tag",
               "type": "string"
             }
@@ -50,7 +50,7 @@
         },
         "orgId": {
           "default": "",
-          "description": "Organization the workers and producers stamp on their events. This is\nthe organization's `id` FIELD (its slug), not the Mongo `_id`. The chart\nrenders `FIFTYONE_ACTIVITY_ORG_ID` only when this is set — an empty value\nis never rendered as an empty string.\nSet it. With the worker image pinned above (v0.0.26) the snapshot worker\nhas no way to discover the organization: rollups are org-scoped, so an\nempty value makes it skip every cycle and the install looks healthy while\nrecording nothing. Producers are unaffected — they stamp the authenticated\norganization carried on the request — so this is specifically about the\ndeployment-wide state counts the snapshot worker produces.\nIt becomes a true override, safe to leave empty, once the pin moves to\n`fiftyone-activity` \u003e= 0.0.27, which teaches the workers to discover a\nsingle-org deployment's organization for themselves\n(voxel51/fiftyone-activity#17). From then on it is only needed for a\ndeployment holding several organizations, where the deployment-wide counts\ncannot be attributed to one of them — the workers log which one to name.",
+          "description": "Organization that the deployment-wide rollups are attributed to. This is\nthe organization's `id` FIELD (its slug), not the Mongo `_id`.\nLeave empty: a single-org deployment is discovered automatically. Set it\nonly when the deployment holds several organizations, where the\ndeployment-wide counts cannot be attributed to one of them — the workers\nlog which one to name.",
           "title": "orgId",
           "type": "string"
         },
@@ -2931,8 +2931,8 @@
             "persistence": {
               "properties": {
                 "enabled": {
-                  "default": false,
-                  "description": "Whether to provision a `PersistentVolumeClaim` for the bundled queue\nRedis `/data` directory, where its append-only file (AOF) lives.\nDefaults to `false` so the chart installs without a default\n`StorageClass`.\n\nREAD THIS BEFORE LEAVING IT `false`: the queue Redis always runs with\n`--appendonly yes --appendfsync everysec`, but with persistence\ndisabled the AOF is written to an `emptyDir`. An `emptyDir` is tied to\nthe pod rather than the container, so the AOF survives a **container**\nrestart (crash, OOM-kill, liveness restart) but is **lost** on a\n**pod** reschedule (node drain, eviction, `kubectl delete pod`, chart\nupgrade). Set this to `true` for the queue to survive rescheduling.\n\nWhen enabling this alongside a non-empty\n`fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's\nredis GID so the mounted `/data` stays writable.\n\nEither way, this bounds one loss window rather than making the pipeline\ndurable end to end: the in-process emit buffer is cleared when an\nenqueue fails, and enqueuing is not atomic with the domain change the\nevent describes. Tracked as `FOEPD-4411` (write events to MongoDB\ndirectly and keep only the work queue in Redis).",
+                  "default": true,
+                  "description": "Whether to provision a `PersistentVolumeClaim` for the bundled queue\nRedis `/data` directory, where its append-only file (AOF) lives.\nDefaults to `true` to prevent queued activities from being lost on pod\nreschedules. Disabling it writes the AOF to an `emptyDir`, which\nsurvives a container restart but is lost on a pod reschedule (node\ndrain, eviction, `kubectl delete pod`, chart upgrade). Requires a\ndefault `StorageClass`, or set `storageClass` / `existingClaim`.\n\nWhen enabling this alongside a non-empty\n`fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's\nredis GID so the mounted `/data` stays writable.\n\nThis bounds one loss window rather than making the pipeline durable end\nto end: the in-process emit buffer is cleared when an enqueue fails,\nand enqueuing is not atomic with the domain change the event describes.\nTracked as `FOEPD-4411`.",
                   "title": "enabled",
                   "type": "boolean"
                 },

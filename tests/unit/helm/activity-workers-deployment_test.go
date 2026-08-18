@@ -42,6 +42,46 @@ func TestActivityWorkersDeploymentTemplate(t *testing.T) {
 	})
 }
 
+// TestActivityWithoutQueueFailsRender pins the pairing guard. Activity on with
+// the queue off renders producers and workers with nothing to connect to, so
+// every event is dropped while the install reports healthy -- the failure this
+// turns into a render error instead.
+func (s *activityWorkersDeploymentTemplateTest) TestActivityWithoutQueueFailsRender() {
+	options := &helm.Options{SetValues: map[string]string{
+		"activitySettings.enabled": "true",
+		"fiftyoneMq.enabled":       "false",
+	}}
+
+	_, err := helm.RenderTemplateE(
+		s.T(), options, s.chartPath, s.releaseName,
+		[]string{"templates/api-deployment.yaml"},
+	)
+
+	s.Require().Error(err, "activity without a queue must not render")
+	s.Contains(
+		err.Error(),
+		"activitySettings.enabled is true but fiftyoneMq.enabled is false",
+		"the error should name both settings so the fix is obvious",
+	)
+}
+
+// TestQueueWithoutActivityRenders pins the deliberate asymmetry: a reachable
+// queue is not consent to emit, which is why the gate is a flag rather than an
+// inference from FIFTYONE_MQ_REDIS_URL. This direction must stay legal.
+func (s *activityWorkersDeploymentTemplateTest) TestQueueWithoutActivityRenders() {
+	options := &helm.Options{SetValues: map[string]string{
+		"activitySettings.enabled": "false",
+		"fiftyoneMq.enabled":       "true",
+	}}
+
+	_, err := helm.RenderTemplateE(
+		s.T(), options, s.chartPath, s.releaseName,
+		[]string{"templates/api-deployment.yaml"},
+	)
+
+	s.NoError(err, "queue on with activity off is a supported configuration")
+}
+
 // activityEnabled returns SetValues enabling the workers with the values the
 // template requires. Tests set these explicitly rather than leaning on chart
 // defaults so they keep asserting the same thing if defaults change.

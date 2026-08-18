@@ -146,6 +146,59 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
+#### FiftyOne Enterprise v2.24+ Activity Analytics
+
+FiftyOne Enterprise v2.24.0 introduces Activity Analytics: a record of
+operator runs, annotation and review decisions, and sample/label mutations,
+rolled up into the data behind the Audit Log and Jobs pages.
+
+**Activity Analytics is opt-in and nothing changes on upgrade unless you
+enable it.** The chart renders no activity environment on the existing
+workloads and no new `Deployment`s while it is off.
+
+Enabling it requires two settings, which are a pair:
+
+```yaml
+# values.yaml
+activitySettings:
+  enabled: true
+fiftyoneMq:
+  enabled: true
+```
+
+- `activitySettings.enabled` tells the producer workloads (`teams-api`,
+  `fiftyone-app`, `teams-plugins`, and the delegated operators) to emit,
+  and renders one worker `Deployment` per activity worker.
+- `fiftyoneMq.enabled` renders the queue Redis that carries events from
+  the producers to the workers.
+
+Turning on activity without the queue fails the render rather than
+installing something that silently records nothing.
+
+**Cluster requirements:**
+
+- `fiftyoneMq.redis.persistence.enabled` defaults to `true`, so the queue
+  Redis claims a `PersistentVolumeClaim` and needs a default
+  `StorageClass` — or set `persistence.storageClass` /
+  `persistence.existingClaim`. Set `persistence.enabled: false` to run on
+  an `emptyDir` instead, at the cost of losing queued events on a pod
+  reschedule.
+- An external Redis supplied through `fiftyoneMq.redis.external.url` must
+  use the `noeviction` maxmemory policy. An evicting policy deletes queued
+  jobs with no error on either side.
+
+**Resource impact:**
+Each worker requests `100m` CPU / `128Mi` memory (limits `500m` /
+`512Mi`), plus one bundled Redis pod.
+
+The workflow Activity and Metrics UI surfaces are gated separately by the
+`VFF_WF_ACTIVITY` and `VFF_WF_METRIC` feature flags on `teams-app`, which
+the chart does not set.
+
+See the
+[Configuring Activity Analytics](./configuring-activity-analytics.md)
+documentation for full details.
+
 #### FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration
 
 FiftyOne Enterprise v2.23.0 introduces service orchestrators: delegated-operator
