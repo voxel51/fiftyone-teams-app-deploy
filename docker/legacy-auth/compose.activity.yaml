@@ -34,8 +34,7 @@ services:
 # GPU/agentic workers are not in every `-f` set, and naming a service that the
 # base layering omits would CREATE it here rather than annotate it. Those
 # services read the same var from .env — set FIFTYONE_ACTIVITY_ENABLED=true
-# there when you run a dedicated-plugins or delegated-operator stack. They
-# already need FIFTYONE_ACTIVITY_ORG_ID from .env regardless.
+# there when you run a dedicated-plugins or delegated-operator stack.
   fiftyone-app:
     environment:
       FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
@@ -44,6 +43,9 @@ services:
     environment:
       FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
 
+  # Using an external Redis? Point FIFTYONE_MQ_REDIS_URL at it in .env AND
+  # delete this service (and the volume below) — otherwise the bundled one
+  # still starts, unused.
   fiftyone-mq-redis:
     extends:
       file: ../common-services.yaml

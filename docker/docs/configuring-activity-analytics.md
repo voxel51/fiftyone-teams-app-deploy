@@ -22,10 +22,7 @@ The `fiftyone-mq-redis` and `activity-worker` services live in the
 `compose.activity.yaml` overlay, not in the base compose files. A plain
 `docker compose up` does not start them, and no activity is recorded.
 `FIFTYONE_ACTIVITY_ENABLED` defaults to `false` besides, so the emit
-seams in the services that do start are no-ops. This matches the Helm
-chart, where `activitySettings.enabled` and `fiftyoneMq.enabled` both
-default to `false` and the chart renders no activity env at all until
-they are on.
+seams in the services that do start are no-ops.
 
 ## How it works
 
@@ -120,9 +117,7 @@ review event producer) executes in `teams-plugins` rather than in
 execute in `teams-do`.
 
 Setting it in `.env` is the belt-and-braces option for every layering: an
-explicit value there wins over the overlay in both directions. You are
-already editing `.env` to set `FIFTYONE_ACTIVITY_ORG_ID`, without which
-the tenant-scoped read path returns nothing.
+explicit value there wins over the overlay in both directions.
 
 Verify what a given `-f` set resolves to before bringing it up:
 
@@ -143,7 +138,7 @@ Set these in your `.env` file. See the Activity Analytics section of
 | Variable                              | Default                            | Description                                                                                                                          |
 | ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `FIFTYONE_ACTIVITY_ENABLED`           | `false`                            | The gate: nothing emits while false. `compose.activity.yaml` sets it for `fiftyone-app` and `teams-api`; set it here for the others. |
-| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id that activity events are scoped by. Set it for single-org deployments.                                               |
+| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id that activity events are scoped by. Defaults to empty, which means self-discovery via CAS for single-org deployments. |
 | `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0` | Queue connection string. Point it at an external Redis to replace the bundled service.                                               |
 | `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                              | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry.                                                 |
 | `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES` | `10737418240`                      | Size cap on raw events. The prune worker removes oldest-first when exceeded. `0` disables.                                           |
@@ -191,29 +186,10 @@ docker compose exec fiftyone-mq-redis \
   redis-cli config get appendonly appendfsync
 ```
 
-## The queue Redis requires `noeviction`
-
-The bundled `fiftyone-mq-redis` service starts with
-`--maxmemory-policy noeviction`. Keep it that way.
-
-The queue is a BullMQ queue, and BullMQ stores queued jobs as ordinary
-Redis keys. Under an evicting policy such as `allkeys-lru`, Redis
-reclaims memory by deleting those keys, and queued jobs disappear
-without an error on either side. Activity data goes missing with no
-signal that anything failed.
-
-With `noeviction`, a full queue rejects writes instead. The emit path
-is best-effort, so a rejected write degrades to a dropped event and the
-emitting operation is unaffected.
-
-Note that the bundled `telemetry-redis` service does use `allkeys-lru`.
-That is correct for telemetry, which stores expendable metric samples.
-Do not copy that setting onto the queue Redis, and do not point
-`FIFTYONE_MQ_REDIS_URL` at `telemetry-redis`.
-
-If you supply an external Redis through `FIFTYONE_MQ_REDIS_URL`, verify
-its policy and its persistence — the compose file only configures the
-bundled service:
+An external Redis supplied through `FIFTYONE_MQ_REDIS_URL` is not
+configured by the compose file. Verify its persistence and that its
+`maxmemory-policy` is `noeviction` — an evicting policy deletes queued
+jobs with no error on either side:
 
 ```shell
 redis-cli -u "${FIFTYONE_MQ_REDIS_URL}" \

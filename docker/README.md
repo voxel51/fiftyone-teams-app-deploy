@@ -626,8 +626,7 @@ docker compose \
 
 Please refer to the
 [Activity Analytics configuration documentation](./docs/configuring-activity-analytics.md)
-for full details, including the queue Redis `noeviction` requirement and
-the single-replica constraint on the worker.
+for full details.
 
 ### Snapshot Archival
 

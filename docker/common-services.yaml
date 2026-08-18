@@ -242,7 +242,7 @@ services:
       - --maxmemory
       - ${FIFTYONE_MQ_REDIS_MAXMEMORY:-200mb}
       - --maxmemory-policy
-      - noeviction
+      - noeviction # required for queue durability
     restart: always
     volumes:
       - fiftyone-mq-redis-data:/data
