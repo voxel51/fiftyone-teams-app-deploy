@@ -38,7 +38,7 @@
 # the LABELER_* values for your model and GPU. LABELER_DISABLE_AUTH turns off
 # the service's built-in auth.
 - id: builtin:agentic-labeler
-  builtin_version: 1
+  builtin_version: 2
   kind: agentic-labeler
   scope: shared
   builtin: true
@@ -48,14 +48,12 @@
   description: Agentic labeler (few-shot VLM inference via vLLM).
   entrypoint:
     kind: shell
-    command: uvicorn agentic_labeler.app:app --host 0.0.0.0 --port 8000
+    command: python3 -m agentic_labeler.launch
     container:
       port: 8000
       healthcheck:
         path: /healthz
         port: 8001
   env: |
-    LABELER_TENSOR_PARALLEL_SIZE=1
-    LABELER_MAX_MODEL_LEN=6144
-    LABELER_DISABLE_AUTH=1
+    LABELER_CONFIG_FILE=/app/configs/gemma4-31B-qat-maxvision.json
   delegation_target: agentic-labeler
