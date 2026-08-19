@@ -1116,10 +1116,10 @@ delegatedOperatorJobTemplates:
           secretKey: fiftyoneAuthSecret
       services:
         annotation-ai:
+          autoStart: false
           builtin: true
           builtin_version: 1
           description: SAM2 point-prompt image masks and whole-video mask propagation.
-          autoStart: false
           entrypoint:
             command: python -m fiftyone.annotation.endpoints.sam2 --mode all --host 0.0.0.0 --port 8000
             container:
@@ -1135,12 +1135,12 @@ delegatedOperatorJobTemplates:
           scope: shared
           secrets: ""
         agentic-labeler:
-          builtin: true
-          builtin_version: 1
-          description: Agentic labeler (few-shot VLM inference via vLLM).
           autoStart: false
+          builtin: true
+          builtin_version: 2
+          description: Agentic labeler (few-shot VLM inference via vLLM).
           entrypoint:
-            command: uvicorn agentic_labeler.app:app --host 0.0.0.0 --port 8000
+            command: python3 -m agentic_labeler.launch
             container:
               healthcheck:
                 path: /healthz
@@ -1150,10 +1150,6 @@ delegatedOperatorJobTemplates:
             kind: shell
           env:
             LABELER_CONFIG_FILE: /app/configs/gemma4-31B-qat-maxvision.json
-            LABELER_TENSOR_PARALLEL_SIZE: 1
-            LABELER_ENFORCE_EAGER: true
-            LABELER_ENGINE_KWARGS: '{"max_num_batched_tokens": 8192, "enable_prefix_caching": true, "mm_processor_cache_gb": 0}'
-            USER: fiftyone
           label: Agentic Labeler
           scope: shared
           secrets: ""
@@ -1506,8 +1502,8 @@ teamsAppSettings:
     # -- When `false`, disables media export options
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
-    # install modal (i.e. `pip install ... fiftyone==2.23.1`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.23.1
+    # install modal (i.e. `pip install ... fiftyone==2.24.0`).
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.24.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.

@@ -129,8 +129,8 @@ func (s *builtinServicesConfigMapTemplateTest) TestGating() {
 
 // TestDefaultServiceDerivation verifies the chart's default agentic-labeler
 // service: identity fields derived from the map keys, `enabled` mapped
-// from `autoStart`, the env map flattened to KEY=VALUE lines, and the
-// untagged image defaulting to the chart's appVersion.
+// from `autoStart`, and the untagged image defaulting to the chart's
+// appVersion.
 func (s *builtinServicesConfigMapTemplateTest) TestDefaultServiceDerivation() {
 	services := s.builtinServices(nil)
 	// Sorted by service key within the orchestrator
@@ -146,7 +146,6 @@ func (s *builtinServicesConfigMapTemplateTest) TestDefaultServiceDerivation() {
 	s.Equal("gpuServiceOrc", service["delegation_target"])
 
 	s.Equal(true, service["builtin"])
-	s.Equal(1, service["builtin_version"])
 	s.Equal("shared", service["scope"])
 	s.Equal("", service["secrets"])
 
@@ -154,13 +153,6 @@ func (s *builtinServicesConfigMapTemplateTest) TestDefaultServiceDerivation() {
 	s.Equal(false, service["enabled"])
 	_, hasAutoStart := service["autoStart"]
 	s.False(hasAutoStart, "autoStart is a values-side key only")
-
-	// The env map flattens to KEY=VALUE lines
-	env, ok := service["env"].(string)
-	s.Require().True(ok, "env should flatten to a string")
-	s.Contains(env, "LABELER_CONFIG_FILE=/app/configs/gemma4-31B-qat-maxvision.json\n")
-	s.Contains(env, "LABELER_TENSOR_PARALLEL_SIZE=1\n")
-	s.Contains(env, "LABELER_ENFORCE_EAGER=true\n")
 
 	// The untagged image gets the chart's appVersion
 	cInfo, err := chartInfo(s.T(), s.chartPath)

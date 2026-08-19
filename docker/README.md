@@ -259,7 +259,7 @@ You can override the default image used by any service in
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.23.1
+    image: voxel51/fiftyone-app-torch:v2.24.0
 ```
 
 > [!NOTE]
@@ -782,7 +782,7 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `FIFTYONE_APP_TERMS_URL`                     | Terms of Service URL used in App                                                                                                                                                                                                                                               | No                        |
 | `FIFTYONE_APP_PRIVACY_URL`                   | Privacy URL used in App                                                                                                                                                                                                                                                        | No                        |
 | `FIFTYONE_APP_IMPRINT_URL`                   | Imprint URL used in App                                                                                                                                                                                                                                                        | No                        |
-| `FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION` | The recommended fiftyone SDK version. This will be displayed in install modal (i.e. `pip install ... fiftyone==2.23.1`)                                                                                                                                                        | No                        |
+| `FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION` | The recommended fiftyone SDK version. This will be displayed in install modal (i.e. `pip install ... fiftyone==2.24.0`)                                                                                                                                                        | No                        |
 | `FIFTYONE_APP_THEME`                         | The default theme configuration for your FiftyOne Enterprise application as described [in our documentation](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                              | No                        |
 | `FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE`     | Controls whether Query Performance mode is enabled by default for every dataset for the application. Set to false to set default mode to off.                                                                                                                                  | No                        |
 | `FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE`      | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application.                                                                                                                                 | No                        |
