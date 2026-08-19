@@ -200,13 +200,13 @@ For more information about `FrontendConfig`s, see
 ## Install FiftyOne Enterprise App
 
 ```shell
-kubectl create namespace fiftyone-teams
-kubectl config set-context --current --namespace fiftyone-teams
+kubectl create namespace your-namespace-here
 kubectl create secret generic regcred \
   --from-file=.dockerconfigjson=./voxel51-docker.json \
   --type kubernetes.io/dockerconfigjson
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
-  --values ./values.yaml
+  --values ./values.yaml \
+  --namespace your-namespace-here
 ```
 
 Issuing SSL Certificates may take up to 15 minutes.
