@@ -105,7 +105,7 @@ teamsAppSettings:
   dnsName: <YOUR_DNS_HOST>
 ```
 
-## Create the Necessary Helm Repos
+## Add Helm Repositories
 
 Add the Helm repositories
 
