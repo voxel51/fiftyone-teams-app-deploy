@@ -444,7 +444,7 @@ In the steps below, `<DNS_NAME>` is the ingress hostname you set for
 
 Verify the deployment's IdP setup by logging in as a regular user
 
-1. In a browser, open `https://<DNS_NAME>/cas`
+1. In a browser, open `https://<DNS_NAME>`
 1. Log in with the credentials of the admin
    (you created in the CAS Super Admin UI)
 1. Confirm the login redirects you to the FiftyOne Enterprise datasets page
