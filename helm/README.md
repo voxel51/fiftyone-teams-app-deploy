@@ -209,7 +209,8 @@ Edit your `values.yaml` file (see the example
   [Step 3](#file_folder-step-3-choose-authentication-mode)
 - `teamsAppSettings.dnsName` — your ingress hostname
 - `namespace.name` — set to match your target namespace
-   (e.g. `your-namespace-here`). See the note below
+   (e.g. `your-namespace-here`).
+   See the note below.
 
 When using the Voxel51 Docker Hub registry to pull container images,
 create an image pull secret and reference it in `imagePullSecrets`:
