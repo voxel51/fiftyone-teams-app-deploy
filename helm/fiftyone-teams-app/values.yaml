@@ -1,4 +1,81 @@
 ---
+# FiftyOne Activity Analytics workers. Reads the queue populated by the
+# producers and writes the activity_* collections.
+activitySettings:
+  # -- Controls whether the Activity Analytics worker Deployments are rendered,
+  # and whether the producer workloads (teams-api, fiftyone-app, teams-plugins,
+  # and the delegated operators) are told to emit.
+  # Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if
+  # only one of the two is on.
+  enabled: false
+  image:
+    # -- Worker image.
+    repository: voxel51/fiftyone-activity
+    # -- Worker image tag. Defaults to the chart `appVersion`.
+    tag: ""
+    # -- Worker image pull policy. [Reference][image-pull-policy].
+    pullPolicy: IfNotPresent
+  mongo:
+    # -- Database holding the activity_* collections. When empty, they are
+    # co-located in the per-deployment FiftyOne database. Set a name to use a
+    # dedicated database.
+    database: ""
+  # -- Organization that the deployment-wide rollups are attributed to. This is
+  # the organization's `id` FIELD (its slug), not the Mongo `_id`.
+  # Leave empty: a single-org deployment is discovered automatically. Set it
+  # only when the deployment holds several organizations, where the
+  # deployment-wide counts cannot be attributed to one of them — the workers
+  # log which one to name.
+  orgId: ""
+  # -- Resources for the worker containers. [Reference][resources].
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  # -- Snapshot interval in milliseconds. Defaults to hourly, matching the
+  # bucket the state metrics roll up by.
+  snapshotIntervalMs: ""
+  # One Deployment is rendered per entry.
+  workers:
+    ingest:
+      # -- Entrypoint for the ingest worker.
+      command: ["fiftyone-activity-ingest-worker"]
+      # -- Number of ingest worker replicas.
+      replicaCount: 2
+    prune:
+      # -- Controls whether the prune worker Deployment is rendered.
+      # On by default now that the image pin carries the entrypoint: without
+      # this worker the storage size cap is never enforced and only the
+      # time-based TTL bounds the event store.
+      enabled: true
+      # -- Entrypoint for the prune worker, which enforces the event store
+      # size cap. Without it only the time-based TTL applies.
+      command: ["fiftyone-activity-prune-worker"]
+      # -- Number of prune worker replicas. Keep at 1.
+      replicaCount: 1
+      # -- Use the `Recreate` strategy. The prune worker owns a repeatable
+      # schedule, so only one replica may reconcile it.
+      recreate: true
+    rollup:
+      # -- Entrypoint for the rollup worker.
+      command: ["fiftyone-activity-rollup-worker"]
+      # -- Number of rollup worker replicas. Keep at 1.
+      replicaCount: 1
+      # -- Use the `Recreate` strategy. The rollup worker owns a repeatable
+      # schedule, so only one replica may reconcile it.
+      recreate: true
+    snapshot:
+      # -- Entrypoint for the snapshot worker.
+      command: ["fiftyone-activity-snapshot-worker"]
+      # -- Number of snapshot worker replicas. Keep at 1.
+      replicaCount: 1
+      # -- Use the `Recreate` strategy. The snapshot worker owns a repeatable
+      # schedule, and two replicas would double-count a bucket.
+      recreate: true
+
 # yaml-language-server: $schema=values.schema.json
 # FiftyOne Enterprise API (`teams-api`)
 apiSettings:
@@ -1161,6 +1238,65 @@ delegatedOperatorJobTemplates:
 # -- List of secrets for FiftyOne Enterprise Licenses (one per org)
 fiftyoneLicenseSecrets:
   - fiftyone-license
+
+# In-cluster queue for fiftyone-mq. Renders a Redis Deployment and Service, and
+# sets `FIFTYONE_MQ_REDIS_URL` on the workloads that publish to the queue.
+fiftyoneMq:
+  # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
+  # environment variable are rendered.
+  enabled: false
+  redis:
+    # -- Controls whether the bundled Redis Deployment and Service are
+    # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.
+    enabled: true
+    # -- Security context for the Redis container. [Reference][container-security-context].
+    containerSecurityContext: {}
+    external:
+      # -- URL of an external Redis. When set, the bundled Redis is not
+      # rendered and the workloads are wired to this URL instead. The instance
+      # must use the `noeviction` maxmemory policy. An evicting policy drops
+      # queued jobs.
+      url: ""
+    # -- Redis image for the bundled queue backend.
+    image: redis:7-alpine
+    # -- Memory limit for the bundled Redis.
+    maxmemory: 200mb
+    persistence:
+      # -- Whether to provision a `PersistentVolumeClaim` for the bundled queue
+      # Redis `/data` directory, where its append-only file (AOF) lives.
+      # Defaults to `true` to prevent queued activities from being lost on pod
+      # reschedules. Disabling it writes the AOF to an `emptyDir`, which
+      # survives a container restart but is lost on a pod reschedule (node
+      # drain, eviction, `kubectl delete pod`, chart upgrade). Requires a
+      # default `StorageClass`, or set `storageClass` / `existingClaim`.
+      #
+      # When enabling this alongside a non-empty
+      # `fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's
+      # redis GID so the mounted `/data` stays writable.
+      #
+      # This bounds one loss window rather than making the pipeline durable end
+      # to end: the in-process emit buffer is cleared when an enqueue fails,
+      # and enqueuing is not atomic with the domain change the event describes.
+      # Tracked as `FOEPD-4411`.
+      enabled: true
+      # -- Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to
+      # bind the queue Redis to. When set, `size` and `storageClass` are
+      # ignored. Has no effect when `persistence.enabled` is `false`.
+      existingClaim: ""
+      # -- Storage size for the queue Redis `PersistentVolumeClaim`. The AOF
+      # holds in-flight jobs rather than event history, so this only needs to
+      # cover the queue's peak backlog.
+      size: 1Gi
+      # @schema
+      # type: ["string", "null"]
+      # @schema
+      # -- `StorageClass` name for the queue Redis `PersistentVolumeClaim`.
+      # Leave unset to use the cluster's default `StorageClass`.
+      storageClass: ""
+    # -- Security context for the Redis pod. [Reference][security-context].
+    podSecurityContext: {}
+    # -- Resources for the Redis container. [Reference][resources].
+    resources: {}
 
 # -- Container image registry keys. [Reference][image-pull-secrets].
 imagePullSecrets: []

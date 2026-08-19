@@ -2609,3 +2609,26 @@ func (s *deploymentTeamsAppTemplateTest) TestDeploymentUpdateStrategy() {
 		})
 	}
 }
+
+// TestNoActivityDebugFlagDefaults pins the policy that the SHIPPING chart
+// never enables the activity/metrics debug flags by default: VFF_WF_ACTIVITY
+// gates internal debug surfaces (the workflow Activity tab + label History)
+// and VFF_WF_METRIC gates the pre-release Metrics tab — deployments opt in
+// per environment, customers never get them implicitly.
+func (s *deploymentTeamsAppTemplateTest) TestNoActivityDebugFlagDefaults() {
+	options := &helm.Options{SetValues: map[string]string{}}
+	output := helm.RenderTemplate(
+		s.T(), options, s.chartPath, s.releaseName, s.templates,
+	)
+	for _, flag := range []string{
+		"VFF_WF_ACTIVITY",
+		"VFF_WF_METRIC",
+		"VFF_Workflow_ACTIVITY",
+	} {
+		s.NotContains(
+			output, flag,
+			"the default chart render must not set %s — debug flags are per-env opt-ins",
+			flag,
+		)
+	}
+}

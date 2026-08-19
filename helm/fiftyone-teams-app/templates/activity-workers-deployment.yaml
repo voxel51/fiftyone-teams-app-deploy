@@ -1,0 +1,110 @@
+{{- /*
+One Deployment per entry in `activitySettings.workers`, differing only by
+entrypoint. Mongo comes from the shared teams secret. The queue URL comes from
+the fiftyone-mq helper.
+*/}}
+{{- if .Values.activitySettings.enabled }}
+{{- $a := .Values.activitySettings }}
+{{- range $name, $w := $a.workers }}
+{{- if ne $w.enabled false }}
+{{- $args := dict "ctx" $ "worker" $name }}
+{{- $full := include "activity.worker.name" $args }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}
+  namespace: {{ $.Values.namespace.name }}
+  labels:
+    {{- include "activity.worker.labels" $args | nindent 4 }}
+spec:
+  replicas: {{ $w.replicaCount | default 1 }}
+  {{- if $w.recreate }}
+  strategy:
+    type: Recreate
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "activity.worker.selectorLabels" $args | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "activity.worker.labels" $args | nindent 8 }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $full }}
+          image: "{{ $a.image.repository }}:{{ $a.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $a.image.pullPolicy | default "IfNotPresent" }}
+          command:
+            {{- toYaml $w.command | nindent 12 }}
+          env:
+            {{- /* These Deployments only render when activitySettings.enabled
+                   is true, so the helper always emits here. It is included
+                   anyway rather than hard-coded: the rollup and snapshot
+                   workers emit derived events of their own, and those emits
+                   go through the same flag-gated path as the producers. A
+                   worker that consumed the queue but could not emit would
+                   silently drop the derived rollup events. */}}
+            {{- include "activity.enabled-env" $ | nindent 12 }}
+            {{- include "fiftyone-mq.redis-url-env" $ | nindent 12 }}
+            - name: FIFTYONE_ACTIVITY_MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secret.name }}
+                  key: mongodbConnectionString
+            {{- /* Co-locate the activity_* collections in the per-deployment
+                   FiftyOne database (the same one teams metadata uses), NOT a
+                   fixed shared "fiftyone_activity" DB. On a shared Mongo (e.g.
+                   the ephem cluster) a fixed name collides across every
+                   Enterprise instance; using the deployment's own DB name
+                   isolates each one. An explicit activitySettings.mongo.database
+                   still wins if a deployment wants a dedicated DB. */}}
+            - name: FIFTYONE_ACTIVITY_MONGO_DB
+              {{- if $a.mongo.database }}
+              value: {{ $a.mongo.database | quote }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secret.name }}
+                  key: fiftyoneDatabaseName
+              {{- end }}
+            {{- /* The snapshot worker reads the FiftyOne (datasets) database —
+                   a DIFFERENT database from the activity store, though the same
+                   Mongo instance — and stamps its org onto the snapshot event,
+                   since the rollups are tenant-scoped. The database name comes
+                   from the same secret every other service reads it from. */}}
+            - name: FIFTYONE_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secret.name }}
+                  key: fiftyoneDatabaseName
+            {{- /* Rendered only when set, and deliberately through the same
+                   helper the producers use (`activity.org-id-env`) so the
+                   condition lives in one place instead of a second variant
+                   here. An unset org id must not render as an empty string:
+                   the workers cannot tell that apart from a deliberate blank.
+
+                   Unset is the intended normal case, but NOT yet with the
+                   image pinned in values.yaml. Org discovery lands in
+                   fiftyone-activity 0.0.27 (voxel51/fiftyone-activity#17);
+                   the pinned v0.0.26 build still requires the org id, and
+                   rollups are org-scoped, so without one the snapshot worker
+                   skips every cycle — a "successful" install of a silently
+                   empty pipeline. Until the pin moves, orgId must be set;
+                   the values.yaml comment says so too. */}}
+            {{- with (include "activity.org-id-env" $ | trim) }}
+            {{- . | nindent 12 }}
+            {{- end }}
+            {{- if $a.snapshotIntervalMs }}
+            - name: FIFTYONE_ACTIVITY_SNAPSHOT_INTERVAL_MS
+              value: {{ $a.snapshotIntervalMs | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml $a.resources | nindent 12 }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

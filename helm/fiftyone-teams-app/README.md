@@ -27,6 +27,31 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
+### Version 2.24+
+
+#### Activity Analytics
+
+FiftyOne Enterprise 2.24+ records operator runs, annotation and review
+decisions, and sample/label mutations, and rolls them up into the data behind
+the Audit Log and Jobs pages.
+
+Activity Analytics is opt-in; nothing changes on upgrade unless you enable it.
+It requires two settings together — `activitySettings.enabled` (tells the
+existing workloads to emit, and adds the worker `Deployment`s) and
+`fiftyoneMq.enabled` (the queue Redis carrying events between them).
+Enabling one without the other fails the render.
+
+The bundled queue Redis claims a `PersistentVolumeClaim` by default, so a
+default `StorageClass` is required unless you disable persistence or supply
+your own claim.
+Please refer to
+
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v224-activity-analytics)
+  for what changes on upgrade, cluster requirements, and resource impact
+- [configuring activity analytics](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-activity-analytics.md)
+  for full details, including external Redis and multi-organization
+  deployments
+
 ### Version 2.23+
 
 #### Service Orchestrators and Auto-registration
@@ -805,6 +830,26 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| activitySettings.enabled | bool | `false` | Controls whether the Activity Analytics worker Deployments are rendered, and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
+| activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
+| activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
+| activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |
+| activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
+| activitySettings.orgId | string | `""` | Organization that the deployment-wide rollups are attributed to. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Leave empty: a single-org deployment is discovered automatically. Set it only when the deployment holds several organizations, where the deployment-wide counts cannot be attributed to one of them — the workers log which one to name. |
+| activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
+| activitySettings.snapshotIntervalMs | string | `""` | Snapshot interval in milliseconds. Defaults to hourly, matching the bucket the state metrics roll up by. |
+| activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
+| activitySettings.workers.ingest.replicaCount | int | `2` | Number of ingest worker replicas. |
+| activitySettings.workers.prune.command | list | `["fiftyone-activity-prune-worker"]` | Entrypoint for the prune worker, which enforces the event store size cap. Without it only the time-based TTL applies. |
+| activitySettings.workers.prune.enabled | bool | `true` | Controls whether the prune worker Deployment is rendered. On by default now that the image pin carries the entrypoint: without this worker the storage size cap is never enforced and only the time-based TTL bounds the event store. |
+| activitySettings.workers.prune.recreate | bool | `true` | Use the `Recreate` strategy. The prune worker owns a repeatable schedule, so only one replica may reconcile it. |
+| activitySettings.workers.prune.replicaCount | int | `1` | Number of prune worker replicas. Keep at 1. |
+| activitySettings.workers.rollup.command | list | `["fiftyone-activity-rollup-worker"]` | Entrypoint for the rollup worker. |
+| activitySettings.workers.rollup.recreate | bool | `true` | Use the `Recreate` strategy. The rollup worker owns a repeatable schedule, so only one replica may reconcile it. |
+| activitySettings.workers.rollup.replicaCount | int | `1` | Number of rollup worker replicas. Keep at 1. |
+| activitySettings.workers.snapshot.command | list | `["fiftyone-activity-snapshot-worker"]` | Entrypoint for the snapshot worker. |
+| activitySettings.workers.snapshot.recreate | bool | `true` | Use the `Recreate` strategy. The snapshot worker owns a repeatable schedule, and two replicas would double-count a bucket. |
+| activitySettings.workers.snapshot.replicaCount | int | `1` | Number of snapshot worker replicas. Keep at 1. |
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
 | apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
 | apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api` to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators. |
@@ -1040,6 +1085,18 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorJobTemplates.template.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
+| fiftyoneMq.enabled | bool | `false` | Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL` environment variable are rendered. |
+| fiftyoneMq.redis.containerSecurityContext | object | `{}` | Security context for the Redis container. [Reference][container-security-context]. |
+| fiftyoneMq.redis.enabled | bool | `true` | Controls whether the bundled Redis Deployment and Service are rendered. Set to `false` when using `fiftyoneMq.redis.external.url`. |
+| fiftyoneMq.redis.external.url | string | `""` | URL of an external Redis. When set, the bundled Redis is not rendered and the workloads are wired to this URL instead. The instance must use the `noeviction` maxmemory policy. An evicting policy drops queued jobs. |
+| fiftyoneMq.redis.image | string | `"redis:7-alpine"` | Redis image for the bundled queue backend. |
+| fiftyoneMq.redis.maxmemory | string | `"200mb"` | Memory limit for the bundled Redis. |
+| fiftyoneMq.redis.persistence.enabled | bool | `true` | Whether to provision a `PersistentVolumeClaim` for the bundled queue Redis `/data` directory, where its append-only file (AOF) lives. Defaults to `true` to prevent queued activities from being lost on pod reschedules. Disabling it writes the AOF to an `emptyDir`, which survives a container restart but is lost on a pod reschedule (node drain, eviction, `kubectl delete pod`, chart upgrade). Requires a default `StorageClass`, or set `storageClass` / `existingClaim`.  When enabling this alongside a non-empty `fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's redis GID so the mounted `/data` stays writable.  This bounds one loss window rather than making the pipeline durable end to end: the in-process emit buffer is cleared when an enqueue fails, and enqueuing is not atomic with the domain change the event describes. Tracked as `FOEPD-4411`. |
+| fiftyoneMq.redis.persistence.existingClaim | string | `""` | Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to bind the queue Redis to. When set, `size` and `storageClass` are ignored. Has no effect when `persistence.enabled` is `false`. |
+| fiftyoneMq.redis.persistence.size | string | `"1Gi"` | Storage size for the queue Redis `PersistentVolumeClaim`. The AOF holds in-flight jobs rather than event history, so this only needs to cover the queue's peak backlog. |
+| fiftyoneMq.redis.persistence.storageClass | string | `""` | `StorageClass` name for the queue Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |
+| fiftyoneMq.redis.podSecurityContext | object | `{}` | Security context for the Redis pod. [Reference][security-context]. |
+| fiftyoneMq.redis.resources | object | `{}` | Resources for the Redis container. [Reference][resources]. |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
