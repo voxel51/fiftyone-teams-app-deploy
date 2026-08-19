@@ -181,7 +181,7 @@ Choose the one that matches your deployment:
 > `casSettings.env.FIFTYONE_AUTH_MODE: legacy` by default.
 > Set it to `internal` if your Identity Provider uses OIDC.
 
-You can refer to the following docs to set up your Identity Provider
+Refer to the following docs to set up your Identity Provider
 with FiftyOne:
 
 - [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
