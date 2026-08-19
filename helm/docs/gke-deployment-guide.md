@@ -172,9 +172,12 @@ Reserve a global static IP address for use in your cluster:
 
 ```shell
 gcloud compute addresses create \
-  fiftyone-teams-static-ip --global --ip-version IPV4
+  fiftyone-teams-static-ip \
+  --global \
+  --ip-version IPV4
 gcloud compute addresses describe \
-  fiftyone-teams-static-ip --global
+  fiftyone-teams-static-ip \
+  --global
 ```
 
 Record the IP address
