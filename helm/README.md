@@ -91,7 +91,7 @@ A successful, properly secured deployment of FiftyOne Enterprise requires:
    [delegated operators](./fiftyone-teams-app/README.md#builtin-delegated-operator-orchestrator),
    [plugins](./fiftyone-teams-app/README.md#plugins),
    and
-   [API high-availability](./fiftyone-teams-app/README.md#highly-available-fiftyone-teams-api-deployments)
+   [API high availability](./fiftyone-teams-app/README.md#highly-available-fiftyone-teams-api-deployments)
 
 ## :clock10: Estimated Completion Time
 
