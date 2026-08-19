@@ -7,12 +7,18 @@ activitySettings:
   # and the delegated operators) are told to emit.
   # Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if
   # only one of the two is on.
-  enabled: false
+  # DEPLOY-ONLY BRANCH: forced on for ritchie.ephem sample-history validation.
+  enabled: true
   image:
     # -- Worker image.
-    repository: voxel51/fiftyone-activity
+    # DEPLOY-ONLY: the dev registry, not the public name.
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- Worker image tag. Defaults to the chart `appVersion`.
-    tag: ""
+    # DEPLOY-ONLY: 0.0.27, the first image carrying the `samples.modified` v2
+    # registry the pymongo-proxy capture emits against. The appVersion default
+    # (v2.24.0) is not a tag this repository holds -- CBAD cannot build the
+    # image yet (its SSH key has no access to voxel51/fiftyone-activity).
+    tag: "2544db29679f66248e390ab98569f8a941d7362c"
     # -- Worker image pull policy. [Reference][image-pull-policy].
     pullPolicy: IfNotPresent
   mongo:
@@ -26,7 +32,10 @@ activitySettings:
   # only when the deployment holds several organizations, where the
   # deployment-wide counts cannot be attributed to one of them — the workers
   # log which one to name.
-  orgId: ""
+  # DEPLOY-ONLY: the ephem's org slug, pinned rather than discovered -- the
+  # reader scopes by `user.organization.id`, so a wrong value stores events
+  # that no reader ever returns.
+  orgId: "dev-internal-env"
   # -- Resources for the worker containers. [Reference][resources].
   resources:
     requests:
@@ -1244,7 +1253,8 @@ fiftyoneLicenseSecrets:
 fiftyoneMq:
   # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
   # environment variable are rendered.
-  enabled: false
+  # DEPLOY-ONLY BRANCH: forced on for ritchie.ephem sample-history validation.
+  enabled: true
   redis:
     # -- Controls whether the bundled Redis Deployment and Service are
     # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.
