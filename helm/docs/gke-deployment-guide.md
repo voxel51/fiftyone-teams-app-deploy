@@ -162,7 +162,8 @@ While waiting,
 To determine the state of the `fiftyone-teams-mongodb` pods, run
 
 ```shell
-kubectl get pods
+kubectl get pods \
+  -n your-mongodb-namespace
 ```
 
 ## Obtain a Global Static IP Address and Configure a DNS Entry
