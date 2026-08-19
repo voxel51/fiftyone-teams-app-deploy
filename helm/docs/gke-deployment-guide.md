@@ -130,7 +130,7 @@ helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager
 ```
 
-You can use the cert-manager instructions to
+Follow the cert-manager instructions to
 [verify the cert-manager Installation](https://cert-manager.io/v1.4-docs/installation/verify/).
 
 ### Create a ClusterIssuer
