@@ -18,7 +18,7 @@ is the whole reason the gate is a flag rather than an inference from
 {{- end }}
 
 {{/*
-Name of an Activity Analytics worker Deployment.
+Name of an Activity Core worker Deployment.
 Inputs (dict):
   ctx     — root context (.)
   worker  — the key from `activitySettings.workers` (e.g. "ingest")
@@ -28,7 +28,7 @@ Inputs (dict):
 {{- end }}
 
 {{/*
-Selector labels for an Activity Analytics worker Deployment.
+Selector labels for an Activity Core worker Deployment.
 Inputs: same dict as activity.worker.name.
 */}}
 {{- define "activity.worker.selectorLabels" -}}
@@ -37,7 +37,7 @@ app.kubernetes.io/instance: {{ .ctx.Release.Name }}
 {{- end }}
 
 {{/*
-Combined labels for an Activity Analytics worker Deployment.
+Combined labels for an Activity Core worker Deployment.
 Inputs: same dict as activity.worker.name.
 */}}
 {{- define "activity.worker.labels" -}}
@@ -48,7 +48,7 @@ app.voxel51.com/component: {{ printf "activity-%s-worker" .worker }}
 
 {{/*
 Emit a `FIFTYONE_ACTIVITY_ENABLED` env entry for a main workload container.
-Renders empty when Activity Analytics is disabled, allowing safe inclusion
+Renders empty when Activity Core is disabled, allowing safe inclusion
 from env-vars-list helpers.
 
 This is the single gate the producer side reads: `emit()`, `flush()`, and the
@@ -71,8 +71,36 @@ URL is only how the queue is reached once enabled.
 {{- end }}
 
 {{/*
+Emit the `VFF_WF_ACTIVITY` env entry for the `teams-app` container.
+Renders empty when Activity Core is disabled.
+
+`activity.enabled-env` gates *capture*; this gates the surfaces that display
+what was captured. They are separate layers, but they are not independently
+useful: a deployment that set `activitySettings.enabled=true` collected and
+rolled up events with no way to view them, because every viewing surface —
+the workflow Activity tab and the label History panel — sits behind this
+frontend flag. Nothing distinguished "no activity yet" from "no UI wired
+up". So enabling capture now graduates the surfaces that read it.
+
+`VFF_WF_METRIC` is deliberately NOT rendered here. It gates the pre-release
+Metrics tab, which stays a per-environment opt-in — set it through
+`teamsAppSettings.env` if you want it. Coupling it to this flag would ship an
+unreleased surface to every deployment that turns on capture.
+
+Rendered before the `teamsAppSettings.env` passthrough so that an explicit
+entry there still wins: later duplicates take precedence in a container's
+env list, which leaves a deployment able to force the flag off.
+*/}}
+{{- define "activity.ui-flags-env" -}}
+{{- if .Values.activitySettings.enabled }}
+- name: VFF_WF_ACTIVITY
+  value: "true"
+{{- end }}
+{{- end }}
+
+{{/*
 Emit a `FIFTYONE_ACTIVITY_MONGO_DB` env entry for a main workload container.
-Renders empty when Activity Analytics is disabled OR when no dedicated
+Renders empty when Activity Core is disabled OR when no dedicated
 database is configured, allowing safe inclusion from env-vars-list helpers.
 
 Only the dedicated-database override is ever emitted: when
@@ -92,7 +120,7 @@ deployment would then write database X and read database Y with no error.
 
 {{/*
 Emit a `FIFTYONE_ACTIVITY_ORG_ID` env entry for a main workload container.
-Renders empty when Activity Analytics is disabled or no organization is set,
+Renders empty when Activity Core is disabled or no organization is set,
 allowing safe inclusion from env-vars-list helpers.
 
 Unset is the normal case, and is NOT a misconfiguration: the producers stamp

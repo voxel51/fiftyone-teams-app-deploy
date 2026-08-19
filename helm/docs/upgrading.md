@@ -19,7 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
-    - [FiftyOne Enterprise v2.24+ Activity Analytics](#fiftyone-enterprise-v224-activity-analytics)
+    - [FiftyOne Enterprise v2.24+ Activity Core](#fiftyone-enterprise-v224-activity-core)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
@@ -147,13 +147,18 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
-#### FiftyOne Enterprise v2.24+ Activity Analytics
+#### FiftyOne Enterprise v2.24+ Activity Core
 
-FiftyOne Enterprise v2.24.0 introduces Activity Analytics: a record of
-operator runs, annotation and review decisions, and sample/label mutations,
-rolled up into the data behind the Audit Log and Jobs pages.
+FiftyOne Enterprise v2.24.0 introduces Activity Core: the basis for
+activity tracking across the app. It records operator runs, annotation and
+review decisions, and sample and label mutations, and rolls those events up
+into the data that the features built on it read — annotation metrics, the
+Audit Log, the Jobs pages, and more to come.
 
-**Activity Analytics is opt-in and nothing changes on upgrade unless you
+It is a substrate rather than a feature of its own, so enabling it is what
+gives those surfaces anything to show.
+
+**Activity Core is opt-in and nothing changes on upgrade unless you
 enable it.** The chart renders no activity environment on the existing
 workloads and no new `Deployment`s while it is off.
 
@@ -192,12 +197,8 @@ installing something that silently records nothing.
 Each worker requests `100m` CPU / `128Mi` memory (limits `500m` /
 `512Mi`), plus one bundled Redis pod.
 
-The workflow Activity and Metrics UI surfaces are gated separately by the
-`VFF_WF_ACTIVITY` and `VFF_WF_METRIC` feature flags on `teams-app`, which
-the chart does not set.
-
 See the
-[Configuring Activity Analytics](./configuring-activity-analytics.md)
+[Configuring Activity Core](./configuring-activity-core.md)
 documentation for full details.
 
 #### FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration

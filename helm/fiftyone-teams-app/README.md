@@ -29,13 +29,15 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ### Version 2.24+
 
-#### Activity Analytics
+#### Activity Core
 
-FiftyOne Enterprise 2.24+ records operator runs, annotation and review
-decisions, and sample/label mutations, and rolls them up into the data behind
-the Audit Log and Jobs pages.
+Activity Core is the basis for activity tracking across FiftyOne Enterprise
+2.24+. It records operator runs, annotation and review decisions, and
+sample/label mutations, and rolls them up into the data that the features
+built on it read — annotation metrics, the Audit Log, the Jobs pages, and
+more to come.
 
-Activity Analytics is opt-in; nothing changes on upgrade unless you enable it.
+Activity Core is opt-in; nothing changes on upgrade unless you enable it.
 It requires two settings together — `activitySettings.enabled` (tells the
 existing workloads to emit, and adds the worker `Deployment`s) and
 `fiftyoneMq.enabled` (the queue Redis carrying events between them).
@@ -46,9 +48,9 @@ default `StorageClass` is required unless you disable persistence or supply
 your own claim.
 Please refer to
 
-- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v224-activity-analytics)
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v224-activity-core)
   for what changes on upgrade, cluster requirements, and resource impact
-- [configuring activity analytics](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-activity-analytics.md)
+- [configuring activity core](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-activity-core.md)
   for full details, including external Redis and multi-organization
   deployments
 
@@ -830,7 +832,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| activitySettings.enabled | bool | `false` | Controls whether the Activity Analytics worker Deployments are rendered, and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
+| activitySettings.enabled | bool | `false` | Controls whether the Activity Core worker Deployments are rendered, whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit, and whether `teams-app` shows the surfaces that read the result (`VFF_WF_ACTIVITY`). The pre-release Metrics tab (`VFF_WF_METRIC`) is not included; opt in through `teamsAppSettings.env`. Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
 | activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |

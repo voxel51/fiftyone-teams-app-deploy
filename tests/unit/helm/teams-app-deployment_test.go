@@ -2612,9 +2612,12 @@ func (s *deploymentTeamsAppTemplateTest) TestDeploymentUpdateStrategy() {
 
 // TestNoActivityDebugFlagDefaults pins the policy that the SHIPPING chart
 // never enables the activity/metrics debug flags by default: VFF_WF_ACTIVITY
-// gates internal debug surfaces (the workflow Activity tab + label History)
-// and VFF_WF_METRIC gates the pre-release Metrics tab — deployments opt in
-// per environment, customers never get them implicitly.
+// gates the workflow Activity tab + label History and VFF_WF_METRIC gates the
+// pre-release Metrics tab — customers never get either implicitly.
+//
+// VFF_WF_ACTIVITY graduates with activitySettings.enabled (see
+// TestActivityEnabledSetsActivityUIFlag); this case covers the default render,
+// where activity capture is off and neither flag has any business appearing.
 func (s *deploymentTeamsAppTemplateTest) TestNoActivityDebugFlagDefaults() {
 	options := &helm.Options{SetValues: map[string]string{}}
 	output := helm.RenderTemplate(
@@ -2631,4 +2634,66 @@ func (s *deploymentTeamsAppTemplateTest) TestNoActivityDebugFlagDefaults() {
 			flag,
 		)
 	}
+}
+
+// TestActivityEnabledSetsActivityUIFlag pins that turning on capture also turns
+// on the surfaces that read it. Collecting events with every viewing surface
+// dark is indistinguishable from a broken deployment, so VFF_WF_ACTIVITY
+// follows activitySettings.enabled.
+//
+// VFF_WF_METRIC must NOT follow it: that tab is pre-release, and coupling it
+// here would ship an unreleased surface to everyone who enables capture.
+func (s *deploymentTeamsAppTemplateTest) TestActivityEnabledSetsActivityUIFlag() {
+	options := &helm.Options{SetValues: map[string]string{
+		"activitySettings.enabled": "true",
+		"fiftyoneMq.enabled":       "true",
+	}}
+	output := helm.RenderTemplate(
+		s.T(), options, s.chartPath, s.releaseName, s.templates,
+	)
+
+	s.Contains(
+		output, "VFF_WF_ACTIVITY",
+		"enabling activitySettings must set VFF_WF_ACTIVITY — "+
+			"capture with no viewing surface reads as a broken deployment",
+	)
+	s.NotContains(
+		output, "VFF_WF_METRIC",
+		"VFF_WF_METRIC gates a pre-release tab and must stay a separate "+
+			"per-environment opt-in via teamsAppSettings.env",
+	)
+}
+
+// TestActivityUIFlagOverridable pins that teamsAppSettings.env still wins, so a
+// deployment can collect activity without exposing the surfaces. The helper is
+// rendered before the passthrough and later duplicates take precedence in a
+// container's env list.
+func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagOverridable() {
+	options := &helm.Options{SetValues: map[string]string{
+		"activitySettings.enabled":             "true",
+		"fiftyoneMq.enabled":                   "true",
+		"teamsAppSettings.env.VFF_WF_ACTIVITY": "false",
+	}}
+	output := helm.RenderTemplate(
+		s.T(), options, s.chartPath, s.releaseName, s.templates,
+	)
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+	var values []string
+	for _, env := range deployment.Spec.Template.Spec.Containers[0].Env {
+		if env.Name == "VFF_WF_ACTIVITY" {
+			values = append(values, env.Value)
+		}
+	}
+
+	s.Require().Len(
+		values, 2,
+		"expected the chart default and the override to both render",
+	)
+	s.Equal(
+		"false", values[len(values)-1],
+		"the teamsAppSettings.env entry must render last so it wins",
+	)
 }

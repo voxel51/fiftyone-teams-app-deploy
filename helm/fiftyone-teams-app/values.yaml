@@ -1,10 +1,15 @@
 ---
-# FiftyOne Activity Analytics workers. Reads the queue populated by the
-# producers and writes the activity_* collections.
+# FiftyOne Activity Core workers. Activity Core is the basis for activity
+# tracking across the app — annotation metrics, the Audit Log, the Jobs
+# pages, and more. The workers read the queue populated by the producers and
+# write the activity_* collections.
 activitySettings:
-  # -- Controls whether the Activity Analytics worker Deployments are rendered,
-  # and whether the producer workloads (teams-api, fiftyone-app, teams-plugins,
-  # and the delegated operators) are told to emit.
+  # -- Controls whether the Activity Core worker Deployments are rendered,
+  # whether the producer workloads (teams-api, fiftyone-app, teams-plugins,
+  # and the delegated operators) are told to emit, and whether `teams-app`
+  # shows the surfaces that read the result (`VFF_WF_ACTIVITY`). The
+  # pre-release Metrics tab (`VFF_WF_METRIC`) is not included; opt in through
+  # `teamsAppSettings.env`.
   # Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if
   # only one of the two is on.
   enabled: false

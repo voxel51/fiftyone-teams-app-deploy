@@ -1,15 +1,19 @@
 <!-- markdownlint-disable MD013 -->
-# Configuring Activity Analytics
+# Configuring Activity Core
 
-Activity Analytics records what happens in a FiftyOne Enterprise
-deployment — operator runs, annotation and review decisions, sample and
-label mutations — and rolls those events up into the data behind the
-Audit Log and Jobs pages.
+Activity Core is the basis for activity tracking across FiftyOne
+Enterprise. It records what happens in a deployment — operator runs,
+annotation and review decisions, sample and label mutations — and rolls
+those events up into the data that the features built on it read:
+annotation metrics, the Audit Log, the Jobs pages, and more to come.
+
+It is a substrate, not a feature in its own right. Enabling it is what
+makes those surfaces have anything to show.
 
 <!-- toc -->
 
 - [Overview](#overview)
-- [Enabling Activity Analytics](#enabling-activity-analytics)
+- [Enabling Activity Core](#enabling-activity-core)
 - [Queue durability](#queue-durability)
 - [Using an external Redis](#using-an-external-redis)
 - [Multi-organization deployments](#multi-organization-deployments)
@@ -33,7 +37,7 @@ Both halves are off by default. The chart renders no activity
 environment on the producers and no worker `Deployment`s until you turn
 it on.
 
-## Enabling Activity Analytics
+## Enabling Activity Core
 
 Two settings, and they are a pair:
 
@@ -133,10 +137,26 @@ request.
 
 ## Viewing the data
 
-Enabling Activity Analytics starts **collecting** data. The workflow
-Activity and Metrics surfaces in the UI are gated separately, by the
-`VFF_WF_ACTIVITY` and `VFF_WF_METRIC` feature flags on `teams-app`.
-Those are per-environment opt-ins that the chart does not set.
+Enabling Activity Core also enables the surfaces that display it. The
+chart sets `VFF_WF_ACTIVITY` on `teams-app`, which turns on the workflow
+Activity tab and the label History panel.
+
+To keep the flag off while still collecting, set it explicitly:
+
+```yaml
+teamsAppSettings:
+  env:
+    VFF_WF_ACTIVITY: false
+```
+
+The pre-release **Metrics** tab is separate and stays off. It is gated by
+`VFF_WF_METRIC`, which the chart never sets — opt in per environment:
+
+```yaml
+teamsAppSettings:
+  env:
+    VFF_WF_METRIC: true
+```
 
 ## Resource impact
 
