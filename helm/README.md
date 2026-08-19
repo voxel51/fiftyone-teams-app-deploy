@@ -85,7 +85,7 @@ A successful, properly secured deployment of FiftyOne Enterprise requires:
        [Installing Helm documentation](https://helm.sh/docs/intro/install/)
 1. A MongoDB Database that meets FiftyOne's
    [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
-1. A DNS record or records for ingress
+1. A DNS record (or records) for ingress
 1. A TLS/SSL certificate or certificates for HTTPS ingress
 1. (optional) An NFS server or `ReadWriteMany` compatible storage medium for
    [delegated operators](./fiftyone-teams-app/README.md#builtin-delegated-operator-orchestrator),
