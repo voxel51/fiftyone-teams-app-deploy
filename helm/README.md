@@ -46,11 +46,10 @@ Please contact Voxel51 for more information about FiftyOne Enterprise.
 - [:globe_with_meridians: Step 9: Configure Ingress & TLS](#globe_with_meridians-step-9-configure-ingress--tls)
   - [:compass: Routing Overview (Path-Based Ingress)](#compass-routing-overview-path-based-ingress)
   - [:memo: Notes](#memo-notes)
-- [Step 10: Identity Provider (IdP) and Authentication (CAS)](#step-10-identity-provider-idp-and-authentication-cas)
-- [Step 11: Initial CAS Setup](#step-11-initial-cas-setup)
+- [Step 10: Initial CAS Setup](#step-10-initial-cas-setup)
   - [Add First Admin User](#add-first-admin-user)
   - [Enable Auto Join](#enable-auto-join)
-- [Step 12: Test End User Login](#step-12-test-end-user-login)
+- [Step 11: Test End User Login](#step-11-test-end-user-login)
 - [Recommended Enhancements](#recommended-enhancements)
   - [:label: Agentic Labeling](#label-agentic-labeling)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
@@ -414,27 +413,7 @@ For cloud-specific examples of setting up ingress with TLS, see
 - [GKE Deployment Guide](./docs/gke-deployment-guide.md)
 - [AWS Deployment Guide](./docs/aws-deployment-guide.md)
 
-## Step 10: Identity Provider (IdP) and Authentication (CAS)
-
-FiftyOne Enterprise uses a Central Authentication Service (CAS)
-for centralized login, roles, and user management.
-You chose an authentication mode earlier in
-[Step 3](#file_folder-step-3-choose-authentication-mode).
-
-The CAS service requires the following in your `values.yaml`:
-
-- `secret.fiftyone.fiftyoneAuthSecret` (set in
-  [Step 4](#gear-step-4-configure-valuesyaml))
-- When using path-based routing, an ingress rule for `/cas` routed to
-  `teams-cas` (see
-  [Step 9](#globe_with_meridians-step-9-configure-ingress--tls))
-
-For more detail, see the documentation in the chart's
-[Central Authentication Service](./fiftyone-teams-app/README.md#central-authentication-service)
-and
-[FiftyOne Enterprise Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html).
-
-## Step 11: Initial CAS Setup
+## Step 10: Initial CAS Setup
 
 In the steps below, `<DNS_NAME>` is the ingress hostname you set for
 `teamsAppSettings.dnsName` in [Step 4](#gear-step-4-configure-valuesyaml).
@@ -460,7 +439,7 @@ In the steps below, `<DNS_NAME>` is the ingress hostname you set for
 1. Select *Allow auto join*
 1. Select *Save*
 
-## Step 12: Test End User Login
+## Step 11: Test End User Login
 
 Verify the deployment's IdP setup by logging in as a regular user
 

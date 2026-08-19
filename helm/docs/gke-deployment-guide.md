@@ -240,4 +240,4 @@ at the DNS address you created in
 Proceed to
 [Helm README](../README.md)
 and follow the rest of the document starting at
-[Step 10: Identity Provider (IdP) and Authentication (CAS)](../README.md#step-10-identity-provider-idp-and-authentication-cas).
+[Step 10: Initial CAS Setup](../README.md#step-10-initial-cas-setup).
