@@ -149,8 +149,15 @@ You will need it in Step 4 when configuring your `.env` file.
 The URI follows this format:
 
 ```dotenv
-FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin"
+FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin&tls=true"
 ```
+
+> [!NOTE]
+> We recommend enabling TLS on the MongoDB connection (`tls=true`) whenever
+> your MongoDB endpoint supports it, so that database traffic is encrypted in
+> transit. Connections to MongoDB Atlas (`mongodb+srv://`) use TLS by default.
+> If your MongoDB deployment does not have TLS configured, omit the
+> `tls=true` parameter.
 
 ## :closed_lock_with_key: Step 2: Prepare License File
 
@@ -558,8 +565,9 @@ encryption keys, and authentication secrets are stored in environment variables.
 This is configured by the following settings in `.env`:
 
 ```dotenv
-# This should be a MongoDB Connection String for your database
-FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin"
+# This should be a MongoDB Connection String for your database.
+# TLS is recommended when your MongoDB endpoint supports it.
+FIFTYONE_DATABASE_URI="mongodb://username:password@mongodb-example.fiftyone.ai:27017/?authSource=admin&tls=true"
 # If you are using a different MongoDB Connection String for your CAS database,
 #  set it here
 # CAS_MONGODB_URI="mongodb://username:password@mongodb-cas-example.fiftyone.ai:27017/?authSource=admin"
