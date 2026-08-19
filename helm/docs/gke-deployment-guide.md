@@ -181,7 +181,7 @@ gcloud compute addresses describe \
 ```
 
 Record the IP address
-and either create a DNS entry.
+and create a DNS entry.
 
 ## Set up HTTP to HTTPS Forwarding
 
