@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.23.1](https://img.shields.io/badge/Version-2.23.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.23.1](https://img.shields.io/badge/AppVersion-v2.23.1-informational?style=flat-square)
+![Version: 2.24.0](https://img.shields.io/badge/Version-2.24.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.24.0](https://img.shields.io/badge/AppVersion-v2.24.0-informational?style=flat-square)
 
 FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
@@ -26,6 +26,73 @@ This page assumes general knowledge of FiftyOne Enterprise and how to use it.
 Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
+
+### Version 2.23+
+
+#### Service Orchestrators and Auto-registration
+
+FiftyOne Enterprise 2.23+ introduces service orchestrators: delegated-operator
+workers that host long-lived services (always-on model servers)
+rather than tasks that exit.
+Two builtin services (requiring GPU(s)) are provided:
+`annotation-ai` (SAM2) and `agentic-labeler` (few-shot VLM labeling).
+
+- Orchestrators (`delegatedOperatorJobTemplates.jobs.*` and
+  `delegatedOperatorJobTemplates.serviceOrchestrators.*`) are automatically
+  registered and are available within the FiftyOne Enterprise UI under
+  *Settings* -> *Orchestrators*.
+  - Registration is triggered via Helm hooks (`post-install` and `post-upgrade`).
+    Every `helm install` or `helm upgrade` runs a job that connects to MongoDB
+    (with the deployment's existing secrets) and registers the orchestrators.
+    - This replaces the previously required
+      [manual registration process](../../docs/orchestrators/configuring-kubernetes-orchestrator.md).
+- The chart provides two service orchestrators
+  (`cpuServiceOrc` and `gpuServiceOrc`), both registered by default,
+  so both builtin services appear under *Settings* -> *Services*.
+  - Both services are created stopped and neither starts on its own.
+
+On clusters without GPU nodes, disable the GPU orchestrator.
+Please refer to
+
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
+  for what changes on upgrade
+- [configuring service orchestrators](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/configuring-service-orchestrator.md)
+  for GPU requirements and accelerator sizing
+
+### Version 2.22+
+
+#### Multimodal Datasets
+
+FiftyOne Enterprise 2.22+ introduces multimodal dataset support, storing large
+modalities as Parquet-backed Iceberg tables rather than as fields on the sample
+document, ingested and compacted by a background delegated-operator pipeline.
+
+This requires the `VFF_MULTIMODAL` feature flag on several components, along
+with additional `ephemeral-storage` for delegated-operator workloads and
+additional memory for `fiftyone-app`.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v222-multimodal-datasets)
+for the required configuration, and
+[configuring multimodal datasets](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-multimodal.md)
+for full details.
+
+### Version 2.19+
+
+#### Telemetry Sidecars
+
+FiftyOne Enterprise 2.19+ adds observability features viewable by admins
+directly in the FiftyOne UI.
+These are powered by a `telemetry-sidecar` container injected into the
+`teams-api`, `fiftyone-app`, `teams-plugins`, and delegated-operator workloads,
+plus an in-cluster Redis `Deployment` and `Service` that buffers the streamed
+metrics and logs.
+
+Telemetry is enabled by default and increases the resources a default deploy
+requires by roughly `850m` CPU and `2Gi` memory.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v219-telemetry-sidecars)
+for the resource impact, cluster requirements, pointing at an external Redis,
+and how to opt out.
 
 ### Version 2.16+
 
@@ -99,6 +166,18 @@ appSettings:
   env:
     FIFTYONE_DATABASE_ADMIN: true
 ```
+
+### Version 2.8+ `initContainer` Changes
+
+FiftyOne Enterprise v2.8.2 introduces changes to the default settings for each
+component's `initContainers`.
+They now default to a container security context that prevents privilege
+escalation and runs the initialization processes as a non-root user (UID 1000),
+and to small resource requests and limits (`10m` CPU and `128Mi` memory)
+instead of a cluster's defaults.
+Please refer to the
+[upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v28-initcontainer-changes)
+for the new default values.
 
 ### Version 2.7+ Delegated Operator Changes
 
@@ -1055,7 +1134,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS | string | `"kubernetes"` | Deployment characteristics for the `teams-app`. `kubernetes`: Indicates the app is running in a Kubernetes environment. `docker`: Indicates the app is running in a Docker environment. `kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.23.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==2.23.1`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.24.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==2.24.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
