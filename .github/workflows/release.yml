@@ -53,41 +53,6 @@ jobs:
           name: helm-fiftyone-ai-readme
           path: helm/fiftyone-teams-app/README.md
 
-  update-chart-version:
-    if: ${{ needs.release.outputs.changed_charts != '' }}
-    needs: release
-    permissions:
-      contents: write
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Get Chart Version
-        id: get-version
-        run: |
-          version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
-          echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_ENV}"
-          echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_OUTPUT}"
-
-      - name: Trigger Internal Chart Build by Release
-        uses: actions/github-script@v9
-        with:
-          github-token: ${{ secrets.WD_HCI_FG_PAT }}
-          script: |
-            const result = await github.rest.actions.createWorkflowDispatch({
-              owner: "${{ github.repository_owner }}",
-              repo: "${{ secrets.CROSS_REPOSITORY_REPOSITORY }}",
-              workflow_id: "${{ secrets.CROSS_REPOSITORY_WORKFLOW_2 }}",
-              ref: "main",
-              inputs: {
-                "fiftyone-teams-app-deploy-version": "${{ steps.get-version.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
-              }
-            })
-
   update-gh-pages:
     if: ${{ needs.release.outputs.changed_charts != '' }}
     needs: release
@@ -127,3 +92,38 @@ jobs:
             git commit -m "chore(release): Update README on helm.fiftyone.ai with contents from helm directory"
             git push origin gh-pages
           fi
+
+  update-chart-version:
+    if: ${{ needs.release.outputs.changed_charts != '' }}
+    needs: [release, update-gh-pages]
+    permissions:
+      contents: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Get Chart Version
+        id: get-version
+        run: |
+          version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
+          echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_ENV}"
+          echo "FIFTYONE_TEAMS_APP_DEPLOY_VERSION=${version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Trigger Internal Chart Build by Release
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.WD_HCI_FG_PAT }}
+          script: |
+            const result = await github.rest.actions.createWorkflowDispatch({
+              owner: "${{ github.repository_owner }}",
+              repo: "${{ secrets.CROSS_REPOSITORY_REPOSITORY }}",
+              workflow_id: "${{ secrets.CROSS_REPOSITORY_WORKFLOW_2 }}",
+              ref: "main",
+              inputs: {
+                "fiftyone-teams-app-deploy-version": "${{ steps.get-version.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
+              }
+            })
