@@ -179,7 +179,7 @@ Choose the one that matches your deployment:
 > [!NOTE]
 > The example [`values.yaml`](./values.yaml) ships with
 > `casSettings.env.FIFTYONE_AUTH_MODE: legacy` by default.
-> Update it if your Identity Provider uses OIDC.
+> Set it to `internal` if your Identity Provider uses OIDC.
 
 You can refer to the following docs to set up your Identity Provider
 with FiftyOne:
