@@ -189,7 +189,9 @@ Apply the example `FrontendConfig` in
 [frontend-config.yaml](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/frontend-config.yaml).
 
 ```shell
-kubectl apply -f frontend-config.yaml
+kubectl apply \
+  -f frontend-config.yaml \
+  --namespace your-namespace-here
 ```
 
 For more information about `FrontendConfig`s, see
