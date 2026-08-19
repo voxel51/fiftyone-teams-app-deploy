@@ -70,7 +70,7 @@ These instructions assume you have
 >
 > ```shell
 > kubectl rollout restart deploy \
->   -n your-namespace \
+>   -n your-namespace-here \
 >   teams-cas \
 >   teams-api
 > ```
