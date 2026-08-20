@@ -19,7 +19,7 @@
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Download the Example Configuration Files](#download-the-example-configuration-files)
-- [Create the Necessary Helm Repos](#create-the-necessary-helm-repos)
+- [Add Helm Repositories](#add-helm-repositories)
 - [Install and Configure cert-manager](#install-and-configure-cert-manager)
   - [Create a ClusterIssuer](#create-a-clusterissuer)
 - [Install and Configure MongoDB](#install-and-configure-mongodb)

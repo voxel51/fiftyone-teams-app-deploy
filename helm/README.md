@@ -72,8 +72,6 @@ for the full list.
 
 ## :white_check_mark: Technical Requirements
 
-A successful, properly secured deployment of FiftyOne Enterprise requires:
-
 1. Kubernetes Cluster with `kubectl` configured
     1. Use a
        [supported Kubernetes version](https://kubernetes.io/releases/)
