@@ -126,7 +126,7 @@ and adjust your installation accordingly.
 ```shell
 kubectl create namespace cert-manager
 helm install cert-manager jetstack/cert-manager \
-  --set installCRDs=true\
+  --set installCRDs=true \
   --namespace cert-manager
 ```
 
