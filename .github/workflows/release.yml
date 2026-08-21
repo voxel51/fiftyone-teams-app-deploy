@@ -95,7 +95,7 @@ jobs:
 
   update-chart-version:
     if: ${{ needs.release.outputs.changed_charts != '' }}
-    needs: [release, update-gh-pages]
+    needs: [release, update-gh-pages] # update-gh-pages is used only as a wait, not a strict dependency
     permissions:
       contents: write
       id-token: write
