@@ -103,6 +103,8 @@ secret:
     fiftyoneAuthSecret: <YOUR_FIFTYONE_AUTH_SECRET>
 teamsAppSettings:
   dnsName: <YOUR_DNS_HOST>
+namespace:
+  name: your-namespace-here
 ```
 
 ## Add Helm Repositories
