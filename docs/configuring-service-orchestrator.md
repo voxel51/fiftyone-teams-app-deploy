@@ -41,7 +41,14 @@ an accelerator that exceeds the minimum recommended requirements:
 | Service | Minimum accelerator | Notes |
 | --- | --- | --- |
 | `annotation-ai` | 16 GB VRAM (T4, L4) | SAM2 is a small model. |
-| `agentic-labeler` | 24 GB VRAM, Ampere or newer (L4, A10G, L40S, A100) | The default `gemma4-31B-qat-maxvision` config is ~17-20 GB of int4 weights before KV cache, and vLLM's int4 kernels require compute capability 8.0+. |
+| `agentic-labeler` | 48 GB VRAM, Ampere or newer (L40S, A100, H100), or 2 x 24 GB (L4, A10G) | The pinned `gemma4-31B-qat-maxvision` config is ~22 GB of int4 weights before KV cache, and vLLM's int4 kernels require compute capability 8.0+. |
+
+A single 24 GB card cannot run the pinned default: the weights alone leave
+under 2 GB for the KV cache and activations.
+On two 24 GB cards the launcher shards the model automatically.
+To run the Agentic Labeler on one 24 GB card, point `LABELER_CONFIG_FILE` at a
+smaller config; see
+[choosing a model](../docker/docs/configuring-agentic-labeler.md#choosing-a-model).
 
 Host memory matters as much as VRAM.
 The weights are read into host memory before they reach the device.
@@ -68,8 +75,33 @@ To update a builtin service's definition, you must
 increment the service's `builtin_version`.
 Otherwise the cached definition will not be updated.
 
-The `teams-api`'s `/service` proxy connects to the builtin service's `entrypoint.container.port`.
-This is required even when `entrypoint.kind=shell`.
+A version bump re-applies the **entire** entry, not just the fields you
+changed.
+Any value set through the UI rather than the file is overwritten —
+`delegation_target` in particular.
+Write the current UI values into the file before incrementing.
+
+### Service ports
+
+Two ports are configured per service, and they are not interchangeable:
+
+| Field | Dialed by | Must be |
+| --- | --- | --- |
+| `entrypoint.container.port` | The `teams-api` `/service` proxy, over the network | The address the proxy can reach the service on. Required even when `entrypoint.kind=shell`. |
+| `entrypoint.container.healthcheck.port` | The health probe, on `127.0.0.1` from inside the worker | The port the service listens on **in the container**. |
+
+On a single-host deployment these are usually the same number.
+When `teams-api` and the worker are on different hosts they are not:
+`container.port` is the port published on the worker's host, while
+`healthcheck.port` is still the in-container port.
+
+Setting `healthcheck.port` to a published host port is a common mistake.
+Nothing is listening on that port inside the container, so the service is
+never marked healthy and the Services page reports `STARTING` indefinitely
+with no error in any log.
+
+For a worked split-host example, see
+[running `teams-api` and the worker on separate hosts](../docker/docs/configuring-agentic-labeler.md#running-teams-api-and-the-worker-on-separate-hosts).
 
 ### Where each service runs
 
@@ -175,6 +207,47 @@ that grows beyond its request.
 By default, both builtin services share the `gpuServiceOrc` `resources` block.
 To set service-specific values, declare a second
 orchestrator and move one service's entry under it.
+
+### Persisting the model cache
+
+Starting `agentic-labeler` downloads the model weights, which for the
+pinned config are tens of GB.
+Without persistent storage that download repeats every time the pod is
+recreated.
+
+The chart does not ship a `PersistentVolumeClaim` for this, because the
+storage class and access mode are deployment-specific.
+Mount your own through the existing `volumes` and `volumeMounts` keys:
+
+```yaml
+delegatedOperatorJobTemplates:
+  serviceOrchestrators:
+    gpuServiceOrc:
+      volumes:
+        - name: labeler-cache
+          persistentVolumeClaim:
+            claimName: agentic-labeler-cache
+      volumeMounts:
+        - name: labeler-cache
+          mountPath: /home/voxel51/.cache/huggingface
+          subPath: huggingface
+        - name: labeler-cache
+          mountPath: /home/voxel51/.cache/torchinductor
+          subPath: torchinductor
+        - name: labeler-cache
+          mountPath: /home/voxel51/.cache/triton
+          subPath: triton
+```
+
+Mount each path the image declares as a `VOLUME` rather than their shared
+parent; a mount on `/home/voxel51/.cache` alone is shadowed and has no
+effect.
+See
+[persist the model cache](../docker/docs/configuring-agentic-labeler.md#persist-the-model-cache).
+
+`podSecurityContext.fsGroup` is already `1000` on the delegated-operator
+templates, so the mounted volume is writable by the service with no
+further configuration.
 
 ### Targeting specific GPU nodes
 
