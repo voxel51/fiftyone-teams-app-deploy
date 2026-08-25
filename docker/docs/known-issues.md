@@ -83,3 +83,24 @@ To verify shared memory usage and limits inside a container, run:
 ```bash
 docker exec -it <container_name> df -h /dev/shm
 ```
+
+## Service Orchestrators: Known Issues
+
+### :framed_picture: Blank Example Images in the Agentic Labeler Panel
+
+Datasets whose `filepath` values are stored in **endpoint form** — for
+example `https://<account>.blob.core.windows.net/<container>/<path>` for Azure
+Blob Storage, or an `https://` MinIO endpoint — render blank example images in
+the Agentic Labeler panel.
+
+The panel treats any `https://` path as directly servable and passes it to the
+browser unsigned, so a private bucket returns `403` and the image slot is
+empty. Paths stored with a non-`https` scheme (`s3://`, `gs://`, `az://`, or a
+configured alias) are signed correctly and are unaffected.
+
+This is a display-only issue. The service resolves sample media server-side,
+so labeling runs produce correct results even while the previews are blank.
+
+There is no configuration workaround. Rewriting stored `filepath` values to an
+aliased form (`alias://<container>/<path>`) does render the previews, but
+modifies the dataset and is not recommended for this alone.
