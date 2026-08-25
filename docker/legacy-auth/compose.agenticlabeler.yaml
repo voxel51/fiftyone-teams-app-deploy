@@ -58,6 +58,16 @@ services:
     volumes:
       - plugins-vol:/opt/plugins:ro
       - telemetry-socket-agentic:/tmp/telemetry
+      # Model cache. Without these, every service start re-downloads the
+      # model (tens of GB). These mount at the EXACT paths the image
+      # declares as VOLUMEs; a single mount on the parent
+      # /home/voxel51/.cache does NOT suppress those declarations, so the
+      # anonymous volume Docker creates would shadow it and the download
+      # would be discarded on every restart. See
+      # docker/docs/configuring-agentic-labeler.md#persist-the-model-cache.
+      - labeler-hf-cache:/home/voxel51/.cache/huggingface
+      - labeler-inductor-cache:/home/voxel51/.cache/torchinductor
+      - labeler-triton-cache:/home/voxel51/.cache/triton
     restart: always
 
   agentic-labeler-telemetry:
@@ -100,10 +110,19 @@ services:
         condition: service_started
     restart: always
 
-# tmpfs-backed named volume with uid/gid set at mount time so the
-# non-root sidecar can bind agent.sock.
+# The labeler-*-cache volumes persist the model weights and compile
+# caches across restarts. Docker seeds a fresh named volume from the image
+# path, including its 1000:1000 ownership, so no chown is needed. A volume
+# that already exists and is root-owned does need a one-time chown; see
+# docker/docs/configuring-agentic-labeler.md#persist-the-model-cache.
+#
+# telemetry-socket-agentic is tmpfs-backed with uid/gid set at mount time
+# so the non-root sidecar can bind agent.sock.
 volumes:
   plugins-vol:
+  labeler-hf-cache:
+  labeler-inductor-cache:
+  labeler-triton-cache:
   telemetry-socket-agentic:
     driver_opts:
       type: tmpfs
