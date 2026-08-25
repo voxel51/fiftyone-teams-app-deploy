@@ -34,9 +34,11 @@
 
 # agentic-labeler (few-shot VLM inference via vLLM). Runs on the dedicated GPU
 # worker from compose.agenticlabeler.yaml. `delegation_target` matches that
-# worker's `-n agentic-labeler` name. Health is on 8001, the API on 8000. Tune
-# the LABELER_* values for your model and GPU. LABELER_DISABLE_AUTH turns off
-# the service's built-in auth.
+# worker's `-n agentic-labeler` name. Health is on 8001 (the in-container port
+# the health probe dials on 127.0.0.1), the API on 8000. `LABELER_CONFIG_FILE`
+# selects the model; the launcher sizes the deployment to the detected GPUs on
+# its own. For the LABELER_* reference, the token budget, and split-host
+# deployments, see docker/docs/configuring-agentic-labeler.md.
 - id: builtin:agentic-labeler
   builtin_version: 2
   kind: agentic-labeler
