@@ -350,7 +350,7 @@ We wrote configuration guides for the major cloud-managed Kubernetes services:
 - [Azure Kubernetes Service (AKS)](./docs/configuring-gpu-workloads.md#deploying-gpu-enabled-delegated-operator-pods-1)
 
 To configure **On-Demand** mode for delegated operators, see
-[Configuring the Kubernetes On-Demand Orchestrator](../docs/orchestrators/configuring-kubernetes-orchestrator.md).
+[Using delegatedOperatorJobTemplates for on-demand executors](docs/configuring-delegated-operators.md#using-delegatedoperatorjobtemplates-for-on-demand-executors).
 
 ## :rocket: Step 8: Initial Deployment
 
