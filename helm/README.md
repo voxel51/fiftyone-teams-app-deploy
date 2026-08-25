@@ -351,6 +351,14 @@ We wrote configuration guides for the major cloud-managed Kubernetes services:
 
 To configure **On-Demand** mode for delegated operators, see
 [Using delegatedOperatorJobTemplates for on-demand executors](docs/configuring-delegated-operators.md#using-delegatedoperatorjobtemplates-for-on-demand-executors).
+On-demand orchestrators are now auto-registered.
+
+> [!NOTE]
+> After configuring an on-demand orchestrator, an admin must go to
+> **Settings > Orchestrators** in the FiftyOne Enterprise UI, select the
+> orchestrator, and click **Refresh**. This end-to-end tests your job
+> template values and makes the orchestrator available as a delegation
+> target in the UI.
 
 ## :rocket: Step 8: Initial Deployment
 
