@@ -576,7 +576,7 @@ secret:
   fiftyone:
     # -- MongoDB Database Name for FiftyOne Enterprise.
     fiftyoneDatabaseName: ""
-    # -- MongoDB Connection String. [Reference][mongodb-connection-string]. TLS is recommended when your MongoDB endpoint supports it (append `tls=true`; Atlas `mongodb+srv://` connections use TLS by default).
+    # -- MongoDB Connection String. [Reference][mongodb-connection-string].
     mongodbConnectionString: ""
 
     # -- A randomly generated string for cookie encryption.
