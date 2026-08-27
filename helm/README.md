@@ -354,11 +354,14 @@ To configure **On-Demand** mode for delegated operators, see
 On-demand orchestrators are now auto-registered.
 
 > [!NOTE]
-> After configuring an on-demand orchestrator, an admin must go to
-> **Settings > Orchestrators** in the FiftyOne Enterprise UI, select the
-> orchestrator, and click **Refresh**. This end-to-end tests your job
-> template values and makes the orchestrator available as a delegation
-> target in the UI.
+> After configuring an on-demand orchestrator, an admin must
+> 
+> 1. In the FiftyOne Enterprise UI go to *Settings* -> *Orchestrators*
+> 1. Select the orchestrator
+> 1. Select *Refresh*
+>
+> This end-to-end tests your job template values
+> and makes the orchestrator available as a delegation target in the UI.
 
 ## :rocket: Step 8: Initial Deployment
 
