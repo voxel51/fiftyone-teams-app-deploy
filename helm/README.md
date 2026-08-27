@@ -3,296 +3,609 @@
 <div align="center">
 <p align="center">
 
-<img alt="Voxel51 Logo" src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px"> &nbsp;
+<img alt="Voxel51 Logo" src="https://user-images.githubusercontent.com/25985824/106288517-2422e000-6216-11eb-871d-26ad2e7b1e59.png" height="55px">
+&nbsp;
 <img alt="Voxel51 FiftyOne" src="https://user-images.githubusercontent.com/25985824/106288518-24bb7680-6216-11eb-8f10-60052c519586.png" height="50px">
 
 </p>
 </div>
 <!-- markdownlint-enable no-inline-html line-length -->
 
+---
+
+# FiftyOne Enterprise: Helm Deployment Guide
+
+FiftyOne Enterprise is the enterprise version of the open source
+[FiftyOne](https://github.com/voxel51/fiftyone) project.
+
+The FiftyOne Enterprise Helm chart is the recommended way
+to install and configure FiftyOne Enterprise on Kubernetes.
+
+This guide walks you through the steps for installing FiftyOne Enterprise
+using Helm.
+It also includes advanced configuration and upgrade considerations.
+This page assumes general knowledge of FiftyOne Enterprise and how to use it.
+Please contact Voxel51 for more information about FiftyOne Enterprise.
+
+## Table of Contents
+
 <!-- toc -->
 
-- [FiftyOne Enterprise Helm Resources](#fiftyone-enterprise-helm-resources)
-  - [Installing FiftyOne Enterprise](#installing-fiftyone-enterprise)
-    - [Example with `values.yaml`](#example-with-valuesyaml)
-    - [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke)
-      - [Download the Example Configuration Files](#download-the-example-configuration-files)
-      - [Create the Necessary Helm Repos](#create-the-necessary-helm-repos)
-    - [Install and Configure cert-manager](#install-and-configure-cert-manager)
-      - [Create a ClusterIssuer](#create-a-clusterissuer)
-      - [Install and Configure MongoDB](#install-and-configure-mongodb)
-      - [Obtain a Global Static IP Address and Configure a DNS Entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry)
-      - [Set up http to https Forwarding](#set-up-http-to-https-forwarding)
-      - [Install FiftyOne Enterprise App](#install-fiftyone-enterprise-app)
-      - [Installation Complete](#installation-complete)
-  - [Recommended Next Steps](#recommended-next-steps)
+- [:green_book: Prerequisites Skills and Knowledge](#green_book-prerequisites-skills-and-knowledge)
+- [:white_check_mark: Technical Requirements](#white_check_mark-technical-requirements)
+- [:clock10: Estimated Completion Time](#clock10-estimated-completion-time)
+- [:floppy_disk: Sizing](#floppy_disk-sizing)
+- [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-1-set-up-mongodb-database)
+- [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-2-prepare-license-file)
+- [:file_folder: Step 3: Choose Authentication Mode](#file_folder-step-3-choose-authentication-mode)
+- [:gear: Step 4: Configure `values.yaml`](#gear-step-4-configure-valuesyaml)
+- [:file_cabinet: Step 5: Enable Shared Storage](#file_cabinet-step-5-enable-shared-storage)
+- [:jigsaw: Step 6: Enable Dedicated Plugins Mode](#jigsaw-step-6-enable-dedicated-plugins-mode)
+- [:robot: Step 7: Configure Delegated Operators](#robot-step-7-configure-delegated-operators)
+- [:rocket: Step 8: Initial Deployment](#rocket-step-8-initial-deployment)
+- [:globe_with_meridians: Step 9: Configure Ingress & TLS](#globe_with_meridians-step-9-configure-ingress--tls)
+  - [:compass: Routing Overview (Path-Based Ingress)](#compass-routing-overview-path-based-ingress)
+  - [:memo: Notes](#memo-notes)
+- [Step 10: Initial CAS Setup](#step-10-initial-cas-setup)
+  - [Add First Admin User](#add-first-admin-user)
+  - [Enable Auto Join](#enable-auto-join)
+- [Step 11: Test End User Login](#step-11-test-end-user-login)
+- [Recommended Enhancements](#recommended-enhancements)
+  - [:label: Agentic Labeling](#label-agentic-labeling)
+  - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
+- [Upgrades](#upgrades)
+- [Known Issues](#known-issues)
+- [Advanced Configuration](#advanced-configuration)
+- [Validating](#validating)
+- [Health Checks and Monitoring](#health-checks-and-monitoring)
+- [Values](#values)
 
 <!-- tocstop -->
 
----
+## :green_book: Prerequisites Skills and Knowledge
 
-# FiftyOne Enterprise Helm Resources
+A successful, properly secured deployment of FiftyOne Enterprise requires
+knowledge of Kubernetes, Helm, MongoDB, DNS, and TLS/SSL certificate management.
+See the chart's
+[Prerequisites Skills and Knowledge](./fiftyone-teams-app/README.md#prerequisites-skills-and-knowledge)
+for the full list.
 
-This directory contains resources and information related to Helm deployments
+## :white_check_mark: Technical Requirements
 
-- Directories
-  - `docs` contains additional documentation for
-    - Exposing the teams-api
-    - Plugin storage
-  - `fiftyone-teams-app` contains the helm chart voxel51/fiftyone-teams-app.
-    For the chart documentation, see the fiftyone-teams-app/README.md file.
-  - `gke-example` contains additional kubernetes resources
-    to install FiftyOne Enterprise on Google Kubernetes Engine (GKE).
-    See
-    [A Full Deployment Example on GKE](#a-full-deployment-example-on-gke).
-- Files
-  - `values.yaml` is example of overrides for the chart's defaults for a deployment
+1. Kubernetes Cluster with `kubectl` configured
+    1. Use a
+       [supported Kubernetes version](https://kubernetes.io/releases/)
+       (and matching the kubectl) version `>=1.31-0`
+    1. Refer to the Kubernetes
+       [Install Tools documentation](https://kubernetes.io/docs/tasks/tools/)
+1. Helm version >= 3.14
+    1. Refer to the
+       [Installing Helm documentation](https://helm.sh/docs/intro/install/)
+1. A MongoDB Database that meets FiftyOne's
+   [version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+1. A DNS record (or records) for ingress
+1. A TLS/SSL certificate (or certificates) for HTTPS ingress
+1. (optional) An NFS server or `ReadWriteMany` compatible storage medium for
+   [delegated operators](./fiftyone-teams-app/README.md#builtin-delegated-operator-orchestrator),
+   [plugins](./fiftyone-teams-app/README.md#plugins),
+   and
+   [API high availability](./fiftyone-teams-app/README.md#highly-available-fiftyone-teams-api-deployments)
 
-## Installing FiftyOne Enterprise
+## :clock10: Estimated Completion Time
 
-### Example with `values.yaml`
+Deploying FiftyOne Enterprise takes approximately 2 hours.
 
-There are some value overrides that you must make for a successful deployment.
-To highlight some of these, see an example
-[`/values.yaml`](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/values.yaml)
-in this directory.
+## :floppy_disk: Sizing
 
-1. Edit the `./values.yaml` file
-1. Deploy FiftyOne Enterprise with `helm install`
-    - For new installations, run
+We recommend the following resource sizing:
 
-        ```shell
-        helm repo add voxel51 https://helm.fiftyone.ai
-        helm repo update voxel51
-        helm install fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
-        ```
+| Service             | CPU    | Memory  | Storage         |
+|---------------------|--------|---------|-----------------|
+| MongoDB             | `4`    | `16Gi`  | 256GB           |
+| FiftyOne App        | `1`    | `6Gi`   | 1GB (per pod)   |
+| Teams API           | `1`    | `2Gi`   | 1GB (per pod)   |
+| Teams App           | `500m` | `512Mi` | 512MB (per pod) |
+| Teams CAS           | `500m` | `512Mi` | 512MB (per pod) |
+| Delegated Operators | `8`    | `16Gi`  | 1GB (per pod)   |
 
-    - For upgrades, run
+We also recommend monitoring resource consumption across the services.
+Resource usage varies dramatically with operations, use cases,
+and dataset sizes.
 
-        ```shell
-        helm repo update voxel51
-        helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f ./values.yaml
-        ```
+## :wrench: Step 1: Set Up MongoDB Database
 
-        > **NOTE**: Prior to running helm upgrade you may
-        > view the changes Helm would apply by using
-        > [helm diff](https://github.com/databus23/helm-diff)
-        > helm plugin.
-        > Voxel51 is not affiliated with the author of this plugin.
-        >
-        > For example:
-        >
-        > ```shell
-        > helm diff --context 1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
-        > ```
+Before deploying FiftyOne Enterprise, you must have a running MongoDB database.
+FiftyOne Enterprise supports:
 
-### A Full Deployment Example on GKE
+- **MongoDB Atlas** (managed cloud)
+- **MongoDB Community Edition** (self-hosted, open source)
+- **MongoDB Enterprise** (self-hosted, commercial)
 
-The following instructions represent a full Google Kubernetes Engine [GKE]
-deployment using these helm charts
+Ensure your MongoDB version meets FiftyOne's
+[version constraints](https://docs.voxel51.com/user_guide/config.html#using-a-different-mongodb-version).
+We recommend MongoDB 8.0+.
 
-- [jetstack/cert-manager](https://github.com/cert-manager/cert-manager)
-  - For Let's Encrypt SSL certificates
-- [mongodb/community-operator](https://github.com/mongodb/helm-charts/tree/main/charts/community-operator)
-  - for MongoDB
-- voxel51/fiftyone-teams-app
+Once your database is running, record your MongoDB connection URI.
+You will need it in
+[Step 4](#gear-step-4-configure-valuesyaml)
+to set `secret.fiftyone.mongodbConnectionString` in your `values.yaml`.
+The URI follows this format:
 
-These instructions assume you have
+```text
+mongodb://<YOUR_USERNAME>:<YOUR_PASSWORD>@<YOUR_MONGODB_HOSTNAME>:27017/?authSource=admin
+```
 
-- These tools installed and operating
-  - [kubectl](https://kubernetes.io/docs/tasks/tools/)
-  - [Helm](https://helm.sh/docs/intro/install/)
-- An existing
-  [GKE Cluster available](https://cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview)
-- Received Docker Hub credentials from Voxel51
-  - Have `voxel51-docker.json` file in the current directory
-    - If `voxel51-docker.json` is not in the current directory,
-      please update the command line accordingly.
-- Your license file from the Voxel51 Customer Success Team
-  - If you have not received this information, please contact your
-    Voxel51 Support Team via your agreed-upon mechanism (Slack, email, etc.)
+## :closed_lock_with_key: Step 2: Prepare License File
 
-> **NOTE**: Anytime a license file secret is updated, you
-> must restart the `teams-cas` and `teams-api` services.
-> You may delete the pods, or run
+> Required for **v2.0+**
+
+Use the license file provided by the Voxel51 Customer Success Team
+to create a license secret:
+
+```shell
+kubectl create namespace your-namespace-here
+kubectl create secret generic fiftyone-license \
+  --namespace your-namespace-here \
+  --from-file=license=./your-license-file
+```
+
+Set the name of this secret in your `values.yaml`'s `fiftyoneLicenseSecrets` list.
+See the example [`values.yaml`](./values.yaml).
+
+> [!TIP]
+> When rotating the license,
+> restart the `teams-cas` and `teams-api` deployments
+> so the new values take effect immediately:
 >
 > ```shell
 > kubectl rollout restart deploy \
->   -n your-namespace \
+>   --namespace your-namespace-here \
 >   teams-cas \
 >   teams-api
 > ```
 
-#### Download the Example Configuration Files
+## :file_folder: Step 3: Choose Authentication Mode
 
-Download the example configuration files from the
-[voxel51/fiftyone-teams-app-deploy](https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/gke-example)
-GitHub repository.
+FiftyOne Enterprise supports two authentication modes.
+Choose the one that matches your deployment:
 
-For example
+| Mode       | Use when                                                                   | `values.yaml` setting                          |
+| ---------- | -------------------------------------------------------------------------- | ---------------------------------------------- |
+| `internal` | Deployment is Air-gapped or Identity Provider is **OpenID Connect (OIDC)** | `casSettings.env.FIFTYONE_AUTH_MODE: internal` |
+| `legacy`   | Identity Provider is **SAML**                                              | `casSettings.env.FIFTYONE_AUTH_MODE: legacy`   |
 
-```shell
-curl -o values.yaml \
-  https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/values.yaml
-curl -o cluster-issuer.yaml \
-  https://raw.githubusercontent.com/voxel51/fiftyone-teams-app-deploy/main/helm/gke-example/cluster-issuer.yaml
-curl -o frontend-config.yaml \
-  https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/gke-example/frontend-config.yaml
-```
+> [!NOTE]
+> The example [`values.yaml`](./values.yaml) ships with
+> `casSettings.env.FIFTYONE_AUTH_MODE: legacy` by default.
+> Set it to `internal` if your Identity Provider uses OIDC.
 
-Update the `values.yaml` file with
+Refer to the following docs to set up your Identity Provider
+with FiftyOne:
 
-- In `secret.fiftyone`
-  - MongoDB
-    - Set `mongodbConnectionString` containing your MongoDB username and password
-  - Set `cookieSecret`
-  - Set `encryptionKey`
-  - Set `fiftyoneAuthSecret`
-- In `teamsAppSettings.dnsName`
-  - Set ingress `host` values
+- [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
+  includes information on configuring CAS
+- To set up authentication for internal mode: refer to the
+  [Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
 
-Assuming you follow these directions your MongoDB host will be
-`fiftyone-teams-mongodb.fiftyone-teams-mongodb.svc.cluster.local`.
-<!-- Please modify this hostname if you modify these instructions. -->
+## :gear: Step 4: Configure `values.yaml`
 
-#### Create the Necessary Helm Repos
+Edit your `values.yaml` file (see the example
+[`values.yaml`](./values.yaml) in this directory) to set:
 
-Add the Helm repositories
+- `fiftyoneLicenseSecrets` — the name of the secret created in
+  [Step 2](#closed_lock_with_key-step-2-prepare-license-file)
+- `secret.fiftyone.mongodbConnectionString` — the MongoDB connection URI from
+  [Step 1](#wrench-step-1-set-up-mongodb-database)
+- `secret.fiftyone.cookieSecret` — a randomly generated string
+- `secret.fiftyone.encryptionKey` — used to encrypt storage credentials.
+  See
+  [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](./fiftyone-teams-app/README.md#storage-credentials-and-fiftyone_encryption_key)
+  for how to generate it
+- `secret.fiftyone.fiftyoneAuthSecret` — a randomly generated shared secret
+  used for CAS
+- `casSettings.env.FIFTYONE_AUTH_MODE` — the mode chosen in
+  [Step 3](#file_folder-step-3-choose-authentication-mode)
+- `teamsAppSettings.dnsName` — your ingress hostname
+- `namespace.name` — set to match your target namespace
+   (e.g. `your-namespace-here`).
+   See the note below.
 
-```shell
-helm repo add mongodb https://mongodb.github.io/helm-charts
-helm repo add jetstack https://charts.jetstack.io
-helm repo add voxel51 https://helm.fiftyone.ai
-helm repo update
-```
-
-### Install and Configure cert-manager
-
-If you are using a GKE Autopilot cluster, please review the information
-[provided by cert-manager](https://github.com/cert-manager/cert-manager/issues/3717#issuecomment-919299192)
-and adjust your installation accordingly.
-
-```shell
-kubectl create namespace cert-manager
-kubectl config set-context --current --namespace cert-manager
-helm install cert-manager jetstack/cert-manager --set installCRDs=true
-```
-
-You can use the cert-manager instructions to
-[verify the cert-manager Installation](https://cert-manager.io/v1.4-docs/installation/verify/).
-
-#### Create a ClusterIssuer
-
-`ClusterIssuers` are Kubernetes resources that represent certificate authorities
-that are able to generate signed certificates by honoring certificate signing requests.
-You must create either an `Issuer` in each namespace or a `ClusterIssuer`
-as part of your cert-manager configuration.
-Voxel51 has provided an example `ClusterIssuer` configuration (downloaded
-[earlier](#download-the-example-configuration-files)
-in this guide).
+When using the Voxel51 Docker Hub registry to pull container images,
+create an image pull secret and reference it in `imagePullSecrets`:
 
 ```shell
-kubectl apply -f ./cluster-issuer.yaml
-```
-
-#### Install and Configure MongoDB
-
-These
-[instructions](https://github.com/mongodb/helm-charts/tree/main/charts/community-operator#deploying-a-mongodb-replica-set)
-can be used to deploy a MongoDB replicaset in your GKE cluster.
-
-Wait until the MongoDB pods are in the `Ready` state before
-beginning the "Install FiftyOne Enterprise App" instructions.
-
-While waiting,
-[configure a DNS entry](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
-
-To determine the state of the `fiftyone-teams-mongodb` pods, run
-
-```shell
-kubectl get pods
-```
-
-#### Obtain a Global Static IP Address and Configure a DNS Entry
-
-Reserve a global static IP address for use in your cluster:
-
-```shell
-gcloud compute addresses create \
-  fiftyone-teams-static-ip --global --ip-version IPV4
-gcloud compute addresses describe \
-  fiftyone-teams-static-ip --global
-```
-
-Record the IP address and either create a DNS entry or contact your Voxel51
-support team to have them create an appropriate `fiftyone.ai` DNS entry for you.
-
-#### Set up http to https Forwarding
-
-```shell
-kubectl apply -f frontend-config.yaml
-```
-
-For more information, see
-[HTTP to HTTPS redirects](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#https_redirect).
-
-#### Install FiftyOne Enterprise App
-
-```shell
-kubectl create namespace fiftyone-teams
-kubectl config set-context --current --namespace fiftyone-teams
 kubectl create secret generic regcred \
+  --namespace your-namespace-here \
   --from-file=.dockerconfigjson=./voxel51-docker.json \
   --type kubernetes.io/dockerconfigjson
+```
+
+> [!NOTE]
+> This chart uses `namespace.name` from your `values.yaml` to set the
+> namespace for all chart resources.
+> The Helm `--namespace` flag alone does not control
+> where the chart creates resources.
+> See the chart's
+> [Usage](./fiftyone-teams-app/README.md#usage) section for the full
+> `namespace.name` configuration note.
+
+For the full list of available settings, see
+[Values](./fiftyone-teams-app/README.md#values).
+
+## :file_cabinet: Step 5: Enable Shared Storage
+
+Dedicated plugins and delegated operators (below) share a common plugin
+directory that uses a Kubernetes PersistentVolume (PV)
+and PersistentVolumeClaim (PVC).
+
+```yaml
+# teams-plugins-pv-pvc.yaml
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: teams-plugins
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+    - ReadOnlyMany
+  nfs:
+    server: nfs-server
+    path: "/fiftyone_teams_app/plugins"
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: teams-plugins
+spec:
+  accessModes:
+    - ReadWriteMany
+    - ReadOnlyMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 10Gi
+```
+
+```shell
+kubectl apply \
+  --namespace your-namespace-here \
+  --filename teams-plugins-pv-pvc.yaml
+```
+
+For NFS export configuration and cloud-provider alternatives
+(Google Filestore, AWS EFS, Azure Files), see
+[Adding Shared Storage for FiftyOne Enterprise Plugins](./docs/plugins-storage.md).
+
+## :jigsaw: Step 6: Enable Dedicated Plugins Mode
+
+Add the following to your `values.yaml` to run plugins
+in a dedicated `teams-plugins` pod, isolated from `fiftyone-app`:
+
+```yaml
+pluginsSettings:
+  enabled: true
+  env:
+    FIFTYONE_PLUGINS_DIR: /opt/plugins
+  volumes:
+    - name: plugins-vol
+      persistentVolumeClaim:
+        claimName: teams-plugins-pvc
+        readOnly: true
+  volumeMounts:
+    - name: plugins-vol
+      mountPath: /opt/plugins
+
+# teams-api also requires read-write access to the plugins directory
+apiSettings:
+  env:
+    FIFTYONE_PLUGINS_DIR: /opt/plugins
+  volumes:
+    - name: plugins-vol
+      persistentVolumeClaim:
+        claimName: teams-plugins-pvc
+  volumeMounts:
+    - name: plugins-vol
+      mountPath: /opt/plugins
+```
+
+For full configuration options, see
+[Configuring Plugins](./docs/configuring-plugins.md).
+
+## :robot: Step 7: Configure Delegated Operators
+
+Delegated operators let you schedule long-running or compute-heavy tasks
+(computing embeddings, model evaluation, dataset import, annotation workflows)
+from the FiftyOne UI and run them in dedicated pods.
+Choose the mode that fits your workloads:
+
+| Mode           | Use when                                                                                |
+| -------------- | --------------------------------------------------------------------------------------- |
+| **Always-On**  | Steady or unpredictable delegated-operation volume that needs workers ready immediately |
+| **On-Demand**  | Infrequent or GPU-heavy jobs where you don't pay for idle workers                       |
+
+FiftyOne Enterprise 2.14+ provides the configuration for a delegated
+operator `teams-do-cpu-default` on CPU nodes in **Always-On** mode.
+Enable it by setting
+`delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled` to
+`true` in your `values.yaml`:
+
+```yaml
+delegatedOperatorDeployments:
+  deployments:
+    teamsDoCpuDefault:
+      enabled: true
+```
+
+Running delegated operators on GPU nodes requires additional configuration.
+See
+[Leveraging GPU Workloads](./docs/configuring-gpu-workloads.md).
+We wrote configuration guides for the major cloud-managed Kubernetes services:
+
+- [Amazon Elastic Kubernetes Service (EKS)](./docs/configuring-gpu-workloads.md#deploying-gpu-enabled-delegated-operator-pods-2)
+- [Google Kubernetes Engine (GKE)](./docs/configuring-gpu-workloads.md#deploying-gpu-enabled-delegated-operator-pods)
+- [Azure Kubernetes Service (AKS)](./docs/configuring-gpu-workloads.md#deploying-gpu-enabled-delegated-operator-pods-1)
+
+To configure **On-Demand** mode for delegated operators, see
+[Using delegatedOperatorJobTemplates for on-demand executors](docs/configuring-delegated-operators.md#using-delegatedoperatorjobtemplates-for-on-demand-executors).
+On-demand orchestrators are now auto-registered.
+
+> [!NOTE]
+> After configuring an on-demand orchestrator, an admin must
+>
+> 1. In the FiftyOne Enterprise UI go to *Settings* -> *Orchestrators*
+> 1. Select the orchestrator
+> 1. Select *Refresh*
+>
+> This end-to-end tests your job template values
+> and makes the orchestrator available as a delegation target in the UI.
+
+## :rocket: Step 8: Initial Deployment
+
+Add the Voxel51 Helm repository and install FiftyOne Enterprise:
+
+```shell
+helm repo add voxel51 https://helm.fiftyone.ai
+helm repo update voxel51
 helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
+  --namespace your-namespace-here \
   --values ./values.yaml
 ```
 
-Issuing SSL Certificates can take up to 15 minutes.
-Be patient while Let's Encrypt and GKE negotiate.
-
-You can verify that your SSL certificates have been
-properly issued with the following curl command:
-
-```shell
-curl -I https://replace.this.dns.name
-```
-
-Your SSL certificates have been correctly issued when
-you see `HTTP/2 200` at the top of the response.
-If, however, you encounter a
-`SSL certificate problem: unable to get local issuer certificate`
-message you should delete the certificate and allow it to recreate.
+Confirm all pods are running, including `teams-plugins`
+(from [Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode)) and your chosen
+delegated operators
+(from [Step 7](#robot-step-7-configure-delegated-operators)):
 
 ```shell
-kubectl delete secret fiftyone-teams-cert-secret
+kubectl get pods \
+  --namespace your-namespace-here
 ```
 
-Further instructions for debugging ACME certificates are on the
-[cert-manager docs site](https://cert-manager.io/docs/faq/acme/).
+## :globe_with_meridians: Step 9: Configure Ingress & TLS
 
-Once your installation is complete, browse to
-`/settings/cloud_storage_credentials`
-and add your storage credentials to access sample data.
+Configure an **Ingress controller** and **TLS termination**
+in front of your FiftyOne Enterprise services.
+For example, you may generate certificates using
+[cert-manager](https://cert-manager.io/)
+and apply them to your cloud provider ingress controller or load balancer.
 
-#### Installation Complete
+### :compass: Routing Overview (Path-Based Ingress)
 
-Congratulations! You should now be able to access your
-FiftyOne Enterprise installation at the DNS address you created
-[earlier](#obtain-a-global-static-ip-address-and-configure-a-dns-entry).
+| Path                 | Proxied To  | Description                          |
+| -------------------- | ----------- | ------------------------------------ |
+| `/`                  | `teams-app` | Main web UI                          |
+| `/cas`               | `teams-cas` | Central Authentication Service (CAS) |
+| `/cloud_credentials` | `teams-api` | Cloud credentials API endpoint       |
+| `/graphql/v1`        | `teams-api` | GraphQL API endpoint                 |
+| `/rpc`               | `teams-api` | RPC API endpoint                     |
+| `/file`              | `teams-api` | File import handling                 |
+| `/_pymongo`          | `teams-api` | MongoDB requests via SDK             |
+| `/health`            | `teams-api` | Health check endpoint                |
 
-## Recommended Next Steps
+### :memo: Notes
 
-The base `helm install` above starts FiftyOne Enterprise with
-**built-in only plugins** and **no delegated operator workers**.
-While sufficient to get started, we recommend enabling
-the following features for a production-ready deployment:
+FiftyOne Enterprise supports
 
-| Step | What it enables |
-| --- | --- |
-| **Dedicated Plugins** | Install and run custom plugins in an isolated `teams-plugins` pod, keeping plugin workloads separate from the main app |
-| **Delegated Operators** | Schedule compute-heavy tasks — embeddings, model evaluation, dataset import, annotation — from the UI and run them on dedicated background workers |
-| **On-Demand Orchestrator** | *(Optional)* Spin up Kubernetes pods on demand per job instead of maintaining always-on workers; more cost-efficient for infrequent or GPU-heavy workloads |
+- Proxy server traffic routing
+  - See the
+    [proxy configuration documentation](./docs/configuring-proxies.md)
+    for information on how to configure proxies
+- Host-based and path-based routing
+  - For host-based routing, see
+    [Exposing the `teams-api`](./docs/expose-teams-api.md)
 
-For step-by-step configuration instructions, see
+For cloud-specific examples of setting up ingress with TLS, see
+
+- [GKE Deployment Guide](./docs/gke-deployment-guide.md)
+- [AWS Deployment Guide](./docs/aws-deployment-guide.md)
+
+## Step 10: Initial CAS Setup
+
+In the steps below, `<DNS_NAME>` is the ingress hostname you set for
+`teamsAppSettings.dnsName` in [Step 4](#gear-step-4-configure-valuesyaml).
+
+1. Navigate to the CAS Super Admin UI at
+   `https://<DNS_NAME>/cas/configurations`
+1. In the *API Key* field (upper right corner),
+   enter the value of `secret.fiftyone.fiftyoneAuthSecret`
+   (from your `values.yaml`) and select *Sign in*
+
+### Add First Admin User
+
+1. Navigate to the *Admins* tab at
+   `https://<DNS_NAME>/cas/admins`
+1. Select *Add admin*
+1. Provide *Name* and *Email*
+1. Select *Add*
+
+### Enable Auto Join
+
+1. Navigate to `https://<DNS_NAME>/cas/providers`
+1. Select *+ Edit*
+1. Select *Allow auto join*
+1. Select *Save*
+
+## Step 11: Test End User Login
+
+Verify the deployment's IdP setup by logging in as a regular user
+
+1. In a browser, open `https://<DNS_NAME>`
+1. Log in with the credentials of the admin
+   (you created in the CAS Super Admin UI)
+1. Confirm the login redirects you to the FiftyOne Enterprise datasets page
+
+## Recommended Enhancements
+
+With dedicated plugins and delegated operators configured in
+[Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode) and
+[Step 7](#robot-step-7-configure-delegated-operators),
+consider these additional enhancements for a production-ready deployment.
+
+### :label: Agentic Labeling
+
+The Agentic Labeler service provides few-shot VLM inference via vLLM.
+Configure a dedicated GPU delegated-operator worker
+(see [Leveraging GPU Workloads](./docs/configuring-gpu-workloads.md)).
+Start the service via the FiftyOne Enterprise UI under *Settings* -> *Services*.
+For an overview of builtin services and the service orchestrator, see the
+[service orchestrator documentation](../docs/configuring-service-orchestrator.md).
+
+### :bricks: Custom Plugin Images
+
+If your delegated operators or plugins need additional dependencies,
+build and use custom plugin container images.
+Use `voxel51/fiftyone-teams-cv-full` as the base image
+(that includes a full CV/ML environment), and extend with:
+
+- Custom Python packages
+- Internal SDKs or models
+
+After you build the container image, tag the image,
+and push it to your container image registry.
+Override the default container image in `values.yaml`:
+
+```yaml
+delegatedOperatorDeployments:
+  deployments:
+    teamsDoCpuDefault:
+      image:
+        repository: <YOUR_CONTAINER_REGISTRY>/fiftyone-cv-full-custom
+        tag: v2.24.0
+```
+
+For all the recommended FiftyOne Enterprise configurations, see
 [Recommended Post-Installation Configuration](./docs/post-install-recommended-configuration.md).
+
+## Upgrades
+
+Follow this upgrade path:
+
+1. Pull the latest reference files from this repo:
+
+   ```shell
+   # from a checkout of https://github.com/voxel51/fiftyone-teams-app-deploy
+   git pull origin main
+   ```
+
+   > **Note**: This provides the latest example `values.yaml`
+   > and upgrade notes for any version-specific changes.
+
+1. Confirm `appSettings.env.FIFTYONE_DATABASE_ADMIN` is set to `false`
+   (or unset) in your `values.yaml`:
+
+   ```yaml
+   appSettings:
+     env:
+       FIFTYONE_DATABASE_ADMIN: false
+   ```
+
+   > **Note**: This prevents automatic database migrations from running on startup
+   > and breaking active SDK sessions.
+
+1. When using [Custom Plugin Images](#bricks-custom-plugin-images),
+   rebuild them using the updated base image version.
+   For every reference,
+   update the tag in `values.yaml` to match the new release.
+
+1. Update your `kubectl` configuration to set your current namespace
+   for your `kubectl` context:
+
+   ```shell
+   kubectl config set-context \
+     --current \
+     --namespace your-namespace-here
+   ```
+
+1. Update your Voxel51 Helm repository
+   and upgrade your FiftyOne Enterprise deployment:
+
+   > [!NOTE]
+   > When using Helm v3, replace `--rollback-on-failure` with `--atomic`.
+   > If set, Helm will rollback the upgrade to the previous successful release
+   > upon failure.
+
+   ```shell
+   helm repo update voxel51
+   helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+     --namespace your-namespace-here \
+     --values ./values.yaml \
+     --rollback-on-failure
+   ```
+
+   > [!TIP]
+   > Before running `helm upgrade`,
+   > you may view the changes Helm would apply using the
+   > [helm diff](https://github.com/databus23/helm-diff) plugin
+   > (Voxel51 is not affiliated with the author of this plugin):
+   >
+   > ```shell
+   > helm diff --context 1 upgrade \
+   >   fiftyone-teams-app voxel51/fiftyone-teams-app \
+   >   --namespace your-namespace-here \
+   >   --values values.yaml
+   > ```
+
+For full upgrade guidance, including version-specific migration notes,
+refer to [Upgrading](./docs/upgrading.md).
+
+## Known Issues
+
+For a list of common issues and their solutions, refer to the
+[Known Issues documentation](./docs/known-issues.md).
+
+If you encounter a new issue,
+please open a ticket on the
+[GitHub Issues page](https://github.com/voxel51/fiftyone-teams-app-deploy/issues).
+
+## Advanced Configuration
+
+For backup and recovery, secrets management, GPU workloads,
+high availability, plugins, proxies, snapshot archival,
+storage credentials, static banners, Terms of Service URLs,
+text similarity, and workload identity federation,
+see the chart's
+[Advanced Configuration](./fiftyone-teams-app/README.md#advanced-configuration)
+documentation.
+
+## Validating
+
+After deploying FiftyOne Enterprise (with authentication configured),
+please follow
+[Validating Your Deployment](../docs/validating-deployment.md).
+
+## Health Checks and Monitoring
+
+See the chart's
+[Health Checks And Monitoring](./fiftyone-teams-app/README.md#health-checks-and-monitoring)
+documentation for basic health assessment
+and how to troubleshoot unhealthy pods.
+
+## Values
+
+For the full list of configurable `values.yaml` settings, see the chart's
+generated [Values](./fiftyone-teams-app/README.md#values) reference table
+or [values.yaml](./fiftyone-teams-app/values.yaml).
