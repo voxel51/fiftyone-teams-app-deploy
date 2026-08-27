@@ -355,7 +355,7 @@ On-demand orchestrators are now auto-registered.
 
 > [!NOTE]
 > After configuring an on-demand orchestrator, an admin must
-> 
+>
 > 1. In the FiftyOne Enterprise UI go to *Settings* -> *Orchestrators*
 > 1. Select the orchestrator
 > 1. Select *Refresh*
