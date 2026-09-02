@@ -107,7 +107,7 @@ plugin installs, and delegated operators entirely).
 | Question | Options | Where it matters later |
 | --- | --- | --- |
 | Deployment target? | Docker Compose / Kubernetes (Helm) | Which of Step 2's two paths to follow |
-| Identity provider? | Which IdP do you use — Okta, Azure AD/Entra ID, Google Workspace, PingIdentity, ADFS, something else — or none at all (air-gapped/self-contained)? See "Auth mode, explained" below | `docker/README.md` Step 3 / `helm/fiftyone-teams-app/README.md` |
+| Identity provider — *and* which protocol? | Which IdP do you use — Okta, Azure AD/Entra ID, Google Workspace, PingIdentity, ADFS, something else — or none at all (air-gapped/self-contained)? Always ask for the **protocol** too (SAML vs. OIDC/OAuth2), since that, not the vendor, picks the auth mode. See "Auth mode, explained" below | `docker/README.md` Step 3 / `helm/fiftyone-teams-app/README.md` |
 | Plugins? | Builtin only / Shared / **Dedicated (standard — see below)** | `docker/docs/configuring-plugins.md`, `helm/docs/configuring-plugins.md` |
 | Delegated operators (background compute)? | **Some form is standard — see below.** Ask: how many orchestrators do you want, and what type/where should each run? E.g. always-on `teams-do` workers on a VM/on-prem host or in Kubernetes, or on-demand executors on Anyscale, Databricks, or whichever cloud (AWS/GCP/Azure) Kubernetes you already run | `docs/configuring-on-demand-orchestrator.md` + `docs/orchestrators/*` |
 | GPU-backed workloads? | Yes/No — needed for delegated operators doing embeddings/inference, and *required* for either builtin service below | `docker/docs/configuring-gpu-workloads.md`, `helm/docs/configuring-gpu-workloads.md` |
@@ -122,6 +122,19 @@ plugin installs, and delegated operators entirely).
 | Custom MongoDB permissions (non-root DB role)? | Yes/No | `docs/custom-mongodb-permissions.md` |
 | Corporate proxy in the network path? | Yes/No | `docker/docs/configuring-proxies.md`, `helm/docs/configuring-proxies.md` |
 | Air-gapped (no egress to Docker Hub / GHCR / public PyPI)? | Yes/No | Adds items to Step 1's gate — see below |
+
+**Follow-up questions, conditioned on the answers above.** Ask each one only
+when its trigger answer was selected; every one of them feeds a Step 1
+prerequisite row, so collect them *before* directing anyone to Step 2.
+
+| If Step 0 selected… | Also ask | Feeds |
+| --- | --- | --- |
+| Shared or Dedicated plugins, or always-on delegated operators | Where does shared plugin storage live, how much capacity, and which pods get read/write vs. read-only access? (Helm: which StorageClass and access mode; Docker: which host path) | Step 1 shared-storage row |
+| Any deployment | What is the network path to MongoDB, the IdP, the container registry, and the ingress — including egress restrictions, allowlists, or a proxy in between? | Step 1 network-connectivity row |
+| HA `teams-api` | Which RWX-capable StorageClass will back the shared PVC, and is it provisioned in this cluster today? | Step 1 RWX row |
+| Snapshot archival | Which cold-storage bucket/path, and what credentials or role grant the deployment write access to it? | Step 1 snapshot-storage row |
+| Workload Identity Federation | Which cloud service account is being federated, and does it already carry the IAM permissions the workloads need? | Step 1 Workload Identity row |
+| Air-gapped | Where does the Helm chart itself come from — an internal OCI registry or chart mirror, since `helm repo add https://helm.fiftyone.ai` needs egress? | Step 1 air-gapped chart-source row |
 
 **Auth mode, explained:** this isn't a vendor choice — almost any IdP (Okta,
 Azure AD/Entra ID, Google Workspace, PingIdentity, OneLogin, ADFS, etc.) can
@@ -171,7 +184,13 @@ until this gate passes.
 | DNS record(s) you control for ingress | Both | You can create/modify the record now, even if it isn't pointed at anything yet |
 | TLS/SSL certificate mechanism decided | Both | cert-manager + ClusterIssuer (Helm/GKE example), customer-provided certs, or a load balancer that terminates TLS |
 | GPU host(s) available | Only if Step 0 selected GPU workloads, Agentic Labeler, or Annotation AI | `nvidia-smi` on the host, or `kubectl get nodes -o json \| grep nvidia.com/gpu` in-cluster |
+| Shared plugin/DO storage exists, is sized, and is writable by the right pods | Shared or Dedicated plugins, or always-on delegated operators | Helm: `kubectl get pvc -n <namespace>` shows the claim `Bound` with the intended capacity; write a file from `teams-plugins` and read it back read-only from `teams-do`. Docker: the host path exists with the intended mode |
+| Network path open to MongoDB, IdP, registry, and ingress (proxy/allowlist accounted for) | Both | From the deployment host/pod network: reach the Mongo endpoint, the IdP discovery URL, and the registry — don't assume egress that hasn't been tested |
+| RWX-capable StorageClass provisioned for the shared `teams-api` volume | Only if Step 0 selected HA `teams-api` | `kubectl get storageclass`, then bind a test PVC with `ReadWriteMany` and mount it from two pods at once |
+| Cold-storage bucket/path reachable and writable for archived snapshots | Only if Step 0 selected snapshot archival | Write and delete a test object at the archive path using the same credentials/role the deployment will use |
+| Federated service account carries the IAM permissions the workloads need | Only if Step 0 selected Workload Identity Federation | Impersonate/assume the federated identity and perform one real read *and* write against the buckets the deployment will touch |
 | *(air-gapped only)* Internal registry mirrors all required images | Air-gapped | Pull one image through the mirror end-to-end before proceeding |
+| *(air-gapped only)* Internal Helm chart source available | Air-gapped + Helm | `helm repo add voxel51 https://helm.fiftyone.ai` needs egress — confirm an internal OCI registry or chart mirror instead, and `helm pull` the target chart version through it |
 | *(air-gapped only)* Internal CA distributed; `NODE_EXTRA_CA_CERTS` path known | Air-gapped | `curl` an HTTPS internal endpoint from a test container using that CA |
 | *(air-gapped only)* Internal PyPI/package mirror reachable, if plugins/DO images `pip install` anything | Air-gapped | `pip install <pkg> --index-url <mirror>` from a test container |
 
@@ -230,10 +249,13 @@ command/flag detail; this is the ordered checklist with gates.
    (omit `-f compose.delegated-operators.yaml` if the customer chose
    on-demand-only or none)
 
-   → **Gate:** `docker compose ps` shows every expected container `Up`
-   (`fiftyone-app`, `teams-app`, `teams-api`, `teams-cas`, `teams-do-*`,
-   `teams-plugins`, plus `*-telemetry` sidecars and `telemetry-redis` — see
-   [Basic Health Assessment](./docker/README.md#basic-health-assessment)), and:
+   → **Gate:** `docker compose ps` shows every container *your* Step 0 profile
+   expects to be `Up` — always `fiftyone-app`, `teams-app`, `teams-api`, and
+   `teams-cas`; `teams-do-*` only if always-on delegated operators were
+   selected; `teams-plugins` only for Dedicated Plugins; `*-telemetry`
+   sidecars and `telemetry-redis` only while telemetry is enabled (it is on by
+   default, so expect them unless Step 0 turned it off). See
+   [Basic Health Assessment](./docker/README.md#basic-health-assessment). Then:
 
    ```shell
    curl -Iv http://localhost:3030/cas/api    # expect HTTP/1.1 200 OK
@@ -293,8 +315,12 @@ explicitly in item 5 below, per the Step 0 standard recommendation.
    `helm upgrade` with your overlay updated, not a fresh `values.yaml` copy →
    **Gate:**
    [Verifying Your Setup](./helm/docs/post-install-recommended-configuration.md#verifying-your-setup)
-   passes (a `teams-plugins` pod is `Running`, and a test delegated operation
-   completes instead of sitting `QUEUED`).
+   passes for the parts Step 0 selected — a `teams-plugins` pod is `Running`
+   only if Dedicated Plugins were chosen, and a test delegated operation
+   completes instead of sitting `QUEUED` only if the profile configures
+   delegated operators at all (always-on *or* on-demand; for on-demand, the
+   job lands on the configured executor rather than a `teams-do` pod). Skip
+   whichever check the profile doesn't include.
 6. Work through Step 3 of this file for every other feature Step 0 selected.
 7. Run [Step 4 — Final validation](#step-4--final-validation).
 
@@ -332,12 +358,18 @@ before promising either feature works on whatever GPU happens to be available.
 
 Regardless of path, the deployment isn't done until this passes:
 
+Replace both `REPLACE_ME` values before running this — the placeholders are
+sentinels, not shell syntax:
+
 ```shell
-export FIFTYONE_API_URL=https://<your-api-url>
-export FIFTYONE_API_KEY=<generate one from the Enterprise UI>
+export FIFTYONE_API_URL="https://REPLACE_ME_API_URL"
+export FIFTYONE_API_KEY="REPLACE_ME_API_KEY"   # generate one from the Enterprise UI  # pragma: allowlist secret
 python -c 'import fiftyone.management as fom; fom.test_api_connection()'
 # Expect: "API connection succeeded"
 ```
+
+If the deployment's `.env` already holds a working API URL and key, source it
+instead of retyping them (`set -a; . ./.env; set +a`).
 
 Full prerequisites and troubleshooting: [`docs/validating-deployment.md`](./docs/validating-deployment.md).
 
