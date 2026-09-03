@@ -390,7 +390,7 @@ kubectl get pods \
 
 <!-- markdownlint-disable line-length -->
 | Pod | What it does |
-|-----|--------------|
+| --- | ------------ |
 | `fiftyone-app-*` | The core App server — the same visualization engine as open source `fo.launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, so the ingress you will configure in [Step 9](#globe_with_meridians-step-9-configure-ingress--tls) needs no route to it. |
 | `teams-app-*` | The web UI your users browse — dataset listing, settings, runs, and history pages — which embeds the core App by proxying `fiftyone-app`. |
 | `teams-api-*` | The control plane — users, roles, dataset permissions, plugin management, delegated operation orchestration, and the MongoDB proxy that SDK connections tunnel through (`/_pymongo`, `/graphql/v1`, `/file`, `/health`). |

@@ -307,7 +307,7 @@ each of them in `docker compose ps` — here is what each one does:
 
 <!-- markdownlint-disable line-length -->
 | Container | Default port | What it does |
-|-----------|--------------|--------------|
+| --------- | ------------ | ------------ |
 | `fiftyone-app` | `5151` | The core App server — the same visualization engine as open source `fo.launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, which is why the reverse proxy in Step 6 needs no route to it. |
 | `teams-app` | `3000` | The web UI your users browse — dataset listing, settings, runs, and history pages — which embeds the core App by proxying `fiftyone-app`. |
 | `teams-api` | `8000` | The control plane — users, roles, dataset permissions, plugin management, delegated operation orchestration, and the MongoDB proxy that SDK connections tunnel through (`/_pymongo`, `/graphql/v1`, `/file`, `/health`). |
