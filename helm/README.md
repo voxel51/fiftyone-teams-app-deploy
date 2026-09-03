@@ -43,6 +43,7 @@ Please contact Voxel51 for more information about FiftyOne Enterprise.
 - [:jigsaw: Step 6: Enable Dedicated Plugins Mode](#jigsaw-step-6-enable-dedicated-plugins-mode)
 - [:robot: Step 7: Configure Delegated Operators](#robot-step-7-configure-delegated-operators)
 - [:rocket: Step 8: Initial Deployment](#rocket-step-8-initial-deployment)
+  - [What Each Service Does](#what-each-service-does)
 - [:globe_with_meridians: Step 9: Configure Ingress & TLS](#globe_with_meridians-step-9-configure-ingress--tls)
   - [:compass: Routing Overview (Path-Based Ingress)](#compass-routing-overview-path-based-ingress)
   - [:memo: Notes](#memo-notes)
@@ -383,6 +384,36 @@ delegated operators
 ```shell
 kubectl get pods \
   --namespace your-namespace-here
+```
+
+### What Each Service Does
+
+<!-- markdownlint-disable line-length -->
+| Pod | What it does |
+|-----|--------------|
+| `fiftyone-app-*` | The core App server — the same visualization engine as open source `fo.launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, so the ingress you will configure in [Step 9](#globe_with_meridians-step-9-configure-ingress--tls) needs no route to it. |
+| `teams-app-*` | The web UI your users browse — dataset listing, settings, runs, and history pages — which embeds the core App by proxying `fiftyone-app`. |
+| `teams-api-*` | The control plane — users, roles, dataset permissions, plugin management, delegated operation orchestration, and the MongoDB proxy that SDK connections tunnel through (`/_pymongo`, `/graphql/v1`, `/file`, `/health`). |
+| `teams-cas-*` | The Central Authentication Service — every login flows through it. Also handles license validation and serves the super admin console at `/cas`. |
+| `teams-plugins-*` | (When dedicated plugins mode is enabled in [Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode)) a dedicated instance of the App server for executing plugin operators in isolation, so heavy plugins cannot impact the main App. |
+| `teams-do-*` | Delegated operator workers (from [Step 7](#robot-step-7-configure-delegated-operators)) — they poll the queue and run background jobs (embeddings, exports, brain runs). |
+<!-- markdownlint-enable line-length -->
+
+How the services fit together:
+
+```mermaid
+flowchart LR
+    browser["Browser"] --> ingress["Ingress"]
+    sdk["Python SDK"] -->|"/_pymongo, /graphql/v1"| ingress
+    ingress -->|"/"| teamsapp["teams-app"]
+    ingress -->|"/cas"| cas["teams-cas"]
+    ingress -->|"API paths"| api["teams-api"]
+    teamsapp -->|"internal proxy"| app["fiftyone-app"]
+    cas --> mongo[("MongoDB")]
+    api --> mongo
+    app --> mongo
+    do["teams-do workers"] --> mongo
+    plugins["teams-plugins"] --> mongo
 ```
 
 ## :globe_with_meridians: Step 9: Configure Ingress & TLS

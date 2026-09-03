@@ -775,36 +775,6 @@ teams-cas-68f95d68f-fmq5g         1/1     Running                  0          41
 
 Note that number of pods and pod names may vary per deployment.
 
-### What Each Service Does
-
-<!-- markdownlint-disable line-length -->
-| Pod | What it does |
-|-----|--------------|
-| `fiftyone-app-*` | The core App server — the same visualization engine as open source `fo.launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, so your ingress needs no route to it. |
-| `teams-app-*` | The web UI your users browse — dataset listing, settings, runs, and history pages — which embeds the core App by proxying `fiftyone-app`. |
-| `teams-api-*` | The control plane — users, roles, dataset permissions, plugin management, delegated operation orchestration, and the MongoDB proxy that SDK connections tunnel through (`/_pymongo`, `/graphql/v1`, `/file`, `/health`). |
-| `teams-cas-*` | The Central Authentication Service — every login flows through it. Also handles license validation and serves the super admin console at `/cas`. |
-| `teams-plugins-*` | (When [dedicated plugins](#plugins) are enabled) a dedicated instance of the App server for executing plugin operators in isolation, so heavy plugins cannot impact the main App. |
-| `teams-do-*` | Delegated operator workers — they poll the queue and run background jobs (embeddings, exports, brain runs). |
-<!-- markdownlint-enable line-length -->
-
-How the services fit together:
-
-```mermaid
-flowchart LR
-    browser["Browser"] --> ingress["Ingress"]
-    sdk["Python SDK"] -->|"/_pymongo, /graphql/v1"| ingress
-    ingress -->|"/"| teamsapp["teams-app"]
-    ingress -->|"/cas"| cas["teams-cas"]
-    ingress -->|"API paths"| api["teams-api"]
-    teamsapp -->|"internal proxy"| app["fiftyone-app"]
-    cas --> mongo[("MongoDB")]
-    api --> mongo
-    app --> mongo
-    do["teams-do workers"] --> mongo
-    plugins["teams-plugins"] --> mongo
-```
-
 ### Troubleshooting Unhealthy Pods
 
 If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
