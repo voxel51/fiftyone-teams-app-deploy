@@ -1502,8 +1502,8 @@ teamsAppSettings:
     # -- When `false`, disables media export options
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
-    # install modal (i.e. `pip install ... fiftyone==2.24.1`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.24.1
+    # install modal (i.e. `pip install ... fiftyone==2.25.0`).
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.25.0
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
