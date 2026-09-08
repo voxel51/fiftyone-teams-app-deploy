@@ -1,6 +1,248 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "properties": {
+    "activitySettings": {
+      "description": "FiftyOne Activity Core workers. Activity Core is the basis for activity\ntracking across the app — annotation metrics, the Audit Log, the Jobs\npages, and more. The workers read the queue populated by the producers and\nwrite the activity_* collections.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Controls whether the Activity Core worker Deployments are rendered,\nwhether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit, and whether `teams-app`\nshows the surfaces that read the result (`VFF_WF_ACTIVITY`). The\npre-release Metrics tab (`VFF_WF_METRIC`) is not included; opt in through\n`teamsAppSettings.env`.\nEnable `fiftyoneMq.enabled` alongside this; the chart fails the render if\nonly one of the two is on.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "image": {
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Worker image pull policy. [Reference][image-pull-policy].",
+              "title": "pullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "voxel51/fiftyone-activity",
+              "description": "Worker image.",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "",
+              "description": "Worker image tag. Defaults to the chart `appVersion`.",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "mongo": {
+          "properties": {
+            "database": {
+              "default": "",
+              "description": "Database holding the activity_* collections. When empty, they are\nco-located in the per-deployment FiftyOne database. Set a name to use a\ndedicated database.",
+              "title": "database",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "mongo",
+          "type": "object"
+        },
+        "orgId": {
+          "default": "",
+          "description": "Organization that the deployment-wide rollups are attributed to. This is\nthe organization's `id` FIELD (its slug), not the Mongo `_id`.\nLeave empty: a single-org deployment is discovered automatically. Set it\nonly when the deployment holds several organizations, where the\ndeployment-wide counts cannot be attributed to one of them — the workers\nlog which one to name.",
+          "title": "orgId",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Resources for the worker containers. [Reference][resources].",
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "500m",
+                  "title": "cpu",
+                  "type": "string"
+                },
+                "memory": {
+                  "default": "512Mi",
+                  "title": "memory",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "title": "cpu",
+                  "type": "string"
+                },
+                "memory": {
+                  "default": "128Mi",
+                  "title": "memory",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "snapshotIntervalMs": {
+          "default": "",
+          "description": "Snapshot interval in milliseconds. Defaults to hourly, matching the\nbucket the state metrics roll up by.",
+          "title": "snapshotIntervalMs",
+          "type": "string"
+        },
+        "workers": {
+          "description": "One Deployment is rendered per entry.",
+          "properties": {
+            "ingest": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the ingest worker.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "replicaCount": {
+                  "default": 2,
+                  "description": "Number of ingest worker replicas.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "ingest",
+              "type": "object"
+            },
+            "prune": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the prune worker, which enforces the event store\nsize cap. Without it only the time-based TTL applies.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "enabled": {
+                  "default": true,
+                  "description": "Controls whether the prune worker Deployment is rendered.\nOn by default now that the image pin carries the entrypoint: without\nthis worker the storage size cap is never enforced and only the\ntime-based TTL bounds the event store.",
+                  "title": "enabled",
+                  "type": "boolean"
+                },
+                "recreate": {
+                  "default": true,
+                  "description": "Use the `Recreate` strategy. The prune worker owns a repeatable\nschedule, so only one replica may reconcile it.",
+                  "title": "recreate",
+                  "type": "boolean"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "description": "Number of prune worker replicas. Keep at 1.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "prune",
+              "type": "object"
+            },
+            "rollup": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the rollup worker.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "recreate": {
+                  "default": true,
+                  "description": "Use the `Recreate` strategy. The rollup worker owns a repeatable\nschedule, so only one replica may reconcile it.",
+                  "title": "recreate",
+                  "type": "boolean"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "description": "Number of rollup worker replicas. Keep at 1.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "rollup",
+              "type": "object"
+            },
+            "snapshot": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the snapshot worker.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "recreate": {
+                  "default": true,
+                  "description": "Use the `Recreate` strategy. The snapshot worker owns a repeatable\nschedule, and two replicas would double-count a bucket.",
+                  "title": "recreate",
+                  "type": "boolean"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "description": "Number of snapshot worker replicas. Keep at 1.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "snapshot",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "workers",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "activitySettings",
+      "type": "object"
+    },
     "apiSettings": {
       "description": "yaml-language-server: $schema=values.schema.json\nFiftyOne Enterprise API (`teams-api`)",
       "properties": {
@@ -2637,6 +2879,111 @@
       },
       "title": "fiftyoneLicenseSecrets",
       "type": "array"
+    },
+    "fiftyoneMq": {
+      "description": "In-cluster queue for fiftyone-mq. Renders a Redis Deployment and Service, and\nsets `FIFTYONE_MQ_REDIS_URL` on the workloads that publish to the queue.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`\nenvironment variable are rendered.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "redis": {
+          "properties": {
+            "containerSecurityContext": {
+              "description": "Security context for the Redis container. [Reference][container-security-context].",
+              "required": [],
+              "title": "containerSecurityContext",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Controls whether the bundled Redis Deployment and Service are\nrendered. Set to `false` when using `fiftyoneMq.redis.external.url`.",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "external": {
+              "properties": {
+                "url": {
+                  "default": "",
+                  "description": "URL of an external Redis. When set, the bundled Redis is not\nrendered and the workloads are wired to this URL instead. The instance\nmust use the `noeviction` maxmemory policy. An evicting policy drops\nqueued jobs.",
+                  "title": "url",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "external",
+              "type": "object"
+            },
+            "image": {
+              "default": "redis:7-alpine",
+              "description": "Redis image for the bundled queue backend.",
+              "title": "image",
+              "type": "string"
+            },
+            "maxmemory": {
+              "default": "200mb",
+              "description": "Memory limit for the bundled Redis.",
+              "title": "maxmemory",
+              "type": "string"
+            },
+            "persistence": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "description": "Whether to provision a `PersistentVolumeClaim` for the bundled queue\nRedis `/data` directory, where its append-only file (AOF) lives.\nDefaults to `true` to prevent queued activities from being lost on pod\nreschedules. Disabling it writes the AOF to an `emptyDir`, which\nsurvives a container restart but is lost on a pod reschedule (node\ndrain, eviction, `kubectl delete pod`, chart upgrade). Requires a\ndefault `StorageClass`, or set `storageClass` / `existingClaim`.\n\nWhen enabling this alongside a non-empty\n`fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's\nredis GID so the mounted `/data` stays writable.\n\nThis bounds one loss window rather than making the pipeline durable end\nto end: the in-process emit buffer is cleared when an enqueue fails,\nand enqueuing is not atomic with the domain change the event describes.\nTracked as `FOEPD-4411`.",
+                  "title": "enabled",
+                  "type": "boolean"
+                },
+                "existingClaim": {
+                  "default": "",
+                  "description": "Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to\nbind the queue Redis to. When set, `size` and `storageClass` are\nignored. Has no effect when `persistence.enabled` is `false`.",
+                  "title": "existingClaim",
+                  "type": "string"
+                },
+                "size": {
+                  "default": "1Gi",
+                  "description": "Storage size for the queue Redis `PersistentVolumeClaim`. The AOF\nholds in-flight jobs rather than event history, so this only needs to\ncover the queue's peak backlog.",
+                  "title": "size",
+                  "type": "string"
+                },
+                "storageClass": {
+                  "default": "",
+                  "description": "`StorageClass` name for the queue Redis `PersistentVolumeClaim`.\nLeave unset to use the cluster's default `StorageClass`.",
+                  "required": [],
+                  "title": "storageClass",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [],
+              "title": "persistence",
+              "type": "object"
+            },
+            "podSecurityContext": {
+              "description": "Security context for the Redis pod. [Reference][security-context].",
+              "required": [],
+              "title": "podSecurityContext",
+              "type": "object"
+            },
+            "resources": {
+              "description": "Resources for the Redis container. [Reference][resources].",
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "redis",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "fiftyoneMq",
+      "type": "object"
     },
     "global": {
       "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
