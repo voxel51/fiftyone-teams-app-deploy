@@ -302,13 +302,37 @@ docker compose \
   up -d
 ```
 
-This will start the following containers:
+This will start the following containers. As a sanity check, you should see
+each of them in `docker compose ps` — here is what each one does:
 
-- `fiftyone-app` (embedded API) → default port `5151`
-- `fiftyone-teams-app` (UI) → default port `3000`
-- `fiftyone-teams-api` (API) → default port `8000`
-- `fiftyone-teams-cas` (Auth) → default port `3030`
-- `fiftyone-teams-do-n` where n is the number of VPUs your in deployment
+<!-- markdownlint-disable line-length -->
+| Container | Default port | What it does |
+| --------- | ------------ | ------------ |
+| `fiftyone-app` | `5151` | The core App server — the same visualization engine as open source FiftyOne's `launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, which is why the reverse proxy in Step 6 needs no route to it. |
+| `teams-app` | `3000` | The web UI your users browse — dataset listing, settings, runs, and history pages — which embeds the core App by proxying `fiftyone-app`. |
+| `teams-api` | `8000` | The control plane — users, roles, dataset permissions, plugin management, delegated operation orchestration, and the MongoDB proxy that SDK connections tunnel through (`/_pymongo`, `/graphql/v1`, `/file`, `/health`). |
+| `teams-cas` | `3030` (container port `3000`) | The Central Authentication Service — every login flows through it. Also handles license validation and serves the super admin console at `/cas`. |
+| `teams-plugins` | — | A dedicated instance of the App server for executing plugin operators in isolation, so heavy plugins cannot impact the main App. |
+| `teams-do-n` | — | Delegated operator workers, where `n` is the number of VPUs in your deployment — they poll the queue and run background jobs (embeddings, exports, brain runs). |
+| `*-telemetry`, `telemetry-redis` | — | Telemetry sidecars paired with each service, plus a local Redis, collecting deployment metrics and logs. |
+<!-- markdownlint-enable line-length -->
+
+How the services fit together:
+
+```mermaid
+flowchart LR
+    browser["Browser"] -->|"/"| proxy["Reverse proxy"]
+    sdk["Python SDK"] -->|"/_pymongo, /graphql/v1"| proxy
+    proxy -->|"/"| teamsapp["teams-app :3000"]
+    proxy -->|"/cas"| cas["teams-cas :3000"]
+    proxy -->|"API paths"| api["teams-api :8000"]
+    teamsapp -->|"internal proxy"| app["fiftyone-app :5151"]
+    cas --> mongo[("MongoDB")]
+    api --> mongo
+    app --> mongo
+    do["teams-do workers"] --> mongo
+    plugins["teams-plugins"] --> mongo
+```
 
 You can ensure that all your containers are up and healthy through:
 
