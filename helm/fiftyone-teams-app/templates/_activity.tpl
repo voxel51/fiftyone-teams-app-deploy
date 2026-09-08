@@ -71,32 +71,18 @@ URL is only how the queue is reached once enabled.
 {{- end }}
 
 {{/*
-Emit the `VFF_WF_ACTIVITY` env entry for the `teams-app` container.
-Renders empty when Activity Core is disabled.
+The UI flags are NOT rendered by the chart. `VFF_WF_ACTIVITY` (workflow
+Activity tab + label History panel) and `VFF_WF_METRIC` (pre-release Metrics
+tab) are internal debug surfaces: every deployment defaults to off, and an
+environment that wants one opts in through `teamsAppSettings.env`.
 
-`activity.enabled-env` gates *capture*; this gates the surfaces that display
-what was captured. They are separate layers, but they are not independently
-useful: a deployment that set `activitySettings.enabled=true` collected and
-rolled up events with no way to view them, because every viewing surface —
-the workflow Activity tab and the label History panel — sits behind this
-frontend flag. Nothing distinguished "no activity yet" from "no UI wired
-up". So enabling capture now graduates the surfaces that read it.
-
-`VFF_WF_METRIC` is deliberately NOT rendered here. It gates the pre-release
-Metrics tab, which stays a per-environment opt-in — set it through
-`teamsAppSettings.env` if you want it. Coupling it to this flag would ship an
-unreleased surface to every deployment that turns on capture.
-
-Rendered before the `teamsAppSettings.env` passthrough so that an explicit
-entry there still wins: later duplicates take precedence in a container's
-env list, which leaves a deployment able to force the flag off.
+`activity.enabled-env` above gates *capture* only. Coupling the surfaces to
+it was tried and reverted: the only way to force a coupled flag back off was
+a second `teamsAppSettings.env` entry, and a duplicate env name is not a
+supported override — the API server warns under client-side apply that the
+later entry "may be dropped when using apply" and rejects the Deployment
+under server-side apply.
 */}}
-{{- define "activity.ui-flags-env" -}}
-{{- if .Values.activitySettings.enabled }}
-- name: VFF_WF_ACTIVITY
-  value: "true"
-{{- end }}
-{{- end }}
 
 {{/*
 Emit a `FIFTYONE_ACTIVITY_MONGO_DB` env entry for a main workload container.

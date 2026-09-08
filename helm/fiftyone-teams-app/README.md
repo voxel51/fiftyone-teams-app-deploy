@@ -832,7 +832,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| activitySettings.enabled | bool | `false` | Controls whether the Activity Core worker Deployments are rendered, whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit, and whether `teams-app` shows the surfaces that read the result (`VFF_WF_ACTIVITY`). The pre-release Metrics tab (`VFF_WF_METRIC`) is not included; opt in through `teamsAppSettings.env`. Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
+| activitySettings.enabled | bool | `false` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. The UI surfaces that read the result are separate, default-off opt-ins through `teamsAppSettings.env` (`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel, `VFF_WF_METRIC` for the pre-release Metrics tab). Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
 | activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |

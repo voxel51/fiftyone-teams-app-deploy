@@ -137,26 +137,22 @@ request.
 
 ## Viewing the data
 
-Enabling Activity Core also enables the surfaces that display it. The
-chart sets `VFF_WF_ACTIVITY` on `teams-app`, which turns on the workflow
-Activity tab and the label History panel.
-
-To keep the flag off while still collecting, set it explicitly:
-
-```yaml
-teamsAppSettings:
-  env:
-    VFF_WF_ACTIVITY: false
-```
-
-The pre-release **Metrics** tab is separate and stays off. It is gated by
-`VFF_WF_METRIC`, which the chart never sets — opt in per environment:
+Enabling Activity Core turns on collection only. The surfaces that
+display the data are internal debug views, off by default in every
+deployment, and the chart never sets their flags. Opt in per environment
+through `teamsAppSettings.env`:
 
 ```yaml
 teamsAppSettings:
   env:
+    # workflow Activity tab + label History panel
+    VFF_WF_ACTIVITY: true
+    # pre-release Metrics tab
     VFF_WF_METRIC: true
 ```
+
+Set only the ones you want; each flag is independent of the other and of
+`activitySettings.enabled`.
 
 ## Resource impact
 
