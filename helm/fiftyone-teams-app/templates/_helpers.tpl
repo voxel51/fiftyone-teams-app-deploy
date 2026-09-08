@@ -625,7 +625,6 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- else }}
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
 {{- end }}
-{{- include "activity.ui-flags-env" . }}
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
 {{- range $key, $val := .Values.teamsAppSettings.env }}

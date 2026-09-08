@@ -6,7 +6,7 @@
       "properties": {
         "enabled": {
           "default": false,
-          "description": "Controls whether the Activity Core worker Deployments are rendered,\nwhether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit, and whether `teams-app`\nshows the surfaces that read the result (`VFF_WF_ACTIVITY`). The\npre-release Metrics tab (`VFF_WF_METRIC`) is not included; opt in through\n`teamsAppSettings.env`.\nEnable `fiftyoneMq.enabled` alongside this; the chart fails the render if\nonly one of the two is on.",
+          "description": "Controls whether the Activity Core worker Deployments are rendered and\nwhether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit. The UI surfaces that read\nthe result are separate, default-off opt-ins through `teamsAppSettings.env`\n(`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel,\n`VFF_WF_METRIC` for the pre-release Metrics tab).\nEnable `fiftyoneMq.enabled` alongside this; the chart fails the render if\nonly one of the two is on.",
           "title": "enabled",
           "type": "boolean"
         },
