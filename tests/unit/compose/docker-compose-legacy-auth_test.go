@@ -25,6 +25,7 @@ const (
 )
 
 var legacyAuthComposeFile = filepath.Join(dockerLegacyAuthDir, "compose.yaml")
+var legacyAuthComposeActivityFile = filepath.Join(dockerLegacyAuthDir, "compose.activity.yaml")
 var legacyAuthComposePluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.plugins.yaml")
 var legacyAuthComposeDedicatedPluginsFile = filepath.Join(dockerLegacyAuthDir, "compose.dedicated-plugins.yaml")
 var legacyAuthComposeDelegatedOperationsFile = filepath.Join(dockerLegacyAuthDir, "compose.delegated-operators.yaml")
@@ -150,6 +151,61 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServicesNames() {
 				"telemetry-redis",
 			},
 		},
+		// Activity Analytics is opt-in. The two services only render when
+		// compose.activity.yaml is layered onto a base file.
+		{
+			"composeActivity",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composePluginsActivity",
+			[]string{legacyAuthComposePluginsFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"telemetry-redis",
+			},
+		},
+		{
+			"composeDedicatedPluginsActivity",
+			[]string{legacyAuthComposeDedicatedPluginsFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			nil,
+			[]string{
+				"activity-worker",
+				"fiftyone-app",
+				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
+				"teams-api",
+				"teams-api-telemetry",
+				"teams-app",
+				"teams-cas",
+				"teams-plugins",
+				"teams-plugins-telemetry",
+				"telemetry-redis",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -193,6 +249,20 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 		envFiles    []string // file paths to ".env" files with additional environment variable data
 		expected    string
 	}{
+		{
+			"activityFiftyoneMqRedis",
+			"fiftyone-mq-redis",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			"redis:7",
+		},
+		{
+			"activityWorker",
+			"activity-worker",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			"voxel51/fiftyone-activity:v2.24.0",
+		},
 		{
 			"defaultFiftyoneApp",
 			"fiftyone-app",
@@ -317,6 +387,22 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 		expected    []string
 	}{
 		{
+			"activityWorker",
+			"activity-worker",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			[]string{
+				"FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES=10737418240",
+				"FIFTYONE_ACTIVITY_MONGO_DB=fiftyone",
+				"FIFTYONE_ACTIVITY_MONGO_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_ACTIVITY_RETENTION_DAYS=365",
+				"FIFTYONE_DATABASE_NAME=fiftyone",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
+			},
+		},
+		{
 			"defaultFiftyoneApp",
 			"fiftyone-app",
 			[]string{legacyAuthComposeFile},
@@ -335,6 +421,42 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
+				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+			},
+		},
+		// FIFTYONE_ACTIVITY_ENABLED is the gate, and adding
+		// compose.activity.yaml to the -f set is what flips it. The paired
+		// default* case above pins the other half: a base stack with no
+		// overlay resolves to false, so a plain `docker compose up` cannot
+		// reach a queue hostname that does not exist. The overlay stanzas
+		// carry no image/extends, so they must annotate these services
+		// without creating them -- TestServicesNames pins that.
+		{
+			"activityOverlayFiftyoneApp",
+			"fiftyone-app",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			[]string{
+				"API_URL=http://teams-api:8000",
+				"FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE=true",
+				"FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE=true",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_DATABASE_ADMIN=false",
+				"FIFTYONE_DATABASE_NAME=fiftyone",
+				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"FIFTYONE_DEFAULT_APP_ADDRESS=0.0.0.0",
+				"FIFTYONE_DEFAULT_APP_PORT=5151",
+				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
+				"FIFTYONE_INTERNAL_SERVICE=true",
+				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
+				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
@@ -355,6 +477,35 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
+				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
+				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"GRAPHQL_DEFAULT_LIMIT=10",
+				"LOGGING_LEVEL=INFO",
+				"MONGO_DEFAULT_DB=fiftyone",
+			},
+		},
+		{
+			"activityOverlayTeamsApi",
+			"teams-api",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			[]string{
+				"API_EXTERNAL_URL=https://example-api.fiftyone.ai",
+				"CAS_BASE_URL=http://teams-cas:3000/cas/api",
+				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
+				"FIFTYONE_BUILTIN_SERVICES_PATH=/opt/builtin-services/builtin_services.yaml",
+				"FIFTYONE_DATABASE_NAME=fiftyone",
+				"FIFTYONE_DATABASE_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"FIFTYONE_ENCRYPTION_KEY=test-fiftyone-encryption-key",
+				"FIFTYONE_ENV=production",
+				"FIFTYONE_INTERNAL_SERVICE=true",
+				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"GRAPHQL_DEFAULT_LIMIT=10",
@@ -422,6 +573,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
@@ -442,6 +596,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"GRAPHQL_DEFAULT_LIMIT=10",
@@ -510,6 +667,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
@@ -530,6 +690,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
@@ -598,6 +761,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
@@ -618,6 +784,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
@@ -686,6 +855,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
 		},
@@ -703,6 +875,9 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
+				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ORG_ID=",
+				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 				"TELEMETRY_SOCKET=/tmp/telemetry/agent.sock",
 			},
@@ -862,6 +1037,20 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceRestart() {
 		envFiles    []string // file paths to ".env" files with additional environment variable data
 		expected    string
 	}{
+		{
+			"activityFiftyoneMqRedis",
+			"fiftyone-mq-redis",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			types.RestartPolicyAlways,
+		},
+		{
+			"activityWorker",
+			"activity-worker",
+			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
+			s.dotEnvFiles,
+			types.RestartPolicyAlways,
+		},
 		{
 			"defaultFiftyoneApp",
 			"fiftyone-app",
