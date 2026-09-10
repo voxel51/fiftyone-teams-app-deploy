@@ -12,12 +12,12 @@ activitySettings:
   # `VFF_WF_METRIC` for the pre-release Metrics tab).
   # Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if
   # only one of the two is on.
-  enabled: false
+  enabled: true
   image:
     # -- Worker image.
-    repository: voxel51/fiftyone-activity
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- Worker image tag. Defaults to the chart `appVersion`.
-    tag: ""
+    tag: "v2.25.0rc3"
     # -- Worker image pull policy. [Reference][image-pull-policy].
     pullPolicy: IfNotPresent
   mongo:
@@ -1249,7 +1249,7 @@ fiftyoneLicenseSecrets:
 fiftyoneMq:
   # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
   # environment variable are rendered.
-  enabled: false
+  enabled: true
   redis:
     # -- Controls whether the bundled Redis Deployment and Service are
     # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.
@@ -1637,6 +1637,8 @@ teamsAppSettings:
     # When `true`, uses the https protocol.
     # When `false`, uses the http protocol.
     APP_USE_HTTPS: true
+    # Ephem-only: expose the workflow Metrics tab for rollup testing.
+    VFF_WF_METRIC: "true"
     # @schema
     # type: ["string", "boolean"]
     # @schema
