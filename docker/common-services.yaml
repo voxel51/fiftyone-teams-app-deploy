@@ -1,7 +1,7 @@
 ---
 services:
   fiftyone-app-common:
-    image: voxel51/fiftyone-app:v2.24.1
+    image: voxel51/fiftyone-app:v2.25.0
     environment:
       API_URL: ${API_URL}
       FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE: ${FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE}
@@ -17,6 +17,19 @@ services:
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_SIGNED_URL_EXPIRATION: ${FIFTYONE_SIGNED_URL_EXPIRATION:-24}
+      # Activity Analytics is opt-in and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # compose.activity.yaml flips it to true; set it in .env to arm
+      # services that overlay does not reach (teams-plugins, teams-do).
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
+      # Activity Analytics: where operator/annotation emits enqueue events.
+      # Emit is fire-and-forget; unset = those events simply don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
@@ -33,7 +46,7 @@ services:
     restart: always
 
   teams-api-common:
-    image: voxel51/fiftyone-teams-api:v2.24.1
+    image: voxel51/fiftyone-teams-api:v2.25.0
     environment:
       API_EXTERNAL_URL: ${FIFTYONE_API_URI}
       CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
@@ -45,6 +58,19 @@ services:
       FIFTYONE_ENV: ${FIFTYONE_ENV}
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_LOGGING_FORMAT: ${FIFTYONE_LOGGING_FORMAT:-text}
+      # Activity Analytics is opt-in and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # compose.activity.yaml flips it to true; set it in .env to arm
+      # services that overlay does not reach (teams-plugins, teams-do).
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
+      # Activity Analytics: teams-api hosts the domain-event bridge, which
+      # enqueues activity events here. Unset = bridged events are dropped.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_SERVICE_POD_READY_TIMEOUT_S: ${FIFTYONE_SERVICE_POD_READY_TIMEOUT_S:-1800}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
@@ -74,13 +100,13 @@ services:
         read_only: true
 
   teams-app-common:
-    image: voxel51/fiftyone-teams-app:v2.24.1
+    image: voxel51/fiftyone-teams-app:v2.25.0
     environment:
       API_URL: ${API_URL}
       APP_USE_HTTPS: ${APP_USE_HTTPS:-true}
       FIFTYONE_API_URI: ${FIFTYONE_API_URI:-"Please contact your Admin for an API URI"}
       FIFTYONE_APP_ALLOW_MEDIA_EXPORT: ${FIFTYONE_APP_ALLOW_MEDIA_EXPORT:-true}
-      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.24.1
+      FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.25.0
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_SERVER_ADDRESS: ""
       FIFTYONE_SERVER_PATH_PREFIX: /api/proxy/fiftyone-teams
@@ -109,7 +135,7 @@ services:
     restart: always
 
   teams-cas-common:
-    image: voxel51/fiftyone-teams-cas:v2.24.1
+    image: voxel51/fiftyone-teams-cas:v2.25.0
     environment:
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
@@ -144,7 +170,7 @@ services:
         read_only: true
 
   teams-plugins-common:
-    image: voxel51/fiftyone-app-torch:v2.24.1
+    image: voxel51/fiftyone-app-torch:v2.25.0
     environment:
       API_URL: ${API_URL}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
@@ -158,6 +184,21 @@ services:
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Activity Analytics is opt-in and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # compose.activity.yaml flips it to true; set it in .env to arm
+      # services that overlay does not reach (teams-plugins, teams-do).
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
+      # Activity Analytics: under the dedicated-plugins layering the plugins
+      # (including workflows, the annotation/review event producer) execute
+      # here rather than in fiftyone-app, so this service has to reach the
+      # queue too. Emit is fire-and-forget; unset = those events don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
@@ -171,8 +212,74 @@ services:
       # no_proxy: ${NO_PROXY_LIST}
     restart: always
 
+  # Redis-backed queue (fiftyone.mq) for Activity Analytics events.
+  # Emitting services enqueue here. The activity worker consumes.
+  # The worker writes the activity_* collections in the FiftyOne database
+  # and maintains the rollups behind the Audit Log and Jobs pages.
+  # The queue is persisted with AOF onto the fiftyone-mq-redis-data volume,
+  # so restarting the container replays queued jobs instead of losing them.
+  # See docker/docs/configuring-activity-analytics.md.
+  fiftyone-mq-redis-common:
+    image: redis:7
+    # AOF (`--appendonly yes`) with `--appendfsync everysec` bounds queue
+    # loss on a restart to roughly one second of writes.
+    # RDB snapshots (what telemetry-redis uses) would lose up to a whole
+    # snapshot interval, which is the wrong trade for a work queue.
+    #
+    # The queue requires `maxmemory-policy noeviction`.
+    # An evicting policy (such as telemetry-redis's allkeys-lru) silently
+    # drops queued jobs under memory pressure.
+    # With noeviction, writes fail loudly and the best-effort emit path
+    # degrades to dropped events.
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+      - --dir
+      - /data
+      - --maxmemory
+      - ${FIFTYONE_MQ_REDIS_MAXMEMORY:-200mb}
+      - --maxmemory-policy
+      - noeviction # required for queue durability
+    restart: always
+    volumes:
+      - fiftyone-mq-redis-data:/data
+
+  # One container runs all four activity workers (ingest, rollup, snapshot,
+  # prune) via the combined entrypoint.
+  # Keep this service at one replica.
+  # The rollup, snapshot, and prune schedulers are single-flight.
+  # See docker/docs/configuring-activity-analytics.md.
+  activity-worker-common:
+    # Published from the fiftyone-activity repo with each Enterprise release.
+    # Keep the tag in lockstep with the other service images.
+    image: voxel51/fiftyone-activity:v2.24.0
+    command: ["fiftyone-activity-worker"]
+    environment:
+      # This service only exists under compose.activity.yaml, so the
+      # default is true here: the rollup and snapshot workers emit
+      # derived events through the same flag-gated path they consume.
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_MONGO_URI: ${FIFTYONE_DATABASE_URI}
+      # Co-locate the activity_* collections in the deployment's own
+      # FiftyOne database rather than a fixed shared name.
+      FIFTYONE_ACTIVITY_MONGO_DB: ${FIFTYONE_DATABASE_NAME}
+      # The snapshot worker reads the datasets database.
+      # It stamps its org onto the snapshot events. Rollups are tenant-scoped.
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
+      # Raw events are kept 365 days by default. Rollups are kept indefinitely.
+      # The size cap (10 GiB default) prunes oldest-first.
+      # Override both in .env.
+      FIFTYONE_ACTIVITY_RETENTION_DAYS: ${FIFTYONE_ACTIVITY_RETENTION_DAYS:-365}
+      FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES: ${FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES:-10737418240}
+    restart: always
+
   teams-do-common:
-    image: voxel51/fiftyone-teams-cv-full:v2.24.1
+    image: voxel51/fiftyone-teams-cv-full:v2.25.0
     # Telemetry default-on requires teams-do to share its PID namespace
     # with a single sidecar (compose's `pid: "service:<name>"` only joins
     # one replica). Force replicas=1 to keep the 1:1 pairing deterministic.
@@ -190,6 +297,20 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Activity Analytics is opt-in and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # compose.activity.yaml flips it to true; set it in .env to arm
+      # services that overlay does not reach (teams-plugins, teams-do).
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
+      # Activity Analytics: delegated operator runs execute here, so the
+      # `op.executed` and `samples.modified` seams enqueue from this service.
+      # Emit is fire-and-forget; unset = those events simply don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
     restart: always
@@ -226,7 +347,7 @@ services:
   # target's PID namespace so the sidecar can read /proc/<pid>/fd/1 and
   # psutil can see the target's process.
   fiftyone-app-telemetry-common:
-    image: voxel51/telemetry-sidecar:v2.24.1
+    image: voxel51/telemetry-sidecar:v2.25.0
     pid: "service:fiftyone-app"
     # Matches the workload image's USER 1000:1000 so the kernel's
     # ptrace_may_access() check on /proc/<workload-pid>/fd/1 reads passes via the
@@ -253,7 +374,7 @@ services:
     restart: always
 
   teams-api-telemetry-common:
-    image: voxel51/telemetry-sidecar:v2.24.1
+    image: voxel51/telemetry-sidecar:v2.25.0
     pid: "service:teams-api"
     user: "1000:1000"
     cap_drop:
@@ -277,7 +398,7 @@ services:
     restart: always
 
   teams-plugins-telemetry-common:
-    image: voxel51/telemetry-sidecar:v2.24.1
+    image: voxel51/telemetry-sidecar:v2.25.0
     pid: "service:teams-plugins"
     user: "1000:1000"
     cap_drop:
@@ -301,7 +422,7 @@ services:
     restart: always
 
   teams-do-telemetry-common:
-    image: voxel51/telemetry-sidecar:v2.24.1
+    image: voxel51/telemetry-sidecar:v2.25.0
     pid: "service:teams-do"
     user: "1000:1000"
     cap_drop:

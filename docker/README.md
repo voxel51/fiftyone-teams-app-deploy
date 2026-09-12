@@ -68,6 +68,7 @@ regarding FiftyOne Enterprise.
   - [Backup And Recovery](#backup-and-recovery)
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Telemetry](#telemetry)
+  - [Activity Analytics](#activity-analytics)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -259,7 +260,7 @@ You can override the default image used by any service in
 ```yaml
 services:
   fiftyone-app:
-    image: voxel51/fiftyone-app-torch:v2.24.1
+    image: voxel51/fiftyone-app-torch:v2.25.0
 ```
 
 > [!NOTE]
@@ -630,6 +631,28 @@ Please refer to the
 [telemetry configuration documentation](./docs/configuring-telemetry.md)
 for full details.
 
+### Activity Analytics
+
+Activity Analytics is opt-in. FiftyOne Enterprise ships an activity
+worker and a queue Redis in the `compose.activity.yaml` overlay, which
+is not part of any base compose file.
+The Audit Log and Jobs pages in teams-app are built from the activity
+events those services record.
+
+Enable it by adding the overlay to your usual `-f` set:
+
+```shell
+docker compose \
+  -f compose.yaml \
+  -f compose.activity.yaml \
+  -f compose.override.yaml \
+  up -d
+```
+
+Please refer to the
+[Activity Analytics configuration documentation](./docs/configuring-activity-analytics.md)
+for full details.
+
 ### Snapshot Archival
 
 Since version v1.5, FiftyOne Enterprise supports
@@ -806,7 +829,7 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `FIFTYONE_APP_TERMS_URL`                     | Terms of Service URL used in App                                                                                                                                                                                                                                               | No                        |
 | `FIFTYONE_APP_PRIVACY_URL`                   | Privacy URL used in App                                                                                                                                                                                                                                                        | No                        |
 | `FIFTYONE_APP_IMPRINT_URL`                   | Imprint URL used in App                                                                                                                                                                                                                                                        | No                        |
-| `FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION` | The recommended fiftyone SDK version. This will be displayed in install modal (i.e. `pip install ... fiftyone==2.24.1`)                                                                                                                                                        | No                        |
+| `FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION` | The recommended fiftyone SDK version. This will be displayed in install modal (i.e. `pip install ... fiftyone==2.25.0`)                                                                                                                                                        | No                        |
 | `FIFTYONE_APP_THEME`                         | The default theme configuration for your FiftyOne Enterprise application as described [in our documentation](https://docs.voxel51.com/user_guide/config.html#configuring-the-app)                                                                                              | No                        |
 | `FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE`     | Controls whether Query Performance mode is enabled by default for every dataset for the application. Set to false to set default mode to off.                                                                                                                                  | No                        |
 | `FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE`      | Controls whether Query Performance mode is enabled for the application. Set to false to disable Query Performance mode for entire application.                                                                                                                                 | No                        |

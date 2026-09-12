@@ -56,6 +56,15 @@ Create a merged list of environment variables for delegated-operator templates
 - name: TELEMETRY_SOCKET
   value: /tmp/telemetry/agent.sock
 {{- end }}
+{{- /* Queue + activity env, independent of telemetry (see the matching
+note in delegated-operator-deployments.env-vars-list): job-dispatched
+delegated operators are activity producers too. */}}
+{{- if .ctx }}
+{{- include "fiftyone-mq.redis-url-env" .ctx }}
+{{- include "activity.enabled-env" .ctx }}
+{{- include "activity.org-id-env" .ctx }}
+{{- include "activity.mongo-db-env" .ctx }}
+{{- end }}
 {{- range $key, $val := .env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

@@ -19,7 +19,7 @@
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 services:
   teams-do-gpu:
-    image: voxel51/fiftyone-teams-cv-full:v2.24.1
+    image: voxel51/fiftyone-teams-cv-full:v2.25.0
     profiles: ["gpu"]
     shm_size: "8g"
     command: >
@@ -33,6 +33,15 @@ services:
       FIFTYONE_INTERNAL_SERVICE: "true"
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # The activity gate. compose.activity.yaml cannot reach this
+      # service (it is not in every -f set, so declaring it there
+      # would create the container), so arm it from .env instead.
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
+      # Activity Analytics: delegated operator runs execute here, so the
+      # `op.executed` and `samples.modified` seams enqueue from this service.
+      # Emit is fire-and-forget; unset = those events simply don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
       NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
@@ -51,7 +60,7 @@ services:
     restart: always
 
   teams-do-gpu-telemetry:
-    image: voxel51/telemetry-sidecar:v2.24.1
+    image: voxel51/telemetry-sidecar:v2.25.0
     pid: "service:teams-do-gpu"
     profiles: ["gpu"]
     user: "1000:1000"

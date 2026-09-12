@@ -480,7 +480,7 @@ spec:
   shareProcessNamespace: true
   initContainers:
     - name: telemetry-sidecar
-      image: voxel51/telemetry-sidecar:v2.24.1
+      image: voxel51/telemetry-sidecar:v2.25.0
       restartPolicy: Always
       securityContext:
         # The sidecar image runs as root (SYS_PTRACE +
@@ -641,7 +641,7 @@ spec:
       shareProcessNamespace: true
       initContainers:
       - name: telemetry-sidecar
-        image: voxel51/telemetry-sidecar:v2.24.1
+        image: voxel51/telemetry-sidecar:v2.25.0
         restartPolicy: Always
         securityContext:
           # The sidecar image runs as root (SYS_PTRACE +
