@@ -3759,7 +3759,7 @@
             },
             "mongodbConnectionString": {
               "default": "",
-              "description": "MongoDB Connection String. [Reference][mongodb-connection-string].",
+              "description": "MongoDB Connection String. [Reference][mongodb-connection-string]. TLS is recommended when your MongoDB endpoint supports it (append `tls=true`; Atlas `mongodb+srv://` connections use TLS by default).",
               "title": "mongodbConnectionString",
               "type": "string"
             }
