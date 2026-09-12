@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.24.1](https://img.shields.io/badge/Version-2.24.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.24.1](https://img.shields.io/badge/AppVersion-v2.24.1-informational?style=flat-square)
+![Version: 2.25.0](https://img.shields.io/badge/Version-2.25.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.25.0](https://img.shields.io/badge/AppVersion-v2.25.0-informational?style=flat-square)
 
 FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
@@ -26,6 +26,33 @@ This page assumes general knowledge of FiftyOne Enterprise and how to use it.
 Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
+
+### Version 2.24+
+
+#### Activity Core
+
+Activity Core is the basis for activity tracking across FiftyOne Enterprise
+2.24+. It records operator runs, annotation and review decisions, and
+sample/label mutations, and rolls them up into the data that the features
+built on it read — annotation metrics, the Audit Log, the Jobs pages, and
+more to come.
+
+Activity Core is opt-in; nothing changes on upgrade unless you enable it.
+It requires two settings together — `activitySettings.enabled` (tells the
+existing workloads to emit, and adds the worker `Deployment`s) and
+`fiftyoneMq.enabled` (the queue Redis carrying events between them).
+Enabling one without the other fails the render.
+
+The bundled queue Redis claims a `PersistentVolumeClaim` by default, so a
+default `StorageClass` is required unless you disable persistence or supply
+your own claim.
+Please refer to
+
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v224-activity-core)
+  for what changes on upgrade, cluster requirements, and resource impact
+- [configuring activity core](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-activity-core.md)
+  for full details, including external Redis and multi-organization
+  deployments
 
 ### Version 2.23+
 
@@ -805,6 +832,26 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| activitySettings.enabled | bool | `false` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. The UI surfaces that read the result are separate, default-off opt-ins through `teamsAppSettings.env` (`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel, `VFF_WF_METRIC` for the pre-release Metrics tab). Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
+| activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
+| activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
+| activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |
+| activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
+| activitySettings.orgId | string | `""` | Organization that the deployment-wide rollups are attributed to. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Leave empty: a single-org deployment is discovered automatically. Set it only when the deployment holds several organizations, where the deployment-wide counts cannot be attributed to one of them — the workers log which one to name. |
+| activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
+| activitySettings.snapshotIntervalMs | string | `""` | Snapshot interval in milliseconds. Defaults to hourly, matching the bucket the state metrics roll up by. |
+| activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
+| activitySettings.workers.ingest.replicaCount | int | `2` | Number of ingest worker replicas. |
+| activitySettings.workers.prune.command | list | `["fiftyone-activity-prune-worker"]` | Entrypoint for the prune worker, which enforces the event store size cap. Without it only the time-based TTL applies. |
+| activitySettings.workers.prune.enabled | bool | `true` | Controls whether the prune worker Deployment is rendered. On by default now that the image pin carries the entrypoint: without this worker the storage size cap is never enforced and only the time-based TTL bounds the event store. |
+| activitySettings.workers.prune.recreate | bool | `true` | Use the `Recreate` strategy. The prune worker owns a repeatable schedule, so only one replica may reconcile it. |
+| activitySettings.workers.prune.replicaCount | int | `1` | Number of prune worker replicas. Keep at 1. |
+| activitySettings.workers.rollup.command | list | `["fiftyone-activity-rollup-worker"]` | Entrypoint for the rollup worker. |
+| activitySettings.workers.rollup.recreate | bool | `true` | Use the `Recreate` strategy. The rollup worker owns a repeatable schedule, so only one replica may reconcile it. |
+| activitySettings.workers.rollup.replicaCount | int | `1` | Number of rollup worker replicas. Keep at 1. |
+| activitySettings.workers.snapshot.command | list | `["fiftyone-activity-snapshot-worker"]` | Entrypoint for the snapshot worker. |
+| activitySettings.workers.snapshot.recreate | bool | `true` | Use the `Recreate` strategy. The snapshot worker owns a repeatable schedule, and two replicas would double-count a bucket. |
+| activitySettings.workers.snapshot.replicaCount | int | `1` | Number of snapshot worker replicas. Keep at 1. |
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
 | apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
 | apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api` to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators. |
@@ -1040,6 +1087,18 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorJobTemplates.template.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
+| fiftyoneMq.enabled | bool | `false` | Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL` environment variable are rendered. |
+| fiftyoneMq.redis.containerSecurityContext | object | `{}` | Security context for the Redis container. [Reference][container-security-context]. |
+| fiftyoneMq.redis.enabled | bool | `true` | Controls whether the bundled Redis Deployment and Service are rendered. Set to `false` when using `fiftyoneMq.redis.external.url`. |
+| fiftyoneMq.redis.external.url | string | `""` | URL of an external Redis. When set, the bundled Redis is not rendered and the workloads are wired to this URL instead. The instance must use the `noeviction` maxmemory policy. An evicting policy drops queued jobs. |
+| fiftyoneMq.redis.image | string | `"redis:7-alpine"` | Redis image for the bundled queue backend. |
+| fiftyoneMq.redis.maxmemory | string | `"200mb"` | Memory limit for the bundled Redis. |
+| fiftyoneMq.redis.persistence.enabled | bool | `true` | Whether to provision a `PersistentVolumeClaim` for the bundled queue Redis `/data` directory, where its append-only file (AOF) lives. Defaults to `true` to prevent queued activities from being lost on pod reschedules. Disabling it writes the AOF to an `emptyDir`, which survives a container restart but is lost on a pod reschedule (node drain, eviction, `kubectl delete pod`, chart upgrade). Requires a default `StorageClass`, or set `storageClass` / `existingClaim`.  When enabling this alongside a non-empty `fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's redis GID so the mounted `/data` stays writable.  This bounds one loss window rather than making the pipeline durable end to end: the in-process emit buffer is cleared when an enqueue fails, and enqueuing is not atomic with the domain change the event describes. Tracked as `FOEPD-4411`. |
+| fiftyoneMq.redis.persistence.existingClaim | string | `""` | Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to bind the queue Redis to. When set, `size` and `storageClass` are ignored. Has no effect when `persistence.enabled` is `false`. |
+| fiftyoneMq.redis.persistence.size | string | `"1Gi"` | Storage size for the queue Redis `PersistentVolumeClaim`. The AOF holds in-flight jobs rather than event history, so this only needs to cover the queue's peak backlog. |
+| fiftyoneMq.redis.persistence.storageClass | string | `""` | `StorageClass` name for the queue Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |
+| fiftyoneMq.redis.podSecurityContext | object | `{}` | Security context for the Redis pod. [Reference][security-context]. |
+| fiftyoneMq.redis.resources | object | `{}` | Resources for the Redis container. [Reference][resources]. |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
@@ -1134,7 +1193,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS | string | `"kubernetes"` | Deployment characteristics for the `teams-app`. `kubernetes`: Indicates the app is running in a Kubernetes environment. `docker`: Indicates the app is running in a Docker environment. `kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.24.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==2.24.1`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.25.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==2.25.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
