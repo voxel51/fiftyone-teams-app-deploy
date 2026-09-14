@@ -82,11 +82,11 @@ jobs:
           branch="cherry-pick/${RELEASE_BRANCH#release/}/pr-$PR_NUMBER"
           git checkout -b "$branch" "origin/$RELEASE_BRANCH"
 
-          mainline=""
+          mainline=()
           if [ "$(git rev-list --parents -n 1 "$sha" | wc -w)" -gt 2 ]; then
-            mainline="-m 1"
+            mainline=(-m 1)
           fi
-          if ! git cherry-pick -x $mainline "$sha"; then
+          if ! git cherry-pick -x "${mainline[@]}" "$sha"; then
             git cherry-pick --abort
             gh pr comment "$PR_NUMBER" --body "Cherry-pick to \`$RELEASE_BRANCH\` conflicts — pick it manually with \`git cherry-pick -x\`, or use the \`release-only-fix\` escape hatch if main has moved on."
             echo "::error::Cherry-pick of $sha onto $RELEASE_BRANCH conflicts."
