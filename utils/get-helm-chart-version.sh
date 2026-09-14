@@ -22,7 +22,7 @@ if [[ ${CURRENT_BRANCH} == "main" ]]; then
   version=$(gcloud artifacts docker images list \
     us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env \
     --include-tags \
-    --format="value(tags)" | grep -E '[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+    --format="value(tags)" | tr ';' '\n' | grep -Ex '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1)
 else
   # Look for the .*-<sha> in GAR.
   # Handles both x.x.x-sha-<sha> and x.x.x-rc-<sha> formats
