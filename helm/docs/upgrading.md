@@ -19,7 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
-    - [FiftyOne Enterprise v2.24+ Activity Core](#fiftyone-enterprise-v224-activity-core)
+    - [FiftyOne Enterprise v2.25+ Activity Core](#fiftyone-enterprise-v225-activity-core)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
@@ -119,9 +119,9 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
-#### FiftyOne Enterprise v2.24+ Activity Core
+#### FiftyOne Enterprise v2.25+ Activity Core
 
-FiftyOne Enterprise v2.24.0 introduces Activity Core: the basis for
+FiftyOne Enterprise v2.25.0 introduces Activity Core: the basis for
 activity tracking across the app. It records operator runs, annotation and
 review decisions, and sample and label mutations, and rolls those events up
 into the data that the features built on it read — annotation metrics, the
@@ -152,6 +152,10 @@ fiftyoneMq:
 
 Turning on activity without the queue fails the render rather than
 installing something that silently records nothing.
+
+The annotation Metrics tab is gated separately by the `VFF_WF_METRIC`
+app flag. Set it under `teamsAppSettings.env` alongside the pair above;
+see [Viewing the data](./configuring-activity-core.md#viewing-the-data).
 
 **Cluster requirements:**
 

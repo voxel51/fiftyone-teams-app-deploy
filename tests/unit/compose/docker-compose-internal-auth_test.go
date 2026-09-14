@@ -261,7 +261,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			"activity-worker",
 			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-activity:v2.24.0",
+			"voxel51/fiftyone-activity:v2.25.0",
 		},
 		{
 			"defaultFiftyoneApp",

@@ -15,7 +15,8 @@
 # Configuring Activity Analytics
 
 Activity Analytics records what happens in a deployment and aggregates it
-for the Audit Log and Jobs pages in the app.
+for the Audit Log and Jobs pages and the annotation Metrics tab in the
+app.
 
 **Activity Analytics is opt-in.**
 The `fiftyone-mq-redis` and `activity-worker` services live in the
@@ -130,6 +131,24 @@ Include the same `-f` set on every subsequent `docker compose` command
 for the deployment. Omitting `compose.activity.yaml` on a later
 `up -d` removes the two services from the project.
 
+## Enabling the Metrics tab
+
+The annotation Metrics tab in `teams-app` is gated by its own flag,
+`VFF_WF_METRIC`, and is off by default. It reads the rollups that
+`activity-worker` maintains, so enable Activity Analytics first, then
+set the flag on `teams-app` in your `compose.override.yaml`:
+
+```yaml
+services:
+  teams-app:
+    environment:
+      VFF_WF_METRIC: "true"
+```
+
+Bring the stack up again with your usual `-f` set. The flag is
+independent of `FIFTYONE_ACTIVITY_ENABLED`; with Activity Analytics off
+the tab renders but has no data to show.
+
 ## Environment variables
 
 Set these in your `.env` file. See the Activity Analytics section of
@@ -241,3 +260,6 @@ In the app, the Audit Log page populates as events are ingested and
 rolled up. An empty Audit Log with a healthy worker usually means
 `FIFTYONE_ACTIVITY_ORG_ID` does not match the organization you are
 viewing.
+The Metrics tab appears on annotation datasets once `VFF_WF_METRIC` is
+set on `teams-app`; see
+[Enabling the Metrics tab](#enabling-the-metrics-tab).
