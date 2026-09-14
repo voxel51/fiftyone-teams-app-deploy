@@ -70,8 +70,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -85,8 +87,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -100,8 +104,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -117,8 +123,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			nil,
 			[]string{
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -138,8 +146,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 			s.dotEnvFiles,
 			[]string{"gpu"},
 			[]string{
+				"activity-worker",
 				"fiftyone-app",
 				"fiftyone-app-telemetry",
+				"fiftyone-mq-redis",
 				"teams-api",
 				"teams-api-telemetry",
 				"teams-app",
@@ -151,8 +161,8 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServicesNames() {
 				"telemetry-redis",
 			},
 		},
-		// Activity Analytics is opt-in. The two services only render when
-		// compose.activity.yaml is layered onto a base file.
+		// compose.activity.yaml is a deprecated, empty shim. Layering it onto
+		// a base file must not change the service set.
 		{
 			"composeActivity",
 			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
@@ -261,7 +271,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			"activity-worker",
 			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-activity:v2.24.0",
+			"voxel51/fiftyone-activity:v2.25.0",
 		},
 		{
 			"defaultFiftyoneApp",
@@ -421,20 +431,16 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
-				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
 		},
-		// FIFTYONE_ACTIVITY_ENABLED is the gate, and adding
-		// compose.activity.yaml to the -f set is what flips it. The paired
-		// default* case above pins the other half: a base stack with no
-		// overlay resolves to false, so a plain `docker compose up` cannot
-		// reach a queue hostname that does not exist. The overlay stanzas
-		// carry no image/extends, so they must annotate these services
-		// without creating them -- TestServicesNames pins that.
+		// compose.activity.yaml is a deprecated, empty shim. Layering it onto
+		// a base file must leave the environment exactly as the base renders
+		// it, with activity on by default.
 		{
 			"activityOverlayFiftyoneApp",
 			"fiftyone-app",
@@ -477,7 +483,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
-				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
@@ -533,6 +539,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 				"FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS=docker",
+				"VFF_WF_METRIC=true",
 			},
 		},
 		{
@@ -575,7 +582,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
-				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
@@ -598,7 +605,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
-				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
@@ -629,6 +636,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 				"FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS=docker",
+				"VFF_WF_METRIC=true",
 			},
 		},
 		{
@@ -670,7 +678,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
-				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
@@ -693,7 +701,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ENV=production",
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_LOGGING_FORMAT=text",
-				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
@@ -725,6 +733,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151",
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 				"FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS=docker",
+				"VFF_WF_METRIC=true",
 			},
 		},
 		{
@@ -765,7 +774,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MEDIA_CACHE_APP_IMAGES=false",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
-				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
@@ -785,7 +794,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_INTERNAL_SERVICE=true",
 				"FIFTYONE_MEDIA_CACHE_SIZE_BYTES=-1",
 				"FIFTYONE_PLUGINS_DIR=/opt/plugins",
-				"FIFTYONE_ACTIVITY_ENABLED=false",
+				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
@@ -1279,6 +1288,9 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
 			types.Volumes{
+				"fiftyone-mq-redis-data": {
+					Name: "fiftyone-compose-test_fiftyone-mq-redis-data",
+				},
 				"telemetry-redis-data": {
 					Name: "fiftyone-compose-test_telemetry-redis-data",
 				},
@@ -1289,6 +1301,9 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 			[]string{internalAuthComposePluginsFile},
 			s.dotEnvFiles,
 			types.Volumes{
+				"fiftyone-mq-redis-data": {
+					Name: "fiftyone-compose-test_fiftyone-mq-redis-data",
+				},
 				"plugins-vol": {
 					Name: "fiftyone-compose-test_plugins-vol",
 				},
@@ -1302,6 +1317,9 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 			[]string{internalAuthComposeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			types.Volumes{
+				"fiftyone-mq-redis-data": {
+					Name: "fiftyone-compose-test_fiftyone-mq-redis-data",
+				},
 				"plugins-vol": {
 					Name: "fiftyone-compose-test_plugins-vol",
 				},
@@ -1315,6 +1333,9 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestVolumes() {
 			[]string{internalAuthComposeFile, internalAuthComposeDelegatedOperationsFile},
 			s.dotEnvFiles,
 			types.Volumes{
+				"fiftyone-mq-redis-data": {
+					Name: "fiftyone-compose-test_fiftyone-mq-redis-data",
+				},
 				"plugins-vol": {
 					Name: "fiftyone-compose-test_plugins-vol",
 				},

@@ -6,13 +6,13 @@
 activitySettings:
   # -- Controls whether the Activity Core worker Deployments are rendered and
   # whether the producer workloads (teams-api, fiftyone-app, teams-plugins,
-  # and the delegated operators) are told to emit. The UI surfaces that read
-  # the result are separate, default-off opt-ins through `teamsAppSettings.env`
-  # (`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel,
-  # `VFF_WF_METRIC` for the pre-release Metrics tab).
-  # Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if
-  # only one of the two is on.
-  enabled: false
+  # and the delegated operators) are told to emit. On by default: the Audit
+  # Log, the Jobs pages, and the annotation Metrics tab all read what it
+  # records. While enabled, teams-app also gets `VFF_WF_METRIC=true` unless
+  # `teamsAppSettings.env.VFF_WF_METRIC` is set explicitly. To turn Activity
+  # Core off, set both this and `fiftyoneMq.enabled` to `false`; the chart
+  # fails the render if this is on and the queue is off.
+  enabled: true
   image:
     # -- Worker image.
     repository: voxel51/fiftyone-activity
@@ -1248,8 +1248,9 @@ fiftyoneLicenseSecrets:
 # sets `FIFTYONE_MQ_REDIS_URL` on the workloads that publish to the queue.
 fiftyoneMq:
   # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
-  # environment variable are rendered.
-  enabled: false
+  # environment variable are rendered. On by default, paired with
+  # `activitySettings.enabled`.
+  enabled: true
   redis:
     # -- Controls whether the bundled Redis Deployment and Service are
     # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.

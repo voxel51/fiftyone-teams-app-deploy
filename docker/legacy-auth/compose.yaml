@@ -27,6 +27,23 @@ services:
       file: ../common-services.yaml
       service: teams-cas-common
 
+  # Activity Analytics: the fiftyone.mq queue Redis and the worker that drains
+  # it into the activity_* collections. See
+  # docker/docs/configuring-activity-analytics.md.
+  # Using an external Redis? Point FIFTYONE_MQ_REDIS_URL at it in .env and
+  # remove this service in compose.override.yaml.
+  fiftyone-mq-redis:
+    extends:
+      file: ../common-services.yaml
+      service: fiftyone-mq-redis-common
+
+  activity-worker:
+    depends_on:
+      - fiftyone-mq-redis
+    extends:
+      file: ../common-services.yaml
+      service: activity-worker-common
+
   telemetry-redis:
     extends:
       file: ../common-services.yaml
@@ -55,4 +72,5 @@ services:
         condition: service_started
 
 volumes:
+  fiftyone-mq-redis-data:
   telemetry-redis-data:

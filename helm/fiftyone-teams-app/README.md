@@ -27,28 +27,29 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
-### Version 2.24+
+### Version 2.25+
 
 #### Activity Core
 
 Activity Core is the basis for activity tracking across FiftyOne Enterprise
-2.24+. It records operator runs, annotation and review decisions, and
+2.25+. It records operator runs, annotation and review decisions, and
 sample/label mutations, and rolls them up into the data that the features
 built on it read — annotation metrics, the Audit Log, the Jobs pages, and
 more to come.
 
-Activity Core is opt-in; nothing changes on upgrade unless you enable it.
-It requires two settings together — `activitySettings.enabled` (tells the
-existing workloads to emit, and adds the worker `Deployment`s) and
-`fiftyoneMq.enabled` (the queue Redis carrying events between them).
-Enabling one without the other fails the render.
+Activity Core is on by default. The chart renders the activity workers and
+a queue Redis, tells the existing workloads to emit, and turns on the
+annotation Metrics tab (`VFF_WF_METRIC`). To turn it off, set both
+`activitySettings.enabled` (the producer env and worker `Deployment`s) and
+`fiftyoneMq.enabled` (the queue Redis carrying events between them) to
+`false`. Turning off only the queue fails the render.
 
 The bundled queue Redis claims a `PersistentVolumeClaim` by default, so a
 default `StorageClass` is required unless you disable persistence or supply
 your own claim.
 Please refer to
 
-- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v224-activity-core)
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v225-activity-core)
   for what changes on upgrade, cluster requirements, and resource impact
 - [configuring activity core](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-activity-core.md)
   for full details, including external Redis and multi-organization
@@ -832,7 +833,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| activitySettings.enabled | bool | `false` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. The UI surfaces that read the result are separate, default-off opt-ins through `teamsAppSettings.env` (`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel, `VFF_WF_METRIC` for the pre-release Metrics tab). Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
+| activitySettings.enabled | bool | `true` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. On by default: the Audit Log, the Jobs pages, and the annotation Metrics tab all read what it records. While enabled, teams-app also gets `VFF_WF_METRIC=true` unless `teamsAppSettings.env.VFF_WF_METRIC` is set explicitly. To turn Activity Core off, set both this and `fiftyoneMq.enabled` to `false`; the chart fails the render if this is on and the queue is off. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
 | activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |
@@ -1087,7 +1088,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorJobTemplates.template.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
-| fiftyoneMq.enabled | bool | `false` | Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL` environment variable are rendered. |
+| fiftyoneMq.enabled | bool | `true` | Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL` environment variable are rendered. On by default, paired with `activitySettings.enabled`. |
 | fiftyoneMq.redis.containerSecurityContext | object | `{}` | Security context for the Redis container. [Reference][container-security-context]. |
 | fiftyoneMq.redis.enabled | bool | `true` | Controls whether the bundled Redis Deployment and Service are rendered. Set to `false` when using `fiftyoneMq.redis.external.url`. |
 | fiftyoneMq.redis.external.url | string | `""` | URL of an external Redis. When set, the bundled Redis is not rendered and the workloads are wired to this URL instead. The instance must use the `noeviction` maxmemory policy. An evicting policy drops queued jobs. |

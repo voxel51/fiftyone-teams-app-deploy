@@ -71,18 +71,28 @@ URL is only how the queue is reached once enabled.
 {{- end }}
 
 {{/*
-The UI flags are NOT rendered by the chart. `VFF_WF_ACTIVITY` (workflow
-Activity tab + label History panel) and `VFF_WF_METRIC` (pre-release Metrics
-tab) are internal debug surfaces: every deployment defaults to off, and an
-environment that wants one opts in through `teamsAppSettings.env`.
+Emit a `VFF_WF_METRIC` env entry for the teams-app container, turning on the
+annotation workflow Metrics tab whenever Activity Core is capturing the data
+it reads.
 
-`activity.enabled-env` above gates *capture* only. Coupling the surfaces to
-it was tried and reverted: the only way to force a coupled flag back off was
-a second `teamsAppSettings.env` entry, and a duplicate env name is not a
-supported override — the API server warns under client-side apply that the
-later entry "may be dropped when using apply" and rejects the Deployment
-under server-side apply.
+Renders nothing when `teamsAppSettings.env` already carries the key, so an
+explicit value there — including `false` — is the only entry in the
+container. That is what makes the coupling safe: an earlier attempt coupled
+`VFF_WF_ACTIVITY` unconditionally and was reverted because the only way to
+force it back off was a second `teamsAppSettings.env` entry, and a duplicate
+env name is not a supported override (the API server warns under client-side
+apply and rejects the Deployment under server-side apply).
+
+`VFF_WF_ACTIVITY` (workflow Activity tab + label History panel) is still never
+rendered by the chart. It is an internal debug surface; an environment that
+wants it opts in through `teamsAppSettings.env`.
 */}}
+{{- define "activity.metrics-ui-env" -}}
+{{- if and .Values.activitySettings.enabled (not (hasKey .Values.teamsAppSettings.env "VFF_WF_METRIC")) }}
+- name: VFF_WF_METRIC
+  value: "true"
+{{- end }}
+{{- end }}
 
 {{/*
 Emit a `FIFTYONE_ACTIVITY_MONGO_DB` env entry for a main workload container.
