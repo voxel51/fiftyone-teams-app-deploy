@@ -18,6 +18,7 @@
     - [Port Forward to the `teams-app` Service](#port-forward-to-the-teams-app-service)
     - [Port Forward to the `teams-api` Service](#port-forward-to-the-teams-api-service)
     - [Port Forward - Login](#port-forward---login)
+- [Releasing](#releasing)
 
 <!-- tocstop -->
 
@@ -598,3 +599,7 @@ With the port forward running,
 > Without this setting, the app code makes the callback URL
 > [https://localhost:3000](https://localhost:3000)
 > and Auth0 throws a Callback URL mismatch error.
+
+## Releasing
+
+See [RELEASING.md](./RELEASING.md).
