@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.25+ Activity Analytics](#fiftyone-enterprise-v225-activity-analytics)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators](#fiftyone-enterprise-v223-service-orchestrators)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
@@ -103,6 +104,35 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.25+ Activity Analytics
+
+FiftyOne Enterprise v2.25.0 introduces Activity Analytics, which records
+operator runs, annotation and review decisions, and sample and label
+mutations for the Audit Log, the Jobs pages, and the annotation Metrics
+tab.
+
+**Activity Analytics is on by default.** It shipped opt-in in v2.25.0,
+behind the `compose.activity.yaml` overlay. In later versions an upgrade
+with no changes:
+
+- starts two new services from every base compose file:
+  `fiftyone-mq-redis` (the queue, persisted on the new
+  `fiftyone-mq-redis-data` volume) and `activity-worker`
+- sets `FIFTYONE_ACTIVITY_ENABLED=true` on `fiftyone-app`, `teams-api`,
+  `teams-plugins`, and the `teams-do*` workers
+- sets `VFF_WF_METRIC=true` on `teams-app`, which shows the annotation
+  Metrics tab
+
+`compose.activity.yaml` is now empty and deprecated. Existing
+`-f compose.activity.yaml` commands keep working; drop it from your `-f`
+set when convenient.
+
+Activity data accumulates from the upgrade onward; earlier activity is not
+backfilled.
+
+To stay opted out, see
+[Turning Activity Analytics off](./configuring-activity-analytics.md#turning-activity-analytics-off).
 
 #### FiftyOne Enterprise v2.23+ Service Orchestrators
 

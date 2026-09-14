@@ -19,7 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
-    - [FiftyOne Enterprise v2.24+ Activity Core](#fiftyone-enterprise-v224-activity-core)
+    - [FiftyOne Enterprise v2.25+ Activity Core](#fiftyone-enterprise-v225-activity-core)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
@@ -119,9 +119,9 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
-#### FiftyOne Enterprise v2.24+ Activity Core
+#### FiftyOne Enterprise v2.25+ Activity Core
 
-FiftyOne Enterprise v2.24.0 introduces Activity Core: the basis for
+FiftyOne Enterprise v2.25.0 introduces Activity Core: the basis for
 activity tracking across the app. It records operator runs, annotation and
 review decisions, and sample and label mutations, and rolls those events up
 into the data that the features built on it read — annotation metrics, the
@@ -130,28 +130,37 @@ Audit Log, the Jobs pages, and more to come.
 It is a substrate rather than a feature of its own, so enabling it is what
 gives those surfaces anything to show.
 
-**Activity Core is opt-in and nothing changes on upgrade unless you
-enable it.** The chart renders no activity environment on the existing
-workloads and no new `Deployment`s while it is off.
+**Activity Core is on by default.** It shipped opt-in in v2.25.0; in later
+versions an upgrade with no values changes renders:
 
-Enabling it requires two settings, which are a pair:
+- `FIFTYONE_ACTIVITY_ENABLED=true` on the producer workloads (`teams-api`,
+  `fiftyone-app`, `teams-plugins`, and the delegated operators)
+- one worker `Deployment` per activity worker (ingest, rollup, snapshot,
+  and prune)
+- the queue Redis `Deployment`, `Service`, and `PersistentVolumeClaim`,
+  plus `FIFTYONE_MQ_REDIS_URL` on the workloads that reach it
+- `VFF_WF_METRIC=true` on `teams-app`, which shows the annotation
+  Metrics tab
+
+Activity data accumulates from the upgrade onward; earlier activity is not
+backfilled.
+
+To stay opted out, set both keys to `false`. They are a pair:
 
 ```yaml
 # values.yaml
 activitySettings:
-  enabled: true
+  enabled: false
 fiftyoneMq:
-  enabled: true
+  enabled: false
 ```
 
-- `activitySettings.enabled` tells the producer workloads (`teams-api`,
-  `fiftyone-app`, `teams-plugins`, and the delegated operators) to emit,
-  and renders one worker `Deployment` per activity worker.
-- `fiftyoneMq.enabled` renders the queue Redis that carries events from
-  the producers to the workers.
+Turning off only `fiftyoneMq.enabled` fails the render rather than
+installing producers and workers that silently record nothing.
 
-Turning on activity without the queue fails the render rather than
-installing something that silently records nothing.
+To keep Activity Core but hide the Metrics tab, set
+`teamsAppSettings.env.VFF_WF_METRIC: false`. An explicit value there
+replaces the chart's default rather than adding a second entry.
 
 **Cluster requirements:**
 
@@ -167,7 +176,8 @@ installing something that silently records nothing.
 
 **Resource impact:**
 Each worker requests `100m` CPU / `128Mi` memory (limits `500m` /
-`512Mi`), plus one bundled Redis pod.
+`512Mi`), plus one bundled Redis pod. The ingest worker runs two replicas.
+Check any namespace `ResourceQuota` for headroom before upgrading.
 
 See the
 [Configuring Activity Core](./configuring-activity-core.md)

@@ -5,8 +5,8 @@
       "description": "FiftyOne Activity Core workers. Activity Core is the basis for activity\ntracking across the app — annotation metrics, the Audit Log, the Jobs\npages, and more. The workers read the queue populated by the producers and\nwrite the activity_* collections.",
       "properties": {
         "enabled": {
-          "default": false,
-          "description": "Controls whether the Activity Core worker Deployments are rendered and\nwhether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit. The UI surfaces that read\nthe result are separate, default-off opt-ins through `teamsAppSettings.env`\n(`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel,\n`VFF_WF_METRIC` for the pre-release Metrics tab).\nEnable `fiftyoneMq.enabled` alongside this; the chart fails the render if\nonly one of the two is on.",
+          "default": true,
+          "description": "Controls whether the Activity Core worker Deployments are rendered and\nwhether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit. On by default: the Audit\nLog, the Jobs pages, and the annotation Metrics tab all read what it\nrecords. While enabled, teams-app also gets `VFF_WF_METRIC=true` unless\n`teamsAppSettings.env.VFF_WF_METRIC` is set explicitly. To turn Activity\nCore off, set both this and `fiftyoneMq.enabled` to `false`; the chart\nfails the render if this is on and the queue is off.",
           "title": "enabled",
           "type": "boolean"
         },
@@ -2884,8 +2884,8 @@
       "description": "In-cluster queue for fiftyone-mq. Renders a Redis Deployment and Service, and\nsets `FIFTYONE_MQ_REDIS_URL` on the workloads that publish to the queue.",
       "properties": {
         "enabled": {
-          "default": false,
-          "description": "Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`\nenvironment variable are rendered.",
+          "default": true,
+          "description": "Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`\nenvironment variable are rendered. On by default, paired with\n`activitySettings.enabled`.",
           "title": "enabled",
           "type": "boolean"
         },

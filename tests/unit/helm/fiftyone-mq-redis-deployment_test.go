@@ -112,6 +112,7 @@ func (s *fiftyoneMqRedisDeploymentTemplateTest) TestNamespaceOverride() {
 // off, even with the redis sub-toggle on.
 func (s *fiftyoneMqRedisDeploymentTemplateTest) TestMqDisabled() {
 	options := &helm.Options{SetValues: map[string]string{
+		"activitySettings.enabled": "false",
 		"fiftyoneMq.enabled":       "false",
 		"fiftyoneMq.redis.enabled": "true",
 	}}
@@ -478,6 +479,7 @@ func (s *fiftyoneMqRedisDeploymentTemplateTest) TestPvcFollowsBundledRedisGates(
 		{
 			"mqDisabled",
 			map[string]string{
+				"activitySettings.enabled":             "false",
 				"fiftyoneMq.enabled":                   "false",
 				"fiftyoneMq.redis.enabled":             "true",
 				"fiftyoneMq.redis.persistence.enabled": "true",

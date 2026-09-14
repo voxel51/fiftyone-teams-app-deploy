@@ -66,6 +66,22 @@ func disableTelemetry(values map[string]string) map[string]string {
 	return out
 }
 
+// disableActivity returns a copy of the given helm SetValues map with
+// Activity Core and its queue turned off. Activity Core is on by default, so
+// tests asserting a workload's exact env list use this to keep the activity
+// env out of their expectations; the activity-* tests cover that env.
+// Explicit keys in values win.
+func disableActivity(values map[string]string) map[string]string {
+	out := map[string]string{
+		"activitySettings.enabled": "false",
+		"fiftyoneMq.enabled":       "false",
+	}
+	for k, v := range values {
+		out[k] = v
+	}
+	return out
+}
+
 // disableDefaultServiceOrchestrators returns a copy of the given helm
 // SetValues map that removes the chart's default serviceOrchestrators
 // entries (cpuServiceOrc, gpuServiceOrc). Use this in tests that assert

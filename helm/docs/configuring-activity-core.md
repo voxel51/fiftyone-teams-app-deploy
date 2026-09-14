@@ -13,7 +13,7 @@ makes those surfaces have anything to show.
 <!-- toc -->
 
 - [Overview](#overview)
-- [Enabling Activity Core](#enabling-activity-core)
+- [Turning Activity Core off](#turning-activity-core-off)
 - [Queue durability](#queue-durability)
 - [Using an external Redis](#using-an-external-redis)
 - [Multi-organization deployments](#multi-organization-deployments)
@@ -33,28 +33,28 @@ Two moving parts:
   queue and write the `activity_*` collections in the deployment's own
   FiftyOne database, then maintain the rollups.
 
-Both halves are off by default. The chart renders no activity
-environment on the producers and no worker `Deployment`s until you turn
-it on.
+Both halves are on by default.
 
-## Enabling Activity Core
+## Turning Activity Core off
 
-Two settings, and they are a pair:
+Two settings control it, and they are a pair. To turn Activity Core off,
+set both:
 
 ```yaml
 # values.yaml
 activitySettings:
-  enabled: true
+  enabled: false
 fiftyoneMq:
-  enabled: true
+  enabled: false
 ```
 
 `activitySettings.enabled` renders `FIFTYONE_ACTIVITY_ENABLED=true` on
-the producer workloads and creates the worker `Deployment`s.
+the producer workloads, creates the worker `Deployment`s, and turns on the
+Metrics tab (see [Viewing the data](#viewing-the-data)).
 `fiftyoneMq.enabled` renders the queue Redis and sets
 `FIFTYONE_MQ_REDIS_URL` on everything that talks to it.
 
-Enabling activity without the queue is rejected at render time — the
+Turning off the queue while activity is on is rejected at render time — the
 workers and producers would have nothing to connect to, and every event
 would be dropped while the install looked healthy:
 
@@ -137,22 +137,30 @@ request.
 
 ## Viewing the data
 
-Enabling Activity Core turns on collection only. The surfaces that
-display the data are internal debug views, off by default in every
-deployment, and the chart never sets their flags. Opt in per environment
-through `teamsAppSettings.env`:
+The Audit Log and the Jobs pages appear whenever Activity Core is
+enabled.
+
+The annotation workflow Metrics tab is behind `VFF_WF_METRIC` on
+`teams-app`. While `activitySettings.enabled` is true the chart sets it to
+`true`, unless `teamsAppSettings.env` already carries the key. An explicit
+value there, including `false`, is the only entry rendered:
 
 ```yaml
 teamsAppSettings:
   env:
-    # workflow Activity tab + label History panel
-    VFF_WF_ACTIVITY: true
-    # pre-release Metrics tab
-    VFF_WF_METRIC: true
+    # hide the Metrics tab while keeping Activity Core
+    VFF_WF_METRIC: false
 ```
 
-Set only the ones you want; each flag is independent of the other and of
-`activitySettings.enabled`.
+The workflow Activity tab and label History panel are internal debug
+views behind `VFF_WF_ACTIVITY`. The chart never sets it; opt in per
+environment through `teamsAppSettings.env`:
+
+```yaml
+teamsAppSettings:
+  env:
+    VFF_WF_ACTIVITY: true
+```
 
 ## Resource impact
 
