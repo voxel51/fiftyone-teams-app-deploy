@@ -255,7 +255,7 @@ services:
   activity-worker-common:
     # Published from the fiftyone-activity repo with each Enterprise release.
     # Keep the tag in lockstep with the other service images.
-    image: voxel51/fiftyone-activity:v2.24.0
+    image: voxel51/fiftyone-activity:v2.25.0
     command: ["fiftyone-activity-worker"]
     environment:
       # This service only exists under compose.activity.yaml, so the
