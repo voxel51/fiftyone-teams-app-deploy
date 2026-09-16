@@ -1,22 +1,21 @@
 ---
 # Ensures that all of the default images in our
 # helm values.yaml file are pullable to authenticated
-# users.
-# Triggered on the PRs to the main branch.
+# users. Called by the Release Charts workflow before the chart
+# publishes; main pins the version in flight, whose images only
+# exist once it is released.
 
 name: Tests - Artifact Pulls
 
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-    branches:
-      - main # test only PRs to main branch
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
+    secrets:
+      ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT:
+        required: true
+      RO_DOCKERHUB_PAT:
+        required: true
+      RO_DOCKERHUB_USERNAME:
+        required: true
 
 jobs:
   docker-pulls:
