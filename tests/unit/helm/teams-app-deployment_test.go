@@ -2701,8 +2701,8 @@ func (s *deploymentTeamsAppTemplateTest) TestMetricsFlagExplicitValueWins() {
 
 // TestActivityUIFlagDefaultsOn pins that the default render, where Activity
 // Core is on, also turns on the surfaces that read it -- the dataset Activity
-// tab, the workflow Activity tab and the sample history panel -- with exactly
-// one VFF_WF_ACTIVITY entry.
+// tab and the sample history panel -- with exactly one VFF_WF_ACTIVITY
+// entry.
 func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagDefaultsOn() {
 	values := s.teamsAppEnvValues(map[string]string{}, "VFF_WF_ACTIVITY")
 

@@ -117,9 +117,9 @@ services:
       # Annotation workflow Metrics tab, which reads the Activity Analytics
       # rollups. On by default; set VFF_WF_METRIC=false in .env to hide it.
       VFF_WF_METRIC: ${VFF_WF_METRIC:-true}
-      # Dataset and workflow Activity tabs and the sample history panel,
-      # which read the same events. On by default; set
-      # VFF_WF_ACTIVITY=false in .env to hide them.
+      # The dataset Activity tab and the sample history panel, which read
+      # the same events. On by default; set VFF_WF_ACTIVITY=false in .env
+      # to hide them.
       VFF_WF_ACTIVITY: ${VFF_WF_ACTIVITY:-true}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env

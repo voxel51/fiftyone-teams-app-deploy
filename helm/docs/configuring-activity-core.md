@@ -152,8 +152,8 @@ teamsAppSettings:
     VFF_WF_METRIC: false
 ```
 
-The dataset **Activity** tab, the workflow Activity tab and the sample
-and label history panel are behind `VFF_WF_ACTIVITY`, which follows
+The dataset **Activity** tab and the sample and label history panel are
+behind `VFF_WF_ACTIVITY`, which follows
 Activity Core the same way: rendered `true` while capture is on, unless
 `teamsAppSettings.env` already carries the key.
 

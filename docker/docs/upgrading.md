@@ -124,7 +124,7 @@ with no changes:
 - sets `VFF_WF_METRIC=true` on `teams-app`, which shows the annotation
   Metrics tab
 - sets `VFF_WF_ACTIVITY=true` on `teams-app`, which shows the dataset
-  Activity tab, the workflow Activity tab and the sample history panel
+  Activity tab and the sample history panel
 
 `compose.activity.yaml` is now empty and deprecated. Existing
 `-f compose.activity.yaml` commands keep working; drop it from your `-f`

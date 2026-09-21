@@ -142,7 +142,7 @@ versions an upgrade with no values changes renders:
 - `VFF_WF_METRIC=true` on `teams-app`, which shows the annotation
   Metrics tab
 - `VFF_WF_ACTIVITY=true` on `teams-app`, which shows the dataset
-  Activity tab, the workflow Activity tab and the sample history panel
+  Activity tab and the sample history panel
 
 Activity data accumulates from the upgrade onward; earlier activity is not
 backfilled.

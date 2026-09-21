@@ -93,8 +93,8 @@ apply and rejects the Deployment under server-side apply).
 
 {{/*
 Emit a `VFF_WF_ACTIVITY` env entry for the teams-app container, turning on the
-dataset Activity tab, the workflow Activity tab and the sample/label history
-panel whenever Activity Core is capturing what they read.
+dataset Activity tab and the sample/label history panel whenever Activity
+Core is capturing what they read.
 
 Guarded exactly like `VFF_WF_METRIC` above, and for the reason that comment
 records: an earlier attempt coupled this flag UNCONDITIONALLY and had to be
