@@ -540,6 +540,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 				"FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS=docker",
 				"VFF_WF_METRIC=true",
+				"VFF_WF_ACTIVITY=true",
 			},
 		},
 		{
@@ -637,6 +638,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 				"FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS=docker",
 				"VFF_WF_METRIC=true",
+				"VFF_WF_ACTIVITY=true",
 			},
 		},
 		{
@@ -734,6 +736,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED=true",
 				"FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS=docker",
 				"VFF_WF_METRIC=true",
+				"VFF_WF_ACTIVITY=true",
 			},
 		},
 		{

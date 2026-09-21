@@ -152,15 +152,21 @@ teamsAppSettings:
     VFF_WF_METRIC: false
 ```
 
-The workflow Activity tab and label History panel are internal debug
-views behind `VFF_WF_ACTIVITY`. The chart never sets it; opt in per
-environment through `teamsAppSettings.env`:
+The dataset **Activity** tab, the workflow Activity tab and the sample
+and label history panel are behind `VFF_WF_ACTIVITY`, which follows
+Activity Core the same way: rendered `true` while capture is on, unless
+`teamsAppSettings.env` already carries the key.
 
 ```yaml
 teamsAppSettings:
   env:
-    VFF_WF_ACTIVITY: true
+    # keep recording history, but hide every way to read it
+    VFF_WF_ACTIVITY: false
 ```
+
+On a standalone `mongod` these pages still render; they show a banner
+saying edit history is not being recorded, which is a more useful answer
+than a missing tab.
 
 ## Resource impact
 

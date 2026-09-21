@@ -8,8 +8,10 @@ activitySettings:
   # whether the producer workloads (teams-api, fiftyone-app, teams-plugins,
   # and the delegated operators) are told to emit. On by default: the Audit
   # Log, the Jobs pages, and the annotation Metrics tab all read what it
-  # records. While enabled, teams-app also gets `VFF_WF_METRIC=true` unless
-  # `teamsAppSettings.env.VFF_WF_METRIC` is set explicitly. To turn Activity
+  # records. While enabled, teams-app also gets `VFF_WF_METRIC=true` and
+  # `VFF_WF_ACTIVITY=true` unless the matching `teamsAppSettings.env` key is
+  # set explicitly, which shows the Metrics tab and the Activity tab plus
+  # the sample history panel respectively. To turn Activity
   # Core off, set both this and `fiftyoneMq.enabled` to `false`; the chart
   # fails the render if this is on and the queue is off.
   enabled: true

@@ -108,8 +108,10 @@ services:
     profiles: ["activity-disabled"]
 ```
 
-To keep Activity Analytics but hide only the Metrics tab, set
-`VFF_WF_METRIC=false` alone.
+To keep Activity Analytics but hide only a surface, set
+`VFF_WF_METRIC=false` (the Metrics tab) or `VFF_WF_ACTIVITY=false`
+(the dataset Activity tab, the workflow Activity tab and the sample
+history panel) alone.
 
 ## Environment variables
 
@@ -120,6 +122,7 @@ Set these in your `.env` file. See the Activity Analytics section of
 | ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `FIFTYONE_ACTIVITY_ENABLED`           | `true`                             | The gate: nothing emits while false. Every service reads it.                                                                         |
 | `VFF_WF_METRIC`                       | `true`                             | Shows the annotation workflow Metrics tab in `teams-app`.                                                                            |
+| `VFF_WF_ACTIVITY`                     | `true`                             | Shows the dataset Activity tab, the workflow Activity tab and the sample history panel in `teams-app`.                               |
 | `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id that activity events are scoped by. Defaults to empty, meaning self-discovery via CAS for single-org deployments.    |
 | `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0` | Queue connection string. Point it at an external Redis to replace the bundled service.                                               |
 | `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                              | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry.                                                 |

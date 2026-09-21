@@ -141,6 +141,8 @@ versions an upgrade with no values changes renders:
   plus `FIFTYONE_MQ_REDIS_URL` on the workloads that reach it
 - `VFF_WF_METRIC=true` on `teams-app`, which shows the annotation
   Metrics tab
+- `VFF_WF_ACTIVITY=true` on `teams-app`, which shows the dataset
+  Activity tab, the workflow Activity tab and the sample history panel
 
 Activity data accumulates from the upgrade onward; earlier activity is not
 backfilled.
@@ -158,8 +160,9 @@ fiftyoneMq:
 Turning off only `fiftyoneMq.enabled` fails the render rather than
 installing producers and workers that silently record nothing.
 
-To keep Activity Core but hide the Metrics tab, set
-`teamsAppSettings.env.VFF_WF_METRIC: false`. An explicit value there
+To keep Activity Core but hide a surface, set
+`teamsAppSettings.env.VFF_WF_METRIC: false` or
+`teamsAppSettings.env.VFF_WF_ACTIVITY: false`. An explicit value there
 replaces the chart's default rather than adding a second entry.
 
 **Cluster requirements:**

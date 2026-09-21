@@ -2633,27 +2633,30 @@ func (s *deploymentTeamsAppTemplateTest) teamsAppEnvValues(
 	return values
 }
 
-// TestActivityDebugFlagNeverRendered pins that the chart never sets
-// VFF_WF_ACTIVITY, the internal debug flag for the workflow Activity tab and
-// label History panel, in the default render or with capture on.
-func (s *deploymentTeamsAppTemplateTest) TestActivityDebugFlagNeverRendered() {
+// TestActivityFlagIsNotMisspelled pins that no render emits
+// VFF_Workflow_ACTIVITY. Nothing reads that name -- teams-app allowlists
+// VFF_WF_ACTIVITY -- so a render carrying it is a flag that silently does
+// nothing, which is worse than one that is plainly off.
+//
+// Whether VFF_WF_ACTIVITY itself is rendered is no longer pinned here: it now
+// follows capture, covered by TestActivityUIFlagDefaultsOn,
+// TestActivityUIFlagFollowsActivity and TestActivityUIFlagExplicitValueWins.
+func (s *deploymentTeamsAppTemplateTest) TestActivityFlagIsNotMisspelled() {
 	for name, setValues := range map[string]map[string]string{
 		"default": {},
-		"activityOn": {
-			"activitySettings.enabled": "true",
-			"fiftyoneMq.enabled":       "true",
+		"activityOff": {
+			"activitySettings.enabled": "false",
+			"fiftyoneMq.enabled":       "false",
 		},
 	} {
 		options := &helm.Options{SetValues: setValues}
 		output := helm.RenderTemplate(
 			s.T(), options, s.chartPath, s.releaseName, s.templates,
 		)
-		for _, flag := range []string{"VFF_WF_ACTIVITY", "VFF_Workflow_ACTIVITY"} {
-			s.NotContains(
-				output, flag,
-				"%s: the chart must not set %s — it is a per-env opt-in", name, flag,
-			)
-		}
+		s.NotContains(
+			output, "VFF_Workflow_ACTIVITY",
+			"%s: VFF_Workflow_ACTIVITY is not a flag anything reads", name,
+		)
 	}
 }
 
@@ -2696,32 +2699,47 @@ func (s *deploymentTeamsAppTemplateTest) TestMetricsFlagExplicitValueWins() {
 	}
 }
 
-// TestActivityUIFlagOptIn pins that an environment opting in through
-// teamsAppSettings.env gets exactly one VFF_WF_ACTIVITY entry. A second entry
-// would be a duplicate env name, which is not a supported override.
-func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagOptIn() {
-	options := &helm.Options{SetValues: map[string]string{
-		"activitySettings.enabled":             "true",
-		"fiftyoneMq.enabled":                   "true",
-		"teamsAppSettings.env.VFF_WF_ACTIVITY": "true",
-	}}
-	output := helm.RenderTemplate(
-		s.T(), options, s.chartPath, s.releaseName, s.templates,
-	)
+// TestActivityUIFlagDefaultsOn pins that the default render, where Activity
+// Core is on, also turns on the surfaces that read it -- the dataset Activity
+// tab, the workflow Activity tab and the sample history panel -- with exactly
+// one VFF_WF_ACTIVITY entry.
+func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagDefaultsOn() {
+	values := s.teamsAppEnvValues(map[string]string{}, "VFF_WF_ACTIVITY")
 
-	var deployment appsv1.Deployment
-	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
-
-	var values []string
-	for _, env := range deployment.Spec.Template.Spec.Containers[0].Env {
-		if env.Name == "VFF_WF_ACTIVITY" {
-			values = append(values, env.Value)
-		}
-	}
-
-	s.Require().Len(
-		values, 1,
-		"expected exactly one VFF_WF_ACTIVITY entry (no chart-rendered duplicate)",
-	)
+	s.Require().Len(values, 1, "expected exactly one VFF_WF_ACTIVITY entry")
 	s.Equal("true", values[0])
+}
+
+// TestActivityUIFlagFollowsActivity pins that turning Activity Core off also
+// hides those surfaces: there is no history behind them.
+func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagFollowsActivity() {
+	values := s.teamsAppEnvValues(map[string]string{
+		"activitySettings.enabled": "false",
+		"fiftyoneMq.enabled":       "false",
+	}, "VFF_WF_ACTIVITY")
+
+	s.Empty(values, "VFF_WF_ACTIVITY must not render while Activity Core is off")
+}
+
+// TestActivityUIFlagExplicitValueWins pins that an explicit
+// teamsAppSettings.env.VFF_WF_ACTIVITY is the only entry, in both directions.
+//
+// This is the case that reverted the first attempt at this default: coupling
+// the flag unconditionally left no way to force it back off except a second
+// env entry, and a duplicate env name is not an override -- the API server
+// warns under client-side apply and rejects the Deployment under server-side
+// apply.
+func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagExplicitValueWins() {
+	for _, explicit := range []string{"false", "true"} {
+		values := s.teamsAppEnvValues(map[string]string{
+			"teamsAppSettings.env.VFF_WF_ACTIVITY": explicit,
+		}, "VFF_WF_ACTIVITY")
+
+		s.Require().Len(
+			values, 1,
+			"explicit VFF_WF_ACTIVITY=%s: expected exactly one entry (no chart-rendered duplicate)",
+			explicit,
+		)
+		s.Equal(explicit, values[0])
+	}
 }
