@@ -1382,6 +1382,8 @@ pluginsSettings:
     targetMemoryUtilizationPercentage: 80
   # Environment Variables are passed to the `teams-plugins` containers.
   env:
+    # Ephem-only: per-phase workflow_next timings (plugins.workflows.perf).
+    WF_RUN_PERF: "1"
     # @schema
     # type: ["string", "boolean"]
     # @schema
