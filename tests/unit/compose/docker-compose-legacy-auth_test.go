@@ -261,7 +261,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 			"activity-worker",
 			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
 			s.dotEnvFiles,
-			"voxel51/fiftyone-activity:v2.25.0",
+			"voxel51/fiftyone-activity:v2.25.1",
 		},
 		{
 			"defaultFiftyoneApp",
