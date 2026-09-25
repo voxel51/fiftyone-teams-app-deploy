@@ -247,10 +247,10 @@ services:
     volumes:
       - fiftyone-mq-redis-data:/data
 
-  # One container runs all four activity workers (ingest, rollup, snapshot,
-  # prune) via the combined entrypoint.
+  # One container runs the activity workers (ingest, rollup, prune) via the
+  # combined entrypoint.
   # Keep this service at one replica.
-  # The rollup, snapshot, and prune schedulers are single-flight.
+  # The rollup and prune schedulers are single-flight.
   # See docker/docs/configuring-activity-analytics.md.
   activity-worker-common:
     # Published from the fiftyone-activity repo with each Enterprise release.
@@ -259,16 +259,16 @@ services:
     command: ["fiftyone-activity-worker"]
     environment:
       # This service only exists under compose.activity.yaml, so the
-      # default is true here: the rollup and snapshot workers emit
-      # derived events through the same flag-gated path they consume.
+      # default is true here: the rollup worker emits derived events
+      # through the same flag-gated path it consumes.
       FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
       FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
       FIFTYONE_ACTIVITY_MONGO_URI: ${FIFTYONE_DATABASE_URI}
       # Co-locate the activity_* collections in the deployment's own
       # FiftyOne database rather than a fixed shared name.
       FIFTYONE_ACTIVITY_MONGO_DB: ${FIFTYONE_DATABASE_NAME}
-      # The snapshot worker reads the datasets database.
-      # It stamps its org onto the snapshot events. Rollups are tenant-scoped.
+      # The rollup worker's database watch reads the datasets database and
+      # stamps FIFTYONE_ACTIVITY_ORG_ID onto the events it records.
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       # Raw events are kept 365 days by default. Rollups are kept indefinitely.
