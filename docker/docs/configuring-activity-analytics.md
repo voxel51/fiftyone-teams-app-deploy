@@ -48,14 +48,13 @@ succeeds. To stop events flowing, leave `FIFTYONE_ACTIVITY_ENABLED`
 false — that short-circuits before a client is built, rather than
 relying on a connection failing.
 
-One `activity-worker` container runs four workers via the combined
+One `activity-worker` container runs three workers via the combined
 `fiftyone-activity-worker` entrypoint:
 
 | Worker   | Responsibility                                         |
 | -------- | ------------------------------------------------------ |
 | ingest   | Drains the queue into the raw `activity_*` collections |
 | rollup   | Aggregates raw events into the rollups the app reads   |
-| snapshot | Periodically records dataset and deployment state      |
 | prune    | Enforces the retention window and the storage size cap |
 
 ## Enabling Activity Analytics
@@ -157,7 +156,7 @@ Set these in your `.env` file. See the Activity Analytics section of
 | Variable                              | Default                            | Description                                                                                                                          |
 | ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `FIFTYONE_ACTIVITY_ENABLED`           | `false`                            | The gate: nothing emits while false. `compose.activity.yaml` sets it for `fiftyone-app` and `teams-api`; set it here for the others. |
-| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id that activity events are scoped by. Defaults to empty, meaning self-discovery via CAS for single-org deployments.    |
+| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id stamped on the events the workers record themselves. Per-request events and dataset counts don't need it.            |
 | `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0` | Queue connection string. Point it at an external Redis to replace the bundled service.                                               |
 | `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                              | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry.                                                 |
 | `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES` | `10737418240`                      | Size cap on raw events. The prune worker removes oldest-first when exceeded. `0` disables.                                           |
@@ -219,11 +218,10 @@ redis-cli -u "${FIFTYONE_MQ_REDIS_URL}" \
 
 Do not scale `activity-worker` above one replica.
 
-The rollup, snapshot, and prune schedulers inside the container are
-single-flight and hold no cross-container lock. A second replica runs
-its own copy of each schedule, which produces duplicate rollup and
-snapshot writes and lets two prune passes compete over the same
-records.
+The rollup and prune schedulers inside the container are single-flight
+and hold no cross-container lock. A second replica runs its own copy of
+each schedule, which produces duplicate rollup writes and lets two
+prune passes compete over the same records.
 
 The ingest worker is the only part of the pipeline that would benefit
 from horizontal scale, and it is not separable from the others in this
