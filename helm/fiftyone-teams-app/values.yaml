@@ -43,6 +43,45 @@ activitySettings:
   # -- Snapshot interval in milliseconds. Defaults to hourly, matching the
   # bucket the state metrics roll up by.
   snapshotIntervalMs: ""
+  # Deployment-level Events retention and archiving. These configure the
+  # archiver in teams-api (Settings > Events) and the prune worker's storage
+  # cap. Without `lockSettings` they are defaults an admin can change on the
+  # Events page; with it they are the configuration.
+  archive:
+    # @schema
+    # enum: ["", "archive", "delete", "keep"]
+    # @schema
+    # -- What happens to old events: `archive`, `delete`, or `keep`. When
+    # empty, events are archived if `bucketPath` is set and deleted otherwise.
+    retentionMode: ""
+    # -- Bucket prefix archives are written under, e.g. `gs://my-bucket` or
+    # `s3://my-bucket/prefix`. Chunks land under `<bucketPath>/activity/`.
+    # Written with the teams-api pod's own cloud credentials (workload
+    # identity, an instance role, or a mounted key).
+    bucketPath: ""
+    # @schema
+    # enum: ["", "time", "space"]
+    # @schema
+    # -- What triggers archiving: `time` (events older than `afterDays`) or
+    # `space` (the oldest events, while the event store exceeds
+    # `maxStorageBytes`). When empty, `time`.
+    trigger: ""
+    # @schema
+    # type: ["string", "integer"]
+    # @schema
+    # -- For the `time` trigger: archive events older than this many days.
+    # When empty, the activity retention horizon (365 days).
+    afterDays: ""
+    # @schema
+    # type: ["string", "integer"]
+    # @schema
+    # -- The event store's size budget in bytes: the `space` trigger's
+    # threshold AND the prune worker's cap, set from one value so the two
+    # cannot disagree. Default 10 GiB (10737418240).
+    maxStorageBytes: 10737418240
+    # -- Lock the configuration: these values win over anything saved on the
+    # Events page, and the page shows them read-only.
+    lockSettings: false
   # One Deployment is rendered per entry.
   workers:
     ingest:

@@ -167,6 +167,22 @@ Set these in your `.env` file. See the Activity Analytics section of
 `FIFTYONE_DATABASE_URI` and `FIFTYONE_DATABASE_NAME`. You do not
 configure it separately.
 
+### Events retention and archiving
+
+These configure the Events archiver in `teams-api` (Settings > Events).
+Without `FIFTYONE_ACTIVITY_ARCHIVE_SETTINGS_LOCKED` they are defaults an
+admin can change on the Events page; with it they are the configuration,
+and the page shows them read-only.
+
+| Variable                                   | Default       | Description                                                                                                  |
+| ------------------------------------------ | ------------- | ------------------------------------------------------------------------------------------------------------ |
+| `FIFTYONE_ACTIVITY_ARCHIVE_RETENTION_MODE` | empty         | `archive`, `delete`, or `keep`. Empty archives when a bucket is set, and deletes otherwise.                  |
+| `FIFTYONE_ACTIVITY_ARCHIVE_BUCKET_PATH`    | empty         | Bucket prefix, e.g. `gs://my-bucket`. Written with `teams-api`'s own cloud credentials.                      |
+| `FIFTYONE_ACTIVITY_ARCHIVE_TRIGGER`        | empty         | `time` (older than `FIFTYONE_ACTIVITY_ARCHIVE_AFTER_DAYS`) or `space` (oldest first while over the budget). |
+| `FIFTYONE_ACTIVITY_ARCHIVE_AFTER_DAYS`     | empty         | Age threshold for the `time` trigger. Empty uses the retention window.                                       |
+| `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES`      | `10737418240` | The same budget as above: the `space` trigger's threshold as well as the prune worker's cap.                 |
+| `FIFTYONE_ACTIVITY_ARCHIVE_SETTINGS_LOCKED` | `false`      | Lock the configuration to these values.                                                                      |
+
 ## Queue durability
 
 The `fiftyone-mq-redis` service starts with `--appendonly yes` and
