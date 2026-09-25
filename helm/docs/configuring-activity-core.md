@@ -150,17 +150,14 @@ redis-cli -u "${FIFTYONE_MQ_REDIS_URL}" \
 
 ## Multi-organization deployments
 
-`activitySettings.orgId` attributes the deployment-wide rollups to an
-organization. Leave it empty for a single-organization deployment — the
-workers discover the organization themselves.
+`activitySettings.orgId` is the organization stamped on the events the
+workers record themselves (the database watch), which carry no request
+to take one from.
 
-Set it only when the deployment holds several organizations, where the
-deployment-wide counts cannot be attributed to one of them. The workers
-log which organization to name.
-
-This affects only the deployment-wide rollups. Per-request events are
-always stamped with the authenticated organization carried on the
-request.
+Per-request events are always stamped with the authenticated
+organization carried on the request. The dataset and sample counts come
+from `teams-api`, which reads each organization from CAS, so they don't
+use `orgId` either.
 
 ## Viewing the data
 
@@ -191,7 +188,7 @@ The bundled queue Redis adds one more pod, with `maxmemory` defaulting
 to `200mb` (`fiftyoneMq.redis.maxmemory`). Raise it if the queue backs
 up under load.
 
-Do not scale the rollup, snapshot, or prune workers above one replica.
-Their schedulers are single-flight and hold no cross-pod lock, so a
-second replica produces duplicate rollup and snapshot writes and lets
-two prune passes compete over the same records.
+Do not scale the rollup or prune workers above one replica. Their
+schedulers are single-flight and hold no cross-pod lock, so a second
+replica produces duplicate rollup writes and lets two prune passes
+compete over the same records.

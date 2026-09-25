@@ -844,9 +844,8 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for the workers. [Reference][probes]. |
 | activitySettings.liveness.timeoutSeconds | int | `5` | Number of seconds after which the liveness probe times out for the workers. [Reference][probes]. |
 | activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
-| activitySettings.orgId | string | `""` | Organization that the deployment-wide rollups are attributed to. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Leave empty: a single-org deployment is discovered automatically. Set it only when the deployment holds several organizations, where the deployment-wide counts cannot be attributed to one of them — the workers log which one to name. |
+| activitySettings.orgId | string | `""` | Organization stamped on the events the workers record themselves (the database watch), which carry no request to take one from. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Per-request events and the dataset and sample counts (read by `teams-api` from CAS) carry the organization without it. |
 | activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
-| activitySettings.snapshotIntervalMs | string | `""` | Snapshot interval in milliseconds. Defaults to hourly, matching the bucket the state metrics roll up by. |
 | activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
 | activitySettings.workers.ingest.replicaCount | int | `2` | Number of ingest worker replicas. |
 | activitySettings.workers.prune.command | list | `["fiftyone-activity-prune-worker"]` | Entrypoint for the prune worker, which enforces the event store size cap. Without it only the time-based TTL applies. |
@@ -856,9 +855,6 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.workers.rollup.command | list | `["fiftyone-activity-rollup-worker"]` | Entrypoint for the rollup worker. |
 | activitySettings.workers.rollup.recreate | bool | `true` | Use the `Recreate` strategy. The rollup worker owns a repeatable schedule, so only one replica may reconcile it. |
 | activitySettings.workers.rollup.replicaCount | int | `1` | Number of rollup worker replicas. Keep at 1. |
-| activitySettings.workers.snapshot.command | list | `["fiftyone-activity-snapshot-worker"]` | Entrypoint for the snapshot worker. |
-| activitySettings.workers.snapshot.recreate | bool | `true` | Use the `Recreate` strategy. The snapshot worker owns a repeatable schedule, and two replicas would double-count a bucket. |
-| activitySettings.workers.snapshot.replicaCount | int | `1` | Number of snapshot worker replicas. Keep at 1. |
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
 | apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
 | apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api` to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators. |
