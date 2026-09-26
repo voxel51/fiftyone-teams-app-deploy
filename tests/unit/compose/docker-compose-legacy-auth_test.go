@@ -398,6 +398,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ACTIVITY_ENABLED=true",
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_ACTIVITY_RETENTION_DAYS=365",
+				"FIFTYONE_ACTIVITY_WATCH_ENABLED=true",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 			},

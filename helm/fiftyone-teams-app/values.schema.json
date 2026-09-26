@@ -145,6 +145,19 @@
           "title": "resources",
           "type": "object"
         },
+        "watch": {
+          "properties": {
+            "enabled": {
+              "default": true,
+              "description": "Controls whether the rollup worker watches the FiftyOne database's\nchange stream, recording writes no service reported (such as direct\ndatabase edits). Needs a replica set; on a standalone MongoDB it records\nnothing and logs why.",
+              "title": "enabled",
+              "type": "boolean"
+            }
+          },
+          "required": [],
+          "title": "watch",
+          "type": "object"
+        },
         "workers": {
           "description": "One Deployment is rendered per entry.",
           "properties": {
