@@ -271,6 +271,9 @@ services:
       # stamps FIFTYONE_ACTIVITY_ORG_ID onto the events it records.
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
+      # Watches the datasets database's change stream for writes no service
+      # reported. Needs a replica set; set false to opt out.
+      FIFTYONE_ACTIVITY_WATCH_ENABLED: ${FIFTYONE_ACTIVITY_WATCH_ENABLED:-true}
       # Raw events are kept 365 days by default. Rollups are kept indefinitely.
       # The size cap (10 GiB default) prunes oldest-first.
       # Override both in .env.

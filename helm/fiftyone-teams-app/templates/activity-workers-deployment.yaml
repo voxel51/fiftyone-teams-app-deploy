@@ -91,6 +91,10 @@ spec:
             {{- with (include "activity.org-id-env" $ | trim) }}
             {{- . | nindent 12 }}
             {{- end }}
+            {{- if and (eq $name "rollup") $a.watch.enabled }}
+            - name: FIFTYONE_ACTIVITY_WATCH_ENABLED
+              value: "true"
+            {{- end }}
             {{- if $a.liveness.enabled }}
             - name: FIFTYONE_MQ_HEARTBEAT_FILE
               value: {{ $a.liveness.heartbeatFile | quote }}

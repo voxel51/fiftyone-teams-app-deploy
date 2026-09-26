@@ -51,11 +51,11 @@ relying on a connection failing.
 One `activity-worker` container runs three workers via the combined
 `fiftyone-activity-worker` entrypoint:
 
-| Worker   | Responsibility                                         |
-| -------- | ------------------------------------------------------ |
-| ingest   | Drains the queue into the raw `activity_*` collections |
-| rollup   | Aggregates raw events into the rollups the app reads   |
-| prune    | Enforces the retention window and the storage size cap |
+| Worker | Responsibility                                         |
+| ------ | ------------------------------------------------------ |
+| ingest | Drains the queue into the raw `activity_*` collections |
+| rollup | Aggregates raw events into the rollups the app reads   |
+| prune  | Enforces the retention window and the storage size cap |
 
 ## Enabling Activity Analytics
 
@@ -93,7 +93,7 @@ docker compose \
 `FIFTYONE_ACTIVITY_ENABLED` decides whether a service emits at all. It
 defaults to `false`, and `emit`, `flush`, and the operator mutation
 capture are no-ops while it is — checked before any queue client is
-constructed. `FIFTYONE_MQ_REDIS_URL` says only *where* to reach the
+constructed. `FIFTYONE_MQ_REDIS_URL` says only _where_ to reach the
 queue once enabled; it is not the switch, because it carries a default
 of its own and so cannot distinguish "unset" from "deliberately pointed
 at localhost".
@@ -157,6 +157,7 @@ Set these in your `.env` file. See the Activity Analytics section of
 | ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `FIFTYONE_ACTIVITY_ENABLED`           | `false`                            | The gate: nothing emits while false. `compose.activity.yaml` sets it for `fiftyone-app` and `teams-api`; set it here for the others. |
 | `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id stamped on the events the workers record themselves. Per-request events and dataset counts don't need it.            |
+| `FIFTYONE_ACTIVITY_WATCH_ENABLED`     | `true`                             | Records writes no service reported (direct database edits) from the change stream. Needs a replica set; set `false` to opt out.      |
 | `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0` | Queue connection string. Point it at an external Redis to replace the bundled service.                                               |
 | `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                              | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry.                                                 |
 | `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES` | `10737418240`                      | Size cap on raw events. The prune worker removes oldest-first when exceeded. `0` disables.                                           |

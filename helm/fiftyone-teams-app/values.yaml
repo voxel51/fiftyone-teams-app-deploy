@@ -56,6 +56,12 @@ activitySettings:
   # events and the dataset and sample counts (read by `teams-api` from CAS)
   # carry the organization without it.
   orgId: ""
+  watch:
+    # -- Controls whether the rollup worker watches the FiftyOne database's
+    # change stream, recording writes no service reported (such as direct
+    # database edits). Needs a replica set; on a standalone MongoDB it records
+    # nothing and logs why.
+    enabled: true
   # -- Resources for the worker containers. [Reference][resources].
   resources:
     requests:
