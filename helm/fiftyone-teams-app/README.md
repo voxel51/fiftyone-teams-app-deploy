@@ -846,6 +846,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
 | activitySettings.orgId | string | `""` | Organization stamped on the events the workers record themselves (the database watch), which carry no request to take one from. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Per-request events and the dataset and sample counts (read by `teams-api` from CAS) carry the organization without it. |
 | activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
+| activitySettings.watch.enabled | bool | `true` | Controls whether the rollup worker watches the FiftyOne database's change stream, recording writes no service reported (such as direct database edits). Needs a replica set; on a standalone MongoDB it records nothing and logs why. |
 | activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
 | activitySettings.workers.ingest.replicaCount | int | `2` | Number of ingest worker replicas. |
 | activitySettings.workers.prune.command | list | `["fiftyone-activity-prune-worker"]` | Entrypoint for the prune worker, which enforces the event store size cap. Without it only the time-based TTL applies. |

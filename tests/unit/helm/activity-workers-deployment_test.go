@@ -236,7 +236,7 @@ func (s *activityWorkersDeploymentTemplateTest) TestWorkerEnvDedicatedDatabase()
 // env and an exec liveness probe on its age by default.
 func (s *activityWorkersDeploymentTemplateTest) TestWorkerLivenessDefaults() {
 	deployments := s.renderWorkers(activityEnabled(nil))
-	s.Len(deployments, 4)
+	s.Len(deployments, 3)
 	for _, d := range deployments {
 		container := d.Spec.Template.Spec.Containers[0]
 		env := envByName(container)
@@ -285,5 +285,27 @@ func (s *activityWorkersDeploymentTemplateTest) TestWorkerLivenessOptOut() {
 		s.Nil(container.LivenessProbe, "%s", d.ObjectMeta.Name)
 		_, ok := envByName(container)["FIFTYONE_MQ_HEARTBEAT_FILE"]
 		s.False(ok, "%s must not set the heartbeat file when disabled", d.ObjectMeta.Name)
+	}
+}
+
+func (s *activityWorkersDeploymentTemplateTest) TestRollupWatchesByDefault() {
+	for _, d := range s.renderWorkers(activityEnabled(nil)) {
+		watch, ok := envByName(d.Spec.Template.Spec.Containers[0])["FIFTYONE_ACTIVITY_WATCH_ENABLED"]
+		if strings.Contains(d.ObjectMeta.Name, "rollup") {
+			s.True(ok, "the rollup worker hosts the database watch")
+			s.Equal("true", watch.Value)
+		} else {
+			s.False(ok, "%s does not host the watch", d.ObjectMeta.Name)
+		}
+	}
+}
+
+func (s *activityWorkersDeploymentTemplateTest) TestRollupWatchOptOut() {
+	deployments := s.renderWorkers(activityEnabled(map[string]string{
+		"activitySettings.watch.enabled": "false",
+	}))
+	for _, d := range deployments {
+		_, ok := envByName(d.Spec.Template.Spec.Containers[0])["FIFTYONE_ACTIVITY_WATCH_ENABLED"]
+		s.False(ok, "%s must not watch when opted out", d.ObjectMeta.Name)
 	}
 }
