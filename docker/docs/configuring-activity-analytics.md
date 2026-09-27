@@ -229,6 +229,21 @@ from horizontal scale, and it is not separable from the others in this
 image. A single container keeps up with the emit volume of a normal
 deployment.
 
+## Monitoring
+
+Every activity process (the services that record events, and the
+activity workers) logs one line per minute when it has something to
+report, starting with `activity.stats`:
+
+```text
+activity.stats kind=producer emitted=120 delivered=120 dropped_full=0 dropped_invalid=0 failed_flushes=0 pending=0
+```
+
+Route these lines from your log pipeline into your metrics system to
+watch for dropped events, a queue backlog, or a stalled database watch.
+The [`activity.stats` reference](https://github.com/voxel51/fiftyone-activity#monitor)
+lists every key and suggests alert thresholds.
+
 ## Verifying
 
 The commands below need `compose.activity.yaml` in the `-f` set, the
