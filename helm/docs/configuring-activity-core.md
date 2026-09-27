@@ -19,6 +19,7 @@ makes those surfaces have anything to show.
 - [Using an external Redis](#using-an-external-redis)
 - [Multi-organization deployments](#multi-organization-deployments)
 - [Viewing the data](#viewing-the-data)
+- [Monitoring](#monitoring)
 - [Resource impact](#resource-impact)
 
 <!-- tocstop -->
@@ -177,6 +178,21 @@ teamsAppSettings:
 
 Set only the ones you want; each flag is independent of the other and of
 `activitySettings.enabled`.
+
+## Monitoring
+
+Every activity process (the services that record events, and the
+activity workers) logs one line per minute when it has something to
+report, starting with `activity.stats`:
+
+```text
+activity.stats kind=producer emitted=120 delivered=120 dropped_full=0 dropped_invalid=0 failed_flushes=0 pending=0
+```
+
+Route these lines from your log pipeline into your metrics system to
+watch for dropped events, a queue backlog, or a stalled database watch.
+The [`activity.stats` reference](https://github.com/voxel51/fiftyone-activity#monitor)
+lists every key and suggests alert thresholds.
 
 ## Resource impact
 
