@@ -1,0 +1,20 @@
+{{- if and .Values.fiftyoneMq.enabled .Values.fiftyoneMq.redis.enabled (not .Values.fiftyoneMq.redis.external.url) }}
+{{- if and .Values.fiftyoneMq.redis.persistence.enabled (not .Values.fiftyoneMq.redis.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "fiftyone-mq.redis.name" . }}-data
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-mq.redis.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- with .Values.fiftyoneMq.redis.persistence.storageClass }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.fiftyoneMq.redis.persistence.size | default "1Gi" }}
+{{- end }}
+{{- end }}

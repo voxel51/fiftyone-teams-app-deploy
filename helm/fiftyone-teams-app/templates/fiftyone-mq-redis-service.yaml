@@ -1,0 +1,15 @@
+{{- if and .Values.fiftyoneMq.enabled .Values.fiftyoneMq.redis.enabled (not .Values.fiftyoneMq.redis.external.url) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "fiftyone-mq.redis.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-mq.redis.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "fiftyone-mq.redis.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: 6379
+      targetPort: 6379
+{{- end }}

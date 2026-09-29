@@ -90,9 +90,12 @@ jobs:
     needs: [all-tests, helm-unit, helm-integration, validate-chart-version]
     if: |
       always() &&
-      (needs.helm-unit.result == 'success' &&
-       needs.helm-integration.result == 'success' &&
-       needs.validate-chart-version.result == 'success')
+      (
+        needs.all-tests.result == 'success' &&
+        needs.helm-unit.result == 'success' &&
+        needs.helm-integration.result == 'success' &&
+        needs.validate-chart-version.result == 'success'
+      )
     uses: ./.github/workflows/pre-release-internal-env.yml
     secrets:
       REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}

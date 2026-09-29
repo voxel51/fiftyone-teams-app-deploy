@@ -36,7 +36,11 @@ if [ "${1}" == 'help' ]; then
   exit 0
 fi
 
+# fiftyone-activity is currently tagged in dev-docker by commit SHA rather than
+# by semver, so the version-regex modes report "Not found" for it. Use the
+# `latest` mode until the fiftyone-activity repo publishes semver tags.
 IMAGES=(
+  fiftyone-activity
   fiftyone-app
   fiftyone-teams-api
   fiftyone-teams-app

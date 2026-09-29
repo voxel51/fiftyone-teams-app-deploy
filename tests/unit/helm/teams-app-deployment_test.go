@@ -2609,3 +2609,85 @@ func (s *deploymentTeamsAppTemplateTest) TestDeploymentUpdateStrategy() {
 		})
 	}
 }
+
+// TestNoActivityDebugFlagDefaults pins the policy that the SHIPPING chart
+// never enables the activity/metrics debug flags by default: VFF_WF_ACTIVITY
+// gates the workflow Activity tab + label History and VFF_WF_METRIC gates the
+// pre-release Metrics tab — customers never get either implicitly.
+//
+// This case covers the default render, where activity capture is off.
+// TestActivityEnabledDoesNotSetUIFlags covers the render with capture on.
+func (s *deploymentTeamsAppTemplateTest) TestNoActivityDebugFlagDefaults() {
+	options := &helm.Options{SetValues: map[string]string{}}
+	output := helm.RenderTemplate(
+		s.T(), options, s.chartPath, s.releaseName, s.templates,
+	)
+	for _, flag := range []string{
+		"VFF_WF_ACTIVITY",
+		"VFF_WF_METRIC",
+		"VFF_Workflow_ACTIVITY",
+	} {
+		s.NotContains(
+			output, flag,
+			"the default chart render must not set %s — debug flags are per-env opt-ins",
+			flag,
+		)
+	}
+}
+
+// TestActivityEnabledDoesNotSetUIFlags pins that turning on capture does NOT
+// turn on the surfaces that read it. Both flags are internal debug views and
+// stay per-environment opt-ins via teamsAppSettings.env.
+//
+// Coupling VFF_WF_ACTIVITY to activitySettings.enabled was tried and
+// reverted: the only way to force it back off was a second teamsAppSettings
+// env entry, and a duplicate env name is not a supported override (the API
+// server warns under client-side apply and rejects under server-side apply).
+func (s *deploymentTeamsAppTemplateTest) TestActivityEnabledDoesNotSetUIFlags() {
+	options := &helm.Options{SetValues: map[string]string{
+		"activitySettings.enabled": "true",
+		"fiftyoneMq.enabled":       "true",
+	}}
+	output := helm.RenderTemplate(
+		s.T(), options, s.chartPath, s.releaseName, s.templates,
+	)
+
+	for _, flag := range []string{"VFF_WF_ACTIVITY", "VFF_WF_METRIC"} {
+		s.NotContains(
+			output, flag,
+			"enabling activitySettings must not set %s — the UI flags are "+
+				"per-environment opt-ins via teamsAppSettings.env",
+			flag,
+		)
+	}
+}
+
+// TestActivityUIFlagOptIn pins that an environment opting in through
+// teamsAppSettings.env gets exactly one VFF_WF_ACTIVITY entry. A second entry
+// would be a duplicate env name, which is not a supported override.
+func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagOptIn() {
+	options := &helm.Options{SetValues: map[string]string{
+		"activitySettings.enabled":             "true",
+		"fiftyoneMq.enabled":                   "true",
+		"teamsAppSettings.env.VFF_WF_ACTIVITY": "true",
+	}}
+	output := helm.RenderTemplate(
+		s.T(), options, s.chartPath, s.releaseName, s.templates,
+	)
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+
+	var values []string
+	for _, env := range deployment.Spec.Template.Spec.Containers[0].Env {
+		if env.Name == "VFF_WF_ACTIVITY" {
+			values = append(values, env.Value)
+		}
+	}
+
+	s.Require().Len(
+		values, 1,
+		"expected exactly one VFF_WF_ACTIVITY entry (no chart-rendered duplicate)",
+	)
+	s.Equal("true", values[0])
+}

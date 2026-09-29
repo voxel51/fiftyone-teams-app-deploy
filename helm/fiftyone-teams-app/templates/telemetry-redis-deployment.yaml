@@ -8,16 +8,20 @@ metadata:
     {{- include "telemetry.redis.labels" . | nindent 4 }}
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       {{- include "telemetry.redis.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         {{- include "telemetry.redis.labels" . | nindent 8 }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.telemetry.redis.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}

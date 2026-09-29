@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.25+ Activity Core](#fiftyone-enterprise-v225-activity-core)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
@@ -54,38 +55,10 @@ and update your deployment accordingly.
 Voxel51 provides a
 [minimum example `values.yaml`](../values.yaml).
 
-1. Edit the `values.yaml` file
-1. To upgrade an existing helm installation
-
-    1. Make sure you have followed the appropriate directions for
-       [Upgrading From Previous Versions](#upgrading-from-previous-versions)
-
-    1. Update your kubectl configuration to set your current namespace for
-       your kubectl context
-
-        ```shell
-        kubectl config set-context --current --namespace your-namespace-here
-        ```
-
-    1. Update your Voxel51 Helm repository and upgrade your FiftyOne Enterprise
-       deployment
-
-        ```shell
-        helm repo update voxel51
-        helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
-          -f ./values.yaml
-        ```
-
-    > **NOTE**: To view the changes Helm would apply during installations
-    > and upgrades, consider using
-    > [helm diff](https://github.com/databus23/helm-diff).
-    > Voxel51 is not affiliated with the author of this plugin.
-    >
-    > For example:
-    >
-    > ```shell
-    > helm diff -C1 upgrade fiftyone-teams-app voxel51/fiftyone-teams-app -f values.yaml
-    > ```
+For the general upgrade procedure, see the
+[Upgrades](../README.md#upgrades) section of the Helm Deployment Guide.
+The version-specific notes below cover additional changes required when
+upgrading from particular FiftyOne Enterprise versions.
 
 ### A Note On Database Migrations
 
@@ -126,10 +99,10 @@ quickstart  0.21.2
 
 ### From FiftyOne Enterprise Version 2.0.0 or Higher
 
-1. [Upgrade to FiftyOne Enterprise version 2.23.1](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise version 2.25.0](#upgrading-from-previous-versions)
 1. Voxel51 recommends upgrading all FiftyOne Enterprise SDK users to FiftyOne Enterprise
-   version 2.23.1
-    1. Login to the FiftyOne Enterprise UI
+   version 2.25.0
+    1. Log in to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
@@ -145,6 +118,64 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.25+ Activity Core
+
+FiftyOne Enterprise v2.25.0 introduces Activity Core: the basis for
+activity tracking across the app. It records operator runs, annotation and
+review decisions, and sample and label mutations, and rolls those events up
+into the data that the features built on it read — annotation metrics, the
+Audit Log, the Jobs pages, and more to come.
+
+It is a substrate rather than a feature of its own, so enabling it is what
+gives those surfaces anything to show.
+
+**Activity Core is opt-in and nothing changes on upgrade unless you
+enable it.** The chart renders no activity environment on the existing
+workloads and no new `Deployment`s while it is off.
+
+Enabling it requires two settings, which are a pair:
+
+```yaml
+# values.yaml
+activitySettings:
+  enabled: true
+fiftyoneMq:
+  enabled: true
+```
+
+- `activitySettings.enabled` tells the producer workloads (`teams-api`,
+  `fiftyone-app`, `teams-plugins`, and the delegated operators) to emit,
+  and renders one worker `Deployment` per activity worker.
+- `fiftyoneMq.enabled` renders the queue Redis that carries events from
+  the producers to the workers.
+
+Turning on activity without the queue fails the render rather than
+installing something that silently records nothing.
+
+The annotation Metrics tab is gated separately by the `VFF_WF_METRIC`
+app flag. Set it under `teamsAppSettings.env` alongside the pair above;
+see [Viewing the data](./configuring-activity-core.md#viewing-the-data).
+
+**Cluster requirements:**
+
+- `fiftyoneMq.redis.persistence.enabled` defaults to `true`, so the queue
+  Redis claims a `PersistentVolumeClaim` and needs a default
+  `StorageClass` — or set `persistence.storageClass` /
+  `persistence.existingClaim`. Set `persistence.enabled: false` to run on
+  an `emptyDir` instead, at the cost of losing queued events on a pod
+  reschedule.
+- An external Redis supplied through `fiftyoneMq.redis.external.url` must
+  use the `noeviction` maxmemory policy. An evicting policy deletes queued
+  jobs with no error on either side.
+
+**Resource impact:**
+Each worker requests `100m` CPU / `128Mi` memory (limits `500m` /
+`512Mi`), plus one bundled Redis pod.
+
+See the
+[Configuring Activity Core](./configuring-activity-core.md)
+documentation for full details.
 
 #### FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration
 
@@ -516,7 +547,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions 1.6.0 to 1.7.1
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.25.0 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -556,17 +587,17 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Enterprise version 2.23.1](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.23.1
-    1. Login to the FiftyOne Enterprise UI
+1. [Upgrade to FiftyOne Enterprise version 2.25.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.25.0
+    1. Log in to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. Upgrade all the datasets
 
-    > **NOTE**: Any FiftyOne SDK less than 2.23.1 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.25.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.23.1` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.25.0` is recommended before migrating
     > your database.
 
     ```shell
@@ -581,7 +612,7 @@ For a full list of settings, please refer to the
 
 ### From FiftyOne Enterprise Versions After 1.1.0 and Before Version 1.6.0
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires*
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.25.0 *requires*
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted
 > Web App. You should coordinate this upgrade carefully with your
@@ -600,7 +631,7 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.25.0 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -640,17 +671,17 @@ For a full list of settings, please refer to the
     1. `secret.fiftyone.fiftyoneAuthSecret` (or your deployment's equivalent)
         1. This sets the `FIFTYONE_AUTH_SECRET` environment variable
            in the appropriate service pods
-1. [Upgrade to FiftyOne Enterprise version 2.23.1](#upgrading-from-previous-versions)
-1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.23.1
-    1. Login to the FiftyOne Enterprise UI
+1. [Upgrade to FiftyOne Enterprise version 2.25.0](#upgrading-from-previous-versions)
+1. Upgrade FiftyOne Enterprise SDK users to FiftyOne Enterprise version 2.25.0
+    1. Log in to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated with
       your FiftyOne Enterprise version, navigate to `Account > Install FiftyOne`
 
 1. Upgrade all the datasets
 
-    > **NOTE**: Any FiftyOne SDK less than 2.23.1 will lose connectivity after
+    > **NOTE**: Any FiftyOne SDK less than 2.25.0 will lose connectivity after
     > this point.
-    > Upgrading all SDKs to `fiftyone==2.23.1` is recommended before migrating
+    > Upgrading all SDKs to `fiftyone==2.25.0` is recommended before migrating
     > your database.
 
     ```shell
@@ -682,14 +713,14 @@ For a full list of settings, please refer to the
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires*
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.25.0 *requires*
 > your users to log in after the upgrade is complete.
 > This will interrupt active workflows in the FiftyOne Enterprise Hosted Web App.
 > You should coordinate this upgrade carefully with your end-users.
 
 ---
 
-> **NOTE**: Upgrading to FiftyOne Enterprise v2.23.1 *requires* a license file.
+> **NOTE**: Upgrading to FiftyOne Enterprise v2.25.0 *requires* a license file.
 > Please contact your Customer Success Team before upgrading to FiftyOne Enterprise
 > 2.0 or beyond.
 >
@@ -728,11 +759,11 @@ For a full list of settings, please refer to the
       fiftyone-license --from-file=license=./your-license-file
     ```
 
-1. [Upgrade to FiftyOne Enterprise v2.23.1](#upgrading-from-previous-versions)
+1. [Upgrade to FiftyOne Enterprise v2.25.0](#upgrading-from-previous-versions)
     > **NOTE**: At this step, FiftyOne SDK users will lose access to the
-    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.23.1`
-1. Upgrade your FiftyOne SDKs to version 2.23.1
-    1. Login to the FiftyOne Enterprise UI
+    > FiftyOne Enterprise Database until they upgrade to `fiftyone==2.25.0`
+1. Upgrade your FiftyOne SDKs to version 2.25.0
+    1. Log in to the FiftyOne Enterprise UI
     1. To obtain the CLI command to install the FiftyOne SDK associated
       with your FiftyOne Enterprise version, navigate to
       `Account > Install FiftyOne`

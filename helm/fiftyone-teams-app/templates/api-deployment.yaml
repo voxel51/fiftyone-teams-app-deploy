@@ -1,3 +1,7 @@
+{{- /* Hooked here because teams-api always renders, so the check runs on
+every install and upgrade rather than only when the activity templates
+happen to be reached. */}}
+{{- include "activity.validate" . }}
 {{- $serviceAccountName := include "fiftyone-teams-app.serviceAccountName" . }}
 {{- if or (.Values.apiSettings.rbac.create) (.Values.apiSettings.rbac.serviceAccount.name) }}
 {{- $serviceAccountName = include "teams-api-rbac.service-account-name" . }}

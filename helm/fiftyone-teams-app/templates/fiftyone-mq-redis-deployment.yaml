@@ -1,0 +1,72 @@
+{{- if and .Values.fiftyoneMq.enabled .Values.fiftyoneMq.redis.enabled (not .Values.fiftyoneMq.redis.external.url) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fiftyone-mq.redis.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "fiftyone-mq.redis.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "fiftyone-mq.redis.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "fiftyone-mq.redis.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.fiftyoneMq.redis.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: redis
+          image: {{ .Values.fiftyoneMq.redis.image | default "redis:7-alpine" }}
+          {{- with .Values.fiftyoneMq.redis.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- /* AOF (appendonly) with appendfsync everysec bounds queue loss on
+                 a Redis restart to ~1s of writes. Without it the queue is
+                 memory-only and a restart starts empty, losing every job that
+                 had not been consumed.
+
+                 AOF rather than the RDB snapshots the telemetry cache uses
+                 (--save 60 1): a snapshot interval is the wrong loss bound for
+                 a work queue.
+
+                 This bounds ONE loss window. It does not make the pipeline
+                 durable end to end — see FOEPD-4411. */}}
+          args:
+            - redis-server
+            - --appendonly
+            - "yes"
+            - --appendfsync
+            - everysec
+            - --dir
+            - /data
+            - --maxmemory
+            - {{ .Values.fiftyoneMq.redis.maxmemory | default "200mb" | quote }}
+            - --maxmemory-policy
+            - noeviction
+          ports:
+            - containerPort: 6379
+          {{- with .Values.fiftyoneMq.redis.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          {{- if .Values.fiftyoneMq.redis.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.fiftyoneMq.redis.persistence.existingClaim | default (printf "%s-data" (include "fiftyone-mq.redis.name" .)) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}
