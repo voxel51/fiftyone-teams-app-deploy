@@ -382,6 +382,7 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- include "activity.enabled-env" . }}
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
+{{- include "activity.archive-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:

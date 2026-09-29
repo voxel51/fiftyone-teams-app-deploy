@@ -4,6 +4,69 @@
     "activitySettings": {
       "description": "FiftyOne Activity Core workers. Activity Core is the basis for activity\ntracking across the app — annotation metrics, the Audit Log, the Jobs\npages, and more. The workers read the queue populated by the producers and\nwrite the activity_* collections.",
       "properties": {
+        "archive": {
+          "description": "Deployment-level Events retention and archiving. These configure the\narchiver in teams-api (Settings \u003e Events) and the prune worker's storage\ncap. Without `lockSettings` they are defaults an admin can change on the\nEvents page; with it they are the configuration.",
+          "properties": {
+            "afterDays": {
+              "default": "",
+              "description": "For the `time` trigger: archive events older than this many days.\nWhen empty, the activity retention horizon (365 days).",
+              "required": [],
+              "title": "afterDays",
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "bucketPath": {
+              "default": "",
+              "description": "Bucket prefix archives are written under, e.g. `gs://my-bucket` or\n`s3://my-bucket/prefix`. Chunks land under `\u003cbucketPath\u003e/activity/`.\nWritten with the teams-api pod's own cloud credentials (workload\nidentity, an instance role, or a mounted key).",
+              "title": "bucketPath",
+              "type": "string"
+            },
+            "lockSettings": {
+              "default": false,
+              "description": "Lock the configuration: these values win over anything saved on the\nEvents page, and the page shows them read-only.",
+              "title": "lockSettings",
+              "type": "boolean"
+            },
+            "maxStorageBytes": {
+              "default": 10737418240,
+              "description": "The event store's size budget in bytes: the `space` trigger's\nthreshold AND the prune worker's cap, set from one value so the two\ncannot disagree. Default 10 GiB (10737418240).",
+              "required": [],
+              "title": "maxStorageBytes",
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "retentionMode": {
+              "default": "",
+              "description": "What happens to old events: `archive`, `delete`, or `keep`. When\nempty, events are archived if `bucketPath` is set and deleted otherwise.",
+              "enum": [
+                "",
+                "archive",
+                "delete",
+                "keep"
+              ],
+              "required": [],
+              "title": "retentionMode"
+            },
+            "trigger": {
+              "default": "",
+              "description": "What triggers archiving: `time` (events older than `afterDays`) or\n`space` (the oldest events, while the event store exceeds\n`maxStorageBytes`). When empty, `time`.",
+              "enum": [
+                "",
+                "time",
+                "space"
+              ],
+              "required": [],
+              "title": "trigger"
+            }
+          },
+          "required": [],
+          "title": "archive",
+          "type": "object"
+        },
         "enabled": {
           "default": false,
           "description": "Controls whether the Activity Core worker Deployments are rendered and\nwhether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit. The UI surfaces that read\nthe result are separate, default-off opt-ins through `teamsAppSettings.env`\n(`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel,\n`VFF_WF_METRIC` for the pre-release Metrics tab).\nEnable `fiftyoneMq.enabled` alongside this; the chart fails the render if\nonly one of the two is on.",
