@@ -12,7 +12,7 @@ activitySettings:
   # `VFF_WF_METRIC` for the pre-release Metrics tab).
   # Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if
   # only one of the two is on.
-  enabled: false
+  enabled: true
   image:
     # -- Worker image.
     repository: voxel51/fiftyone-activity
@@ -392,6 +392,8 @@ appSettings:
   deploymentAnnotations: {}
   # Environment Variables are passed to the `fiftyone-app` containers
   env:
+    # -- Activity Analytics browser tracker (ephem default-on).
+    VFF_WF_ACTIVITY: true
     # @schema
     # type: ["string", "boolean"]
     # @schema
@@ -1274,7 +1276,7 @@ fiftyoneLicenseSecrets:
 fiftyoneMq:
   # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
   # environment variable are rendered.
-  enabled: false
+  enabled: true
   redis:
     # -- Controls whether the bundled Redis Deployment and Service are
     # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.
@@ -1407,6 +1409,8 @@ pluginsSettings:
     targetMemoryUtilizationPercentage: 80
   # Environment Variables are passed to the `teams-plugins` containers.
   env:
+    # -- Activity Analytics browser tracker (ephem default-on).
+    VFF_WF_ACTIVITY: true
     # @schema
     # type: ["string", "boolean"]
     # @schema
@@ -1655,6 +1659,10 @@ teamsAppSettings:
   deploymentAnnotations: {}
   # Environment Variables are passed to the `teams-app` containers.
   env:
+    # -- Activity tab + label History (ephem default-on).
+    VFF_WF_ACTIVITY: true
+    # -- Metrics tab (ephem default-on).
+    VFF_WF_METRIC: true
     # @schema
     # type: ["string", "boolean"]
     # @schema
