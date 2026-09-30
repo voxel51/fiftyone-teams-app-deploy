@@ -43,8 +43,8 @@ spec:
           env:
             {{- /* These Deployments only render when activitySettings.enabled
                    is true, so the helper always emits here. It is included
-                   anyway rather than hard-coded: the rollup and snapshot
-                   workers emit derived events of their own, and those emits
+                   anyway rather than hard-coded: the rollup worker emits
+                   derived events of its own, and those emits
                    go through the same flag-gated path as the producers. A
                    worker that consumed the queue but could not emit would
                    silently drop the derived rollup events. */}}
@@ -71,11 +71,11 @@ spec:
                   name: {{ $.Values.secret.name }}
                   key: fiftyoneDatabaseName
               {{- end }}
-            {{- /* The snapshot worker reads the FiftyOne (datasets) database —
-                   a DIFFERENT database from the activity store, though the same
-                   Mongo instance — and stamps its org onto the snapshot event,
-                   since the rollups are tenant-scoped. The database name comes
-                   from the same secret every other service reads it from. */}}
+            {{- /* The rollup worker's database watch reads the FiftyOne
+                   (datasets) database — a DIFFERENT database from the activity
+                   store, though the same Mongo instance. The database name
+                   comes from the same secret every other service reads it
+                   from. */}}
             - name: FIFTYONE_DATABASE_NAME
               valueFrom:
                 secretKeyRef:
@@ -86,21 +86,14 @@ spec:
                    condition lives in one place instead of a second variant
                    here. An unset org id must not render as an empty string:
                    the workers cannot tell that apart from a deliberate blank.
-
-                   Unset is the intended normal case, but NOT yet with the
-                   image pinned in values.yaml. Org discovery lands in
-                   fiftyone-activity 0.0.27 (voxel51/fiftyone-activity#17);
-                   the pinned v0.0.26 build still requires the org id, and
-                   rollups are org-scoped, so without one the snapshot worker
-                   skips every cycle — a "successful" install of a silently
-                   empty pipeline. Until the pin moves, orgId must be set;
-                   the values.yaml comment says so too. */}}
+                   It scopes only the events the workers record themselves;
+                   the dataset and sample counts come from teams-api. */}}
             {{- with (include "activity.org-id-env" $ | trim) }}
             {{- . | nindent 12 }}
             {{- end }}
-            {{- if $a.snapshotIntervalMs }}
-            - name: FIFTYONE_ACTIVITY_SNAPSHOT_INTERVAL_MS
-              value: {{ $a.snapshotIntervalMs | quote }}
+            {{- if and (eq $name "rollup") $a.watch.enabled }}
+            - name: FIFTYONE_ACTIVITY_WATCH_ENABLED
+              value: "true"
             {{- end }}
             {{- if $a.liveness.enabled }}
             - name: FIFTYONE_MQ_HEARTBEAT_FILE

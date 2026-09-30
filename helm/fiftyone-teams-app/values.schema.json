@@ -99,7 +99,7 @@
         },
         "orgId": {
           "default": "",
-          "description": "Organization that the deployment-wide rollups are attributed to. This is\nthe organization's `id` FIELD (its slug), not the Mongo `_id`.\nLeave empty: a single-org deployment is discovered automatically. Set it\nonly when the deployment holds several organizations, where the\ndeployment-wide counts cannot be attributed to one of them — the workers\nlog which one to name.",
+          "description": "Organization stamped on the events the workers record themselves (the\ndatabase watch), which carry no request to take one from. This is the\norganization's `id` FIELD (its slug), not the Mongo `_id`. Per-request\nevents and the dataset and sample counts (read by `teams-api` from CAS)\ncarry the organization without it.",
           "title": "orgId",
           "type": "string"
         },
@@ -145,11 +145,18 @@
           "title": "resources",
           "type": "object"
         },
-        "snapshotIntervalMs": {
-          "default": "",
-          "description": "Snapshot interval in milliseconds. Defaults to hourly, matching the\nbucket the state metrics roll up by.",
-          "title": "snapshotIntervalMs",
-          "type": "string"
+        "watch": {
+          "properties": {
+            "enabled": {
+              "default": true,
+              "description": "Controls whether the rollup worker watches the FiftyOne database's\nchange stream, recording writes no service reported (such as direct\ndatabase edits). Needs a replica set; on a standalone MongoDB it records\nnothing and logs why.",
+              "title": "enabled",
+              "type": "boolean"
+            }
+          },
+          "required": [],
+          "title": "watch",
+          "type": "object"
         },
         "workers": {
           "description": "One Deployment is rendered per entry.",
@@ -248,38 +255,6 @@
               },
               "required": [],
               "title": "rollup",
-              "type": "object"
-            },
-            "snapshot": {
-              "properties": {
-                "command": {
-                  "description": "Entrypoint for the snapshot worker.",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      }
-                    ],
-                    "required": []
-                  },
-                  "title": "command",
-                  "type": "array"
-                },
-                "recreate": {
-                  "default": true,
-                  "description": "Use the `Recreate` strategy. The snapshot worker owns a repeatable\nschedule, and two replicas would double-count a bucket.",
-                  "title": "recreate",
-                  "type": "boolean"
-                },
-                "replicaCount": {
-                  "default": 1,
-                  "description": "Number of snapshot worker replicas. Keep at 1.",
-                  "title": "replicaCount",
-                  "type": "integer"
-                }
-              },
-              "required": [],
-              "title": "snapshot",
               "type": "object"
             }
           },
