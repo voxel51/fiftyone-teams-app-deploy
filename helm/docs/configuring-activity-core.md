@@ -15,6 +15,7 @@ makes those surfaces have anything to show.
 - [Overview](#overview)
 - [Enabling Activity Core](#enabling-activity-core)
 - [Queue durability](#queue-durability)
+- [Worker liveness](#worker-liveness)
 - [Using an external Redis](#using-an-external-redis)
 - [Multi-organization deployments](#multi-organization-deployments)
 - [Viewing the data](#viewing-the-data)
@@ -96,6 +97,32 @@ redis GID so the mounted `/data` stays writable.
 This bounds one loss window rather than making the pipeline durable end
 to end: the in-process emit buffer is cleared when an enqueue fails, and
 enqueuing is not atomic with the domain change the event describes.
+
+## Worker liveness
+
+When the queue Redis pod is replaced (a reschedule, an upgrade), the
+workers' existing connections go silent rather than closing. Workers
+built on fiftyone-mq 0.0.7 or later time those connections out and
+reconnect. If a worker cannot reconnect, it exits so Kubernetes restarts
+it.
+
+As a backstop, each worker refreshes a heartbeat file while its queue
+poll loop is making progress. The chart gives every worker an exec
+liveness probe that fails when the file is older than
+`activitySettings.liveness.maxHeartbeatAgeSeconds` (180 by default). The
+probe passes while the file does not exist, so worker images that
+predate the heartbeat are not restarted by it.
+
+```yaml
+activitySettings:
+  liveness:
+    enabled: true
+    heartbeatFile: /tmp/fiftyone-mq-heartbeat
+    maxHeartbeatAgeSeconds: 180
+```
+
+The symptom this guards against is a worker that stays `Running` and
+`Ready` while `bull:activity.ingest:wait` keeps growing.
 
 ## Using an external Redis
 

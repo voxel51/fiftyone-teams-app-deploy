@@ -20,6 +20,31 @@ activitySettings:
     tag: ""
     # -- Worker image pull policy. [Reference][image-pull-policy].
     pullPolicy: IfNotPresent
+  liveness:
+    # -- Controls whether the worker containers get a liveness probe. Each
+    # worker refreshes a heartbeat file every few seconds while its queue
+    # poll loop is making progress (fiftyone-mq 0.0.7+); the probe restarts a
+    # worker that is running but no longer draining, such as one left wedged
+    # on a dead connection after the queue Redis pod was replaced. The probe
+    # passes while the file does not exist, so older worker images are
+    # unaffected. [Reference][probes].
+    enabled: true
+    # -- Path of the heartbeat file, passed to the workers as
+    # `FIFTYONE_MQ_HEARTBEAT_FILE`. Must be writable by the container.
+    heartbeatFile: /tmp/fiftyone-mq-heartbeat
+    # -- Seconds since the last heartbeat after which a probe attempt fails.
+    # Keep it above the workers' own stall timeout
+    # (`FIFTYONE_MQ_WORKER_STALL_TIMEOUT_S`, 120 by default) so the worker
+    # normally exits on its own first.
+    maxHeartbeatAgeSeconds: 180
+    # -- Number of times to retry the liveness probe for the workers. [Reference][probes].
+    failureThreshold: 3
+    # -- Seconds to wait before the first liveness probe for the workers. [Reference][probes].
+    initialDelaySeconds: 30
+    # -- How often (in seconds) to perform the liveness probe for the workers. [Reference][probes].
+    periodSeconds: 30
+    # -- Number of seconds after which the liveness probe times out for the workers. [Reference][probes].
+    timeoutSeconds: 5
   mongo:
     # -- Database holding the activity_* collections. When empty, they are
     # co-located in the per-deployment FiftyOne database. Set a name to use a
