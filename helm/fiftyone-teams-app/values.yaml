@@ -14,10 +14,11 @@ activitySettings:
   # only one of the two is on.
   enabled: true
   image:
-    # -- Worker image.
-    repository: voxel51/fiftyone-activity
-    # -- Worker image tag. Defaults to the chart `appVersion`.
-    tag: ""
+    # -- Worker image. EPHEM BRANCH: the public image is not published yet,
+    # so pin the internally built image from the fiftyone-activity repo.
+    repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
+    # -- Worker image tag. EPHEM BRANCH: pinned to the latest internal build.
+    tag: "v2.26.0.dev29_31c949bc4c11"
     # -- Worker image pull policy. [Reference][image-pull-policy].
     pullPolicy: IfNotPresent
   liveness:
