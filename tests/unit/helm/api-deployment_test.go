@@ -474,6 +474,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -499,6 +503,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneDatabaseName"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
@@ -596,6 +604,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -621,6 +633,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneDatabaseName"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
@@ -732,6 +748,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -757,6 +777,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneDatabaseName"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
@@ -865,6 +889,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -890,6 +918,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneDatabaseName"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
@@ -986,6 +1018,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -1011,6 +1047,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneDatabaseName"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
@@ -1107,6 +1147,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -1132,6 +1176,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneDatabaseName"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
