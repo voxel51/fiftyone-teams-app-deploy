@@ -25,6 +25,7 @@
   - [Example Volume Configuration](#example-volume-configuration)
 - [`fiftyone-app` Memory Sizing](#fiftyone-app-memory-sizing)
   - [Recommended Starting Point](#recommended-starting-point)
+- [External Orchestrators](#external-orchestrators)
 - [Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`](#pinning-projection-processing-with-fiftyone_projection_delegation_target)
   - [Behavior When Set](#behavior-when-set)
   - [Naming Your `teams-do` Worker](#naming-your-teams-do-worker)
@@ -45,6 +46,9 @@ Running multimodal datasets requires:
 
 1. Setting the `VFF_MULTIMODAL` environment variable (feature flag) on
    every service that serves or processes multimodal data.
+1. Installing the `multimodal` extra (`fiftyone[multimodal]`) on any
+   external orchestrator that may run the projection pipeline — see
+   [External Orchestrators](#external-orchestrators).
 1. Providing sufficient disk space on `teams-do` (delegated operator) containers
    for projection compaction to succeed — optionally redirected to a
    mounted volume via the `FIFTYONE_COMPACTION_TEMP_LOCATION` environment variable.
@@ -198,6 +202,34 @@ services:
 This gives ≈1.6G per DuckDB query (`4G × 0.8 ÷ 2`). If your widest
 projections (many columns) return empty sidebar filters, raise
 `fiftyone-app` memory or lower `HYPERCORN_WORKERS`.
+
+## External Orchestrators
+
+The `teams-do` image ships with every dependency the projection pipeline
+needs. Orchestrators you build yourself install the `fiftyone` package
+themselves, and the bare package does not include the projection
+dependencies:
+
+- [Databricks](../../docs/orchestrators/configuring-databricks-orchestrator.md)
+- [Anyscale](../../docs/orchestrators/configuring-anyscale-orchestrator.md)
+- [Kubernetes](../../docs/orchestrators/configuring-kubernetes-orchestrator.md)
+
+Any external orchestrator that may run the projection pipeline must:
+
+1. Install the `multimodal` extra, `fiftyone[multimodal]==<version>`, which
+   provides `pyiceberg`, `pyarrow`, `duckdb`, `mcap`, and the stream
+   decoders. `pyiceberg>=0.10` is required: older releases cannot read
+   tables in cloud storage during compaction and fail with
+   `Expected PyArrowFileIO or FsspecFileIO`.
+1. Set `VFF_MULTIMODAL=1` in the job's environment, like every other
+   service that processes multimodal data.
+1. Provide compaction scratch space, sized per
+   [Delegated Operator Scratch Space Requirements](#delegated-operator-scratch-space-requirements).
+
+By default `teams-api` selects the lowest-compute active orchestrator for
+projection work, so an external orchestrator that is missing these can be
+chosen automatically. To keep projections on a `teams-do` worker instead,
+pin them with `FIFTYONE_PROJECTION_DELEGATION_TARGET` (next section).
 
 ## Pinning Projection Processing With `FIFTYONE_PROJECTION_DELEGATION_TARGET`
 
