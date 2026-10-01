@@ -251,8 +251,10 @@ to `limits` so the scheduler reserves what DuckDB will actually use.
 
 ## External Orchestrators
 
-The Voxel51 delegated-operator images ship with every dependency the
-projection pipeline needs. Orchestrators you build yourself install the
+The `delegatedOperatorDeployments` workloads run
+`voxel51/fiftyone-teams-cv-full` by default, which includes every
+dependency the projection pipeline needs (as does `voxel51/fiftyone-app`,
+which it builds on). Orchestrators you build yourself install the
 `fiftyone` package themselves, and the bare package does not include the
 projection dependencies:
 

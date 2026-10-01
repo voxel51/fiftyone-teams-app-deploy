@@ -46,15 +46,12 @@ Running multimodal datasets requires:
 
 1. Setting the `VFF_MULTIMODAL` environment variable (feature flag) on
    every service that serves or processes multimodal data.
-1. Installing the `multimodal` extra (`fiftyone[multimodal]`) on any
-   external orchestrator that may run the projection pipeline — see
-   [External Orchestrators](#external-orchestrators).
-1. Providing sufficient disk space on `teams-do` (delegated operator) containers
+2. Providing sufficient disk space on `teams-do` (delegated operator) containers
    for projection compaction to succeed — optionally redirected to a
    mounted volume via the `FIFTYONE_COMPACTION_TEMP_LOCATION` environment variable.
-1. Providing enough memory on `fiftyone-app` to serve multimodal grid queries, which
+3. Providing enough memory on `fiftyone-app` to serve multimodal grid queries, which
    run DuckDB in-process.
-1. Optionally, setting `FIFTYONE_PROJECTION_DELEGATION_TARGET` to pin projection
+4. Optionally, setting `FIFTYONE_PROJECTION_DELEGATION_TARGET` to pin projection
    processing to a specific `teams-do` worker instead of relying on
    automatic selection.
 
@@ -205,10 +202,11 @@ projections (many columns) return empty sidebar filters, raise
 
 ## External Orchestrators
 
-The `teams-do` image ships with every dependency the projection pipeline
-needs. Orchestrators you build yourself install the `fiftyone` package
-themselves, and the bare package does not include the projection
-dependencies:
+The `teams-do` services run `voxel51/fiftyone-teams-cv-full` by default,
+which includes every dependency the projection pipeline needs (as does
+`voxel51/fiftyone-app`, which it builds on). Orchestrators you build
+yourself install the `fiftyone` package themselves, and the bare package
+does not include the projection dependencies:
 
 - [Databricks](../../docs/orchestrators/configuring-databricks-orchestrator.md)
 - [Anyscale](../../docs/orchestrators/configuring-anyscale-orchestrator.md)
