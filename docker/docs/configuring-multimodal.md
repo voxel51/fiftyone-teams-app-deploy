@@ -46,12 +46,15 @@ Running multimodal datasets requires:
 
 1. Setting the `VFF_MULTIMODAL` environment variable (feature flag) on
    every service that serves or processes multimodal data.
-2. Providing sufficient disk space on `teams-do` (delegated operator) containers
+1. Installing the `multimodal` extra (`fiftyone[multimodal]`) on any
+   external orchestrator that may run the projection pipeline — see
+   [External Orchestrators](#external-orchestrators).
+1. Providing sufficient disk space on `teams-do` (delegated operator) containers
    for projection compaction to succeed — optionally redirected to a
    mounted volume via the `FIFTYONE_COMPACTION_TEMP_LOCATION` environment variable.
-3. Providing enough memory on `fiftyone-app` to serve multimodal grid queries, which
+1. Providing enough memory on `fiftyone-app` to serve multimodal grid queries, which
    run DuckDB in-process.
-4. Optionally, setting `FIFTYONE_PROJECTION_DELEGATION_TARGET` to pin projection
+1. Optionally, setting `FIFTYONE_PROJECTION_DELEGATION_TARGET` to pin projection
    processing to a specific `teams-do` worker instead of relying on
    automatic selection.
 
