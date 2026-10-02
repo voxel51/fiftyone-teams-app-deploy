@@ -69,17 +69,14 @@ add them here.
 for any zoo model in the [FiftyOne documentation](https://docs.voxel51.com/model_zoo/models.html):
 find the model, then look under `Requirements` > `Packages`.
 - If your deployment uses multimodal datasets, install the `multimodal`
-  extra, `fiftyone[multimodal]==<version>`, instead of the bare `fiftyone`
-  package. Projection ingestion and compaction run on the orchestrator and
-  need `pyiceberg>=0.10`, `pyarrow`, `duckdb`, `mcap`, and the other
-  packages that extra provides. See the multimodal configuration guide for
+  extra, `fiftyone[multimodal]==<version>`, and add an explicit
+  `pyiceberg[pyarrow,sql-sqlite]>=0.10,<1` line. Databricks Runtime 17
+  preinstalls `pyiceberg 0.9.0`, which satisfies the extra's own floor but
+  cannot compact projection tables in cloud storage. See the multimodal
+  configuration guide for
   [docker](../../docker/docs/configuring-multimodal.md#external-orchestrators)
   or
   [helm](../../helm/docs/configuring-multimodal.md#external-orchestrators).
-  If the extra's `pyarrow` or `protobuf` pins conflict with the Databricks
-  runtime, keep the runtime's versions and add the remaining packages
-  individually, at minimum `pyiceberg[pyarrow,sql-sqlite]>=0.10,<1`,
-  `duckdb>=1,<2`, `mcap>=1.3.1,<2`, and `rosbags>=0.9.20,<1`.
 
 Save your `DBFS_PATH` for later as it will be used when creating your
 job configuration. The script will also create the file in your Databricks
@@ -100,7 +97,8 @@ DBFS_PATH = "/FileStore/my_project/requirements.txt"
 
 PYTHON_DEPENDENCIES = [
    "fiftyone==2.25.1",  # use your FiftyOne version here
-   # "fiftyone[multimodal]==2.25.1",  # use instead for multimodal datasets
+   # "fiftyone[multimodal]==2.25.1",  # multimodal datasets: use instead...
+   # "pyiceberg[pyarrow,sql-sqlite]>=0.10,<1",  # ...and add this line
    "ultralytics",
    "torch",
    "transformers",
