@@ -1363,6 +1363,26 @@ ingress:
       serviceName: teams-cas
       # -- (int) Ingress path service port
       servicePort: 80
+    # -- Ingress path for teams-api's agent gateway surface. Without this,
+    # /agent falls through to the teams-app catch-all below instead of
+    # teams-api. Used directly by the CLI's `fiftyone agent` commands.
+    - path: /agent
+      # -- Ingress path type
+      pathType: Prefix
+      # -- Ingress path service name
+      serviceName: teams-api
+      # -- (int) Ingress path service port
+      servicePort: 80
+    # -- Ingress path for the enterprise agent gateway (MCP), for clients
+    # like Claude Code. `serviceName` must point at wherever you deploy
+    # the mcp-gateway workload; this chart does not provision it yet.
+    - path: /mcp
+      # -- Ingress path type
+      pathType: Prefix
+      # -- Ingress path service name
+      serviceName: mcp-gateway
+      # -- (int) Ingress path service port
+      servicePort: 80
     # -- Ingress path for teams-app
     - path: /*
       # -- Ingress path type
