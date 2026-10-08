@@ -862,6 +862,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
 | apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
 | apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api` to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators. |
+| apiSettings.env.FEATURE_FLAG_ENABLE_AGENT_GATEWAY | bool | `false` |  |
 | apiSettings.env.FIFTYONE_DO_EXPIRATION_DAYS | int | `1` | Deprecated use `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` instead. The amount of time in days that an unmonitored delegated operation can run before being automatically terminated. Overridden by `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` if provided. |
 | apiSettings.env.FIFTYONE_DO_EXPIRATION_MINUTES | int | `30` | The amount of time in minutes that a monitored delegated operation can run without reporting its status before being automatically terminated. If your executor was launched with the `-m` argument or is push based, then it is monitored. |
 | apiSettings.env.FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES | int | `nil` | The amount of time in minutes that an unmonitored delegated operation can run before being automatically terminated. Overrides `FIFTYONE_DO_EXPIRATION_DAYS` if provided. |
@@ -983,9 +984,12 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-cas`. [Reference][affinity]. |
 | casSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-cas` deployment. [Reference][annotations]. |
 | casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
+| casSettings.env.CAS_AGENT_SCOPE_ENABLED | bool | `false` |  |
 | casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
+| casSettings.env.CAS_DEVICE_AUTH_ENABLED | bool | `false` |  |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
+| casSettings.env.CAS_SERVICE_AUTH_ALLOWED | string | `"teams-api"` |  |
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
 | casSettings.env.FIFTYONE_AUTH_MODE | string | `"legacy"` | Configure Authentication Mode. One of `legacy` or `internal` |
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
@@ -1112,15 +1116,23 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
 | ingress.enabled | bool | `true` | Controls whether to create the ingress. When `false`, uses a pre-existing ingress. [Reference][ingress]. |
 | ingress.labels | object | `{}` | Additional labels for the ingress. [Reference][labels-and-selectors]. |
-| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
+| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/agent","pathType":"Prefix","serviceName":"teams-api","servicePort":80},{"path":"/mcp","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
 | ingress.paths[0] | object | `{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
 | ingress.paths[0].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[0].serviceName | string | `"teams-cas"` | Ingress path service name |
 | ingress.paths[0].servicePort | int | `80` | Ingress path service port |
-| ingress.paths[1] | object | `{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}` | Ingress path for teams-app |
-| ingress.paths[1].pathType | string | `"ImplementationSpecific"` | Ingress path type |
-| ingress.paths[1].serviceName | string | `"teams-app"` | Ingress path service name |
+| ingress.paths[1] | object | `{"path":"/agent","pathType":"Prefix","serviceName":"teams-api","servicePort":80}` | Ingress path for teams-api's agent gateway surface. Without this, /agent falls through to the teams-app catch-all below instead of teams-api. Used directly by the CLI's `fiftyone agent` commands. |
+| ingress.paths[1].pathType | string | `"Prefix"` | Ingress path type |
+| ingress.paths[1].serviceName | string | `"teams-api"` | Ingress path service name |
 | ingress.paths[1].servicePort | int | `80` | Ingress path service port |
+| ingress.paths[2] | object | `{"path":"/mcp","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80}` | Ingress path for the enterprise agent gateway (MCP), for clients like Claude Code. `serviceName` must point at wherever you deploy the mcp-gateway workload; this chart does not provision it yet. |
+| ingress.paths[2].pathType | string | `"Prefix"` | Ingress path type |
+| ingress.paths[2].serviceName | string | `"mcp-gateway"` | Ingress path service name |
+| ingress.paths[2].servicePort | int | `80` | Ingress path service port |
+| ingress.paths[3] | object | `{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}` | Ingress path for teams-app |
+| ingress.paths[3].pathType | string | `"ImplementationSpecific"` | Ingress path type |
+| ingress.paths[3].serviceName | string | `"teams-app"` | Ingress path service name |
+| ingress.paths[3].servicePort | int | `80` | Ingress path service port |
 | ingress.tlsEnabled | bool | `true` | Controls whether the chart managed ingress contains a `spec.tls` stanza. |
 | ingress.tlsSecretName | string | `"fiftyone-teams-tls-secret"` | Name of secret containing TLS certificate for `teams-app`. Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`. When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`. |
 | namespace.create | bool | `false` | Controls whether to create the namespace. When `false`, the namespace must already exists. |

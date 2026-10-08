@@ -316,6 +316,11 @@
         "env": {
           "description": "Environment Variables are passed to the `teams-api` containers",
           "properties": {
+            "FEATURE_FLAG_ENABLE_AGENT_GATEWAY": {
+              "default": false,
+              "title": "FEATURE_FLAG_ENABLE_AGENT_GATEWAY",
+              "type": "boolean"
+            },
             "FIFTYONE_DO_EXPIRATION_DAYS": {
               "default": 1,
               "description": "Deprecated use `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` instead. The amount of time in days that an unmonitored delegated operation can\nrun before being automatically terminated. Overridden by `FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES` if provided.",
@@ -1616,6 +1621,11 @@
         "env": {
           "description": "Environment Variables are passed to the `teams-cas` containers",
           "properties": {
+            "CAS_AGENT_SCOPE_ENABLED": {
+              "default": false,
+              "title": "CAS_AGENT_SCOPE_ENABLED",
+              "type": "boolean"
+            },
             "CAS_DATABASE_NAME": {
               "default": "cas",
               "description": "Provide the name for the CAS database.\nWhen multiple deployments use the same database instance,\nset `CAS_DATABASE_NAME` to a unique value for each deployment.",
@@ -1628,10 +1638,20 @@
               "title": "CAS_DEFAULT_USER_ROLE",
               "type": "string"
             },
+            "CAS_DEVICE_AUTH_ENABLED": {
+              "default": false,
+              "title": "CAS_DEVICE_AUTH_ENABLED",
+              "type": "boolean"
+            },
             "CAS_MONGODB_URI_KEY": {
               "default": "mongodbConnectionString",
               "description": "The key from `secret.fiftyone.name` that contains the CAS MongoDB\nConnection String.",
               "title": "CAS_MONGODB_URI_KEY",
+              "type": "string"
+            },
+            "CAS_SERVICE_AUTH_ALLOWED": {
+              "default": "teams-api",
+              "title": "CAS_SERVICE_AUTH_ALLOWED",
               "type": "string"
             },
             "DEBUG": {
@@ -3111,6 +3131,64 @@
                   },
                   "serviceName": {
                     "default": "teams-cas",
+                    "description": "Ingress path service name",
+                    "title": "serviceName",
+                    "type": "string"
+                  },
+                  "servicePort": {
+                    "default": 80,
+                    "description": "(int) Ingress path service port",
+                    "title": "servicePort",
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "path": {
+                    "default": "/agent",
+                    "title": "path",
+                    "type": "string"
+                  },
+                  "pathType": {
+                    "default": "Prefix",
+                    "description": "Ingress path type",
+                    "title": "pathType",
+                    "type": "string"
+                  },
+                  "serviceName": {
+                    "default": "teams-api",
+                    "description": "Ingress path service name",
+                    "title": "serviceName",
+                    "type": "string"
+                  },
+                  "servicePort": {
+                    "default": 80,
+                    "description": "(int) Ingress path service port",
+                    "title": "servicePort",
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "path": {
+                    "default": "/mcp",
+                    "title": "path",
+                    "type": "string"
+                  },
+                  "pathType": {
+                    "default": "Prefix",
+                    "description": "Ingress path type",
+                    "title": "pathType",
+                    "type": "string"
+                  },
+                  "serviceName": {
+                    "default": "mcp-gateway",
                     "description": "Ingress path service name",
                     "title": "serviceName",
                     "type": "string"
