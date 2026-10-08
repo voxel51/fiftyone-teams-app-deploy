@@ -512,6 +512,10 @@ Create a merged list of environment variables for fiftyone-teams-cas
   value: {{ include "teams-cas.license-key-file-paths" . | quote }}
 - name: NEXTAUTH_URL
   value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
+# Lets an agent-pairing approval check the approving user's USE_API_KEYS
+# attribute against teams-api directly.
+- name: TEAMS_API_URL
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: TEAMS_API_DATABASE_NAME
   valueFrom:
     secretKeyRef:

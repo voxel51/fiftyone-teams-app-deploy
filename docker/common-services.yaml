@@ -161,6 +161,7 @@ services:
       # Lets an agent-pairing approval check the approving user's
       # USE_API_KEYS attribute against teams-api directly.
       TEAMS_API_URL: ${TEAMS_API_URL:-http://teams-api:8000}
+      CAS_SERVICE_AUTH_ALLOWED: ${CAS_SERVICE_AUTH_ALLOWED:-teams-api}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
