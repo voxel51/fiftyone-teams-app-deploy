@@ -1125,7 +1125,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | ingress.paths[1].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[1].serviceName | string | `"teams-api"` | Ingress path service name |
 | ingress.paths[1].servicePort | int | `80` | Ingress path service port |
-| ingress.paths[2] | object | `{"path":"/mcp","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80}` | Ingress path for the enterprise agent gateway (MCP), for clients like Claude Code. `serviceName` must point at wherever you deploy the mcp-gateway workload; this chart does not provision it yet. |
+| ingress.paths[2] | object | `{"path":"/mcp","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80}` | Ingress path for the enterprise agent gateway (MCP), for clients like Claude Code. Set `mcpGatewaySettings.enabled: true` to have this chart provision it; if you run the gateway elsewhere instead, point `serviceName` at that deployment. |
 | ingress.paths[2].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[2].serviceName | string | `"mcp-gateway"` | Ingress path service name |
 | ingress.paths[2].servicePort | int | `80` | Ingress path service port |

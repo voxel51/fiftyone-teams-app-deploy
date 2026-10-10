@@ -106,7 +106,6 @@ func (s *deploymentMcpGatewayTemplateTest) TestContainerEnv() {
 
 		s.Run(testCase.name, func() {
 			subT := s.T()
-			subT.Parallel()
 
 			options := &helm.Options{SetValues: testCase.values}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
@@ -160,7 +159,6 @@ func (s *deploymentMcpGatewayTemplateTest) TestContainerImage() {
 
 		s.Run(testCase.name, func() {
 			subT := s.T()
-			subT.Parallel()
 
 			options := &helm.Options{SetValues: testCase.values}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)

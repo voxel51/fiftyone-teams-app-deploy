@@ -1378,8 +1378,9 @@ ingress:
       # -- (int) Ingress path service port
       servicePort: 80
     # -- Ingress path for the enterprise agent gateway (MCP), for clients
-    # like Claude Code. `serviceName` must point at wherever you deploy
-    # the mcp-gateway workload; this chart does not provision it yet.
+    # like Claude Code. Set `mcpGatewaySettings.enabled: true` to have this
+    # chart provision it; if you run the gateway elsewhere instead, point
+    # `serviceName` at that deployment.
     - path: /mcp
       # -- Ingress path type
       pathType: Prefix
