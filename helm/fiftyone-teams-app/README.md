@@ -1135,6 +1135,32 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | ingress.paths[3].servicePort | int | `80` | Ingress path service port |
 | ingress.tlsEnabled | bool | `true` | Controls whether the chart managed ingress contains a `spec.tls` stanza. |
 | ingress.tlsSecretName | string | `"fiftyone-teams-tls-secret"` | Name of secret containing TLS certificate for `teams-app`. Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`. When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`. |
+| mcpGatewaySettings.affinity | object | `{}` | Affinity and anti-affinity for `mcp-gateway`. [Reference][affinity]. |
+| mcpGatewaySettings.deploymentAnnotations | object | `{}` | Annotations for the `mcp-gateway` deployment. [Reference][annotations]. |
+| mcpGatewaySettings.enabled | bool | `false` | Controls whether to create a `mcp-gateway` deployment. |
+| mcpGatewaySettings.env.SERVICE_AUTH_MODE | string | `"insecure-dev"` | How `mcp-gateway` authenticates to CAS's internal key-resolve endpoint. One of `insecure-dev` or `gcp-id-token`. |
+| mcpGatewaySettings.image.pullPolicy | string | `"IfNotPresent"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
+| mcpGatewaySettings.image.repository | string | `"voxel51/fiftyone-mcp-gateway"` | Container image for `mcp-gateway`. |
+| mcpGatewaySettings.image.tag | string | `""` | Image tag for `mcp-gateway`. Defaults to the chart appVersion. |
+| mcpGatewaySettings.labels | object | `{}` | Additional labels for the `mcp-gateway` related objects. [Reference][labels-and-selectors]. |
+| mcpGatewaySettings.livenessProbe.initialDelaySeconds | int | `10` | The initial delay, in seconds, before performing liveness checks for `mcp-gateway`. |
+| mcpGatewaySettings.livenessProbe.periodSeconds | int | `10` | How often (in seconds) to perform liveness checks for `mcp-gateway`. |
+| mcpGatewaySettings.nodeSelector | object | `{}` | nodeSelector for `mcp-gateway`. [Reference][node-selector]. |
+| mcpGatewaySettings.podAnnotations | object | `{}` | Annotations for `mcp-gateway` pods. [Reference][annotations]. |
+| mcpGatewaySettings.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | Pod-level security attributes for `mcp-gateway`. [Reference][security-context]. |
+| mcpGatewaySettings.readinessProbe.initialDelaySeconds | int | `5` | The initial delay, in seconds, before performing readiness checks for `mcp-gateway`. |
+| mcpGatewaySettings.readinessProbe.periodSeconds | int | `5` | How often (in seconds) to perform readiness checks for `mcp-gateway`. |
+| mcpGatewaySettings.replicaCount | int | `1` | Number of pods in the `mcp-gateway` deployment's ReplicaSet. |
+| mcpGatewaySettings.resources | object | `{}` | Container resource requests and limits for `mcp-gateway`. [Reference][resources]. |
+| mcpGatewaySettings.secretEnv | object | `{}` | Secret variables to be passed to the `mcp-gateway` container. |
+| mcpGatewaySettings.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | Container security configuration for `mcp-gateway`. [Reference][container-security-context]. |
+| mcpGatewaySettings.service.annotations | object | `{}` | Service annotations for `mcp-gateway`. [Reference][annotations]. |
+| mcpGatewaySettings.service.containerPort | int | `8000` | Service container port for `mcp-gateway`. |
+| mcpGatewaySettings.service.name | string | `"mcp-gateway"` | Service name. Must match the `serviceName` of the `/mcp` entry in `ingress.paths`. |
+| mcpGatewaySettings.service.port | int | `80` | Service port. |
+| mcpGatewaySettings.service.shortname | string | `"mcp-gateway"` | Port name (maximum length is 15 characters) for `mcp-gateway`. [Reference][ports]. |
+| mcpGatewaySettings.service.type | string | `"ClusterIP"` | Service type for `mcp-gateway`. [Reference][service-type]. |
+| mcpGatewaySettings.tolerations | list | `[]` | Allow the k8s scheduler to schedule `mcp-gateway` pods with matching taints. [Reference][taints-and-tolerations]. |
 | namespace.create | bool | `false` | Controls whether to create the namespace. When `false`, the namespace must already exists. |
 | namespace.name | string | `"fiftyone-teams"` | The namespace name used for chart resources. |
 | pluginsSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-plugins`. [Reference][affinity]. |

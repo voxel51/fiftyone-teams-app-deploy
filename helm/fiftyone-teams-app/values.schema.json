@@ -3255,6 +3255,283 @@
       "title": "ingress",
       "type": "object"
     },
+    "mcpGatewaySettings": {
+      "description": "The enterprise agent gateway (MCP), for clients like Claude Code. Off by\ndefault: no image is published for self-serve deployments yet. Reached\nthrough the chart's `/mcp` ingress path (see `ingress.paths`), never\nthrough its own ingress.",
+      "properties": {
+        "affinity": {
+          "description": "Affinity and anti-affinity for `mcp-gateway`. [Reference][affinity].",
+          "required": [],
+          "title": "affinity",
+          "type": "object"
+        },
+        "deploymentAnnotations": {
+          "description": "Annotations for the `mcp-gateway` deployment. [Reference][annotations].",
+          "required": [],
+          "title": "deploymentAnnotations",
+          "type": "object"
+        },
+        "enabled": {
+          "default": false,
+          "description": "Controls whether to create a `mcp-gateway` deployment.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "env": {
+          "description": "Environment Variables are passed to the `mcp-gateway` container, in\naddition to `MCP_GATEWAY_RESOURCE_URL`, `MCP_GATEWAY_CAS_URL`, and\n`MCP_GATEWAY_TEAMS_API_URL`, which this chart computes for you.",
+          "properties": {
+            "SERVICE_AUTH_MODE": {
+              "default": "insecure-dev",
+              "description": "How `mcp-gateway` authenticates to CAS's internal key-resolve\nendpoint. One of `insecure-dev` or `gcp-id-token`.",
+              "title": "SERVICE_AUTH_MODE",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "env",
+          "type": "object"
+        },
+        "image": {
+          "description": "  ENV_VAR_NAME:\n    secretName: the-pre-existing-secret\n    secretKey: the-key-in-the-secret",
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Instruct when the kubelet should pull (download) the specified image.\nOne of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Always",
+                    "IfNotPresent",
+                    "Never"
+                  ],
+                  "required": []
+                }
+              ],
+              "required": [],
+              "title": "pullPolicy"
+            },
+            "repository": {
+              "default": "voxel51/fiftyone-mcp-gateway",
+              "description": "Container image for `mcp-gateway`.",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "",
+              "description": "Image tag for `mcp-gateway`. Defaults to the chart appVersion.",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "labels": {
+          "description": "Additional labels for the `mcp-gateway` related objects. [Reference][labels-and-selectors].",
+          "required": [],
+          "title": "labels",
+          "type": "object"
+        },
+        "livenessProbe": {
+          "properties": {
+            "initialDelaySeconds": {
+              "default": 10,
+              "description": "No HTTP health path exists (the server serves only `/mcp`, which\nitself requires a valid bearer token), so this is a TCP check.\nThe initial delay, in seconds, before performing liveness checks for `mcp-gateway`.",
+              "title": "initialDelaySeconds",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 10,
+              "description": "How often (in seconds) to perform liveness checks for `mcp-gateway`.",
+              "title": "periodSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "livenessProbe",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "description": "nodeSelector for `mcp-gateway`. [Reference][node-selector].",
+          "required": [],
+          "title": "nodeSelector",
+          "type": "object"
+        },
+        "podAnnotations": {
+          "description": "Annotations for `mcp-gateway` pods. [Reference][annotations].",
+          "required": [],
+          "title": "podAnnotations",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "description": "Pod-level security attributes for `mcp-gateway`. [Reference][security-context].",
+          "properties": {
+            "fsGroup": {
+              "default": 1000,
+              "title": "fsGroup",
+              "type": "integer"
+            },
+            "runAsGroup": {
+              "default": 1000,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 1000,
+              "title": "runAsUser",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "readinessProbe": {
+          "properties": {
+            "initialDelaySeconds": {
+              "default": 5,
+              "description": "The initial delay, in seconds, before performing readiness checks for `mcp-gateway`.",
+              "title": "initialDelaySeconds",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 5,
+              "description": "How often (in seconds) to perform readiness checks for `mcp-gateway`.",
+              "title": "periodSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "readinessProbe",
+          "type": "object"
+        },
+        "replicaCount": {
+          "default": 1,
+          "description": "Number of pods in the `mcp-gateway` deployment's ReplicaSet.",
+          "minimum": 1,
+          "title": "replicaCount",
+          "type": "integer"
+        },
+        "resources": {
+          "description": "Container resource requests and limits for `mcp-gateway`. [Reference][resources].",
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "secretEnv": {
+          "description": "Secret variables to be passed to the `mcp-gateway` container.",
+          "required": [],
+          "title": "secretEnv",
+          "type": "object"
+        },
+        "securityContext": {
+          "description": "Container security configuration for `mcp-gateway`. [Reference][container-security-context].",
+          "properties": {
+            "allowPrivilegeEscalation": {
+              "default": false,
+              "title": "allowPrivilegeEscalation",
+              "type": "boolean"
+            },
+            "capabilities": {
+              "properties": {
+                "drop": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "drop",
+                  "type": "array"
+                }
+              },
+              "required": [],
+              "title": "capabilities",
+              "type": "object"
+            },
+            "readOnlyRootFilesystem": {
+              "default": true,
+              "title": "readOnlyRootFilesystem",
+              "type": "boolean"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 1000,
+              "title": "runAsUser",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "securityContext",
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "annotations": {
+              "description": "Service annotations for `mcp-gateway`. [Reference][annotations].",
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "containerPort": {
+              "default": 8000,
+              "description": "Service container port for `mcp-gateway`.",
+              "title": "containerPort",
+              "type": "integer"
+            },
+            "name": {
+              "default": "mcp-gateway",
+              "description": "Service name. Must match the `serviceName` of the `/mcp` entry in\n`ingress.paths`.",
+              "title": "name",
+              "type": "string"
+            },
+            "port": {
+              "default": 80,
+              "description": "Service port.",
+              "title": "port",
+              "type": "integer"
+            },
+            "shortname": {
+              "default": "mcp-gateway",
+              "description": "Port name (maximum length is 15 characters) for `mcp-gateway`. [Reference][ports].",
+              "title": "shortname",
+              "type": "string"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "description": "Service type for `mcp-gateway`. [Reference][service-type].",
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "service",
+          "type": "object"
+        },
+        "tolerations": {
+          "description": "Allow the k8s scheduler to schedule `mcp-gateway` pods with matching taints. [Reference][taints-and-tolerations].",
+          "items": {
+            "required": []
+          },
+          "title": "tolerations",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "mcpGatewaySettings",
+      "type": "object"
+    },
     "namespace": {
       "properties": {
         "create": {
