@@ -55,6 +55,8 @@ jobs:
       FO_LEGACY_LICENSE: ${{ secrets.FO_LEGACY_LICENSE }}
       ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
       REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
+      RO_DOCKERHUB_PAT: ${{ secrets.RO_DOCKERHUB_PAT }}
+      RO_DOCKERHUB_USERNAME: ${{ secrets.RO_DOCKERHUB_USERNAME }}
 
   helm-integration:
     needs: modified-files
