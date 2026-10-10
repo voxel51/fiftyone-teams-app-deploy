@@ -461,6 +461,30 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
+                  "path": "/agent",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-api",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/mcp",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
                   "backend": {
@@ -558,6 +582,30 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
+                  "path": "/agent",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-api",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/mcp",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
                   "backend": {
@@ -596,6 +644,30 @@ func (s *ingressTemplateTest) TestRules() {
                   "backend": {
                     "service": {
                       "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/agent",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-api",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/mcp",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
                       "port": {
                         "number": 80
                       }
@@ -665,6 +737,30 @@ func (s *ingressTemplateTest) TestRules() {
                   "backend": {
                     "service": {
                       "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/agent",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-api",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/mcp",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
                       "port": {
                         "number": 80
                       }

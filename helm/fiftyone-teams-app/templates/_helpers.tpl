@@ -79,6 +79,17 @@ Create a default name for the teams plugins service
 {{- end }}
 
 {{/*
+Create a default name for the mcp-gateway service
+*/}}
+{{- define "mcp-gateway.name" -}}
+{{- if .Values.mcpGatewaySettings.service.name }}
+{{- .Values.mcpGatewaySettings.service.name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+"mcp-gateway"
+{{- end }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "fiftyone-teams-app.chart" -}}
@@ -175,6 +186,22 @@ Plugins Combined labels
 {{- define "teams-plugins.labels" -}}
 {{ include "fiftyone-teams-app.commonLabels" . }}
 {{ include "teams-plugins.selectorLabels" . }}
+{{- end }}
+
+{{/*
+MCP Gateway Selector labels
+*/}}
+{{- define "mcp-gateway.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "mcp-gateway.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+MCP Gateway Combined labels
+*/}}
+{{- define "mcp-gateway.labels" -}}
+{{ include "fiftyone-teams-app.commonLabels" . }}
+{{ include "mcp-gateway.selectorLabels" . }}
 {{- end }}
 
 {{/*
@@ -512,6 +539,10 @@ Create a merged list of environment variables for fiftyone-teams-cas
   value: {{ include "teams-cas.license-key-file-paths" . | quote }}
 - name: NEXTAUTH_URL
   value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
+# Lets an agent-pairing approval check the approving user's USE_API_KEYS
+# attribute against teams-api directly.
+- name: TEAMS_API_URL
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
 - name: TEAMS_API_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -587,6 +618,32 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 {{- end }}
 {{- end -}}
 
+{{/*
+Create a merged list of environment variables for mcp-gateway
+*/}}
+{{- define "mcp-gateway.env-vars-list" -}}
+- name: MCP_GATEWAY_RESOURCE_URL
+{{- if .Values.teamsAppSettings.dnsName }}
+  value: {{ printf "https://%s/mcp" .Values.teamsAppSettings.dnsName | quote }}
+{{- else }}
+  value: ""
+{{- end }}
+- name: MCP_GATEWAY_CAS_URL
+  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name (float64 .Values.casSettings.service.port) | quote }}
+- name: MCP_GATEWAY_TEAMS_API_URL
+  value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
+{{- range $key, $val := .Values.mcpGatewaySettings.env }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- range $key, $val := .Values.mcpGatewaySettings.secretEnv }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.secretKey }}
+{{- end }}
+{{- end -}}
 
 {{/*
 Create a merged list of environment variables for fiftyone-teams-app

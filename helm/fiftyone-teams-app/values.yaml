@@ -163,6 +163,7 @@ apiSettings:
     FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES:
     # -- (int) The number of seconds to wait for service orchestrator pods to start passing their healthchecks before marking the service with an Error state.
     FIFTYONE_SERVICE_POD_READY_TIMEOUT_S: 1800
+    FEATURE_FLAG_ENABLE_AGENT_GATEWAY: false
 
   # -- Secret variables to be passed to the `teams-api` containers.
   secretEnv: {}
@@ -638,6 +639,9 @@ casSettings:
     # -- Configure Authentication Mode.
     # One of `legacy` or `internal`
     FIFTYONE_AUTH_MODE: legacy
+    CAS_DEVICE_AUTH_ENABLED: false
+    CAS_AGENT_SCOPE_ENABLED: false
+    CAS_SERVICE_AUTH_ALLOWED: teams-api
 
   # -- Secret variables to be passed to the `teams-cas` containers.
   secretEnv: {}
@@ -1363,6 +1367,26 @@ ingress:
       serviceName: teams-cas
       # -- (int) Ingress path service port
       servicePort: 80
+    # -- Ingress path for teams-api's agent gateway surface. Without this,
+    # /agent falls through to the teams-app catch-all below instead of
+    # teams-api. Used directly by the CLI's `fiftyone agent` commands.
+    - path: /agent
+      # -- Ingress path type
+      pathType: Prefix
+      # -- Ingress path service name
+      serviceName: teams-api
+      # -- (int) Ingress path service port
+      servicePort: 80
+    # -- Ingress path for the enterprise agent gateway (MCP), for clients
+    # like Claude Code. `serviceName` must point at wherever you deploy
+    # the mcp-gateway workload; this chart does not provision it yet.
+    - path: /mcp
+      # -- Ingress path type
+      pathType: Prefix
+      # -- Ingress path service name
+      serviceName: mcp-gateway
+      # -- (int) Ingress path service port
+      servicePort: 80
     # -- Ingress path for teams-app
     - path: /*
       # -- Ingress path type
@@ -1379,6 +1403,98 @@ ingress:
   # Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`.
   # When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`.
   tlsSecretName: fiftyone-teams-tls-secret
+
+# The enterprise agent gateway (MCP), for clients like Claude Code. Off by
+# default: no image is published for self-serve deployments yet. Reached
+# through the chart's `/mcp` ingress path (see `ingress.paths`), never
+# through its own ingress.
+mcpGatewaySettings:
+  # -- Controls whether to create a `mcp-gateway` deployment.
+  enabled: false
+  # -- Annotations for the `mcp-gateway` deployment. [Reference][annotations].
+  deploymentAnnotations: {}
+  # Environment Variables are passed to the `mcp-gateway` container, in
+  # addition to `MCP_GATEWAY_RESOURCE_URL`, `MCP_GATEWAY_CAS_URL`, and
+  # `MCP_GATEWAY_TEAMS_API_URL`, which this chart computes for you.
+  env:
+    # -- How `mcp-gateway` authenticates to CAS's internal key-resolve
+    # endpoint. One of `insecure-dev` or `gcp-id-token`.
+    SERVICE_AUTH_MODE: insecure-dev
+  # -- Secret variables to be passed to the `mcp-gateway` container.
+  secretEnv: {}
+  #   ENV_VAR_NAME:
+  #     secretName: the-pre-existing-secret
+  #     secretKey: the-key-in-the-secret
+  image:
+    # @schema
+    # oneOf:
+    #   - enum: ["Always", "IfNotPresent", "Never"]
+    # @schema
+    # -- Instruct when the kubelet should pull (download) the specified image.
+    # One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy].
+    pullPolicy: IfNotPresent
+    # -- Container image for `mcp-gateway`.
+    repository: voxel51/fiftyone-mcp-gateway
+    # -- Image tag for `mcp-gateway`. Defaults to the chart appVersion.
+    tag: ""
+  # -- Additional labels for the `mcp-gateway` related objects. [Reference][labels-and-selectors].
+  labels: {}
+  # @schema
+  # minimum: 1
+  # type: integer
+  # @schema
+  # -- Number of pods in the `mcp-gateway` deployment's ReplicaSet.
+  replicaCount: 1
+  # -- Container resource requests and limits for `mcp-gateway`. [Reference][resources].
+  resources: {}
+  service:
+    # -- Service annotations for `mcp-gateway`. [Reference][annotations].
+    annotations: {}
+    # -- Service container port for `mcp-gateway`.
+    containerPort: 8000
+    # -- Service name. Must match the `serviceName` of the `/mcp` entry in
+    # `ingress.paths`.
+    name: mcp-gateway
+    # -- Service port.
+    port: 80
+    # -- Port name (maximum length is 15 characters) for `mcp-gateway`. [Reference][ports].
+    shortname: mcp-gateway
+    # -- Service type for `mcp-gateway`. [Reference][service-type].
+    type: ClusterIP
+  # -- Affinity and anti-affinity for `mcp-gateway`. [Reference][affinity].
+  affinity: {}
+  livenessProbe:
+    # No HTTP health path exists (the server serves only `/mcp`, which
+    # itself requires a valid bearer token), so this is a TCP check.
+    # -- The initial delay, in seconds, before performing liveness checks for `mcp-gateway`.
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform liveness checks for `mcp-gateway`.
+    periodSeconds: 10
+  # -- nodeSelector for `mcp-gateway`. [Reference][node-selector].
+  nodeSelector: {}
+  # -- Annotations for `mcp-gateway` pods. [Reference][annotations].
+  podAnnotations: {}
+  # -- Pod-level security attributes for `mcp-gateway`. [Reference][security-context].
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  readinessProbe:
+    # -- The initial delay, in seconds, before performing readiness checks for `mcp-gateway`.
+    initialDelaySeconds: 5
+    # -- How often (in seconds) to perform readiness checks for `mcp-gateway`.
+    periodSeconds: 5
+  # -- Container security configuration for `mcp-gateway`. [Reference][container-security-context].
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+  # -- Allow the k8s scheduler to schedule `mcp-gateway` pods with matching taints. [Reference][taints-and-tolerations].
+  tolerations: []
 
 namespace:
   # -- Controls whether to create the namespace.

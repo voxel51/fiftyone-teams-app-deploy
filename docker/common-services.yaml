@@ -50,6 +50,11 @@ services:
     environment:
       API_EXTERNAL_URL: ${FIFTYONE_API_URI}
       CAS_BASE_URL: ${CAS_BASE_URL:-http://teams-cas:3000/cas/api}
+      # Mounts the /agent/* operator-execution surface for the CLI and the
+      # agent gateway (MCP). Off until you've also enabled the matching
+      # scope in CAS (CAS_AGENT_SCOPE_ENABLED, below) and routed /agent and
+      # /mcp in front of this deployment (see docker/example-nginx-*.conf).
+      FEATURE_FLAG_ENABLE_AGENT_GATEWAY: ${FEATURE_FLAG_ENABLE_AGENT_GATEWAY:-false}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_BUILTIN_SERVICES_PATH: /opt/builtin-services/builtin_services.yaml
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
@@ -146,6 +151,17 @@ services:
       TEAMS_API_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       TEAMS_API_MONGODB_URI: ${FIFTYONE_DATABASE_URI}
       FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      # Device-authorization pairing (RFC 8628), for onboarding uploads and
+      # the enterprise agent gateway alike. Off until you opt in.
+      CAS_DEVICE_AUTH_ENABLED: ${CAS_DEVICE_AUTH_ENABLED:-false}
+      # The `agent` scope specifically (CLI/MCP pairing, OAuth2.1+PKCE,
+      # refresh tokens): independent of CAS_DEVICE_AUTH_ENABLED above, so
+      # you can run onboarding's device flow without this.
+      CAS_AGENT_SCOPE_ENABLED: ${CAS_AGENT_SCOPE_ENABLED:-false}
+      # Lets an agent-pairing approval check the approving user's
+      # USE_API_KEYS attribute against teams-api directly.
+      TEAMS_API_URL: ${TEAMS_API_URL:-http://teams-api:8000}
+      CAS_SERVICE_AUTH_ALLOWED: ${CAS_SERVICE_AUTH_ALLOWED:-teams-api}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
@@ -168,6 +184,21 @@ services:
         source: ${LOCAL_LICENSE_FILE_DIR}
         target: /opt/fiftyone/licenses
         read_only: true
+
+  # The enterprise agent gateway (MCP), for CLI/MCP clients like Claude
+  # Code. Commented out: no published image yet. Uncomment once one
+  # exists, and see docker/example-nginx-*.conf for the matching /mcp
+  # route this expects to sit behind.
+  # mcp-gateway-common:
+  #   image: voxel51/fiftyone-mcp-gateway:v2.25.1
+  #   environment:
+  #     MCP_GATEWAY_RESOURCE_URL: ${MCP_GATEWAY_RESOURCE_URL}
+  #     MCP_GATEWAY_CAS_URL: ${MCP_GATEWAY_CAS_URL:-http://teams-cas:3000/cas/api}
+  #     MCP_GATEWAY_TEAMS_API_URL: ${MCP_GATEWAY_TEAMS_API_URL:-http://teams-api:8000}
+  #     SERVICE_AUTH_MODE: ${SERVICE_AUTH_MODE:-insecure-dev}
+  #   ports:
+  #     - ${MCP_BIND_ADDRESS:-127.0.0.1}:${MCP_BIND_PORT:-8001}:8000
+  #   restart: always
 
   teams-plugins-common:
     image: voxel51/fiftyone-app-torch:v2.25.1

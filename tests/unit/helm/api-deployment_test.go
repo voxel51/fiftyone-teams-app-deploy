@@ -501,6 +501,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FEATURE_FLAG_ENABLE_AGENT_GATEWAY",
+            "value": "false"
+          },
+          {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
             "value": "1"
           },
@@ -621,6 +625,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneDatabaseName"
               }
             }
+          },
+          {
+            "name": "FEATURE_FLAG_ENABLE_AGENT_GATEWAY",
+            "value": "false"
           },
           {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
@@ -759,6 +767,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FEATURE_FLAG_ENABLE_AGENT_GATEWAY",
+            "value": "false"
+          },
+          {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
             "value": "1"
           },
@@ -892,6 +904,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FEATURE_FLAG_ENABLE_AGENT_GATEWAY",
+            "value": "false"
+          },
+          {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
             "value": "1"
           },
@@ -1013,6 +1029,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FEATURE_FLAG_ENABLE_AGENT_GATEWAY",
+            "value": "false"
+          },
+          {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
             "value": "1"
           },
@@ -1132,6 +1152,10 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneDatabaseName"
               }
             }
+          },
+          {
+            "name": "FEATURE_FLAG_ENABLE_AGENT_GATEWAY",
+            "value": "false"
           },
           {
             "name": "FIFTYONE_DO_EXPIRATION_DAYS",
