@@ -485,6 +485,18 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
+                  "path": "/.well-known/oauth-protected-resource",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
                   "backend": {
@@ -606,6 +618,18 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
+                  "path": "/.well-known/oauth-protected-resource",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
                   "backend": {
@@ -664,6 +688,18 @@ func (s *ingressTemplateTest) TestRules() {
                 },
                 {
                   "path": "/mcp",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/.well-known/oauth-protected-resource",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
@@ -757,6 +793,18 @@ func (s *ingressTemplateTest) TestRules() {
                 },
                 {
                   "path": "/mcp",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/.well-known/oauth-protected-resource",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
