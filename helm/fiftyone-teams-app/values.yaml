@@ -1388,6 +1388,14 @@ ingress:
       serviceName: mcp-gateway
       # -- (int) Ingress path service port
       servicePort: 80
+    # -- Ingress path for the agent gateway's OAuth discovery document
+    - path: /.well-known/oauth-protected-resource
+      # -- Ingress path type
+      pathType: Prefix
+      # -- Ingress path service name
+      serviceName: mcp-gateway
+      # -- (int) Ingress path service port
+      servicePort: 80
     # -- Ingress path for teams-app
     - path: /*
       # -- Ingress path type

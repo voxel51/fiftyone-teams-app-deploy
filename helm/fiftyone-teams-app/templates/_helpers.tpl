@@ -630,8 +630,18 @@ Create a merged list of environment variables for mcp-gateway
 {{- end }}
 - name: MCP_GATEWAY_CAS_URL
   value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name (float64 .Values.casSettings.service.port) | quote }}
+- name: MCP_GATEWAY_PUBLIC_CAS_URL
+{{- if .Values.teamsAppSettings.dnsName }}
+  value: {{ printf "https://%s/cas/api" .Values.teamsAppSettings.dnsName | quote }}
+{{- else }}
+  value: ""
+{{- end }}
 - name: MCP_GATEWAY_TEAMS_API_URL
   value: {{ printf "http://%s:%.0f" .Values.apiSettings.service.name (float64 .Values.apiSettings.service.port) | quote }}
+- name: MCP_GATEWAY_HOST
+  value: "0.0.0.0"
+- name: MCP_GATEWAY_PORT
+  value: {{ .Values.mcpGatewaySettings.service.containerPort | default 8000 | quote }}
 {{- range $key, $val := .Values.mcpGatewaySettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
