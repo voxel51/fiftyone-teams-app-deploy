@@ -3148,6 +3148,35 @@
               {
                 "properties": {
                   "path": {
+                    "default": "/.well-known/oauth-authorization-server",
+                    "title": "path",
+                    "type": "string"
+                  },
+                  "pathType": {
+                    "default": "Prefix",
+                    "description": "Ingress path type",
+                    "title": "pathType",
+                    "type": "string"
+                  },
+                  "serviceName": {
+                    "default": "teams-cas",
+                    "description": "Ingress path service name",
+                    "title": "serviceName",
+                    "type": "string"
+                  },
+                  "servicePort": {
+                    "default": 80,
+                    "description": "(int) Ingress path service port",
+                    "title": "servicePort",
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "path": {
                     "default": "/agent",
                     "title": "path",
                     "type": "string"

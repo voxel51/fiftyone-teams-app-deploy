@@ -461,6 +461,18 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
+                  "path": "/.well-known/oauth-authorization-server",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
                   "path": "/agent",
                   "pathType": "Prefix",
                   "backend": {
@@ -594,6 +606,18 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
+                  "path": "/.well-known/oauth-authorization-server",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
                   "path": "/agent",
                   "pathType": "Prefix",
                   "backend": {
@@ -664,6 +688,18 @@ func (s *ingressTemplateTest) TestRules() {
               "paths": [
                 {
                   "path": "/cas",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/.well-known/oauth-authorization-server",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
@@ -769,6 +805,18 @@ func (s *ingressTemplateTest) TestRules() {
               "paths": [
                 {
                   "path": "/cas",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "teams-cas",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/.well-known/oauth-authorization-server",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
