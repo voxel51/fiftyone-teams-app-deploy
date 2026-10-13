@@ -1367,16 +1367,6 @@ ingress:
       serviceName: teams-cas
       # -- (int) Ingress path service port
       servicePort: 80
-    # -- Ingress path for CAS's own RFC 8414 discovery document. CAS's issuer
-    # path (`/cas/api`) means it's requested at the host root -- without
-    # this it falls through to the teams-app catch-all below instead.
-    - path: /.well-known/oauth-authorization-server
-      # -- Ingress path type
-      pathType: Prefix
-      # -- Ingress path service name
-      serviceName: teams-cas
-      # -- (int) Ingress path service port
-      servicePort: 80
     # -- Ingress path for teams-api's agent gateway surface. Without this,
     # /agent falls through to the teams-app catch-all below instead of
     # teams-api. Used directly by the CLI's `fiftyone agent` commands.
@@ -1400,6 +1390,16 @@ ingress:
       servicePort: 80
     # -- Ingress path for the agent gateway's OAuth discovery document
     - path: /.well-known/oauth-protected-resource
+      # -- Ingress path type
+      pathType: Prefix
+      # -- Ingress path service name
+      serviceName: mcp-gateway
+      # -- (int) Ingress path service port
+      servicePort: 80
+    # -- Ingress path for CAS's RFC 8414 discovery document, proxied by
+    # mcp-gateway: CAS's basePath (`/cas`) can't serve it at this issuer's
+    # host-root-relative location itself.
+    - path: /.well-known/oauth-authorization-server
       # -- Ingress path type
       pathType: Prefix
       # -- Ingress path service name

@@ -1116,24 +1116,24 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
 | ingress.enabled | bool | `true` | Controls whether to create the ingress. When `false`, uses a pre-existing ingress. [Reference][ingress]. |
 | ingress.labels | object | `{}` | Additional labels for the ingress. [Reference][labels-and-selectors]. |
-| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/.well-known/oauth-authorization-server","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/agent","pathType":"Prefix","serviceName":"teams-api","servicePort":80},{"path":"/mcp","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80},{"path":"/.well-known/oauth-protected-resource","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
+| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/agent","pathType":"Prefix","serviceName":"teams-api","servicePort":80},{"path":"/mcp","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80},{"path":"/.well-known/oauth-protected-resource","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80},{"path":"/.well-known/oauth-authorization-server","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
 | ingress.paths[0] | object | `{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
 | ingress.paths[0].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[0].serviceName | string | `"teams-cas"` | Ingress path service name |
 | ingress.paths[0].servicePort | int | `80` | Ingress path service port |
-| ingress.paths[1] | object | `{"path":"/.well-known/oauth-authorization-server","pathType":"Prefix","serviceName":"teams-cas","servicePort":80}` | Ingress path for CAS's own RFC 8414 discovery document. CAS's issuer path (`/cas/api`) means it's requested at the host root -- without this it falls through to the teams-app catch-all below instead. |
+| ingress.paths[1] | object | `{"path":"/agent","pathType":"Prefix","serviceName":"teams-api","servicePort":80}` | Ingress path for teams-api's agent gateway surface. Without this, /agent falls through to the teams-app catch-all below instead of teams-api. Used directly by the CLI's `fiftyone agent` commands. |
 | ingress.paths[1].pathType | string | `"Prefix"` | Ingress path type |
-| ingress.paths[1].serviceName | string | `"teams-cas"` | Ingress path service name |
+| ingress.paths[1].serviceName | string | `"teams-api"` | Ingress path service name |
 | ingress.paths[1].servicePort | int | `80` | Ingress path service port |
-| ingress.paths[2] | object | `{"path":"/agent","pathType":"Prefix","serviceName":"teams-api","servicePort":80}` | Ingress path for teams-api's agent gateway surface. Without this, /agent falls through to the teams-app catch-all below instead of teams-api. Used directly by the CLI's `fiftyone agent` commands. |
+| ingress.paths[2] | object | `{"path":"/mcp","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80}` | Ingress path for the enterprise agent gateway (MCP), for clients like Claude Code. Set `mcpGatewaySettings.enabled: true` to have this chart provision it; if you run the gateway elsewhere instead, point `serviceName` at that deployment. |
 | ingress.paths[2].pathType | string | `"Prefix"` | Ingress path type |
-| ingress.paths[2].serviceName | string | `"teams-api"` | Ingress path service name |
+| ingress.paths[2].serviceName | string | `"mcp-gateway"` | Ingress path service name |
 | ingress.paths[2].servicePort | int | `80` | Ingress path service port |
-| ingress.paths[3] | object | `{"path":"/mcp","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80}` | Ingress path for the enterprise agent gateway (MCP), for clients like Claude Code. Set `mcpGatewaySettings.enabled: true` to have this chart provision it; if you run the gateway elsewhere instead, point `serviceName` at that deployment. |
+| ingress.paths[3] | object | `{"path":"/.well-known/oauth-protected-resource","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80}` | Ingress path for the agent gateway's OAuth discovery document |
 | ingress.paths[3].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[3].serviceName | string | `"mcp-gateway"` | Ingress path service name |
 | ingress.paths[3].servicePort | int | `80` | Ingress path service port |
-| ingress.paths[4] | object | `{"path":"/.well-known/oauth-protected-resource","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80}` | Ingress path for the agent gateway's OAuth discovery document |
+| ingress.paths[4] | object | `{"path":"/.well-known/oauth-authorization-server","pathType":"Prefix","serviceName":"mcp-gateway","servicePort":80}` | Ingress path for CAS's RFC 8414 discovery document, proxied by mcp-gateway: CAS's basePath (`/cas`) can't serve it at this issuer's host-root-relative location itself. |
 | ingress.paths[4].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[4].serviceName | string | `"mcp-gateway"` | Ingress path service name |
 | ingress.paths[4].servicePort | int | `80` | Ingress path service port |

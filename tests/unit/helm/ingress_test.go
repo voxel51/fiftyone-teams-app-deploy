@@ -461,18 +461,6 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
-                  "path": "/.well-known/oauth-authorization-server",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-cas",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
                   "path": "/agent",
                   "pathType": "Prefix",
                   "backend": {
@@ -498,6 +486,18 @@ func (s *ingressTemplateTest) TestRules() {
                 },
                 {
                   "path": "/.well-known/oauth-protected-resource",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/.well-known/oauth-authorization-server",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
@@ -606,18 +606,6 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
-                  "path": "/.well-known/oauth-authorization-server",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-cas",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
                   "path": "/agent",
                   "pathType": "Prefix",
                   "backend": {
@@ -643,6 +631,18 @@ func (s *ingressTemplateTest) TestRules() {
                 },
                 {
                   "path": "/.well-known/oauth-protected-resource",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/.well-known/oauth-authorization-server",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
@@ -699,18 +699,6 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
-                  "path": "/.well-known/oauth-authorization-server",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-cas",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
                   "path": "/agent",
                   "pathType": "Prefix",
                   "backend": {
@@ -736,6 +724,18 @@ func (s *ingressTemplateTest) TestRules() {
                 },
                 {
                   "path": "/.well-known/oauth-protected-resource",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/.well-known/oauth-authorization-server",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
@@ -816,18 +816,6 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
-                  "path": "/.well-known/oauth-authorization-server",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-cas",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
                   "path": "/agent",
                   "pathType": "Prefix",
                   "backend": {
@@ -853,6 +841,18 @@ func (s *ingressTemplateTest) TestRules() {
                 },
                 {
                   "path": "/.well-known/oauth-protected-resource",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "mcp-gateway",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                },
+                {
+                  "path": "/.well-known/oauth-authorization-server",
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
