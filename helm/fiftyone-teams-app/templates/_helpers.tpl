@@ -624,7 +624,7 @@ Create a merged list of environment variables for mcp-gateway
 {{- define "mcp-gateway.env-vars-list" -}}
 - name: MCP_GATEWAY_RESOURCE_URL
 {{- if .Values.teamsAppSettings.dnsName }}
-  value: {{ printf "https://%s/mcp" .Values.teamsAppSettings.dnsName | quote }}
+  value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName | quote }}
 {{- else }}
   value: ""
 {{- end }}

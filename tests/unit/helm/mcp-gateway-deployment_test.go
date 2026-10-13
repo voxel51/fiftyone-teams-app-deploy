@@ -84,7 +84,7 @@ func (s *deploymentMcpGatewayTemplateTest) TestContainerEnv() {
 				"apiSettings.service.port":   "82",
 			},
 			map[string]string{
-				"MCP_GATEWAY_RESOURCE_URL":  "https://teams-app.fiftyone.ai/mcp",
+				"MCP_GATEWAY_RESOURCE_URL":  "https://teams-app.fiftyone.ai",
 				"MCP_GATEWAY_CAS_URL":       "http://test-teams-cas:81/cas/api",
 				"MCP_GATEWAY_TEAMS_API_URL": "http://test-teams-api:82",
 			},
