@@ -481,6 +481,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://fiftyone-app:80"
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
             "name": "APP_USE_HTTPS",
             "value": "true"
           },
@@ -507,6 +511,14 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -567,6 +579,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://fiftyone-app:80"
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
             "name": "APP_USE_HTTPS",
             "value": "true"
           },
@@ -594,9 +610,17 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
           },
-          {
+                    {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
+            "value": "true"
           },
           {
             "name": "AN_ADDITIONAL_SECRET_ENV",
@@ -666,6 +690,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://fiftyone-app:80"
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
             "name": "APP_USE_HTTPS",
             "value": "true"
           },
@@ -692,6 +720,14 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -751,6 +787,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://fiftyone-app:80"
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
             "name": "APP_USE_HTTPS",
             "value": "true"
           },
@@ -777,6 +817,14 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -835,6 +883,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://fiftyone-app:80"
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
             "name": "APP_USE_HTTPS",
             "value": "true"
           },
@@ -861,6 +913,14 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -919,6 +979,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://teams-plugins:80"
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
             "name": "APP_USE_HTTPS",
             "value": "true"
           },
@@ -945,6 +1009,14 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -1003,6 +1075,10 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             "value": "http://fiftyone-app:80"
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
             "name": "APP_USE_HTTPS",
             "value": "true"
           },
@@ -1029,6 +1105,14 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
           {
             "name": "RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED",
             "value": "false"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
+          },
+          {
+            "name": "VFF_WF_METRIC",
+            "value": "true"
           }
         ]`, chartVersion)
 				var expectedEnvVars []corev1.EnvVar
@@ -2622,17 +2706,19 @@ func (s *deploymentTeamsAppTemplateTest) TestNoActivityDebugFlagDefaults() {
 	output := helm.RenderTemplate(
 		s.T(), options, s.chartPath, s.releaseName, s.templates,
 	)
-	for _, flag := range []string{
-		"VFF_WF_ACTIVITY",
-		"VFF_WF_METRIC",
-		"VFF_Workflow_ACTIVITY",
-	} {
-		s.NotContains(
+	// BRANCH DIVERGENCE (ephem-only, never merges): this branch bakes the
+	// UI flags on by default, so the default render MUST carry them.
+	for _, flag := range []string{"VFF_WF_ACTIVITY", "VFF_WF_METRIC"} {
+		s.Contains(
 			output, flag,
-			"the default chart render must not set %s — debug flags are per-env opt-ins",
+			"this ephem branch bakes %s into the default render",
 			flag,
 		)
 	}
+	s.NotContains(
+		output, "VFF_Workflow_ACTIVITY",
+		"the legacy misspelled flag must never render",
+	)
 }
 
 // TestActivityEnabledDoesNotSetUIFlags pins that turning on capture does NOT
@@ -2652,11 +2738,12 @@ func (s *deploymentTeamsAppTemplateTest) TestActivityEnabledDoesNotSetUIFlags() 
 		s.T(), options, s.chartPath, s.releaseName, s.templates,
 	)
 
+	// BRANCH DIVERGENCE (ephem-only, never merges): the flags ride the
+	// baked-in teamsAppSettings.env defaults, independent of capture.
 	for _, flag := range []string{"VFF_WF_ACTIVITY", "VFF_WF_METRIC"} {
-		s.NotContains(
+		s.Contains(
 			output, flag,
-			"enabling activitySettings must not set %s — the UI flags are "+
-				"per-environment opt-ins via teamsAppSettings.env",
+			"this ephem branch bakes %s into the render",
 			flag,
 		)
 	}
