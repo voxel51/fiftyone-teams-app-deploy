@@ -121,3 +121,51 @@ where the deployment-wide state counts cannot be attributed to one of them.
   value: {{ .Values.activitySettings.orgId | quote }}
 {{- end }}
 {{- end }}
+
+{{/*
+Emit the deployment-level Events archive env for teams-api (the archiver
+and the Events page's API). Renders empty when Activity Core is disabled.
+Unset values are omitted so the API's own defaults apply.
+
+`maxStorageBytes` is rendered through `int64`: Helm reads YAML numbers as
+float64, and a byte count this size would otherwise print as `1.073741824e+10`.
+*/}}
+{{- define "activity.archive-env" -}}
+{{- if .Values.activitySettings.enabled }}
+{{- $ar := .Values.activitySettings.archive | default dict }}
+{{- with $ar.retentionMode }}
+- name: FIFTYONE_ACTIVITY_ARCHIVE_RETENTION_MODE
+  value: {{ . | quote }}
+{{- end }}
+{{- with $ar.bucketPath }}
+- name: FIFTYONE_ACTIVITY_ARCHIVE_BUCKET_PATH
+  value: {{ . | quote }}
+{{- end }}
+{{- with $ar.trigger }}
+- name: FIFTYONE_ACTIVITY_ARCHIVE_TRIGGER
+  value: {{ . | quote }}
+{{- end }}
+{{- with $ar.afterDays }}
+- name: FIFTYONE_ACTIVITY_ARCHIVE_AFTER_DAYS
+  value: {{ . | int64 | toString | quote }}
+{{- end }}
+{{- include "activity.max-storage-env" . }}
+{{- if $ar.lockSettings }}
+- name: FIFTYONE_ACTIVITY_ARCHIVE_SETTINGS_LOCKED
+  value: "true"
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Emit `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES`: the event store's size budget,
+read by BOTH the teams-api archiver (the space trigger) and the prune worker
+(the cap). One helper so the two always carry the same value.
+*/}}
+{{- define "activity.max-storage-env" -}}
+{{- $ar := .Values.activitySettings.archive | default dict }}
+{{- with $ar.maxStorageBytes }}
+- name: FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES
+  value: {{ . | int64 | toString | quote }}
+{{- end }}
+{{- end }}

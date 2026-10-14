@@ -98,6 +98,12 @@ spec:
             {{- with (include "activity.org-id-env" $ | trim) }}
             {{- . | nindent 12 }}
             {{- end }}
+            {{- /* The same budget the teams-api archiver's space trigger
+                   reads: the prune worker's cap must not sit below it, or
+                   the prune worker hits its cap first and only warns. */}}
+            {{- with (include "activity.max-storage-env" $ | trim) }}
+            {{- . | nindent 12 }}
+            {{- end }}
             {{- if $a.snapshotIntervalMs }}
             - name: FIFTYONE_ACTIVITY_SNAPSHOT_INTERVAL_MS
               value: {{ $a.snapshotIntervalMs | quote }}
