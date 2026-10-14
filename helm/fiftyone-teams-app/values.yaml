@@ -1381,6 +1381,14 @@ ingress:
       serviceName: teams-plugins
       # -- (int) Ingress path service port
       servicePort: 80
+    # -- Ingress path for the MCP endpoint's OAuth protected-resource metadata (RFC 9728), served by teams-plugins
+    - path: /.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp
+      # -- Ingress path type
+      pathType: Prefix
+      # -- Ingress path service name
+      serviceName: teams-plugins
+      # -- (int) Ingress path service port
+      servicePort: 80
     # -- Ingress path for teams-app
     - path: /*
       # -- Ingress path type

@@ -1115,7 +1115,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
 | ingress.enabled | bool | `true` | Controls whether to create the ingress. When `false`, uses a pre-existing ingress. [Reference][ingress]. |
 | ingress.labels | object | `{}` | Additional labels for the ingress. [Reference][labels-and-selectors]. |
-| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/.well-known/oauth-authorization-server/cas/api","pathType":"Prefix","serviceName":"teams-plugins","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
+| ingress.paths | list | `[{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80},{"path":"/.well-known/oauth-authorization-server/cas/api","pathType":"Prefix","serviceName":"teams-plugins","servicePort":80},{"path":"/.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp","pathType":"Prefix","serviceName":"teams-plugins","servicePort":80},{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}]` | Additional ingress rules for the host `teamsAppSettings.dnsName` for the chart managed ingress (when `ingress.enabled: true`). [Reference][ingress-rules]. |
 | ingress.paths[0] | object | `{"path":"/cas","pathType":"Prefix","serviceName":"teams-cas","servicePort":80}` | Ingress path for teams-cas |
 | ingress.paths[0].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[0].serviceName | string | `"teams-cas"` | Ingress path service name |
@@ -1124,10 +1124,14 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | ingress.paths[1].pathType | string | `"Prefix"` | Ingress path type |
 | ingress.paths[1].serviceName | string | `"teams-plugins"` | Ingress path service name |
 | ingress.paths[1].servicePort | int | `80` | Ingress path service port |
-| ingress.paths[2] | object | `{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}` | Ingress path for teams-app |
-| ingress.paths[2].pathType | string | `"ImplementationSpecific"` | Ingress path type |
-| ingress.paths[2].serviceName | string | `"teams-app"` | Ingress path service name |
+| ingress.paths[2] | object | `{"path":"/.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp","pathType":"Prefix","serviceName":"teams-plugins","servicePort":80}` | Ingress path for the MCP endpoint's OAuth protected-resource metadata (RFC 9728), served by teams-plugins |
+| ingress.paths[2].pathType | string | `"Prefix"` | Ingress path type |
+| ingress.paths[2].serviceName | string | `"teams-plugins"` | Ingress path service name |
 | ingress.paths[2].servicePort | int | `80` | Ingress path service port |
+| ingress.paths[3] | object | `{"path":"/*","pathType":"ImplementationSpecific","serviceName":"teams-app","servicePort":80}` | Ingress path for teams-app |
+| ingress.paths[3].pathType | string | `"ImplementationSpecific"` | Ingress path type |
+| ingress.paths[3].serviceName | string | `"teams-app"` | Ingress path service name |
+| ingress.paths[3].servicePort | int | `80` | Ingress path service port |
 | ingress.tlsEnabled | bool | `true` | Controls whether the chart managed ingress contains a `spec.tls` stanza. |
 | ingress.tlsSecretName | string | `"fiftyone-teams-tls-secret"` | Name of secret containing TLS certificate for `teams-app`. Certificate should contain the host names `apiSettings.dnsName` and `teamsAppSettings.dnsName`. When `ingress.tlsEnabled=True`, sets's the value of ingress' `spec.tls[0].secretName`. |
 | namespace.create | bool | `false` | Controls whether to create the namespace. When `false`, the namespace must already exists. |

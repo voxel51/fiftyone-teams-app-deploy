@@ -3175,6 +3175,35 @@
               {
                 "properties": {
                   "path": {
+                    "default": "/.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp",
+                    "title": "path",
+                    "type": "string"
+                  },
+                  "pathType": {
+                    "default": "Prefix",
+                    "description": "Ingress path type",
+                    "title": "pathType",
+                    "type": "string"
+                  },
+                  "serviceName": {
+                    "default": "teams-plugins",
+                    "description": "Ingress path service name",
+                    "title": "serviceName",
+                    "type": "string"
+                  },
+                  "servicePort": {
+                    "default": 80,
+                    "description": "(int) Ingress path service port",
+                    "title": "servicePort",
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "path": {
                     "default": "/*",
                     "title": "path",
                     "type": "string"
