@@ -1617,10 +1617,14 @@
           "description": "Environment Variables are passed to the `teams-cas` containers",
           "properties": {
             "CAS_AGENT_SCOPE_ENABLED": {
-              "default": "true",
-              "description": "Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE).\nRequires `CAS_DEVICE_AUTH_ENABLED: \"true\"`.",
+              "default": true,
+              "description": "Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE).\nRequires `CAS_DEVICE_AUTH_ENABLED: true`.",
+              "required": [],
               "title": "CAS_AGENT_SCOPE_ENABLED",
-              "type": "string"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "CAS_DATABASE_NAME": {
               "default": "cas",
@@ -1635,10 +1639,14 @@
               "type": "string"
             },
             "CAS_DEVICE_AUTH_ENABLED": {
-              "default": "true",
+              "default": true,
               "description": "Enable the device and OAuth 2.1 + PKCE authorization endpoints that\nCAS's agent scope (CLI and MCP) depends on.",
+              "required": [],
               "title": "CAS_DEVICE_AUTH_ENABLED",
-              "type": "string"
+              "type": [
+                "string",
+                "boolean"
+              ]
             },
             "CAS_MONGODB_URI_KEY": {
               "default": "mongodbConnectionString",

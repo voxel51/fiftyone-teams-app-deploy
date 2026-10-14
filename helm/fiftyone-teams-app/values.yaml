@@ -619,9 +619,12 @@ casSettings:
   enable_invitations: true
   # Environment Variables are passed to the `teams-cas` containers
   env:
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE).
-    # Requires `CAS_DEVICE_AUTH_ENABLED: "true"`.
-    CAS_AGENT_SCOPE_ENABLED: "true"
+    # Requires `CAS_DEVICE_AUTH_ENABLED: true`.
+    CAS_AGENT_SCOPE_ENABLED: true
     # -- Provide the name for the CAS database.
     # When multiple deployments use the same database instance,
     # set `CAS_DATABASE_NAME` to a unique value for each deployment.
@@ -629,9 +632,12 @@ casSettings:
     # -- Set the default user role for new users
     # One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN`
     CAS_DEFAULT_USER_ROLE: GUEST
+    # @schema
+    # type: ["string", "boolean"]
+    # @schema
     # -- Enable the device and OAuth 2.1 + PKCE authorization endpoints that
     # CAS's agent scope (CLI and MCP) depends on.
-    CAS_DEVICE_AUTH_ENABLED: "true"
+    CAS_DEVICE_AUTH_ENABLED: true
     # -- The key from `secret.fiftyone.name` that contains the CAS MongoDB
     # Connection String.
     CAS_MONGODB_URI_KEY: mongodbConnectionString

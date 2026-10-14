@@ -983,10 +983,10 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-cas`. [Reference][affinity]. |
 | casSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-cas` deployment. [Reference][annotations]. |
 | casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
-| casSettings.env.CAS_AGENT_SCOPE_ENABLED | string | `"true"` | Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE). Requires `CAS_DEVICE_AUTH_ENABLED: "true"`. |
+| casSettings.env.CAS_AGENT_SCOPE_ENABLED | bool | `true` | Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE). Requires `CAS_DEVICE_AUTH_ENABLED: true`. |
 | casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
-| casSettings.env.CAS_DEVICE_AUTH_ENABLED | string | `"true"` | Enable the device and OAuth 2.1 + PKCE authorization endpoints that CAS's agent scope (CLI and MCP) depends on. |
+| casSettings.env.CAS_DEVICE_AUTH_ENABLED | bool | `true` | Enable the device and OAuth 2.1 + PKCE authorization endpoints that CAS's agent scope (CLI and MCP) depends on. |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
 | casSettings.env.CAS_SERVICE_AUTH_ALLOWED | string | `"teams-api,teams-plugins"` | Service names allowed to call CAS's internal key-resolution endpoint (teams-plugins, resolving agent-scoped MCP/CLI tokens). Empty disables the endpoint entirely, so this must list every legitimate caller. |
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
