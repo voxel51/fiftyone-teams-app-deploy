@@ -543,9 +543,13 @@ pluginsSettings:
 
 secret:
   fiftyone:
-    # These secrets come from your MongoDB implementation
+    # These secrets come from your MongoDB implementation.
+    # We recommend enabling TLS on the MongoDB connection (`tls=true`) whenever
+    # your MongoDB endpoint supports it, so that database traffic is encrypted
+    # in transit. Connections to MongoDB Atlas (`mongodb+srv://`) use TLS by
+    # default.
     fiftyoneDatabaseName: fiftyone
-    mongodbConnectionString: mongodb://<username>:<password>@<hostname>/?authSource=admin
+    mongodbConnectionString: mongodb://<username>:<password>@<hostname>/?authSource=admin&tls=true
     # This secret is a required random string used to encrypt session cookies.
     # To generate this string, run
     #
