@@ -1,0 +1,77 @@
+{{- if .Values.mcpGatewaySettings.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mcp-gateway.name" . }}
+  namespace: {{ .Values.namespace.name }}
+  {{- with .Values.mcpGatewaySettings.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "mcp-gateway.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.mcpGatewaySettings.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "mcp-gateway.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.mcpGatewaySettings.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mcp-gateway.selectorLabels" . | nindent 8 }}
+        {{- with .Values.mcpGatewaySettings.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fiftyone-teams-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.mcpGatewaySettings.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "mcp-gateway.name" . }}
+          securityContext:
+            {{- toYaml .Values.mcpGatewaySettings.securityContext | nindent 12 }}
+          image: "{{ .Values.mcpGatewaySettings.image.repository }}:{{ .Values.mcpGatewaySettings.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.mcpGatewaySettings.image.pullPolicy | default "IfNotPresent" }}
+          env:
+            {{- include "mcp-gateway.env-vars-list" . | nindent 12 }}
+          ports:
+            - name: {{ .Values.mcpGatewaySettings.service.shortname }}
+              containerPort: {{ .Values.mcpGatewaySettings.service.containerPort | default 8000 }}
+              protocol: TCP
+          # No HTTP health path exists (the server serves only `/mcp`,
+          # which itself requires a valid bearer token), so this is a TCP
+          # check, the honest signal available without changing the
+          # server's code.
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.mcpGatewaySettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.mcpGatewaySettings.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.mcpGatewaySettings.livenessProbe.periodSeconds }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.mcpGatewaySettings.service.shortname }}
+            initialDelaySeconds: {{ .Values.mcpGatewaySettings.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.mcpGatewaySettings.readinessProbe.periodSeconds }}
+          resources:
+            {{- toYaml .Values.mcpGatewaySettings.resources | nindent 12 }}
+      {{- with .Values.mcpGatewaySettings.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mcpGatewaySettings.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mcpGatewaySettings.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
