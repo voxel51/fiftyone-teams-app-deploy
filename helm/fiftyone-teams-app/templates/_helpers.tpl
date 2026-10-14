@@ -496,6 +496,12 @@ Create a merged list of environment variables for fiftyone-teams-cas
     secretKeyRef:
       name: {{ $secretName }}
       key: {{ .Values.casSettings.env.CAS_MONGODB_URI_KEY }}
+- name: CAS_OAUTH_RESOURCE
+{{- if .Values.teamsAppSettings.dnsName }}
+  value: {{ printf "https://%s/api/proxy/fiftyone-teams" .Values.teamsAppSettings.dnsName | quote }}
+{{- else }}
+  value: ""
+{{- end }}
 - name: CAS_URL
   value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName | quote }}
 - name: FIFTYONE_AUTH_SECRET
@@ -574,6 +580,20 @@ Create a merged list of environment variables for fiftyone-teams-plugins
       key: encryptionKey
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
+- name: FIFTYONE_CAS_URL
+  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name (float64 .Values.casSettings.service.port) | quote }}
+- name: FIFTYONE_CAS_PUBLIC_URL
+{{- if .Values.teamsAppSettings.dnsName }}
+  value: {{ printf "https://%s/cas/api" .Values.teamsAppSettings.dnsName | quote }}
+{{- else }}
+  value: ""
+{{- end }}
+- name: FIFTYONE_MCP_RESOURCE_URL
+{{- if .Values.teamsAppSettings.dnsName }}
+  value: {{ printf "https://%s/api/proxy/fiftyone-teams" .Values.teamsAppSettings.dnsName | quote }}
+{{- else }}
+  value: ""
+{{- end }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
