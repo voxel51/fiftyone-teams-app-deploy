@@ -498,7 +498,7 @@ Create a merged list of environment variables for fiftyone-teams-cas
       key: {{ .Values.casSettings.env.CAS_MONGODB_URI_KEY }}
 {{- if .Values.teamsAppSettings.dnsName }}
 - name: CAS_OAUTH_RESOURCE
-  value: {{ printf "https://%s/api/proxy/fiftyone-teams" .Values.teamsAppSettings.dnsName | quote }}
+  value: {{ printf "https://%s/api/proxy/fiftyone-teams/mcp" .Values.teamsAppSettings.dnsName | quote }}
 {{- end }}
 - name: CAS_URL
   value: {{ printf "https://%s" .Values.teamsAppSettings.dnsName | quote }}

@@ -955,7 +955,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           },
           {
             "name": "CAS_OAUTH_RESOURCE",
-            "value": "https://the-app:9999/api/proxy/fiftyone-teams"
+            "value": "https://the-app:9999/api/proxy/fiftyone-teams/mcp"
           },
           {
             "name": "CAS_URL",
