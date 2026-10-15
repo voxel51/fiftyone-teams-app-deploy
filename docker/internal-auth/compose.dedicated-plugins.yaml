@@ -28,11 +28,15 @@ services:
       FIFTYONE_AUTH_MODE: internal
       NEXTAUTH_URL: ${BASE_URL}/cas/api/auth
       CAS_URL: ${BASE_URL}
+      CAS_OAUTH_RESOURCE: ${CAS_OAUTH_RESOURCE:-${BASE_URL}/api/proxy/fiftyone-teams}
     extends:
       file: ../common-services.yaml
       service: teams-cas-common
 
   teams-plugins:
+    environment:
+      FIFTYONE_CAS_PUBLIC_URL: ${FIFTYONE_CAS_PUBLIC_URL:-${BASE_URL}/cas/api}
+      FIFTYONE_MCP_RESOURCE_URL: ${FIFTYONE_MCP_RESOURCE_URL:-${BASE_URL}/api/proxy/fiftyone-teams}
     extends:
       file: ../common-services.yaml
       service: teams-plugins-common

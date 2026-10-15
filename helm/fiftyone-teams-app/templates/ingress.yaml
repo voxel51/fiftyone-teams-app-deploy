@@ -35,6 +35,7 @@ spec:
         paths:
           {{- if and .Values.ingress.paths (gt (len .Values.ingress.paths) 1) }}
           {{- range .Values.ingress.paths }}
+          {{- if or (ne .serviceName "teams-plugins") $.Values.pluginsSettings.enabled }}
           - path: {{ .path }}
             pathType: {{ .pathType }}
             backend:
@@ -42,6 +43,7 @@ spec:
                 name: {{ .serviceName }}
                 port:
                   number: {{ .servicePort }}
+          {{- end }}
           {{- end }}
           {{- else }}
           - path: {{ .Values.ingress.teamsApp.path }}
