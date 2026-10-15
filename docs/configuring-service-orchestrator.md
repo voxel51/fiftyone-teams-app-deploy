@@ -50,6 +50,15 @@ On Kubernetes the chart sets no cpu or memory request on the orchestrator, so
 On Docker Compose, size the host itself; see the
 [worker requirements](../docker/docs/configuring-agentic-labeler.md#requirements).
 
+`agentic-labeler` downloads its model (about 24 GB) from Hugging Face
+when it starts, so it needs internet access to `huggingface.co`
+or a pre-downloaded model.
+For network, token, and offline setup, see the
+[Docker Compose](../docker/docs/configuring-agentic-labeler.md#model-downloads)
+and
+[Kubernetes](../helm/docs/configuring-agentic-labeler.md#model-downloads)
+Agentic Labeler guides.
+
 ## Docker Compose
 
 ### The builtin services list
