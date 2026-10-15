@@ -658,7 +658,7 @@ casSettings:
     FIFTYONE_AUTH_MODE: legacy
     # -- How CAS verifies the services calling its internal key-resolution
     # endpoint (`CAS_SERVICE_AUTH_ALLOWED`, above). `insecure-dev` trusts a
-    # self-asserted `X-Service-Name` header; only safe when every caller
+    # self-asserted `x-voxel-service` header; only safe when every caller
     # already runs on a trusted network. GKE/SaaS cells should set this to
     # `gcp-id-token` (cryptographically verifies a GCP Workload Identity
     # token) and also set `SERVICE_AUTH_AUDIENCE` and `SERVICE_AUTH_ACCOUNTS`
