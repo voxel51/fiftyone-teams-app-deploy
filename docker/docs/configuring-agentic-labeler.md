@@ -83,6 +83,10 @@ and leave at least 30 GB of free disk space on the host.
 The default models are public.
 You do not need a Hugging Face account to download them.
 
+> [!NOTE]
+> If you would like to use a different model,
+> contact your Voxel51 Customer Success team with the request.
+
 ### Applying changes
 
 The settings below go in your `compose.override.yaml`.

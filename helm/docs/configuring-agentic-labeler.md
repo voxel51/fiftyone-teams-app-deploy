@@ -53,6 +53,10 @@ Plan for the first start to take several minutes.
 The default models are public.
 You do not need a Hugging Face account to download them.
 
+> [!NOTE]
+> If you would like to use a different model,
+> contact your Voxel51 Customer Success team with the request.
+
 ### Applying changes
 
 The settings below go in your `values.yaml`,
