@@ -241,8 +241,8 @@ images.
     ```shell
     kubectl apply -n <namespace.name> -f model-download.yaml
     kubectl wait -n <namespace.name> --for=jsonpath='{.status.phase}'=Succeeded \
-      pod/agentic-labeler-model-download --timeout=1h
-    kubectl delete -n <namespace.name> pod/agentic-labeler-model-download
+      pod/agentic-labeler-model-download --timeout=1h && \
+      kubectl delete -n <namespace.name> pod/agentic-labeler-model-download
     ```
 
 1. Turn on offline mode, then [apply the changes](#applying-changes):
