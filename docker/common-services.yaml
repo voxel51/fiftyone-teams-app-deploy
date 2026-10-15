@@ -137,9 +137,12 @@ services:
   teams-cas-common:
     image: voxel51/fiftyone-teams-cas:v2.25.1
     environment:
+      CAS_AGENT_SCOPE_ENABLED: ${CAS_AGENT_SCOPE_ENABLED:-true}
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
+      CAS_DEVICE_AUTH_ENABLED: ${CAS_DEVICE_AUTH_ENABLED:-true}
       CAS_MONGODB_URI: ${CAS_MONGO_DB_URI:-$FIFTYONE_DATABASE_URI}
+      CAS_SERVICE_AUTH_ALLOWED: ${CAS_SERVICE_AUTH_ALLOWED:-teams-api,teams-plugins}
       DEBUG: ${CAS_DEBUG:-cas:*,-cas:*:debug}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       LICENSE_KEY_FILE_PATHS: ${LICENSE_KEY_FILE_PATHS:-/opt/fiftyone/licenses/license}
@@ -173,6 +176,8 @@ services:
     image: voxel51/fiftyone-app-torch:v2.25.1
     environment:
       API_URL: ${API_URL}
+      FIFTYONE_CAS_URL: ${FIFTYONE_CAS_URL:-http://teams-cas:3000/cas/api}
+      FIFTYONE_CAS_SERVICE_AUTH_MODE: ${FIFTYONE_CAS_SERVICE_AUTH_MODE:-insecure-dev}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       FIFTYONE_DATABASE_ADMIN: false
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
@@ -210,6 +215,8 @@ services:
       # http_proxy: ${HTTP_PROXY_URL}
       # https_proxy: ${HTTPS_PROXY_URL}
       # no_proxy: ${NO_PROXY_LIST}
+    ports:
+      - ${PLUGINS_BIND_ADDRESS:-127.0.0.1}:${PLUGINS_BIND_PORT:-5151}:5151
     restart: always
 
   # Redis-backed queue (fiftyone.mq) for Activity Analytics events.

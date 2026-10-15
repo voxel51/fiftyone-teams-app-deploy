@@ -1671,6 +1671,12 @@
               "description": "Configure Authentication Mode.\nOne of `legacy` or `internal`",
               "title": "FIFTYONE_AUTH_MODE",
               "type": "string"
+            },
+            "SERVICE_AUTH_MODE": {
+              "default": "insecure-dev",
+              "description": "How CAS verifies the services calling its internal key-resolution\nendpoint (`CAS_SERVICE_AUTH_ALLOWED`, above). `insecure-dev` trusts a\nself-asserted `X-Service-Name` header; only safe when every caller\nalready runs on a trusted network. GKE/SaaS cells should set this to\n`gcp-id-token` (cryptographically verifies a GCP Workload Identity\ntoken) and also set `SERVICE_AUTH_AUDIENCE` and `SERVICE_AUTH_ACCOUNTS`\n(comma-separated `\u003cgsa-email\u003e=\u003cservice\u003e` pairs) via their own values\noverride; leave both unset for `insecure-dev`.",
+              "title": "SERVICE_AUTH_MODE",
+              "type": "string"
             }
           },
           "required": [],

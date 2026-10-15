@@ -524,6 +524,10 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_AUTH_MODE",
             "value": "legacy"
+          },
+          {
+            "name": "SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -642,6 +646,10 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_AUTH_MODE",
             "value": "legacy"
+          },
+          {
+            "name": "SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
           },
           {
             "name": "TEST_KEY",
@@ -776,6 +784,10 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             "value": "internal"
           },
           {
+            "name": "SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
+          },
+          {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
           },
@@ -904,6 +916,10 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_AUTH_MODE",
             "value": "legacy"
+          },
+          {
+            "name": "SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -1020,6 +1036,10 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_AUTH_MODE",
             "value": "legacy"
+          },
+          {
+            "name": "SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -1136,6 +1156,10 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_AUTH_MODE",
             "value": "legacy"
+          },
+          {
+            "name": "SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
