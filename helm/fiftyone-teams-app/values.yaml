@@ -623,8 +623,9 @@ casSettings:
     # type: ["string", "boolean"]
     # @schema
     # -- Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE).
-    # Requires `CAS_DEVICE_AUTH_ENABLED: true`.
-    CAS_AGENT_SCOPE_ENABLED: true
+    # Requires `CAS_DEVICE_AUTH_ENABLED: true`. Off by default so installs that
+    # don't use the agent gateway don't get new OAuth endpoints for free.
+    CAS_AGENT_SCOPE_ENABLED: false
     # -- Provide the name for the CAS database.
     # When multiple deployments use the same database instance,
     # set `CAS_DATABASE_NAME` to a unique value for each deployment.
@@ -636,8 +637,9 @@ casSettings:
     # type: ["string", "boolean"]
     # @schema
     # -- Enable the device and OAuth 2.1 + PKCE authorization endpoints that
-    # CAS's agent scope (CLI and MCP) depends on.
-    CAS_DEVICE_AUTH_ENABLED: true
+    # CAS's agent scope (CLI and MCP) depends on. Off by default, same reason
+    # as `CAS_AGENT_SCOPE_ENABLED`.
+    CAS_DEVICE_AUTH_ENABLED: false
     # -- The key from `secret.fiftyone.name` that contains the CAS MongoDB
     # Connection String.
     CAS_MONGODB_URI_KEY: mongodbConnectionString
@@ -1538,6 +1540,24 @@ pluginsSettings:
     shortname: teams-plugins
     # -- Service type for `teams-plugins`. [Reference][service-type].
     type: ClusterIP
+
+  # GCE's load-balancer health check for `teams-plugins`, needed only on a
+  # GKE cluster using the GCE ingress controller (`kubernetes.io/ingress.class:
+  # gce`), because the two `.well-known` ingress rules above route to this
+  # service directly, bypassing `teams-app`. `teams-plugins`' own readiness
+  # probe is a plain TCP check, which GCE can't turn into an HTTP health
+  # check on its own, so without this its backend is marked unhealthy and
+  # every request GCE routes straight to it 502s. Leave disabled on
+  # non-GKE clusters, where the `BackendConfig` CRD this creates doesn't
+  # exist at all.
+  gceBackendConfig:
+    # -- Creates a `BackendConfig` pointing GCE's health check at
+    # `teams-plugins`' `/healthz` endpoint. That endpoint only exists once
+    # `teamsAppSettings.dnsName` is set (it gates `FIFTYONE_CAS_PUBLIC_URL`/
+    # `FIFTYONE_MCP_RESOURCE_URL`, which the agent gateway needs to start at
+    # all); enabling this without `dnsName` set makes the health check 404
+    # and marks the backend unhealthy instead of fixing it.
+    enabled: false
 
   # -- Affinity and anti-affinity for `teams-plugins`. [Reference][affinity].
   affinity: {}

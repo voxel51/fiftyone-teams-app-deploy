@@ -1,0 +1,14 @@
+{{- if and .Values.pluginsSettings.enabled .Values.pluginsSettings.gceBackendConfig.enabled }}
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: {{ include "teams-plugins.name" . }}-backend-config
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "teams-plugins.labels" . | nindent 4 }}
+spec:
+  healthCheck:
+    type: HTTP
+    requestPath: /healthz
+    port: {{ .Values.pluginsSettings.service.containerPort | default 5151 }}
+{{- end }}

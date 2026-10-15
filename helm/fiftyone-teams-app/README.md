@@ -983,10 +983,10 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-cas`. [Reference][affinity]. |
 | casSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-cas` deployment. [Reference][annotations]. |
 | casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
-| casSettings.env.CAS_AGENT_SCOPE_ENABLED | bool | `true` | Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE). Requires `CAS_DEVICE_AUTH_ENABLED: true`. |
+| casSettings.env.CAS_AGENT_SCOPE_ENABLED | bool | `false` | Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE). Requires `CAS_DEVICE_AUTH_ENABLED: true`. Off by default so installs that don't use the agent gateway don't get new OAuth endpoints for free. |
 | casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
-| casSettings.env.CAS_DEVICE_AUTH_ENABLED | bool | `true` | Enable the device and OAuth 2.1 + PKCE authorization endpoints that CAS's agent scope (CLI and MCP) depends on. |
+| casSettings.env.CAS_DEVICE_AUTH_ENABLED | bool | `false` | Enable the device and OAuth 2.1 + PKCE authorization endpoints that CAS's agent scope (CLI and MCP) depends on. Off by default, same reason as `CAS_AGENT_SCOPE_ENABLED`. |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
 | casSettings.env.CAS_SERVICE_AUTH_ALLOWED | string | `"teams-api,teams-plugins"` | Service names allowed to call CAS's internal key-resolution endpoint (teams-plugins, resolving agent-scoped MCP/CLI tokens). Empty disables the endpoint entirely, so this must list every legitimate caller. |
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
@@ -1149,6 +1149,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | pluginsSettings.env.FIFTYONE_INTERNAL_SERVICE | bool | `true` | Whether the SDK is running in an internal service context. When running in FiftyOne Enterprise, set to `true`. |
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_APP_IMAGES | bool | `false` | Controls whether cloud media images will be downloaded and added to the local cache upon viewing media in the app. |
 | pluginsSettings.env.FIFTYONE_MEDIA_CACHE_SIZE_BYTES | int | `-1` | Set the media cache size (in bytes) for the local FiftyOne Plugins processes. When not set, the app's default value is 32 GiB. `-1` disables the media cache garbage collection (and cache size is unlimited). |
+| pluginsSettings.gceBackendConfig.enabled | bool | `false` | Creates a `BackendConfig` pointing GCE's health check at `teams-plugins`' `/healthz` endpoint. That endpoint only exists once `teamsAppSettings.dnsName` is set (it gates `FIFTYONE_CAS_PUBLIC_URL`/ `FIFTYONE_MCP_RESOURCE_URL`, which the agent gateway needs to start at all); enabling this without `dnsName` set makes the health check 404 and marks the backend unhealthy instead of fixing it. |
 | pluginsSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | pluginsSettings.image.repository | string | `"voxel51/fiftyone-app"` | Container image for `teams-plugins`. |
 | pluginsSettings.image.tag | string | `""` | Image tag for `teams-plugins`. Defaults to the chart version. |

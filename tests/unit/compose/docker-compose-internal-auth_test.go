@@ -541,10 +541,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
 			[]string{
-				"CAS_AGENT_SCOPE_ENABLED=true",
+				"CAS_AGENT_SCOPE_ENABLED=false",
 				"CAS_DATABASE_NAME=fiftyone-cas",
 				"CAS_DEFAULT_USER_ROLE=GUEST",
-				"CAS_DEVICE_AUTH_ENABLED=true",
+				"CAS_DEVICE_AUTH_ENABLED=false",
 				"CAS_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"CAS_SERVICE_AUTH_ALLOWED=teams-api,teams-plugins",
 				"CAS_URL=https://example.fiftyone.ai",
@@ -556,6 +556,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
 				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"TEAMS_API_URL=http://teams-api:8000",
 			},
 		},
 		{
@@ -640,10 +641,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{internalAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
-				"CAS_AGENT_SCOPE_ENABLED=true",
+				"CAS_AGENT_SCOPE_ENABLED=false",
 				"CAS_DATABASE_NAME=fiftyone-cas",
 				"CAS_DEFAULT_USER_ROLE=GUEST",
-				"CAS_DEVICE_AUTH_ENABLED=true",
+				"CAS_DEVICE_AUTH_ENABLED=false",
 				"CAS_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"CAS_SERVICE_AUTH_ALLOWED=teams-api,teams-plugins",
 				"CAS_URL=https://example.fiftyone.ai",
@@ -655,6 +656,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
 				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"TEAMS_API_URL=http://teams-api:8000",
 			},
 		},
 		{
@@ -739,10 +741,10 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 			[]string{internalAuthComposePluginsFile},
 			s.dotEnvFiles,
 			[]string{
-				"CAS_AGENT_SCOPE_ENABLED=true",
+				"CAS_AGENT_SCOPE_ENABLED=false",
 				"CAS_DATABASE_NAME=fiftyone-cas",
 				"CAS_DEFAULT_USER_ROLE=GUEST",
-				"CAS_DEVICE_AUTH_ENABLED=true",
+				"CAS_DEVICE_AUTH_ENABLED=false",
 				"CAS_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
 				"CAS_SERVICE_AUTH_ALLOWED=teams-api,teams-plugins",
 				"CAS_URL=https://example.fiftyone.ai",
@@ -754,6 +756,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceEnvironment() {
 				"NEXTAUTH_URL=https://example.fiftyone.ai/cas/api/auth",
 				"TEAMS_API_DATABASE_NAME=fiftyone",
 				"TEAMS_API_MONGODB_URI=mongodb://root:test-secret@mongodb.local/?authSource=admin",
+				"TEAMS_API_URL=http://teams-api:8000",
 			},
 		},
 		{

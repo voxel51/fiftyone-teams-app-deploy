@@ -137,10 +137,10 @@ services:
   teams-cas-common:
     image: voxel51/fiftyone-teams-cas:v2.25.1
     environment:
-      CAS_AGENT_SCOPE_ENABLED: ${CAS_AGENT_SCOPE_ENABLED:-true}
+      CAS_AGENT_SCOPE_ENABLED: ${CAS_AGENT_SCOPE_ENABLED:-false}
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
-      CAS_DEVICE_AUTH_ENABLED: ${CAS_DEVICE_AUTH_ENABLED:-true}
+      CAS_DEVICE_AUTH_ENABLED: ${CAS_DEVICE_AUTH_ENABLED:-false}
       CAS_MONGODB_URI: ${CAS_MONGO_DB_URI:-$FIFTYONE_DATABASE_URI}
       CAS_SERVICE_AUTH_ALLOWED: ${CAS_SERVICE_AUTH_ALLOWED:-teams-api,teams-plugins}
       DEBUG: ${CAS_DEBUG:-cas:*,-cas:*:debug}
@@ -148,6 +148,7 @@ services:
       LICENSE_KEY_FILE_PATHS: ${LICENSE_KEY_FILE_PATHS:-/opt/fiftyone/licenses/license}
       TEAMS_API_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       TEAMS_API_MONGODB_URI: ${FIFTYONE_DATABASE_URI}
+      TEAMS_API_URL: ${TEAMS_API_URL:-http://teams-api:8000}
       FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
@@ -216,7 +217,7 @@ services:
       # https_proxy: ${HTTPS_PROXY_URL}
       # no_proxy: ${NO_PROXY_LIST}
     ports:
-      - ${PLUGINS_BIND_ADDRESS:-127.0.0.1}:${PLUGINS_BIND_PORT:-5151}:5151
+      - ${PLUGINS_BIND_ADDRESS:-127.0.0.1}:${PLUGINS_BIND_PORT:-5152}:5151
     restart: always
 
   # Redis-backed queue (fiftyone.mq) for Activity Analytics events.

@@ -1617,8 +1617,8 @@
           "description": "Environment Variables are passed to the `teams-cas` containers",
           "properties": {
             "CAS_AGENT_SCOPE_ENABLED": {
-              "default": true,
-              "description": "Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE).\nRequires `CAS_DEVICE_AUTH_ENABLED: true`.",
+              "default": false,
+              "description": "Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE).\nRequires `CAS_DEVICE_AUTH_ENABLED: true`. Off by default so installs that\ndon't use the agent gateway don't get new OAuth endpoints for free.",
               "required": [],
               "title": "CAS_AGENT_SCOPE_ENABLED",
               "type": [
@@ -1639,8 +1639,8 @@
               "type": "string"
             },
             "CAS_DEVICE_AUTH_ENABLED": {
-              "default": true,
-              "description": "Enable the device and OAuth 2.1 + PKCE authorization endpoints that\nCAS's agent scope (CLI and MCP) depends on.",
+              "default": false,
+              "description": "Enable the device and OAuth 2.1 + PKCE authorization endpoints that\nCAS's agent scope (CLI and MCP) depends on. Off by default, same reason\nas `CAS_AGENT_SCOPE_ENABLED`.",
               "required": [],
               "title": "CAS_DEVICE_AUTH_ENABLED",
               "type": [
@@ -3387,6 +3387,20 @@
           },
           "required": [],
           "title": "env",
+          "type": "object"
+        },
+        "gceBackendConfig": {
+          "description": "GCE's load-balancer health check for `teams-plugins`, needed only on a\nGKE cluster using the GCE ingress controller (`kubernetes.io/ingress.class:\ngce`), because the two `.well-known` ingress rules above route to this\nservice directly, bypassing `teams-app`. `teams-plugins`' own readiness\nprobe is a plain TCP check, which GCE can't turn into an HTTP health\ncheck on its own, so without this its backend is marked unhealthy and\nevery request GCE routes straight to it 502s. Leave disabled on\nnon-GKE clusters, where the `BackendConfig` CRD this creates doesn't\nexist at all.",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Creates a `BackendConfig` pointing GCE's health check at\n`teams-plugins`' `/healthz` endpoint. That endpoint only exists once\n`teamsAppSettings.dnsName` is set (it gates `FIFTYONE_CAS_PUBLIC_URL`/\n`FIFTYONE_MCP_RESOURCE_URL`, which the agent gateway needs to start at\nall); enabling this without `dnsName` set makes the health check 404\nand marks the backend unhealthy instead of fixing it.",
+              "title": "enabled",
+              "type": "boolean"
+            }
+          },
+          "required": [],
+          "title": "gceBackendConfig",
           "type": "object"
         },
         "image": {

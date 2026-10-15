@@ -594,14 +594,6 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             "value": "http://teams-cas:80/cas/api"
           },
           {
-            "name": "FIFTYONE_CAS_PUBLIC_URL",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_MCP_RESOURCE_URL",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
             "value": "insecure-dev"
           },
@@ -690,14 +682,6 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_CAS_URL",
             "value": "http://teams-cas:80/cas/api"
-          },
-          {
-            "name": "FIFTYONE_CAS_PUBLIC_URL",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_MCP_RESOURCE_URL",
-            "value": ""
           },
           {
             "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
@@ -804,14 +788,6 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             "value": "http://teams-cas:80/cas/api"
           },
           {
-            "name": "FIFTYONE_CAS_PUBLIC_URL",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_MCP_RESOURCE_URL",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
             "value": "insecure-dev"
           },
@@ -913,14 +889,6 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             "value": "http://teams-cas:80/cas/api"
           },
           {
-            "name": "FIFTYONE_CAS_PUBLIC_URL",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_MCP_RESOURCE_URL",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
             "value": "insecure-dev"
           },
@@ -1008,14 +976,6 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_CAS_URL",
             "value": "http://teams-cas:80/cas/api"
-          },
-          {
-            "name": "FIFTYONE_CAS_PUBLIC_URL",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_MCP_RESOURCE_URL",
-            "value": ""
           },
           {
             "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",

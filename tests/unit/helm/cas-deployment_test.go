@@ -442,10 +442,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "CAS_OAUTH_RESOURCE",
-            "value": ""
-          },
-          {
             "name": "CAS_URL",
             "value": "https://"
           },
@@ -494,8 +490,12 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "TEAMS_API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
             "name": "CAS_AGENT_SCOPE_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_DATABASE_NAME",
@@ -507,7 +507,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           },
           {
             "name": "CAS_DEVICE_AUTH_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_MONGODB_URI_KEY",
@@ -564,10 +564,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "CAS_OAUTH_RESOURCE",
-            "value": ""
-          },
-          {
             "name": "CAS_URL",
             "value": "https://"
           },
@@ -616,8 +612,12 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "TEAMS_API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
             "name": "CAS_AGENT_SCOPE_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_DATABASE_NAME",
@@ -629,7 +629,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           },
           {
             "name": "CAS_DEVICE_AUTH_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_MONGODB_URI_KEY",
@@ -700,10 +700,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "CAS_OAUTH_RESOURCE",
-            "value": ""
-          },
-          {
             "name": "CAS_URL",
             "value": "https://"
           },
@@ -752,8 +748,12 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "TEAMS_API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
             "name": "CAS_AGENT_SCOPE_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_DATABASE_NAME",
@@ -765,7 +765,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           },
           {
             "name": "CAS_DEVICE_AUTH_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_MONGODB_URI_KEY",
@@ -834,10 +834,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "CAS_OAUTH_RESOURCE",
-            "value": ""
-          },
-          {
             "name": "CAS_URL",
             "value": "https://"
           },
@@ -886,8 +882,12 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "TEAMS_API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
             "name": "CAS_AGENT_SCOPE_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_DATABASE_NAME",
@@ -899,7 +899,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           },
           {
             "name": "CAS_DEVICE_AUTH_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_MONGODB_URI_KEY",
@@ -1006,8 +1006,12 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "TEAMS_API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
             "name": "CAS_AGENT_SCOPE_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_DATABASE_NAME",
@@ -1019,7 +1023,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           },
           {
             "name": "CAS_DEVICE_AUTH_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_MONGODB_URI_KEY",
@@ -1074,10 +1078,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "CAS_OAUTH_RESOURCE",
-            "value": ""
-          },
-          {
             "name": "CAS_URL",
             "value": "https://"
           },
@@ -1126,8 +1126,12 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "TEAMS_API_URL",
+            "value": "http://teams-api:80"
+          },
+          {
             "name": "CAS_AGENT_SCOPE_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_DATABASE_NAME",
@@ -1139,7 +1143,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           },
           {
             "name": "CAS_DEVICE_AUTH_ENABLED",
-            "value": "true"
+            "value": "false"
           },
           {
             "name": "CAS_MONGODB_URI_KEY",

@@ -2,7 +2,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  {{- with .Values.pluginsSettings.service.annotations }}
+  {{- $annotations := .Values.pluginsSettings.service.annotations }}
+  {{- if .Values.pluginsSettings.gceBackendConfig.enabled }}
+  {{- $annotations = merge (dict "cloud.google.com/backend-config" (printf "{\"default\": \"%s-backend-config\"}" (include "teams-plugins.name" .))) $annotations }}
+  {{- end }}
+  {{- with $annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}

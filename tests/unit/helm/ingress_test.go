@@ -461,30 +461,6 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
-                  "path": "/.well-known/oauth-authorization-server/cas/api",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-plugins",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
-                  "path": "/.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-plugins",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
                   "backend": {
@@ -582,30 +558,6 @@ func (s *ingressTemplateTest) TestRules() {
                   }
                 },
                 {
-                  "path": "/.well-known/oauth-authorization-server/cas/api",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-plugins",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
-                  "path": "/.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-plugins",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
                   "path": "/*",
                   "pathType": "ImplementationSpecific",
                   "backend": {
@@ -644,30 +596,6 @@ func (s *ingressTemplateTest) TestRules() {
                   "backend": {
                     "service": {
                       "name": "teams-cas",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
-                  "path": "/.well-known/oauth-authorization-server/cas/api",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-plugins",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
-                  "path": "/.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-plugins",
                       "port": {
                         "number": 80
                       }
@@ -737,30 +665,6 @@ func (s *ingressTemplateTest) TestRules() {
                   "backend": {
                     "service": {
                       "name": "teams-cas",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
-                  "path": "/.well-known/oauth-authorization-server/cas/api",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-plugins",
-                      "port": {
-                        "number": 80
-                      }
-                    }
-                  }
-                },
-                {
-                  "path": "/.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp",
-                  "pathType": "Prefix",
-                  "backend": {
-                    "service": {
-                      "name": "teams-plugins",
                       "port": {
                         "number": 80
                       }
