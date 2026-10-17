@@ -29,7 +29,6 @@ jobs:
               - '.github/workflows/test-docker.yml'
               - 'docker/common-services.yaml'
               - 'docker/internal-auth/**'
-              - 'docker/legacy-auth/**'
               - 'tests/fixtures/docker/**'
               - 'tests/integration/compose/**'
               - 'tests/unit/compose/**'
@@ -52,7 +51,6 @@ jobs:
     uses: ./.github/workflows/test-docker.yml
     secrets:
       FO_INTERNAL_LICENSE: ${{ secrets.FO_INTERNAL_LICENSE }}
-      FO_LEGACY_LICENSE: ${{ secrets.FO_LEGACY_LICENSE }}
       ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
       REPO_GOOGLE_WORKLOAD_IDP: ${{ secrets.REPO_GOOGLE_WORKLOAD_IDP }}
       RO_DOCKERHUB_PAT: ${{ secrets.RO_DOCKERHUB_PAT }}

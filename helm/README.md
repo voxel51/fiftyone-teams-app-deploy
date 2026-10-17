@@ -37,7 +37,7 @@ Please contact Voxel51 for more information about FiftyOne Enterprise.
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
 - [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-1-set-up-mongodb-database)
 - [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-2-prepare-license-file)
-- [:file_folder: Step 3: Choose Authentication Mode](#file_folder-step-3-choose-authentication-mode)
+- [:file_folder: Step 3: Set Up Authentication](#file_folder-step-3-set-up-authentication)
 - [:gear: Step 4: Configure `values.yaml`](#gear-step-4-configure-valuesyaml)
 - [:file_cabinet: Step 5: Enable Shared Storage](#file_cabinet-step-5-enable-shared-storage)
 - [:jigsaw: Step 6: Enable Dedicated Plugins Mode](#jigsaw-step-6-enable-dedicated-plugins-mode)
@@ -165,28 +165,14 @@ See the example [`values.yaml`](./values.yaml).
 >   teams-api
 > ```
 
-## :file_folder: Step 3: Choose Authentication Mode
-
-FiftyOne Enterprise supports two authentication modes.
-Choose the one that matches your deployment:
-
-| Mode       | Use when                                                                   | `values.yaml` setting                          |
-| ---------- | -------------------------------------------------------------------------- | ---------------------------------------------- |
-| `internal` | Deployment is Air-gapped or Identity Provider is **OpenID Connect (OIDC)** | `casSettings.env.FIFTYONE_AUTH_MODE: internal` |
-| `legacy`   | Identity Provider is **SAML**                                              | `casSettings.env.FIFTYONE_AUTH_MODE: legacy`   |
-
-> [!NOTE]
-> The example [`values.yaml`](./values.yaml) ships with
-> `casSettings.env.FIFTYONE_AUTH_MODE: legacy` by default.
-> Set it to `internal` if your Identity Provider uses OIDC.
+## :file_folder: Step 3: Set Up Authentication
 
 Refer to the following docs to set up your Identity Provider
 with FiftyOne:
 
 - [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
   includes information on configuring CAS
-- To set up authentication for internal mode: refer to the
-  [Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
+- [Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
 
 ## :gear: Step 4: Configure `values.yaml`
 
@@ -204,8 +190,6 @@ Edit your `values.yaml` file (see the example
   for how to generate it
 - `secret.fiftyone.fiftyoneAuthSecret` — a randomly generated shared secret
   used for CAS
-- `casSettings.env.FIFTYONE_AUTH_MODE` — the mode chosen in
-  [Step 3](#file_folder-step-3-choose-authentication-mode)
 - `teamsAppSettings.dnsName` — your ingress hostname
 - `namespace.name` — set to match your target namespace
    (e.g. `your-namespace-here`).

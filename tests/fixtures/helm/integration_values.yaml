@@ -37,7 +37,6 @@ appSettings:
 casSettings:
   env:
     DEBUG: cas:*
-    FIFTYONE_AUTH_MODE: internal
   image:
     # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-teams-cas

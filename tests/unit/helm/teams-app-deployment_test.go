@@ -434,7 +434,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 		expected func(envVars []corev1.EnvVar)
 	}{
 		{
-			"defaultValues", // legacy auth mode
+			"defaultValues",
 			nil,
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := fmt.Sprintf(`[

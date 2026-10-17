@@ -140,13 +140,7 @@ See
     make auth start
     ```
 
-1. Download dev license file (legacy or internal)
-
-    ```shell
-    make license-secret-legacy
-    ```
-
-    or
+1. Download dev license file
 
     ```shell
     make license-secret-internal

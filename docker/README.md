@@ -37,7 +37,7 @@ regarding FiftyOne Enterprise.
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
 - [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-1-set-up-mongodb-database)
 - [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-2-prepare-license-file)
-- [:file_folder: Step 3: Choose Authentication Mode](#file_folder-step-3-choose-authentication-mode)
+- [:file_folder: Step 3: Navigate to the Compose Directory](#file_folder-step-3-navigate-to-the-compose-directory)
 - [:gear: Step 4: Configure Environment](#gear-step-4-configure-environment)
   - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
   - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
@@ -176,20 +176,10 @@ chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
-## :file_folder: Step 3: Choose Authentication Mode
-
-FiftyOne Enterprise supports two authentication modes.
-Choose the one that matches your deployment:
-
-| Mode            | Use when                                                                   |
-|-----------------|----------------------------------------------------------------------------|
-| `internal-auth` | Deployment is Air-gapped or Identity Provider is **OpenID Connect (OIDC)** |
-| `legacy-auth`   | Identity Provider is **SAML**                                              |
-
-Navigate into the appropriate directory:
+## :file_folder: Step 3: Navigate to the Compose Directory
 
 ```bash
-cd internal-auth  # or legacy-auth
+cd internal-auth
 ```
 
 ## :gear: Step 4: Configure Environment
@@ -204,7 +194,7 @@ cp env.template .env
 
 At minimum, configure:
 
-- `BASE_URL` / `AUTH0_BASE_URL` - Your WebApp URL
+- `BASE_URL` - Your WebApp URL
 - `FIFTYONE_API_URI` - Your API URL (can be the same as webApp URL if using
   path-based routing)
 - `FIFTYONE_DATABASE_URI` – Your MongoDB connection URI
@@ -427,7 +417,7 @@ v1.6. This enables centralized login, roles, and user management.
    - `CAS_DEBUG`
    - `CAS_DEFAULT_USER_ROLE`
 1. Update `compose.override.yaml` with any needed `teams-cas` service changes.
-1. Use `docker compose` from within the `legacy-auth`/`internal-auth` directory
+1. Use `docker compose` from within the `internal-auth` directory
    to bring up services.
 1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
 

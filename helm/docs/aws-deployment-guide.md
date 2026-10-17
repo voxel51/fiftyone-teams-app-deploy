@@ -460,10 +460,6 @@ apiSettings:
     - name: nfs-shared-vol
       mountPath: /opt/shared
 
-casSettings:
-  env:
-    FIFTYONE_AUTH_MODE: internal # or legacy depending on your license.
-
 delegatedOperatorDeployments:
   template:
     env:

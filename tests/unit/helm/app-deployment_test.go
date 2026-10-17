@@ -419,7 +419,7 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
 		expected func(envVars []corev1.EnvVar)
 	}{
 		{
-			"defaultValues", // legacy auth mode
+			"defaultValues",
 			nil,
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
@@ -508,115 +508,8 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
 			},
 		},
 		{
-			"overrideEnv", // legacy auth mode
+			"overrideEnv",
 			map[string]string{
-				"appSettings.env.TEST_KEY":                                  "TEST_VALUE",
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "anExistingKey",      // pragma: allowlist secret
-			},
-			func(envVars []corev1.EnvVar) {
-				expectedEnvVarJSON := `[
-          {
-            "name": "POD_NAME",
-            "valueFrom": {
-              "fieldRef": {
-                "apiVersion": "v1",
-                "fieldPath": "metadata.name"
-              }
-            }
-          },
-          {
-            "name": "API_URL",
-            "value": "http://teams-api:80"
-          },
-          {
-            "name": "FIFTYONE_AUTH_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "fiftyoneAuthSecret"
-              }
-            }
-          },
-          {
-            "name": "FIFTYONE_DATABASE_NAME",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "fiftyoneDatabaseName"
-              }
-            }
-          },
-          {
-            "name": "FIFTYONE_DATABASE_URI",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "mongodbConnectionString"
-              }
-            }
-          },
-          {
-            "name": "FIFTYONE_ENCRYPTION_KEY",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "encryptionKey"
-              }
-            }
-          },
-          {
-            "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
-            "value": "true"
-          },
-          {
-            "name": "FIFTYONE_APP_ENABLE_QUERY_PERFORMANCE",
-            "value": "true"
-          },
-          {
-            "name": "FIFTYONE_DATABASE_ADMIN",
-            "value": "false"
-          },
-          {
-            "name": "FIFTYONE_INTERNAL_SERVICE",
-            "value": "true"
-          },
-          {
-            "name": "FIFTYONE_MEDIA_CACHE_APP_IMAGES",
-            "value": "false"
-          },
-          {
-            "name": "FIFTYONE_MEDIA_CACHE_SIZE_BYTES",
-            "value": "-1"
-          },
-          {
-            "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
-            "value": "24"
-          },
-          {
-            "name": "TEST_KEY",
-            "value": "TEST_VALUE"
-          },
-          {
-            "name": "AN_ADDITIONAL_SECRET_ENV",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "an-existing-secret",
-                "key": "anExistingKey"
-              }
-            }
-          }
-        ]`
-				var expectedEnvVars []corev1.EnvVar
-				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
-				s.NoError(err)
-				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
-			},
-		},
-		{
-			"internalAuthMode",
-			map[string]string{
-				"casSettings.env.FIFTYONE_AUTH_MODE":                        "internal",
 				"appSettings.env.TEST_KEY":                                  "TEST_VALUE",
 				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
 				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "anExistingKey",      // pragma: allowlist secret
