@@ -10,12 +10,12 @@ repos:
         args:
           - --allow-multiple-document
         # We exclude helm template files since in raw form, they are not valid yaml
-        exclude: (^helm/fiftyone-teams-app/templates|^cloudformation|^tests/unit/helm/test_data)
+        exclude: (^helm/fiftyone-teams-app/templates|^helm/fiftyone-model-server/templates|^cloudformation|^tests/unit/helm/test_data)
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: pretty-format-json
         # Ignore generated files
-        exclude: ^helm/fiftyone-teams-app/values.schema.json
+        exclude: ^helm/fiftyone-(teams-app|model-server)/values.schema.json
       - id: trailing-whitespace
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.6
@@ -34,6 +34,11 @@ repos:
           - --chart-search-root=helm/fiftyone-teams-app
           # A base filename makes it relative to each chart directory found
           - --template-files=README.md.gotmpl
+      - id: helm-docs
+        name: helm-docs (fiftyone-model-server)
+        args:
+          - --chart-search-root=helm/fiftyone-model-server
+          - --template-files=README.md.gotmpl
   - repo: https://github.com/dadav/helm-schema
     rev: 0.23.1
     hooks:
@@ -46,6 +51,14 @@ repos:
           - --append-newline
           # This breaks type annotations
           # - --helm-docs-compatibility-mode
+      - id: helm-schema
+        name: helm-schema (fiftyone-model-server)
+        args:
+          - --chart-search-root=./helm/fiftyone-model-server
+          - --no-dependencies
+          - --add-schema-reference
+          - --skip-auto-generation=additionalProperties,required
+          - --append-newline
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.48.0
@@ -67,7 +80,7 @@ repos:
       - id: yamllint
         entry: yamllint --config-file .yamllint.yaml
         # We exclude helm template files since in raw form, they are not valid yaml
-        exclude: (^helm/fiftyone-teams-app/templates|^tests/unit/helm/test_data)
+        exclude: (^helm/fiftyone-teams-app/templates|^helm/fiftyone-model-server/templates|^tests/unit/helm/test_data)
   - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
     rev: v1.1.2
     hooks:

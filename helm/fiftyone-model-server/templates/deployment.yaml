@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "model-server.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "model-server.labels" . | nindent 4 }}
+spec:
+  # One box per release: the inference service limits runs per box and keeps
+  # a video propagation on the box that started it, so replicas behind one
+  # Service would break both. Another box is another release.
+  replicas: 1
+  # A GPU node is not shared, and a weights volume mounts once
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "model-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "model-server.labels" . | nindent 8 }}
+    spec:
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
+      {{- with .Values.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: model-server
+          image: {{ printf "%s:%s" (required "image.repository is required" .Values.image.repository) (required "image.tag is required" .Values.image.tag) | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "model-server.name" . }}
+          {{- /* gpu.count wins over a nvidia.com/gpu set in resources */}}
+          {{- $resources := deepCopy (.Values.resources | default dict) }}
+          {{- if .Values.gpu.enabled }}
+          {{- $_ := set $resources "limits" (merge (dict "nvidia.com/gpu" .Values.gpu.count) ($resources.limits | default dict)) }}
+          {{- $_ := set $resources "requests" (merge (dict "nvidia.com/gpu" .Values.gpu.count) ($resources.requests | default dict)) }}
+          {{- end }}
+          {{- with $resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: weights
+              mountPath: /models
+          # Nothing listens until the preload is done, downloads included
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+          # 503 after repeated GPU out of memory errors, so a sick box restarts
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 30
+            failureThreshold: 3
+          # 503 while nothing is loaded
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+      volumes:
+        - name: weights
+          {{- if .Values.weights.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.weights.persistence.existingClaim | default (printf "%s-weights" (include "model-server.name" .)) }}
+          {{- else if .Values.weights.sizeLimit }}
+          emptyDir:
+            sizeLimit: {{ .Values.weights.sizeLimit }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

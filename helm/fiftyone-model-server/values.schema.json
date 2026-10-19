@@ -1,0 +1,346 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "affinity": {
+      "description": "Affinity.",
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "allowedMediaPrefixes": {
+      "description": "Media locations this box fetches from, as scheme and host prefixes such\nas `gs://my-bucket`. Empty means any URL, including internal addresses.",
+      "items": {
+        "required": []
+      },
+      "title": "allowedMediaPrefixes",
+      "type": "array"
+    },
+    "allowedModelKwargs": {
+      "description": "Model arguments this box passes to the zoo loader. Empty means any.\nSet it when anything besides the inference service can reach the box:\nsome loader arguments are filesystem paths.",
+      "items": {
+        "required": []
+      },
+      "title": "allowedModelKwargs",
+      "type": "array"
+    },
+    "allowedModels": {
+      "description": "Models this box serves at all. Empty means any zoo model, which lets a\ncaller fill the disk with weights. Set it to the same list as the\ninference service declares for this box.",
+      "items": {
+        "required": []
+      },
+      "title": "allowedModels",
+      "type": "array"
+    },
+    "automountServiceAccountToken": {
+      "default": false,
+      "description": "Mount the service account token. Off: the model server calls no\nKubernetes API.",
+      "title": "automountServiceAccountToken",
+      "type": "boolean"
+    },
+    "env": {
+      "description": "Extra environment variables, by name.",
+      "required": [],
+      "title": "env",
+      "type": "object"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "gpu": {
+      "properties": {
+        "count": {
+          "default": 1,
+          "description": "GPUs requested when `gpu.enabled`.",
+          "title": "count",
+          "type": "integer"
+        },
+        "enabled": {
+          "default": false,
+          "description": "Request GPUs. Off runs on CPU, which is enough for small models such\nas SigLIP and too slow for SAM2 or video.",
+          "title": "enabled",
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "title": "gpu",
+      "type": "object"
+    },
+    "image": {
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "description": "Image pull policy.",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "",
+          "description": "(string) Container image repository. Required: the image is not\npublished yet.",
+          "required": [],
+          "title": "repository",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tag": {
+          "default": "",
+          "description": "(string) Container image tag. Required.",
+          "required": [],
+          "title": "tag",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "Image pull secrets for a private registry.",
+      "items": {
+        "required": []
+      },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "maxLoadedModels": {
+      "default": 6,
+      "description": "Models kept loaded at once, least recently used evicted first.",
+      "title": "maxLoadedModels",
+      "type": "integer"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "yaml-language-server: $schema=values.schema.json\nOverrides the release name in every object's name.",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "networkPolicy": {
+      "properties": {
+        "enabled": {
+          "default": true,
+          "description": "Admit only `networkPolicy.from` to the box. The model server checks no\ntoken, so leave this on unless the cluster enforces nothing.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "from": {
+          "description": "NetworkPolicy peers allowed to call the box: by default the inference\nservice's pods in this namespace. Add a `namespaceSelector` to the peer\nfor an inference service in another namespace. With a LoadBalancer, the\n`service.loadBalancerSourceRanges` are admitted as well.",
+          "items": {
+            "anyOf": [
+              {
+                "properties": {
+                  "podSelector": {
+                    "properties": {
+                      "matchLabels": {
+                        "properties": {
+                          "app": {
+                            "default": "inference",
+                            "title": "app",
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "title": "matchLabels",
+                        "type": "object"
+                      }
+                    },
+                    "required": [],
+                    "title": "podSelector",
+                    "type": "object"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "from",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "networkPolicy",
+      "type": "object"
+    },
+    "nodeSelector": {
+      "description": "Node selector, for GPU nodes for example.",
+      "required": [],
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "podAnnotations": {
+      "description": "Pod annotations.",
+      "required": [],
+      "title": "podAnnotations",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "description": "Pod security context.",
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "preload": {
+      "description": "Models loaded at startup, by zoo name. Required: `/readyz` answers 503\nuntil one is loaded, so with none the pod never becomes Ready. Name the\nmodels the inference service routes to this box.",
+      "items": {
+        "required": []
+      },
+      "title": "preload",
+      "type": "array"
+    },
+    "resources": {
+      "description": "Not set by default, as in the main chart. A box needs about 16Gi of memory\nfor SigLIP and Qwen3-VL. Weights in an emptyDir count as ephemeral storage,\nso set an `ephemeral-storage` request and limit for them (GKE Autopilot\ngives 1Gi otherwise), or use `weights.persistence`. To set them, uncomment\nand adjust, and remove the curly braces after `limits:` and `requests:`.\nContainer resources. With `gpu.enabled`, `nvidia.com/gpu` is set to\n`gpu.count` in requests and limits.",
+      "properties": {
+        "limits": {
+          "required": [],
+          "title": "limits",
+          "type": "object"
+        },
+        "requests": {
+          "description": "  memory: 16Gi\n  ephemeral-storage: 20Gi",
+          "required": [],
+          "title": "requests",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "resources",
+      "type": "object"
+    },
+    "securityContext": {
+      "description": "Container security context.",
+      "required": [],
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "properties": {
+        "annotations": {
+          "description": "Service annotations, such as\n`networking.gke.io/load-balancer-type: Internal`.",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "externalTrafficPolicy": {
+          "default": "Local",
+          "description": "`externalTrafficPolicy` of a LoadBalancer. `Local` keeps the caller's\naddress, which the NetworkPolicy needs to admit it by range.",
+          "title": "externalTrafficPolicy",
+          "type": "string"
+        },
+        "loadBalancerSourceRanges": {
+          "description": "Source ranges a LoadBalancer admits, such as the calling cluster's pod\nrange. The model server checks no token, so this is its access control.\nThe NetworkPolicy admits the same ranges.",
+          "items": {
+            "required": []
+          },
+          "title": "loadBalancerSourceRanges",
+          "type": "array"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "description": "`ClusterIP` for callers in this cluster. `LoadBalancer` for an\ninference service in another cluster, which then requires\n`service.loadBalancerSourceRanges`.",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccountName": {
+      "default": "",
+      "description": "(string) Service account the pod runs as.",
+      "required": [],
+      "title": "serviceAccountName",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "startupProbe": {
+      "properties": {
+        "failureThreshold": {
+          "default": 90,
+          "description": "Startup probe attempts, 10 s apart. Nothing listens until the preload\nis done, downloads included, so the default allows 15 minutes.",
+          "title": "failureThreshold",
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "title": "startupProbe",
+      "type": "object"
+    },
+    "tolerations": {
+      "description": "Tolerations, for tainted GPU nodes for example.",
+      "items": {
+        "required": []
+      },
+      "title": "tolerations",
+      "type": "array"
+    },
+    "weights": {
+      "properties": {
+        "persistence": {
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Keep downloaded weights on a PersistentVolumeClaim, so a restart\ndoes not download them again and the node's disk is not filled.\nOff uses an emptyDir.",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "existingClaim": {
+              "default": "",
+              "description": "(string) Use this claim instead of creating one.",
+              "required": [],
+              "title": "existingClaim",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "size": {
+              "default": "30Gi",
+              "description": "Size of the created claim.",
+              "title": "size",
+              "type": "string"
+            },
+            "storageClass": {
+              "default": "",
+              "description": "(string) Storage class of the created claim. Empty is the cluster\ndefault.",
+              "required": [],
+              "title": "storageClass",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [],
+          "title": "persistence",
+          "type": "object"
+        },
+        "sizeLimit": {
+          "default": "",
+          "description": "(string) emptyDir size limit, when persistence is off.",
+          "required": [],
+          "title": "sizeLimit",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [],
+      "title": "weights",
+      "type": "object"
+    }
+  },
+  "required": [],
+  "type": "object"
+}

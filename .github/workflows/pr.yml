@@ -41,6 +41,7 @@ jobs:
               - 'tests/unit/helm/**'
             helm-unit:
               - '.github/workflows/test-helm.yml'
+              - 'helm/fiftyone-model-server/**'
               - 'helm/fiftyone-teams-app/**'
               - 'tests/fixtures/helm/**'
               - 'tests/integration/helm/**'

@@ -1,0 +1,18 @@
+{{- if and .Values.weights.persistence.enabled (not .Values.weights.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "model-server.name" . }}-weights
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "model-server.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- with .Values.weights.persistence.storageClass }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.weights.persistence.size }}
+{{- end }}

@@ -1,0 +1,60 @@
+{{ template "chart.header" . }}
+
+<!-- markdownlint-disable-next-line line-length -->
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+The FiftyOne inference service routes embeddings, predictions and
+segmentation to model servers. This chart deploys one: install one release
+per box. The inference service reaches a box by URL only, so a box can run in
+a separate GPU cluster.
+
+## What to know before installing
+
+- **The model server checks no token.** Only the inference service should
+  reach it:
+  - In the same cluster, the default NetworkPolicy admits only pods labelled
+    `app: inference` in this namespace. For an inference service in another
+    namespace, add a `namespaceSelector` to the peer in `networkPolicy.from`.
+  - From another cluster, use `service.type: LoadBalancer` with
+    `service.loadBalancerSourceRanges` set to the calling cluster's pod range,
+    and an internal load balancer annotation for your cloud. The
+    NetworkPolicy then admits those ranges too, and
+    `service.externalTrafficPolicy: Local` keeps the caller's address so it
+    can.
+- **One box per release.** The inference service limits how many video runs
+  each box takes and keeps a run on the box that started it, so the chart
+  runs one replica. Add capacity with another release, and list its URL in
+  the inference service's backend.
+- **`preload` is required.** The pod reports Ready only once a model is
+  loaded. Nothing answers until the preload is done, so the first start
+  includes downloading the weights.
+- **Weights.** By default they go to an `emptyDir`: a new pod downloads them
+  again, and they count as the pod's ephemeral storage, so request enough of
+  it (GKE Autopilot gives 1Gi otherwise). Set `weights.persistence.enabled`
+  to keep them on a claim instead.
+- **GPU.** `gpu.enabled` requests `gpu.count` GPUs. Use `nodeSelector` and
+  `tolerations` for your GPU nodes. On CPU, small models such as SigLIP work,
+  but SAM2 and video models are too slow for the inference service's
+  timeouts.
+
+## Install
+
+```shell
+helm install model-server ./helm/fiftyone-model-server \
+  --namespace fiftyone-teams \
+  --set image.repository=<repository> \
+  --set image.tag=<tag> \
+  --set 'preload[0]=siglip-base-patch16-224-torch'
+```
+
+{{ template "chart.requirementsSection" . }}
+
+## Values
+
+<!-- markdownlint-disable MD060 -->
+
+{{ template "chart.valuesTable" . }}
+
+<!-- markdownlint-enable MD060 -->
