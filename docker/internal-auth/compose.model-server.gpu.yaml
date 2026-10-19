@@ -1,0 +1,24 @@
+---
+# The model server on NVIDIA GPUs. Requires a Linux host with the NVIDIA
+# driver, nvidia-container-toolkit, and the `nvidia` runtime configured in
+# dockerd. Docker Desktop on macOS / Windows does not support GPU
+# passthrough.
+#
+# Add it after compose.model-server.yaml:
+#
+#   docker compose \
+#     -f compose.model-server.yaml \
+#     -f compose.model-server.gpu.yaml \
+#     up -d
+services:
+  model-server:
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${NVIDIA_GPU_COUNT:-1}
+              capabilities: ["gpu"]

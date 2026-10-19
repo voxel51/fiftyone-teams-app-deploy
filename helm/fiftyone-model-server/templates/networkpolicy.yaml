@@ -1,0 +1,31 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- $peers := .Values.networkPolicy.from | default list }}
+{{- if eq .Values.service.type "LoadBalancer" }}
+{{- /* Callers through the load balancer, from another cluster */}}
+{{- range .Values.service.loadBalancerSourceRanges }}
+{{- $peers = append $peers (dict "ipBlock" (dict "cidr" .)) }}
+{{- end }}
+{{- end }}
+{{- /* An empty from admits everyone, so it is refused */}}
+{{- if not $peers }}
+{{- fail "networkPolicy.from is required: who may call the model server" }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "model-server.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "model-server.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "model-server.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        {{- toYaml $peers | nindent 8 }}
+      ports:
+        - port: 8080
+{{- end }}

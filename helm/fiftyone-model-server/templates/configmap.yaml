@@ -1,0 +1,24 @@
+{{- if not .Values.preload }}
+{{- fail "preload is required: with nothing loaded /readyz is 503 and the pod is never Ready" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "model-server.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "model-server.labels" . | nindent 4 }}
+data:
+  MODEL_SERVER_PORT: "8080"
+  MODEL_SERVER_PRELOAD: {{ .Values.preload | toJson | quote }}
+  MODEL_SERVER_ALLOWED_MODELS: {{ .Values.allowedModels | default list | toJson | quote }}
+  MODEL_SERVER_ALLOWED_MODEL_KWARGS: {{ .Values.allowedModelKwargs | default list | toJson | quote }}
+  MODEL_SERVER_ALLOWED_MEDIA_PREFIXES: {{ .Values.allowedMediaPrefixes | default list | toJson | quote }}
+  MODEL_SERVER_MAX_LOADED_MODELS: {{ .Values.maxLoadedModels | quote }}
+  # Weights land on the weights volume, not the image's filesystem
+  FIFTYONE_MODEL_ZOO_DIR: /models/zoo
+  HF_HOME: /models/hf
+  TORCH_HOME: /models/torch
+  {{- range $name, $value := .Values.env }}
+  {{ $name }}: {{ $value | quote }}
+  {{- end }}
