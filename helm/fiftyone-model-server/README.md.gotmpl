@@ -1,0 +1,83 @@
+{{ template "chart.header" . }}
+
+<!-- markdownlint-disable-next-line line-length -->
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+The FiftyOne inference service routes embeddings, predictions and
+segmentation to model servers. This chart deploys them, one box per pod. The
+inference service reaches a box by URL only, so a box can run in a separate
+GPU cluster.
+
+## What to know before installing
+
+- **The model server checks no token by default.** Set `token.value`, or
+  `token.secretName` for your own Secret with the key `token`, and every call
+  but the probes (`/healthz`, `/readyz`) then needs
+  `Authorization: Bearer <token>`, `/metrics` included: anything that scrapes
+  it must send the token. Give the same Secret to the fiftyone-inference
+  chart, `modelServer.tokenSecret`, which then sends it. To change the
+  token, change the Secret, then restart the model servers and the inference
+  service: both read it at start only, and a change to `token.value`
+  restarts the model servers alone. With or without a token, only the
+  inference service should reach it:
+  - In the same cluster, the default NetworkPolicy admits only pods labelled
+    `app: inference` in this namespace. For an inference service in another
+    namespace, add a `namespaceSelector` to the peer in `networkPolicy.from`.
+  - From another cluster, use `service.type: LoadBalancer` with
+    `service.loadBalancerSourceRanges` set to the calling cluster's pod range,
+    and an internal load balancer annotation for your cloud. Each pod gets
+    its own load balancer. The
+    NetworkPolicy then admits those ranges too, and
+    `service.externalTrafficPolicy: Local` keeps the caller's address so it
+    can.
+- **One box per pod.** `replicas` sets how many pods run, 1 by default. The
+  inference service limits how many video runs each box takes and keeps a run
+  on the box that started it, so pods do not share one URL: each pod has its
+  own Service, `<name>-<i>` with i from 0, where `<name>` is the release name
+  or `nameOverride`. For release `model-server` with `replicas: 3`, the URLs
+  are `http://model-server-0:8080`, `http://model-server-1:8080` and
+  `http://model-server-2:8080`. List them all in the fiftyone-inference
+  chart (`modelServer.replicas`, or `modelServer.urls`). Pods are not
+  autoscaled.
+- **`preload` is required.** The pod reports Ready only once a model is
+  loaded. Nothing answers until the preload is done, so the first start
+  includes downloading the weights.
+- **Weights.** By default they go to an `emptyDir`: a new pod downloads them
+  again, and they count as the pod's ephemeral storage, so request enough of
+  it (GKE Autopilot gives 1Gi otherwise). Set `weights.persistence.enabled`
+  to keep them on a claim instead: one claim per pod, `weights-<name>-<i>`.
+  Scaling in keeps the claims of the pods removed, and scaling out again
+  reuses them: delete a claim yourself once you no longer need it.
+  `helm uninstall` keeps the claims too, and a reinstall uses them again.
+  `weights.persistence.existingClaim` takes one pod only, as a ReadWriteOnce
+  claim cannot be shared.
+  `weights.persistence` `enabled`, `size`, `storageClass` and `existingClaim`
+  cannot change after install: to change them, run
+  `kubectl delete statefulset <name> --cascade=orphan`, then upgrade.
+  Existing claims keep their old size until you resize them yourself.
+- **GPU.** `gpu.enabled` requests `gpu.count` GPUs. Use `nodeSelector` and
+  `tolerations` for your GPU nodes. On CPU, small models such as SigLIP work,
+  but SAM2 and video models are too slow for the inference service's
+  timeouts.
+
+## Install
+
+```shell
+helm install model-server ./helm/fiftyone-model-server \
+  --namespace fiftyone-teams \
+  --set image.repository=<repository> \
+  --set image.tag=<tag> \
+  --set 'preload[0]=siglip-base-patch16-224-torch'
+```
+
+{{ template "chart.requirementsSection" . }}
+
+## Values
+
+<!-- markdownlint-disable MD060 -->
+
+{{ template "chart.valuesTable" . }}
+
+<!-- markdownlint-enable MD060 -->
