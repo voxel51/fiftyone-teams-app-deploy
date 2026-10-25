@@ -17,7 +17,7 @@ activitySettings:
     # -- Worker image.
     repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/fiftyone-activity
     # -- Worker image tag. Defaults to the chart `appVersion`.
-    tag: "v2.25.0"
+    tag: "69f7de7cb79ae38663a5319f08f8cdca4e26e430"
     # -- Worker image pull policy. [Reference][image-pull-policy].
     pullPolicy: IfNotPresent
   mongo:
