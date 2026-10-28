@@ -150,9 +150,10 @@ v2.25 `teams-cas` cannot read the data as v2.26 stores it. Until the step is
 done, v2.25 does not list service accounts and over-counts seats taken by
 pending invitations.
 
-1. Roll the release back to v2.25, for example with `helm rollback`, so
-   that no v2.26 `teams-cas` pod is left running. A v2.26 `teams-cas` that
-   starts again stores the data the v2.26 way again.
+1. Roll the release back to v2.25, for example with `helm rollback --wait`,
+   and confirm with `kubectl get pods` that no v2.26 `teams-cas` pod is
+   still running or terminating. If a v2.26 `teams-cas` starts, it stores
+   the data in the v2.26 format.
 1. Contact Voxel51 support for a `fiftyone-migrator` release with the
    `rollback` command, and run it against the deployment's databases:
 

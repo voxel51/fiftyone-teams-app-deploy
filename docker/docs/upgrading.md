@@ -137,8 +137,8 @@ pending invitations.
 
 1. Stop the deployment, set the image tags back to v2.25 in your
    `compose.override.yaml`, and start it again, so that no v2.26
-   `teams-cas` container is left running. A v2.26 `teams-cas` that starts
-   again stores the data the v2.26 way again.
+   `teams-cas` container is left running. If a v2.26 `teams-cas` starts,
+   it stores the data in the v2.26 format.
 1. Contact Voxel51 support for a `fiftyone-migrator` release with the
    `rollback` command, and run it against the deployment's databases:
 
