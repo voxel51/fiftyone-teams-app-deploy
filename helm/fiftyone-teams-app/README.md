@@ -1257,13 +1257,18 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.redis.podSecurityContext | object | `{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999}` | Pod-level security attributes for the telemetry Redis. UID/GID 999 matches the `redis` user in the `redis:7-alpine` image; `fsGroup` keeps the mounted `/data` volume group-writable. [Reference][security-context]. |
 | telemetry.redis.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"512Mi"}}` | Resource requests/limits for the telemetry Redis container. [Reference][resources]. |
 | telemetry.serviceAccounts | list | `[]` | ServiceAccount names (in `namespace.name`) bound to the telemetry pod-logs Role. When empty, the RoleBinding binds the chart's main app service account. The teams-api sidecar uses the teams-api RBAC service account, which already grants `pods/log` GET via `api-role.yaml`. |
+| telemetry.sidecar.api.env | object | `{}` | Additional environment variables for the `teams-api` sidecar only, overriding `telemetry.sidecar.env`. |
+| telemetry.sidecar.app.env | object | `{}` | Additional environment variables for the `fiftyone-app` sidecar only, overriding `telemetry.sidecar.env`. |
+| telemetry.sidecar.delegatedOperator.env | object | `{}` | Additional environment variables for the delegated-operator sidecars only (instance Deployments and Job templates), overriding `telemetry.sidecar.env`. |
+| telemetry.sidecar.env | object | `{}` | Additional environment variables for every `telemetry-sidecar` container, e.g. `DISABLE_STACKS: "true"`. Must not repeat a variable the chart sets (`POD_NAME`, `SERVICE_TYPE`, `TARGET_NAME`, ...). |
 | telemetry.sidecar.extraVolumeMounts | list | `[]` | Additional volume mounts for the `telemetry-sidecar` container, e.g. to mount the same CA certs the app containers use. [Reference][volumes]. |
 | telemetry.sidecar.extraVolumes | list | `[]` | Additional pod volumes available to the `telemetry-sidecar`. Omit any volume already defined on the workload (`*.volumes`) to avoid name collisions. [Reference][volumes]. |
 | telemetry.sidecar.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | telemetry.sidecar.image.repository | string | `"voxel51/telemetry-sidecar"` | Container image for `telemetry-sidecar`. |
 | telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to `Chart.AppVersion`. |
+| telemetry.sidecar.plugins.env | object | `{}` | Additional environment variables for the `teams-plugins` sidecar only, overriding `telemetry.sidecar.env`. |
 | telemetry.sidecar.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"512Mi"}}` | Resource requests/limits for each `telemetry-sidecar` container. |
-| telemetry.sidecar.stackSampling | bool | `true` | Set `false` if your cluster's admission policy won't permit the `SYS_PTRACE` capability that the delegated-operator sidecar uses for `py-spy` stack sampling; the rest of telemetry keeps working without it. |
+| telemetry.sidecar.stackSampling | bool | `true` | Set `false` if your cluster's admission policy won't permit the `SYS_PTRACE` capability that the delegated-operator sidecar uses for `py-spy` stack sampling, or to stop stack sampling altogether. `false` drops the capability and sets `DISABLE_STACKS=true` on every sidecar, so none runs `py-spy`; CPU, memory and the rest of telemetry keep working without it. |
 
 <!-- markdownlint-enable MD060 -->
 

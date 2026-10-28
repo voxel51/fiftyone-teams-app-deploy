@@ -165,6 +165,30 @@ services:
   # teams-do-gpu-telemetry: {cap_add: !reset []} # compose.delegated-operators.gpu.yaml
 ```
 
+### Turning off stack sampling
+
+Set `DISABLE_STACKS: "true"` on a sidecar to stop it running `py-spy` at all,
+for example while stacks are not needed or to keep runtime security tools from
+reporting its attempts.
+CPU, memory and the rest of telemetry keep working.
+Set it per sidecar in a `compose.override.yaml`; this matches
+`telemetry.sidecar.stackSampling: false` in the Helm chart when set on every
+sidecar you run:
+
+```yaml
+services:
+  teams-api-telemetry:
+    environment:
+      DISABLE_STACKS: "true"
+  fiftyone-app-telemetry:
+    environment:
+      DISABLE_STACKS: "true"
+  teams-do-telemetry:
+    cap_add: !reset []
+    environment:
+      DISABLE_STACKS: "true"
+```
+
 [compose-merge]: https://docs.docker.com/reference/compose-file/merge/#reset-value
 
 ### Scaling teams-do with telemetry

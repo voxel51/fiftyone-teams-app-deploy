@@ -292,3 +292,98 @@ func (s *telemetrySidecarTemplateTest) TestSidecarSecurityContext() {
 		})
 	}
 }
+
+// renderSidecar renders one workload template and returns its sidecar.
+func (s *telemetrySidecarTemplateTest) renderSidecar(template string, base, values map[string]string) *corev1.Container {
+	merged := map[string]string{}
+	for k, v := range base {
+		merged[k] = v
+	}
+	for k, v := range values {
+		merged[k] = v
+	}
+	output := helm.RenderTemplate(s.T(), &helm.Options{SetValues: merged}, s.chartPath, s.releaseName,
+		[]string{template})
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+	sidecar := findContainer(deployment.Spec.Template.Spec.Containers, telemetrySidecarName)
+	s.Require().NotNil(sidecar, "telemetry-sidecar container should be injected into %s", template)
+	return sidecar
+}
+
+// TestStackSamplingOffStopsEverySidecar asserts that stackSampling=false sets
+// DISABLE_STACKS on every sidecar, so none runs py-spy, as well as dropping
+// SYS_PTRACE.
+func (s *telemetrySidecarTemplateTest) TestStackSamplingOffStopsEverySidecar() {
+	for _, tc := range telemetrySidecarWorkloads {
+		tc := tc
+		s.Run(tc.template, func() {
+			sidecar := s.renderSidecar(tc.template, tc.values,
+				map[string]string{"telemetry.sidecar.stackSampling": "false"})
+
+			value, ok := envValue(sidecar.Env, "DISABLE_STACKS")
+			s.True(ok && value == "true", "DISABLE_STACKS should be true on %s", tc.template)
+			s.NotContains(sidecar.SecurityContext.Capabilities.Add, corev1.Capability("SYS_PTRACE"),
+				"SYS_PTRACE should be dropped on %s", tc.template)
+		})
+	}
+}
+
+// TestSidecarEnvLayers asserts that a workload's telemetry.sidecar.<workload>.env
+// overrides telemetry.sidecar.env on that workload only, a false included.
+func (s *telemetrySidecarTemplateTest) TestSidecarEnvLayers() {
+	values := map[string]string{
+		"telemetry.sidecar.env.DISABLE_STACKS":     "true",
+		"telemetry.sidecar.api.env.DISABLE_STACKS": "false",
+	}
+
+	api, _ := envValue(s.renderSidecar("templates/api-deployment.yaml", nil, values).Env, "DISABLE_STACKS")
+	app, _ := envValue(s.renderSidecar("templates/app-deployment.yaml", nil, values).Env, "DISABLE_STACKS")
+
+	s.Equal([]string{"false", "true"}, []string{api, app})
+}
+
+// TestSidecarEnvRefusesChartVariables asserts that extra env naming a
+// variable the chart already sets fails the render instead of emitting it
+// twice.
+func (s *telemetrySidecarTemplateTest) TestSidecarEnvRefusesChartVariables() {
+	options := &helm.Options{SetValues: map[string]string{
+		"telemetry.sidecar.app.env.TARGET_NAME": "other",
+	}}
+
+	_, err := helm.RenderTemplateE(s.T(), options, s.chartPath, s.releaseName,
+		[]string{"templates/app-deployment.yaml"})
+
+	s.Require().Error(err)
+	s.Contains(err.Error(), "telemetry.sidecar env must not set TARGET_NAME")
+}
+
+// TestSidecarReadsItsTargetsLimits asserts that each sidecar takes its CPU and
+// memory limits from the container it samples, whose cgroup it cannot see.
+func (s *telemetrySidecarTemplateTest) TestSidecarReadsItsTargetsLimits() {
+	for _, tc := range telemetrySidecarWorkloads {
+		tc := tc
+		s.Run(tc.template, func() {
+			output := helm.RenderTemplate(s.T(), &helm.Options{SetValues: tc.values}, s.chartPath,
+				s.releaseName, []string{tc.template})
+			var deployment appsv1.Deployment
+			helm.UnmarshalK8SYaml(s.T(), output, &deployment)
+			containers := deployment.Spec.Template.Spec.Containers
+			sidecar := findContainer(containers, telemetrySidecarName)
+			s.Require().NotNil(sidecar)
+
+			refs := map[string]string{}
+			for _, e := range sidecar.Env {
+				if e.ValueFrom != nil && e.ValueFrom.ResourceFieldRef != nil {
+					refs[e.Name] = e.ValueFrom.ResourceFieldRef.ContainerName + "/" +
+						e.ValueFrom.ResourceFieldRef.Resource
+				}
+			}
+			s.Equal(map[string]string{
+				"TARGET_CPU_LIMIT_MILLICORES": containers[0].Name + "/limits.cpu",
+				"TARGET_MEMORY_LIMIT_BYTES":   containers[0].Name + "/limits.memory",
+			}, refs, "sidecar limits should come from %s", containers[0].Name)
+		})
+	}
+}

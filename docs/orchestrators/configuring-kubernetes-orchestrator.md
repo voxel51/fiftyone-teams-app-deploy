@@ -483,10 +483,9 @@ spec:
       image: voxel51/telemetry-sidecar:v2.25.1
       restartPolicy: Always
       securityContext:
-        # The sidecar image runs as root (SYS_PTRACE +
-        # /proc/<pid>/fd/1 access require it). Set explicitly so it
-        # works even when the pod's podSecurityContext sets
-        # runAsNonRoot: true.
+        # Root and SYS_PTRACE are only for py-spy stack sampling and
+        # for reading the worker's output when it runs as another user.
+        # Where policy forbids them, see the notes below.
         runAsNonRoot: false
         runAsUser: 0
         capabilities:
@@ -545,7 +544,11 @@ Notes:
 
 - `shareProcessNamespace: true` lets the sidecar's psutil call see the
   worker process via `/proc/<pid>` in the shared PID namespace.
-- `SYS_PTRACE` is required so py-spy can attach to the worker.
+- `SYS_PTRACE` and `runAsUser: 0` are only for py-spy stack sampling and
+  for reading the worker's output when it runs as a different user.
+  Where your admission policy forbids them, remove both and add
+  `DISABLE_STACKS: "true"` to the sidecar's `env`; CPU and memory
+  metrics do not need them.
 - `EXECUTOR_SIDECAR=true` switches the sidecar into per-operation mode;
   the worker writes execution metadata to `TELEMETRY_SOCKET` and the
   sidecar records per-op metrics into the `delegated_ops` MongoDB
@@ -644,10 +647,9 @@ spec:
         image: voxel51/telemetry-sidecar:v2.25.1
         restartPolicy: Always
         securityContext:
-          # The sidecar image runs as root (SYS_PTRACE +
-          # /proc/<pid>/fd/1 access require it). Set explicitly so it
-          # works even when the pod's podSecurityContext sets
-          # runAsNonRoot: true.
+          # Root and SYS_PTRACE are only for py-spy stack sampling and
+          # for reading the worker's output when it runs as another user.
+          # Where policy forbids them, see the notes below.
           runAsNonRoot: false
           runAsUser: 0
           capabilities:

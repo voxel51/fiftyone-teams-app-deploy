@@ -4660,6 +4660,51 @@
         },
         "sidecar": {
           "properties": {
+            "api": {
+              "properties": {
+                "env": {
+                  "description": "Additional environment variables for the `teams-api` sidecar only,\noverriding `telemetry.sidecar.env`.",
+                  "required": [],
+                  "title": "env",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "api",
+              "type": "object"
+            },
+            "app": {
+              "properties": {
+                "env": {
+                  "description": "Additional environment variables for the `fiftyone-app` sidecar\nonly, overriding `telemetry.sidecar.env`.",
+                  "required": [],
+                  "title": "env",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "app",
+              "type": "object"
+            },
+            "delegatedOperator": {
+              "properties": {
+                "env": {
+                  "description": "Additional environment variables for the delegated-operator\nsidecars only (instance Deployments and Job templates), overriding\n`telemetry.sidecar.env`.",
+                  "required": [],
+                  "title": "env",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "delegatedOperator",
+              "type": "object"
+            },
+            "env": {
+              "description": "Additional environment variables for every `telemetry-sidecar`\ncontainer, e.g. `DISABLE_STACKS: \"true\"`. Must not repeat a variable the\nchart sets (`POD_NAME`, `SERVICE_TYPE`, `TARGET_NAME`, ...).",
+              "required": [],
+              "title": "env",
+              "type": "object"
+            },
             "extraVolumeMounts": {
               "description": "Additional volume mounts for the `telemetry-sidecar` container, e.g. to\nmount the same CA certs the app containers use. [Reference][volumes].",
               "items": {
@@ -4711,6 +4756,19 @@
               "title": "image",
               "type": "object"
             },
+            "plugins": {
+              "properties": {
+                "env": {
+                  "description": "Additional environment variables for the `teams-plugins` sidecar\nonly, overriding `telemetry.sidecar.env`.",
+                  "required": [],
+                  "title": "env",
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "plugins",
+              "type": "object"
+            },
             "resources": {
               "description": "Resource requests/limits for each `telemetry-sidecar` container.",
               "properties": {
@@ -4755,7 +4813,7 @@
             },
             "stackSampling": {
               "default": true,
-              "description": "Set `false` if your cluster's admission policy won't permit the\n`SYS_PTRACE` capability that the delegated-operator sidecar uses for\n`py-spy` stack sampling; the rest of telemetry keeps working without it.",
+              "description": "Set `false` if your cluster's admission policy won't permit the\n`SYS_PTRACE` capability that the delegated-operator sidecar uses for\n`py-spy` stack sampling, or to stop stack sampling altogether. `false`\ndrops the capability and sets `DISABLE_STACKS=true` on every sidecar,\nso none runs `py-spy`; CPU, memory and the rest of telemetry keep\nworking without it.",
               "title": "stackSampling",
               "type": "boolean"
             }
