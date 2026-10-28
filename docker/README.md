@@ -389,6 +389,11 @@ See a full example configuration in
 
 ## Step 6: Identity Provider (IdP) and Authentication (CAS)
 
+> [!NOTE]
+> This step applies only to air-gapped deployments.
+> If your deployment is not air-gapped, skip to
+> [Step 7](#step-7-initial-cas-setup).
+
 ### :information_source: IdP configuration
 
 You can refer to the following docs to set up your Identity Provider with

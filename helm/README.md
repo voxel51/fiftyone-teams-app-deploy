@@ -46,10 +46,13 @@ Please contact Voxel51 for more information about FiftyOne Enterprise.
 - [:globe_with_meridians: Step 8: Configure Ingress & TLS](#globe_with_meridians-step-8-configure-ingress--tls)
   - [:compass: Routing Overview (Path-Based Ingress)](#compass-routing-overview-path-based-ingress)
   - [:memo: Notes](#memo-notes)
-- [Step 9: Initial CAS Setup](#step-9-initial-cas-setup)
+- [Step 9: Identity Provider (IdP) and Authentication (CAS)](#step-9-identity-provider-idp-and-authentication-cas)
+  - [:information_source: IdP configuration](#information_source-idp-configuration)
+  - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
+- [Step 10: Initial CAS Setup](#step-10-initial-cas-setup)
   - [Add First Admin User](#add-first-admin-user)
   - [Enable Auto Join](#enable-auto-join)
-- [Step 10: Test End User Login](#step-10-test-end-user-login)
+- [Step 11: Test End User Login](#step-11-test-end-user-login)
 - [Recommended Enhancements](#recommended-enhancements)
   - [:label: Agentic Labeling](#label-agentic-labeling)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
@@ -428,7 +431,14 @@ For cloud-specific examples of setting up ingress with TLS, see
 - [GKE Deployment Guide](./docs/gke-deployment-guide.md)
 - [AWS Deployment Guide](./docs/aws-deployment-guide.md)
 
-## Step 9: Initial CAS Setup
+## Step 9: Identity Provider (IdP) and Authentication (CAS)
+
+> [!NOTE]
+> This step applies only to air-gapped deployments.
+> If your deployment is not air-gapped, skip to
+> [Step 10](#step-10-initial-cas-setup).
+
+### :information_source: IdP configuration
 
 Refer to the following docs to set up your Identity Provider
 with FiftyOne:
@@ -437,6 +447,30 @@ with FiftyOne:
   includes information on configuring CAS
 - [Getting started documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
   for setting up authentication
+
+FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in
+v1.6.
+This enables centralized login, roles, and user management.
+
+### :hammer_and_wrench: Optional: CAS Customization Instructions
+
+1. Update CAS values in your `values.yaml`:
+   - `secret.fiftyone.fiftyoneAuthSecret`
+   - `casSettings.env.CAS_DATABASE_NAME` (⚠️ Must be unique per deployment)
+   - `casSettings.env.CAS_DEFAULT_USER_ROLE`
+   - `casSettings.env.DEBUG`
+1. Apply the changes:
+
+   ```shell
+   helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+     --namespace your-namespace-here \
+     --values ./values.yaml
+   ```
+
+1. Ensure your ingress routes `/cas` to the `teams-cas` service
+   (see [Step 8](#globe_with_meridians-step-8-configure-ingress--tls)).
+
+## Step 10: Initial CAS Setup
 
 In the steps below, `<DNS_NAME>` is the ingress hostname you set for
 `teamsAppSettings.dnsName` in [Step 3](#gear-step-3-configure-valuesyaml).
@@ -462,7 +496,7 @@ In the steps below, `<DNS_NAME>` is the ingress hostname you set for
 1. Select *Allow auto join*
 1. Select *Save*
 
-## Step 10: Test End User Login
+## Step 11: Test End User Login
 
 Verify the deployment's IdP setup by logging in as a regular user
 
