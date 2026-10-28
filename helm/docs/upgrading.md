@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.26+ Invitations and Service Accounts](#fiftyone-enterprise-v226-invitations-and-service-accounts)
     - [FiftyOne Enterprise v2.25+ Activity Core](#fiftyone-enterprise-v225-activity-core)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
@@ -118,6 +119,60 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.26+ Invitations and Service Accounts
+
+FiftyOne Enterprise v2.26.0 changes how `teams-cas` stores invitations and
+service accounts.
+
+**Upgrading needs no extra step.** The first time a v2.26 `teams-cas` starts,
+it updates the stored data before serving requests:
+
+- Each pending invitation becomes a pending user who holds a seat of the
+  invited role until the invitation is accepted, revoked or expires.
+- Service accounts move into a collection of their own, and their group
+  memberships move with them.
+
+Each step can be repeated safely, so several `teams-cas` replicas can start
+together. If the update fails, `teams-cas` exits and tries again the next
+time it starts.
+
+**What changes for administrators:**
+
+- Pending invitations count toward the license's seat limits. When an
+  organization is at its limit for a role, an invitation for that role is
+  refused, the same as adding a user. An expired invitation frees its seat.
+- Invitations are enabled by default for organizations that have never
+  changed the setting.
+
+**Rolling back to v2.25.** Rolling back needs one extra step, because a
+v2.25 `teams-cas` cannot read the data as v2.26 stores it. Until the step is
+done, v2.25 does not list service accounts and over-counts seats taken by
+pending invitations.
+
+1. Roll the release back to v2.25, for example with `helm rollback`, so
+   that no v2.26 `teams-cas` pod is left running. A v2.26 `teams-cas` that
+   starts again stores the data the v2.26 way again.
+1. Contact Voxel51 support for a `fiftyone-migrator` release with the
+   `rollback` command, and run it against the deployment's databases:
+
+   ```shell
+   export CAS_DATABASE_URI=<the teams-cas MongoDB connection string>
+   export CAS_DATABASE_NAME=<the teams-cas database name>
+   export FIFTYONE_DATABASE_URI=<the FiftyOne MongoDB connection string>
+   export FIFTYONE_DATABASE_NAME=<the FiftyOne database name>
+
+   # Shows what would be undone
+   fiftyone-migrator rollback 2.25.1 --include cas --dry-run
+
+   fiftyone-migrator rollback 2.25.1 --include cas
+   ```
+
+   It returns invitations, service accounts and their groups to the way
+   v2.25 stores them. It can be run again safely, and it works whether or
+   not `fiftyone-migrator` was ever run on the deployment before.
+
+Upgrading to v2.26 again later needs no extra step.
 
 #### FiftyOne Enterprise v2.25+ Activity Core
 
