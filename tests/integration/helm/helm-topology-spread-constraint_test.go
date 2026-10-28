@@ -71,7 +71,6 @@ func (s *topologyAuthHelmTest) TestHelmInstall() {
 				"appSettings.topologySpreadConstraints[0].maxSkew":                "1",
 				"appSettings.topologySpreadConstraints[0].topologyKey":            "kubernetes.io/hostname",
 				"appSettings.topologySpreadConstraints[0].whenUnsatisfiable":      "ScheduleAnyway",
-				"casSettings.env.FIFTYONE_AUTH_MODE":                              "internal",
 				"casSettings.env.CAS_DATABASE_NAME":                               "cas-top-dp-" + suffix,
 				"casSettings.topologySpreadConstraints[0].maxSkew":                "1",
 				"casSettings.topologySpreadConstraints[0].topologyKey":            "kubernetes.io/hostname",

@@ -615,7 +615,6 @@ casSettings:
   # -- Annotations for the `teams-cas` deployment. [Reference][annotations].
   deploymentAnnotations: {}
   # -- Allow ADMINs to invite users by email
-  # NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal`
   enable_invitations: true
   # Environment Variables are passed to the `teams-cas` containers
   env:
@@ -635,9 +634,6 @@ casSettings:
     # `DEBUG: cas:*:info` - shows all CAS INFO logs
     # `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs
     DEBUG: cas:*,-cas:*:debug
-    # -- Configure Authentication Mode.
-    # One of `legacy` or `internal`
-    FIFTYONE_AUTH_MODE: legacy
 
   # -- Secret variables to be passed to the `teams-cas` containers.
   secretEnv: {}

@@ -492,15 +492,6 @@ Please review these notes, and the
 [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 documentation before completing your upgrade.
 
-Voxel51 recommends upgrading your deployment using
-[`legacy` authentication mode][legacy-auth-mode]
-and migrating to
-[`internal` authentication mode][internal-auth-mode]
-after confirming your initial upgrade was successful.
-
-Please contact your Voxel51 customer success representative for assistance
-in migrating to internal mode.
-
 The CAS service requires changes to your `values.yaml` files.
 A brief summary of those changes include
 
@@ -982,12 +973,11 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | appSettings.volumes | list | `[]` | Volumes for `fiftyone-app`. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-cas`. [Reference][affinity]. |
 | casSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-cas` deployment. [Reference][annotations]. |
-| casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
+| casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email |
 | casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
-| casSettings.env.FIFTYONE_AUTH_MODE | string | `"legacy"` | Configure Authentication Mode. One of `legacy` or `internal` |
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for `teams-cas`. |
 | casSettings.image.tag | string | `""` | Image tag for `teams-cas`. Defaults to the chart version. |
@@ -1285,9 +1275,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
 [init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-[internal-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-[legacy-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#legacy-mode
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [pod-disruption-budget]: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/

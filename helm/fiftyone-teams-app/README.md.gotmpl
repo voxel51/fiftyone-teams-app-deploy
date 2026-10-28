@@ -492,15 +492,6 @@ Please review these notes, and the
 [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 documentation before completing your upgrade.
 
-Voxel51 recommends upgrading your deployment using
-[`legacy` authentication mode][legacy-auth-mode]
-and migrating to
-[`internal` authentication mode][internal-auth-mode]
-after confirming your initial upgrade was successful.
-
-Please contact your Voxel51 customer success representative for assistance
-in migrating to internal mode.
-
 The CAS service requires changes to your `values.yaml` files.
 A brief summary of those changes include
 
@@ -858,9 +849,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
 [init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-[internal-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-[legacy-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#legacy-mode
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [pod-disruption-budget]: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/

@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.26+ `legacy-auth` Directory Removed](#fiftyone-enterprise-v226-legacy-auth-directory-removed)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators](#fiftyone-enterprise-v223-service-orchestrators)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
     - [FiftyOne Enterprise v2.19+ Telemetry Sidecars](#fiftyone-enterprise-v219-telemetry-sidecars)
@@ -103,6 +104,22 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.26+ `legacy-auth` Directory Removed
+
+FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode, the
+`FIFTYONE_AUTH_MODE` environment variable, and the `legacy-auth` directory.
+All deployments use the `internal-auth` directory.
+
+If you deploy from the `legacy-auth` directory:
+
+1. Copy your `compose.override.yaml` and `.env` files into the `internal-auth`
+   directory
+1. `cd` into the `internal-auth` directory
+1. In the `.env` file, rename `AUTH0_BASE_URL` to `BASE_URL`
+1. Remove `AUTH0_SECRET` from the `.env` file; it is no longer used
+1. Remove `FIFTYONE_AUTH_MODE` from the `.env` and `compose.override.yaml`
+   files if it is set
 
 #### FiftyOne Enterprise v2.23+ Service Orchestrators
 
@@ -477,9 +494,10 @@ Additionally,
 
 ---
 
-1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
+1. Copy your `compose.override.yaml` and `.env` files into the `internal-auth`
    directory
-1. `cd` into the `legacy-auth` directory
+1. `cd` into the `internal-auth` directory
+1. In the `.env` file, set `BASE_URL` to your WebApp URL
 1. In the `.env` file, set the required environment variables
     - `FIFTYONE_API_URI`
     - `FIFTYONE_AUTH_SECRET`
@@ -550,7 +568,7 @@ Additionally,
 > (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
-> [Central Authentication Service](../README.md#step-7-identity-provider-idp-and-authentication-cas)
+> [Central Authentication Service](../README.md#step-6-identity-provider-idp-and-authentication-cas)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 > documentation before completing your upgrade.
@@ -575,9 +593,10 @@ Additionally,
 
 ---
 
-1. Copy your `compose.override.yaml` and `.env` files into the `legacy-auth`
+1. Copy your `compose.override.yaml` and `.env` files into the `internal-auth`
    directory
-1. `cd` into the `legacy-auth` directory
+1. `cd` into the `internal-auth` directory
+1. In the `.env` file, set `BASE_URL` to your WebApp URL
 1. In your `.env` file, set the required environment variables:
     - `FIFTYONE_ENCRYPTION_KEY`
     - `FIFTYONE_API_URI`

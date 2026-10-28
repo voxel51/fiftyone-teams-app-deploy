@@ -1,5 +1,5 @@
-//go:build docker || compose || integration || integrationComposeInternalAuth || integrationComposeLegacyAuth || integrationComposeInternalAuth
-// +build docker compose integration integrationComposeInternalAuth integrationComposeLegacyAuth integrationComposeInternalAuth
+//go:build docker || compose || integration || integrationComposeInternalAuth
+// +build docker compose integration integrationComposeInternalAuth
 
 package integration
 
@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	legacyAuthEnvFixtureFilePath   = "../../fixtures/docker/integration_legacy_auth.env"
 	internalAuthFixtureEnvFilePath = "../../fixtures/docker/integration_internal_auth.env"
 	overrideFile                   = "../../tests/fixtures/docker/compose.override.yaml"
 	mongodbComposeFile             = "../../tests/fixtures/docker/compose.override.mongodb.yaml"
