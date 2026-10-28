@@ -37,26 +37,25 @@ regarding FiftyOne Enterprise.
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
 - [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-1-set-up-mongodb-database)
 - [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-2-prepare-license-file)
-- [:file_folder: Step 3: Navigate to the Compose Directory](#file_folder-step-3-navigate-to-the-compose-directory)
-- [:gear: Step 4: Configure Environment](#gear-step-4-configure-environment)
+- [:gear: Step 3: Configure Environment](#gear-step-3-configure-environment)
   - [1. Copy the template `.env` file](#1-copy-the-template-env-file)
   - [2. Fill out required values in `.env`](#2-fill-out-required-values-in-env)
   - [3. Create a `compose.override.yaml` to override configuration](#3-create-a-composeoverrideyaml-to-override-configuration)
   - [:package: Official Docker Images](#package-official-docker-images)
-- [:rocket: Step 5: Initial Deployment](#rocket-step-5-initial-deployment)
+- [:rocket: Step 4: Initial Deployment](#rocket-step-4-initial-deployment)
   - [1. Database admin mode](#1-database-admin-mode)
   - [2. Launch the application](#2-launch-the-application)
-- [:globe_with_meridians: Step 6: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-6-configure-ssl--reverse-proxy-nginx--load-balancer)
+- [:globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)](#globe_with_meridians-step-5-configure-ssl--reverse-proxy-nginx--load-balancer)
   - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
   - [:open_file_folder: Nginx Configuration](#open_file_folder-nginx-configuration)
   - [:memo: Notes](#memo-notes)
-- [Step 7: Identity Provider (IdP) and Authentication (CAS)](#step-7-identity-provider-idp-and-authentication-cas)
+- [Step 6: Identity Provider (IdP) and Authentication (CAS)](#step-6-identity-provider-idp-and-authentication-cas)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
-- [Step 8: Initial CAS Setup](#step-8-initial-cas-setup)
+- [Step 7: Initial CAS Setup](#step-7-initial-cas-setup)
   - [Add First Admin User](#add-first-admin-user)
   - [Enable Auto Join](#enable-auto-join)
-- [Step 9: Test End User Login](#step-9-test-end-user-login)
+- [Step 8: Test End User Login](#step-8-test-end-user-login)
 - [Advanced DO Settings](#advanced-do-settings)
   - [:desktop_computer: GPU-Enabled Workloads](#desktop_computer-gpu-enabled-workloads)
   - [:robot: Agentic Labeler Service](#robot-agentic-labeler-service)
@@ -146,7 +145,7 @@ Ensure your MongoDB version meets FiftyOne's
 MongoDB 8.0+ is recommended.
 
 Once your database is running, record your MongoDB connection URI.
-You will need it in Step 4 when configuring your `.env` file.
+You will need it in Step 3 when configuring your `.env` file.
 The URI follows this format:
 
 ```dotenv
@@ -176,17 +175,14 @@ chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 > picked up immediately, you may need to restart the `teams-cas` and `teams-api`
 > services.
 
-## :file_folder: Step 3: Navigate to the Compose Directory
-
-```bash
-cd internal-auth
-```
-
-## :gear: Step 4: Configure Environment
+## :gear: Step 3: Configure Environment
 
 ### 1. Copy the template `.env` file
 
+From the `docker` directory, `cd` into `internal-auth` and copy the template:
+
 ```bash
+cd internal-auth
 cp env.template .env
 ```
 
@@ -261,7 +257,7 @@ services:
 > Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
 > Omitting the tag will result in a **not found** error.
 
-## :rocket: Step 5: Initial Deployment
+## :rocket: Step 4: Initial Deployment
 
 ### 1. Database admin mode
 
@@ -299,7 +295,7 @@ each of them in `docker compose ps` — here is what each one does:
 <!-- markdownlint-disable line-length -->
 | Container | Default port | What it does |
 | --------- | ------------ | ------------ |
-| `fiftyone-app` | `5151` | The core App server — the same visualization engine as open source FiftyOne's `launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, which is why the reverse proxy in Step 6 needs no route to it. |
+| `fiftyone-app` | `5151` | The core App server — the same visualization engine as open source FiftyOne's `launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, which is why the reverse proxy in Step 5 needs no route to it. |
 | `teams-app` | `3000` | The web UI your users browse — dataset listing, settings, runs, and history pages — which embeds the core App by proxying `fiftyone-app`. |
 | `teams-api` | `8000` | The control plane — users, roles, dataset permissions, plugin management, delegated operation orchestration, and the MongoDB proxy that SDK connections tunnel through (`/_pymongo`, `/graphql/v1`, `/file`, `/health`). |
 | `teams-cas` | `3030` (container port `3000`) | The Central Authentication Service — every login flows through it. Also handles license validation and serves the super admin console at `/cas`. |
@@ -347,7 +343,7 @@ curl -Iv http://localhost:3000/api/hello
 For a full health assessment, see
 [Basic Health Assessment](#basic-health-assessment).
 
-## :globe_with_meridians: Step 6: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
+## :globe_with_meridians: Step 5: Configure SSL & Reverse Proxy (Nginx / Load Balancer)
 
 Next, you will need to place a **reverse proxy or SSL endpoint** in front of
 your FiftyOne Enterprise services. This can be a tool like:
@@ -391,7 +387,7 @@ See a full example configuration in
 - To validate your deployments api connection, see
   [Validating Your Deployment](../docs/validating-deployment.md)
 
-## Step 7: Identity Provider (IdP) and Authentication (CAS)
+## Step 6: Identity Provider (IdP) and Authentication (CAS)
 
 ### :information_source: IdP configuration
 
@@ -400,8 +396,8 @@ FiftyOne.
 
 - [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
   includes information on configuring CAS.
-- To set up authentication for internal-auth mode: Refer to the
-  [Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode).
+- [Getting started documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
+  for setting up authentication.
 
 FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in
 v1.6. This enables centralized login, roles, and user management.
@@ -421,7 +417,7 @@ v1.6. This enables centralized login, roles, and user management.
    to bring up services.
 1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
 
-## Step 8: Initial CAS Setup
+## Step 7: Initial CAS Setup
 
 1. Navigate to the CAS Super Admin UI at
   `https://<ENVIRONMENT>.fiftyone.ai/cas/configurations`.
@@ -442,7 +438,7 @@ v1.6. This enables centralized login, roles, and user management.
 1. Select **Allow auto join**.
 1. Select **Save**.
 
-## Step 9: Test End User Login
+## Step 8: Test End User Login
 
 Verify the deployment's IdP setup by logging in as a regular user.
 
@@ -803,7 +799,7 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `APP_BIND_ADDRESS`                           | The host address that `fiftyone-teams-app` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                            | Yes                       |
 | `APP_BIND_PORT`                              | The host port that `fiftyone-teams-app` should bind to the default is `3000`                                                                                                                                                                                                   | Yes                       |
 | `APP_USE_HTTPS`                              | Set this to true if your Application endpoint uses TLS; this should be `true` in most cases'                                                                                                                                                                                   | Yes                       |
-| `BASE_URL`                                   | The URL where you plan to deploy your FiftyOne Enterprise                                                                                                                                                                                                                      | `internal` auth mode only |
+| `BASE_URL`                                   | The URL where you plan to deploy your FiftyOne Enterprise                                                                                                                                                                                                                      | Yes                       |
 | `CAS_BASE_URL`                               | The URL that FiftyOne Enterprise Services should use to communicate with `teams-cas`; `teams-cas` is the compose service                                                                                                                                                       | Yes                       |
 | `CAS_BIND_ADDRESS`                           | The host address that `teams-cas` should bind to; `127.0.0.1` is appropriate in most cases                                                                                                                                                                                     | Yes                       |
 | `CAS_BIND_PORT`                              | The host port that `teams-cas` should bind to; the default is `3030`                                                                                                                                                                                                           | Yes                       |

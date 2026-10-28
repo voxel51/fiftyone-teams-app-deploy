@@ -37,20 +37,19 @@ Please contact Voxel51 for more information about FiftyOne Enterprise.
 - [:floppy_disk: Sizing](#floppy_disk-sizing)
 - [:wrench: Step 1: Set Up MongoDB Database](#wrench-step-1-set-up-mongodb-database)
 - [:closed_lock_with_key: Step 2: Prepare License File](#closed_lock_with_key-step-2-prepare-license-file)
-- [:file_folder: Step 3: Set Up Authentication](#file_folder-step-3-set-up-authentication)
-- [:gear: Step 4: Configure `values.yaml`](#gear-step-4-configure-valuesyaml)
-- [:file_cabinet: Step 5: Enable Shared Storage](#file_cabinet-step-5-enable-shared-storage)
-- [:jigsaw: Step 6: Enable Dedicated Plugins Mode](#jigsaw-step-6-enable-dedicated-plugins-mode)
-- [:robot: Step 7: Configure Delegated Operators](#robot-step-7-configure-delegated-operators)
-- [:rocket: Step 8: Initial Deployment](#rocket-step-8-initial-deployment)
+- [:gear: Step 3: Configure `values.yaml`](#gear-step-3-configure-valuesyaml)
+- [:file_cabinet: Step 4: Enable Shared Storage](#file_cabinet-step-4-enable-shared-storage)
+- [:jigsaw: Step 5: Enable Dedicated Plugins Mode](#jigsaw-step-5-enable-dedicated-plugins-mode)
+- [:robot: Step 6: Configure Delegated Operators](#robot-step-6-configure-delegated-operators)
+- [:rocket: Step 7: Initial Deployment](#rocket-step-7-initial-deployment)
   - [What Each Service Does](#what-each-service-does)
-- [:globe_with_meridians: Step 9: Configure Ingress & TLS](#globe_with_meridians-step-9-configure-ingress--tls)
+- [:globe_with_meridians: Step 8: Configure Ingress & TLS](#globe_with_meridians-step-8-configure-ingress--tls)
   - [:compass: Routing Overview (Path-Based Ingress)](#compass-routing-overview-path-based-ingress)
   - [:memo: Notes](#memo-notes)
-- [Step 10: Initial CAS Setup](#step-10-initial-cas-setup)
+- [Step 9: Initial CAS Setup](#step-9-initial-cas-setup)
   - [Add First Admin User](#add-first-admin-user)
   - [Enable Auto Join](#enable-auto-join)
-- [Step 11: Test End User Login](#step-11-test-end-user-login)
+- [Step 10: Test End User Login](#step-10-test-end-user-login)
 - [Recommended Enhancements](#recommended-enhancements)
   - [:label: Agentic Labeling](#label-agentic-labeling)
   - [:bricks: Custom Plugin Images](#bricks-custom-plugin-images)
@@ -128,7 +127,7 @@ We recommend MongoDB 8.0+.
 
 Once your database is running, record your MongoDB connection URI.
 You will need it in
-[Step 4](#gear-step-4-configure-valuesyaml)
+[Step 3](#gear-step-3-configure-valuesyaml)
 to set `secret.fiftyone.mongodbConnectionString` in your `values.yaml`.
 The URI follows this format:
 
@@ -165,16 +164,7 @@ See the example [`values.yaml`](./values.yaml).
 >   teams-api
 > ```
 
-## :file_folder: Step 3: Set Up Authentication
-
-Refer to the following docs to set up your Identity Provider
-with FiftyOne:
-
-- [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
-  includes information on configuring CAS
-- [Getting Started with Internal Mode documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
-
-## :gear: Step 4: Configure `values.yaml`
+## :gear: Step 3: Configure `values.yaml`
 
 Edit your `values.yaml` file (see the example
 [`values.yaml`](./values.yaml) in this directory) to set:
@@ -217,7 +207,7 @@ kubectl create secret generic regcred \
 For the full list of available settings, see
 [Values](./fiftyone-teams-app/README.md#values).
 
-## :file_cabinet: Step 5: Enable Shared Storage
+## :file_cabinet: Step 4: Enable Shared Storage
 
 Dedicated plugins and delegated operators (below) share a common plugin
 directory that uses a Kubernetes PersistentVolume (PV)
@@ -265,7 +255,7 @@ For NFS export configuration and cloud-provider alternatives
 (Google Filestore, AWS EFS, Azure Files), see
 [Adding Shared Storage for FiftyOne Enterprise Plugins](./docs/plugins-storage.md).
 
-## :jigsaw: Step 6: Enable Dedicated Plugins Mode
+## :jigsaw: Step 5: Enable Dedicated Plugins Mode
 
 Add the following to your `values.yaml` to run plugins
 in a dedicated `teams-plugins` pod, isolated from `fiftyone-app`:
@@ -300,7 +290,7 @@ apiSettings:
 For full configuration options, see
 [Configuring Plugins](./docs/configuring-plugins.md).
 
-## :robot: Step 7: Configure Delegated Operators
+## :robot: Step 6: Configure Delegated Operators
 
 Delegated operators let you schedule long-running or compute-heavy tasks
 (computing embeddings, model evaluation, dataset import, annotation workflows)
@@ -348,7 +338,7 @@ On-demand orchestrators are now auto-registered.
 > This end-to-end tests your job template values
 > and makes the orchestrator available as a delegation target in the UI.
 
-## :rocket: Step 8: Initial Deployment
+## :rocket: Step 7: Initial Deployment
 
 Add the Voxel51 Helm repository and install FiftyOne Enterprise:
 
@@ -361,9 +351,9 @@ helm install fiftyone-teams-app voxel51/fiftyone-teams-app \
 ```
 
 Confirm all pods are running, including `teams-plugins`
-(from [Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode)) and your chosen
+(from [Step 5](#jigsaw-step-5-enable-dedicated-plugins-mode)) and your chosen
 delegated operators
-(from [Step 7](#robot-step-7-configure-delegated-operators)):
+(from [Step 6](#robot-step-6-configure-delegated-operators)):
 
 ```shell
 kubectl get pods \
@@ -375,12 +365,12 @@ kubectl get pods \
 <!-- markdownlint-disable line-length -->
 | Pod | What it does |
 | --- | ------------ |
-| `fiftyone-app-*` | The core App server — the same visualization engine as open source FiftyOne's `launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, so the ingress you will configure in [Step 9](#globe_with_meridians-step-9-configure-ingress--tls) needs no route to it. |
+| `fiftyone-app-*` | The core App server — the same visualization engine as open source FiftyOne's `launch_app()`: samples grid, sample modal, filters and aggregations, media serving. It is only reached through `teams-app`'s authenticated proxy, so the ingress you will configure in [Step 8](#globe_with_meridians-step-8-configure-ingress--tls) needs no route to it. |
 | `teams-app-*` | The web UI your users browse — dataset listing, settings, runs, and history pages — which embeds the core App by proxying `fiftyone-app`. |
 | `teams-api-*` | The control plane — users, roles, dataset permissions, plugin management, delegated operation orchestration, and the MongoDB proxy that SDK connections tunnel through (`/_pymongo`, `/graphql/v1`, `/file`, `/health`). |
 | `teams-cas-*` | The Central Authentication Service — every login flows through it. Also handles license validation and serves the super admin console at `/cas`. |
-| `teams-plugins-*` | (When dedicated plugins mode is enabled in [Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode)) a dedicated instance of the App server for executing plugin operators in isolation, so heavy plugins cannot impact the main App. |
-| `teams-do-*` | Delegated operator workers (from [Step 7](#robot-step-7-configure-delegated-operators)) — they poll the queue and run background jobs (embeddings, exports, brain runs). |
+| `teams-plugins-*` | (When dedicated plugins mode is enabled in [Step 5](#jigsaw-step-5-enable-dedicated-plugins-mode)) a dedicated instance of the App server for executing plugin operators in isolation, so heavy plugins cannot impact the main App. |
+| `teams-do-*` | Delegated operator workers (from [Step 6](#robot-step-6-configure-delegated-operators)) — they poll the queue and run background jobs (embeddings, exports, brain runs). |
 <!-- markdownlint-enable line-length -->
 
 How the services fit together:
@@ -400,7 +390,7 @@ flowchart LR
     plugins["teams-plugins"] --> mongo
 ```
 
-## :globe_with_meridians: Step 9: Configure Ingress & TLS
+## :globe_with_meridians: Step 8: Configure Ingress & TLS
 
 Configure an **Ingress controller** and **TLS termination**
 in front of your FiftyOne Enterprise services.
@@ -438,10 +428,18 @@ For cloud-specific examples of setting up ingress with TLS, see
 - [GKE Deployment Guide](./docs/gke-deployment-guide.md)
 - [AWS Deployment Guide](./docs/aws-deployment-guide.md)
 
-## Step 10: Initial CAS Setup
+## Step 9: Initial CAS Setup
+
+Refer to the following docs to set up your Identity Provider
+with FiftyOne:
+
+- [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
+  includes information on configuring CAS
+- [Getting started documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
+  for setting up authentication
 
 In the steps below, `<DNS_NAME>` is the ingress hostname you set for
-`teamsAppSettings.dnsName` in [Step 4](#gear-step-4-configure-valuesyaml).
+`teamsAppSettings.dnsName` in [Step 3](#gear-step-3-configure-valuesyaml).
 
 1. Navigate to the CAS Super Admin UI at
    `https://<DNS_NAME>/cas/configurations`
@@ -464,7 +462,7 @@ In the steps below, `<DNS_NAME>` is the ingress hostname you set for
 1. Select *Allow auto join*
 1. Select *Save*
 
-## Step 11: Test End User Login
+## Step 10: Test End User Login
 
 Verify the deployment's IdP setup by logging in as a regular user
 
@@ -476,8 +474,8 @@ Verify the deployment's IdP setup by logging in as a regular user
 ## Recommended Enhancements
 
 With dedicated plugins and delegated operators configured in
-[Step 6](#jigsaw-step-6-enable-dedicated-plugins-mode) and
-[Step 7](#robot-step-7-configure-delegated-operators),
+[Step 5](#jigsaw-step-5-enable-dedicated-plugins-mode) and
+[Step 6](#robot-step-6-configure-delegated-operators),
 consider these additional enhancements for a production-ready deployment.
 
 ### :label: Agentic Labeling
