@@ -49,7 +49,7 @@ regarding FiftyOne Enterprise.
   - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
   - [:open_file_folder: Nginx Configuration](#open_file_folder-nginx-configuration)
   - [:memo: Notes](#memo-notes)
-- [Step 6: Identity Provider (IdP) and Authentication (CAS)](#step-6-identity-provider-idp-and-authentication-cas)
+- [Step 6: Identity Provider (IdP) and Authentication (CAS) (Air-Gapped Only)](#step-6-identity-provider-idp-and-authentication-cas-air-gapped-only)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
 - [Step 7: Initial CAS Setup](#step-7-initial-cas-setup)
@@ -387,7 +387,7 @@ See a full example configuration in
 - To validate your deployments api connection, see
   [Validating Your Deployment](../docs/validating-deployment.md)
 
-## Step 6: Identity Provider (IdP) and Authentication (CAS)
+## Step 6: Identity Provider (IdP) and Authentication (CAS) (Air-Gapped Only)
 
 > [!NOTE]
 > This step applies only to air-gapped deployments.

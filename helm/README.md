@@ -46,7 +46,7 @@ Please contact Voxel51 for more information about FiftyOne Enterprise.
 - [:globe_with_meridians: Step 8: Configure Ingress & TLS](#globe_with_meridians-step-8-configure-ingress--tls)
   - [:compass: Routing Overview (Path-Based Ingress)](#compass-routing-overview-path-based-ingress)
   - [:memo: Notes](#memo-notes)
-- [Step 9: Identity Provider (IdP) and Authentication (CAS)](#step-9-identity-provider-idp-and-authentication-cas)
+- [Step 9: Identity Provider (IdP) and Authentication (CAS) (Air-Gapped Only)](#step-9-identity-provider-idp-and-authentication-cas-air-gapped-only)
   - [:information_source: IdP configuration](#information_source-idp-configuration)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
 - [Step 10: Initial CAS Setup](#step-10-initial-cas-setup)
@@ -431,7 +431,7 @@ For cloud-specific examples of setting up ingress with TLS, see
 - [GKE Deployment Guide](./docs/gke-deployment-guide.md)
 - [AWS Deployment Guide](./docs/aws-deployment-guide.md)
 
-## Step 9: Identity Provider (IdP) and Authentication (CAS)
+## Step 9: Identity Provider (IdP) and Authentication (CAS) (Air-Gapped Only)
 
 > [!NOTE]
 > This step applies only to air-gapped deployments.
