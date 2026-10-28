@@ -49,8 +49,8 @@ regarding FiftyOne Enterprise.
   - [:compass: Routing Overview (Path-Based Proxy)](#compass-routing-overview-path-based-proxy)
   - [:open_file_folder: Nginx Configuration](#open_file_folder-nginx-configuration)
   - [:memo: Notes](#memo-notes)
-- [Step 6: Identity Provider (IdP) and Authentication (CAS) (Air-Gapped Only)](#step-6-identity-provider-idp-and-authentication-cas-air-gapped-only)
-  - [:information_source: IdP configuration](#information_source-idp-configuration)
+- [Step 6: Identity Provider (IdP) and Authentication (CAS)](#step-6-identity-provider-idp-and-authentication-cas)
+  - [:information_source: IdP configuration (Air-Gapped Only)](#information_source-idp-configuration-air-gapped-only)
   - [:hammer_and_wrench: Optional: CAS Customization Instructions](#hammer_and_wrench-optional-cas-customization-instructions)
 - [Step 7: Initial CAS Setup](#step-7-initial-cas-setup)
   - [Add First Admin User](#add-first-admin-user)
@@ -387,14 +387,18 @@ See a full example configuration in
 - To validate your deployments api connection, see
   [Validating Your Deployment](../docs/validating-deployment.md)
 
-## Step 6: Identity Provider (IdP) and Authentication (CAS) (Air-Gapped Only)
+## Step 6: Identity Provider (IdP) and Authentication (CAS)
+
+FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in
+v1.6. This enables centralized login, roles, and user management.
+
+### :information_source: IdP configuration (Air-Gapped Only)
 
 > [!NOTE]
-> This step applies only to air-gapped deployments.
-> If your deployment is not air-gapped, skip to
-> [Step 7](#step-7-initial-cas-setup).
-
-### :information_source: IdP configuration
+> Custom identity providers are supported only in air-gapped deployments.
+> Other deployments sign in through the identity provider Voxel51
+> configures for them, so skip to
+> [CAS Customization](#hammer_and_wrench-optional-cas-customization-instructions).
 
 You can refer to the following docs to set up your Identity Provider with
 FiftyOne.
@@ -403,9 +407,6 @@ FiftyOne.
   includes information on configuring CAS.
 - [Getting started documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started)
   for setting up authentication.
-
-FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in
-v1.6. This enables centralized login, roles, and user management.
 
 ### :hammer_and_wrench: Optional: CAS Customization Instructions
 
