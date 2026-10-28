@@ -568,7 +568,7 @@ Additionally,
 > (CAS).
 > CAS requires additional configurations and consumes additional resources.
 > Please review the upgrade instructions, the
-> [Central Authentication Service](../README.md#step-7-identity-provider-idp-and-authentication-cas)
+> [Central Authentication Service](../README.md#step-6-identity-provider-idp-and-authentication-cas)
 > documentation and the
 > [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 > documentation before completing your upgrade.

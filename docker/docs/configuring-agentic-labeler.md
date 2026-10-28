@@ -35,7 +35,7 @@ each one runs on, and accelerator sizing, see
 
 ## Run the worker
 
-From your auth mode directory,
+From the `internal-auth` directory,
 add `-f compose.agenticlabeler.yaml` to your usual `-f` set:
 
 ```shell
