@@ -438,6 +438,11 @@ with FiftyOne:
 - [Getting started documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
   for setting up authentication
 
+> [!NOTE]
+> The rest of this step applies only to air-gapped deployments.
+> If your deployment is not air-gapped, skip to
+> [Step 10](#step-10-test-end-user-login).
+
 In the steps below, `<DNS_NAME>` is the ingress hostname you set for
 `teamsAppSettings.dnsName` in [Step 3](#gear-step-3-configure-valuesyaml).
 
