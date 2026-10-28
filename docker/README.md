@@ -401,7 +401,7 @@ FiftyOne.
 
 - [Pluggable authentication docs](https://docs.voxel51.com/enterprise/pluggable_auth.html#pluggable-authentication)
   includes information on configuring CAS.
-- [Getting started documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started-with-internal-mode)
+- [Getting started documentation](https://docs.voxel51.com/enterprise/pluggable_auth.html#getting-started)
   for setting up authentication.
 
 FiftyOne Enterprise uses a Central Authentication Service (CAS) introduced in
