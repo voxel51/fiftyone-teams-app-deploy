@@ -47,6 +47,13 @@ Note: Some zoo models require additional packages. You can check the
 requirements for any zoo model in the [fiftyone documentation](https://docs.voxel51.com/model_zoo/models.html):
 find the model, then look under `Requirements` > `Packages`.
 
+Note: If your deployment uses multimodal datasets, install the `multimodal`
+extra, `fiftyone[multimodal]==<version>`, so the image can run projection
+ingestion and compaction. See the multimodal configuration guide for
+[docker](../../docker/docs/configuring-multimodal.md#external-orchestrators)
+or
+[helm](../../helm/docs/configuring-multimodal.md#external-orchestrators).
+
 1. Determine base for Container Image using one of the following options:
    - An [Anyscale base image](https://docs.anyscale.com/reference/anyscale-base-images)
    - A custom image meeting the [requirements](https://docs.anyscale.com/configuration/dependency-management/image-requirement)
@@ -61,7 +68,8 @@ find the model, then look under `Requirements` > `Packages`.
 
     # Install system level packages here
 
-    # Install fiftyone
+    # Install fiftyone. For multimodal datasets, install
+    # "fiftyone[multimodal]==${FIFTYONE_ENTERPRISE_VERSION}" instead.
     RUN pip install fiftyone==${FIFTYONE_ENTERPRISE_VERSION} \
       --index-url https://${FIFTYONE_ENTERPRISE_PYPI_TOKEN}@pypi.dev.fiftyone.ai/simple/ \
       --extra-index-url "https://pypi.org/simple"

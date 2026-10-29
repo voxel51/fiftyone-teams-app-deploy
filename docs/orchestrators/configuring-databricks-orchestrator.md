@@ -68,6 +68,15 @@ add them here.
 - Some zoo models require additional packages. You can check the requirements
 for any zoo model in the [FiftyOne documentation](https://docs.voxel51.com/model_zoo/models.html):
 find the model, then look under `Requirements` > `Packages`.
+- If your deployment uses multimodal datasets, install the `multimodal`
+  extra, `fiftyone[multimodal]==<version>`, and add an explicit
+  `pyiceberg[pyarrow,sql-sqlite]>=0.10,<1` line. Databricks Runtime 17
+  preinstalls `pyiceberg 0.9.0`, which satisfies the extra's own floor but
+  cannot compact projection tables in cloud storage. See the multimodal
+  configuration guide for
+  [docker](../../docker/docs/configuring-multimodal.md#external-orchestrators)
+  or
+  [helm](../../helm/docs/configuring-multimodal.md#external-orchestrators).
 
 Save your `DBFS_PATH` for later as it will be used when creating your
 job configuration. The script will also create the file in your Databricks
@@ -88,6 +97,8 @@ DBFS_PATH = "/FileStore/my_project/requirements.txt"
 
 PYTHON_DEPENDENCIES = [
    "fiftyone==2.25.1",  # use your FiftyOne version here
+   # "fiftyone[multimodal]==2.25.1",  # multimodal datasets: use instead...
+   # "pyiceberg[pyarrow,sql-sqlite]>=0.10,<1",  # ...and add this line
    "ultralytics",
    "torch",
    "transformers",
@@ -291,8 +302,8 @@ custom plugins. There are many ways to set this up, but here are some examples:
 Regardless of your chosen solution, save the absolute file path to be used in
 the `FIFTYONE_PLUGINS_DIR` environment variable when setting up your job
 config. Read more about configuring plugins for
-[helm](../helm/docs/configuring-plugins.md) and
-[docker](../docker/docs/configuring-plugins.md).
+[helm](../../helm/docs/configuring-plugins.md) and
+[docker](../../docker/docs/configuring-plugins.md).
 
 ## Create Job
 

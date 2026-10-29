@@ -126,6 +126,12 @@ You need a container image with FiftyOne installed that will run your
 delegated operations. This image should include:
 
 1. FiftyOne Enterprise Python package
+1. The `multimodal` extra, `fiftyone[multimodal]`, if your deployment uses
+   multimodal datasets, so the image can run projection ingestion and
+   compaction. See the multimodal configuration guide for
+   [docker](../../docker/docs/configuring-multimodal.md#external-orchestrators)
+   or
+   [helm](../../helm/docs/configuring-multimodal.md#external-orchestrators).
 1. Any additional dependencies required by your operators
 1. Custom operators (if not using a plugins directory)
 1. Pushed to a container registry accessible by your Kubernetes cluster
