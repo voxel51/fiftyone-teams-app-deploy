@@ -590,6 +590,14 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_CAS_URL",
+            "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
+          },
+          {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
@@ -670,6 +678,14 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_CAS_URL",
+            "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
           },
           {
             "name": "FIFTYONE_INTERNAL_SERVICE",
@@ -768,6 +784,14 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_CAS_URL",
+            "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
+          },
+          {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
@@ -861,6 +885,14 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_CAS_URL",
+            "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
+          },
+          {
             "name": "FIFTYONE_INTERNAL_SERVICE",
             "value": "true"
           },
@@ -940,6 +972,14 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_CAS_URL",
+            "value": "http://teams-cas:80/cas/api"
+          },
+          {
+            "name": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
+            "value": "insecure-dev"
           },
           {
             "name": "FIFTYONE_INTERNAL_SERVICE",

@@ -1616,6 +1616,16 @@
         "env": {
           "description": "Environment Variables are passed to the `teams-cas` containers",
           "properties": {
+            "CAS_AGENT_SCOPE_ENABLED": {
+              "default": false,
+              "description": "Enable the agent scope (CLI and MCP access to operators via OAuth 2.1 + PKCE).\nRequires `CAS_DEVICE_AUTH_ENABLED: true`. Off by default so installs that\ndon't use the agent gateway don't get new OAuth endpoints for free.",
+              "required": [],
+              "title": "CAS_AGENT_SCOPE_ENABLED",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
             "CAS_DATABASE_NAME": {
               "default": "cas",
               "description": "Provide the name for the CAS database.\nWhen multiple deployments use the same database instance,\nset `CAS_DATABASE_NAME` to a unique value for each deployment.",
@@ -1628,10 +1638,26 @@
               "title": "CAS_DEFAULT_USER_ROLE",
               "type": "string"
             },
+            "CAS_DEVICE_AUTH_ENABLED": {
+              "default": false,
+              "description": "Enable the device and OAuth 2.1 + PKCE authorization endpoints that\nCAS's agent scope (CLI and MCP) depends on. Off by default, same reason\nas `CAS_AGENT_SCOPE_ENABLED`.",
+              "required": [],
+              "title": "CAS_DEVICE_AUTH_ENABLED",
+              "type": [
+                "string",
+                "boolean"
+              ]
+            },
             "CAS_MONGODB_URI_KEY": {
               "default": "mongodbConnectionString",
               "description": "The key from `secret.fiftyone.name` that contains the CAS MongoDB\nConnection String.",
               "title": "CAS_MONGODB_URI_KEY",
+              "type": "string"
+            },
+            "CAS_SERVICE_AUTH_ALLOWED": {
+              "default": "teams-api,teams-plugins",
+              "description": "Service names allowed to call CAS's internal key-resolution endpoint\n(teams-plugins, resolving agent-scoped MCP/CLI tokens). Empty disables\nthe endpoint entirely, so this must list every legitimate caller.",
+              "title": "CAS_SERVICE_AUTH_ALLOWED",
               "type": "string"
             },
             "DEBUG": {
@@ -1644,6 +1670,12 @@
               "default": "legacy",
               "description": "Configure Authentication Mode.\nOne of `legacy` or `internal`",
               "title": "FIFTYONE_AUTH_MODE",
+              "type": "string"
+            },
+            "SERVICE_AUTH_MODE": {
+              "default": "insecure-dev",
+              "description": "How CAS verifies the services calling its internal key-resolution\nendpoint (`CAS_SERVICE_AUTH_ALLOWED`, above). `insecure-dev` trusts a\nself-asserted `x-voxel-service` header; only safe when every caller\nalready runs on a trusted network. GKE/SaaS cells should set this to\n`gcp-id-token` (cryptographically verifies a GCP Workload Identity\ntoken) and also set `SERVICE_AUTH_AUDIENCE` and `SERVICE_AUTH_ACCOUNTS`\n(comma-separated `\u003cgsa-email\u003e=\u003cservice\u003e` pairs) via their own values\noverride; leave both unset for `insecure-dev`.",
+              "title": "SERVICE_AUTH_MODE",
               "type": "string"
             }
           },
@@ -3128,6 +3160,64 @@
               {
                 "properties": {
                   "path": {
+                    "default": "/.well-known/oauth-authorization-server/cas/api",
+                    "title": "path",
+                    "type": "string"
+                  },
+                  "pathType": {
+                    "default": "Prefix",
+                    "description": "Ingress path type",
+                    "title": "pathType",
+                    "type": "string"
+                  },
+                  "serviceName": {
+                    "default": "teams-plugins",
+                    "description": "Ingress path service name",
+                    "title": "serviceName",
+                    "type": "string"
+                  },
+                  "servicePort": {
+                    "default": 80,
+                    "description": "(int) Ingress path service port",
+                    "title": "servicePort",
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "path": {
+                    "default": "/.well-known/oauth-protected-resource/api/proxy/fiftyone-teams/mcp",
+                    "title": "path",
+                    "type": "string"
+                  },
+                  "pathType": {
+                    "default": "Prefix",
+                    "description": "Ingress path type",
+                    "title": "pathType",
+                    "type": "string"
+                  },
+                  "serviceName": {
+                    "default": "teams-plugins",
+                    "description": "Ingress path service name",
+                    "title": "serviceName",
+                    "type": "string"
+                  },
+                  "servicePort": {
+                    "default": 80,
+                    "description": "(int) Ingress path service port",
+                    "title": "servicePort",
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "path": {
                     "default": "/*",
                     "title": "path",
                     "type": "string"
@@ -3258,6 +3348,12 @@
         "env": {
           "description": "Environment Variables are passed to the `teams-plugins` containers.",
           "properties": {
+            "FIFTYONE_CAS_SERVICE_AUTH_MODE": {
+              "default": "insecure-dev",
+              "description": "How `teams-plugins` authenticates to CAS's internal key-resolution\nendpoint. `insecure-dev` (the only cross-cloud-compatible option today)\nsends a self-asserted service name; `gcp-id-token` verifies a signed\nGCP identity token instead, but only works on GKE and requires CAS's\nown `SERVICE_AUTH_ACCOUNTS` to list `teams-plugins`' real GCP service\naccount email. SaaS cells running on GKE should override this to\n`gcp-id-token` once that service account is provisioned; on-prem and\nany non-GCP deployment must stay on `insecure-dev`.",
+              "title": "FIFTYONE_CAS_SERVICE_AUTH_MODE",
+              "type": "string"
+            },
             "FIFTYONE_INTERNAL_SERVICE": {
               "default": true,
               "description": "TODO: Kevin - remove from values. yaml and hardcode in `_helpers.tpl`\nWhether the SDK is running in an internal service context.\nWhen running in FiftyOne Enterprise, set to `true`.",
@@ -3291,6 +3387,20 @@
           },
           "required": [],
           "title": "env",
+          "type": "object"
+        },
+        "gceBackendConfig": {
+          "description": "GCE's load-balancer health check for `teams-plugins`, needed only on a\nGKE cluster using the GCE ingress controller (`kubernetes.io/ingress.class:\ngce`), because the two `.well-known` ingress rules above route to this\nservice directly, bypassing `teams-app`. `teams-plugins`' own readiness\nprobe is a plain TCP check, which GCE can't turn into an HTTP health\ncheck on its own, so without this its backend is marked unhealthy and\nevery request GCE routes straight to it 502s. Leave disabled on\nnon-GKE clusters, where the `BackendConfig` CRD this creates doesn't\nexist at all.",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Creates a `BackendConfig` pointing GCE's health check at\n`teams-plugins`' `/healthz` endpoint. That endpoint only exists once\n`teamsAppSettings.dnsName` is set (it gates `FIFTYONE_CAS_PUBLIC_URL`/\n`FIFTYONE_MCP_RESOURCE_URL`, which the agent gateway needs to start at\nall); enabling this without `dnsName` set makes the health check 404\nand marks the backend unhealthy instead of fixing it.",
+              "title": "enabled",
+              "type": "boolean"
+            }
+          },
+          "required": [],
+          "title": "gceBackendConfig",
           "type": "object"
         },
         "image": {
