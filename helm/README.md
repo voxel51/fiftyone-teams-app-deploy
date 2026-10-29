@@ -498,10 +498,13 @@ consider these additional enhancements for a production-ready deployment.
 
 ### :label: Agentic Labeling
 
-The Agentic Labeler service provides few-shot VLM inference via vLLM.
-Configure a dedicated GPU delegated-operator worker
+The Agentic Labeler service labels images with a vision-language model.
+It runs on the chart's GPU service orchestrator, so the cluster needs GPU nodes
 (see [Leveraging GPU Workloads](./docs/configuring-gpu-workloads.md)).
 Start the service via the FiftyOne Enterprise UI under *Settings* -> *Services*.
+The service downloads its model from Hugging Face when it starts.
+For network, token, and offline setup, see the
+[configuring Agentic Labeler documentation](./docs/configuring-agentic-labeler.md).
 For an overview of builtin services and the service orchestrator, see the
 [service orchestrator documentation](../docs/configuring-service-orchestrator.md).
 
