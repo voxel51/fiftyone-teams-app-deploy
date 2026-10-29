@@ -87,12 +87,38 @@ Inputs (dict):
   ctx              — root context (.)
   serviceType      — value for SERVICE_TYPE env var (e.g. "teams-api")
   targetName       — value for TARGET_NAME env var (e.g. "fiftyone-teams-api")
-  podName          — value for POD_NAME env var (defaults to fieldRef metadata.name)
   executor         — bool, when true emit EXECUTOR_SIDECAR=true and TELEMETRY_SOCKET env
   targetContainer  — when set, emit TARGET_CONTAINER env var (used by job sidecars)
+  sampledContainer — the sampled container's name, whose limits the sidecar
+                     reads from the downward API: its cgroup is outside the
+                     sidecar's cgroup namespace
+  workload         — the `telemetry.sidecar` key (api, app, plugins,
+                     delegatedOperator) whose `env` applies to this sidecar only
+
+Extra env comes from `telemetry.sidecar.env`, overridden per workload by
+`telemetry.sidecar.<workload>.env`. `stackSampling: false` sets
+`DISABLE_STACKS=true` unless that env sets it. Names this template already
+sets are refused rather than emitted twice.
 */}}
 {{- define "telemetry.sidecar-env" -}}
 {{- $secretName := .ctx.Values.secret.name -}}
+{{- $sidecar := .ctx.Values.telemetry.sidecar -}}
+{{- $extraEnv := dict -}}
+{{- if not $sidecar.stackSampling }}
+{{- $_ := set $extraEnv "DISABLE_STACKS" "true" }}
+{{- end }}
+{{- /* set, not merge: merge lets a lower layer replace a false or empty value. */}}
+{{- range $name, $value := $sidecar.env | default dict }}
+{{- $_ := set $extraEnv $name $value }}
+{{- end }}
+{{- range $name, $value := (get $sidecar (.workload | default "") | default dict).env | default dict }}
+{{- $_ := set $extraEnv $name $value }}
+{{- end }}
+{{- range $name := list "POD_NAME" "POD_NAMESPACE" "SERVICE_TYPE" "TARGET_NAME" "TARGET_CONTAINER" "EXECUTOR_SIDECAR" "TELEMETRY_SOCKET" "FIFTYONE_TELEMETRY_REDIS_URL" "FIFTYONE_DATABASE_URI" "FIFTYONE_DATABASE_NAME" "TARGET_CPU_LIMIT_MILLICORES" "TARGET_MEMORY_LIMIT_BYTES" }}
+{{- if hasKey $extraEnv $name }}
+{{- fail (printf "telemetry.sidecar env must not set %s: the chart sets it" $name) }}
+{{- end }}
+{{- end -}}
 - name: POD_NAME
   valueFrom:
     fieldRef:
@@ -127,6 +153,23 @@ Inputs (dict):
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneDatabaseName
+{{- with .sampledContainer }}
+- name: TARGET_CPU_LIMIT_MILLICORES
+  valueFrom:
+    resourceFieldRef:
+      containerName: {{ . }}
+      resource: limits.cpu
+      divisor: 1m
+- name: TARGET_MEMORY_LIMIT_BYTES
+  valueFrom:
+    resourceFieldRef:
+      containerName: {{ . }}
+      resource: limits.memory
+{{- end }}
+{{- range $name, $value := $extraEnv }}
+- name: {{ $name }}
+  value: {{ $value | toString | quote }}
+{{- end }}
 {{- end }}
 
 {{/*

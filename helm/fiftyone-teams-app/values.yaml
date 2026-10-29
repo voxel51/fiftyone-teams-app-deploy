@@ -1968,8 +1968,32 @@ telemetry:
         memory: 512Mi
     # -- Set `false` if your cluster's admission policy won't permit the
     # `SYS_PTRACE` capability that the delegated-operator sidecar uses for
-    # `py-spy` stack sampling; the rest of telemetry keeps working without it.
+    # `py-spy` stack sampling, or to stop stack sampling altogether. `false`
+    # drops the capability and sets `DISABLE_STACKS=true` on every sidecar,
+    # so none runs `py-spy`; CPU, memory and the rest of telemetry keep
+    # working without it.
     stackSampling: true
+    # -- Additional environment variables for every `telemetry-sidecar`
+    # container, e.g. `DISABLE_STACKS: "true"`. Must not repeat a variable the
+    # chart sets (`POD_NAME`, `SERVICE_TYPE`, `TARGET_NAME`, ...).
+    env: {}
+    api:
+      # -- Additional environment variables for the `teams-api` sidecar only,
+      # overriding `telemetry.sidecar.env`.
+      env: {}
+    app:
+      # -- Additional environment variables for the `fiftyone-app` sidecar
+      # only, overriding `telemetry.sidecar.env`.
+      env: {}
+    plugins:
+      # -- Additional environment variables for the `teams-plugins` sidecar
+      # only, overriding `telemetry.sidecar.env`.
+      env: {}
+    delegatedOperator:
+      # -- Additional environment variables for the delegated-operator
+      # sidecars only (instance Deployments and Job templates), overriding
+      # `telemetry.sidecar.env`.
+      env: {}
   # -- ServiceAccount names (in `namespace.name`) bound to the telemetry
   # pod-logs Role. When empty, the RoleBinding binds the chart's main app
   # service account. The teams-api sidecar uses the teams-api RBAC service
