@@ -1,0 +1,12 @@
+---
+apiVersion: v2
+name: fiftyone-model-server
+description: |
+  The FiftyOne model server: the GPU box the FiftyOne inference service sends
+  embeddings, predictions and segmentation to. One release is one box, in the
+  same cluster as FiftyOne Enterprise or in a separate GPU cluster.
+  Preview: the image is not published yet.
+type: application
+version: 0.1.0
+icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
+kubeVersion: ">=1.31-0"

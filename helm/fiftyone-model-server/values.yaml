@@ -1,0 +1,157 @@
+---
+# yaml-language-server: $schema=values.schema.json
+# -- Overrides the release name in every object's name.
+nameOverride: ""
+
+image:
+  # @schema
+  # type: ["string", "null"]
+  # @schema
+  # -- (string) Container image repository. Required: the image is not
+  # published yet.
+  repository:
+  # @schema
+  # type: ["string", "null"]
+  # @schema
+  # -- (string) Container image tag. Required.
+  tag:
+  # -- Image pull policy.
+  pullPolicy: IfNotPresent
+
+# -- Image pull secrets for a private registry.
+imagePullSecrets: []
+
+# -- Models loaded at startup, by zoo name. Required: `/readyz` answers 503
+# until one is loaded, so with none the pod never becomes Ready. Name the
+# models the inference service routes to this box.
+preload: []
+
+# -- Models this box serves at all. Empty means any zoo model, which lets a
+# caller fill the disk with weights. Set it to the same list as the
+# inference service declares for this box.
+allowedModels: []
+
+# -- Model arguments this box passes to the zoo loader. Empty means any.
+# Set it when anything besides the inference service can reach the box:
+# some loader arguments are filesystem paths.
+allowedModelKwargs: []
+
+# -- Media locations this box fetches from, as scheme and host prefixes such
+# as `gs://my-bucket`. Empty means any URL, including internal addresses.
+allowedMediaPrefixes: []
+
+# -- Models kept loaded at once, least recently used evicted first.
+maxLoadedModels: 6
+
+# -- Extra environment variables, by name.
+env: {}
+
+gpu:
+  # -- Request GPUs. Off runs on CPU, which is enough for small models such
+  # as SigLIP and too slow for SAM2 or video.
+  enabled: false
+  # -- GPUs requested when `gpu.enabled`.
+  count: 1
+
+# Not set by default, as in the main chart. A box needs about 16Gi of memory
+# for SigLIP and Qwen3-VL. Weights in an emptyDir count as ephemeral storage,
+# so set an `ephemeral-storage` request and limit for them (GKE Autopilot
+# gives 1Gi otherwise), or use `weights.persistence`. To set them, uncomment
+# and adjust, and remove the curly braces after `limits:` and `requests:`.
+# -- Container resources. With `gpu.enabled`, `nvidia.com/gpu` is set to
+# `gpu.count` in requests and limits.
+resources:
+  limits: {}
+  #   memory: 16Gi
+  #   ephemeral-storage: 20Gi
+  requests: {}
+  #   cpu: 4
+  #   memory: 16Gi
+  #   ephemeral-storage: 20Gi
+
+weights:
+  persistence:
+    # -- Keep downloaded weights on a PersistentVolumeClaim, so a restart
+    # does not download them again and the node's disk is not filled.
+    # Off uses an emptyDir.
+    enabled: false
+    # @schema
+    # type: ["string", "null"]
+    # @schema
+    # -- (string) Use this claim instead of creating one.
+    existingClaim:
+    # @schema
+    # type: ["string", "null"]
+    # @schema
+    # -- (string) Storage class of the created claim. Empty is the cluster
+    # default.
+    storageClass:
+    # -- Size of the created claim.
+    size: 30Gi
+  # @schema
+  # type: ["string", "null"]
+  # @schema
+  # -- (string) emptyDir size limit, when persistence is off.
+  sizeLimit:
+
+startupProbe:
+  # -- Startup probe attempts, 10 s apart. Nothing listens until the preload
+  # is done, downloads included, so the default allows 15 minutes.
+  failureThreshold: 90
+
+service:
+  # -- `ClusterIP` for callers in this cluster. `LoadBalancer` for an
+  # inference service in another cluster, which then requires
+  # `service.loadBalancerSourceRanges`.
+  type: ClusterIP
+  # -- Source ranges a LoadBalancer admits, such as the calling cluster's pod
+  # range. The model server checks no token, so this is its access control.
+  # The NetworkPolicy admits the same ranges.
+  loadBalancerSourceRanges: []
+  # -- `externalTrafficPolicy` of a LoadBalancer. `Local` keeps the caller's
+  # address, which the NetworkPolicy needs to admit it by range.
+  externalTrafficPolicy: Local
+  # -- Service annotations, such as
+  # `networking.gke.io/load-balancer-type: Internal`.
+  annotations: {}
+
+networkPolicy:
+  # -- Admit only `networkPolicy.from` to the box. The model server checks no
+  # token, so leave this on unless the cluster enforces nothing.
+  enabled: true
+  # -- NetworkPolicy peers allowed to call the box: by default the inference
+  # service's pods in this namespace. Add a `namespaceSelector` to the peer
+  # for an inference service in another namespace. With a LoadBalancer, the
+  # `service.loadBalancerSourceRanges` are admitted as well.
+  from:
+    - podSelector:
+        matchLabels:
+          app: inference
+
+# -- Mount the service account token. Off: the model server calls no
+# Kubernetes API.
+automountServiceAccountToken: false
+
+# @schema
+# type: ["string", "null"]
+# @schema
+# -- (string) Service account the pod runs as.
+serviceAccountName:
+
+# -- Pod annotations.
+podAnnotations: {}
+
+# -- Pod security context.
+podSecurityContext: {}
+
+# -- Container security context.
+securityContext: {}
+
+# -- Node selector, for GPU nodes for example.
+nodeSelector: {}
+
+# -- Affinity.
+affinity: {}
+
+# -- Tolerations, for tainted GPU nodes for example.
+tolerations: []
