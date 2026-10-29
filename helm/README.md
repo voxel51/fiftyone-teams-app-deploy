@@ -525,7 +525,7 @@ delegatedOperatorDeployments:
     teamsDoCpuDefault:
       image:
         repository: <YOUR_CONTAINER_REGISTRY>/fiftyone-cv-full-custom
-        tag: v2.25.1
+        tag: v2.26.0
 ```
 
 For all the recommended FiftyOne Enterprise configurations, see
