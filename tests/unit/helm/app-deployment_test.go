@@ -455,6 +455,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -471,6 +475,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
@@ -499,6 +507,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
             "value": "24"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -548,6 +560,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -564,6 +580,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
@@ -596,6 +616,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
           },
           {
             "name": "AN_ADDITIONAL_SECRET_ENV",
@@ -655,6 +679,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -671,6 +699,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
@@ -703,6 +735,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
           {
             "name": "TEST_KEY",
             "value": "TEST_VALUE"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
           },
           {
             "name": "AN_ADDITIONAL_SECRET_ENV",
@@ -759,6 +795,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -775,6 +815,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
@@ -803,6 +847,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
             "value": "24"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -851,6 +899,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DATABASE_URI",
             "valueFrom": {
               "secretKeyRef": {
@@ -867,6 +919,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
           },
           {
             "name": "FIFTYONE_APP_DEFAULT_QUERY_PERFORMANCE",
@@ -895,6 +951,10 @@ func (s *deploymentAppTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_SIGNED_URL_EXPIRATION",
             "value": "24"
+          },
+          {
+            "name": "VFF_WF_ACTIVITY",
+            "value": "true"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar

@@ -77,6 +77,10 @@ spec:
                 secretKeyRef:
                   name: fiftyone-teams-secrets
                   key: encryptionKey
+            - name: FIFTYONE_MQ_REDIS_URL
+              value: "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+            - name: FIFTYONE_ACTIVITY_ENABLED
+              value: "true"
             - name: ADDITIONAL_ENV_VAR
               value: "an-env-var-override"
             - name: FIFTYONE_DELEGATED_OPERATION_LOG_PATH

@@ -946,6 +946,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
           },
@@ -1022,6 +1030,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
           },
@@ -1095,6 +1111,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
             }
           },
           {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
+          },
+          {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
             "value": ""
           },
@@ -1161,6 +1185,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
@@ -1238,6 +1270,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
@@ -1319,6 +1359,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                 "key": "encryptionKey"
               }
             }
+          },
+          {
+            "name": "FIFTYONE_MQ_REDIS_URL",
+            "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+          },
+          {
+            "name": "FIFTYONE_ACTIVITY_ENABLED",
+            "value": "true"
           },
           {
             "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
@@ -1411,6 +1459,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     }
                   },
                   {
+                    "name": "FIFTYONE_MQ_REDIS_URL",
+                    "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+                  },
+                  {
+                    "name": "FIFTYONE_ACTIVITY_ENABLED",
+                    "value": "true"
+                  },
+                  {
                     "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
                     "value": "gs://foo.com"
                   },
@@ -1490,6 +1546,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                         "key": "encryptionKey"
                       }
                     }
+                  },
+                  {
+                    "name": "FIFTYONE_MQ_REDIS_URL",
+                    "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+                  },
+                  {
+                    "name": "FIFTYONE_ACTIVITY_ENABLED",
+                    "value": "true"
                   },
                   {
                     "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
@@ -1573,6 +1637,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                     }
                   },
                   {
+                    "name": "FIFTYONE_MQ_REDIS_URL",
+                    "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+                  },
+                  {
+                    "name": "FIFTYONE_ACTIVITY_ENABLED",
+                    "value": "true"
+                  },
+                  {
                     "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
                     "value": "gs://foo.com"
                   },
@@ -1652,6 +1724,14 @@ func (s *deploymentDelegatedOperatorInstanceTemplateTest) TestContainerEnv() {
                         "key": "encryptionKey"
                       }
                     }
+                  },
+                  {
+                    "name": "FIFTYONE_MQ_REDIS_URL",
+                    "value": "redis://fiftyone-test-fiftyone-mq-redis.fiftyone-teams.svc.cluster.local:6379/0"
+                  },
+                  {
+                    "name": "FIFTYONE_ACTIVITY_ENABLED",
+                    "value": "true"
                   },
                   {
                     "name": "FIFTYONE_DELEGATED_OPERATION_LOG_PATH",
