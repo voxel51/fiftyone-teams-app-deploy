@@ -240,7 +240,7 @@ All knobs live in your `.env` — see `env.template` for the full list:
 | Variable                           | Default                                | Purpose                                                                                            |
 | ---------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `FIFTYONE_TELEMETRY_REDIS_URL`     | `redis://telemetry-redis:6379`         | Override to point at an external Redis if desired                                                  |
-| `TELEMETRY_REDIS_IMAGE`            | `redis:7-alpine`                       | Alternate redis image                                                                              |
+| `TELEMETRY_REDIS_IMAGE`            | `redis:8-alpine`                       | Alternate redis image                                                                              |
 | `TELEMETRY_REDIS_MAXMEMORY`        | `400mb`                                | Redis maxmemory budget                                                                             |
 | `TELEMETRY_NAMESPACE`              | `docker`                               | Namespace label attached to each registered pod                                                    |
 | `FIFTYONE_APP_TARGET_NAME`         | `hypercorn`                            | Substring used to locate the fiftyone-app process                                                  |

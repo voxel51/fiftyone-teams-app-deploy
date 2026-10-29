@@ -2966,7 +2966,7 @@
               "type": "object"
             },
             "image": {
-              "default": "redis:7-alpine",
+              "default": "redis:8-alpine",
               "description": "Redis image for the bundled queue backend.",
               "title": "image",
               "type": "string"
@@ -4529,7 +4529,7 @@
               "type": "object"
             },
             "image": {
-              "default": "redis:7-alpine",
+              "default": "redis:8-alpine",
               "description": "Container image for the telemetry Redis Deployment.",
               "title": "image",
               "type": "string"
@@ -4576,7 +4576,7 @@
               "type": "object"
             },
             "podSecurityContext": {
-              "description": "Pod-level security attributes for the telemetry Redis. UID/GID 999\nmatches the `redis` user in the `redis:7-alpine` image; `fsGroup` keeps\nthe mounted `/data` volume group-writable. [Reference][security-context].",
+              "description": "Pod-level security attributes for the telemetry Redis. UID/GID 999\nmatches the `redis` user in the `redis:8-alpine` image; `fsGroup` keeps\nthe mounted `/data` volume group-writable. [Reference][security-context].",
               "properties": {
                 "fsGroup": {
                   "default": 999,

@@ -1288,7 +1288,7 @@ fiftyoneMq:
       # queued jobs.
       url: ""
     # -- Redis image for the bundled queue backend.
-    image: redis:7-alpine
+    image: redis:8-alpine
     # -- Memory limit for the bundled Redis.
     maxmemory: 200mb
     persistence:
@@ -1885,7 +1885,7 @@ telemetry:
     create: true
   redis:
     # -- Container image for the telemetry Redis Deployment.
-    image: redis:7-alpine
+    image: redis:8-alpine
     persistence:
       # -- Whether to provision a `PersistentVolumeClaim` for the bundled
       # telemetry Redis. Defaults to `false` (emptyDir) so the chart installs
@@ -1916,7 +1916,7 @@ telemetry:
         cpu: 250m
         memory: 512Mi
     # -- Pod-level security attributes for the telemetry Redis. UID/GID 999
-    # matches the `redis` user in the `redis:7-alpine` image; `fsGroup` keeps
+    # matches the `redis` user in the `redis:8-alpine` image; `fsGroup` keeps
     # the mounted `/data` volume group-writable. [Reference][security-context].
     podSecurityContext:
       runAsNonRoot: true

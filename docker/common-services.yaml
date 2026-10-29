@@ -220,7 +220,7 @@ services:
   # so restarting the container replays queued jobs instead of losing them.
   # See docker/docs/configuring-activity-analytics.md.
   fiftyone-mq-redis-common:
-    image: redis:7
+    image: redis:8
     # AOF (`--appendonly yes`) with `--appendfsync everysec` bounds queue
     # loss on a restart to roughly one second of writes.
     # RDB snapshots (what telemetry-redis uses) would lose up to a whole
@@ -319,7 +319,7 @@ services:
       - telemetry-socket:/tmp/telemetry
 
   telemetry-redis-common:
-    image: ${TELEMETRY_REDIS_IMAGE:-redis:7-alpine}
+    image: ${TELEMETRY_REDIS_IMAGE:-redis:8-alpine}
     command:
       - redis-server
       - --save

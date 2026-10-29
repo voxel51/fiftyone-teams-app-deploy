@@ -183,7 +183,7 @@ func (s *fiftyoneMqRedisDeploymentTemplateTest) TestContainer() {
 	containers := deployment.Spec.Template.Spec.Containers
 	s.Require().Len(containers, 1, "Deployment should have exactly one container")
 	s.Equal("redis", containers[0].Name)
-	s.Equal("redis:7-alpine", containers[0].Image)
+	s.Equal("redis:8-alpine", containers[0].Image)
 
 	s.Require().Len(containers[0].Ports, 1, "container should expose exactly one port")
 	s.EqualValues(6379, containers[0].Ports[0].ContainerPort)
