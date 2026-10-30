@@ -4576,7 +4576,7 @@
               "type": "object"
             },
             "podSecurityContext": {
-              "description": "Pod-level security attributes for the telemetry Redis. UID/GID 999\nmatches the `redis` user in the `redis:8-alpine` image; `fsGroup` keeps\nthe mounted `/data` volume group-writable. [Reference][security-context].",
+              "description": "Pod-level security attributes for the telemetry Redis. UID 999\nmatches the `redis` user in the `redis:8-alpine` image (whose primary\nGID is 1000); `runAsGroup` and `fsGroup` set GID 999 so the mounted\n`/data` volume is group-writable. [Reference][security-context].",
               "properties": {
                 "fsGroup": {
                   "default": 999,

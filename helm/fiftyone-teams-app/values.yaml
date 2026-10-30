@@ -1915,9 +1915,10 @@ telemetry:
       limits:
         cpu: 250m
         memory: 512Mi
-    # -- Pod-level security attributes for the telemetry Redis. UID/GID 999
-    # matches the `redis` user in the `redis:8-alpine` image; `fsGroup` keeps
-    # the mounted `/data` volume group-writable. [Reference][security-context].
+    # -- Pod-level security attributes for the telemetry Redis. UID 999
+    # matches the `redis` user in the `redis:8-alpine` image (whose primary
+    # GID is 1000); `runAsGroup` and `fsGroup` set GID 999 so the mounted
+    # `/data` volume is group-writable. [Reference][security-context].
     podSecurityContext:
       runAsNonRoot: true
       runAsUser: 999
