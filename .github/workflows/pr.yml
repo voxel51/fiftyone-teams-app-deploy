@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   modified-files:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       docker-unit-required: ${{ steps.filter.outputs.docker-unit }}
       helm-integration-required: ${{ steps.filter.outputs.helm-integration }}
@@ -78,7 +78,7 @@ jobs:
     uses: ./.github/workflows/validate-chart-version.yml
 
   all-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [docker-unit, helm-unit, helm-integration, validate-chart-version]
     if: always()
     steps:
