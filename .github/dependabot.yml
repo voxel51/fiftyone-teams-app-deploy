@@ -8,3 +8,5 @@ updates:
       # tue%2 is fugit's modulo extension, which Dependabot supports.
       interval: "cron"
       cronjob: "0 9 * * tue%2"
+    cooldown:
+      default-days: 7
