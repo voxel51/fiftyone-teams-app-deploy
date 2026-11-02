@@ -509,10 +509,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "30"
           },
           {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
             "value": "30"
           },
@@ -629,10 +625,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
             "value": "30"
-          },
-          {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
           },
           {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
@@ -767,10 +759,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "30"
           },
           {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
             "value": "30"
           },
@@ -900,10 +888,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "30"
           },
           {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
             "value": "30"
           },
@@ -1021,10 +1005,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "30"
           },
           {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
             "value": "30"
           },
@@ -1140,10 +1120,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
             "value": "30"
-          },
-          {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
           },
           {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",

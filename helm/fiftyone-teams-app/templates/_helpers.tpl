@@ -404,8 +404,10 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
 {{- range $key, $val := .Values.apiSettings.env }}
+{{- if not (kindIs "invalid" $val) }}
 - name: {{ $key }}
   value: {{ $val | quote }}
+{{- end }}
 {{- end }}
 {{- range $key, $val := .Values.apiSettings.secretEnv }}
 - name: {{ $key }}
