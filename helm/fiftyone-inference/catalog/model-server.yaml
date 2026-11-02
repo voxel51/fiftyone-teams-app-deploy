@@ -1,0 +1,58 @@
+---
+# The models the voxel51 model server image serves, as the inference service
+# declares them. Updated with each release, from the SaaS declarations. The
+# chart adds the endpoints from `modelServer.urls`.
+id: model-server
+kind: model-server
+auth:
+  mode: none
+models:
+  - name: qwen3-vl-embedding-2b-torch
+    architecture: Qwen3-VL
+    description: Multimodal encoder for video. Embeds a clip and a text query
+      into one space, so a search box can find a moment.
+    dimensions: 2048
+    intervalSec: 5
+    license: Apache-2.0
+    # One video per request, but images batch like SigLIP
+    maxImagesPerEmbed: 32
+    maxMediaPerRequest: 1
+    maxSegmentSec: 60
+    # The most one whole video embed reads: 768 frames at 2 a second
+    maxWholeSec: 384
+    modality: video
+    supportsLogits: false
+    supportsText: true
+    tags: [embeddings, video]
+    tasks: [embedding]
+  - name: segment-anything-2-hiera-large-image-torch
+    architecture: SAM 2
+    description: Click to segment. Takes point prompts and answers with one mask.
+    license: Apache-2.0
+    maxMediaPerRequest: 1
+    supportsLogits: false
+    supportsText: false
+    tags: [segmentation, interactive]
+    tasks: [prediction]
+  - name: segment-anything-2-hiera-large-video-torch
+    architecture: SAM 2
+    description: Follows a mask through a clip.
+    license: Apache-2.0
+    maxMediaPerRequest: 1
+    modality: video
+    supportsLogits: false
+    supportsText: false
+    tags: [segmentation, interactive, video]
+    tasks: [propagation]
+  - name: siglip-base-patch16-224-torch
+    architecture: SigLIP 2 ViT-B/16
+    description: Contrastive image and text encoder.
+    dimensions: 768
+    license: Apache-2.0
+    maxMediaPerRequest: 32
+    modelKwargs: [classes, text_prompt]
+    parameters: 375187970
+    supportsLogits: true
+    supportsText: true
+    tags: [classification, zero-shot, embeddings]
+    tasks: [embedding, prediction]
