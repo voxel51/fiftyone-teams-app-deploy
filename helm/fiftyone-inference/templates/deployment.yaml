@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "inference.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "inference.chartLabels" . | nindent 4 }}
+    {{- include "inference.selectorLabels" . | nindent 4 }}
+spec:
+  # The memory store and the rate limits are per replica
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "inference.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.sharedToken.value }}
+      annotations:
+        # The token is read at start only
+        checksum/token: {{ . | trim | sha256sum }}
+      {{- end }}
+      labels:
+        {{- include "inference.chartLabels" . | nindent 8 }}
+        {{- include "inference.selectorLabels" . | nindent 8 }}
+        # The fiftyone-model-server chart admits callers with this label
+        app: inference
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "inference.podSettings" . | nindent 6 }}
+      # Sized with the service: the 10 s preStop, its 320 s drain of the calls
+      # in flight and the rest of its shutdown
+      terminationGracePeriodSeconds: 360
+      containers:
+        - name: inference
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: PORT
+              value: "8080"
+            - name: AUTH_MODE
+              value: shared-token
+            - name: AUTH_SHARED_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "inference.tokenSecret" . }}
+                  key: token
+            - name: BILLING_MODE
+              value: license
+            - name: LICENSE_KEY_FILE_PATHS
+              value: {{ include "inference.licensePaths" . | quote }}
+            - name: STORE_MODE
+              value: {{ .Values.storeMode | quote }}
+            - name: MAX_BODY_BYTES
+              value: {{ .Values.maxBodyBytes | int64 | quote }}
+            - name: BACKENDS
+              value: |
+                {{- include "inference.backends" . | nindent 16 }}
+            {{- range $name, $value := .Values.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- if and .Values.modelServer.enabled .Values.modelServer.tokenSecret }}
+            # The model servers' bearer token
+            - name: MODEL_SERVER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.modelServer.tokenSecret }}
+                  key: token
+            {{- end }}
+            {{- range $name, $ref := .Values.secretEnv }}
+            - name: {{ $name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $ref.secretName }}
+                  key: {{ $ref.secretKey }}
+            {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- include "inference.securityContext" . | nindent 10 }}
+          ports:
+            - name: http
+              containerPort: 8080
+          lifecycle:
+            # Callers stop sending here before the service stops listening
+            preStop:
+              sleep:
+                seconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          volumeMounts:
+            - name: license
+              mountPath: /opt/fiftyone/licenses
+              readOnly: true
+      volumes:
+        # One file per org, /opt/fiftyone/licenses/<Secret>
+        - name: license
+          projected:
+            sources:
+              {{- range .Values.licenseSecrets }}
+              - secret:
+                  name: {{ . }}
+                  items:
+                    - key: license
+                      path: {{ . }}
+              {{- end }}
