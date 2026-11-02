@@ -1,0 +1,168 @@
+---
+# yaml-language-server: $schema=values.schema.json
+image:
+  # -- Inference service image repository.
+  repository: voxel51/inference
+  # -- Inference service image tag. Defaults to the chart `appVersion`.
+  tag: ""
+  # -- Image pull policy of the inference service and the labeler.
+  pullPolicy: IfNotPresent
+
+# -- Image pull secrets for a private registry.
+imagePullSecrets: []
+
+# @schema
+# type: array
+# minItems: 1
+# items:
+#   type: string
+#   minLength: 1
+# @schema
+# -- Existing Secrets holding the FiftyOne Enterprise licenses, one per org,
+# under the key `license`: the ones the fiftyone-teams-app chart mounts for
+# CAS (its `fiftyoneLicenseSecrets`). Each call is admitted against the
+# license of the org it names: unexpired, it admits every call, expired, none.
+# A new org's license needs a restart.
+licenseSecrets:
+  - fiftyone-license
+
+sharedToken:
+  # -- Existing Secret holding the shared token under the key `token`. Every
+  # caller sends this token: FiftyOne Enterprise and the labeler.
+  secretName: ""
+  # -- The shared token, used to create the Secret `<release>-token` when
+  # `sharedToken.secretName` is empty. At least 32 characters, or the service
+  # refuses to start. Generate one with `openssl rand -hex 32`.
+  value: ""
+
+modelServer:
+  # -- Declare the model server backend this chart ships: every model the
+  # voxel51 model server image serves (`catalog/model-server.yaml`). A chart
+  # upgrade brings the new ones. Off leaves only `backends`.
+  enabled: true
+  # @schema
+  # type: string
+  # minLength: 1
+  # @schema
+  # -- Name of the fiftyone-model-server release in this namespace: its
+  # release name, or its `nameOverride`.
+  name: model-server
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Its `replicas`. The model servers are then
+  # `http://<name>-<i>:8080` for i from 0, one per pod.
+  replicas: 1
+  # -- Existing Secret holding the model servers' bearer token under the key
+  # `token`: the fiftyone-model-server chart's `token` (its Secret
+  # `<name>-token` from `token.value`, or your own). Empty: the model servers
+  # check no token.
+  tokenSecret: ""
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  #   minLength: 1
+  # @schema
+  # -- The model servers, one URL per box, used instead of `name` and
+  # `replicas` when set: for model servers in another namespace or cluster.
+  urls: []
+
+# @schema
+# type: array
+# items:
+#   type: object
+# @schema
+# -- Your own backends, added to the shipped model server backend in
+# `BACKENDS`. A backend of `kind: openai` is an LLM endpoint (any OpenAI
+# compatible API), and turns on the agentic labeler. On an OpenAI backend with
+# `openaiHosted` and `files`, the labeler uses its model `gpt-6-sol-responses`
+# (`wireFormat: openai-responses`). Otherwise it uses the first model of the
+# first `kind: openai` backend, which needs `wireFormat: openai-chat` and
+# `limits.maxImagesPerRequest`. Either needs `generation` in its tasks. A
+# backend names its token's variable in `auth.tokenEnv`, set from a Secret
+# with `secretEnv`. See the README for LLM examples.
+backends: []
+
+# -- Environment variables of the inference service from existing Secrets,
+# such as the LLM token a backend's `auth.tokenEnv` names.
+secretEnv: {}
+#   OPENAI_API_KEY:
+#     secretName: the-pre-existing-secret
+#     secretKey: the-key-in-the-secret
+
+# @schema
+# enum: ["memory", "mongo"]
+# @schema
+# -- Where the catalog and per organization model settings live. `memory`
+# loses the settings at restart. `mongo` needs `MONGO_URI` in `secretEnv`.
+storeMode: memory
+
+# -- Largest request body in bytes. Images are sent inline, so this is large.
+maxBodyBytes: 67108864
+
+# -- Extra environment variables of the inference service, by name.
+env: {}
+
+# Not set by default, as in the main chart. The service sizes how many request
+# bodies it holds at once from its memory limit, and refuses to start when the
+# limit cannot hold one `maxBodyBytes` body: 1Gi holds two 64 MiB bodies.
+# To set them, uncomment and adjust, and remove the curly braces after
+# `limits:` and `requests:`.
+# -- Inference service container resources.
+resources:
+  limits: {}
+  #   memory: 1Gi
+  requests: {}
+  #   cpu: 50m
+  #   memory: 1Gi
+
+# The shared agentic labeling service. It runs when a backend has
+# `kind: openai`. It calls `gpt-6-sol-responses` on an OpenAI backend with
+# `openaiHosted` and `files`, otherwise the first model of the first
+# `kind: openai` backend.
+labeler:
+  image:
+    # -- Labeler image repository.
+    repository: voxel51/agentic-labeler-cpu
+    # -- Labeler image tag. Defaults to the chart `appVersion`.
+    tag: ""
+  # -- Labeler environment variables, by name. They win over the ones the
+  # chart sets. The labeler fetches media only from public addresses on port
+  # 443 by default. For media in a private object store, set
+  # `LABELER_FETCH_ALLOWED_HOSTS`, `LABELER_FETCH_ALLOWED_NETWORKS`,
+  # `LABELER_FETCH_ALLOWED_PORTS` and, for plain http,
+  # `LABELER_FETCH_ALLOW_HTTP: "true"`. Lists are JSON strings, such as
+  # `'["minio.internal"]'`, not YAML lists.
+  env:
+    # @schema
+    # type: ["string", "integer"]
+    # @schema
+    # Jobs at once. Each holds its images in memory, about 3.4 GiB at most.
+    LABELER_MAX_IN_FLIGHT_TESTS: "1"
+  # Not set by default. One job at once needs about 4Gi of memory.
+  # -- Labeler container resources.
+  resources:
+    limits: {}
+    #   memory: 4Gi
+    requests: {}
+    #   cpu: 1
+    #   memory: 4Gi
+
+# -- Pod security context of both pods, added to `runAsNonRoot: true`,
+# `runAsUser: 1000` and `runAsGroup: 1000`. Those cannot be set to false or 0.
+podSecurityContext: {}
+
+# -- Container security context of both pods, added to
+# `allowPrivilegeEscalation: false`.
+securityContext: {}
+
+# -- Node selector of both pods.
+nodeSelector: {}
+
+# -- Affinity of both pods.
+affinity: {}
+
+# -- Tolerations of both pods, for tainted nodes for example.
+tolerations: []

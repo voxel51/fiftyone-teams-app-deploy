@@ -1,0 +1,270 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "affinity": {
+      "description": "Affinity of both pods.",
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "backends": {
+      "description": "Your own backends, added to the shipped model server backend in\n`BACKENDS`. A backend of `kind: openai` is an LLM endpoint (any OpenAI\ncompatible API), and turns on the agentic labeler. On an OpenAI backend with\n`openaiHosted` and `files`, the labeler uses its model `gpt-6-sol-responses`\n(`wireFormat: openai-responses`). Otherwise it uses the first model of the\nfirst `kind: openai` backend, which needs `wireFormat: openai-chat` and\n`limits.maxImagesPerRequest`. Either needs `generation` in its tasks. A\nbackend names its token's variable in `auth.tokenEnv`, set from a Secret\nwith `secretEnv`. See the README for LLM examples.",
+      "items": {
+        "required": [],
+        "type": "object"
+      },
+      "title": "backends",
+      "type": "array"
+    },
+    "env": {
+      "description": "Extra environment variables of the inference service, by name.",
+      "required": [],
+      "title": "env",
+      "type": "object"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "description": "yaml-language-server: $schema=values.schema.json",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "description": "Image pull policy of the inference service and the labeler.",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "voxel51/inference",
+          "description": "Inference service image repository.",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "",
+          "description": "Inference service image tag. Defaults to the chart `appVersion`.",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "Image pull secrets for a private registry.",
+      "items": {
+        "required": []
+      },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "labeler": {
+      "description": "The shared agentic labeling service. It runs when a backend has\n`kind: openai`. It calls `gpt-6-sol-responses` on an OpenAI backend with\n`openaiHosted` and `files`, otherwise the first model of the first\n`kind: openai` backend.",
+      "properties": {
+        "env": {
+          "description": "Labeler environment variables, by name. They win over the ones the\nchart sets. The labeler fetches media only from public addresses on port\n443 by default. For media in a private object store, set\n`LABELER_FETCH_ALLOWED_HOSTS`, `LABELER_FETCH_ALLOWED_NETWORKS`,\n`LABELER_FETCH_ALLOWED_PORTS` and, for plain http,\n`LABELER_FETCH_ALLOW_HTTP: \"true\"`. Lists are JSON strings, such as\n`'[\"minio.internal\"]'`, not YAML lists.",
+          "properties": {
+            "LABELER_MAX_IN_FLIGHT_TESTS": {
+              "default": 1,
+              "description": "Jobs at once. Each holds its images in memory, about 3.4 GiB at most.",
+              "required": [],
+              "title": "LABELER_MAX_IN_FLIGHT_TESTS",
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "required": [],
+          "title": "env",
+          "type": "object"
+        },
+        "image": {
+          "properties": {
+            "repository": {
+              "default": "voxel51/agentic-labeler-cpu",
+              "description": "Labeler image repository.",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "",
+              "description": "Labeler image tag. Defaults to the chart `appVersion`.",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "resources": {
+          "description": "Not set by default. One job at once needs about 4Gi of memory.\nLabeler container resources.",
+          "properties": {
+            "limits": {
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "description": "  memory: 4Gi",
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "labeler",
+      "type": "object"
+    },
+    "licenseSecrets": {
+      "description": "Existing Secrets holding the FiftyOne Enterprise licenses, one per org,\nunder the key `license`: the ones the fiftyone-teams-app chart mounts for\nCAS (its `fiftyoneLicenseSecrets`). Each call is admitted against the\nlicense of the org it names: unexpired, it admits every call, expired, none.\nA new org's license needs a restart.",
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "licenseSecrets",
+      "type": "array"
+    },
+    "maxBodyBytes": {
+      "default": 67108864,
+      "description": "Largest request body in bytes. Images are sent inline, so this is large.",
+      "title": "maxBodyBytes",
+      "type": "integer"
+    },
+    "modelServer": {
+      "properties": {
+        "enabled": {
+          "default": true,
+          "description": "Declare the model server backend this chart ships: every model the\nvoxel51 model server image serves (`catalog/model-server.yaml`). A chart\nupgrade brings the new ones. Off leaves only `backends`.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "model-server",
+          "description": "Name of the fiftyone-model-server release in this namespace: its\nrelease name, or its `nameOverride`.",
+          "minLength": 1,
+          "title": "name",
+          "type": "string"
+        },
+        "replicas": {
+          "default": 1,
+          "description": "Its `replicas`. The model servers are then\n`http://\u003cname\u003e-\u003ci\u003e:8080` for i from 0, one per pod.",
+          "minimum": 1,
+          "title": "replicas",
+          "type": "integer"
+        },
+        "tokenSecret": {
+          "default": "",
+          "description": "Existing Secret holding the model servers' bearer token under the key\n`token`: the fiftyone-model-server chart's `token` (its Secret\n`\u003cname\u003e-token` from `token.value`, or your own). Empty: the model servers\ncheck no token.",
+          "title": "tokenSecret",
+          "type": "string"
+        },
+        "urls": {
+          "description": "The model servers, one URL per box, used instead of `name` and\n`replicas` when set: for model servers in another namespace or cluster.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "urls",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "modelServer",
+      "type": "object"
+    },
+    "nodeSelector": {
+      "description": "Node selector of both pods.",
+      "required": [],
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "description": "Pod security context of both pods, added to `runAsNonRoot: true`,\n`runAsUser: 1000` and `runAsGroup: 1000`. Those cannot be set to false or 0.",
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "resources": {
+      "description": "Not set by default, as in the main chart. The service sizes how many request\nbodies it holds at once from its memory limit, and refuses to start when the\nlimit cannot hold one `maxBodyBytes` body: 1Gi holds two 64 MiB bodies.\nTo set them, uncomment and adjust, and remove the curly braces after\n`limits:` and `requests:`.\nInference service container resources.",
+      "properties": {
+        "limits": {
+          "required": [],
+          "title": "limits",
+          "type": "object"
+        },
+        "requests": {
+          "description": "  memory: 1Gi",
+          "required": [],
+          "title": "requests",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "resources",
+      "type": "object"
+    },
+    "secretEnv": {
+      "description": "Environment variables of the inference service from existing Secrets,\nsuch as the LLM token a backend's `auth.tokenEnv` names.",
+      "required": [],
+      "title": "secretEnv",
+      "type": "object"
+    },
+    "securityContext": {
+      "description": "Container security context of both pods, added to\n`allowPrivilegeEscalation: false`.",
+      "required": [],
+      "title": "securityContext",
+      "type": "object"
+    },
+    "sharedToken": {
+      "properties": {
+        "secretName": {
+          "default": "",
+          "description": "Existing Secret holding the shared token under the key `token`. Every\ncaller sends this token: FiftyOne Enterprise and the labeler.",
+          "title": "secretName",
+          "type": "string"
+        },
+        "value": {
+          "default": "",
+          "description": "The shared token, used to create the Secret `\u003crelease\u003e-token` when\n`sharedToken.secretName` is empty. At least 32 characters, or the service\nrefuses to start. Generate one with `openssl rand -hex 32`.",
+          "title": "value",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "sharedToken",
+      "type": "object"
+    },
+    "storeMode": {
+      "default": "memory",
+      "description": "Where the catalog and per organization model settings live. `memory`\nloses the settings at restart. `mongo` needs `MONGO_URI` in `secretEnv`.",
+      "enum": [
+        "memory",
+        "mongo"
+      ],
+      "required": [],
+      "title": "storeMode"
+    },
+    "tolerations": {
+      "description": "Tolerations of both pods, for tainted nodes for example.",
+      "items": {
+        "required": []
+      },
+      "title": "tolerations",
+      "type": "array"
+    }
+  },
+  "required": [],
+  "type": "object"
+}
