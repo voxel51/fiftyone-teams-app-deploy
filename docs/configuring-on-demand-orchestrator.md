@@ -22,3 +22,10 @@ This is the list of supported orchestrators and their configuration guides:
 - [Anyscale](./orchestrators/configuring-anyscale-orchestrator.md)
 - [Databricks](./orchestrators/configuring-databricks-orchestrator.md)
 - [Kubernetes](./orchestrators/configuring-kubernetes-orchestrator.md)
+
+If your deployment uses multimodal datasets, the orchestrator must install
+the `multimodal` extra, `fiftyone[multimodal]`, so it can run projection
+ingestion and compaction. See the multimodal configuration guide for
+[docker](../docker/docs/configuring-multimodal.md#external-orchestrators)
+or
+[helm](../helm/docs/configuring-multimodal.md#external-orchestrators).
