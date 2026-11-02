@@ -177,4 +177,14 @@ deploy:
               pullPolicy: IfNotPresent
               tag: v2.25.1
 
+          # Telemetry sidecar injected into teams-api, fiftyone-app,
+          # teams-plugins, and delegated-operator pods
+          telemetry:
+            sidecar:
+              image:
+                # See https://console.cloud.google.com/artifacts/docker/computer-vision-team/us-central1/dev-docker?project=computer-vision-team
+                repository: us-central1-docker.pkg.dev/computer-vision-team/dev-docker/telemetry-sidecar
+                pullPolicy: IfNotPresent
+                tag: v2.25.1
+
   kubeContext: minikube

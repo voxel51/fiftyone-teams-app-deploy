@@ -1,4 +1,6 @@
 ---
+default_language_version:
+  node: 26.13.0
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -35,7 +37,7 @@ repos:
           # A base filename makes it relative to each chart directory found
           - --template-files=README.md.gotmpl
   - repo: https://github.com/dadav/helm-schema
-    rev: 0.23.1
+    rev: 0.24.0
     hooks:
       - id: helm-schema
         args:
@@ -48,12 +50,12 @@ repos:
           # - --helm-docs-compatibility-mode
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.48.0
+    rev: v0.50.0
     hooks:
       - id: markdownlint
       - id: markdownlint-fix
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+    rev: v2.4.3
     hooks:
       - id: codespell
         exclude: helm/local-self-signed-example/cert-manger-crds|tests/go.sum
@@ -115,7 +117,7 @@ repos:
           - --case-indent
           - --indent=2
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
