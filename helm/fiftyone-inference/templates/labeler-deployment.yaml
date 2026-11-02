@@ -1,0 +1,146 @@
+{{- if include "inference.labeler.enabled" . }}
+{{- $llm := dict }}
+{{- $files := dict }}
+{{- range .Values.backends }}
+{{- if eq (.kind | default "") "openai" }}
+{{- if not $llm }}
+{{- $llm = . }}
+{{- end }}
+{{- if and .openaiHosted .files (not $files) }}
+{{- $files = . }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- $env := dict
+  "LABELER_SERVICE_MODE" "shared"
+  "LABELER_AUTH_MODE" "shared-token"
+  "FIFTYONE_INFERENCE_URL" (printf "http://%s:8080" (include "inference.name" .))
+}}
+{{- if $files }}
+{{- /* OpenAI with files: gpt-6-sol on the Responses API, examples as uploaded files */}}
+{{- $id := $files.id | default "of kind openai" }}
+{{- $models := $files.models | default list }}
+{{- if not (kindIs "slice" $models) }}
+{{- fail (printf "backend %s: models must be a list" $id) }}
+{{- end }}
+{{- $sol := dict }}
+{{- range $models }}
+{{- if and (kindIs "map" .) (eq (.name | default "") "gpt-6-sol-responses") }}
+{{- $sol = . }}
+{{- end }}
+{{- end }}
+{{- if not $sol }}
+{{- fail (printf "backend %s is OpenAI with files, so the labeler calls its model gpt-6-sol-responses: declare it (see the README)" $id) }}
+{{- end }}
+{{- include "inference.labeler.checkModel" (dict "model" $sol "id" $id "wireFormat" "openai-responses") }}
+{{- $_ := set $env "LABELER_CONFIG_FILE" "/app/configs/remote-gpt-6-sol.json" }}
+{{- else }}
+{{- /* Any other OpenAI compatible LLM: Chat Completions with inline images,
+through this chart's service, on the first model of the first LLM backend.
+No key of its own, so the engine sends FIFTYONE_INFERENCE_TOKEN. The shared
+service needs a pixel limit, and a json schema constraint works on every
+host, a regex only on vLLM. */}}
+{{- $id := $llm.id | default "of kind openai" }}
+{{- $models := $llm.models | default list }}
+{{- if not (kindIs "slice" $models) }}
+{{- fail (printf "backend %s: models must be a list" $id) }}
+{{- end }}
+{{- if not $models }}
+{{- fail (printf "backend %s declares no models: the labeler calls its first one" $id) }}
+{{- end }}
+{{- $model := first $models }}
+{{- if not (and (kindIs "map" $model) $model.name) }}
+{{- fail (printf "backend %s: each model must be an object with a name, such as `- name: my-model`, not a plain string" $id) }}
+{{- end }}
+{{- include "inference.labeler.checkModel" (dict "model" $model "id" $id "wireFormat" "openai-chat") }}
+{{- /* The labeler sizes how many examples a test may carry from the image
+count alone, which bounds the request, images being inline. Not from the
+context window: its image token estimate is Gemma's */}}
+{{- $images := ($model.limits | default dict).maxImagesPerRequest }}
+{{- if not $images }}
+{{- fail (printf "model %s of backend %s declares no limits.maxImagesPerRequest: the labeler needs it to bound how many images a request carries" $model.name $id) }}
+{{- end }}
+{{- $engine := dict
+  "base_url_env" "LABELER_INFERENCE_BASE_URL"
+  "api_key_env" nil
+  "model" $model.name
+  "max_pixels" 1048576
+  "structured_output" "auto"
+  "max_images" ($images | int64)
+}}
+{{- $_ := set $env "LABELER_CONFIG_FILE" "/app/configs/remote-vllm-openai.json" }}
+{{- $_ := set $env "LABELER_ENGINE_CONFIG" ($engine | toJson) }}
+{{- end }}
+{{- /* Values in labeler.env win */}}
+{{- $env = merge (deepCopy (.Values.labeler.env | default dict)) $env }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "inference.name" . }}-labeler
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "inference.chartLabels" . | nindent 4 }}
+    {{- include "inference.labeler.selectorLabels" . | nindent 4 }}
+spec:
+  # A job lives in the memory of the pod that took it
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "inference.labeler.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.sharedToken.value }}
+      annotations:
+        checksum/token: {{ . | trim | sha256sum }}
+      {{- end }}
+      labels:
+        {{- include "inference.chartLabels" . | nindent 8 }}
+        {{- include "inference.labeler.selectorLabels" . | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "inference.podSettings" . | nindent 6 }}
+      # The 5 s preStop, the 150 s drain of the jobs in flight, the 10 s linger
+      # and 15 s more
+      terminationGracePeriodSeconds: 180
+      containers:
+        - name: labeler
+          image: "{{ .Values.labeler.image.repository }}:{{ .Values.labeler.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- range $name, $value := $env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+            # Sent as the bearer to the inference service, as the engine config
+            # names no key of its own, and the bearer its callers must send
+            # (LABELER_AUTH_MODE shared-token)
+            - name: FIFTYONE_INFERENCE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "inference.tokenSecret" . }}
+                  key: token
+          {{- with .Values.labeler.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- include "inference.securityContext" . | nindent 10 }}
+          ports:
+            - name: http
+              containerPort: 8080
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+{{- end }}
