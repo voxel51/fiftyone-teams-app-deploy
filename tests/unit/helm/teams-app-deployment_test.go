@@ -465,14 +465,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
-          },
-          {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
             "value": "http://fiftyone-app:80"
           },
@@ -549,14 +541,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneAuthSecret"
               }
             }
-          },
-          {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
           },
           {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
@@ -650,14 +634,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
-          },
-          {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
             "value": "http://fiftyone-app:80"
           },
@@ -733,14 +709,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneAuthSecret"
               }
             }
-          },
-          {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
           },
           {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
@@ -819,14 +787,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
-          },
-          {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
             "value": "http://fiftyone-app:80"
           },
@@ -903,14 +863,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
-          },
-          {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
             "value": "http://fiftyone-app:80"
           },
@@ -985,14 +937,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneAuthSecret"
               }
             }
-          },
-          {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
           },
           {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
