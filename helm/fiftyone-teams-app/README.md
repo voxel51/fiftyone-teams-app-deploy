@@ -832,6 +832,12 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| activitySettings.archive.afterDays | string | `""` | For the `time` trigger: archive events older than this many days. When empty, the activity retention horizon (365 days). |
+| activitySettings.archive.bucketPath | string | `""` | Bucket prefix archives are written under, e.g. `gs://my-bucket` or `s3://my-bucket/prefix`. Chunks land under `<bucketPath>/activity/`. Written with the teams-api pod's own cloud credentials (workload identity, an instance role, or a mounted key). |
+| activitySettings.archive.lockSettings | bool | `false` | Lock the configuration: these values win over anything saved on the Events page, and the page shows them read-only. |
+| activitySettings.archive.maxStorageBytes | int | `10737418240` | The event store's size budget in bytes: the `space` trigger's threshold AND the prune worker's cap, set from one value so the two cannot disagree. Default 10 GiB (10737418240). |
+| activitySettings.archive.retentionMode | string | `""` | What happens to old events: `archive`, `delete`, or `keep`. When empty, events are archived if `bucketPath` is set and deleted otherwise. |
+| activitySettings.archive.trigger | string | `""` | What triggers archiving: `time` (events older than `afterDays`) or `space` (the oldest events, while the event store exceeds `maxStorageBytes`). When empty, `time`. |
 | activitySettings.enabled | bool | `false` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. The UI surfaces that read the result are separate, default-off opt-ins through `teamsAppSettings.env` (`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel, `VFF_WF_METRIC` for the pre-release Metrics tab). Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
