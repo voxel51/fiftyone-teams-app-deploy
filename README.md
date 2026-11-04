@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.25.1](https://img.shields.io/badge/Version-2.25.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.25.1](https://img.shields.io/badge/AppVersion-v2.25.1-informational?style=flat-square)
+![Version: 2.25.2](https://img.shields.io/badge/Version-2.25.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.25.2](https://img.shields.io/badge/AppVersion-v2.25.2-informational?style=flat-square)
 
 FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
@@ -836,6 +836,13 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
 | activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |
+| activitySettings.liveness.enabled | bool | `true` | Controls whether the worker containers get a liveness probe. Each worker refreshes a heartbeat file every few seconds while its queue poll loop is making progress (fiftyone-mq 0.0.7+); the probe restarts a worker that is running but no longer draining, such as one left wedged on a dead connection after the queue Redis pod was replaced. The probe passes while the file does not exist, so older worker images are unaffected. [Reference][probes]. |
+| activitySettings.liveness.failureThreshold | int | `3` | Number of times to retry the liveness probe for the workers. [Reference][probes]. |
+| activitySettings.liveness.heartbeatFile | string | `"/tmp/fiftyone-mq-heartbeat"` | Path of the heartbeat file, passed to the workers as `FIFTYONE_MQ_HEARTBEAT_FILE`. Must be writable by the container. |
+| activitySettings.liveness.initialDelaySeconds | int | `30` | Seconds to wait before the first liveness probe for the workers. [Reference][probes]. |
+| activitySettings.liveness.maxHeartbeatAgeSeconds | int | `180` | Seconds since the last heartbeat after which a probe attempt fails. Keep it above the workers' own stall timeout (`FIFTYONE_MQ_WORKER_STALL_TIMEOUT_S`, 120 by default) so the worker normally exits on its own first. |
+| activitySettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for the workers. [Reference][probes]. |
+| activitySettings.liveness.timeoutSeconds | int | `5` | Number of seconds after which the liveness probe times out for the workers. [Reference][probes]. |
 | activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
 | activitySettings.orgId | string | `""` | Organization that the deployment-wide rollups are attributed to. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Leave empty: a single-org deployment is discovered automatically. Set it only when the deployment holds several organizations, where the deployment-wide counts cannot be attributed to one of them — the workers log which one to name. |
 | activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
@@ -1193,7 +1200,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS | string | `"kubernetes"` | Deployment characteristics for the `teams-app`. `kubernetes`: Indicates the app is running in a Kubernetes environment. `docker`: Indicates the app is running in a Docker environment. `kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.25.1"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==2.25.1`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.25.2"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==2.25.2`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
