@@ -344,7 +344,7 @@ The estimated time to deploy FiftyOne Enterprise is approximately 2 hours.
 
 ## Sizing
 
-Voxel51 recommends the following resource sizing:
+Voxel51 recommends the following resource sizing as a starting point:
 
 - MongoDB: 4 CPU, 16GB RAM, 256GB Storage
 - FiftyOne App: 1 CPU, 6GB RAM, 1GB Storage per pod
@@ -354,7 +354,7 @@ Voxel51 recommends the following resource sizing:
 - Delegated Operators: 8 CPU, 16GB RAM, 1GB Storage per pod
 - Dedicated Plugins (optional): 8 CPU, 16GB RAM, 1GB Storage per pod
 
-Voxel51 also recommends monitoring resource consumption across
+Voxel51 recommends monitoring resource consumption across
 the applications.
 Resource usage varies dramatically with operations, use cases,
 and dataset sizes.

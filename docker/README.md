@@ -122,12 +122,12 @@ The estimated time to deploy FiftyOne Enterprise is approximately 2 hours.
 
 ## :floppy_disk: Sizing
 
-Voxel51 recommends the following resource sizing:
+Voxel51 recommends the following resource sizing as a starting point:
 
 - MongoDB: 4 CPU, 16GB RAM, 256GB Storage
 - Docker Compose Server: 8 CPU, 32GB RAM, 256GB Storage
 
-Voxel51 also recommends monitoring resource consumption across
+Voxel51 recommends monitoring resource consumption across
 the applications.
 Resource usage varies dramatically with operations, use cases,
 and dataset sizes.

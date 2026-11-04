@@ -98,7 +98,7 @@ Deploying FiftyOne Enterprise takes approximately 2 hours.
 
 ## :floppy_disk: Sizing
 
-We recommend the following resource sizing:
+We recommend the following resource sizing as a starting point:
 
 | Service             | CPU    | Memory  | Storage         |
 |---------------------|--------|---------|-----------------|
@@ -109,7 +109,7 @@ We recommend the following resource sizing:
 | Teams CAS           | `500m` | `512Mi` | 512MB (per pod) |
 | Delegated Operators | `8`    | `16Gi`  | 1GB (per pod)   |
 
-We also recommend monitoring resource consumption across the services.
+We recommend monitoring resource consumption across the services.
 Resource usage varies dramatically with operations, use cases,
 and dataset sizes.
 
