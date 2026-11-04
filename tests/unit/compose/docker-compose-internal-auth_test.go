@@ -254,7 +254,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			"fiftyone-mq-redis",
 			[]string{internalAuthComposeFile, internalAuthComposeActivityFile},
 			s.dotEnvFiles,
-			"redis:7",
+			"redis:8",
 		},
 		{
 			"activityWorker",
@@ -310,7 +310,7 @@ func (s *commonServicesInternalAuthDockerComposeTest) TestServiceImage() {
 			"telemetry-redis",
 			[]string{internalAuthComposeFile},
 			s.dotEnvFiles,
-			"redis:7-alpine",
+			"redis:8-alpine",
 		},
 		{
 			"telemetrySidecarFiftyoneApp",

@@ -254,7 +254,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 			"fiftyone-mq-redis",
 			[]string{legacyAuthComposeFile, legacyAuthComposeActivityFile},
 			s.dotEnvFiles,
-			"redis:7",
+			"redis:8",
 		},
 		{
 			"activityWorker",
@@ -310,7 +310,7 @@ func (s *commonServicesLegacyAuthDockerComposeTest) TestServiceImage() {
 			"telemetry-redis",
 			[]string{legacyAuthComposeFile},
 			s.dotEnvFiles,
-			"redis:7-alpine",
+			"redis:8-alpine",
 		},
 		{
 			"telemetrySidecarFiftyoneApp",
