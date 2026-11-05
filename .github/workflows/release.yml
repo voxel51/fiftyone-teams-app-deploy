@@ -1,7 +1,8 @@
 ---
-# Publishes the public chart for a release tag. The release pipeline
-# (cloud-build-and-deploy) tags the release branch tip
-# `fiftyone-teams-app-X.Y.Z`; `main` is the trunk and never publishes.
+# Publishes the public chart when a release tag is pushed.
+# The release pipeline in cloud-build-and-deploy
+# tags the tip of the release branch `fiftyone-teams-app-X.Y.Z`.
+# Pushes to `main` never publish a chart.
 name: Release Charts
 
 # yamllint disable-line rule:truthy
@@ -68,8 +69,10 @@ jobs:
         id: chart_releaser
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          # Re-running a published tag fails with a 422 from GitHub instead
-          # of skipping, so internal charts never drift from the public one.
+          # If you re-run a tag that already published,
+          # GitHub returns a 422 error and the run fails.
+          # Failing, instead of skipping,
+          # keeps the internal charts in sync with the public chart.
           CR_SKIP_EXISTING: false
         uses: helm/chart-releaser-action@v1.8.0
         with:
@@ -157,8 +160,9 @@ jobs:
             })
 
   update-main-fixtures:
-    # The cloud build pins the release branch's integration fixtures to
-    # each build; main gets the released pins by PR.
+    # The cloud build pins the integration fixtures on the release branch
+    # to each build.
+    # This job opens a PR to pin the fixtures on main to the release.
     if: ${{ needs.release.outputs.changed_charts != '' }}
     needs: [release, verify-tag]
     runs-on: ubuntu-latest

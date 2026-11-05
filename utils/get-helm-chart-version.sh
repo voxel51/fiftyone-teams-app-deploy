@@ -9,16 +9,18 @@
 set -o pipefail
 set -eu
 
+. "$(dirname "$0")/common.sh"
+
 version=""
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-# Note: Sending echos to STDERR so that users can easily use
+# Note: Sending logs to STDERR so that users can easily use
 # the STDOUT for other, more interesting automations.
 if [[ ${CURRENT_BRANCH} == "main" ]]; then
   # main carries the version in flight, so take the newest released
   # <x.x.x> chart from GAR rather than the Chart.yaml version.
-  echo "Look for the newest released version in us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env" >&2
+  log_info "Look for the newest released version in us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env" >&2
   version=$(gcloud artifacts docker images list \
     us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env \
     --include-tags \
@@ -29,7 +31,7 @@ else
 
   sha=$(git rev-parse --short HEAD)
 
-  echo "Look for version \"${sha}\" in us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env" >&2
+  log_info "Look for version \"${sha}\" in us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env" >&2
 
   version=$(gcloud artifacts docker images list \
     us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env \
@@ -41,14 +43,14 @@ else
 fi
 
 if [[ -z ${version} ]] || [[ ! ${version} =~ [0-9]+\.[0-9]+\.[0-9]+.* ]]; then
-  echo "[ERROR] No version found in the helm chart registry... Failing build." >&2
-  echo "        Please submit a PR to fiftyone-teams-app-deploy if this is a " >&2
-  echo "        non-release branch so that your chart gets published." >&2
-  echo "        If this is a release branch, please view the " >&2
-  echo "        'Release Pre-release charts' action in fiftyone-teams-app-deploy" >&2
+  log_error "No version found in the helm chart registry... Failing build.
+      Please submit a PR to fiftyone-teams-app-deploy if this is a
+      non-release branch so that your chart gets published.
+      If this is a release branch, please view the
+      'Release Pre-release charts' action in fiftyone-teams-app-deploy"
   exit 1
 fi
 
-echo "Found internal-env chart version ${version}" >&2
+log_info "Found internal-env chart version ${version}" >&2
 # Let caller do with it what they'd like
 echo "${version}"
