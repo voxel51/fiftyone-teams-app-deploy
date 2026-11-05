@@ -615,10 +615,6 @@ Create a merged list of environment variables for fiftyone-teams-app
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
-- name: FIFTYONE_SERVER_ADDRESS
-  value: ""
-- name: FIFTYONE_SERVER_PATH_PREFIX
-  value: "/api/proxy/fiftyone-teams"
 - name: FIFTYONE_TEAMS_PROXY_URL
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
 - name: FIFTYONE_TEAMS_PLUGIN_URL
