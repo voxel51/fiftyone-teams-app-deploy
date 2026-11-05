@@ -21,7 +21,6 @@ on:
   push:
     branches:
       - release/*
-      - release-next
 
 jobs:
   pre-release:
