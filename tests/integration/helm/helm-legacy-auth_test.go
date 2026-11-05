@@ -83,7 +83,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
 					httpResponseCode: 200,
 					log:              "FiftyOne CAS starting up",
 				},
@@ -160,7 +160,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
 					httpResponseCode: 200,
 					log:              "FiftyOne CAS starting up",
 				},
@@ -247,7 +247,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
 					httpResponseCode: 200,
 					log:              "FiftyOne CAS starting up",
 				},
