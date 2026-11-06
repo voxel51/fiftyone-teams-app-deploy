@@ -130,32 +130,36 @@ Audit Log, the Jobs pages, and more to come.
 It is a substrate rather than a feature of its own, so enabling it is what
 gives those surfaces anything to show.
 
-**Activity Core is opt-in and nothing changes on upgrade unless you
-enable it.** The chart renders no activity environment on the existing
-workloads and no new `Deployment`s while it is off.
+**Activity Core is on by default.** It shipped opt-in in v2.25.0; in later
+versions an upgrade with no values changes renders:
 
-Enabling it requires two settings, which are a pair:
+- `FIFTYONE_ACTIVITY_ENABLED=true` on the producer workloads (`teams-api`,
+  `fiftyone-app`, `teams-plugins`, and the delegated operators)
+- one worker `Deployment` per activity worker (ingest, rollup, snapshot,
+  and prune)
+- the queue Redis `Deployment`, `Service`, and `PersistentVolumeClaim`,
+  plus `FIFTYONE_MQ_REDIS_URL` on the workloads that reach it
+
+Activity data accumulates from the upgrade onward; earlier activity is not
+backfilled.
+
+To stay opted out, set both keys to `false`. They are a pair:
 
 ```yaml
 # values.yaml
 activitySettings:
-  enabled: true
+  enabled: false
 fiftyoneMq:
-  enabled: true
+  enabled: false
 ```
 
-- `activitySettings.enabled` tells the producer workloads (`teams-api`,
-  `fiftyone-app`, `teams-plugins`, and the delegated operators) to emit,
-  and renders one worker `Deployment` per activity worker.
-- `fiftyoneMq.enabled` renders the queue Redis that carries events from
-  the producers to the workers.
+Turning off only `fiftyoneMq.enabled` fails the render rather than
+installing producers and workers that silently record nothing.
 
-Turning on activity without the queue fails the render rather than
-installing something that silently records nothing.
-
-The annotation Metrics tab is gated separately by the `VFF_WF_METRIC`
-app flag. Set it under `teamsAppSettings.env` alongside the pair above;
-see [Viewing the data](./configuring-activity-core.md#viewing-the-data).
+To keep Activity Core but hide the dataset Activity tab and the sample
+history panel, set `VFF_WF_ACTIVITY: false` under both
+`teamsAppSettings.env` and `appSettings.env`; see
+[Viewing the data](./configuring-activity-core.md#viewing-the-data).
 
 **Cluster requirements:**
 
@@ -171,7 +175,8 @@ see [Viewing the data](./configuring-activity-core.md#viewing-the-data).
 
 **Resource impact:**
 Each worker requests `100m` CPU / `128Mi` memory (limits `500m` /
-`512Mi`), plus one bundled Redis pod.
+`512Mi`), plus one bundled Redis pod. The ingest worker runs two replicas.
+Check any namespace `ResourceQuota` for headroom before upgrading.
 
 See the
 [Configuring Activity Core](./configuring-activity-core.md)

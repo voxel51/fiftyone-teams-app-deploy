@@ -1169,7 +1169,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
+			options := &helm.Options{SetValues: disableActivity(disableTelemetry(disableDefaultServiceOrchestrators(testCase.values)))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
