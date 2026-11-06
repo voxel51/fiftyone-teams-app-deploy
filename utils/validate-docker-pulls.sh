@@ -20,6 +20,7 @@ EXPECTED_IMAGES=(
   "docker.io/busybox:stable-glibc" # For initContainers
   "docker.io/redis:8-alpine"       # For telemetry redis (telemetry.enabled defaults to true)
   "voxel51/agentic-labeler"
+  "voxel51/fiftyone-activity" # Activity Core workers (activitySettings.enabled defaults to true)
   "voxel51/fiftyone-app"
   "voxel51/fiftyone-app-gpt"
   "voxel51/fiftyone-app-torch"

@@ -971,7 +971,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
 
 			// when vars are set outside of the if statement, they aren't accessible from within the conditional
 			if testCase.values == nil {
-				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+				options := &helm.Options{SetValues: disableActivity(disableTelemetry(testCase.values))}
 				output, err := helm.RenderTemplateE(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				s.ErrorContains(err, "could not find template templates/plugins-deployment.yaml in chart")
@@ -981,7 +981,7 @@ func (s *deploymentPluginsTemplateTest) TestContainerEnv() {
 
 				s.Nil(deployment.Spec.Template.Spec.Containers)
 			} else {
-				options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+				options := &helm.Options{SetValues: disableActivity(disableTelemetry(testCase.values))}
 				output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 				var deployment appsv1.Deployment
