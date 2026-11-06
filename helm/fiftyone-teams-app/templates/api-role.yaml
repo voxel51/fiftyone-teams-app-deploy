@@ -23,4 +23,10 @@ rules:
   - apiGroups: [""]
     resources: ["pods/log"]
     verbs: ["get"]
+  {{- /* The Kubernetes broker reads pod and job events to report why a
+         queued delegated operation has not started (for example an
+         exceeded GPU quota, or no cloud capacity for its machine type). */}}
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list"]
 {{- end }}
