@@ -203,7 +203,7 @@ func (s *activityProducerEnvTemplateTest) TestTeamsAppNeverCarriesActivityGate()
 }
 
 // The worker Deployments only render when activity is enabled, but they emit
-// derived rollup events through the same gated path, so they need
+// derived rollup/snapshot events through the same gated path, so they need
 // the flag too.
 func (s *activityProducerEnvTemplateTest) TestActivityWorkersCarryTheGate() {
 	values := map[string]string{}

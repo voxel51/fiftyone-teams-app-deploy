@@ -196,7 +196,7 @@ The bundled queue Redis adds one more pod, with `maxmemory` defaulting
 to `200mb` (`fiftyoneMq.redis.maxmemory`). Raise it if the queue backs
 up under load.
 
-Do not scale the rollup or prune workers above one replica.
+Do not scale the rollup, snapshot, or prune workers above one replica.
 Their schedulers are single-flight and hold no cross-pod lock, so a
-second replica produces duplicate rollup writes and lets two prune
-passes compete over the same records.
+second replica produces duplicate rollup and snapshot writes and lets
+two prune passes compete over the same records.

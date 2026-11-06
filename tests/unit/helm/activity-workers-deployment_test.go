@@ -136,7 +136,7 @@ func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerEnabledByDefault(
 	for _, d := range deployments {
 		names = append(names, d.ObjectMeta.Name)
 	}
-	s.Len(deployments, 3, "expected ingest, prune, rollup; got %v", names)
+	s.Len(deployments, 4, "expected ingest, prune, rollup, snapshot; got %v", names)
 	s.Contains(strings.Join(names, ","), "prune")
 }
 
@@ -148,7 +148,7 @@ func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerOptOut() {
 	for _, d := range deployments {
 		names = append(names, d.ObjectMeta.Name)
 	}
-	s.Len(deployments, 2, "expected ingest, rollup only; got %v", names)
+	s.Len(deployments, 3, "expected ingest, rollup, snapshot only; got %v", names)
 	for _, d := range deployments {
 		s.NotContains(d.ObjectMeta.Name, "prune")
 	}
@@ -159,7 +159,9 @@ func (s *activityWorkersDeploymentTemplateTest) TestPruneWorkerOptOut() {
 // the request, and from fiftyone-activity 0.0.27 the workers discover a
 // single-org deployment's organization for themselves. The var must be absent
 // rather than an empty string, which the workers cannot tell apart from a
-// deliberate blank.
+// deliberate blank. (With the currently pinned v0.0.26 image the snapshot
+// worker still needs the value — that is a documented deployment caveat in
+// values.yaml, not a chart-render constraint.)
 func (s *activityWorkersDeploymentTemplateTest) TestOrgIdOmittedWhenUnset() {
 	values := activityEnabled(nil)
 	delete(values, "activitySettings.orgId")
@@ -170,7 +172,7 @@ func (s *activityWorkersDeploymentTemplateTest) TestOrgIdOmittedWhenUnset() {
 	s.NoError(err, "an unset orgId must not fail the render")
 
 	deployments := s.renderWorkers(values)
-	s.Len(deployments, 3)
+	s.Len(deployments, 4)
 	for _, d := range deployments {
 		env := envByName(d.Spec.Template.Spec.Containers[0])
 		_, ok := env["FIFTYONE_ACTIVITY_ORG_ID"]
@@ -187,7 +189,7 @@ func (s *activityWorkersDeploymentTemplateTest) TestOrgIdRenderedWhenSet() {
 	deployments := s.renderWorkers(activityEnabled(map[string]string{
 		"activitySettings.orgId": "acme-org",
 	}))
-	s.Len(deployments, 3)
+	s.Len(deployments, 4)
 	for _, d := range deployments {
 		env := envByName(d.Spec.Template.Spec.Containers[0])
 		orgId, ok := env["FIFTYONE_ACTIVITY_ORG_ID"]
@@ -237,7 +239,7 @@ func (s *activityWorkersDeploymentTemplateTest) TestWorkerEnvDedicatedDatabase()
 // env and an exec liveness probe on its age by default.
 func (s *activityWorkersDeploymentTemplateTest) TestWorkerLivenessDefaults() {
 	deployments := s.renderWorkers(activityEnabled(nil))
-	s.Len(deployments, 3)
+	s.Len(deployments, 4)
 	for _, d := range deployments {
 		container := d.Spec.Template.Spec.Containers[0]
 		env := envByName(container)

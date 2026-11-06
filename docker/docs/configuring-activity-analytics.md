@@ -47,13 +47,14 @@ succeeds. To stop events flowing, set `FIFTYONE_ACTIVITY_ENABLED`
 to false — that short-circuits before a client is built, rather than
 relying on a connection failing.
 
-One `activity-worker` container runs three workers via the combined
+One `activity-worker` container runs four workers via the combined
 `fiftyone-activity-worker` entrypoint:
 
 | Worker   | Responsibility                                         |
 | -------- | ------------------------------------------------------ |
 | ingest   | Drains the queue into the raw `activity_*` collections |
 | rollup   | Aggregates raw events into the rollups the app reads   |
+| snapshot | Periodically records dataset and deployment state      |
 | prune    | Enforces the retention window and the storage size cap |
 
 ## Compose files
@@ -193,10 +194,11 @@ redis-cli -u "${FIFTYONE_MQ_REDIS_URL}" \
 
 Do not scale `activity-worker` above one replica.
 
-The rollup and prune schedulers inside the container are single-flight
-and hold no cross-container lock. A second replica runs its own copy of
-each schedule, which produces duplicate rollup writes and lets two prune
-passes compete over the same records.
+The rollup, snapshot, and prune schedulers inside the container are
+single-flight and hold no cross-container lock. A second replica runs
+its own copy of each schedule, which produces duplicate rollup and
+snapshot writes and lets two prune passes compete over the same
+records.
 
 The ingest worker is the only part of the pipeline that would benefit
 from horizontal scale, and it is not separable from the others in this

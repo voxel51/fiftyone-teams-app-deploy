@@ -135,8 +135,8 @@ versions an upgrade with no values changes renders:
 
 - `FIFTYONE_ACTIVITY_ENABLED=true` on the producer workloads (`teams-api`,
   `fiftyone-app`, `teams-plugins`, and the delegated operators)
-- one worker `Deployment` per activity worker (ingest, rollup, and
-  prune)
+- one worker `Deployment` per activity worker (ingest, rollup, snapshot,
+  and prune)
 - the queue Redis `Deployment`, `Service`, and `PersistentVolumeClaim`,
   plus `FIFTYONE_MQ_REDIS_URL` on the workloads that reach it
 
@@ -160,13 +160,6 @@ To keep Activity Core but hide the dataset Activity tab and the sample
 history panel, set `VFF_WF_ACTIVITY: false` under both
 `teamsAppSettings.env` and `appSettings.env`; see
 [Viewing the data](./configuring-activity-core.md#viewing-the-data).
-
-The snapshot worker is gone; `teams-api` now records the deployment
-state it used to. Remove `activitySettings.workers.snapshot` and
-`activitySettings.snapshotIntervalMs` from your values file. The chart
-renders one `Deployment` per `activitySettings.workers` entry, so a
-leftover `snapshot` entry still renders a worker whose entrypoint no
-longer exists.
 
 **Cluster requirements:**
 

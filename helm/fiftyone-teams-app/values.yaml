@@ -64,6 +64,9 @@ activitySettings:
     limits:
       cpu: 500m
       memory: 512Mi
+  # -- Snapshot interval in milliseconds. Defaults to hourly, matching the
+  # bucket the state metrics roll up by.
+  snapshotIntervalMs: ""
   # One Deployment is rendered per entry.
   workers:
     ingest:
@@ -92,6 +95,14 @@ activitySettings:
       replicaCount: 1
       # -- Use the `Recreate` strategy. The rollup worker owns a repeatable
       # schedule, so only one replica may reconcile it.
+      recreate: true
+    snapshot:
+      # -- Entrypoint for the snapshot worker.
+      command: ["fiftyone-activity-snapshot-worker"]
+      # -- Number of snapshot worker replicas. Keep at 1.
+      replicaCount: 1
+      # -- Use the `Recreate` strategy. The snapshot worker owns a repeatable
+      # schedule, and two replicas would double-count a bucket.
       recreate: true
 
 # yaml-language-server: $schema=values.schema.json
