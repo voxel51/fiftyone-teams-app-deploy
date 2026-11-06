@@ -84,6 +84,7 @@ func (s *fiftyoneMqRedisServiceTemplateTest) TestNamespaceOverride() {
 func (s *fiftyoneMqRedisServiceTemplateTest) TestMqDisabled() {
 	options := &helm.Options{SetValues: map[string]string{
 		"fiftyoneMq.enabled":       "false",
+		"activitySettings.enabled": "false",
 		"fiftyoneMq.redis.enabled": "true",
 	}}
 

@@ -149,9 +149,12 @@ func (s *activityProducerEnvTemplateTest) TestActivityEnabledPresentWhenEnabled(
 func (s *activityProducerEnvTemplateTest) TestActivityEnabledAbsentWhenDisabled() {
 	for _, tc := range activityProducerTemplates {
 		s.Run(tc.name, func() {
-			// Chart defaults for activitySettings/fiftyoneMq — only the
-			// values that make the Deployment render are set.
-			values := map[string]string{}
+			// This branch flips the chart defaults on, so "disabled"
+			// must be explicit for the absence contract to hold.
+			values := map[string]string{
+				"activitySettings.enabled": "false",
+				"fiftyoneMq.enabled":       "false",
+			}
 			for k, v := range tc.values {
 				values[k] = v
 			}
