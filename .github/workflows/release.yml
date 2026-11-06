@@ -159,10 +159,10 @@ jobs:
               }
             })
 
-  update-main-fixtures:
-    # The cloud build pins the integration fixtures on the release branch
-    # to each build.
-    # This job opens a PR to pin the fixtures on main to the release.
+  update-main:
+    # Keeps main on the latest release.
+    # This job opens a PR that bumps the versions on main to the release
+    # and pins the integration fixtures on main to the released images.
     if: ${{ needs.release.outputs.changed_charts != '' }}
     needs: [release, verify-tag]
     runs-on: ubuntu-latest
@@ -173,36 +173,46 @@ jobs:
           ref: main
           token: ${{ secrets.FIFTYONE_GITHUB_TOKEN }}
 
-      - name: Open fixture pin PR
+      - name: Open main update PR
         env:
           GH_TOKEN: ${{ secrets.FIFTYONE_GITHUB_TOKEN }}
-          VERSION: "v${{ needs.verify-tag.outputs.version }}"
+          VERSION: "${{ needs.verify-tag.outputs.version }}"
         run: |
           set -euo pipefail
 
           git config user.name "voxel51-bot"
           git config user.email "voxel51-bot@users.noreply.github.com"
 
-          branch="fixtures/${VERSION}"
+          branch="release-sync/v${VERSION}"
           git checkout -b "${branch}"
 
-          ./utils/bump-fixtures.sh \
-            --app-version "${VERSION}" \
-            --api-version "${VERSION}" \
-            --teams-app-version "${VERSION}" \
-            --cas-version "${VERSION}"
+          main_version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
+          newest=$(printf '%s\n%s\n' "${main_version}" "${VERSION}" | sort -V | tail -1)
+          if [[ "${newest}" == "${VERSION}" ]]; then
+            ./utils/bump-version.sh \
+              --from "${main_version}" \
+              --to "${VERSION}"
+          else
+            echo "::notice::main is on ${main_version}, newer than ${VERSION}. Leaving the versions on main alone."
+          fi
 
-          git add tests/fixtures
+          ./utils/bump-fixtures.sh \
+            --app-version "v${VERSION}" \
+            --api-version "v${VERSION}" \
+            --teams-app-version "v${VERSION}" \
+            --cas-version "v${VERSION}"
+
+          git add --all
           if git diff --cached --quiet; then
-            echo "Fixtures on main already pin ${VERSION}"
+            echo "main is already on v${VERSION}"
             exit 0
           fi
 
-          title="ci(fixtures): pin integration test fixtures to ${VERSION}"
+          title="chore(release): update main to v${VERSION}"
           git commit -m "${title}"
           git push origin "${branch}"
           gh pr create \
             --base main \
             --head "${branch}" \
             --title "${title}" \
-            --body "Pins the integration test fixtures on \`main\` to the images released with \`${GITHUB_REF_NAME}\`. Opened by the Release Charts workflow."
+            --body "Bumps the versions on \`main\` to \`v${VERSION}\` and pins the integration test fixtures to the images released with \`${GITHUB_REF_NAME}\`. Opened by the Release Charts workflow."

@@ -10,9 +10,12 @@ name: Release Gate
 #
 # Every other change merges to `main`
 # and reaches a release branch by cherry-pick.
-# The only commits on a release branch that `main` doesn't have
-# are release-only fixes and the integration-fixture pins
-# that the release-candidate deploy pushes.
+# The only commits on a release branch that `main` doesn't have are:
+#
+# - release-only fixes
+# - version bumps
+# - the integration-fixture pins that the release-candidate deploy pushes
+#
 # After the release, a PR pins the fixtures on `main` to the release.
 # So you never need to merge a release branch back to `main`.
 
