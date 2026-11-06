@@ -1,0 +1,50 @@
+{{- if and (eq .Values.service.type "LoadBalancer") (not .Values.service.loadBalancerSourceRanges) }}
+{{- fail "service.loadBalancerSourceRanges is required for a LoadBalancer: it decides who reaches the model server" }}
+{{- end }}
+{{- $name := include "model-server.name" . }}
+# The StatefulSet's governing Service. Callers use the per-pod Services below
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}-headless
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "model-server.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    {{- include "model-server.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+{{- range $i := until (int .Values.replicas) }}
+---
+# One Service per box, <name>-<i>, so a caller reaches the box it means
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}-{{ $i }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "model-server.labels" $ | nindent 4 }}
+  {{- with $.Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.service.type }}
+  {{- if eq $.Values.service.type "LoadBalancer" }}
+  loadBalancerSourceRanges:
+    {{- toYaml $.Values.service.loadBalancerSourceRanges | nindent 4 }}
+  # Keeps the caller's address, which the NetworkPolicy admits by range
+  externalTrafficPolicy: {{ $.Values.service.externalTrafficPolicy }}
+  {{- end }}
+  selector:
+    {{- include "model-server.selectorLabels" $ | nindent 4 }}
+    statefulset.kubernetes.io/pod-name: {{ $name }}-{{ $i }}
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+{{- end }}

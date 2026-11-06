@@ -69,6 +69,7 @@ regarding FiftyOne Enterprise.
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Telemetry](#telemetry)
   - [Activity Analytics](#activity-analytics)
+  - [Model Server](#model-server)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -653,6 +654,58 @@ Please refer to the
 [Activity Analytics configuration documentation](./docs/configuring-activity-analytics.md)
 for full details.
 
+### Model Server
+
+The FiftyOne model server runs the models the inference service routes
+embeddings, predictions and segmentation to. It ships in
+`compose.model-server.yaml`, on CPU, and works on any host. Set its image in
+`.env`, from your Voxel51 support team:
+
+```shell
+MODEL_SERVER_IMAGE=<repository>:<tag>
+```
+
+On the worker that runs FiftyOne Enterprise, add it to your usual `-f` set:
+
+```shell
+docker compose \
+  -f compose.dedicated-plugins.yaml \
+  -f compose.delegated-operators.yaml \
+  -f compose.model-server.yaml \
+  -f compose.override.yaml \
+  up -d
+```
+
+On another worker, copy `compose.model-server.yaml` there, and
+`compose.model-server.gpu.yaml` for a GPU, with a `.env` setting
+`MODEL_SERVER_IMAGE` and `MODEL_SERVER_BIND_ADDRESS`, the worker's own
+address. Start the model server alone:
+
+```shell
+docker compose -f compose.model-server.yaml up -d
+```
+
+For NVIDIA GPUs, add `compose.model-server.gpu.yaml` after
+`compose.model-server.yaml`, and set `NVIDIA_GPU_COUNT` in `.env` (the
+default is `1`). It needs a Linux host with the NVIDIA driver,
+nvidia-container-toolkit and the `nvidia` runtime configured in dockerd. SAM2
+and video models are too slow on CPU.
+
+To require a bearer token, set `MODEL_SERVER_TOKEN`. Every call but
+`/healthz` and `/readyz` then needs `Authorization: Bearer <token>`,
+`/metrics` included, so anything that scrapes it must send the token. Give the
+inference service the same `MODEL_SERVER_TOKEN`.
+
+> [!WARNING]
+> Without `MODEL_SERVER_TOKEN` the model server checks no token. Its port is
+> bound to `127.0.0.1` by default, so only its own host reaches it. When you
+> bind it to another address, firewall `MODEL_SERVER_BIND_PORT` so that only
+> the FiftyOne Enterprise host can reach it. Docker's published ports skip ufw
+> and firewalld: use the `DOCKER-USER` iptables chain or a cloud security
+> group. Where more than the inference service can reach it, also set
+> `MODEL_SERVER_ALLOWED_MODELS`, `MODEL_SERVER_ALLOWED_MODEL_KWARGS` and
+> `MODEL_SERVER_ALLOWED_MEDIA_PREFIXES`.
+
 ### Snapshot Archival
 
 Since version v1.5, FiftyOne Enterprise supports
@@ -859,6 +912,15 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                        | No                        |
 | `HTTPS_PROXY_URL`                            | The URL for your environment https proxy                                                                                                                                                                                                                                       | No                        |
 | `LOCAL_LICENSE_FILE_DIR`                     | Location of the directory that contains the FiftyOne Enterprise license file on the local server.                                                                                                                                                                              | Yes                       |
+| `MODEL_SERVER_ALLOWED_MEDIA_PREFIXES`        | JSON list of the scheme and host prefixes the model server fetches media from, such as `["https://minio.internal"]`; the default `[]` means any                                                                                                                                | No                        |
+| `MODEL_SERVER_ALLOWED_MODELS`                | JSON list of the models the model server serves at all; the default `[]` means any zoo model                                                                                                                                                                                   | No                        |
+| `MODEL_SERVER_ALLOWED_MODEL_KWARGS`          | JSON list of the model arguments the model server passes to the zoo loader; the default `[]` means any                                                                                                                                                                         | No                        |
+| `MODEL_SERVER_BIND_ADDRESS`                  | The host address the model server binds to; the default `127.0.0.1` reaches it from its own host only. See [Model Server](#model-server)                                                                                                                                       | No                        |
+| `MODEL_SERVER_BIND_PORT`                     | The host port the model server binds to; the default is `8080`                                                                                                                                                                                                                 | No                        |
+| `MODEL_SERVER_IMAGE`                         | The model server image, as `repository:tag`                                                                                                                                                                                                                                    | Model server only         |
+| `MODEL_SERVER_MAX_LOADED_MODELS`             | Models the model server keeps loaded at once, least recently used evicted first; the default is `6`                                                                                                                                                                            | No                        |
+| `MODEL_SERVER_PRELOAD`                       | JSON list of the models the model server loads at start; the default is `["siglip-base-patch16-224-torch"]`                                                                                                                                                                    | No                        |
+| `MODEL_SERVER_TOKEN`                         | Bearer token the model server requires on every call but `/healthz` and `/readyz`, `/metrics` included; empty means none                                                                                                                                                       | No                        |
 | `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
 
 <!-- Reference Links -->

@@ -1,0 +1,53 @@
+---
+# FiftyOne model server: runs the models the inference service routes
+# embeddings, predictions and segmentation to. CPU by default, on any host.
+# Add compose.model-server.gpu.yaml for a GPU. See the Model Server section
+# of docker/README.md.
+#
+# On the worker that runs FiftyOne Enterprise, add it to your usual -f set:
+#
+#   docker compose \
+#     -f compose.dedicated-plugins.yaml \
+#     -f compose.delegated-operators.yaml \
+#     -f compose.model-server.yaml \
+#     -f compose.override.yaml \
+#     up -d
+#
+# On another worker, start it alone:
+#
+#   docker compose -f compose.model-server.yaml up -d
+#
+# The model server checks no token unless MODEL_SERVER_TOKEN is set. Its
+# port is bound to 127.0.0.1 unless MODEL_SERVER_BIND_ADDRESS says otherwise:
+# on another worker, set that to the worker's own address and firewall the
+# port so that only the app host can reach it. Docker's published ports skip ufw and firewalld: filter them
+# in the DOCKER-USER iptables chain or with a cloud security group.
+services:
+  model-server:
+    image: ${MODEL_SERVER_IMAGE:?MODEL_SERVER_IMAGE is required}
+    environment:
+      MODEL_SERVER_PORT: 8080
+      # Answers 503 on /readyz until these are loaded
+      MODEL_SERVER_PRELOAD: '${MODEL_SERVER_PRELOAD:-["siglip-base-patch16-224-torch"]}'
+      # JSON lists. `[]`, the default, means any: set them where more than
+      # the inference service can reach this server
+      MODEL_SERVER_ALLOWED_MODELS: '${MODEL_SERVER_ALLOWED_MODELS:-[]}'
+      MODEL_SERVER_ALLOWED_MODEL_KWARGS: '${MODEL_SERVER_ALLOWED_MODEL_KWARGS:-[]}'
+      MODEL_SERVER_ALLOWED_MEDIA_PREFIXES: '${MODEL_SERVER_ALLOWED_MEDIA_PREFIXES:-[]}'
+      # When set, every call but /healthz and /readyz needs it as a bearer,
+      # /metrics included. Empty means no token
+      MODEL_SERVER_TOKEN: ${MODEL_SERVER_TOKEN:-}
+      # Models kept loaded at once, least recently used evicted first
+      MODEL_SERVER_MAX_LOADED_MODELS: ${MODEL_SERVER_MAX_LOADED_MODELS:-6}
+      # Weights land on the weights volume
+      FIFTYONE_MODEL_ZOO_DIR: /models/zoo
+      HF_HOME: /models/hf
+      TORCH_HOME: /models/torch
+    ports:
+      - ${MODEL_SERVER_BIND_ADDRESS:-127.0.0.1}:${MODEL_SERVER_BIND_PORT:-8080}:8080
+    restart: always
+    volumes:
+      - model-weights:/models
+
+volumes:
+  model-weights:
