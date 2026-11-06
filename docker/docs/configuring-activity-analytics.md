@@ -32,7 +32,7 @@ Activity events travel over a Redis-backed queue (`fiftyone.mq`):
    domain-event bridge, and `fiftyone-app` emits operator and annotation
    activity. Both emit only while `FIFTYONE_ACTIVITY_ENABLED` is true, and
    read `FIFTYONE_MQ_REDIS_URL` to find the queue once it is.
-1. `fiftyone-mq-redis` holds the queue. It is a stock `redis:7` that
+1. `fiftyone-mq-redis` holds the queue. It is a stock `redis:8` that
    persists the queue with AOF onto the `fiftyone-mq-redis-data` volume,
    so a restart replays queued jobs instead of losing them. See
    [Queue durability](#queue-durability) for what that does and does not
@@ -220,3 +220,6 @@ In the app, the Audit Log page populates as events are ingested and
 rolled up. An empty Audit Log with a healthy worker usually means
 `FIFTYONE_ACTIVITY_ORG_ID` does not match the organization you are
 viewing.
+The Metrics tab appears on annotation datasets unless `VFF_WF_METRIC`
+is set to `false` on `teams-app`; see
+[Turning Activity Analytics off](#turning-activity-analytics-off).

@@ -12,6 +12,10 @@ on:
         required: true
       REPO_GOOGLE_WORKLOAD_IDP:
         required: true
+      RO_DOCKERHUB_PAT:
+        required: true
+      RO_DOCKERHUB_USERNAME:
+        required: true
 
 jobs:
   unit-compose:
@@ -34,7 +38,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/setup-python@v7.1.0
       - name: Install asdf & tools
         uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
       - name: Run unit tests
@@ -49,7 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Free Disk Space (Ubuntu) # standard runner's 14 GB available disk size isn't enough. Need at least 22 GB free.
-        uses: jlumbroso/free-disk-space@v1.3.1
+        uses: jlumbroso/free-disk-space@v2.0.0
       - name: Checkout voxel51/aloha-github-workflows
         uses: actions/checkout@v7
         with:
@@ -66,7 +70,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/setup-python@v7.1.0
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: Install asdf & tools
@@ -87,6 +91,11 @@ jobs:
           registry: us-central1-docker.pkg.dev
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.RO_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.RO_DOCKERHUB_PAT }}
       - name: Create Local License From Secret
         uses: mobiledevops/secret-to-file-action@v2
         with:
@@ -106,7 +115,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Free Disk Space (Ubuntu) # standard runner's 14 GB available disk size isn't enough. Need at least 22 GB free.
-        uses: jlumbroso/free-disk-space@v1.3.1
+        uses: jlumbroso/free-disk-space@v2.0.0
       - name: Checkout voxel51/aloha-github-workflows
         uses: actions/checkout@v7
         with:
@@ -123,7 +132,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/setup-python@v7.1.0
       - name: Install asdf & tools
         uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
       - name: Authenticate to Google Cloud
@@ -142,6 +151,11 @@ jobs:
           registry: us-central1-docker.pkg.dev
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.RO_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.RO_DOCKERHUB_PAT }}
       - name: Create Local License From Secret
         uses: mobiledevops/secret-to-file-action@v2
         with:

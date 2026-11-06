@@ -35,6 +35,55 @@
           "title": "image",
           "type": "object"
         },
+        "liveness": {
+          "properties": {
+            "enabled": {
+              "default": true,
+              "description": "Controls whether the worker containers get a liveness probe. Each\nworker refreshes a heartbeat file every few seconds while its queue\npoll loop is making progress (fiftyone-mq 0.0.7+); the probe restarts a\nworker that is running but no longer draining, such as one left wedged\non a dead connection after the queue Redis pod was replaced. The probe\npasses while the file does not exist, so older worker images are\nunaffected. [Reference][probes].",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "failureThreshold": {
+              "default": 3,
+              "description": "Number of times to retry the liveness probe for the workers. [Reference][probes].",
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "heartbeatFile": {
+              "default": "/tmp/fiftyone-mq-heartbeat",
+              "description": "Path of the heartbeat file, passed to the workers as\n`FIFTYONE_MQ_HEARTBEAT_FILE`. Must be writable by the container.",
+              "title": "heartbeatFile",
+              "type": "string"
+            },
+            "initialDelaySeconds": {
+              "default": 30,
+              "description": "Seconds to wait before the first liveness probe for the workers. [Reference][probes].",
+              "title": "initialDelaySeconds",
+              "type": "integer"
+            },
+            "maxHeartbeatAgeSeconds": {
+              "default": 180,
+              "description": "Seconds since the last heartbeat after which a probe attempt fails.\nKeep it above the workers' own stall timeout\n(`FIFTYONE_MQ_WORKER_STALL_TIMEOUT_S`, 120 by default) so the worker\nnormally exits on its own first.",
+              "title": "maxHeartbeatAgeSeconds",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 30,
+              "description": "How often (in seconds) to perform the liveness probe for the workers. [Reference][probes].",
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "timeoutSeconds": {
+              "default": 5,
+              "description": "Number of seconds after which the liveness probe times out for the workers. [Reference][probes].",
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "liveness",
+          "type": "object"
+        },
         "mongo": {
           "properties": {
             "database": {
@@ -2917,7 +2966,7 @@
               "type": "object"
             },
             "image": {
-              "default": "redis:7-alpine",
+              "default": "redis:8-alpine",
               "description": "Redis image for the bundled queue backend.",
               "title": "image",
               "type": "string"
@@ -3915,8 +3964,8 @@
               "type": "string"
             },
             "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION": {
-              "default": "2.25.0",
-              "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==2.25.0`).",
+              "default": "2.25.2",
+              "description": "The recommended fiftyone SDK version that will be displayed in the\ninstall modal (i.e. `pip install ... fiftyone==2.25.2`).",
               "title": "FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION",
               "type": "string"
             },
@@ -4480,7 +4529,7 @@
               "type": "object"
             },
             "image": {
-              "default": "redis:7-alpine",
+              "default": "redis:8-alpine",
               "description": "Container image for the telemetry Redis Deployment.",
               "title": "image",
               "type": "string"
@@ -4527,7 +4576,7 @@
               "type": "object"
             },
             "podSecurityContext": {
-              "description": "Pod-level security attributes for the telemetry Redis. UID/GID 999\nmatches the `redis` user in the `redis:7-alpine` image; `fsGroup` keeps\nthe mounted `/data` volume group-writable. [Reference][security-context].",
+              "description": "Pod-level security attributes for the telemetry Redis. UID 999\nmatches the `redis` user in the `redis:8-alpine` image (whose primary\nGID is 1000); `runAsGroup` and `fsGroup` set GID 999 so the mounted\n`/data` volume is group-writable. [Reference][security-context].",
               "properties": {
                 "fsGroup": {
                   "default": 999,

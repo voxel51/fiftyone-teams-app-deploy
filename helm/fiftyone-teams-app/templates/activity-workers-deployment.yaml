@@ -102,6 +102,30 @@ spec:
             - name: FIFTYONE_ACTIVITY_SNAPSHOT_INTERVAL_MS
               value: {{ $a.snapshotIntervalMs | quote }}
             {{- end }}
+            {{- if $a.liveness.enabled }}
+            - name: FIFTYONE_MQ_HEARTBEAT_FILE
+              value: {{ $a.liveness.heartbeatFile | quote }}
+            {{- end }}
+          {{- if $a.liveness.enabled }}
+          {{- /* A worker left parked on a dead Redis connection (the queue
+                 pod was replaced) stays Running and Ready while draining
+                 nothing. The workers refresh the heartbeat file while their
+                 poll loop makes progress; a stale file fails the probe. A
+                 missing file passes, so an image that predates the heartbeat
+                 is never restarted by it. */}}
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - >-
+                  f="$FIFTYONE_MQ_HEARTBEAT_FILE"; [ ! -f "$f" ] ||
+                  [ $(( $(date +%s) - $(stat -c %Y "$f") )) -lt {{ int $a.liveness.maxHeartbeatAgeSeconds }} ]
+            failureThreshold: {{ $a.liveness.failureThreshold }}
+            initialDelaySeconds: {{ $a.liveness.initialDelaySeconds }}
+            periodSeconds: {{ $a.liveness.periodSeconds }}
+            timeoutSeconds: {{ $a.liveness.timeoutSeconds }}
+          {{- end }}
           resources:
             {{- toYaml $a.resources | nindent 12 }}
 ---

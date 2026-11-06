@@ -232,3 +232,61 @@ func (s *activityWorkersDeploymentTemplateTest) TestWorkerEnvDedicatedDatabase()
 		s.Nil(env["FIFTYONE_ACTIVITY_MONGO_DB"].ValueFrom)
 	}
 }
+
+// A worker left parked on a dead Redis connection (the queue pod was
+// replaced) stays Running and Ready while draining nothing -- the
+// 2026-09-28 ephem incident. Every worker therefore gets the heartbeat file
+// env and an exec liveness probe on its age by default.
+func (s *activityWorkersDeploymentTemplateTest) TestWorkerLivenessDefaults() {
+	deployments := s.renderWorkers(activityEnabled(nil))
+	s.Len(deployments, 4)
+	for _, d := range deployments {
+		container := d.Spec.Template.Spec.Containers[0]
+		env := envByName(container)
+		s.Equal(
+			"/tmp/fiftyone-mq-heartbeat",
+			env["FIFTYONE_MQ_HEARTBEAT_FILE"].Value,
+			"%s must tell the worker where to write its heartbeat",
+			d.ObjectMeta.Name,
+		)
+
+		probe := container.LivenessProbe
+		s.Require().NotNil(probe, "%s must have a liveness probe", d.ObjectMeta.Name)
+		s.Require().NotNil(probe.Exec)
+		s.Equal([]string{"sh", "-c"}, probe.Exec.Command[:2])
+		script := probe.Exec.Command[2]
+		s.Contains(script, `[ ! -f "$f" ]`,
+			"a missing heartbeat file must pass, so older images are not restarted")
+		s.Contains(script, "-lt 180 ]")
+		s.Equal(int32(3), probe.FailureThreshold)
+		s.Equal(int32(30), probe.InitialDelaySeconds)
+		s.Equal(int32(30), probe.PeriodSeconds)
+		s.Equal(int32(5), probe.TimeoutSeconds)
+	}
+}
+
+func (s *activityWorkersDeploymentTemplateTest) TestWorkerLivenessOverrides() {
+	deployments := s.renderWorkers(activityEnabled(map[string]string{
+		"activitySettings.liveness.heartbeatFile":          "/var/run/hb",
+		"activitySettings.liveness.maxHeartbeatAgeSeconds": "600",
+		"activitySettings.liveness.periodSeconds":          "10",
+	}))
+	for _, d := range deployments {
+		container := d.Spec.Template.Spec.Containers[0]
+		s.Equal("/var/run/hb", envByName(container)["FIFTYONE_MQ_HEARTBEAT_FILE"].Value)
+		s.Contains(container.LivenessProbe.Exec.Command[2], "-lt 600 ]")
+		s.Equal(int32(10), container.LivenessProbe.PeriodSeconds)
+	}
+}
+
+func (s *activityWorkersDeploymentTemplateTest) TestWorkerLivenessOptOut() {
+	deployments := s.renderWorkers(activityEnabled(map[string]string{
+		"activitySettings.liveness.enabled": "false",
+	}))
+	for _, d := range deployments {
+		container := d.Spec.Template.Spec.Containers[0]
+		s.Nil(container.LivenessProbe, "%s", d.ObjectMeta.Name)
+		_, ok := envByName(container)["FIFTYONE_MQ_HEARTBEAT_FILE"]
+		s.False(ok, "%s must not set the heartbeat file when disabled", d.ObjectMeta.Name)
+	}
+}

@@ -22,6 +22,31 @@ activitySettings:
     tag: ""
     # -- Worker image pull policy. [Reference][image-pull-policy].
     pullPolicy: IfNotPresent
+  liveness:
+    # -- Controls whether the worker containers get a liveness probe. Each
+    # worker refreshes a heartbeat file every few seconds while its queue
+    # poll loop is making progress (fiftyone-mq 0.0.7+); the probe restarts a
+    # worker that is running but no longer draining, such as one left wedged
+    # on a dead connection after the queue Redis pod was replaced. The probe
+    # passes while the file does not exist, so older worker images are
+    # unaffected. [Reference][probes].
+    enabled: true
+    # -- Path of the heartbeat file, passed to the workers as
+    # `FIFTYONE_MQ_HEARTBEAT_FILE`. Must be writable by the container.
+    heartbeatFile: /tmp/fiftyone-mq-heartbeat
+    # -- Seconds since the last heartbeat after which a probe attempt fails.
+    # Keep it above the workers' own stall timeout
+    # (`FIFTYONE_MQ_WORKER_STALL_TIMEOUT_S`, 120 by default) so the worker
+    # normally exits on its own first.
+    maxHeartbeatAgeSeconds: 180
+    # -- Number of times to retry the liveness probe for the workers. [Reference][probes].
+    failureThreshold: 3
+    # -- Seconds to wait before the first liveness probe for the workers. [Reference][probes].
+    initialDelaySeconds: 30
+    # -- How often (in seconds) to perform the liveness probe for the workers. [Reference][probes].
+    periodSeconds: 30
+    # -- Number of seconds after which the liveness probe times out for the workers. [Reference][probes].
+    timeoutSeconds: 5
   mongo:
     # -- Database holding the activity_* collections. When empty, they are
     # co-located in the per-deployment FiftyOne database. Set a name to use a
@@ -1266,7 +1291,7 @@ fiftyoneMq:
       # queued jobs.
       url: ""
     # -- Redis image for the bundled queue backend.
-    image: redis:7-alpine
+    image: redis:8-alpine
     # -- Memory limit for the bundled Redis.
     maxmemory: 200mb
     persistence:
@@ -1646,8 +1671,8 @@ teamsAppSettings:
     # -- When `false`, disables media export options
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
-    # install modal (i.e. `pip install ... fiftyone==2.25.0`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.25.0
+    # install modal (i.e. `pip install ... fiftyone==2.25.2`).
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.25.2
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
@@ -1863,7 +1888,7 @@ telemetry:
     create: true
   redis:
     # -- Container image for the telemetry Redis Deployment.
-    image: redis:7-alpine
+    image: redis:8-alpine
     persistence:
       # -- Whether to provision a `PersistentVolumeClaim` for the bundled
       # telemetry Redis. Defaults to `false` (emptyDir) so the chart installs
@@ -1893,9 +1918,10 @@ telemetry:
       limits:
         cpu: 250m
         memory: 512Mi
-    # -- Pod-level security attributes for the telemetry Redis. UID/GID 999
-    # matches the `redis` user in the `redis:7-alpine` image; `fsGroup` keeps
-    # the mounted `/data` volume group-writable. [Reference][security-context].
+    # -- Pod-level security attributes for the telemetry Redis. UID 999
+    # matches the `redis` user in the `redis:8-alpine` image (whose primary
+    # GID is 1000); `runAsGroup` and `fsGroup` set GID 999 so the mounted
+    # `/data` volume is group-writable. [Reference][security-context].
     podSecurityContext:
       runAsNonRoot: true
       runAsUser: 999

@@ -509,10 +509,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "30"
           },
           {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
             "value": "30"
           },
@@ -629,10 +625,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
             "value": "30"
-          },
-          {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
           },
           {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
@@ -767,10 +759,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "30"
           },
           {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
             "value": "30"
           },
@@ -900,10 +888,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "30"
           },
           {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
             "value": "30"
           },
@@ -1019,10 +1003,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
           {
             "name": "FIFTYONE_DO_EXPIRATION_MINUTES",
             "value": "30"
-          },
-          {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
           },
           {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
@@ -1142,10 +1122,6 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
             "value": "30"
           },
           {
-            "name": "FIFTYONE_DO_LEGACY_EXPIRATION_MINUTES",
-            "value": ""
-          },
-          {
             "name": "FIFTYONE_DO_REQUEUE_DELAY_MINUTES",
             "value": "30"
           },
@@ -1193,7 +1169,7 @@ func (s *deploymentApiTemplateTest) TestContainerEnv() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(disableDefaultServiceOrchestrators(testCase.values))}
+			options := &helm.Options{SetValues: disableActivity(disableTelemetry(disableDefaultServiceOrchestrators(testCase.values)))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
