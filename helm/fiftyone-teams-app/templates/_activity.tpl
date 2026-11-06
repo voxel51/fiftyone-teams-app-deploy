@@ -71,53 +71,6 @@ URL is only how the queue is reached once enabled.
 {{- end }}
 
 {{/*
-Emit a `VFF_WF_METRIC` env entry for the teams-app container, turning on the
-annotation workflow Metrics tab whenever Activity Core is capturing the data
-it reads.
-
-Renders nothing when `teamsAppSettings.env` already carries the key, so an
-explicit value there — including `false` — is the only entry in the
-container. That is what makes the coupling safe: an earlier attempt coupled
-`VFF_WF_ACTIVITY` unconditionally and was reverted because the only way to
-force it back off was a second `teamsAppSettings.env` entry, and a duplicate
-env name is not a supported override (the API server warns under client-side
-apply and rejects the Deployment under server-side apply).
-
-*/}}
-{{- define "activity.metrics-ui-env" -}}
-{{- if and .Values.activitySettings.enabled (not (hasKey .Values.teamsAppSettings.env "VFF_WF_METRIC")) }}
-- name: VFF_WF_METRIC
-  value: "true"
-{{- end }}
-{{- end }}
-
-{{/*
-Emit a `VFF_WF_ACTIVITY` env entry for the teams-app container, turning on the
-dataset Activity tab and the sample/label history panel whenever Activity
-Core is capturing what they read.
-
-Guarded exactly like `VFF_WF_METRIC` above, and for the reason that comment
-records: an earlier attempt coupled this flag UNCONDITIONALLY and had to be
-reverted, because the only way to force it back off was a second
-`teamsAppSettings.env` entry, and a duplicate env name is not an override --
-the API server warns under client-side apply and rejects the Deployment under
-server-side apply. With the `hasKey` guard an explicit value there, including
-`false`, is the only entry in the container.
-
-Why it is now on with capture rather than an opt-in: the surfaces it reveals
-are the product answer to "what happened to this dataset", and a deployment
-that records history while hiding every way to read it is the more surprising
-default. On a standalone `mongod` the pages still render -- they show the
-capture banner, which is the honest answer rather than an empty page.
-*/}}
-{{- define "activity.activity-ui-env" -}}
-{{- if and .Values.activitySettings.enabled (not (hasKey .Values.teamsAppSettings.env "VFF_WF_ACTIVITY")) }}
-- name: VFF_WF_ACTIVITY
-  value: "true"
-{{- end }}
-{{- end }}
-
-{{/*
 Emit a `FIFTYONE_ACTIVITY_MONGO_DB` env entry for a main workload container.
 Renders empty when Activity Core is disabled OR when no dedicated
 database is configured, allowing safe inclusion from env-vars-list helpers.

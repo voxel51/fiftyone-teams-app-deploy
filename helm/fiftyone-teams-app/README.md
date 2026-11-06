@@ -38,8 +38,8 @@ built on it read — annotation metrics, the Audit Log, the Jobs pages, and
 more to come.
 
 Activity Core is on by default. The chart renders the activity workers and
-a queue Redis, tells the existing workloads to emit, and turns on the
-annotation Metrics tab (`VFF_WF_METRIC`). To turn it off, set both
+a queue Redis, and tells the existing workloads to emit. To turn it off,
+set both
 `activitySettings.enabled` (the producer env and worker `Deployment`s) and
 `fiftyoneMq.enabled` (the queue Redis carrying events between them) to
 `false`. Turning off only the queue fails the render.
@@ -833,7 +833,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| activitySettings.enabled | bool | `true` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. On by default: the Audit Log, the Jobs pages, and the annotation Metrics tab all read what it records. While enabled, teams-app also gets `VFF_WF_METRIC=true` unless `teamsAppSettings.env.VFF_WF_METRIC` is set explicitly. To turn Activity Core off, set both this and `fiftyoneMq.enabled` to `false`; the chart fails the render if this is on and the queue is off. |
+| activitySettings.enabled | bool | `true` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. On by default: the Audit Log, the Jobs pages, and the annotation Metrics tab all read what it records. To turn Activity Core off, set both this and `fiftyoneMq.enabled` to `false`; the chart fails the render if this is on and the queue is off. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
 | activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |
@@ -847,7 +847,6 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
 | activitySettings.orgId | string | `""` | Organization that the deployment-wide rollups are attributed to. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Leave empty: a single-org deployment is discovered automatically. Set it only when the deployment holds several organizations, where the deployment-wide counts cannot be attributed to one of them — the workers log which one to name. |
 | activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
-| activitySettings.snapshotIntervalMs | string | `""` | Snapshot interval in milliseconds. Defaults to hourly, matching the bucket the state metrics roll up by. |
 | activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
 | activitySettings.workers.ingest.replicaCount | int | `2` | Number of ingest worker replicas. |
 | activitySettings.workers.prune.command | list | `["fiftyone-activity-prune-worker"]` | Entrypoint for the prune worker, which enforces the event store size cap. Without it only the time-based TTL applies. |
@@ -857,9 +856,6 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.workers.rollup.command | list | `["fiftyone-activity-rollup-worker"]` | Entrypoint for the rollup worker. |
 | activitySettings.workers.rollup.recreate | bool | `true` | Use the `Recreate` strategy. The rollup worker owns a repeatable schedule, so only one replica may reconcile it. |
 | activitySettings.workers.rollup.replicaCount | int | `1` | Number of rollup worker replicas. Keep at 1. |
-| activitySettings.workers.snapshot.command | list | `["fiftyone-activity-snapshot-worker"]` | Entrypoint for the snapshot worker. |
-| activitySettings.workers.snapshot.recreate | bool | `true` | Use the `Recreate` strategy. The snapshot worker owns a repeatable schedule, and two replicas would double-count a bucket. |
-| activitySettings.workers.snapshot.replicaCount | int | `1` | Number of snapshot worker replicas. Keep at 1. |
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
 | apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
 | apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api` to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators. |

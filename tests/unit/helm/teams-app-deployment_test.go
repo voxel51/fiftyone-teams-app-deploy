@@ -2582,9 +2582,8 @@ func (s *deploymentTeamsAppTemplateTest) teamsAppEnvValues(
 // VFF_WF_ACTIVITY -- so a render carrying it is a flag that silently does
 // nothing, which is worse than one that is plainly off.
 //
-// Whether VFF_WF_ACTIVITY itself is rendered is no longer pinned here: it now
-// follows capture, covered by TestActivityUIFlagDefaultsOn,
-// TestActivityUIFlagFollowsActivity and TestActivityUIFlagExplicitValueWins.
+// Whether VFF_WF_ACTIVITY itself is rendered is covered by
+// TestChartRendersNoUIFlags and TestActivityUIFlagExplicitValuePassesThrough.
 func (s *deploymentTeamsAppTemplateTest) TestActivityFlagIsNotMisspelled() {
 	for name, setValues := range map[string]map[string]string{
 		"default": {},
@@ -2604,86 +2603,39 @@ func (s *deploymentTeamsAppTemplateTest) TestActivityFlagIsNotMisspelled() {
 	}
 }
 
-// TestMetricsFlagDefaultsOn pins that the default render, where Activity Core
-// is on, turns on the Metrics tab with exactly one VFF_WF_METRIC entry.
-func (s *deploymentTeamsAppTemplateTest) TestMetricsFlagDefaultsOn() {
-	values := s.teamsAppEnvValues(map[string]string{}, "VFF_WF_METRIC")
-
-	s.Require().Len(values, 1, "expected exactly one VFF_WF_METRIC entry")
-	s.Equal("true", values[0])
-}
-
-// TestMetricsFlagFollowsActivity pins that turning Activity Core off also
-// drops the Metrics tab: there is no data behind it.
-func (s *deploymentTeamsAppTemplateTest) TestMetricsFlagFollowsActivity() {
-	values := s.teamsAppEnvValues(map[string]string{
-		"activitySettings.enabled": "false",
-		"fiftyoneMq.enabled":       "false",
-	}, "VFF_WF_METRIC")
-
-	s.Empty(values, "VFF_WF_METRIC must not render while Activity Core is off")
-}
-
-// TestMetricsFlagExplicitValueWins pins that an explicit
-// teamsAppSettings.env.VFF_WF_METRIC is the only entry, in both directions.
-// The chart-rendered default must step aside rather than add a duplicate env
-// name, which the API server rejects under server-side apply.
-func (s *deploymentTeamsAppTemplateTest) TestMetricsFlagExplicitValueWins() {
-	for _, explicit := range []string{"false", "true"} {
-		values := s.teamsAppEnvValues(map[string]string{
-			"teamsAppSettings.env.VFF_WF_METRIC": explicit,
-		}, "VFF_WF_METRIC")
-
-		s.Require().Len(
-			values, 1,
-			"explicit VFF_WF_METRIC=%s: expected exactly one entry (no chart-rendered duplicate)",
-			explicit,
-		)
-		s.Equal(explicit, values[0])
+// TestChartRendersNoUIFlags pins that the chart sets neither UI flag on
+// teams-app, with Activity Core on or off.
+//
+// VFF_WF_METRIC gates nothing from v2.26.0: the Metrics tab is always shown.
+// VFF_WF_ACTIVITY defaults on in the v2.26.0+ app code, so rendering it
+// "true" adds nothing there -- and against a v2.25.x image it would reveal
+// the workflow Activity debug tab and its raw event log, which were deleted
+// in v2.26.0. Leaving both unset is right for every image.
+func (s *deploymentTeamsAppTemplateTest) TestChartRendersNoUIFlags() {
+	for name, setValues := range map[string]map[string]string{
+		"default": {},
+		"activityOff": {
+			"activitySettings.enabled": "false",
+			"fiftyoneMq.enabled":       "false",
+		},
+	} {
+		for _, flag := range []string{"VFF_WF_METRIC", "VFF_WF_ACTIVITY"} {
+			s.Empty(
+				s.teamsAppEnvValues(setValues, flag),
+				"%s: the chart must not render %s", name, flag,
+			)
+		}
 	}
 }
 
-// TestActivityUIFlagDefaultsOn pins that the default render, where Activity
-// Core is on, also turns on the surfaces that read it -- the dataset Activity
-// tab and the sample history panel -- with exactly one VFF_WF_ACTIVITY
-// entry.
-func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagDefaultsOn() {
-	values := s.teamsAppEnvValues(map[string]string{}, "VFF_WF_ACTIVITY")
-
-	s.Require().Len(values, 1, "expected exactly one VFF_WF_ACTIVITY entry")
-	s.Equal("true", values[0])
-}
-
-// TestActivityUIFlagFollowsActivity pins that turning Activity Core off also
-// hides those surfaces: there is no history behind them.
-func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagFollowsActivity() {
+// TestActivityUIFlagExplicitValuePassesThrough pins that an explicit
+// teamsAppSettings.env.VFF_WF_ACTIVITY -- the documented way to hide the
+// dataset Activity tab -- renders as exactly one entry.
+func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagExplicitValuePassesThrough() {
 	values := s.teamsAppEnvValues(map[string]string{
-		"activitySettings.enabled": "false",
-		"fiftyoneMq.enabled":       "false",
+		"teamsAppSettings.env.VFF_WF_ACTIVITY": "false",
 	}, "VFF_WF_ACTIVITY")
 
-	s.Empty(values, "VFF_WF_ACTIVITY must not render while Activity Core is off")
-}
-
-// TestActivityUIFlagExplicitValueWins pins that an explicit
-// teamsAppSettings.env.VFF_WF_ACTIVITY is the only entry, in both directions.
-//
-// This is the case that reverted the first attempt at this default: coupling
-// the flag unconditionally left no way to force it back off except a second
-// env entry, and a duplicate env name is not an override -- the API server
-// warns under client-side apply and rejects the Deployment under server-side
-// apply.
-func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagExplicitValueWins() {
-	for _, explicit := range []string{"false", "true"} {
-		values := s.teamsAppEnvValues(map[string]string{
-			"teamsAppSettings.env.VFF_WF_ACTIVITY": explicit,
-		}, "VFF_WF_ACTIVITY")
-
-		s.Require().Len(
-			values, 1,
-			"explicit VFF_WF_ACTIVITY=%s: expected exactly one entry (no chart-rendered duplicate)",
-			explicit,
-		)
-		s.Equal(explicit, values[0])
-	}
+	s.Require().Len(values, 1, "expected exactly one VFF_WF_ACTIVITY entry")
+	s.Equal("false", values[0])
 }

@@ -135,14 +135,10 @@ versions an upgrade with no values changes renders:
 
 - `FIFTYONE_ACTIVITY_ENABLED=true` on the producer workloads (`teams-api`,
   `fiftyone-app`, `teams-plugins`, and the delegated operators)
-- one worker `Deployment` per activity worker (ingest, rollup, snapshot,
-  and prune)
+- one worker `Deployment` per activity worker (ingest, rollup, and
+  prune)
 - the queue Redis `Deployment`, `Service`, and `PersistentVolumeClaim`,
   plus `FIFTYONE_MQ_REDIS_URL` on the workloads that reach it
-- `VFF_WF_METRIC=true` on `teams-app`, which shows the annotation
-  Metrics tab
-- `VFF_WF_ACTIVITY=true` on `teams-app`, which shows the dataset
-  Activity tab and the sample history panel
 
 Activity data accumulates from the upgrade onward; earlier activity is not
 backfilled.
@@ -160,14 +156,17 @@ fiftyoneMq:
 Turning off only `fiftyoneMq.enabled` fails the render rather than
 installing producers and workers that silently record nothing.
 
-To keep Activity Core but hide a surface, set
-`teamsAppSettings.env.VFF_WF_METRIC: false` or
-`teamsAppSettings.env.VFF_WF_ACTIVITY: false`. An explicit value there
-replaces the chart's default rather than adding a second entry.
+To keep Activity Core but hide the dataset Activity tab and the sample
+history panel, set `VFF_WF_ACTIVITY: false` under both
+`teamsAppSettings.env` and `appSettings.env`; see
+[Viewing the data](./configuring-activity-core.md#viewing-the-data).
 
-The annotation Metrics tab is gated separately by the `VFF_WF_METRIC`
-app flag. Set it under `teamsAppSettings.env` alongside the pair above;
-see [Viewing the data](./configuring-activity-core.md#viewing-the-data).
+The snapshot worker is gone; `teams-api` now records the deployment
+state it used to. Remove `activitySettings.workers.snapshot` and
+`activitySettings.snapshotIntervalMs` from your values file. The chart
+renders one `Deployment` per `activitySettings.workers` entry, so a
+leftover `snapshot` entry still renders a worker whose entrypoint no
+longer exists.
 
 **Cluster requirements:**
 

@@ -625,8 +625,6 @@ Create a merged list of environment variables for fiftyone-teams-app
 {{- end }}
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
-{{- include "activity.metrics-ui-env" . }}
-{{- include "activity.activity-ui-env" . }}
 {{- range $key, $val := .Values.teamsAppSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

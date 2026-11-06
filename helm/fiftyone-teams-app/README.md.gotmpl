@@ -38,8 +38,8 @@ built on it read — annotation metrics, the Audit Log, the Jobs pages, and
 more to come.
 
 Activity Core is on by default. The chart renders the activity workers and
-a queue Redis, tells the existing workloads to emit, and turns on the
-annotation Metrics tab (`VFF_WF_METRIC`). To turn it off, set both
+a queue Redis, and tells the existing workloads to emit. To turn it off,
+set both
 `activitySettings.enabled` (the producer env and worker `Deployment`s) and
 `fiftyoneMq.enabled` (the queue Redis carrying events between them) to
 `false`. Turning off only the queue fails the render.

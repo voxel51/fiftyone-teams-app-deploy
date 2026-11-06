@@ -165,29 +165,20 @@ request.
 ## Viewing the data
 
 The Audit Log and the Jobs pages appear whenever Activity Core is
-enabled.
-
-The annotation workflow Metrics tab is behind `VFF_WF_METRIC` on
-`teams-app`. While `activitySettings.enabled` is true the chart sets it to
-`true`, unless `teamsAppSettings.env` already carries the key. An explicit
-value there, including `false`, is the only entry rendered:
-
-```yaml
-teamsAppSettings:
-  env:
-    # hide the Metrics tab while keeping Activity Core
-    VFF_WF_METRIC: false
-```
+enabled. The annotation workflow Metrics tab is always shown; it has no
+flag of its own.
 
 The dataset **Activity** tab and the sample and label history panel are
-behind `VFF_WF_ACTIVITY`, which follows
-Activity Core the same way: rendered `true` while capture is on, unless
-`teamsAppSettings.env` already carries the key.
+on by default. To keep recording history but hide them, set
+`VFF_WF_ACTIVITY` to `false` on both `teams-app` (the tab) and
+`fiftyone-app` (the panel):
 
 ```yaml
 teamsAppSettings:
   env:
-    # keep recording history, but hide every way to read it
+    VFF_WF_ACTIVITY: false
+appSettings:
+  env:
     VFF_WF_ACTIVITY: false
 ```
 
@@ -205,7 +196,7 @@ The bundled queue Redis adds one more pod, with `maxmemory` defaulting
 to `200mb` (`fiftyoneMq.redis.maxmemory`). Raise it if the queue backs
 up under load.
 
-Do not scale the rollup, snapshot, or prune workers above one replica.
+Do not scale the rollup or prune workers above one replica.
 Their schedulers are single-flight and hold no cross-pod lock, so a
-second replica produces duplicate rollup and snapshot writes and lets
-two prune passes compete over the same records.
+second replica produces duplicate rollup writes and lets two prune
+passes compete over the same records.

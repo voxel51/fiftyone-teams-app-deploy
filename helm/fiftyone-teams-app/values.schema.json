@@ -6,7 +6,7 @@
       "properties": {
         "enabled": {
           "default": true,
-          "description": "Controls whether the Activity Core worker Deployments are rendered and\nwhether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit. On by default: the Audit\nLog, the Jobs pages, and the annotation Metrics tab all read what it\nrecords. While enabled, teams-app also gets `VFF_WF_METRIC=true` and\n`VFF_WF_ACTIVITY=true` unless the matching `teamsAppSettings.env` key is\nset explicitly, showing the Metrics tab and the Activity tab plus the\nsample history panel respectively. To turn Activity\nCore off, set both this and `fiftyoneMq.enabled` to `false`; the chart\nfails the render if this is on and the queue is off.",
+          "description": "Controls whether the Activity Core worker Deployments are rendered and\nwhether the producer workloads (teams-api, fiftyone-app, teams-plugins,\nand the delegated operators) are told to emit. On by default: the Audit\nLog, the Jobs pages, and the annotation Metrics tab all read what it\nrecords. To turn Activity Core off, set both this and\n`fiftyoneMq.enabled` to `false`; the chart fails the render if this is\non and the queue is off.",
           "title": "enabled",
           "type": "boolean"
         },
@@ -145,12 +145,6 @@
           "title": "resources",
           "type": "object"
         },
-        "snapshotIntervalMs": {
-          "default": "",
-          "description": "Snapshot interval in milliseconds. Defaults to hourly, matching the\nbucket the state metrics roll up by.",
-          "title": "snapshotIntervalMs",
-          "type": "string"
-        },
         "workers": {
           "description": "One Deployment is rendered per entry.",
           "properties": {
@@ -248,38 +242,6 @@
               },
               "required": [],
               "title": "rollup",
-              "type": "object"
-            },
-            "snapshot": {
-              "properties": {
-                "command": {
-                  "description": "Entrypoint for the snapshot worker.",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      }
-                    ],
-                    "required": []
-                  },
-                  "title": "command",
-                  "type": "array"
-                },
-                "recreate": {
-                  "default": true,
-                  "description": "Use the `Recreate` strategy. The snapshot worker owns a repeatable\nschedule, and two replicas would double-count a bucket.",
-                  "title": "recreate",
-                  "type": "boolean"
-                },
-                "replicaCount": {
-                  "default": 1,
-                  "description": "Number of snapshot worker replicas. Keep at 1.",
-                  "title": "replicaCount",
-                  "type": "integer"
-                }
-              },
-              "required": [],
-              "title": "snapshot",
               "type": "object"
             }
           },

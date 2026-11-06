@@ -112,13 +112,6 @@ services:
       RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED: false
       FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED: ${FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED:-true}
       FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS: docker
-      # Annotation workflow Metrics tab, which reads the Activity Analytics
-      # rollups. On by default; set VFF_WF_METRIC=false in .env to hide it.
-      VFF_WF_METRIC: ${VFF_WF_METRIC:-true}
-      # The dataset Activity tab and the sample history panel, which read
-      # the same events. On by default; set VFF_WF_ACTIVITY=false in .env
-      # to hide them.
-      VFF_WF_ACTIVITY: ${VFF_WF_ACTIVITY:-true}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your
@@ -249,10 +242,10 @@ services:
     volumes:
       - fiftyone-mq-redis-data:/data
 
-  # One container runs all four activity workers (ingest, rollup, snapshot,
-  # prune) via the combined entrypoint.
+  # One container runs all three activity workers (ingest, rollup, prune)
+  # via the combined entrypoint.
   # Keep this service at one replica.
-  # The rollup, snapshot, and prune schedulers are single-flight.
+  # The rollup and prune schedulers are single-flight.
   # See docker/docs/configuring-activity-analytics.md.
   activity-worker-common:
     # Published from the fiftyone-activity repo with each Enterprise release.
@@ -260,16 +253,16 @@ services:
     image: voxel51/fiftyone-activity:v2.25.2
     command: ["fiftyone-activity-worker"]
     environment:
-      # The rollup and snapshot workers emit derived events through the
-      # same flag-gated path they consume, so they read the same gate.
+      # The rollup worker emits derived events through the same
+      # flag-gated path it consumes, so it reads the same gate.
       FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
       FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
       FIFTYONE_ACTIVITY_MONGO_URI: ${FIFTYONE_DATABASE_URI}
       # Co-locate the activity_* collections in the deployment's own
       # FiftyOne database rather than a fixed shared name.
       FIFTYONE_ACTIVITY_MONGO_DB: ${FIFTYONE_DATABASE_NAME}
-      # The snapshot worker reads the datasets database.
-      # It stamps its org onto the snapshot events. Rollups are tenant-scoped.
+      # The datasets database, which the workers read dataset collections
+      # from. It can differ from FIFTYONE_ACTIVITY_MONGO_DB.
       FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       # Raw events are kept 365 days by default. Rollups are kept indefinitely.

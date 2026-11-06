@@ -8,12 +8,9 @@ activitySettings:
   # whether the producer workloads (teams-api, fiftyone-app, teams-plugins,
   # and the delegated operators) are told to emit. On by default: the Audit
   # Log, the Jobs pages, and the annotation Metrics tab all read what it
-  # records. While enabled, teams-app also gets `VFF_WF_METRIC=true` and
-  # `VFF_WF_ACTIVITY=true` unless the matching `teamsAppSettings.env` key is
-  # set explicitly, which shows the Metrics tab and the Activity tab plus
-  # the sample history panel respectively. To turn Activity
-  # Core off, set both this and `fiftyoneMq.enabled` to `false`; the chart
-  # fails the render if this is on and the queue is off.
+  # records. To turn Activity Core off, set both this and
+  # `fiftyoneMq.enabled` to `false`; the chart fails the render if this is
+  # on and the queue is off.
   enabled: true
   image:
     # -- Worker image.
@@ -67,9 +64,6 @@ activitySettings:
     limits:
       cpu: 500m
       memory: 512Mi
-  # -- Snapshot interval in milliseconds. Defaults to hourly, matching the
-  # bucket the state metrics roll up by.
-  snapshotIntervalMs: ""
   # One Deployment is rendered per entry.
   workers:
     ingest:
@@ -98,14 +92,6 @@ activitySettings:
       replicaCount: 1
       # -- Use the `Recreate` strategy. The rollup worker owns a repeatable
       # schedule, so only one replica may reconcile it.
-      recreate: true
-    snapshot:
-      # -- Entrypoint for the snapshot worker.
-      command: ["fiftyone-activity-snapshot-worker"]
-      # -- Number of snapshot worker replicas. Keep at 1.
-      replicaCount: 1
-      # -- Use the `Recreate` strategy. The snapshot worker owns a repeatable
-      # schedule, and two replicas would double-count a bucket.
       recreate: true
 
 # yaml-language-server: $schema=values.schema.json
