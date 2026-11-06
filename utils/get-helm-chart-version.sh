@@ -10,22 +10,19 @@ set -o pipefail
 set -eu
 
 version=""
-chart_ver=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Note: Sending echos to STDERR so that users can easily use
 # the STDOUT for other, more interesting automations.
 if [[ ${CURRENT_BRANCH} == "main" ]]; then
-  # Get the most recent <x.x.x> version from GAR
-  pattern="${chart_ver}"
-  echo "Look for version \"${pattern}\" in us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env" >&2
+  # main carries the version in flight, so take the newest released
+  # <x.x.x> chart from GAR rather than the Chart.yaml version.
+  echo "Look for the newest released version in us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env" >&2
   version=$(gcloud artifacts docker images list \
     us-central1-docker.pkg.dev/computer-vision-team/helm-internal/internal-env \
     --include-tags \
-    --format="value(tags)" \
-    --filter="tags:${pattern}" \
-    --sort-by createTime | grep -E '[0-9]+\.[0-9]+\.[0-9]+$$' | tail -1)
+    --format="value(tags)" | tr ';' '\n' | grep -Ex '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1)
 else
   # Look for the .*-<sha> in GAR.
   # Handles both x.x.x-sha-<sha> and x.x.x-rc-<sha> formats
