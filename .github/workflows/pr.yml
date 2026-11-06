@@ -6,7 +6,6 @@ on:
     branches: # Target Branches
       - main
       - release/*
-      - release-next
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
