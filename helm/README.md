@@ -176,7 +176,6 @@ Edit your `values.yaml` file (see the example
   [Step 2](#closed_lock_with_key-step-2-prepare-license-file)
 - `secret.fiftyone.mongodbConnectionString` — the MongoDB connection URI from
   [Step 1](#wrench-step-1-set-up-mongodb-database)
-- `secret.fiftyone.cookieSecret` — a randomly generated string
 - `secret.fiftyone.encryptionKey` — used to encrypt storage credentials.
   See
   [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](./fiftyone-teams-app/README.md#storage-credentials-and-fiftyone_encryption_key)

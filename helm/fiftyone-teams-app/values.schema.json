@@ -3751,12 +3751,6 @@
         },
         "fiftyone": {
           "properties": {
-            "cookieSecret": {
-              "default": "",
-              "description": "A randomly generated string for cookie encryption.\nTo generate, run `openssl rand -hex 32`.",
-              "title": "cookieSecret",
-              "type": "string"
-            },
             "encryptionKey": {
               "default": "",
               "description": "Encryption key for storage credentials. [Reference][fiftyone-encryption-key].",
