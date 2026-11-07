@@ -43,7 +43,7 @@ jobs:
         shell: bash
         run: |
           make test-unit-compose
-  integration-compose-internal:
+  integration-compose:
     permissions:
       contents: read
       id-token: write
@@ -101,7 +101,7 @@ jobs:
           filename: 'internal-license.key'
           is-executable: false
           working-directory: './docker'
-      - name: Run compose integration tests for internal
+      - name: Run compose integration tests
         shell: bash
         run: |
-          make test-integration-compose-internal
+          make test-integration-compose

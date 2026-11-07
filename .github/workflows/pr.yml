@@ -27,8 +27,9 @@ jobs:
           filters: |
             docker-unit:
               - '.github/workflows/test-docker.yml'
-              - 'docker/common-services.yaml'
-              - 'docker/internal-auth/**'
+              - 'docker/*.yaml'
+              - 'docker/env.template'
+              - 'docker/migrate-volumes.sh'
               - 'tests/fixtures/docker/**'
               - 'tests/integration/compose/**'
               - 'tests/unit/compose/**'

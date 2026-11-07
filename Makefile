@@ -164,7 +164,7 @@ helm-repo-update:  ## updates the helm repos for the project
 clean: clean-unit-compose clean-unit-helm clean-integration-compose clean-integration-helm  ## delete all test output and reports
 
 clean-integration-compose:  ## delete docker compose integration test output and reports
-	rm -rf tests/integration/compose/test_output_internal || true
+	rm -rf tests/integration/compose/test_output || true
 	rm tests/integration/compose/test_output*.log || true
 
 clean-integration-helm:  ## delete helm integration test output and reports
@@ -222,19 +222,15 @@ test-unit-helm-interleaved: install-terratest-log-parser  ## run go test on the 
 	go test -count=1 -timeout=10m -v -tags unit | tee test_output.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
 
-test-integration-compose: test-integration-compose-internal ## run go test on the tests/integration/compose directory
-
-test-integration-compose-internal: copy-license-files-docker ## run go test on the tests/integration/compose directory for internal auth mode
+test-integration-compose: copy-license-files-docker ## run go test on the tests/integration/compose directory
 	@cd tests/integration/compose; \
-	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth
+	go test -count=1 -timeout=15m -v -tags integrationCompose
 
-test-integration-compose-interleaved:  test-integration-compose-interleaved-internal  ## run go test on the tests/integration/compose directory and run the terratest_log_parser for reports
-
-test-integration-compose-interleaved-internal: install-terratest-log-parser copy-license-files-docker clean-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode and run the terratest_log_parser for reports
+test-integration-compose-interleaved: install-terratest-log-parser copy-license-files-docker clean-integration-compose ## run go test on the tests/integration/compose directory and run the terratest_log_parser for reports
 	@cd tests/integration/compose; \
-	rm -rf test_output_internal/*; \
-	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth | tee test_output_internal.log; \
-	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
+	rm -rf test_output/*; \
+	go test -count=1 -timeout=15m -v -tags integrationCompose | tee test_output.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
 
 test-integration-helm-ci: ## set context, install mongodb, and run go test on the tests/integration/helm directory with topology constraints
 	@CLST=$(shell gcloud container clusters list --filter="name : voxel51-ephemeral-test-*" --format="get(name)"); \

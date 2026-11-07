@@ -1,5 +1,5 @@
-//go:build docker || compose || integration || integrationComposeInternalAuth
-// +build docker compose integration integrationComposeInternalAuth
+//go:build docker || compose || integration || integrationCompose
+// +build docker compose integration integrationCompose
 
 package integration
 
@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	internalAuthFixtureEnvFilePath = "../../fixtures/docker/integration_internal_auth.env"
-	overrideFile                   = "../../tests/fixtures/docker/compose.override.yaml"
-	mongodbComposeFile             = "../../tests/fixtures/docker/compose.override.mongodb.yaml"
-	mongodbComposeFilePlugins      = "../../tests/fixtures/docker/compose.override.mongodb_plugins.yaml"
-	mongodbComposeFileDO           = "../../tests/fixtures/docker/compose.override.mongodb_do.yaml"
+	fixtureEnvFilePath        = "../../fixtures/docker/integration.env"
+	overrideFile              = "../tests/fixtures/docker/compose.override.yaml"
+	mongodbComposeFile        = "../tests/fixtures/docker/compose.override.mongodb.yaml"
+	mongodbComposeFilePlugins = "../tests/fixtures/docker/compose.override.mongodb_plugins.yaml"
+	mongodbComposeFileDO      = "../tests/fixtures/docker/compose.override.mongodb_do.yaml"
 )
 
 type serviceValidations struct {
