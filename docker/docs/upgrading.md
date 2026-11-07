@@ -159,8 +159,8 @@ To upgrade:
 1. Get the v2.26 files.
 1. Copy your `compose.override.yaml` and `.env` files into the `docker`
    directory, then `cd` into it.
-1. In the `.env` and `compose.override.yaml` files, update relative paths,
-   such as `LOCAL_LICENSE_FILE_DIR` and bind mount sources,
+1. In the `.env` and `compose.override.yaml` files, update relative paths
+   (such as `LOCAL_LICENSE_FILE_DIR` and bind mount sources)
    so they work from the `docker` directory.
    Compose resolves them from the `docker` directory now,
    and it creates an empty directory for a bind mount source that's missing.
@@ -206,6 +206,7 @@ To upgrade:
    ```
 
    Check that the output has the services and settings you expect.
+
 1. Pull the v2.26 images with the same `-f` options and `pull`.
    On air-gapped hosts, load the images instead.
 1. Copy your plugins into the new project.

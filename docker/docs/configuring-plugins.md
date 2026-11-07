@@ -24,52 +24,49 @@ Plugins run in the `fiftyone-app` service.
 To enable this mode
 
 1. Add the file
-[compose.plugins.yaml](../compose.plugins.yaml)
-after
-[compose.yaml](../compose.yaml)
-in your `docker compose` command to create a new Docker Volume shared
-between FiftyOne Enterprise services.
+   [compose.plugins.yaml](../compose.plugins.yaml)
+   after
+   [compose.yaml](../compose.yaml)
+   in your `docker compose` command to create a new Docker Volume shared
+   between FiftyOne Enterprise services.
 
-Example `docker compose` command for this mode from the `docker` directory
+   Example `docker compose` command for this mode from the `docker` directory
 
-```shell
-docker compose \
-  -f compose.yaml \
-  -f compose.plugins.yaml \
-  -f compose.override.yaml \
-  up -d
-```
+    ```shell
+    docker compose \
+      -f compose.yaml \
+      -f compose.plugins.yaml \
+      -f compose.override.yaml \
+      up -d
+    ```
 
 ## Dedicated Plugins
 
 Plugins run in the `teams-plugins` service.
 To enable this mode
 
-1. make sure `FIFTYONE_TEAMS_PLUGIN_URL` is set in your `.env`
-file
-
+1. Set `FIFTYONE_TEAMS_PLUGIN_URL` in your `.env` file
     - `FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151`
 
 1. Add the file
-[compose.dedicated-plugins.yaml](../compose.dedicated-plugins.yaml)
-after
-[compose.yaml](../compose.yaml)
-in your `docker compose` command to create a new Docker Volume shared
-between FiftyOne Enterprise services.
+   [compose.dedicated-plugins.yaml](../compose.dedicated-plugins.yaml)
+   after
+   [compose.yaml](../compose.yaml)
+   in your `docker compose` command to create a new Docker Volume shared
+   between FiftyOne Enterprise services.
 
 1. If you are
-  [using a proxy](./configuring-proxies.md),
-  add the `teams-plugins` service name to your environment variables
-
+   [using a proxy](./configuring-proxies.md),
+   add the `teams-plugins` service name to your environment variables
     - `no_proxy`
     - `NO_PROXY`
 
-Example `docker compose` command for this mode from the `docker` directory
+   Example `docker compose` command for this mode from the `docker` directory
 
-```shell
-docker compose \
-  -f compose.yaml \
-  -f compose.dedicated-plugins.yaml \
-  -f compose.override.yaml \
-  up -d
-```
+    ```shell
+    docker compose \
+      -f compose.yaml \
+      -f compose.dedicated-plugins.yaml \
+      -f compose.override.yaml \
+      up -d
+    ```
