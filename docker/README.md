@@ -179,10 +179,9 @@ chmod 644 "${LOCAL_LICENSE_FILE_DIR}/license"
 
 ### 1. Copy the template `.env` file
 
-From the `docker` directory, `cd` into `internal-auth` and copy the template:
+From the `docker` directory, copy the template:
 
 ```bash
-cd internal-auth
 cp env.template .env
 ```
 
@@ -251,7 +250,8 @@ services:
 
 > [!NOTE]
 > Default images and versions for all services are defined in
-> `common-services.yaml`. To override an image or version,
+> `compose.yaml` and the overlay files next to it.
+> To override an image or version,
 > set the value in `compose.override.yaml`. For example, instead of using
 > the `fiftyone-app` image, you may instead the `fiftyone-app-gpt` image.
 > Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
@@ -283,6 +283,7 @@ enabling scalable and reliable long-running operations.
 
 ```shell
 docker compose \
+  -f compose.yaml \
   -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.override.yaml \
@@ -419,7 +420,7 @@ FiftyOne.
    - `CAS_DEBUG`
    - `CAS_DEFAULT_USER_ROLE`
 1. Update `compose.override.yaml` with any needed `teams-cas` service changes.
-1. Use `docker compose` from within the `internal-auth` directory
+1. Use `docker compose` from the `docker` directory
    to bring up services.
 1. Ensure your proxy (e.g., nginx) forwards `/cas` to the CAS service port.
 
@@ -529,6 +530,7 @@ The recommended upgrade path is:
 
    ```shell
    docker compose \
+     -f compose.yaml \
      -f compose.dedicated-plugins.yaml \
      -f compose.delegated-operators.yaml \
      -f compose.override.yaml \
@@ -539,6 +541,7 @@ The recommended upgrade path is:
 
    ```shell
    docker compose \
+     -f compose.yaml \
      -f compose.dedicated-plugins.yaml \
      -f compose.delegated-operators.yaml \
      -f compose.override.yaml \
@@ -625,13 +628,13 @@ for full details.
 
 ### Activity Analytics
 
-Activity Analytics is on by default. Every base compose file runs an
+Activity Analytics is on by default. `compose.yaml` runs an
 activity worker and a queue Redis, and the Audit Log, the Jobs pages, and
 the annotation Metrics tab in teams-app are built from the activity events
 those services record.
 
-`compose.activity.yaml` is deprecated and now empty; you can drop it from
-your `-f` set.
+FiftyOne Enterprise v2.26 removes `compose.activity.yaml`.
+Remove it from your `-f` set.
 
 Please refer to the
 [Activity Analytics configuration documentation](./docs/configuring-activity-analytics.md)
@@ -665,12 +668,12 @@ Examples:
 
 ```yaml
 services:
-  teams-app-common:
+  teams-app:
     environment:
       FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
       FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
       FIFTYONE_APP_BANNER_TEXT: "Internal Deployment"
-  teams-cas-common:
+  teams-cas:
     environment:
       FIFTYONE_APP_BANNER_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
       FIFTYONE_APP_BANNER_TEXT_COLOR: `green | rgb(34,139,34") | '#f1f1f1'`
@@ -728,7 +731,7 @@ Examples:
 
 ```yaml
 services:
-  teams-app-common:
+  teams-app:
     environment:
       FIFTYONE_APP_TERMS_URL: https://abc.com/tos
       FIFTYONE_APP_PRIVACY_URL: https://abc.com/privacy

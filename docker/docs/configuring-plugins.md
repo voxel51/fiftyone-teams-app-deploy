@@ -23,17 +23,18 @@ Enabled by default. No additional configurations are required.
 Plugins run in the `fiftyone-app` service.
 To enable this mode
 
-1. Use the file
-[internal-auth/compose.plugins.yaml](../internal-auth/compose.plugins.yaml)
-instead of
-[internal-auth/compose.yaml](../internal-auth/compose.yaml)
-as part of your `docker compose` command to create a new Docker Volume shared
+1. Add the file
+[compose.plugins.yaml](../compose.plugins.yaml)
+after
+[compose.yaml](../compose.yaml)
+in your `docker compose` command to create a new Docker Volume shared
 between FiftyOne Enterprise services.
 
-Example `docker compose` command for this mode from the `internal-auth` directory
+Example `docker compose` command for this mode from the `docker` directory
 
 ```shell
 docker compose \
+  -f compose.yaml \
   -f compose.plugins.yaml \
   -f compose.override.yaml \
   up -d
@@ -49,11 +50,11 @@ file
 
     - `FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151`
 
-1. Use the file
-[internal-auth/compose.dedicated-plugins.yaml](../internal-auth/compose.dedicated-plugins.yaml)
-instead of
-[internal-auth/compose.yaml](../internal-auth/compose.yaml).
-as part of your `docker comppse` command to create a new Docker Volume shared
+1. Add the file
+[compose.dedicated-plugins.yaml](../compose.dedicated-plugins.yaml)
+after
+[compose.yaml](../compose.yaml)
+in your `docker compose` command to create a new Docker Volume shared
 between FiftyOne Enterprise services.
 
 1. If you are
@@ -63,10 +64,11 @@ between FiftyOne Enterprise services.
     - `no_proxy`
     - `NO_PROXY`
 
-Example `docker compose` command for this mode from the `internal-auth` directory
+Example `docker compose` command for this mode from the `docker` directory
 
 ```shell
 docker compose \
+  -f compose.yaml \
   -f compose.dedicated-plugins.yaml \
   -f compose.override.yaml \
   up -d

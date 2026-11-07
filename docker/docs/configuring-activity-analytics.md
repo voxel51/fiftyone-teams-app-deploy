@@ -59,14 +59,12 @@ One `activity-worker` container runs three workers via the combined
 ## Compose files
 
 `fiftyone-mq-redis` and `activity-worker` are defined in `compose.yaml`,
-`compose.plugins.yaml`, and `compose.dedicated-plugins.yaml`, so your usual
-`-f` set starts them with no extra flags. `activity-worker` declares
+so your usual `-f` set starts them with no extra flags. `activity-worker` declares
 `depends_on: fiftyone-mq-redis`. The delegated-operator and GPU overlays
 need nothing extra.
 
-`compose.activity.yaml` is deprecated. It used to carry the two services
-and is now empty, so keeping it in your `-f` set changes nothing. It will
-be removed in a future release.
+FiftyOne Enterprise v2.26 removes `compose.activity.yaml`.
+Remove it from your `-f` set.
 
 ### `FIFTYONE_ACTIVITY_ENABLED` is the gate
 
