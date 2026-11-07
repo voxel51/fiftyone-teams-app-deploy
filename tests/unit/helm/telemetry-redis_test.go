@@ -301,7 +301,7 @@ func (s *telemetryRedisTemplateTest) TestDeploymentDefaultImage() {
 	containers := deployment.Spec.Template.Spec.Containers
 	s.Require().Len(containers, 1, "Deployment should have exactly one container")
 	s.Equal("redis", containers[0].Name)
-	s.Equal("redis:7-alpine", containers[0].Image)
+	s.Equal("redis:8-alpine", containers[0].Image)
 }
 
 func (s *telemetryRedisTemplateTest) TestDeploymentImageOverride() {

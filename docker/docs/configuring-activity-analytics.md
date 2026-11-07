@@ -15,15 +15,14 @@
 # Configuring Activity Analytics
 
 Activity Analytics records what happens in a deployment and aggregates it
-for the Audit Log and Jobs pages and the annotation Metrics tab in the
+for the Audit Log, the Jobs pages, and the annotation Metrics tab in the
 app.
 
-**Activity Analytics is opt-in.**
-The `fiftyone-mq-redis` and `activity-worker` services live in the
-`compose.activity.yaml` overlay, not in the base compose files. A plain
-`docker compose up` does not start them, and no activity is recorded.
-`FIFTYONE_ACTIVITY_ENABLED` defaults to `false` besides, so the emit
-seams in the services that do start are no-ops.
+**Activity Analytics is on by default.**
+The `fiftyone-mq-redis` and `activity-worker` services are part of every
+base compose file, and `FIFTYONE_ACTIVITY_ENABLED` defaults to `true`.
+See [Turning Activity Analytics off](#turning-activity-analytics-off) to
+opt out.
 
 ## How it works
 
@@ -33,7 +32,7 @@ Activity events travel over a Redis-backed queue (`fiftyone.mq`):
    domain-event bridge, and `fiftyone-app` emits operator and annotation
    activity. Both emit only while `FIFTYONE_ACTIVITY_ENABLED` is true, and
    read `FIFTYONE_MQ_REDIS_URL` to find the queue once it is.
-1. `fiftyone-mq-redis` holds the queue. It is a stock `redis:7` that
+1. `fiftyone-mq-redis` holds the queue. It is a stock `redis:8` that
    persists the queue with AOF onto the `fiftyone-mq-redis-data` volume,
    so a restart replays queued jobs instead of losing them. See
    [Queue durability](#queue-durability) for what that does and does not
@@ -44,110 +43,85 @@ Activity events travel over a Redis-backed queue (`fiftyone.mq`):
 
 The emit path is best-effort and fire-and-forget. If the queue is
 unavailable, events are dropped and the emitting operation still
-succeeds. To stop events flowing, leave `FIFTYONE_ACTIVITY_ENABLED`
-false — that short-circuits before a client is built, rather than
+succeeds. To stop events flowing, set `FIFTYONE_ACTIVITY_ENABLED`
+to false — that short-circuits before a client is built, rather than
 relying on a connection failing.
 
-One `activity-worker` container runs four workers via the combined
+One `activity-worker` container runs three workers via the combined
 `fiftyone-activity-worker` entrypoint:
 
-| Worker   | Responsibility                                         |
-| -------- | ------------------------------------------------------ |
-| ingest   | Drains the queue into the raw `activity_*` collections |
-| rollup   | Aggregates raw events into the rollups the app reads   |
-| snapshot | Periodically records dataset and deployment state      |
-| prune    | Enforces the retention window and the storage size cap |
+| Worker | Responsibility                                         |
+| ------ | ------------------------------------------------------ |
+| ingest | Drains the queue into the raw `activity_*` collections |
+| rollup | Aggregates raw events into the rollups the app reads   |
+| prune  | Enforces the retention window and the storage size cap |
 
-## Enabling Activity Analytics
+## Compose files
 
-From your auth-mode directory, add `compose.activity.yaml` to your usual
-`-f` set:
+`fiftyone-mq-redis` and `activity-worker` are defined in `compose.yaml`,
+`compose.plugins.yaml`, and `compose.dedicated-plugins.yaml`, so your usual
+`-f` set starts them with no extra flags. `activity-worker` declares
+`depends_on: fiftyone-mq-redis`. The delegated-operator and GPU overlays
+need nothing extra.
 
-```shell
-docker compose \
-  -f compose.yaml \
-  -f compose.activity.yaml \
-  -f compose.override.yaml \
-  up -d
-```
-
-That renders `fiftyone-mq-redis` and `activity-worker` alongside the
-other services. `activity-worker` declares
-`depends_on: fiftyone-mq-redis`.
-
-The overlay layers onto any base file, so substitute
-`compose.plugins.yaml` or `compose.dedicated-plugins.yaml` for
-`compose.yaml` if that is what you deploy. It also composes with the
-delegated-operator and GPU overlays:
-
-```shell
-docker compose \
-  -f compose.dedicated-plugins.yaml \
-  -f compose.delegated-operators.yaml \
-  -f compose.activity.yaml \
-  -f compose.override.yaml \
-  up -d
-```
+`compose.activity.yaml` is deprecated. It used to carry the two services
+and is now empty, so keeping it in your `-f` set changes nothing. It will
+be removed in a future release.
 
 ### `FIFTYONE_ACTIVITY_ENABLED` is the gate
 
 `FIFTYONE_ACTIVITY_ENABLED` decides whether a service emits at all. It
-defaults to `false`, and `emit`, `flush`, and the operator mutation
-capture are no-ops while it is — checked before any queue client is
-constructed. `FIFTYONE_MQ_REDIS_URL` says only *where* to reach the
-queue once enabled; it is not the switch, because it carries a default
-of its own and so cannot distinguish "unset" from "deliberately pointed
-at localhost".
-
-For the base, `compose.plugins.yaml`, and `compose.dedicated-plugins.yaml`
-layerings, adding `compose.activity.yaml` to the `-f` set flips the flag
-to `true` for `fiftyone-app` and `teams-api`. No `.env` change is needed
-for those two.
-
-**Set `FIFTYONE_ACTIVITY_ENABLED=true` in `.env` if you run a
-dedicated-plugins or delegated-operator stack.** The overlay cannot flip
-`teams-plugins` or the `teams-do*` workers: those services are absent
-from some `-f` sets, and naming a service in an overlay creates it rather
-than annotating it, so the overlay would start containers a base stack
-never asked for. They read the flag from `.env` instead, and without it
-they stay off while `fiftyone-app` and `teams-api` are on. That gap
-matters precisely where those services do the work — under the
-dedicated-plugins layering the workflows plugin (the annotation and
-review event producer) executes in `teams-plugins` rather than in
-`fiftyone-app`, and under the delegated-operator overlays operator runs
-execute in `teams-do`.
-
-Setting it in `.env` is the belt-and-braces option for every layering: an
-explicit value there wins over the overlay in both directions.
+defaults to `true` in every service that reads it (`fiftyone-app`,
+`teams-api`, `teams-plugins`, the `teams-do*` workers, and
+`activity-worker`), and `emit`, `flush`, and the operator mutation capture
+are no-ops while it is false, checked before any queue client is
+constructed. `FIFTYONE_MQ_REDIS_URL` says only _where_ to reach the
+queue; it is not the switch, because it carries a default of its own and
+so cannot distinguish "unset" from "deliberately pointed at localhost".
 
 Verify what a given `-f` set resolves to before bringing it up:
 
 ```shell
-docker compose -f compose.yaml -f compose.activity.yaml config \
+docker compose -f compose.yaml config \
   | grep FIFTYONE_ACTIVITY_ENABLED
 ```
 
-Include the same `-f` set on every subsequent `docker compose` command
-for the deployment. Omitting `compose.activity.yaml` on a later
-`up -d` removes the two services from the project.
+## Turning Activity Analytics off
 
-## Enabling the Metrics tab
+Set the gate to `false` in `.env`:
 
-The annotation Metrics tab in `teams-app` is gated by its own flag,
-`VFF_WF_METRIC`, and is off by default. It reads the rollups that
-`activity-worker` maintains, so enable Activity Analytics first, then
-set the flag on `teams-app` in your `compose.override.yaml`:
+```shell
+FIFTYONE_ACTIVITY_ENABLED=false
+```
+
+That stops every service from emitting. The two
+services still start and sit idle. To keep them from starting, put them
+behind a profile you never activate, in `compose.override.yaml`:
+
+```yaml
+services:
+  fiftyone-mq-redis:
+    profiles: ["activity-disabled"]
+  activity-worker:
+    profiles: ["activity-disabled"]
+```
+
+To keep Activity Analytics but hide the dataset Activity tab and the
+sample history panel, set `VFF_WF_ACTIVITY` to `false` on both
+`teams-app` (the tab) and `fiftyone-app` (the panel) in your
+`compose.override.yaml`:
 
 ```yaml
 services:
   teams-app:
     environment:
-      VFF_WF_METRIC: "true"
+      VFF_WF_ACTIVITY: "false"
+  fiftyone-app:
+    environment:
+      VFF_WF_ACTIVITY: "false"
 ```
 
-Bring the stack up again with your usual `-f` set. The flag is
-independent of `FIFTYONE_ACTIVITY_ENABLED`; with Activity Analytics off
-the tab renders but has no data to show.
+The annotation Metrics tab has no flag of its own; it is always shown.
 
 ## Environment variables
 
@@ -156,8 +130,9 @@ Set these in your `.env` file. See the Activity Analytics section of
 
 | Variable                              | Default                            | Description                                                                                                                          |
 | ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `FIFTYONE_ACTIVITY_ENABLED`           | `false`                            | The gate: nothing emits while false. `compose.activity.yaml` sets it for `fiftyone-app` and `teams-api`; set it here for the others. |
-| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id that activity events are scoped by. Defaults to empty, meaning self-discovery via CAS for single-org deployments.    |
+| `FIFTYONE_ACTIVITY_ENABLED`           | `true`                             | The gate: nothing emits while false. Every service reads it.                                                                         |
+| `FIFTYONE_ACTIVITY_ORG_ID`            | empty                              | Organization id stamped on the events the workers record themselves. Per-request events and dataset counts don't need it.            |
+| `FIFTYONE_ACTIVITY_WATCH_ENABLED`     | `true`                             | Records writes no service reported (direct database edits) from the change stream. Needs a replica set; set `false` to opt out.      |
 | `FIFTYONE_MQ_REDIS_URL`               | `redis://fiftyone-mq-redis:6379/0` | Queue connection string. Point it at an external Redis to replace the bundled service.                                               |
 | `FIFTYONE_ACTIVITY_RETENTION_DAYS`    | `365`                              | Retention window for raw events. Rollups are kept indefinitely. `0` disables expiry.                                                 |
 | `FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES` | `10737418240`                      | Size cap on raw events. The prune worker removes oldest-first when exceeded. `0` disables.                                           |
@@ -219,28 +194,37 @@ redis-cli -u "${FIFTYONE_MQ_REDIS_URL}" \
 
 Do not scale `activity-worker` above one replica.
 
-The rollup, snapshot, and prune schedulers inside the container are
-single-flight and hold no cross-container lock. A second replica runs
-its own copy of each schedule, which produces duplicate rollup and
-snapshot writes and lets two prune passes compete over the same
-records.
+The rollup and prune schedulers inside the container are single-flight
+and hold no cross-container lock. A second replica runs its own copy of
+each schedule, which produces duplicate rollup writes and lets two
+prune passes compete over the same records.
 
 The ingest worker is the only part of the pipeline that would benefit
 from horizontal scale, and it is not separable from the others in this
 image. A single container keeps up with the emit volume of a normal
 deployment.
 
-## Verifying
+## Monitoring
 
-The commands below need `compose.activity.yaml` in the `-f` set, the
-same as the `up -d` above. Without it compose does not know the two
-services exist.
+Every activity process (the services that record events, and the
+activity workers) logs one line per minute when it has something to
+report, starting with `activity.stats`:
+
+```text
+activity.stats kind=producer emitted=120 delivered=120 dropped_full=0 dropped_invalid=0 failed_flushes=0 pending=0
+```
+
+Route these lines from your log pipeline into your metrics system to
+watch for dropped events, a queue backlog, or a stalled database watch.
+The [`activity.stats` reference](https://github.com/voxel51/fiftyone-activity#monitor)
+lists every key and suggests alert thresholds.
+
+## Verifying
 
 Confirm both services are running:
 
 ```shell
-docker compose -f compose.yaml -f compose.activity.yaml \
-  ps fiftyone-mq-redis activity-worker
+docker compose -f compose.yaml ps fiftyone-mq-redis activity-worker
 ```
 
 Confirm the queue Redis has the expected policy:
@@ -260,6 +244,4 @@ In the app, the Audit Log page populates as events are ingested and
 rolled up. An empty Audit Log with a healthy worker usually means
 `FIFTYONE_ACTIVITY_ORG_ID` does not match the organization you are
 viewing.
-The Metrics tab appears on annotation datasets once `VFF_WF_METRIC` is
-set on `teams-app`; see
-[Enabling the Metrics tab](#enabling-the-metrics-tab).
+The Metrics tab appears on annotation datasets.

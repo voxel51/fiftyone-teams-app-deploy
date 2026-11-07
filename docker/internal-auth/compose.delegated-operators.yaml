@@ -28,7 +28,7 @@ services:
   # distinct orchestrator name so it surfaces separately in the
   # Settings → Metrics UI.
   teams-do-2:
-    image: voxel51/fiftyone-teams-cv-full:v2.25.1
+    image: voxel51/fiftyone-teams-cv-full:v2.25.2
     profiles: ["do-2", "do-3"]
     deploy:
       replicas: 1
@@ -43,10 +43,9 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
-      # The activity gate. compose.activity.yaml cannot reach this
-      # service (it is not in every -f set, so declaring it there
-      # would create the container), so arm it from .env instead.
-      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
+      # The activity gate. On by default; set
+      # FIFTYONE_ACTIVITY_ENABLED=false in .env to turn capture off.
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
       # Activity Analytics: delegated operator runs execute here, so the
       # `op.executed` and `samples.modified` seams enqueue from this service.
       # Emit is fire-and-forget; unset = those events simply don't flow.
@@ -60,7 +59,7 @@ services:
       - telemetry-socket-2:/tmp/telemetry
 
   teams-do-2-telemetry:
-    image: voxel51/telemetry-sidecar:v2.25.1
+    image: voxel51/telemetry-sidecar:v2.25.2
     profiles: ["do-2", "do-3"]
     pid: "service:teams-do-2"
     user: "1000:1000"
@@ -101,7 +100,7 @@ services:
   # Slot 3 — included by the `do-3` profile. Mirror of slot 2 with its
   # own socket volume and orchestrator name.
   teams-do-3:
-    image: voxel51/fiftyone-teams-cv-full:v2.25.1
+    image: voxel51/fiftyone-teams-cv-full:v2.25.2
     profiles: ["do-3"]
     deploy:
       replicas: 1
@@ -116,10 +115,9 @@ services:
       FIFTYONE_INTERNAL_SERVICE: true
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
-      # The activity gate. compose.activity.yaml cannot reach this
-      # service (it is not in every -f set, so declaring it there
-      # would create the container), so arm it from .env instead.
-      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-false}
+      # The activity gate. On by default; set
+      # FIFTYONE_ACTIVITY_ENABLED=false in .env to turn capture off.
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
       # Activity Analytics: delegated operator runs execute here, so the
       # `op.executed` and `samples.modified` seams enqueue from this service.
       # Emit is fire-and-forget; unset = those events simply don't flow.
@@ -133,7 +131,7 @@ services:
       - telemetry-socket-3:/tmp/telemetry
 
   teams-do-3-telemetry:
-    image: voxel51/telemetry-sidecar:v2.25.1
+    image: voxel51/telemetry-sidecar:v2.25.2
     profiles: ["do-3"]
     pid: "service:teams-do-3"
     user: "1000:1000"

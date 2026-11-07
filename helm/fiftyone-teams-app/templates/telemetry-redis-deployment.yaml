@@ -28,7 +28,7 @@ spec:
       {{- end }}
       containers:
         - name: redis
-          image: {{ .Values.telemetry.redis.image | default "redis:7-alpine" }}
+          image: {{ .Values.telemetry.redis.image | default "redis:8-alpine" }}
           {{- with .Values.telemetry.redis.containerSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}

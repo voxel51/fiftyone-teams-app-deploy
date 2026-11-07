@@ -13,12 +13,13 @@ makes those surfaces have anything to show.
 <!-- toc -->
 
 - [Overview](#overview)
-- [Enabling Activity Core](#enabling-activity-core)
+- [Turning Activity Core off](#turning-activity-core-off)
 - [Queue durability](#queue-durability)
 - [Worker liveness](#worker-liveness)
 - [Using an external Redis](#using-an-external-redis)
 - [Multi-organization deployments](#multi-organization-deployments)
 - [Viewing the data](#viewing-the-data)
+- [Monitoring](#monitoring)
 - [Resource impact](#resource-impact)
 
 <!-- tocstop -->
@@ -34,28 +35,28 @@ Two moving parts:
   queue and write the `activity_*` collections in the deployment's own
   FiftyOne database, then maintain the rollups.
 
-Both halves are off by default. The chart renders no activity
-environment on the producers and no worker `Deployment`s until you turn
-it on.
+Both halves are on by default.
 
-## Enabling Activity Core
+## Turning Activity Core off
 
-Two settings, and they are a pair:
+Two settings control it, and they are a pair. To turn Activity Core off,
+set both:
 
 ```yaml
 # values.yaml
 activitySettings:
-  enabled: true
+  enabled: false
 fiftyoneMq:
-  enabled: true
+  enabled: false
 ```
 
 `activitySettings.enabled` renders `FIFTYONE_ACTIVITY_ENABLED=true` on
-the producer workloads and creates the worker `Deployment`s.
+the producer workloads, creates the worker `Deployment`s, and turns on the
+Metrics tab (see [Viewing the data](#viewing-the-data)).
 `fiftyoneMq.enabled` renders the queue Redis and sets
 `FIFTYONE_MQ_REDIS_URL` on everything that talks to it.
 
-Enabling activity without the queue is rejected at render time — the
+Turning off the queue while activity is on is rejected at render time — the
 workers and producers would have nothing to connect to, and every event
 would be dropped while the install looked healthy:
 
@@ -150,36 +151,53 @@ redis-cli -u "${FIFTYONE_MQ_REDIS_URL}" \
 
 ## Multi-organization deployments
 
-`activitySettings.orgId` attributes the deployment-wide rollups to an
-organization. Leave it empty for a single-organization deployment — the
-workers discover the organization themselves.
+`activitySettings.orgId` is the organization stamped on the events the
+workers record themselves (the database watch), which carry no request
+to take one from.
 
-Set it only when the deployment holds several organizations, where the
-deployment-wide counts cannot be attributed to one of them. The workers
-log which organization to name.
-
-This affects only the deployment-wide rollups. Per-request events are
-always stamped with the authenticated organization carried on the
-request.
+Per-request events are always stamped with the authenticated
+organization carried on the request. The dataset and sample counts come
+from `teams-api`, which reads each organization from CAS, so they don't
+use `orgId` either.
 
 ## Viewing the data
 
-Enabling Activity Core turns on collection only. The surfaces that
-display the data are internal debug views, off by default in every
-deployment, and the chart never sets their flags. Opt in per environment
-through `teamsAppSettings.env`:
+The Audit Log and the Jobs pages appear whenever Activity Core is
+enabled. The annotation workflow Metrics tab is always shown; it has no
+flag of its own.
+
+The dataset **Activity** tab and the sample and label history panel are
+on by default. To keep recording history but hide them, set
+`VFF_WF_ACTIVITY` to `false` on both `teams-app` (the tab) and
+`fiftyone-app` (the panel):
 
 ```yaml
 teamsAppSettings:
   env:
-    # workflow Activity tab + label History panel
-    VFF_WF_ACTIVITY: true
-    # pre-release Metrics tab
-    VFF_WF_METRIC: true
+    VFF_WF_ACTIVITY: false
+appSettings:
+  env:
+    VFF_WF_ACTIVITY: false
 ```
 
-Set only the ones you want; each flag is independent of the other and of
-`activitySettings.enabled`.
+On a standalone `mongod` these pages still render; they show a banner
+saying edit history is not being recorded, which is a more useful answer
+than a missing tab.
+
+## Monitoring
+
+Every activity process (the services that record events, and the
+activity workers) logs one line per minute when it has something to
+report, starting with `activity.stats`:
+
+```text
+activity.stats kind=producer emitted=120 delivered=120 dropped_full=0 dropped_invalid=0 failed_flushes=0 pending=0
+```
+
+Route these lines from your log pipeline into your metrics system to
+watch for dropped events, a queue backlog, or a stalled database watch.
+The [`activity.stats` reference](https://github.com/voxel51/fiftyone-activity#monitor)
+lists every key and suggests alert thresholds.
 
 ## Resource impact
 
@@ -191,7 +209,7 @@ The bundled queue Redis adds one more pod, with `maxmemory` defaulting
 to `200mb` (`fiftyoneMq.redis.maxmemory`). Raise it if the queue backs
 up under load.
 
-Do not scale the rollup, snapshot, or prune workers above one replica.
-Their schedulers are single-flight and hold no cross-pod lock, so a
-second replica produces duplicate rollup and snapshot writes and lets
-two prune passes compete over the same records.
+Do not scale the rollup or prune workers above one replica. Their
+schedulers are single-flight and hold no cross-pod lock, so a second
+replica produces duplicate rollup writes and lets two prune passes
+compete over the same records.
