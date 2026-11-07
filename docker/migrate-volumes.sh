@@ -129,7 +129,9 @@ config=$(compose config) ||
 project=$(sed -n 's/^name: //p' <<<"$config" | head -n 1)
 [[ -n $project ]] || fail "could not read the project name from 'docker compose config'"
 
-if ! compose config --volumes | grep -qx "$VOLUME_KEY"; then
+volumes=$(compose config --volumes) ||
+  fail "'docker compose config --volumes' failed. Check the options after '--'."
+if ! grep -qx "$VOLUME_KEY" <<<"$volumes"; then
   log "skipped: these compose files don't use $VOLUME_KEY. Add compose.plugins.yaml or compose.dedicated-plugins.yaml if you use plugins."
   exit 0
 fi

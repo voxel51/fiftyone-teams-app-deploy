@@ -34,6 +34,7 @@ type migrateEnv struct {
 	t           *testing.T
 	destProject string
 	composeArgs []string
+	env         []string
 }
 
 func newMigrateEnv(t *testing.T, files ...string) *migrateEnv {
@@ -70,6 +71,7 @@ func (e *migrateEnv) migrate(flags ...string) (string, int) {
 	args = append(args, e.composeArgs...)
 	cmd := exec.Command(migrateScript, args...)
 	cmd.Dir = migrateDockerDir
+	cmd.Env = append(os.Environ(), e.env...)
 	out, err := cmd.CombinedOutput()
 	code := 0
 	if exitErr, ok := err.(*exec.ExitError); ok {
@@ -289,4 +291,33 @@ func TestMigrateVolumesDestinationHasComposeLabels(t *testing.T) {
 
 	require.NotContains(t, string(upOut), "already exists")
 	require.NotContains(t, string(upOut), "external: true")
+}
+
+func TestMigrateVolumesFailsWhenVolumeListFails(t *testing.T) {
+	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
+	createSourceVolume(t, uniqueName("oldproj"), "plugin/fiftyone.yml", "name: my-plugin")
+
+	// A docker wrapper that fails only `docker compose ... config --volumes`
+	// and passes every other command to the real docker.
+	realDocker, err := exec.LookPath("docker")
+	require.NoError(t, err)
+	shimDir := t.TempDir()
+	shim := fmt.Sprintf(`#!/bin/sh
+for arg in "$@"; do
+  if [ "$arg" = "--volumes" ]; then
+    echo "simulated failure" >&2
+    exit 1
+  fi
+done
+exec %q "$@"
+`, realDocker)
+	require.NoError(t, os.WriteFile(filepath.Join(shimDir, "docker"), []byte(shim), 0o755))
+	e.env = []string{"PATH=" + shimDir + string(os.PathListSeparator) + os.Getenv("PATH")}
+
+	out, code := e.migrate()
+
+	require.Equal(t, 1, code, out)
+	require.NotContains(t, out, "skipped")
+	require.Contains(t, out, "config --volumes")
+	require.False(t, volumeExists(e.destVolume()), "no destination volume should be created")
 }

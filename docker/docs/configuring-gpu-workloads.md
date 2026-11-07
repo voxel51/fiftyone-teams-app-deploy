@@ -93,8 +93,19 @@ services:
               capabilities: [gpu]
 ```
 
-Redeploy the stack via `docker compose up -d` and wait for the
-`teams-do` containers to be deployed.
+Add the snippet to your `compose.override.yaml`.
+Redeploy the stack with the plugins and delegated operators files,
+which define `plugins-vol` and `teams-do`,
+and wait for the `teams-do` containers to be deployed:
+
+```shell
+docker compose \
+  -f compose.yaml \
+  -f compose.plugins.yaml \
+  -f compose.delegated-operators.yaml \
+  -f compose.override.yaml \
+  up -d
+```
 
 For advanced GPU configuration, including selecting specific GPU devices,
 please refer to the

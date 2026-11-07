@@ -160,8 +160,6 @@ func (s *dockerComposeTest) TestServicesNames() {
 				"telemetry-redis",
 			},
 		},
-		// compose.activity.yaml is a deprecated, empty shim. Layering it onto
-		// a base file must not change the service set.
 	}
 
 	for _, testCase := range testCases {
@@ -354,9 +352,6 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
 			},
 		},
-		// compose.activity.yaml is a deprecated, empty shim. Layering it onto
-		// a base file must leave the environment exactly as the base renders
-		// it, with activity on by default.
 		{
 			"defaultTeamsApi",
 			"teams-api",
