@@ -3,16 +3,87 @@
 #
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+#
+# Delegated operators overlay. Stack it on compose.yaml and a plugins overlay.
+# See docker/docs/configuring-delegated-operators.md.
+#
+#   docker compose \
+#     -f compose.yaml \
+#     -f compose.plugins.yaml \
+#     -f compose.delegated-operators.yaml \
+#     -f compose.override.yaml \
+#     up -d
 services:
   teams-do:
-    extends:
-      file: ../common-services.yaml
-      service: teams-do-common
+    image: voxel51/fiftyone-teams-cv-full:v2.25.2
+    # Telemetry default-on requires teams-do to share its PID namespace
+    # with a single sidecar (compose's `pid: "service:<name>"` only joins
+    # one replica). Force replicas=1 to keep the 1:1 pairing deterministic.
+    # See docker/docs/configuring-telemetry.md for multi-worker patterns.
+    deploy:
+      replicas: 1
+    command: >
+      /bin/sh -c "fiftyone delegated launch -t remote -m"
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_DATABASE_ADMIN: false
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Activity Analytics is on by default and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # Set FIFTYONE_ACTIVITY_ENABLED=false in .env to turn capture off.
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
+      # Activity Analytics: delegated operator runs execute here, so the
+      # `op.executed` and `samples.modified` seams enqueue from this service.
+      # Emit is fire-and-forget; unset = those events simply don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+    restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+      - telemetry-socket:/tmp/telemetry
 
   teams-do-telemetry:
-    extends:
-      file: ../common-services.yaml
-      service: teams-do-telemetry-common
+    image: voxel51/telemetry-sidecar:v2.25.2
+    pid: "service:teams-do"
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POD_NAME: teams-do
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: delegated-operator
+      TARGET_NAME: ${TEAMS_DO_TARGET_NAME:-fiftyone delegated}
+      EXECUTOR_SIDECAR: "true"
+      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 512M
+        reservations:
+          cpus: "0.10"
+          memory: 512M
+    volumes:
+      - telemetry-socket:/tmp/telemetry
+    restart: always
     depends_on:
       teams-do:
         condition: service_started
@@ -21,7 +92,7 @@ services:
         condition: service_started
 
   # Slot 2 — included by the `do-2` and `do-3` profiles. Defined inline
-  # (rather than extending teams-do-common) so it can own its own
+  # (rather than reusing teams-do's definition) so it can own its own
   # executor-socket named volume; named volumes are shared by their
   # volume name, so reusing `telemetry-socket` across slots would
   # clobber the socket. `-n teams-do-2` registers this worker as a
