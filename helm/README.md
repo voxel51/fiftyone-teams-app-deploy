@@ -183,6 +183,8 @@ Edit your `values.yaml` file (see the example
   for how to generate it
 - `secret.fiftyone.fiftyoneAuthSecret` — a randomly generated shared secret
   used for CAS
+- `casSettings.env.CAS_DATABASE_NAME` — the MongoDB database CAS uses.
+  It must be unique per deployment.
 - `teamsAppSettings.dnsName` — your ingress hostname
 - `namespace.name` — set to match your target namespace
    (e.g. `your-namespace-here`).
@@ -455,9 +457,29 @@ with FiftyOne:
 
 ### :hammer_and_wrench: Optional: CAS Customization Instructions
 
+> [!WARNING]
+> Set `secret.fiftyone.fiftyoneAuthSecret` and
+> `casSettings.env.CAS_DATABASE_NAME` in
+> [Step 3](#gear-step-3-configure-valuesyaml),
+> before the initial install.
+> Changing them on an installed release causes problems:
+>
+> - `helm upgrade` updates the secret,
+>   but running pods keep the old `FIFTYONE_AUTH_SECRET`
+>   until they restart,
+>   so services can fail to authenticate with each other.
+>   After changing it,
+>   restart every deployment in the namespace:
+>
+>   ```shell
+>   kubectl rollout restart deployment \
+>     --namespace your-namespace-here
+>   ```
+>
+> - A new `CAS_DATABASE_NAME` points CAS at a new, empty database.
+>   Existing users, roles, and settings stay in the old database.
+
 1. Update CAS values in your `values.yaml`:
-   - `secret.fiftyone.fiftyoneAuthSecret`
-   - `casSettings.env.CAS_DATABASE_NAME` (⚠️ Must be unique per deployment)
    - `casSettings.env.CAS_DEFAULT_USER_ROLE`
    - `casSettings.env.DEBUG`
 1. Apply the changes:
