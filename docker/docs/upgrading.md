@@ -128,6 +128,23 @@ The compose files now live in the `docker` directory:
 Because the project name changes, Compose creates a new, empty plugins volume.
 `migrate-volumes.sh` copies your plugins from the old volume into the new one.
 
+> [!WARNING]
+> Named volumes that you added in `compose.override.yaml`,
+> such as a MongoDB data volume, also start empty under the new project name.
+> To keep using an old volume, set its full name in `compose.override.yaml`
+> and mark it `external`, so Compose uses it as it is.
+> For example, for a volume named `mongodb-data` that you deployed from
+> `internal-auth`:
+>
+> ```yaml
+> volumes:
+>   mongodb-data:
+>     name: internal-auth_mongodb-data
+>     external: true
+> ```
+>
+> Run `docker volume ls` to find your old volume names.
+
 To upgrade:
 
 1. Before you get the v2.26 files, stop the stack from your old directory
@@ -142,8 +159,11 @@ To upgrade:
 1. Get the v2.26 files.
 1. Copy your `compose.override.yaml` and `.env` files into the `docker`
    directory, then `cd` into it.
-1. In the `.env` file, update relative paths, such as
-   `LOCAL_LICENSE_FILE_DIR`, so they work from the `docker` directory.
+1. In the `.env` and `compose.override.yaml` files, update relative paths,
+   such as `LOCAL_LICENSE_FILE_DIR` and bind mount sources,
+   so they work from the `docker` directory.
+   Compose resolves them from the `docker` directory now,
+   and it creates an empty directory for a bind mount source that's missing.
 1. If you deployed from `legacy-auth`, in the `.env` file:
     1. Rename `AUTH0_BASE_URL` to `BASE_URL`
     1. Remove `AUTH0_SECRET`. It's no longer used.
@@ -204,8 +224,9 @@ To upgrade:
    If it finds more than one, choose one with `--from-project`.
    If you don't use plugins, it skips the copy.
 1. Start the stack with the same `-f` options and `up -d`.
-1. Once the new stack works, remove the old volumes.
-   The script prints the command for the plugins volume.
+1. Once the new stack works, remove the old plugins volume.
+   The script prints the command.
+   Keep your other old volumes until you've checked the data in the new stack.
 
 #### FiftyOne Enterprise v2.25+ Activity Analytics
 
