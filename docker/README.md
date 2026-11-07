@@ -249,11 +249,12 @@ services:
 ```
 
 > [!NOTE]
-> Default images and versions for all services are defined in
-> `compose.yaml` and the overlay files next to it.
+> Default images and versions for all services are defined
+> in `compose.yaml` and the overlay files next to it.
 > To override an image or version,
-> set the value in `compose.override.yaml`. For example, instead of using
-> the `fiftyone-app` image, you may instead the `fiftyone-app-gpt` image.
+> set the value in `compose.override.yaml`.
+> For example, instead of using the `fiftyone-app` image,
+> you may instead the `fiftyone-app-gpt` image.
 > Always include a version tag when overriding images (e.g., `:vX.Y.Z`).
 > Omitting the tag will result in a **not found** error.
 
@@ -635,10 +636,10 @@ for full details.
 
 ### Activity Analytics
 
-Activity Analytics is on by default. `compose.yaml` runs an
-activity worker and a queue Redis, and the Audit Log, the Jobs pages, and
-the annotation Metrics tab in teams-app are built from the activity events
-those services record.
+Activity Analytics is on by default.
+`compose.yaml` runs an activity worker and a queue Redis,
+and the Audit Log, the Jobs pages, and the annotation Metrics tab in teams-app
+are built from the activity events those services record.
 
 FiftyOne Enterprise v2.26 removes `compose.activity.yaml`.
 Remove it from your `-f` set.

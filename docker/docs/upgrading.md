@@ -108,33 +108,37 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.26+ Compose Files Moved to `docker/`
 
-FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode and the
-`FIFTYONE_AUTH_MODE` environment variable.
-It also removes the `internal-auth` and `legacy-auth` directories and
-`common-services.yaml`.
+FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode
+and the `FIFTYONE_AUTH_MODE` environment variable.
+It also removes the `internal-auth` and `legacy-auth` directories
+and `common-services.yaml`.
 The compose files now live in the `docker` directory:
 
 - `compose.yaml` defines every base service.
   Run every `docker compose` command with `-f compose.yaml` first.
-- `compose.plugins.yaml`, `compose.dedicated-plugins.yaml`, and the other
-  files add to `compose.yaml`.
+- `compose.plugins.yaml`, `compose.dedicated-plugins.yaml`,
+  and the other files add to `compose.yaml`.
   They no longer replace it.
 - `compose.yaml` names the Compose project `voxel51`.
-  Container and volume names start with `voxel51` instead of the directory
-  name.
+  Container and volume names start with `voxel51`
+  instead of the directory name.
 - `compose.activity.yaml` is removed.
   Activity Analytics is part of `compose.yaml`.
 
-Because the project name changes, Compose creates a new, empty plugins volume.
+Because the project name changes,
+Compose creates a new, empty plugins volume.
 `migrate-volumes.sh` copies your plugins from the old volume into the new one.
 
 > [!WARNING]
 > Named volumes that you added in `compose.override.yaml`,
-> such as a MongoDB data volume, also start empty under the new project name.
-> To keep using an old volume, set its full name in `compose.override.yaml`
-> and mark it `external`, so Compose uses it as it is.
-> For example, for a volume named `mongodb-data` that you deployed from
-> `internal-auth`:
+> such as a MongoDB data volume,
+> also start empty under the new project name.
+> To keep using an old volume,
+> set its full name in `compose.override.yaml`
+> and mark it `external`,
+> so Compose uses it as it is.
+> For example,
+> for a volume named `mongodb-data` that you deployed from `internal-auth`:
 >
 > ```yaml
 > volumes:
@@ -147,30 +151,35 @@ Because the project name changes, Compose creates a new, empty plugins volume.
 
 To upgrade:
 
-1. Before you get the v2.26 files, stop the stack from your old directory
+1. Before you get the v2.26 files,
+   stop the stack from your old directory
    (`internal-auth` or `legacy-auth`).
    `--remove-orphans` also stops services from your other `-f` files.
-   Don't add `-v`, so your volumes stay.
+   Don't add `-v`,
+   so your volumes stay.
 
    ```shell
    docker compose down --remove-orphans
    ```
 
 1. Get the v2.26 files.
-1. Copy your `compose.override.yaml` and `.env` files into the `docker`
-   directory, then `cd` into it.
-1. In the `.env` and `compose.override.yaml` files, update relative paths
+1. Copy your `compose.override.yaml` and `.env` files
+   into the `docker` directory,
+   then `cd` into it.
+1. In the `.env` and `compose.override.yaml` files,
+   update relative paths
    (such as `LOCAL_LICENSE_FILE_DIR` and bind mount sources)
    so they work from the `docker` directory.
    Compose resolves them from the `docker` directory now,
-   and it creates an empty directory for a bind mount source that's missing.
+   and it creates an empty directory
+   for a bind mount source that's missing.
 1. If you deployed from `legacy-auth`, in the `.env` file:
     1. Rename `AUTH0_BASE_URL` to `BASE_URL`
     1. Remove `AUTH0_SECRET`. It's no longer used.
-1. Remove `FIFTYONE_AUTH_MODE` from the `.env` and `compose.override.yaml`
-   files if it's set.
-1. In `compose.override.yaml`, remove any `extends:` block that points at
-   `common-services.yaml`.
+1. Remove `FIFTYONE_AUTH_MODE` from the `.env` and `compose.override.yaml` files
+   if it's set.
+1. In `compose.override.yaml`,
+   remove any `extends:` block that points at `common-services.yaml`.
    Keep the settings you override under the service name.
    For example, change
 
@@ -195,7 +204,8 @@ To upgrade:
 
 1. Update your `docker compose` command.
    Start it with `-f compose.yaml` and remove `-f compose.activity.yaml`.
-   For example, `-f compose.plugins.yaml -f compose.override.yaml` becomes
+   For example,
+   `-f compose.plugins.yaml -f compose.override.yaml` becomes
 
    ```shell
    docker compose \
@@ -210,7 +220,8 @@ To upgrade:
 1. Pull the v2.26 images with the same `-f` options and `pull`.
    On air-gapped hosts, load the images instead.
 1. Copy your plugins into the new project.
-   Check the plan first with `--dry-run`, then run it without:
+   Check the plan first with `--dry-run`,
+   then run it without:
 
    ```shell
    ./migrate-volumes.sh \
@@ -222,12 +233,14 @@ To upgrade:
    ```
 
    The script finds the old plugins volume by its Compose labels.
-   If it finds more than one, choose one with `--from-project`.
+   If it finds more than one,
+   choose one with `--from-project`.
    If you don't use plugins, it skips the copy.
 1. Start the stack with the same `-f` options and `up -d`.
 1. Once the new stack works, remove the old plugins volume.
    The script prints the command.
-   Keep your other old volumes until you've checked the data in the new stack.
+   Keep your other old volumes
+   until you've checked the data in the new stack.
 
 #### FiftyOne Enterprise v2.25+ Activity Analytics
 
@@ -503,7 +516,8 @@ of this new `voxel51/fiftyone-teams-cv-full` image.
 Please note: this image is approximately 2GB larger than its predecessor
 and, as such, might take longer to pull and start.
 
-To utilize the prior image, update your `compose.override.yaml` similar to the below:
+To utilize the prior image,
+update your `compose.override.yaml` similar to the below:
 
 ```yaml
 services:
@@ -629,8 +643,8 @@ Additionally,
 
 ---
 
-1. Copy your `compose.override.yaml` and `.env` files into the `docker`
-   directory
+1. Copy your `compose.override.yaml` and `.env` files
+   into the `docker` directory
 1. `cd` into the `docker` directory
 1. In the `.env` file, set `BASE_URL` to your WebApp URL
 1. In the `.env` file, set the required environment variables
@@ -728,8 +742,8 @@ Additionally,
 
 ---
 
-1. Copy your `compose.override.yaml` and `.env` files into the `docker`
-   directory
+1. Copy your `compose.override.yaml` and `.env` files
+   into the `docker` directory
 1. `cd` into the `docker` directory
 1. In the `.env` file, set `BASE_URL` to your WebApp URL
 1. In your `.env` file, set the required environment variables:

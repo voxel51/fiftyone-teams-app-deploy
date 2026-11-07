@@ -28,8 +28,8 @@ const (
 `
 )
 
-// migrateEnv describes one test's destination project and the docker compose
-// arguments the script receives after `--`.
+// migrateEnv describes one test's destination project
+// and the docker compose arguments the script receives after `--`.
 type migrateEnv struct {
 	t           *testing.T
 	destProject string
@@ -61,7 +61,8 @@ func (e *migrateEnv) destVolume() string {
 	return e.destProject + "_" + migrateVolumeKey
 }
 
-// migrate runs the script from docker/ and returns its combined output and exit code.
+// migrate runs the script from docker/
+// and returns its combined output and exit code.
 func (e *migrateEnv) migrate(flags ...string) (string, int) {
 	e.t.Helper()
 	args := append([]string{}, flags...)
@@ -102,8 +103,9 @@ func ensureImage(t *testing.T, image string) {
 	}
 }
 
-// requireNoOtherPluginVolumes skips the test on hosts that already have
-// Compose plugins volumes, because the script discovers sources host-wide.
+// requireNoOtherPluginVolumes skips the test on hosts
+// that already have Compose plugins volumes,
+// because the script discovers sources host-wide.
 func requireNoOtherPluginVolumes(t *testing.T) {
 	t.Helper()
 	out := run(t, "", "docker", "volume", "ls", "-q", "--filter", "label=com.docker.compose.volume="+migrateVolumeKey)
@@ -125,8 +127,8 @@ func removeVolume(t *testing.T, name string) {
 	_ = exec.Command("docker", "volume", "rm", "-f", name).Run()
 }
 
-// createSourceVolume makes a volume the way an older Compose project would
-// have, and writes one file into it.
+// createSourceVolume makes a volume the way an older Compose project would have,
+// and writes one file into it.
 func createSourceVolume(t *testing.T, project, file, content string) string {
 	t.Helper()
 	name := project + "_" + migrateVolumeKey

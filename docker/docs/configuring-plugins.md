@@ -23,12 +23,10 @@ Enabled by default. No additional configurations are required.
 Plugins run in the `fiftyone-app` service.
 To enable this mode
 
-1. Add the file
-   [compose.plugins.yaml](../compose.plugins.yaml)
-   after
-   [compose.yaml](../compose.yaml)
-   in your `docker compose` command to create a new Docker Volume shared
-   between FiftyOne Enterprise services.
+1. Add the file [compose.plugins.yaml](../compose.plugins.yaml)
+   after [compose.yaml](../compose.yaml)
+   in your `docker compose` command
+   to create a new Docker Volume shared between FiftyOne Enterprise services.
 
    Example `docker compose` command for this mode from the `docker` directory
 
@@ -48,12 +46,10 @@ To enable this mode
 1. Set `FIFTYONE_TEAMS_PLUGIN_URL` in your `.env` file
     - `FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151`
 
-1. Add the file
-   [compose.dedicated-plugins.yaml](../compose.dedicated-plugins.yaml)
-   after
-   [compose.yaml](../compose.yaml)
-   in your `docker compose` command to create a new Docker Volume shared
-   between FiftyOne Enterprise services.
+1. Add the file [compose.dedicated-plugins.yaml](../compose.dedicated-plugins.yaml)
+   after [compose.yaml](../compose.yaml)
+   in your `docker compose` command
+   to create a new Docker Volume shared between FiftyOne Enterprise services.
 
 1. If you are
    [using a proxy](./configuring-proxies.md),

@@ -60,10 +60,10 @@ for the full profile reference.
 
 The snippet below contains custom inline example of
 how to add a GPU-based delegated operator (`teams-do-with-gpu`)
-alongside the standard `teams-do`. Pair it with telemetry by
-adding a matching `teams-do-with-gpu-telemetry` sidecar. See
-`docker/compose.delegated-operators.gpu.yaml` for an
-example.
+alongside the standard `teams-do`.
+Pair it with telemetry
+by adding a matching `teams-do-with-gpu-telemetry` sidecar.
+See `docker/compose.delegated-operators.gpu.yaml` for an example.
 
 ```yaml
 services:

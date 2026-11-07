@@ -2,7 +2,8 @@
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 # Plugins overlay: shares a plugins volume between fiftyone-app and teams-api.
-# Stack it on compose.yaml. See docker/docs/configuring-plugins.md.
+# Stack it on compose.yaml.
+# See docker/docs/configuring-plugins.md.
 #
 #   docker compose \
 #     -f compose.yaml \

@@ -4,7 +4,8 @@
 # For Proxy Server instructions please see
 #  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
 #
-# Delegated operators overlay. Stack it on compose.yaml and a plugins overlay.
+# Delegated operators overlay.
+# Stack it on compose.yaml and a plugins overlay.
 # See docker/docs/configuring-delegated-operators.md.
 #
 #   docker compose \
