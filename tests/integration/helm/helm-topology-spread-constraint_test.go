@@ -202,7 +202,7 @@ func (s *topologyAuthHelmTest) TestHelmInstall() {
 			}
 
 			// create license-file secret
-			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFileInternal)
+			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFile)
 			defer k8s.KubectlDeleteFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 			k8s.KubectlApplyFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 

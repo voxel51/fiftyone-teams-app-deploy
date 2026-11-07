@@ -4,7 +4,7 @@ name: Tests - Docker Compose
 on:
   workflow_call:
     secrets:
-      FO_INTERNAL_LICENSE:
+      FO_LICENSE:
         required: true
       ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT:
         required: true
@@ -97,8 +97,8 @@ jobs:
       - name: Create Local License From Secret
         uses: mobiledevops/secret-to-file-action@v2
         with:
-          base64-encoded-secret: ${{ secrets.FO_INTERNAL_LICENSE }}
-          filename: 'internal-license.key'
+          base64-encoded-secret: ${{ secrets.FO_LICENSE }}
+          filename: 'license.key'
           is-executable: false
           working-directory: './docker'
       - name: Run compose integration tests
