@@ -1,3 +1,11 @@
+{{- if and .Values.secret.create (not .Values.secret.fiftyone.fiftyoneAuthSecret) }}
+[WARN]  secret.fiftyone.fiftyoneAuthSecret is empty.
+        CAS and the services that call it use this shared secret to
+        authenticate to each other, so sign-in and inter-service requests
+        fail without it. Set it to a random string and run `helm upgrade`,
+        then restart every deployment in the namespace. See
+        https://helm.fiftyone.ai for details.
+{{ end }}
 {{- if and (gt ( int .Values.apiSettings.replicaCount)  1) (not .Values.apiSettings.env.FIFTYONE_SHARED_ROOT_DIR) }}
 [WARN]  You have set apiSettings.replicaCount to {{ .Values.apiSettings.replicaCount }}
         but have not set apiSettings.env.FIFTYONE_SHARED_ROOT_DIR
