@@ -1,0 +1,99 @@
+---
+# For Proxy Server instructions please see
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+# Dedicated plugins overlay: runs plugins in a separate teams-plugins service.
+# Stack it on compose.yaml.
+# See docker/docs/configuring-plugins.md.
+#
+#   docker compose \
+#     -f compose.yaml \
+#     -f compose.dedicated-plugins.yaml \
+#     -f compose.override.yaml \
+#     up -d
+services:
+  teams-api:
+    environment:
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+    volumes:
+      - plugins-vol:/opt/plugins
+
+  teams-app:
+    environment:
+      FIFTYONE_TEAMS_PLUGIN_URL: ${FIFTYONE_TEAMS_PLUGIN_URL}
+
+  teams-plugins:
+    image: voxel51/fiftyone-app-torch:v2.25.2
+    environment:
+      API_URL: ${API_URL}
+      FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
+      FIFTYONE_DATABASE_ADMIN: false
+      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
+      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
+      FIFTYONE_DEFAULT_APP_ADDRESS: 0.0.0.0
+      FIFTYONE_DEFAULT_APP_PORT: 5151
+      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
+      FIFTYONE_INTERNAL_SERVICE: true
+      FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
+      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
+      FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Activity Analytics is on by default and this flag is the only gate.
+      # The queue URL below says *where* to emit, never *whether*: it
+      # carries a default, so "unset" and "explicitly local" look
+      # identical and it cannot serve as the switch. Emit, flush, and
+      # the operator mutation capture all no-op while this is false,
+      # before any queue client is constructed.
+      # Set FIFTYONE_ACTIVITY_ENABLED=false in .env to turn capture off.
+      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
+      # Activity Analytics: under the dedicated-plugins layering the plugins
+      # (including workflows, the annotation/review event producer) execute
+      # here rather than in fiftyone-app, so this service has to reach the
+      # queue too. Emit is fire-and-forget; unset = those events don't flow.
+      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
+      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      # If you are routing through a proxy server you will want to set
+      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
+      #  then add the following environment variables to your
+      #  `compose.override.yaml`
+      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
+      # HTTP_PROXY: ${HTTP_PROXY_URL}
+      # NO_PROXY: ${NO_PROXY_LIST}
+      # http_proxy: ${HTTP_PROXY_URL}
+      # https_proxy: ${HTTPS_PROXY_URL}
+      # no_proxy: ${NO_PROXY_LIST}
+    restart: always
+    volumes:
+      - plugins-vol:/opt/plugins:ro
+
+  teams-plugins-telemetry:
+    image: voxel51/telemetry-sidecar:v2.25.2
+    pid: "service:teams-plugins"
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POD_NAME: teams-plugins
+      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
+      SERVICE_TYPE: teams-plugins
+      TARGET_NAME: ${TEAMS_PLUGINS_TARGET_NAME:-hypercorn}
+      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 512M
+        reservations:
+          cpus: "0.20"
+          memory: 512M
+    restart: always
+    depends_on:
+      teams-plugins:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
+
+volumes:
+  plugins-vol:

@@ -1,5 +1,5 @@
-//go:build docker || compose || integration || integrationComposeInternalAuth
-// +build docker compose integration integrationComposeInternalAuth
+//go:build docker || compose || integration || integrationCompose
+// +build docker compose integration integrationCompose
 
 package integration
 
@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	internalAuthFixtureEnvFilePath = "../../fixtures/docker/integration_internal_auth.env"
-	overrideFile                   = "../../tests/fixtures/docker/compose.override.yaml"
-	mongodbComposeFile             = "../../tests/fixtures/docker/compose.override.mongodb.yaml"
-	mongodbComposeFilePlugins      = "../../tests/fixtures/docker/compose.override.mongodb_plugins.yaml"
-	mongodbComposeFileDO           = "../../tests/fixtures/docker/compose.override.mongodb_do.yaml"
+	fixtureEnvFilePath        = "../../fixtures/docker/integration.env"
+	overrideFile              = "../tests/fixtures/docker/compose.override.yaml"
+	mongodbComposeFile        = "../tests/fixtures/docker/compose.override.mongodb.yaml"
+	mongodbComposeFilePlugins = "../tests/fixtures/docker/compose.override.mongodb_plugins.yaml"
+	mongodbComposeFileDO      = "../tests/fixtures/docker/compose.override.mongodb_do.yaml"
 )
 
 type serviceValidations struct {
@@ -41,22 +41,20 @@ func get_logs(t *testing.T, dockerOptions *docker.Options, container string) str
 }
 
 func checkContainerLogsWithRetries(subT *testing.T, dockerOptions *docker.Options, container string, tc string, expected string) {
-	maxRetries := 6
-	retryDelay := 2 * time.Second
+	// Workers such as teams-do can take well over 30 seconds
+	// to log their startup line on a shared CI runner.
+	timeout := 2 * time.Minute
+	retryDelay := 5 * time.Second
+	deadline := time.Now().Add(timeout)
 
 	var log string
 
-	for i := 0; i < maxRetries; i++ {
+	for {
 		log = get_logs(subT, dockerOptions, container)
-		if strings.Contains(log, expected) {
-			// Log entry found, proceed to next container
+		if strings.Contains(log, expected) || time.Now().After(deadline) {
 			break
 		}
-
-		// Log entry not found, wait before retrying
-		if i < maxRetries-1 {
-			time.Sleep(retryDelay)
-		}
+		time.Sleep(retryDelay)
 	}
 
 	// Final assertion

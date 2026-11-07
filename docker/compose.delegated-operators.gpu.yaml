@@ -6,7 +6,8 @@
 #
 # Gated behind the `gpu` profile. Activate with:
 #
-#   docker compose --profile gpu \
+#   docker compose \
+#     --profile gpu \
 #     -f compose.yaml \
 #     -f compose.delegated-operators.yaml \
 #     -f compose.delegated-operators.gpu.yaml \

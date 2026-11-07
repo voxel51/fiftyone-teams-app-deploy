@@ -57,8 +57,8 @@ NO_PROXY_LIST: "fiftyone-app,teams-api,teams-app,teams-cas,teams-plugins"
 Examples of these settings are also included in the
 FiftyOne Enterprise configuration files:
 
-- [common-services.yaml](../common-services.yaml)
-- [internal-auth/env.template](../internal-auth/env.template)
+- [compose.yaml](../compose.yaml)
+- [env.template](../env.template)
 
 By default, the Global Agent Proxy will log all outbound connections and
 identify which connections are routed through the proxy.

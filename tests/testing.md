@@ -143,7 +143,7 @@ See
 1. Download dev license file
 
     ```shell
-    make license-secret-internal
+    make license-secret
     ```
 
 1. Install cert-manager and mongodb into minikube

@@ -16,7 +16,7 @@
 
 The Agentic Labeler is a builtin service (few-shot VLM inference via vLLM).
 It runs on a dedicated GPU delegated-operator worker added by
-[internal-auth/compose.agenticlabeler.yaml](../internal-auth/compose.agenticlabeler.yaml).
+[compose.agenticlabeler.yaml](../compose.agenticlabeler.yaml).
 
 For how builtin services are declared, which worker
 each one runs on, and accelerator sizing, see
@@ -35,11 +35,12 @@ each one runs on, and accelerator sizing, see
 
 ## Run the worker
 
-From the `internal-auth` directory,
+From the `docker` directory,
 add `-f compose.agenticlabeler.yaml` to your usual `-f` set:
 
 ```shell
 docker compose \
+  -f compose.yaml \
   -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.agenticlabeler.yaml \

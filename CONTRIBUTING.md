@@ -66,7 +66,7 @@
 1. Download dev license file
 
     ```shell
-    make license-secret-internal
+    make license-secret
     ```
 
 1. Install or update the required helm repositories
@@ -243,7 +243,7 @@ kubectl create namespace "${NAMESPACE}" --context minikube
 ```
 
 ```shell
-make license-secret-internal
+make license-secret
 ```
 
 When debugging, it may be helpful to start minikube with the flag
