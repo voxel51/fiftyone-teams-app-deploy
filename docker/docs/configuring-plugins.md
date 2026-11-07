@@ -24,13 +24,13 @@ Plugins run in the `fiftyone-app` service.
 To enable this mode
 
 1. Use the file
-[legacy-auth/compose.plugins.yaml](../legacy-auth/compose.plugins.yaml)
+[internal-auth/compose.plugins.yaml](../internal-auth/compose.plugins.yaml)
 instead of
-[legacy-auth/compose.yaml](../legacy-auth/compose.yaml)
+[internal-auth/compose.yaml](../internal-auth/compose.yaml)
 as part of your `docker compose` command to create a new Docker Volume shared
 between FiftyOne Enterprise services.
 
-Example `docker compose` command for this mode from the `legacy-auth` directory
+Example `docker compose` command for this mode from the `internal-auth` directory
 
 ```shell
 docker compose \
@@ -50,9 +50,9 @@ file
     - `FIFTYONE_TEAMS_PLUGIN_URL=http://teams-plugins:5151`
 
 1. Use the file
-[legacy-auth/compose.dedicated-plugins.yaml](../legacy-auth/compose.dedicated-plugins.yaml)
+[internal-auth/compose.dedicated-plugins.yaml](../internal-auth/compose.dedicated-plugins.yaml)
 instead of
-[legacy-auth/compose.yaml](../legacy-auth/compose.yaml).
+[internal-auth/compose.yaml](../internal-auth/compose.yaml).
 as part of your `docker comppse` command to create a new Docker Volume shared
 between FiftyOne Enterprise services.
 
@@ -63,7 +63,7 @@ between FiftyOne Enterprise services.
     - `no_proxy`
     - `NO_PROXY`
 
-Example `docker compose` command for this mode from the `legacy-auth` directory
+Example `docker compose` command for this mode from the `internal-auth` directory
 
 ```shell
 docker compose \

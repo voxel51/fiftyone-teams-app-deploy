@@ -29,7 +29,6 @@ services:
     environment:
       CAS_URL: ${BASE_URL}
       NEXTAUTH_URL: ${BASE_URL}/cas/api/auth
-      FIFTYONE_AUTH_MODE: internal
     extends:
       file: ../common-services.yaml
       service: teams-cas-common

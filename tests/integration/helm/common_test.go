@@ -1,5 +1,5 @@
-//go:build docker || helm || integration || integrationHelmInternalAuth || integrationHelmLegacyAuth || integrationHelmTopology
-// +build docker helm integration integrationHelmInternalAuth integrationHelmLegacyAuth integrationHelmTopology
+//go:build docker || helm || integration || integrationHelmInternalAuth || integrationHelmTopology
+// +build docker helm integration integrationHelmInternalAuth integrationHelmTopology
 
 package integration
 
@@ -48,7 +48,6 @@ const (
 	chartPath           = "../../../helm/fiftyone-teams-app/"
 	integrationValues   = "../../fixtures/helm/integration_values.yaml"
 	licenseFileInternal = "../../fixtures/helm/internal-license.key"
-	licenseFileLegacy   = "../../fixtures/helm/legacy-license.key"
 	// for minikube, where node count is 1, we don't need ReadWriteMany and NFS
 	persistentVolumeYamlTpl = `---
 apiVersion: v1

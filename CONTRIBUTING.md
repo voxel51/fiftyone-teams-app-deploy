@@ -63,13 +63,7 @@
     make start
     ```
 
-1. Download dev license file (legacy or internal)
-
-    ```shell
-    make license-secret-legacy
-    ```
-
-    or
+1. Download dev license file
 
     ```shell
     make license-secret-internal
@@ -247,14 +241,6 @@ First ensure the namespace is created, matching what's defined in
 export NAMESPACE=fiftyone-teams
 kubectl create namespace "${NAMESPACE}" --context minikube
 ```
-
-For legacy CAS mode
-
-```shell
-make license-secret-legacy
-```
-
-For internal CAS mode
 
 ```shell
 make license-secret-internal

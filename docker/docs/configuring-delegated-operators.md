@@ -18,11 +18,11 @@ This option may be added to any of the three existing
 [plugin modes](./configuring-plugins.md).
 
 To enable this mode and launch worker containers, use
-[legacy-auth/compose.delegated-operators.yaml](legacy-auth/compose.delegated-operators.yaml)
+[internal-auth/compose.delegated-operators.yaml](../internal-auth/compose.delegated-operators.yaml)
 in conjunction with one of the three plugin configurations.
 
 - Example `docker compose` command for enabling this mode on top of dedicated
-  plugins mode, from the `legacy-auth` directory
+  plugins mode, from the `internal-auth` directory
 
     ```shell
     docker compose \

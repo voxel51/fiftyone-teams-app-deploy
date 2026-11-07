@@ -1,5 +1,5 @@
-//go:build docker || compose || unit || unitComposeInternalAuth || unitComposeLegacyAuth
-// +build docker compose unit unitComposeInternalAuth unitComposeLegacyAuth
+//go:build docker || compose || unit || unitComposeInternalAuth
+// +build docker compose unit unitComposeInternalAuth
 
 package unit
 

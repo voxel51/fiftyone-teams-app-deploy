@@ -64,7 +64,6 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "cookieSecret",           // pragma: allowlist secret
 				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":      "fiftyone-teams-secrets", // pragma: allowlist secret
 				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "cookieSecret",           // pragma: allowlist secret
-				"casSettings.env.FIFTYONE_AUTH_MODE":                             "internal",
 				"casSettings.env.CAS_DATABASE_NAME":                              "cas-int-bp-" + suffix,
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":      "fiftyone-teams-secrets", // pragma: allowlist secret
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "cookieSecret",           // pragma: allowlist secret
@@ -123,7 +122,6 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"appSettings.volumes[0].persistentVolumeClaim.readOnly":                                                    "true",
 				"appSettings.volumeMounts[0].name":                                                                         "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                                                                    "/opt/plugins",
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                                                       "internal",
 				"casSettings.env.CAS_DATABASE_NAME":                                                                        "cas-int-sp-" + suffix,
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
@@ -211,7 +209,6 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				"apiSettings.volumeMounts[0].mountPath":                                               "/opt/plugins",
 				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                           "fiftyone-teams-secrets", // pragma: allowlist secret
 				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                            "cookieSecret",           // pragma: allowlist secret
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                                  "internal",
 				"casSettings.env.CAS_DATABASE_NAME":                                                   "cas-int-dp-" + suffix,
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                           "fiftyone-teams-secrets", // pragma: allowlist secret
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                            "cookieSecret",           // pragma: allowlist secret
