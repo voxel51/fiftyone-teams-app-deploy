@@ -1598,9 +1598,6 @@ secret:
     # -- MongoDB Connection String. [Reference][mongodb-connection-string].
     mongodbConnectionString: ""
 
-    # -- A randomly generated string for cookie encryption.
-    # To generate, run `openssl rand -hex 32`.
-    cookieSecret: ""
     # -- Encryption key for storage credentials. [Reference][fiftyone-encryption-key].
     encryptionKey: ""
     # -- A randomly generated string for CAS Authentication.
