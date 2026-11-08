@@ -452,7 +452,7 @@ name on each copy) — see the per-slot inline comments in
 
 Each worker now registers under its own orchestrator name (slot 2 as
 `teams-do-2`, slot 3 as `teams-do-3`) so they surface separately in
-Settings → Metrics. Resource impact scales linearly with the worker
+Monitoring → System Health. Resource impact scales linearly with the worker
 count: each additional slot adds ~0.2 CPU and ~1 GiB of memory
 (worker reservation + paired sidecar).
 

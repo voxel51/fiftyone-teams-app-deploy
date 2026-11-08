@@ -16,7 +16,7 @@
 
 Telemetry adds a lightweight per-service metrics collector (sidecar
 pattern) and a Redis backend.
-In the app, the Settings → Metrics page in displays live CPU / memory /
+In the app, the Monitoring → System Health page displays live CPU / memory /
 thread / file-descriptor samples and tailed stdout logs for each
 observed service.
 
@@ -203,7 +203,7 @@ COMPOSE_PROFILES=do-3 docker compose -f compose.yaml \
 Set `COMPOSE_PROFILES` in your `.env` to persist the choice, or pass
 `--profile do-<N>` on the command line. Each worker registers under its
 own orchestrator name (slot 2 as `teams-do-2`, slot 3 as `teams-do-3`)
-so they surface distinctly in Settings → Metrics.
+so they surface distinctly in Monitoring → System Health.
 
 > [!IMPORTANT]
 > v2.19 deprecates the `FIFTYONE_DELEGATED_OPERATOR_WORKER_REPLICAS`
