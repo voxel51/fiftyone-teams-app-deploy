@@ -138,11 +138,6 @@ Before you upgrade, update your `values.yaml`:
 1. Remove `casSettings.env.FIFTYONE_AUTH_MODE` if it's set.
 1. Remove `secret.fiftyone.cookieSecret` if it's set.
    No FiftyOne Enterprise service reads it.
-1. Make sure `secret.fiftyone.fiftyoneAuthSecret` is set.
-   CAS and the services that call it use it to authenticate to each other.
-   If you change its value on an installed release,
-   restart every deployment in the namespace,
-   because running pods keep the old value until they restart.
 
 #### FiftyOne Enterprise v2.25+ Activity Core
 
