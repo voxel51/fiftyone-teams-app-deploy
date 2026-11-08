@@ -412,12 +412,10 @@ FiftyOne.
 
 ### :hammer_and_wrench: Optional: CAS Customization Instructions
 
-1. Update required CAS variables in `.env`:
-   - `FIFTYONE_AUTH_SECRET`
+1. Update CAS variables in `.env`:
    - `CAS_BASE_URL`
    - `CAS_BIND_ADDRESS`
    - `CAS_BIND_PORT`
-   - `CAS_DATABASE_NAME` (⚠️ Must be unique per deployment)
    - `CAS_DEBUG`
    - `CAS_DEFAULT_USER_ROLE`
 1. Update `compose.override.yaml` with any needed `teams-cas` service changes.
