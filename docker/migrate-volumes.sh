@@ -8,11 +8,16 @@
 # so Compose would start with a new, empty plugins volume.
 # This script finds the old volume by its Compose labels
 # and copies its contents into the new project's volume.
+# It picks a source on its own only from the internal-auth or legacy-auth projects,
+# because a host can run other deployments with their own plugins volumes.
 # It never changes or removes the old volume.
 
 set -euo pipefail
 
 VOLUME_KEY='plugins-vol'
+# Project names that the pre-v2.26 docker/internal-auth and
+# docker/legacy-auth directories gave their deployments by default.
+DEFAULT_OLD_PROJECTS=(internal-auth legacy-auth)
 FROM_PROJECT=''
 IMAGE=''
 FORCE='false'
@@ -33,7 +38,8 @@ $package [options] -- [docker compose options]
 
 options:
   --from-project NAME  copy from this Compose project's plugins volume
-                       (required when more than one old project has one)
+                       (required unless the old project is internal-auth
+                       or legacy-auth)
   --image IMAGE        image used to copy the files
                        (default: the telemetry-redis service's image)
   --force              copy even when the new plugins volume already has files
@@ -138,14 +144,56 @@ fi
 
 dest="${project}_${VOLUME_KEY}"
 
+image_checked='false'
+ensure_image() {
+  [[ $image_checked == 'false' ]] || return 0
+  if [[ -z $IMAGE ]]; then
+    IMAGE=$(telemetry_redis_image "$config")
+    [[ -n $IMAGE ]] || fail "could not find the telemetry-redis image. Pass --image."
+  fi
+  if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    fail "image '$IMAGE' isn't on this host. Run 'docker compose <your options> pull' first, load it on air-gapped hosts, or pass --image."
+  fi
+  image_checked='true'
+}
+
+is_default_old_project() {
+  local name
+  for name in "${DEFAULT_OLD_PROJECTS[@]}"; do
+    [[ $1 == "$name" ]] && return 0
+  done
+  return 1
+}
+
+# A project that kept its name, or a second run, already has its plugins.
+dest_exists='false'
+if docker volume inspect "$dest" >/dev/null 2>&1; then
+  dest_exists='true'
+  ensure_image
+  contents=$(docker run \
+    --rm \
+    --volume "$dest:/to:ro" \
+    --entrypoint sh \
+    "$IMAGE" \
+    -c 'ls -A /to | head -n 1')
+  if [[ -n $contents && $FORCE != 'true' ]]; then
+    log "skipped: $dest already has files, so there's nothing to copy. Use --force to copy over them."
+    exit 0
+  fi
+fi
+
 # Find plugins volumes that other Compose projects created.
 sources=()
 source_projects=()
+other_projects=()
 while IFS= read -r volume; do
   [[ -n $volume ]] || continue
   volume_project=$(volume_label "$volume" com.docker.compose.project)
   [[ $volume_project != "$project" ]] || continue
-  if [[ -n $FROM_PROJECT && $volume_project != "$FROM_PROJECT" ]]; then
+  if [[ -n $FROM_PROJECT ]]; then
+    [[ $volume_project == "$FROM_PROJECT" ]] || continue
+  elif ! is_default_old_project "$volume_project"; then
+    other_projects+=("$volume_project")
     continue
   fi
   sources+=("$volume")
@@ -156,7 +204,11 @@ if [[ ${#sources[@]} -eq 0 ]]; then
   if [[ -n $FROM_PROJECT ]]; then
     fail "no $VOLUME_KEY volume belongs to project '$FROM_PROJECT'"
   fi
-  log "skipped: no $VOLUME_KEY volume from an older project was found"
+  log "skipped: no $VOLUME_KEY volume from an internal-auth or legacy-auth project was found"
+  if [[ ${#other_projects[@]} -gt 0 ]]; then
+    log "other projects on this host have one: ${other_projects[*]}
+  If one of them is this deployment's old project, run again with --from-project <project>."
+  fi
   exit 0
 fi
 
@@ -178,27 +230,9 @@ if [[ -n $running ]]; then
   docker compose -p $src_project down"
 fi
 
-if [[ -z $IMAGE ]]; then
-  IMAGE=$(telemetry_redis_image "$config")
-  [[ -n $IMAGE ]] || fail "could not find the telemetry-redis image. Pass --image."
-fi
+ensure_image
 
-if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-  fail "image '$IMAGE' isn't on this host. Run 'docker compose <your options> pull' first, load it on air-gapped hosts, or pass --image."
-fi
-
-if docker volume inspect "$dest" >/dev/null 2>&1; then
-  contents=$(docker run \
-    --rm \
-    --volume "$dest:/to:ro" \
-    --entrypoint sh \
-    "$IMAGE" \
-    -c 'ls -A /to | head -n 1')
-  if [[ -n $contents && $FORCE != 'true' ]]; then
-    log "skipped: $dest already has files. Use --force to copy over them."
-    exit 0
-  fi
-else
+if [[ $dest_exists == 'false' ]]; then
   log "creating $dest"
   # Compose reuses a volume without a warning when these two labels match.
   run_or_print docker volume create \

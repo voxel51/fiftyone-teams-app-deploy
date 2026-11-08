@@ -163,7 +163,7 @@ func volumeExists(volume string) bool {
 
 func TestMigrateVolumesCopiesPlugins(t *testing.T) {
 	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
-	src := createSourceVolume(t, uniqueName("oldproj"), "plugin/fiftyone.yml", "name: my-plugin")
+	src := createSourceVolume(t, "legacy-auth", "plugin/fiftyone.yml", "name: my-plugin")
 
 	out, code := e.migrate()
 
@@ -185,7 +185,7 @@ func TestMigrateVolumesSkipsMissing(t *testing.T) {
 
 func TestMigrateVolumesSkipsWithoutPluginsOverlay(t *testing.T) {
 	e := newMigrateEnv(t, "compose.yaml")
-	createSourceVolume(t, uniqueName("oldproj"), "plugin/fiftyone.yml", "name: my-plugin")
+	createSourceVolume(t, "legacy-auth", "plugin/fiftyone.yml", "name: my-plugin")
 
 	out, code := e.migrate()
 
@@ -196,8 +196,8 @@ func TestMigrateVolumesSkipsWithoutPluginsOverlay(t *testing.T) {
 
 func TestMigrateVolumesStopsOnTwoSources(t *testing.T) {
 	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
-	legacy := uniqueName("legacy-auth")
-	internal := uniqueName("internal-auth")
+	legacy := "legacy-auth"
+	internal := "internal-auth"
 	createSourceVolume(t, legacy, "plugin/fiftyone.yml", "from: legacy")
 	createSourceVolume(t, internal, "plugin/fiftyone.yml", "from: internal")
 
@@ -217,7 +217,7 @@ func TestMigrateVolumesStopsOnTwoSources(t *testing.T) {
 
 func TestMigrateVolumesStopsWhileOldProjectRuns(t *testing.T) {
 	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
-	old := uniqueName("oldproj")
+	old := "legacy-auth"
 	createSourceVolume(t, old, "plugin/fiftyone.yml", "name: my-plugin")
 	container := run(t, "", "docker", "run", "-d",
 		"--label", "com.docker.compose.project="+old,
@@ -234,7 +234,7 @@ func TestMigrateVolumesStopsWhileOldProjectRuns(t *testing.T) {
 
 func TestMigrateVolumesStopsWhenImageMissing(t *testing.T) {
 	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
-	createSourceVolume(t, uniqueName("oldproj"), "plugin/fiftyone.yml", "name: my-plugin")
+	createSourceVolume(t, "legacy-auth", "plugin/fiftyone.yml", "name: my-plugin")
 
 	out, code := e.migrate("--image", "voxel51/does-not-exist:"+uniqueName("tag"))
 
@@ -245,7 +245,7 @@ func TestMigrateVolumesStopsWhenImageMissing(t *testing.T) {
 
 func TestMigrateVolumesSkipsNonEmptyDestination(t *testing.T) {
 	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
-	src := createSourceVolume(t, uniqueName("oldproj"), "plugin/fiftyone.yml", "version: 1")
+	src := createSourceVolume(t, "legacy-auth", "plugin/fiftyone.yml", "version: 1")
 
 	out, code := e.migrate()
 	require.Equal(t, 0, code, out)
@@ -272,7 +272,7 @@ func TestMigrateVolumesDestinationHasComposeLabels(t *testing.T) {
 	probe := filepath.Join(t.TempDir(), "compose.probe.yaml")
 	require.NoError(t, os.WriteFile(probe, []byte(migrateProbeCompose), 0o644))
 	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml", probe)
-	createSourceVolume(t, uniqueName("oldproj"), "plugin/fiftyone.yml", "name: my-plugin")
+	createSourceVolume(t, "legacy-auth", "plugin/fiftyone.yml", "name: my-plugin")
 
 	out, code := e.migrate()
 	require.Equal(t, 0, code, out)
@@ -295,7 +295,7 @@ func TestMigrateVolumesDestinationHasComposeLabels(t *testing.T) {
 
 func TestMigrateVolumesFailsWhenVolumeListFails(t *testing.T) {
 	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
-	createSourceVolume(t, uniqueName("oldproj"), "plugin/fiftyone.yml", "name: my-plugin")
+	createSourceVolume(t, "legacy-auth", "plugin/fiftyone.yml", "name: my-plugin")
 
 	// A docker wrapper that fails only `docker compose ... config --volumes`
 	// and passes every other command to the real docker.
@@ -320,4 +320,42 @@ exec %q "$@"
 	require.NotContains(t, out, "skipped")
 	require.Contains(t, out, "config --volumes")
 	require.False(t, volumeExists(e.destVolume()), "no destination volume should be created")
+}
+
+// On a host that runs several deployments,
+// a project that kept its own name already has its plugins,
+// so the script should skip without looking at other projects.
+func TestMigrateVolumesSkipsWhenDestinationHasFilesOnSharedHost(t *testing.T) {
+	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
+	createSourceVolume(t, e.destProject, "plugin/fiftyone.yml", "from: mine")
+	createSourceVolume(t, uniqueName("alice"), "plugin/fiftyone.yml", "from: alice")
+	createSourceVolume(t, uniqueName("bob"), "plugin/fiftyone.yml", "from: bob")
+
+	out, code := e.migrate()
+
+	require.Equal(t, 0, code, out)
+	require.Contains(t, out, "already has files")
+	require.Equal(t, "1000:1000\nfrom: mine", readFile(t, e.destVolume(), "plugin/fiftyone.yml"))
+}
+
+// A plugins volume from a project with any other name
+// may belong to another deployment on the same host,
+// so the script only copies it when asked by name.
+func TestMigrateVolumesIgnoresOtherProjectNamesWithoutFromProject(t *testing.T) {
+	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
+	teammate := uniqueName("teammate")
+	createSourceVolume(t, teammate, "plugin/fiftyone.yml", "from: teammate")
+
+	out, code := e.migrate()
+
+	require.Equal(t, 0, code, out)
+	require.Contains(t, out, "skipped")
+	require.Contains(t, out, "--from-project")
+	require.Contains(t, out, teammate)
+	require.False(t, volumeExists(e.destVolume()), "no destination volume should be created")
+
+	out, code = e.migrate("--from-project", teammate)
+
+	require.Equal(t, 0, code, out)
+	require.Equal(t, "1000:1000\nfrom: teammate", readFile(t, e.destVolume(), "plugin/fiftyone.yml"))
 }
