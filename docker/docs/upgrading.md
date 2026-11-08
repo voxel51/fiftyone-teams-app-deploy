@@ -129,6 +129,15 @@ Because the project name changes,
 Compose creates a new, empty plugins volume.
 `migrate-volumes.sh` copies your plugins from the old volume into the new one.
 
+If you already set your own project name,
+with a top-level `name:` in `compose.override.yaml`,
+`COMPOSE_PROJECT_NAME` in `.env`,
+or `-p` on the command line,
+Compose keeps that name.
+It reuses your existing volumes,
+so your plugins and other data stay where they are,
+and `migrate-volumes.sh` has nothing to copy.
+
 > [!WARNING]
 > Named volumes that you added in `compose.override.yaml`,
 > such as a MongoDB data volume,
@@ -233,9 +242,17 @@ To upgrade:
    ```
 
    The script finds the old plugins volume by its Compose labels.
-   If it finds more than one,
-   choose one with `--from-project`.
-   If you don't use plugins, it skips the copy.
+   It skips the copy when:
+    - the new project's plugins volume already has files,
+      for example because you kept your project name
+    - your `-f` files don't include a plugins file
+    - no `internal-auth` or `legacy-auth` project has a plugins volume
+
+   It picks a source on its own only from the `internal-auth` or `legacy-auth` project.
+   If both have one,
+   or your old deployment used a different project name,
+   name it with `--from-project`.
+   The skip message lists other projects on the host that have a plugins volume.
 1. Start the stack with the same `-f` options and `up -d`.
 1. Once the new stack works, remove the old plugins volume.
    The script prints the command.
