@@ -204,8 +204,6 @@ print(Fernet.generate_key().decode())
 
 - `LOCAL_LICENSE_FILE_DIR` – Path where the license is mounted
 - `FIFTYONE_AUTH_SECRET` – Shared secret for CAS and App auth
-- `CAS_DATABASE_NAME` – The MongoDB database CAS uses.
-  It must be unique per deployment.
 - Any other variables noted in the `.env.template` or listed in the
   [Environment Variables](#environment-variables) section
 
@@ -414,18 +412,12 @@ FiftyOne.
 
 ### :hammer_and_wrench: Optional: CAS Customization Instructions
 
-> [!WARNING]
-> Set `CAS_DATABASE_NAME` in
-> [Step 3](#gear-step-3-configure-environment),
-> before the initial deployment.
-> Changing it later points CAS at a new, empty database.
-> Existing users, roles, and settings stay in the old database.
-
 1. Update required CAS variables in `.env`:
    - `FIFTYONE_AUTH_SECRET`
    - `CAS_BASE_URL`
    - `CAS_BIND_ADDRESS`
    - `CAS_BIND_PORT`
+   - `CAS_DATABASE_NAME` (⚠️ Must be unique per deployment)
    - `CAS_DEBUG`
    - `CAS_DEFAULT_USER_ROLE`
 1. Update `compose.override.yaml` with any needed `teams-cas` service changes.
