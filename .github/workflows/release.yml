@@ -43,7 +43,7 @@ jobs:
           # CR_SKIP_EXISTING: true so that internal charts don't get into
           # inconsistent states.
           CR_SKIP_EXISTING: false
-        uses: helm/chart-releaser-action@v1.7.0
+        uses: helm/chart-releaser-action@v1.8.0
         with:
           charts_dir: helm
 

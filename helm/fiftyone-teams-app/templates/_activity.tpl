@@ -71,20 +71,6 @@ URL is only how the queue is reached once enabled.
 {{- end }}
 
 {{/*
-The UI flags are NOT rendered by the chart. `VFF_WF_ACTIVITY` (workflow
-Activity tab + label History panel) and `VFF_WF_METRIC` (pre-release Metrics
-tab) are internal debug surfaces: every deployment defaults to off, and an
-environment that wants one opts in through `teamsAppSettings.env`.
-
-`activity.enabled-env` above gates *capture* only. Coupling the surfaces to
-it was tried and reverted: the only way to force a coupled flag back off was
-a second `teamsAppSettings.env` entry, and a duplicate env name is not a
-supported override — the API server warns under client-side apply that the
-later entry "may be dropped when using apply" and rejects the Deployment
-under server-side apply.
-*/}}
-
-{{/*
 Emit a `FIFTYONE_ACTIVITY_MONGO_DB` env entry for a main workload container.
 Renders empty when Activity Core is disabled OR when no dedicated
 database is configured, allowing safe inclusion from env-vars-list helpers.

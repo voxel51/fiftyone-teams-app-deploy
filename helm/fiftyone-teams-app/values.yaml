@@ -6,13 +6,12 @@
 activitySettings:
   # -- Controls whether the Activity Core worker Deployments are rendered and
   # whether the producer workloads (teams-api, fiftyone-app, teams-plugins,
-  # and the delegated operators) are told to emit. The UI surfaces that read
-  # the result are separate, default-off opt-ins through `teamsAppSettings.env`
-  # (`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel,
-  # `VFF_WF_METRIC` for the pre-release Metrics tab).
-  # Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if
-  # only one of the two is on.
-  enabled: false
+  # and the delegated operators) are told to emit. On by default: the Audit
+  # Log, the Jobs pages, and the annotation Metrics tab all read what it
+  # records. To turn Activity Core off, set both this and
+  # `fiftyoneMq.enabled` to `false`; the chart fails the render if this is
+  # on and the queue is off.
+  enabled: true
   image:
     # -- Worker image.
     repository: voxel51/fiftyone-activity
@@ -50,13 +49,18 @@ activitySettings:
     # co-located in the per-deployment FiftyOne database. Set a name to use a
     # dedicated database.
     database: ""
-  # -- Organization that the deployment-wide rollups are attributed to. This is
-  # the organization's `id` FIELD (its slug), not the Mongo `_id`.
-  # Leave empty: a single-org deployment is discovered automatically. Set it
-  # only when the deployment holds several organizations, where the
-  # deployment-wide counts cannot be attributed to one of them — the workers
-  # log which one to name.
+  # -- Organization stamped on the events the workers record themselves (the
+  # database watch), which carry no request to take one from. This is the
+  # organization's `id` FIELD (its slug), not the Mongo `_id`. Per-request
+  # events and the dataset and sample counts (read by `teams-api` from CAS)
+  # carry the organization without it.
   orgId: ""
+  watch:
+    # -- Controls whether the rollup worker watches the FiftyOne database's
+    # change stream, recording writes no service reported (such as direct
+    # database edits). Needs a replica set; on a standalone MongoDB it records
+    # nothing and logs why.
+    enabled: true
   # -- Resources for the worker containers. [Reference][resources].
   resources:
     requests:
@@ -65,9 +69,6 @@ activitySettings:
     limits:
       cpu: 500m
       memory: 512Mi
-  # -- Snapshot interval in milliseconds. Defaults to hourly, matching the
-  # bucket the state metrics roll up by.
-  snapshotIntervalMs: ""
   # One Deployment is rendered per entry.
   workers:
     ingest:
@@ -96,14 +97,6 @@ activitySettings:
       replicaCount: 1
       # -- Use the `Recreate` strategy. The rollup worker owns a repeatable
       # schedule, so only one replica may reconcile it.
-      recreate: true
-    snapshot:
-      # -- Entrypoint for the snapshot worker.
-      command: ["fiftyone-activity-snapshot-worker"]
-      # -- Number of snapshot worker replicas. Keep at 1.
-      replicaCount: 1
-      # -- Use the `Recreate` strategy. The snapshot worker owns a repeatable
-      # schedule, and two replicas would double-count a bucket.
       recreate: true
 
 # yaml-language-server: $schema=values.schema.json
@@ -1273,8 +1266,9 @@ fiftyoneLicenseSecrets:
 # sets `FIFTYONE_MQ_REDIS_URL` on the workloads that publish to the queue.
 fiftyoneMq:
   # -- Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL`
-  # environment variable are rendered.
-  enabled: false
+  # environment variable are rendered. On by default, paired with
+  # `activitySettings.enabled`.
+  enabled: true
   redis:
     # -- Controls whether the bundled Redis Deployment and Service are
     # rendered. Set to `false` when using `fiftyoneMq.redis.external.url`.
@@ -1288,7 +1282,7 @@ fiftyoneMq:
       # queued jobs.
       url: ""
     # -- Redis image for the bundled queue backend.
-    image: redis:7-alpine
+    image: redis:8-alpine
     # -- Memory limit for the bundled Redis.
     maxmemory: 200mb
     persistence:
@@ -1668,8 +1662,8 @@ teamsAppSettings:
     # -- When `false`, disables media export options
     FIFTYONE_APP_ALLOW_MEDIA_EXPORT: true
     # -- The recommended fiftyone SDK version that will be displayed in the
-    # install modal (i.e. `pip install ... fiftyone==2.25.1`).
-    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.25.1
+    # install modal (i.e. `pip install ... fiftyone==2.25.2`).
+    FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION: 2.25.2
     # -- The default theme configuration.
     # `dark`: Theme will be dark when user visits for the first time.
     # `light`: Theme will be light theme when user visits for the first time.
@@ -1885,7 +1879,7 @@ telemetry:
     create: true
   redis:
     # -- Container image for the telemetry Redis Deployment.
-    image: redis:7-alpine
+    image: redis:8-alpine
     persistence:
       # -- Whether to provision a `PersistentVolumeClaim` for the bundled
       # telemetry Redis. Defaults to `false` (emptyDir) so the chart installs
@@ -1915,9 +1909,10 @@ telemetry:
       limits:
         cpu: 250m
         memory: 512Mi
-    # -- Pod-level security attributes for the telemetry Redis. UID/GID 999
-    # matches the `redis` user in the `redis:7-alpine` image; `fsGroup` keeps
-    # the mounted `/data` volume group-writable. [Reference][security-context].
+    # -- Pod-level security attributes for the telemetry Redis. UID 999
+    # matches the `redis` user in the `redis:8-alpine` image (whose primary
+    # GID is 1000); `runAsGroup` and `fsGroup` set GID 999 so the mounted
+    # `/data` volume is group-writable. [Reference][security-context].
     podSecurityContext:
       runAsNonRoot: true
       runAsUser: 999

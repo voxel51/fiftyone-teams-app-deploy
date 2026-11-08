@@ -465,14 +465,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
-          },
-          {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
             "value": "http://fiftyone-app:80"
           },
@@ -549,14 +541,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneAuthSecret"
               }
             }
-          },
-          {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
           },
           {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
@@ -650,14 +634,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
-          },
-          {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
             "value": "http://fiftyone-app:80"
           },
@@ -733,14 +709,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneAuthSecret"
               }
             }
-          },
-          {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
           },
           {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
@@ -819,14 +787,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
-          },
-          {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
             "value": "http://fiftyone-app:80"
           },
@@ -901,14 +861,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
                 "key": "fiftyoneAuthSecret"
               }
             }
-          },
-          {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
           },
           {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
@@ -987,14 +939,6 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
             }
           },
           {
-            "name": "FIFTYONE_SERVER_ADDRESS",
-            "value": ""
-          },
-          {
-            "name": "FIFTYONE_SERVER_PATH_PREFIX",
-            "value": "/api/proxy/fiftyone-teams"
-          },
-          {
             "name": "FIFTYONE_TEAMS_PROXY_URL",
             "value": "http://fiftyone-app:80"
           },
@@ -1046,7 +990,7 @@ func (s *deploymentTeamsAppTemplateTest) TestContainerEnv() {
 			subT := s.T()
 			subT.Parallel()
 
-			options := &helm.Options{SetValues: disableTelemetry(testCase.values)}
+			options := &helm.Options{SetValues: disableActivity(disableTelemetry(testCase.values))}
 			output := helm.RenderTemplate(subT, options, s.chartPath, s.releaseName, s.templates)
 
 			var deployment appsv1.Deployment
@@ -2610,67 +2554,13 @@ func (s *deploymentTeamsAppTemplateTest) TestDeploymentUpdateStrategy() {
 	}
 }
 
-// TestNoActivityDebugFlagDefaults pins the policy that the SHIPPING chart
-// never enables the activity/metrics debug flags by default: VFF_WF_ACTIVITY
-// gates the workflow Activity tab + label History and VFF_WF_METRIC gates the
-// pre-release Metrics tab — customers never get either implicitly.
-//
-// This case covers the default render, where activity capture is off.
-// TestActivityEnabledDoesNotSetUIFlags covers the render with capture on.
-func (s *deploymentTeamsAppTemplateTest) TestNoActivityDebugFlagDefaults() {
-	options := &helm.Options{SetValues: map[string]string{}}
-	output := helm.RenderTemplate(
-		s.T(), options, s.chartPath, s.releaseName, s.templates,
-	)
-	for _, flag := range []string{
-		"VFF_WF_ACTIVITY",
-		"VFF_WF_METRIC",
-		"VFF_Workflow_ACTIVITY",
-	} {
-		s.NotContains(
-			output, flag,
-			"the default chart render must not set %s — debug flags are per-env opt-ins",
-			flag,
-		)
-	}
-}
-
-// TestActivityEnabledDoesNotSetUIFlags pins that turning on capture does NOT
-// turn on the surfaces that read it. Both flags are internal debug views and
-// stay per-environment opt-ins via teamsAppSettings.env.
-//
-// Coupling VFF_WF_ACTIVITY to activitySettings.enabled was tried and
-// reverted: the only way to force it back off was a second teamsAppSettings
-// env entry, and a duplicate env name is not a supported override (the API
-// server warns under client-side apply and rejects under server-side apply).
-func (s *deploymentTeamsAppTemplateTest) TestActivityEnabledDoesNotSetUIFlags() {
-	options := &helm.Options{SetValues: map[string]string{
-		"activitySettings.enabled": "true",
-		"fiftyoneMq.enabled":       "true",
-	}}
-	output := helm.RenderTemplate(
-		s.T(), options, s.chartPath, s.releaseName, s.templates,
-	)
-
-	for _, flag := range []string{"VFF_WF_ACTIVITY", "VFF_WF_METRIC"} {
-		s.NotContains(
-			output, flag,
-			"enabling activitySettings must not set %s — the UI flags are "+
-				"per-environment opt-ins via teamsAppSettings.env",
-			flag,
-		)
-	}
-}
-
-// TestActivityUIFlagOptIn pins that an environment opting in through
-// teamsAppSettings.env gets exactly one VFF_WF_ACTIVITY entry. A second entry
-// would be a duplicate env name, which is not a supported override.
-func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagOptIn() {
-	options := &helm.Options{SetValues: map[string]string{
-		"activitySettings.enabled":             "true",
-		"fiftyoneMq.enabled":                   "true",
-		"teamsAppSettings.env.VFF_WF_ACTIVITY": "true",
-	}}
+// teamsAppEnvValues renders the teams-app Deployment and returns every value
+// set for the named env var, in order. A duplicate name shows up as more than
+// one value.
+func (s *deploymentTeamsAppTemplateTest) teamsAppEnvValues(
+	setValues map[string]string, name string,
+) []string {
+	options := &helm.Options{SetValues: setValues}
 	output := helm.RenderTemplate(
 		s.T(), options, s.chartPath, s.releaseName, s.templates,
 	)
@@ -2680,14 +2570,72 @@ func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagOptIn() {
 
 	var values []string
 	for _, env := range deployment.Spec.Template.Spec.Containers[0].Env {
-		if env.Name == "VFF_WF_ACTIVITY" {
+		if env.Name == name {
 			values = append(values, env.Value)
 		}
 	}
+	return values
+}
 
-	s.Require().Len(
-		values, 1,
-		"expected exactly one VFF_WF_ACTIVITY entry (no chart-rendered duplicate)",
-	)
-	s.Equal("true", values[0])
+// TestActivityFlagIsNotMisspelled pins that no render emits
+// VFF_Workflow_ACTIVITY. Nothing reads that name -- teams-app allowlists
+// VFF_WF_ACTIVITY -- so a render carrying it is a flag that silently does
+// nothing, which is worse than one that is plainly off.
+//
+// Whether VFF_WF_ACTIVITY itself is rendered is covered by
+// TestChartRendersNoUIFlags and TestActivityUIFlagExplicitValuePassesThrough.
+func (s *deploymentTeamsAppTemplateTest) TestActivityFlagIsNotMisspelled() {
+	for name, setValues := range map[string]map[string]string{
+		"default": {},
+		"activityOff": {
+			"activitySettings.enabled": "false",
+			"fiftyoneMq.enabled":       "false",
+		},
+	} {
+		options := &helm.Options{SetValues: setValues}
+		output := helm.RenderTemplate(
+			s.T(), options, s.chartPath, s.releaseName, s.templates,
+		)
+		s.NotContains(
+			output, "VFF_Workflow_ACTIVITY",
+			"%s: VFF_Workflow_ACTIVITY is not a flag anything reads", name,
+		)
+	}
+}
+
+// TestChartRendersNoUIFlags pins that the chart sets neither UI flag on
+// teams-app, with Activity Core on or off.
+//
+// VFF_WF_METRIC gates nothing from v2.26.0: the Metrics tab is always shown.
+// VFF_WF_ACTIVITY defaults on in the v2.26.0+ app code, so rendering it
+// "true" adds nothing there -- and against a v2.25.x image it would reveal
+// the workflow Activity debug tab and its raw event log, which were deleted
+// in v2.26.0. Leaving both unset is right for every image.
+func (s *deploymentTeamsAppTemplateTest) TestChartRendersNoUIFlags() {
+	for name, setValues := range map[string]map[string]string{
+		"default": {},
+		"activityOff": {
+			"activitySettings.enabled": "false",
+			"fiftyoneMq.enabled":       "false",
+		},
+	} {
+		for _, flag := range []string{"VFF_WF_METRIC", "VFF_WF_ACTIVITY"} {
+			s.Empty(
+				s.teamsAppEnvValues(setValues, flag),
+				"%s: the chart must not render %s", name, flag,
+			)
+		}
+	}
+}
+
+// TestActivityUIFlagExplicitValuePassesThrough pins that an explicit
+// teamsAppSettings.env.VFF_WF_ACTIVITY -- the documented way to hide the
+// dataset Activity tab -- renders as exactly one entry.
+func (s *deploymentTeamsAppTemplateTest) TestActivityUIFlagExplicitValuePassesThrough() {
+	values := s.teamsAppEnvValues(map[string]string{
+		"teamsAppSettings.env.VFF_WF_ACTIVITY": "false",
+	}, "VFF_WF_ACTIVITY")
+
+	s.Require().Len(values, 1, "expected exactly one VFF_WF_ACTIVITY entry")
+	s.Equal("false", values[0])
 }

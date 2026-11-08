@@ -306,6 +306,11 @@ func (s *apiRoleTemplateTest) TestRules() {
         "apiGroups": [""],
         "resources": ["pods/log"],
         "verbs": ["get"]
+      },
+      {
+        "apiGroups": [""],
+        "resources": ["events"],
+        "verbs": ["get", "list"]
       }
     ]`
 	testCases := []struct {

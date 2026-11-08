@@ -404,8 +404,10 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
 {{- range $key, $val := .Values.apiSettings.env }}
+{{- if not (kindIs "invalid" $val) }}
 - name: {{ $key }}
   value: {{ $val | quote }}
+{{- end }}
 {{- end }}
 {{- range $key, $val := .Values.apiSettings.secretEnv }}
 - name: {{ $key }}
@@ -613,10 +615,6 @@ Create a merged list of environment variables for fiftyone-teams-app
     secretKeyRef:
       name: {{ $secretName }}
       key: fiftyoneAuthSecret
-- name: FIFTYONE_SERVER_ADDRESS
-  value: ""
-- name: FIFTYONE_SERVER_PATH_PREFIX
-  value: "/api/proxy/fiftyone-teams"
 - name: FIFTYONE_TEAMS_PROXY_URL
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
 - name: FIFTYONE_TEAMS_PLUGIN_URL

@@ -38,7 +38,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/setup-python@v7.1.0
       - name: Install asdf & tools
         uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
       - name: Run unit tests
@@ -70,7 +70,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/setup-python@v7.1.0
       - name: Temporary SQLite/LZMA - Install missing libraries
         run: sudo apt install -y libsqlite3-dev libbz2-dev
       - name: Install asdf & tools
@@ -132,7 +132,7 @@ jobs:
           sed -i \
             's%voxel51/aloha-github-workflows/.github/actions/generate-version-file@main%./.github/actions/aloha-github-workflows/.github/actions/generate-version-file%' \
             .github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache/action.yml
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/setup-python@v7.1.0
       - name: Install asdf & tools
         uses: ./.github/actions/aloha-github-workflows/.github/actions/asdf-install-and-cache
       - name: Authenticate to Google Cloud
