@@ -36,9 +36,10 @@ renders `fiftyone-app`, `teams-api`, `teams-app`, `teams-cas`,
 `telemetry-redis`, `fiftyone-app-telemetry`, and `teams-api-telemetry`.
 
 Optional overlays provide their own bundled sidecar.
-The `compose.yaml`, `compose.plugins.yaml`, and
-`compose.dedicated-plugins.yaml` are mutually exclusive base files —
-pick one, then layer the `compose.delegated-operators.yaml` overlay on top.
+Start with `compose.yaml`,
+add at most one plugins file
+(`compose.plugins.yaml` or `compose.dedicated-plugins.yaml`),
+then layer the `compose.delegated-operators.yaml` overlay on top.
 
 The delegated-operators overlay defines three worker slots
 

@@ -137,6 +137,11 @@ Compose keeps that name.
 It reuses your existing volumes,
 so your plugins and other data stay where they are,
 and `migrate-volumes.sh` has nothing to copy.
+Compose doesn't remember `-p` between commands.
+If you use it,
+pass the same `-p` to every command in the steps below,
+including `down`, `config`, `pull`, `up`,
+and the options after `--` for `migrate-volumes.sh`.
 
 > [!WARNING]
 > Named volumes that you added in `compose.override.yaml`,
@@ -211,6 +216,11 @@ To upgrade:
    docker compose down --remove-orphans
    ```
 
+   If you turned on Activity Analytics in v2.25 with `compose.activity.yaml`,
+   events still in its queue when the old stack stops aren't carried over.
+   The new project starts with an empty `fiftyone-mq-redis-data` volume.
+   To lose as few events as possible,
+   stop the old stack when no one is using the App or running operations.
 1. Get the v2.26 files.
 1. Copy your `compose.override.yaml` and `.env` files
    into the `docker` directory,
@@ -252,14 +262,19 @@ To upgrade:
    ```
 
 1. Update your `docker compose` command.
-   Start it with `-f compose.yaml` and remove `-f compose.activity.yaml`.
-   For example,
-   `-f compose.plugins.yaml -f compose.override.yaml` becomes
+   Start it with `-f compose.yaml`,
+   keep your other `-f` files,
+   and remove `-f compose.activity.yaml`.
+   For example, a deployment with dedicated plugins and delegated operators
+   changes
+   `-f compose.dedicated-plugins.yaml -f compose.delegated-operators.yaml -f compose.override.yaml`
+   to
 
    ```shell
    docker compose \
      -f compose.yaml \
-     -f compose.plugins.yaml \
+     -f compose.dedicated-plugins.yaml \
+     -f compose.delegated-operators.yaml \
      -f compose.override.yaml \
      config
    ```
@@ -269,6 +284,7 @@ To upgrade:
 1. Pull the v2.26 images with the same `-f` options and `pull`.
    On air-gapped hosts, load the images instead.
 1. Copy your plugins into the new project.
+   Pass your `-f` files after `--`.
    Check the plan first with `--dry-run`,
    then run it without:
 
@@ -277,7 +293,8 @@ To upgrade:
      --dry-run \
      -- \
      -f compose.yaml \
-     -f compose.plugins.yaml \
+     -f compose.dedicated-plugins.yaml \
+     -f compose.delegated-operators.yaml \
      -f compose.override.yaml
    ```
 
