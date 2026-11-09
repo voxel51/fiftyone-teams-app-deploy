@@ -60,18 +60,13 @@ for the full profile reference.
 
 The snippet below contains custom inline example of
 how to add a GPU-based delegated operator (`teams-do-with-gpu`)
-alongside the standard `teams-do`. Pair it with telemetry by
-adding a matching `teams-do-with-gpu-telemetry` sidecar. See
-`docker/<auth-dir>/compose.delegated-operators.gpu.yaml` for an
-example.
+alongside the standard `teams-do`.
+Pair it with telemetry
+by adding a matching `teams-do-with-gpu-telemetry` sidecar.
+See `docker/compose.delegated-operators.gpu.yaml` for an example.
 
 ```yaml
 services:
-  teams-do:
-    extends:
-      file: ../common-services.yaml
-      service: teams-do-common
-
   teams-do-with-gpu:
     image: voxel51/fiftyone-teams-cv-full:v2.25.2
     command: >
@@ -98,8 +93,19 @@ services:
               capabilities: [gpu]
 ```
 
-Redeploy the stack via `docker compose up -d` and wait for the
-`teams-do` containers to be deployed.
+Add the snippet to your `compose.override.yaml`.
+Redeploy the stack with the plugins and delegated operators files,
+which define `plugins-vol` and `teams-do`,
+and wait for the `teams-do` containers to be deployed:
+
+```shell
+docker compose \
+  -f compose.yaml \
+  -f compose.plugins.yaml \
+  -f compose.delegated-operators.yaml \
+  -f compose.override.yaml \
+  up -d
+```
 
 For advanced GPU configuration, including selecting specific GPU devices,
 please refer to the

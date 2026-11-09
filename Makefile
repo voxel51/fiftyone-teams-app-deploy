@@ -146,13 +146,9 @@ run-profile-only-fiftyone: helm-repos  ## run skaffold run -p only-fiftyone
 	skaffold run --profile only-fiftyone \
 	  --kube-context minikube
 
-license-secret-internal: copy-license-files-skaffold
-	@LICENSE_INTERNAL=$$(cat internal-license.key | base64 | tr -d '\n') \
-		yq '.data.license = strenv(LICENSE_INTERNAL)' secret-license.template.yaml > secret-license.yaml
-
-license-secret-legacy: copy-license-files-skaffold
-	@LICENSE_LEGACY=$$(cat legacy-license.key | base64 | tr -d '\n') \
-		yq '.data.license = strenv(LICENSE_LEGACY)' secret-license.template.yaml > secret-license.yaml
+license-secret: copy-license-files-skaffold
+	@LICENSE=$$(cat license.key | base64 | tr -d '\n') \
+		yq '.data.license = strenv(LICENSE)' secret-license.template.yaml > secret-license.yaml
 
 tunnel:  ## run minikube tunnel to access the k8s ingress via localhost ()
 	sudo minikube tunnel &> /dev/null &
@@ -168,13 +164,11 @@ helm-repo-update:  ## updates the helm repos for the project
 clean: clean-unit-compose clean-unit-helm clean-integration-compose clean-integration-helm  ## delete all test output and reports
 
 clean-integration-compose:  ## delete docker compose integration test output and reports
-	rm -rf tests/integration/compose/test_output_internal || true
-	rm -rf tests/integration/compose/test_output_legacy || true
+	rm -rf tests/integration/compose/test_output || true
 	rm tests/integration/compose/test_output*.log || true
 
 clean-integration-helm:  ## delete helm integration test output and reports
-	rm -rf tests/integration/helm/test_output_internal || true
-	rm -rf tests/integration/helm/test_output_legacy || true
+	rm -rf tests/integration/helm/test_output || true
 	rm tests/integration/helm/test_output.log || true
 
 clean-unit-compose:  ## delete docker compose unit test output and reports
@@ -188,31 +182,19 @@ clean-unit-helm:  ## delete helm unit test output and reports
 copy-license-files-docker:  ## copy local developer license files used during docker compose integration tests
 	gcloud storage cp \
 	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
-	  ./docker/internal-license.key \
-	  --project computer-vision-team
-	gcloud storage cp \
-	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
-	  ./docker/legacy-license.key \
+	  ./docker/license.key \
 	  --project computer-vision-team
 
 copy-license-files-helm:  ## copy local developer license files used during helm integration tests
 	gcloud storage cp \
 	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
-	  tests/fixtures/helm/internal-license.key \
-	  --project computer-vision-team
-	gcloud storage cp \
-	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
-	  tests/fixtures/helm/legacy-license.key \
+	  tests/fixtures/helm/license.key \
 	  --project computer-vision-team
 
 copy-license-files-skaffold:  ## copy local developer license files used during helm integration tests
 	gcloud storage cp \
 	  gs://voxel51-licenses-dev/test-licenses/internal-license.key \
-	  internal-license.key \
-	  --project computer-vision-team
-	gcloud storage cp \
-	  gs://voxel51-licenses-dev/test-licenses/legacy-license.key \
-	  legacy-license.key \
+	  license.key \
 	  --project computer-vision-team
 
 login:  ## Docker login to Google Artifact Registry (for accessing internal gcr.io container images)
@@ -240,31 +222,17 @@ test-unit-helm-interleaved: install-terratest-log-parser  ## run go test on the 
 	go test -count=1 -timeout=10m -v -tags unit | tee test_output.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
 
-test-integration-compose: test-integration-compose-internal test-integration-compose-legacy ## run go test on the tests/integration/compose directory for both internal and legacy auth modes
-
-test-integration-compose-internal: copy-license-files-docker ## run go test on the tests/integration/compose directory for internal auth mode
+test-integration-compose: copy-license-files-docker ## run go test on the tests/integration/compose directory
 	@cd tests/integration/compose; \
-	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth
+	go test -count=1 -timeout=15m -v -tags integrationCompose
 
-test-integration-compose-legacy: copy-license-files-docker ## run go test on the tests/integration/compose directory for legacy auth mode
+test-integration-compose-interleaved: install-terratest-log-parser copy-license-files-docker clean-integration-compose ## run go test on the tests/integration/compose directory and run the terratest_log_parser for reports
 	@cd tests/integration/compose; \
-	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth
+	rm -rf test_output/*; \
+	go test -count=1 -timeout=15m -v -tags integrationCompose | tee test_output.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
 
-test-integration-compose-interleaved:  test-integration-compose-interleaved-internal test-integration-compose-interleaved-legacy  ## run go test on the tests/integration/compose directory and run the terratest_log_parser for reports
-
-test-integration-compose-interleaved-internal: install-terratest-log-parser copy-license-files-docker clean-integration-compose ## run go test on the tests/integration/compose directory for internal auth mode and run the terratest_log_parser for reports
-	@cd tests/integration/compose; \
-	rm -rf test_output_internal/*; \
-	go test -count=1 -timeout=15m -v -tags integrationComposeInternalAuth | tee test_output_internal.log; \
-	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
-
-test-integration-compose-interleaved-legacy: install-terratest-log-parser copy-license-files-docker clean-integration-compose ## run go test on the tests/integration/compose directory for legacy auth mode and run the terratest_log_parser for reports
-	@cd tests/integration/compose; \
-	rm -rf test_output_legacy/*; \
-	go test -count=1 -timeout=15m -v -tags integrationComposeLegacyAuth | tee test_output_legacy.log; \
-	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
-
-test-integration-helm-ci: ## set context, install mongodb, and run go test on the tests/integration/helm directory for both internal and legacy auth modes with topology constraints
+test-integration-helm-ci: ## set context, install mongodb, and run go test on the tests/integration/helm directory with topology constraints
 	@CLST=$(shell gcloud container clusters list --filter="name : voxel51-ephemeral-test-*" --format="get(name)"); \
 	INTEGRATION_TEST_KUBECONTEXT=gke_computer-vision-team_us-east4_$${CLST}; \
 	gcloud container clusters get-credentials \
@@ -276,39 +244,27 @@ test-integration-helm-ci: ## set context, install mongodb, and run go test on th
 		--kube-context=$${INTEGRATION_TEST_KUBECONTEXT}; \
 	INTEGRATION_TEST_KUBECONTEXT=$${INTEGRATION_TEST_KUBECONTEXT} GOMAXPROCS=2 make test-integration-helm
 
-test-integration-helm: test-integration-helm-internal test-integration-helm-legacy test-integration-helm-topology ## run go test on the tests/integration/helm directory for both internal and legacy auth modes with topology constraints
+test-integration-helm: copy-license-files-helm ## run go test on the tests/integration/helm directory, then the topology constraint tests
+	@cd tests/integration/helm; \
+	go test -count=1 -timeout=25m -v -tags integrationHelm
+	$(MAKE) test-integration-helm-topology
 
-test-integration-helm-interleaved: test-integration-helm-interleaved-internal test-integration-helm-interleaved-legacy test-integration-helm-interleaved-topology ## run go test on the tests/integration/helm directory for both internal and legacy auth modes with topology constraints
+test-integration-helm-interleaved: copy-license-files-helm ## run go test on the tests/integration/helm directory, then the topology constraint tests, and run the terratest_log_parser for reports
+	@cd tests/integration/helm; \
+	rm -rf test_output/*; \
+	go test -count=1 -timeout=25m -v -tags integrationHelm | tee test_output.log; \
+	${ASDF}/packages/bin/terratest_log_parser -testlog test_output.log -outputdir test_output
+	$(MAKE) test-integration-helm-interleaved-topology
 
 test-integration-helm-topology: copy-license-files-helm  ## run go test on the tests/integration/helm directory for topology constraints
 	@cd tests/integration/helm; \
 	go test -count=1 -timeout=25m -v -tags integrationHelmTopology
-
-test-integration-helm-internal: copy-license-files-helm  ## run go test on the tests/integration/helm directory for internal auth mode
-	@cd tests/integration/helm; \
-	go test -count=1 -timeout=25m -v -tags integrationHelmInternalAuth
 
 test-integration-helm-interleaved-topology: copy-license-files-helm  ## run go test on the tests/integration/helm directory for topology constraints
 	@cd tests/integration/helm; \
 	rm -rf test_output_topology/*; \
 	go test -count=1 -timeout=25m -v -tags integrationHelmTopology | tee test_output_topology.log; \
 	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_topology.log -outputdir test_output_topology
-
-test-integration-helm-legacy: copy-license-files-helm  ## run go test on the tests/integration/helm directory for legacy auth mode
-	@cd tests/integration/helm; \
-	go test -count=1 -timeout=25m -v -tags integrationHelmLegacyAuth
-
-test-integration-helm-interleaved-internal: copy-license-files-helm  ## run go test on the tests/integration/helm directory for internal auth mode
-	@cd tests/integration/helm; \
-	rm -rf test_output_internal/*; \
-	go test -count=1 -timeout=25m -v -tags integrationHelmInternalAuth | tee test_output_internal.log; \
-	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_internal.log -outputdir test_output_internal
-
-test-integration-helm-interleaved-legacy: copy-license-files-helm  ## run go test on the tests/integration/helm directory for legacy auth mode
-	@cd tests/integration/helm; \
-	rm -rf test_output_legacy/*; \
-	go test -count=1 -timeout=25m -v -tags integrationHelmLegacyAuth | tee test_output_legacy.log; \
-	${ASDF}/packages/bin/terratest_log_parser -testlog test_output_legacy.log -outputdir test_output_legacy
 
 install-terratest-log-parser:  ## install terratest_log_parser
 	go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@latest

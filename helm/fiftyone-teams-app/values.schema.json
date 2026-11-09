@@ -1584,7 +1584,7 @@
         },
         "enable_invitations": {
           "default": true,
-          "description": "Allow ADMINs to invite users by email\nNOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal`",
+          "description": "Allow ADMINs to invite users by email",
           "title": "enable_invitations",
           "type": "boolean"
         },
@@ -1613,12 +1613,6 @@
               "default": "cas:*,-cas:*:debug",
               "description": "Set the log level for CAS\nexamples:\n`DEBUG: cas:*` - shows all CAS logs\n`DEBUG: cas:*:info` - shows all CAS INFO logs\n`DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs",
               "title": "DEBUG",
-              "type": "string"
-            },
-            "FIFTYONE_AUTH_MODE": {
-              "default": "legacy",
-              "description": "Configure Authentication Mode.\nOne of `legacy` or `internal`",
-              "title": "FIFTYONE_AUTH_MODE",
               "type": "string"
             }
           },
@@ -3757,12 +3751,6 @@
         },
         "fiftyone": {
           "properties": {
-            "cookieSecret": {
-              "default": "",
-              "description": "A randomly generated string for cookie encryption.\nTo generate, run `openssl rand -hex 32`.",
-              "title": "cookieSecret",
-              "type": "string"
-            },
             "encryptionKey": {
               "default": "",
               "description": "Encryption key for storage credentials. [Reference][fiftyone-encryption-key].",
@@ -4441,7 +4429,7 @@
           "properties": {
             "create": {
               "default": true,
-              "description": "When `false`, the telemetry `Role`/`RoleBinding` granting the sidecar\n`pods/log` read access are not rendered. Set `false` only when the\ninstall identity cannot create namespaced RBAC AND `serviceAccounts`\npoints at an existing account that already carries `pods/log` (e.g. the\nteams-api RBAC SA). On Kubernetes the sidecar tails container logs via the\n`pods/log` API; without this grant those calls return `403`, so the\ndelegated-operator log viewer stays empty. The Settings → Metrics\ndashboard is unaffected — metrics use the pod's shared process namespace,\nnot the Kubernetes API.",
+              "description": "When `false`, the telemetry `Role`/`RoleBinding` granting the sidecar\n`pods/log` read access are not rendered. Set `false` only when the\ninstall identity cannot create namespaced RBAC AND `serviceAccounts`\npoints at an existing account that already carries `pods/log` (e.g. the\nteams-api RBAC SA). On Kubernetes the sidecar tails container logs via the\n`pods/log` API; without this grant those calls return `403`, so the\ndelegated-operator log viewer stays empty. The Settings → Monitoring → System Health\ndashboard is unaffected — metrics use the pod's shared process namespace,\nnot the Kubernetes API.",
               "title": "create",
               "type": "boolean"
             }

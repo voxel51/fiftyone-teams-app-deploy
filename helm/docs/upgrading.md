@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
+    - [FiftyOne Enterprise v2.26+ Legacy Authentication Mode Removed](#fiftyone-enterprise-v226-legacy-authentication-mode-removed)
     - [FiftyOne Enterprise v2.25+ Activity Core](#fiftyone-enterprise-v225-activity-core)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
@@ -118,6 +119,25 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.26+ Legacy Authentication Mode Removed
+
+FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode.
+Every deployment uses the Central Authentication Service (CAS)
+with its users, roles, and groups stored in MongoDB.
+The chart no longer sets `casSettings.env.FIFTYONE_AUTH_MODE`,
+and CAS ignores it.
+
+If your deployment used the `legacy` mode,
+CAS moves your Auth0 organization, members, roles, and groups into MongoDB
+the first time it starts after the upgrade.
+You don't need to run a migration yourself.
+
+Before you upgrade, update your `values.yaml`:
+
+1. Remove `casSettings.env.FIFTYONE_AUTH_MODE` if it's set.
+1. Remove `secret.fiftyone.cookieSecret` if it's set.
+   No FiftyOne Enterprise service reads it.
 
 #### FiftyOne Enterprise v2.25+ Activity Core
 

@@ -64,16 +64,10 @@
     make start
     ```
 
-1. Download dev license file (legacy or internal)
+1. Download dev license file
 
     ```shell
-    make license-secret-legacy
-    ```
-
-    or
-
-    ```shell
-    make license-secret-internal
+    make license-secret
     ```
 
 1. Install or update the required helm repositories
@@ -249,16 +243,8 @@ export NAMESPACE=fiftyone-teams
 kubectl create namespace "${NAMESPACE}" --context minikube
 ```
 
-For legacy CAS mode
-
 ```shell
-make license-secret-legacy
-```
-
-For internal CAS mode
-
-```shell
-make license-secret-internal
+make license-secret
 ```
 
 When debugging, it may be helpful to start minikube with the flag

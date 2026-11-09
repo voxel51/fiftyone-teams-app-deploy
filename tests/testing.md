@@ -140,16 +140,10 @@ See
     make auth start
     ```
 
-1. Download dev license file (legacy or internal)
+1. Download dev license file
 
     ```shell
-    make license-secret-legacy
-    ```
-
-    or
-
-    ```shell
-    make license-secret-internal
+    make license-secret
     ```
 
 1. Install cert-manager and mongodb into minikube

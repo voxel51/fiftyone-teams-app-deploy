@@ -460,10 +460,6 @@ apiSettings:
     - name: nfs-shared-vol
       mountPath: /opt/shared
 
-casSettings:
-  env:
-    FIFTYONE_AUTH_MODE: internal # or legacy depending on your license.
-
 delegatedOperatorDeployments:
   template:
     env:
@@ -546,14 +542,6 @@ secret:
     # These secrets come from your MongoDB implementation
     fiftyoneDatabaseName: fiftyone
     mongodbConnectionString: mongodb://<username>:<password>@<hostname>/?authSource=admin
-    # This secret is a required random string used to encrypt session cookies.
-    # To generate this string, run
-    #
-    # ```shell
-    # openssl rand -hex 32
-    # ```
-    #
-    cookieSecret:
     # This required key is used to encrypt storage credentials in the database.
     #   Do NOT lose this key!
     # To generate this key, run (in python)

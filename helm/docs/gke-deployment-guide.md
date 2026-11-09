@@ -98,7 +98,6 @@ secret:
   fiftyone:
     # Update the hostname when necessary
     mongodbConnectionString: mongodb://<YOUR_USERNAME>:<YOUR_PASSWORD>@fiftyone-teams-mongodb.fiftyone-teams-mongodb.svc.cluster.local/?authSource=admin
-    cookieSecret: <YOUR_COOKIE_SECRET>
     encryptionKey: <YOUR_ENCRYPTION_KEY>
     fiftyoneAuthSecret: <YOUR_FIFTYONE_AUTH_SECRET>
 teamsAppSettings:

@@ -94,8 +94,7 @@ parse_arguments() {
 parse_arguments "$@"
 
 DOCKER_FIXTURES=(
-  tests/fixtures/docker/integration_legacy_auth.env
-  tests/fixtures/docker/integration_internal_auth.env
+  tests/fixtures/docker/integration.env
 )
 
 HELM_FIXTURES=(
