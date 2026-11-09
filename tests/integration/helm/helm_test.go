@@ -1,5 +1,5 @@
-//go:build kubeall || helm || integration || integrationHelmInternalAuth
-// +build kubeall helm integration integrationHelmInternalAuth
+//go:build kubeall || helm || integration || integrationHelm
+// +build kubeall helm integration integrationHelm
 
 package integration
 
@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type internalAuthHelmTest struct {
+type helmTest struct {
 	suite.Suite
 	chartPath   string
 	namespace   string
@@ -30,7 +30,7 @@ type internalAuthHelmTest struct {
 	valuesFiles []string
 }
 
-func TestHelmInternalAuth(t *testing.T) {
+func TestHelm(t *testing.T) {
 	t.Parallel()
 
 	helmChartPath, err := filepath.Abs(chartPath)
@@ -39,7 +39,7 @@ func TestHelmInternalAuth(t *testing.T) {
 	kubeCtx := defineKubeCtx()
 	integrationValuesPath, err := filepath.Abs(integrationValues)
 
-	suite.Run(t, &internalAuthHelmTest{
+	suite.Run(t, &helmTest{
 		Suite:     suite.Suite{},
 		chartPath: helmChartPath,
 		namespace: "fiftyone-" + strings.ToLower(random.UniqueId()),
@@ -50,7 +50,7 @@ func TestHelmInternalAuth(t *testing.T) {
 	})
 }
 
-func (s *internalAuthHelmTest) TestHelmInstall() {
+func (s *helmTest) TestHelmInstall() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
@@ -366,7 +366,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 			}
 
 			// create license-file secret
-			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFileInternal)
+			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFile)
 			defer k8s.KubectlDeleteFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 			k8s.KubectlApplyFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 
@@ -376,7 +376,7 @@ func (s *internalAuthHelmTest) TestHelmInstall() {
 				ValuesFiles:    s.valuesFiles,
 			}
 			releaseName := fmt.Sprintf(
-				"%s-internal-%s",
+				"%s-%s",
 				strings.ToLower(testCase.name),
 				strings.ToLower(random.UniqueId()),
 			)

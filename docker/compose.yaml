@@ -1,6 +1,9 @@
 ---
+# For Proxy Server instructions please see
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#globe_with_meridians-step-5-configure-ssl--reverse-proxy-nginx--load-balancer
+name: voxel51
 services:
-  fiftyone-app-common:
+  fiftyone-app:
     image: voxel51/fiftyone-app:v2.25.2
     environment:
       API_URL: ${API_URL}
@@ -44,7 +47,7 @@ services:
       - ${FIFTYONE_DEFAULT_APP_ADDRESS}:${FIFTYONE_DEFAULT_APP_PORT}:5151
     restart: always
 
-  teams-api-common:
+  teams-api:
     image: voxel51/fiftyone-teams-api:v2.25.2
     environment:
       API_EXTERNAL_URL: ${FIFTYONE_API_URI}
@@ -97,7 +100,7 @@ services:
         target: /opt/builtin-services/builtin_services.yaml
         read_only: true
 
-  teams-app-common:
+  teams-app:
     image: voxel51/fiftyone-teams-app:v2.25.2
     environment:
       API_URL: ${API_URL}
@@ -130,15 +133,17 @@ services:
       - ${APP_BIND_ADDRESS}:${APP_BIND_PORT}:3000
     restart: always
 
-  teams-cas-common:
+  teams-cas:
     image: voxel51/fiftyone-teams-cas:v2.25.2
     environment:
       CAS_DATABASE_NAME: ${CAS_DATABASE_NAME:-cas}
       CAS_DEFAULT_USER_ROLE: ${CAS_DEFAULT_USER_ROLE:-GUEST}
       CAS_MONGODB_URI: ${CAS_MONGO_DB_URI:-$FIFTYONE_DATABASE_URI}
+      CAS_URL: ${BASE_URL}
       DEBUG: ${CAS_DEBUG:-cas:*,-cas:*:debug}
       FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
       LICENSE_KEY_FILE_PATHS: ${LICENSE_KEY_FILE_PATHS:-/opt/fiftyone/licenses/license}
+      NEXTAUTH_URL: ${BASE_URL}/cas/api/auth
       TEAMS_API_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
       TEAMS_API_MONGODB_URI: ${FIFTYONE_DATABASE_URI}
       FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
@@ -165,48 +170,6 @@ services:
         target: /opt/fiftyone/licenses
         read_only: true
 
-  teams-plugins-common:
-    image: voxel51/fiftyone-app-torch:v2.25.2
-    environment:
-      API_URL: ${API_URL}
-      FIFTYONE_AUTH_SECRET: ${FIFTYONE_AUTH_SECRET}
-      FIFTYONE_DATABASE_ADMIN: false
-      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
-      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
-      FIFTYONE_DEFAULT_APP_ADDRESS: 0.0.0.0
-      FIFTYONE_DEFAULT_APP_PORT: 5151
-      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
-      FIFTYONE_INTERNAL_SERVICE: true
-      FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
-      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
-      FIFTYONE_PLUGINS_DIR: /opt/plugins
-      # Activity Analytics is on by default and this flag is the only gate.
-      # The queue URL below says *where* to emit, never *whether*: it
-      # carries a default, so "unset" and "explicitly local" look
-      # identical and it cannot serve as the switch. Emit, flush, and
-      # the operator mutation capture all no-op while this is false,
-      # before any queue client is constructed.
-      # Set FIFTYONE_ACTIVITY_ENABLED=false in .env to turn capture off.
-      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
-      # Activity Analytics: under the dedicated-plugins layering the plugins
-      # (including workflows, the annotation/review event producer) execute
-      # here rather than in fiftyone-app, so this service has to reach the
-      # queue too. Emit is fire-and-forget; unset = those events don't flow.
-      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
-      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
-      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
-      # If you are routing through a proxy server you will want to set
-      #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
-      #  then add the following environment variables to your
-      #  `compose.override.yaml`
-      # HTTPS_PROXY: ${HTTPS_PROXY_URL}
-      # HTTP_PROXY: ${HTTP_PROXY_URL}
-      # NO_PROXY: ${NO_PROXY_LIST}
-      # http_proxy: ${HTTP_PROXY_URL}
-      # https_proxy: ${HTTPS_PROXY_URL}
-      # no_proxy: ${NO_PROXY_LIST}
-    restart: always
-
   # Redis-backed queue (fiftyone.mq) for Activity Analytics events.
   # Emitting services enqueue here. The activity worker consumes.
   # The worker writes the activity_* collections in the FiftyOne database
@@ -214,7 +177,9 @@ services:
   # The queue is persisted with AOF onto the fiftyone-mq-redis-data volume,
   # so restarting the container replays queued jobs instead of losing them.
   # See docker/docs/configuring-activity-analytics.md.
-  fiftyone-mq-redis-common:
+  # Using an external Redis? Point FIFTYONE_MQ_REDIS_URL at it in .env and
+  # remove this service in compose.override.yaml.
+  fiftyone-mq-redis:
     image: redis:8
     # AOF (`--appendonly yes`) with `--appendfsync everysec` bounds queue
     # loss on a restart to roughly one second of writes.
@@ -247,11 +212,13 @@ services:
   # Keep this service at one replica.
   # The rollup and prune schedulers are single-flight.
   # See docker/docs/configuring-activity-analytics.md.
-  activity-worker-common:
+  activity-worker:
     # Published from the fiftyone-activity repo with each Enterprise release.
     # Keep the tag in lockstep with the other service images.
     image: voxel51/fiftyone-activity:v2.25.2
     command: ["fiftyone-activity-worker"]
+    depends_on:
+      - fiftyone-mq-redis
     environment:
       # The rollup worker emits derived events through the same
       # flag-gated path it consumes, so it reads the same gate.
@@ -275,46 +242,7 @@ services:
       FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES: ${FIFTYONE_ACTIVITY_MAX_STORAGE_BYTES:-10737418240}
     restart: always
 
-  teams-do-common:
-    image: voxel51/fiftyone-teams-cv-full:v2.25.2
-    # Telemetry default-on requires teams-do to share its PID namespace
-    # with a single sidecar (compose's `pid: "service:<name>"` only joins
-    # one replica). Force replicas=1 to keep the 1:1 pairing deterministic.
-    # See docker/docs/configuring-telemetry.md for multi-worker patterns.
-    deploy:
-      replicas: 1
-    command: >
-      /bin/sh -c "fiftyone delegated launch -t remote -m"
-    environment:
-      API_URL: ${API_URL}
-      FIFTYONE_DATABASE_ADMIN: false
-      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
-      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
-      FIFTYONE_ENCRYPTION_KEY: ${FIFTYONE_ENCRYPTION_KEY}
-      FIFTYONE_INTERNAL_SERVICE: true
-      FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
-      FIFTYONE_PLUGINS_DIR: /opt/plugins
-      # Activity Analytics is on by default and this flag is the only gate.
-      # The queue URL below says *where* to emit, never *whether*: it
-      # carries a default, so "unset" and "explicitly local" look
-      # identical and it cannot serve as the switch. Emit, flush, and
-      # the operator mutation capture all no-op while this is false,
-      # before any queue client is constructed.
-      # Set FIFTYONE_ACTIVITY_ENABLED=false in .env to turn capture off.
-      FIFTYONE_ACTIVITY_ENABLED: ${FIFTYONE_ACTIVITY_ENABLED:-true}
-      # Activity Analytics: delegated operator runs execute here, so the
-      # `op.executed` and `samples.modified` seams enqueue from this service.
-      # Emit is fire-and-forget; unset = those events simply don't flow.
-      FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
-      FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
-      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
-      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
-    restart: always
-    volumes:
-      - plugins-vol:/opt/plugins:ro
-      - telemetry-socket:/tmp/telemetry
-
-  telemetry-redis-common:
+  telemetry-redis:
     image: ${TELEMETRY_REDIS_IMAGE:-redis:8-alpine}
     command:
       - redis-server
@@ -342,7 +270,7 @@ services:
   # One sidecar per observed service. `pid: "service:<target>"` joins the
   # target's PID namespace so the sidecar can read /proc/<pid>/fd/1 and
   # psutil can see the target's process.
-  fiftyone-app-telemetry-common:
+  fiftyone-app-telemetry:
     image: voxel51/telemetry-sidecar:v2.25.2
     pid: "service:fiftyone-app"
     # Matches the workload image's USER 1000:1000 so the kernel's
@@ -368,8 +296,14 @@ services:
           cpus: "0.20"
           memory: 512M
     restart: always
+    depends_on:
+      fiftyone-app:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
 
-  teams-api-telemetry-common:
+  teams-api-telemetry:
     image: voxel51/telemetry-sidecar:v2.25.2
     pid: "service:teams-api"
     user: "1000:1000"
@@ -392,59 +326,13 @@ services:
           cpus: "0.10"
           memory: 512M
     restart: always
+    depends_on:
+      teams-api:
+        condition: service_started
+        restart: true
+      telemetry-redis:
+        condition: service_started
 
-  teams-plugins-telemetry-common:
-    image: voxel51/telemetry-sidecar:v2.25.2
-    pid: "service:teams-plugins"
-    user: "1000:1000"
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      POD_NAME: teams-plugins
-      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
-      SERVICE_TYPE: teams-plugins
-      TARGET_NAME: ${TEAMS_PLUGINS_TARGET_NAME:-hypercorn}
-      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
-    deploy:
-      resources:
-        limits:
-          cpus: "0.20"
-          memory: 512M
-        reservations:
-          cpus: "0.20"
-          memory: 512M
-    restart: always
-
-  teams-do-telemetry-common:
-    image: voxel51/telemetry-sidecar:v2.25.2
-    pid: "service:teams-do"
-    user: "1000:1000"
-    cap_drop:
-      - ALL
-    cap_add:
-      - SYS_PTRACE  # allows for additional profiling metrics (sampled stacks via py-spy)
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      POD_NAME: teams-do
-      POD_NAMESPACE: ${TELEMETRY_NAMESPACE:-docker}
-      SERVICE_TYPE: delegated-operator
-      TARGET_NAME: ${TEAMS_DO_TARGET_NAME:-fiftyone delegated}
-      EXECUTOR_SIDECAR: "true"
-      TELEMETRY_SOCKET: /tmp/telemetry/agent.sock
-      FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
-      FIFTYONE_DATABASE_URI: ${FIFTYONE_DATABASE_URI}
-      FIFTYONE_DATABASE_NAME: ${FIFTYONE_DATABASE_NAME}
-    deploy:
-      resources:
-        limits:
-          cpus: "0.10"
-          memory: 512M
-        reservations:
-          cpus: "0.10"
-          memory: 512M
-    volumes:
-      - telemetry-socket:/tmp/telemetry
-    restart: always
+volumes:
+  fiftyone-mq-redis-data:
+  telemetry-redis-data:

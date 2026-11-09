@@ -40,14 +40,11 @@ This can happen in:
 To resolve this, increase the shared memory (`shm_size`) available to the
 affected service.
 
-For example, in `compose.delegated-operators.yaml`:
+For example, in `compose.override.yaml`:
 
 ```yaml
 services:
   teams-do:
-    extends:
-      file: ../common-services.yaml
-      service: teams-do-common
     shm_size: "512m"
 ```
 

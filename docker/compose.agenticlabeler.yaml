@@ -13,6 +13,7 @@
 # Activate with:
 #
 #   docker compose \
+#     -f compose.yaml \
 #     -f compose.dedicated-plugins.yaml \
 #     -f compose.delegated-operators.yaml \
 #     -f compose.agenticlabeler.yaml \

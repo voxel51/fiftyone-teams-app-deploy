@@ -1,5 +1,5 @@
-//go:build docker || compose || integration || integrationComposeInternalAuth
-// +build docker compose integration integrationComposeInternalAuth
+//go:build docker || compose || integration || integrationCompose
+// +build docker compose integration integrationCompose
 
 package integration
 
@@ -21,16 +21,16 @@ import (
 )
 
 const (
-	dockerInternalAuthDir = "../../../docker/internal-auth"
+	dockerDir = "../../../docker"
 )
 
-var internalAuthComposeFile = "compose.yaml"
-var internalAuthComposePluginsFile = "compose.plugins.yaml"
-var internalAuthComposeDedicatedPluginsFile = "compose.dedicated-plugins.yaml"
-var internalAuthComposeDelegatedOperationsFile = "compose.delegated-operators.yaml"
-var internalAuthEnvTemplateFilePath = filepath.Join(dockerInternalAuthDir, "env.template")
+var composeFile = "compose.yaml"
+var composePluginsFile = "compose.plugins.yaml"
+var composeDedicatedPluginsFile = "compose.dedicated-plugins.yaml"
+var composeDelegatedOperationsFile = "compose.delegated-operators.yaml"
+var envTemplateFilePath = filepath.Join(dockerDir, "env.template")
 
-type commonServicesInternalAuthDockerComposeUpTest struct {
+type dockerComposeUpTest struct {
 	suite.Suite
 	composeFilePath      string
 	dotEnvFiles          []string
@@ -39,10 +39,10 @@ type commonServicesInternalAuthDockerComposeUpTest struct {
 	overrideFilesDO      []string
 }
 
-func TestDockerComposeUpInternalAuth(t *testing.T) {
+func TestDockerComposeUp(t *testing.T) {
 	t.Parallel()
 
-	_, err := filepath.Abs(dockerInternalAuthDir)
+	_, err := filepath.Abs(dockerDir)
 	require.NoError(t, err)
 
 	// Set the override files used for the tests
@@ -57,16 +57,15 @@ func TestDockerComposeUpInternalAuth(t *testing.T) {
 	overrideFilesPlugins = append(overrideFilesPlugins, mongodbComposeFilePlugins)
 
 	var overrideFilesDO []string
-	overrideFilesDO = append(overrideFilesDO, internalAuthComposePluginsFile)
 	overrideFilesDO = append(overrideFilesDO, overrideFiles...)
 	overrideFilesDO = append(overrideFilesDO, mongodbComposeFileDO)
 
-	suite.Run(t, &commonServicesInternalAuthDockerComposeUpTest{
+	suite.Run(t, &dockerComposeUpTest{
 		Suite:           suite.Suite{},
-		composeFilePath: dockerInternalAuthDir,
+		composeFilePath: dockerDir,
 		dotEnvFiles: []string{
-			internalAuthEnvTemplateFilePath,
-			internalAuthFixtureEnvFilePath,
+			envTemplateFilePath,
+			fixtureEnvFilePath,
 		},
 		overrideFiles:        overrideFiles,
 		overrideFilesPlugins: overrideFilesPlugins,
@@ -74,17 +73,17 @@ func TestDockerComposeUpInternalAuth(t *testing.T) {
 	})
 }
 
-func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
+func (s *dockerComposeUpTest) TestDockerComposeUp() {
 	testCases := []struct {
 		name          string
-		composeFile   string
+		composeFiles  []string
 		overrideFiles []string
 		envFiles      []string // file paths to ".env" files with additional environment variable data
 		expected      []serviceValidations
 	}{
 		{
 			"compose",
-			internalAuthComposeFile,
+			[]string{composeFile},
 			s.overrideFiles,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -121,7 +120,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 		},
 		{
 			"composePlugins",
-			internalAuthComposePluginsFile,
+			[]string{composeFile, composePluginsFile},
 			s.overrideFiles,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -158,7 +157,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 		},
 		{
 			"composeDedicatedPlugins",
-			internalAuthComposeDedicatedPluginsFile,
+			[]string{composeFile, composeDedicatedPluginsFile},
 			s.overrideFilesPlugins,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -202,7 +201,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 		},
 		{
 			"composeDelegatedOperations",
-			internalAuthComposeDelegatedOperationsFile,
+			[]string{composeFile, composePluginsFile, composeDelegatedOperationsFile},
 			s.overrideFilesDO,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -261,8 +260,9 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 			//
 			// ```shell
 			// docker compose \
-			//   -f tests/fixtures/docker/compose.override.mongodb.yaml \
-			//   --env-file tests/fixtures/docker/integration_internal_auth.env
+			//   -f compose.yaml \
+			//   -f ../tests/fixtures/docker/compose.override.mongodb.yaml \
+			//   --env-file ../tests/fixtures/docker/integration.env
 
 			//   up -d
 			// ```
@@ -273,7 +273,7 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 
 			dockerOptions := &docker.Options{
 				ProjectName: "fiftyone-" + strings.ToLower(random.UniqueId()),
-				WorkingDir:  dockerInternalAuthDir,
+				WorkingDir:  dockerDir,
 				EnvVars:     environmentVariables,
 			}
 
@@ -283,7 +283,10 @@ func (s *commonServicesInternalAuthDockerComposeUpTest) TestDockerComposeUp() {
 			argsConfig := []string{}
 			argsUp := []string{}
 			argsDown := []string{}
-			args := []string{"-f", testCase.composeFile}
+			args := []string{}
+			for _, composeFile := range testCase.composeFiles {
+				args = append(args, "-f", composeFile)
+			}
 
 			for _, overrideFile := range testCase.overrideFiles {
 				args = append(args, "-f", overrideFile)
