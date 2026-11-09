@@ -21,10 +21,44 @@ on:
   push:
     branches:
       - release/*
-      - release-next
 
 jobs:
+  check-chart-version:
+    runs-on: ubuntu-latest
+    outputs:
+      matches: ${{ steps.check.outputs.matches }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}"
+
+      # A new release branch starts on the previous version
+      # until its version-bump PR merges.
+      # Skip those pushes so the registry and the release-candidate
+      # environments never get a chart under the previous version.
+      # Branches without a version in the name, like ephemeral
+      # environment branches, always publish.
+      - name: Compare Chart.yaml to the release branch
+        id: check
+        run: |
+          matches=true
+
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]] && [[ "${GITHUB_REF_NAME}" =~ ^release/v[0-9] ]]; then
+            chart_version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
+            branch_version="${GITHUB_REF_NAME#release/v}"
+
+            if [[ "${chart_version}" != "${branch_version}" ]]; then
+              echo "::notice::Chart.yaml version ${chart_version} doesn't match ${GITHUB_REF_NAME}. Skipping the release candidate until the version-bump PR merges."
+              matches=false
+            fi
+          fi
+
+          echo "matches=${matches}" >> "${GITHUB_OUTPUT}"
+
   pre-release:
+    needs: check-chart-version
+    if: ${{ needs.check-chart-version.outputs.matches == 'true' }}
     permissions:
       contents: write
       id-token: write
