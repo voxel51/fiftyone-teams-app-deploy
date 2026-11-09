@@ -183,6 +183,8 @@ if docker volume inspect "$dest" >/dev/null 2>&1; then
 fi
 
 # Find plugins volumes that other Compose projects created.
+plugins_volumes=$(docker volume ls --quiet --filter "label=com.docker.compose.volume=$VOLUME_KEY") ||
+  fail "'docker volume ls' failed. Check that this user can run docker commands."
 sources=()
 source_projects=()
 other_projects=()
@@ -198,7 +200,7 @@ while IFS= read -r volume; do
   fi
   sources+=("$volume")
   source_projects+=("$volume_project")
-done < <(docker volume ls --quiet --filter "label=com.docker.compose.volume=$VOLUME_KEY")
+done <<<"$plugins_volumes"
 
 if [[ ${#sources[@]} -eq 0 ]]; then
   if [[ -n $FROM_PROJECT ]]; then
