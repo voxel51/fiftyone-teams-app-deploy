@@ -1,7 +1,8 @@
 ---
-# Publishes the public chart for a release tag. The release pipeline
-# (cloud-build-and-deploy) tags the release branch tip
-# `fiftyone-teams-app-X.Y.Z`; `main` is the trunk and never publishes.
+# Publishes the public chart when a release tag is pushed.
+# The release pipeline in cloud-build-and-deploy
+# tags the tip of the release branch `fiftyone-teams-app-X.Y.Z`.
+# Pushes to `main` never publish a chart.
 name: Release Charts
 
 # yamllint disable-line rule:truthy
@@ -68,8 +69,10 @@ jobs:
         id: chart_releaser
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          # Re-running a published tag fails with a 422 from GitHub instead
-          # of skipping, so internal charts never drift from the public one.
+          # If you re-run a tag that already published,
+          # GitHub returns a 422 error and the run fails.
+          # Failing, instead of skipping,
+          # keeps the internal charts in sync with the public chart.
           CR_SKIP_EXISTING: false
         uses: helm/chart-releaser-action@v1.8.0
         with:
@@ -156,9 +159,10 @@ jobs:
               }
             })
 
-  update-main-fixtures:
-    # The cloud build pins the release branch's integration fixtures to
-    # each build; main gets the released pins by PR.
+  update-main:
+    # Keeps main on the latest release.
+    # This job opens a PR that bumps the versions on main to the release
+    # and pins the integration fixtures on main to the released images.
     if: ${{ needs.release.outputs.changed_charts != '' }}
     needs: [release, verify-tag]
     runs-on: ubuntu-latest
@@ -169,36 +173,46 @@ jobs:
           ref: main
           token: ${{ secrets.FIFTYONE_GITHUB_TOKEN }}
 
-      - name: Open fixture pin PR
+      - name: Open main update PR
         env:
           GH_TOKEN: ${{ secrets.FIFTYONE_GITHUB_TOKEN }}
-          VERSION: "v${{ needs.verify-tag.outputs.version }}"
+          VERSION: "${{ needs.verify-tag.outputs.version }}"
         run: |
           set -euo pipefail
 
           git config user.name "voxel51-bot"
           git config user.email "voxel51-bot@users.noreply.github.com"
 
-          branch="fixtures/${VERSION}"
+          branch="release-sync/v${VERSION}"
           git checkout -b "${branch}"
 
-          ./utils/bump-fixtures.sh \
-            --app-version "${VERSION}" \
-            --api-version "${VERSION}" \
-            --teams-app-version "${VERSION}" \
-            --cas-version "${VERSION}"
+          main_version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
+          newest=$(printf '%s\n%s\n' "${main_version}" "${VERSION}" | sort -V | tail -1)
+          if [[ "${newest}" == "${VERSION}" ]]; then
+            ./utils/bump-version.sh \
+              --from "${main_version}" \
+              --to "${VERSION}"
+          else
+            echo "::notice::main is on ${main_version}, newer than ${VERSION}. Leaving the versions on main alone."
+          fi
 
-          git add tests/fixtures
+          ./utils/bump-fixtures.sh \
+            --app-version "v${VERSION}" \
+            --api-version "v${VERSION}" \
+            --teams-app-version "v${VERSION}" \
+            --cas-version "v${VERSION}"
+
+          git add --all
           if git diff --cached --quiet; then
-            echo "Fixtures on main already pin ${VERSION}"
+            echo "main is already on v${VERSION}"
             exit 0
           fi
 
-          title="ci(fixtures): pin integration test fixtures to ${VERSION}"
+          title="chore(release): update main to v${VERSION}"
           git commit -m "${title}"
           git push origin "${branch}"
           gh pr create \
             --base main \
             --head "${branch}" \
             --title "${title}" \
-            --body "Pins the integration test fixtures on \`main\` to the images released with \`${GITHUB_REF_NAME}\`. Opened by the Release Charts workflow."
+            --body "Bumps the versions on \`main\` to \`v${VERSION}\` and pins the integration test fixtures to the images released with \`${GITHUB_REF_NAME}\`. Opened by the Release Charts workflow."

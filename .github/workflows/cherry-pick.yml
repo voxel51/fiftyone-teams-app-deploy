@@ -1,15 +1,24 @@
 name: Cherry-Pick to Release
 
-# Opens the release-branch PR for a merged main PR: cherry-picks its merge
-# result with -x, which the release gate verifies against main. Two ways in:
-# dispatch with a PR number + target branch, or label a main PR
-# 'cherry-pick-to-release' and the release PR opens itself when the main PR
-# merges. Conflicts fail the run and comment on the source PR — resolving is
-# a human decision, and often the signal that the fix needs the release-only
-# escape hatch instead.
+# Opens a PR that cherry-picks a merged main PR to a release branch.
+# It cherry-picks the PR's merge commit with `-x`,
+# so the Release Gate can confirm the commit is on main.
 #
-# Runs as voxel51-bot (FIFTYONE_GITHUB_TOKEN) so the PRs it opens trigger CI;
-# the default Actions token's PRs would not.
+# Start it in one of two ways:
+#
+# - Manually trigger it with a PR number and a release branch.
+# - Label a main PR 'cherry-pick-to-release'.
+#   When the PR merges,
+#   this workflow opens the release-branch PR.
+#
+# If the cherry-pick conflicts,
+# the run fails and comments on the source PR.
+# A person must resolve the conflict.
+# A conflict often means the fix needs the 'release-only-fix' label instead.
+#
+# Runs as voxel51-bot (FIFTYONE_GITHUB_TOKEN)
+# so the PRs it opens start CI.
+# PRs opened with the default Actions token don't start CI.
 
 on:
   workflow_dispatch:
@@ -20,8 +29,9 @@ on:
       release_branch:
         description: "Target release branch, e.g. release/v2.26.0"
         required: true
-  # PRs come from branches in this repo, so plain pull_request is enough; a
-  # fork PR can use workflow_dispatch.
+  # PRs come from branches in this repo,
+  # so the pull_request trigger is enough.
+  # For a PR from a fork, run the workflow by hand.
   pull_request:
     types: [closed, labeled]
     branches:
@@ -41,8 +51,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # Blobless clone: the cherry-pick needs the full commit graph for
-          # the merge-commit parent lookup, but only the blobs it touches.
+          # Blobless clone.
+          # The cherry-pick needs the full commit history
+          # to find a merge commit's parents.
+          # It only needs the contents of the files it changes.
           fetch-depth: 0
           filter: blob:none
           token: ${{ secrets.FIFTYONE_GITHUB_TOKEN }}
@@ -55,8 +67,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          # The labeled flow targets the live release line; there is one at a
-          # time.
+          # Only one release branch is active at a time.
+          # The label flow targets the newest one.
           if [ -z "$RELEASE_BRANCH" ]; then
             RELEASE_BRANCH=$(gh api "repos/$REPO/branches" --paginate \
               --jq '.[].name | select(startswith("release/v"))' | sort -V | tail -1)
