@@ -122,40 +122,78 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.26+ Invitations and Service Accounts
 
-FiftyOne Enterprise v2.26.0 changes how `teams-cas` stores invitations and
-service accounts.
+FiftyOne Enterprise v2.26.0 changes how `teams-cas` stores invitations
+and service accounts.
 
-**Upgrading needs no extra step.** The first time a v2.26 `teams-cas` starts,
-it updates the stored data before serving requests:
+**Upgrading needs no extra step.**
+The first time a v2.26 `teams-cas` starts,
+it updates the stored data before it serves requests:
 
-- Each pending invitation becomes a pending user who holds a seat of the
-  invited role until the invitation is accepted, revoked or expires.
-- Service accounts move into a collection of their own, and their group
-  memberships move with them.
+- Each pending invitation becomes a pending user.
+  That user holds a seat of the invited role
+  until someone accepts or revokes the invitation,
+  or the invitation expires.
+- Service accounts move into their own collection,
+  and their group memberships move with them.
 
-Each step can be repeated safely, so several `teams-cas` replicas can start
-together. If the update fails, `teams-cas` exits and tries again the next
-time it starts.
+`teams-cas` can safely repeat each step,
+so several `teams-cas` replicas can start at the same time.
+If the update fails,
+`teams-cas` exits and tries again the next time it starts.
 
 **What changes for administrators:**
 
-- Pending invitations count toward the license's seat limits. When an
-  organization is at its limit for a role, an invitation for that role is
-  refused, the same as adding a user. An expired invitation frees its seat.
-- Invitations are enabled by default for organizations that have never
-  changed the setting.
+- Pending invitations count toward the license's seat limits.
+  When an organization reaches its limit for a role,
+  `teams-cas` refuses new invitations for that role,
+  the same way it refuses new users.
+  An expired invitation frees its seat.
+- Invitations are on by default
+  for organizations that never changed the setting.
 
-**Rolling back to v2.25.** Rolling back needs one extra step, because a
-v2.25 `teams-cas` cannot read the data as v2.26 stores it. Until the step is
-done, v2.25 does not list service accounts and over-counts seats taken by
-pending invitations.
+**Rolling back to v2.25 needs one extra step,**
+because a v2.25 `teams-cas` can't read the data in its v2.26 form.
+Until you do that step,
+v2.25 doesn't list service accounts
+and counts too many seats for pending invitations.
 
-1. Roll the release back to v2.25, for example with `helm rollback --wait`,
-   and confirm with `kubectl get pods` that no v2.26 `teams-cas` pod is
-   still running or terminating. If a v2.26 `teams-cas` starts, it stores
-   the data in the v2.26 format.
-1. Contact Voxel51 support for a `fiftyone-migrator` release with the
-   `rollback` command, and run it against the deployment's databases:
+1. Roll the release back to v2.25.
+   If the release history still has the v2.25 revision,
+   roll back to it:
+
+   ```shell
+   helm history <release> --namespace <namespace>
+   helm rollback <release> <v2.25 revision> \
+     --namespace <namespace> \
+     --wait
+   ```
+
+   If that revision is no longer in the history,
+   install the v2.25.2 chart with the values you used for v2.25.2.
+   Without `--version`, Helm installs the latest chart.
+
+   ```shell
+   helm upgrade <release> voxel51/fiftyone-teams-app \
+     --namespace <namespace> \
+     --version 2.25.2 \
+     --values <your v2.25.2 values file> \
+     --wait
+   ```
+
+   If Argo CD or another GitOps tool manages the release,
+   set the chart version back to `2.25.2` in your Git repository instead.
+1. Check that no v2.26 `teams-cas` pod is still running or terminating:
+
+   ```shell
+   kubectl get pods --namespace <namespace>
+   ```
+
+   If a v2.26 `teams-cas` starts,
+   it converts the data to the v2.26 form again.
+1. Get a `fiftyone-migrator` release with the `rollback` command
+   from Voxel51 support.
+   Run it against the deployment's databases,
+   with a dry run first:
 
    ```shell
    export CAS_DATABASE_URI=<the teams-cas MongoDB connection string>
@@ -169,9 +207,11 @@ pending invitations.
    fiftyone-migrator rollback 2.25.1 --include cas
    ```
 
-   It returns invitations, service accounts and their groups to the way
-   v2.25 stores them. It can be run again safely, and it works whether or
-   not `fiftyone-migrator` was ever run on the deployment before.
+   The command returns invitations, service accounts, and their groups
+   to the form v2.25 uses.
+   You can run it again safely.
+   It works whether or not anyone ran `fiftyone-migrator`
+   on the deployment before.
 
 Upgrading to v2.26 again later needs no extra step.
 
