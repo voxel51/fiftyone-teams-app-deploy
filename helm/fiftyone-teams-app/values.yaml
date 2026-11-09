@@ -1866,7 +1866,7 @@ telemetry:
     # points at an existing account that already carries `pods/log` (e.g. the
     # teams-api RBAC SA). On Kubernetes the sidecar tails container logs via the
     # `pods/log` API; without this grant those calls return `403`, so the
-    # delegated-operator log viewer stays empty. The Monitoring → System Health
+    # delegated-operator log viewer stays empty. The Settings → Monitoring → System Health
     # dashboard is unaffected — metrics use the pod's shared process namespace,
     # not the Kubernetes API.
     create: true

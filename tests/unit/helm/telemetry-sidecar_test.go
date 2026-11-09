@@ -210,7 +210,7 @@ func (s *telemetrySidecarTemplateTest) TestShareProcessNamespaceDisabledWithTele
 // telemetry RBAC escape hatch (telemetry.rbac.create=false) does not affect
 // sidecar injection. Metrics ride on the shared process namespace, not the
 // pods/log Role, so an install identity without namespaced RBAC permissions
-// still gets the sidecar and the Monitoring → System Health dashboard.
+// still gets the sidecar and the Settings → Monitoring → System Health dashboard.
 func (s *telemetrySidecarTemplateTest) TestSidecarRenderedWithRbacCreateDisabled() {
 	options := &helm.Options{SetValues: map[string]string{
 		"telemetry.rbac.create": "false",
