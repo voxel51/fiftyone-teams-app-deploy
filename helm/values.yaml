@@ -27,15 +27,6 @@ secret:
     fiftyoneDatabaseName: fiftyone
     mongodbConnectionString: mongodb://username:password@somehostname/?authSource=admin
 
-    # This secret is a required random string used to encrypt session cookies.
-    # To generate this string, run
-    #
-    # ```shell
-    # openssl rand -hex 32
-    # ````
-    #
-    cookieSecret:
-
     # This required key is used to encrypt storage credentials in the database.
     #   Do NOT lose this key!
     # To generate this key, run (in python)
@@ -77,11 +68,10 @@ appSettings:
     # See https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/helm/fiftyone-teams-app#fiftyone-enterprise-plugins
     # FIFTYONE_PLUGINS_DIR: /opt/plugins
 
-casSettings:
-  env:
-    FIFTYONE_AUTH_MODE: legacy
-    # Set the name of the Mongo database for CAS if not using the default `cas`
-    # CAS_DATABASE_NAME: your-cas-name
+# Set the name of the Mongo database for CAS if not using the default `cas`
+# casSettings:
+#   env:
+#     CAS_DATABASE_NAME: your-cas-name
 
 # For a production-ready deployment, we recommend enabling dedicated plugins
 # and delegated operators after your initial install. See:

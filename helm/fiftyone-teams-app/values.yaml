@@ -608,7 +608,6 @@ casSettings:
   # -- Annotations for the `teams-cas` deployment. [Reference][annotations].
   deploymentAnnotations: {}
   # -- Allow ADMINs to invite users by email
-  # NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal`
   enable_invitations: true
   # Environment Variables are passed to the `teams-cas` containers
   env:
@@ -628,9 +627,6 @@ casSettings:
     # `DEBUG: cas:*:info` - shows all CAS INFO logs
     # `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs
     DEBUG: cas:*,-cas:*:debug
-    # -- Configure Authentication Mode.
-    # One of `legacy` or `internal`
-    FIFTYONE_AUTH_MODE: legacy
 
   # -- Secret variables to be passed to the `teams-cas` containers.
   secretEnv: {}
@@ -1602,9 +1598,6 @@ secret:
     # -- MongoDB Connection String. [Reference][mongodb-connection-string].
     mongodbConnectionString: ""
 
-    # -- A randomly generated string for cookie encryption.
-    # To generate, run `openssl rand -hex 32`.
-    cookieSecret: ""
     # -- Encryption key for storage credentials. [Reference][fiftyone-encryption-key].
     encryptionKey: ""
     # -- A randomly generated string for CAS Authentication.
@@ -1873,7 +1866,7 @@ telemetry:
     # points at an existing account that already carries `pods/log` (e.g. the
     # teams-api RBAC SA). On Kubernetes the sidecar tails container logs via the
     # `pods/log` API; without this grant those calls return `403`, so the
-    # delegated-operator log viewer stays empty. The Settings → Metrics
+    # delegated-operator log viewer stays empty. The Settings → Monitoring → System Health
     # dashboard is unaffected — metrics use the pod's shared process namespace,
     # not the Kubernetes API.
     create: true

@@ -1,6 +1,6 @@
 ---
 # Builtin services list for this deployment, mounted into teams-api by
-# common-services.yaml (via FIFTYONE_BUILTIN_SERVICES_PATH) and reconciled at
+# compose.yaml (via FIFTYONE_BUILTIN_SERVICES_PATH) and reconciled at
 # startup so the services show up in Settings -> Services. Entries deep-merge
 # by `id` onto the packaged defaults. Both services are created stopped
 # (enabled: false). An admin starts them from the Services page.
