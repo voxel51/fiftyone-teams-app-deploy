@@ -158,6 +158,46 @@ and `migrate-volumes.sh` has nothing to copy.
 >
 > Run `docker volume ls` to find your old volume names.
 
+Other things named after the Compose project also change with it:
+
+- **Default network:**
+  Compose creates `voxel51_default`
+  in place of `internal-auth_default` or `legacy-auth_default`,
+  usually on a new subnet.
+  Containers outside the stack that attach to the old network,
+  such as a reverse proxy
+  or another Compose project that lists it as `external`,
+  lose their connection,
+  and firewall rules written for the old subnet stop matching.
+  To keep the old network name,
+  set it in `compose.override.yaml`:
+
+  ```yaml
+  networks:
+    default:
+      name: internal-auth_default
+  ```
+
+  Disconnect those outside containers before you stop the old stack,
+  so Compose can remove the old network.
+  Reconnect them after the new stack starts.
+- **Container names:**
+  `internal-auth-teams-api-1` becomes `voxel51-teams-api-1`.
+  Update scripts, cron jobs, and monitoring that use container names.
+- **Project label:**
+  the `com.docker.compose.project` label changes to `voxel51`.
+  Update log and monitoring filters that use it,
+  and commands that pass `-p`.
+- **Directory:**
+  commands run from `docker/`.
+  Update systemd units, deploy scripts, and runbooks
+  that change into `docker/internal-auth` or `docker/legacy-auth`.
+
+Settings in `compose.override.yaml`,
+such as network options or extra services,
+carry over because you copy the file.
+Published host ports don't change.
+
 To upgrade:
 
 1. Before you get the v2.26 files,
