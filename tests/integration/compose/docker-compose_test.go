@@ -239,7 +239,8 @@ func (s *dockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "Registering executor builtin",
+					log:              "",
+					orchestrator:     "builtin",
 				},
 			},
 		},
@@ -337,6 +338,11 @@ func (s *dockerComposeUpTest) TestDockerComposeUp() {
 				}
 				// Validate log output is expected
 				checkContainerLogsWithRetries(subT, dockerOptions, expected.name, testCase.name, expected.log)
+
+				// Validate that a delegated operator worker registered its orchestrator
+				if expected.orchestrator != "" {
+					checkOrchestratorRegisteredWithRetries(subT, dockerOptions, args, expected.name, testCase.name, expected.orchestrator)
+				}
 			}
 		})
 	}
