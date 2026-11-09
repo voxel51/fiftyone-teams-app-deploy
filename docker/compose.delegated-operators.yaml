@@ -98,7 +98,7 @@ services:
   # volume name, so reusing `telemetry-socket` across slots would
   # clobber the socket. `-n teams-do-2` registers this worker as a
   # distinct orchestrator name so it surfaces separately in the
-  # Monitoring → System Health page.
+  # Settings → Monitoring → System Health page.
   teams-do-2:
     image: voxel51/fiftyone-teams-cv-full:v2.25.2
     profiles: ["do-2", "do-3"]

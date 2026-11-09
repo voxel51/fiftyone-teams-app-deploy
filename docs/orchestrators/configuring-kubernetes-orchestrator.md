@@ -463,7 +463,7 @@ If your deployment runs telemetry (the Helm chart includes
 it by default), you can attach a per-Job telemetry
 sidecar to on-demand Kubernetes orchestrators as well.
 This emits per-operation metrics back to the same Redis backend so the
-Monitoring → System Health page sees individual delegated runs.
+Settings → Monitoring → System Health page sees individual delegated runs.
 
 We use Kubernetes
 [native sidecar](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/)

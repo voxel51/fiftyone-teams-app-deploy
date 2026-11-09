@@ -625,7 +625,7 @@ for questions regarding storage and encryption.
 
 FiftyOne Enterprise bundles a telemetry sidecar and Redis backend by
 default in every compose file.
-The Monitoring → System Health page in teams-app exposes live per-service
+The Settings → Monitoring → System Health page in teams-app exposes live per-service
 metrics (CPU, memory, FDs, thread counts) and tailed logs.
 
 Please refer to the
