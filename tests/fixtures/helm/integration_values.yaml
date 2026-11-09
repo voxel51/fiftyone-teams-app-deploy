@@ -103,7 +103,7 @@ ingress:
   tlsEnabled: true
 secret:
   fiftyone:
-    fiftyoneDatabaseName: fiftyone-internal
+    fiftyoneDatabaseName: fiftyone
     # This password is randomly generated and is only used to initialize a local (ephemeral) MongoDB in `./skaffold-mongodb.yaml`
     # URL encoded to overcome errors with unencoded characters
     # Can also use mongo srv now!

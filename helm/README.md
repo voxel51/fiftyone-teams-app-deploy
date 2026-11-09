@@ -455,8 +455,6 @@ with FiftyOne:
 ### :hammer_and_wrench: Optional: CAS Customization Instructions
 
 1. Update CAS values in your `values.yaml`:
-   - `secret.fiftyone.fiftyoneAuthSecret`
-   - `casSettings.env.CAS_DATABASE_NAME` (⚠️ Must be unique per deployment)
    - `casSettings.env.CAS_DEFAULT_USER_ROLE`
    - `casSettings.env.DEBUG`
 1. Apply the changes:

@@ -1,5 +1,5 @@
-//go:build docker || compose || unit || unitComposeInternalAuth
-// +build docker compose unit unitComposeInternalAuth
+//go:build docker || compose || unit || unitCompose
+// +build docker compose unit unitCompose
 
 package unit
 
@@ -15,7 +15,7 @@ const (
 
 // builtinServicesSource is the absolute path compose-go resolves the
 // builtin_services.yaml bind mount to. It resolves relative to the directory of
-// the file that declares the volume (common-services.yaml, i.e. docker/).
+// the file that declares the volume (docker/compose.yaml).
 var builtinServicesSource, _ = filepath.Abs("../../../docker/builtin_services.yaml")
 
 var telemetrySocketDriverOpts = types.Options{

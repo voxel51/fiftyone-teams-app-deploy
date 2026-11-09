@@ -19,7 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
-    - [FiftyOne Enterprise v2.26+ `legacy-auth` Directory Removed](#fiftyone-enterprise-v226-legacy-auth-directory-removed)
+    - [FiftyOne Enterprise v2.26+ Compose Files Moved to `docker/`](#fiftyone-enterprise-v226-compose-files-moved-to-docker)
     - [FiftyOne Enterprise v2.25+ Activity Analytics](#fiftyone-enterprise-v225-activity-analytics)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators](#fiftyone-enterprise-v223-service-orchestrators)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
@@ -106,21 +106,198 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
-#### FiftyOne Enterprise v2.26+ `legacy-auth` Directory Removed
+#### FiftyOne Enterprise v2.26+ Compose Files Moved to `docker/`
 
-FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode, the
-`FIFTYONE_AUTH_MODE` environment variable, and the `legacy-auth` directory.
-All deployments use the `internal-auth` directory.
+FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode
+and the `FIFTYONE_AUTH_MODE` environment variable.
+It also removes the `internal-auth` and `legacy-auth` directories
+and `common-services.yaml`.
+The compose files now live in the `docker` directory:
 
-If you deploy from the `legacy-auth` directory:
+- `compose.yaml` defines every base service.
+  Run every `docker compose` command with `-f compose.yaml` first.
+- `compose.plugins.yaml`, `compose.dedicated-plugins.yaml`,
+  and the other files add to `compose.yaml`.
+  They no longer replace it.
+- `compose.yaml` names the Compose project `voxel51`.
+  Container and volume names start with `voxel51`
+  instead of the directory name.
+- `compose.activity.yaml` is removed.
+  Activity Analytics is part of `compose.yaml`.
 
-1. Copy your `compose.override.yaml` and `.env` files into the `internal-auth`
-   directory
-1. `cd` into the `internal-auth` directory
-1. In the `.env` file, rename `AUTH0_BASE_URL` to `BASE_URL`
-1. Remove `AUTH0_SECRET` from the `.env` file; it is no longer used
-1. Remove `FIFTYONE_AUTH_MODE` from the `.env` and `compose.override.yaml`
-   files if it is set
+Because the project name changes,
+Compose creates a new, empty plugins volume.
+`migrate-volumes.sh` copies your plugins from the old volume into the new one.
+
+If you already set your own project name,
+with a top-level `name:` in `compose.override.yaml`,
+`COMPOSE_PROJECT_NAME` in `.env`,
+or `-p` on the command line,
+Compose keeps that name.
+It reuses your existing volumes,
+so your plugins and other data stay where they are,
+and `migrate-volumes.sh` has nothing to copy.
+
+> [!WARNING]
+> Named volumes that you added in `compose.override.yaml`,
+> such as a MongoDB data volume,
+> also start empty under the new project name.
+> To keep using an old volume,
+> set its full name in `compose.override.yaml`
+> and mark it `external`,
+> so Compose uses it as it is.
+> For example,
+> for a volume named `mongodb-data` that you deployed from `internal-auth`:
+>
+> ```yaml
+> volumes:
+>   mongodb-data:
+>     name: internal-auth_mongodb-data
+>     external: true
+> ```
+>
+> Run `docker volume ls` to find your old volume names.
+
+Other things named after the Compose project also change with it:
+
+- **Default network:**
+  Compose creates `voxel51_default`
+  in place of `internal-auth_default` or `legacy-auth_default`,
+  usually on a new subnet.
+  Containers outside the stack that attach to the old network,
+  such as a reverse proxy
+  or another Compose project that lists it as `external`,
+  lose their connection,
+  and firewall rules written for the old subnet stop matching.
+  To keep the old network name,
+  set it in `compose.override.yaml`:
+
+  ```yaml
+  networks:
+    default:
+      name: internal-auth_default
+  ```
+
+  Disconnect those outside containers before you stop the old stack,
+  so Compose can remove the old network.
+  Reconnect them after the new stack starts.
+- **Container names:**
+  `internal-auth-teams-api-1` becomes `voxel51-teams-api-1`.
+  Update scripts, cron jobs, and monitoring that use container names.
+- **Project label:**
+  the `com.docker.compose.project` label changes to `voxel51`.
+  Update log and monitoring filters that use it,
+  and commands that pass `-p`.
+- **Directory:**
+  commands run from `docker/`.
+  Update systemd units, deploy scripts, and runbooks
+  that change into `docker/internal-auth` or `docker/legacy-auth`.
+
+Settings in `compose.override.yaml`,
+such as network options or extra services,
+carry over because you copy the file.
+Published host ports don't change.
+
+To upgrade:
+
+1. Before you get the v2.26 files,
+   stop the stack from your old directory
+   (`internal-auth` or `legacy-auth`).
+   `--remove-orphans` also stops services from your other `-f` files.
+   Don't add `-v`,
+   so your volumes stay.
+
+   ```shell
+   docker compose down --remove-orphans
+   ```
+
+1. Get the v2.26 files.
+1. Copy your `compose.override.yaml` and `.env` files
+   into the `docker` directory,
+   then `cd` into it.
+1. In the `.env` and `compose.override.yaml` files,
+   update relative paths
+   (such as `LOCAL_LICENSE_FILE_DIR` and bind mount sources)
+   so they work from the `docker` directory.
+   Compose resolves them from the `docker` directory now,
+   and it creates an empty directory
+   for a bind mount source that's missing.
+1. If you deployed from `legacy-auth`, in the `.env` file:
+    1. Rename `AUTH0_BASE_URL` to `BASE_URL`
+    1. Remove `AUTH0_SECRET`. It's no longer used.
+1. Remove `FIFTYONE_AUTH_MODE` from the `.env` and `compose.override.yaml` files
+   if it's set.
+1. In `compose.override.yaml`,
+   remove any `extends:` block that points at `common-services.yaml`.
+   Keep the settings you override under the service name.
+   For example, change
+
+   ```yaml
+   services:
+     teams-api:
+       extends:
+         file: ../common-services.yaml
+         service: teams-api-common
+       environment:
+         MY_SETTING: my-value
+   ```
+
+   to
+
+   ```yaml
+   services:
+     teams-api:
+       environment:
+         MY_SETTING: my-value
+   ```
+
+1. Update your `docker compose` command.
+   Start it with `-f compose.yaml` and remove `-f compose.activity.yaml`.
+   For example,
+   `-f compose.plugins.yaml -f compose.override.yaml` becomes
+
+   ```shell
+   docker compose \
+     -f compose.yaml \
+     -f compose.plugins.yaml \
+     -f compose.override.yaml \
+     config
+   ```
+
+   Check that the output has the services and settings you expect.
+
+1. Pull the v2.26 images with the same `-f` options and `pull`.
+   On air-gapped hosts, load the images instead.
+1. Copy your plugins into the new project.
+   Check the plan first with `--dry-run`,
+   then run it without:
+
+   ```shell
+   ./migrate-volumes.sh \
+     --dry-run \
+     -- \
+     -f compose.yaml \
+     -f compose.plugins.yaml \
+     -f compose.override.yaml
+   ```
+
+   The script finds the old plugins volume by its Compose labels.
+   It skips the copy when:
+    - the new project's plugins volume already has files,
+      for example because you kept your project name
+    - your `-f` files don't include a plugins file
+    - no `internal-auth` or `legacy-auth` project has a plugins volume
+
+   It picks a source on its own only from the `internal-auth` or `legacy-auth` project.
+   If both have one,
+   or your old deployment used a different project name,
+   name it with `--from-project`.
+   The skip message lists other projects on the host that have a plugins volume.
+1. Start the stack with the same `-f` options and `up -d`.
+1. Once the new stack works, remove the old plugins volume.
+   The script prints the command.
+   Keep your other old volumes
+   until you've checked the data in the new stack.
 
 #### FiftyOne Enterprise v2.25+ Activity Analytics
 
@@ -133,15 +310,14 @@ tab.
 behind the `compose.activity.yaml` overlay. In later versions an upgrade
 with no changes:
 
-- starts two new services from every base compose file:
+- starts two new services from the base compose file:
   `fiftyone-mq-redis` (the queue, persisted on the new
   `fiftyone-mq-redis-data` volume) and `activity-worker`
 - sets `FIFTYONE_ACTIVITY_ENABLED=true` on `fiftyone-app`, `teams-api`,
   `teams-plugins`, and the `teams-do*` workers
 
-`compose.activity.yaml` is now empty and deprecated. Existing
-`-f compose.activity.yaml` commands keep working; drop it from your `-f`
-set when convenient.
+FiftyOne Enterprise v2.26 removes `compose.activity.yaml`.
+Remove it from your `-f` set.
 
 Activity data accumulates from the upgrade onward; earlier activity is not
 backfilled.
@@ -316,8 +492,9 @@ name on each copy) — see the per-slot inline comments in
 
 Each worker now registers under its own orchestrator name (slot 2 as
 `teams-do-2`, slot 3 as `teams-do-3`) so they surface separately in
-Settings → Metrics. Resource impact scales linearly with the worker
-count: each additional slot adds ~0.2 CPU and ~1 GiB of memory
+Settings → Monitoring → System Health.
+Resource impact scales linearly with the worker count:
+each additional slot adds ~0.2 CPU and ~1 GiB of memory
 (worker reservation + paired sidecar).
 
 See
@@ -397,11 +574,13 @@ of this new `voxel51/fiftyone-teams-cv-full` image.
 Please note: this image is approximately 2GB larger than its predecessor
 and, as such, might take longer to pull and start.
 
-To utilize the prior image, update your `common-services.yaml` similar to the below:
+To utilize the prior image,
+update your `compose.override.yaml` similar to the below:
 
 ```yaml
-teams-do-common:
-  image: voxel51/fiftyone-app:v2.25.2
+services:
+  teams-do:
+    image: voxel51/fiftyone-app:v2.25.2
 ```
 
 #### FiftyOne Enterprise v2.2+ Delegated Operator Changes
@@ -522,9 +701,9 @@ Additionally,
 
 ---
 
-1. Copy your `compose.override.yaml` and `.env` files into the `internal-auth`
-   directory
-1. `cd` into the `internal-auth` directory
+1. Copy your `compose.override.yaml` and `.env` files
+   into the `docker` directory
+1. `cd` into the `docker` directory
 1. In the `.env` file, set `BASE_URL` to your WebApp URL
 1. In the `.env` file, set the required environment variables
     - `FIFTYONE_API_URI`
@@ -621,9 +800,9 @@ Additionally,
 
 ---
 
-1. Copy your `compose.override.yaml` and `.env` files into the `internal-auth`
-   directory
-1. `cd` into the `internal-auth` directory
+1. Copy your `compose.override.yaml` and `.env` files
+   into the `docker` directory
+1. `cd` into the `docker` directory
 1. In the `.env` file, set `BASE_URL` to your WebApp URL
 1. In your `.env` file, set the required environment variables:
     - `FIFTYONE_ENCRYPTION_KEY`

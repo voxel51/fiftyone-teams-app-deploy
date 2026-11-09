@@ -18,14 +18,15 @@ This option may be added to any of the three existing
 [plugin modes](./configuring-plugins.md).
 
 To enable this mode and launch worker containers, use
-[internal-auth/compose.delegated-operators.yaml](../internal-auth/compose.delegated-operators.yaml)
-in conjunction with one of the three plugin configurations.
+[compose.delegated-operators.yaml](../compose.delegated-operators.yaml)
+with `compose.yaml` and one of the three plugin configurations.
 
 - Example `docker compose` command for enabling this mode on top of dedicated
-  plugins mode, from the `internal-auth` directory
+  plugins mode, from the `docker` directory
 
     ```shell
     docker compose \
+      -f compose.yaml \
       -f compose.dedicated-plugins.yaml \
       -f compose.delegated-operators.yaml \
       -f compose.override.yaml \
