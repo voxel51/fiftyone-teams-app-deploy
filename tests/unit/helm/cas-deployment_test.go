@@ -419,7 +419,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 		expected func(envVars []corev1.EnvVar)
 	}{
 		{
-			"defaultValues", // legacy auth mode
+			"defaultValues",
 			nil,
 			func(envVars []corev1.EnvVar) {
 				expectedEnvVarJSON := `[
@@ -504,10 +504,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "DEBUG",
             "value": "cas:*,-cas:*:debug"
-          },
-          {
-            "name": "FIFTYONE_AUTH_MODE",
-            "value": "legacy"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -517,7 +513,7 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
 			},
 		},
 		{
-			"overrideEnv", // legacy auth mode
+			"overrideEnv",
 			map[string]string{
 				"casSettings.env.TEST_KEY":                                  "TEST_VALUE",
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
@@ -606,126 +602,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "DEBUG",
             "value": "cas:*,-cas:*:debug"
-          },
-          {
-            "name": "FIFTYONE_AUTH_MODE",
-            "value": "legacy"
-          },
-          {
-            "name": "TEST_KEY",
-            "value": "TEST_VALUE"
-          },
-          {
-            "name": "AN_ADDITIONAL_SECRET_ENV",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "an-existing-secret",
-                "key": "anExistingKey"
-              }
-            }
-          }
-        ]`
-				var expectedEnvVars []corev1.EnvVar
-				err := json.Unmarshal([]byte(expectedEnvVarJSON), &expectedEnvVars)
-				s.NoError(err)
-				s.Equal(expectedEnvVars, envVars, "Envs should be equal")
-			},
-		},
-		{
-			"internalAuthMode",
-			map[string]string{
-				"casSettings.env.FIFTYONE_AUTH_MODE":                        "internal",
-				"casSettings.env.TEST_KEY":                                  "TEST_VALUE",
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "an-existing-secret", // pragma: allowlist secret
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "anExistingKey",      // pragma: allowlist secret
-			},
-			func(envVars []corev1.EnvVar) {
-				expectedEnvVarJSON := `[
-          {
-            "name": "POD_NAME",
-            "valueFrom": {
-              "fieldRef": {
-                "apiVersion": "v1",
-                "fieldPath": "metadata.name"
-              }
-            }
-          },
-          {
-            "name": "CAS_MONGODB_URI",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "mongodbConnectionString"
-              }
-            }
-          },
-          {
-            "name": "CAS_URL",
-            "value": "https://"
-          },
-          {
-            "name": "FIFTYONE_AUTH_SECRET",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "fiftyoneAuthSecret"
-              }
-            }
-          },
-          {
-            "name": "FIFTYONE_ENCRYPTION_KEY",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "encryptionKey"
-              }
-            }
-          },
-          {
-            "name": "LICENSE_KEY_FILE_PATHS",
-            "value": "/opt/fiftyone/licenses/fiftyone-license"
-          },
-          {
-            "name": "NEXTAUTH_URL",
-            "value": "https:///cas/api/auth"
-          },
-          {
-            "name": "TEAMS_API_DATABASE_NAME",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "fiftyoneDatabaseName"
-              }
-            }
-          },
-          {
-            "name": "TEAMS_API_MONGODB_URI",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "fiftyone-teams-secrets",
-                "key": "mongodbConnectionString"
-              }
-            }
-          },
-          {
-            "name": "CAS_DATABASE_NAME",
-            "value": "cas"
-          },
-          {
-            "name": "CAS_DEFAULT_USER_ROLE",
-            "value": "GUEST"
-          },
-          {
-            "name": "CAS_MONGODB_URI_KEY",
-            "value": "mongodbConnectionString"
-          },
-          {
-            "name": "DEBUG",
-            "value": "cas:*,-cas:*:debug"
-          },
-          {
-            "name": "FIFTYONE_AUTH_MODE",
-            "value": "internal"
           },
           {
             "name": "TEST_KEY",
@@ -836,10 +712,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "DEBUG",
             "value": "cas:*,-cas:*:debug"
-          },
-          {
-            "name": "FIFTYONE_AUTH_MODE",
-            "value": "legacy"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -936,10 +808,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "DEBUG",
             "value": "cas:*,-cas:*:debug"
-          },
-          {
-            "name": "FIFTYONE_AUTH_MODE",
-            "value": "legacy"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar
@@ -1036,10 +904,6 @@ func (s *deploymentCasTemplateTest) TestContainerEnv() {
           {
             "name": "DEBUG",
             "value": "cas:*,-cas:*:debug"
-          },
-          {
-            "name": "FIFTYONE_AUTH_MODE",
-            "value": "legacy"
           }
         ]`
 				var expectedEnvVars []corev1.EnvVar

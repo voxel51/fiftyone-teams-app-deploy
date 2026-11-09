@@ -18,6 +18,7 @@
     - [Port Forward to the `teams-app` Service](#port-forward-to-the-teams-app-service)
     - [Port Forward to the `teams-api` Service](#port-forward-to-the-teams-api-service)
     - [Port Forward - Login](#port-forward---login)
+- [Releasing](#releasing)
 
 <!-- tocstop -->
 
@@ -63,16 +64,10 @@
     make start
     ```
 
-1. Download dev license file (legacy or internal)
+1. Download dev license file
 
     ```shell
-    make license-secret-legacy
-    ```
-
-    or
-
-    ```shell
-    make license-secret-internal
+    make license-secret
     ```
 
 1. Install or update the required helm repositories
@@ -248,16 +243,8 @@ export NAMESPACE=fiftyone-teams
 kubectl create namespace "${NAMESPACE}" --context minikube
 ```
 
-For legacy CAS mode
-
 ```shell
-make license-secret-legacy
-```
-
-For internal CAS mode
-
-```shell
-make license-secret-internal
+make license-secret
 ```
 
 When debugging, it may be helpful to start minikube with the flag
@@ -598,3 +585,7 @@ With the port forward running,
 > Without this setting, the app code makes the callback URL
 > [https://localhost:3000](https://localhost:3000)
 > and Auth0 throws a Callback URL mismatch error.
+
+## Releasing
+
+See [RELEASING.md](./RELEASING.md).
