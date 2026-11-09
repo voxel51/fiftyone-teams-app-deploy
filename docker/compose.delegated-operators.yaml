@@ -2,7 +2,7 @@
 # See docker/docs/configuring-telemetry.md for details on telemetry settings.
 #
 # For Proxy Server instructions please see
-#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#globe_with_meridians-step-5-configure-ssl--reverse-proxy-nginx--load-balancer
 #
 # Delegated operators overlay.
 # Stack it on compose.yaml and a plugins overlay.

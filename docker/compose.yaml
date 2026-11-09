@@ -1,6 +1,6 @@
 ---
 # For Proxy Server instructions please see
-#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#environment-proxies
+#  https://github.com/voxel51/fiftyone-teams-app-deploy/tree/main/docker#globe_with_meridians-step-5-configure-ssl--reverse-proxy-nginx--load-balancer
 name: voxel51
 services:
   fiftyone-app:
