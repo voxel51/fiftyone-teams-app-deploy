@@ -1,14 +1,48 @@
 ---
+# Publishes the public chart when a release tag is pushed.
+# The release pipeline in cloud-build-and-deploy
+# tags the tip of the release branch `fiftyone-teams-app-X.Y.Z`.
+# Pushes to `main` never publish a chart.
 name: Release Charts
 
 # yamllint disable-line rule:truthy
 on:
   push:
-    branches:
-      - main
+    tags:
+      - fiftyone-teams-app-*
 
 jobs:
+  verify-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Tag matches Chart.yaml
+        id: version
+        run: |
+          tag_version="${GITHUB_REF_NAME#fiftyone-teams-app-}"
+          chart_version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
+
+          if [[ "${tag_version}" != "${chart_version}" ]]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match Chart.yaml version ${chart_version}"
+            exit 1
+          fi
+
+          echo "version=${chart_version}" >> "${GITHUB_OUTPUT}"
+
+  docker-pulls:
+    needs: verify-tag
+    uses: ./.github/workflows/test-docker-pulls.yml
+    secrets:
+      ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT: ${{ secrets.ORG_RO_ALOHA_GITHUB_WORKFLOWS_FG_PAT }}
+      RO_DOCKERHUB_PAT: ${{ secrets.RO_DOCKERHUB_PAT }}
+      RO_DOCKERHUB_USERNAME: ${{ secrets.RO_DOCKERHUB_USERNAME }}
+
   release:
+    needs: docker-pulls
     outputs:
       changed_charts: ${{ steps.chart_releaser.outputs.changed_charts }}
     permissions:
@@ -35,13 +69,10 @@ jobs:
         id: chart_releaser
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          # If there are changes in the `helm/fiftyone-teams-app` directory,
-          # Chart Releaser will try to publish a new chart.
-          # If the `Chart.yaml` hasn't been changed, this will throw an error.
-          # Specifically, you will see a 422 from GitHub.
-          # This is OK - we have opted to use this as opposed to
-          # CR_SKIP_EXISTING: true so that internal charts don't get into
-          # inconsistent states.
+          # If you re-run a tag that already published,
+          # GitHub returns a 422 error and the run fails.
+          # Failing, instead of skipping,
+          # keeps the internal charts in sync with the public chart.
           CR_SKIP_EXISTING: false
         uses: helm/chart-releaser-action@v1.8.0
         with:
@@ -127,3 +158,61 @@ jobs:
                 "fiftyone-teams-app-deploy-version": "${{ steps.get-version.outputs.FIFTYONE_TEAMS_APP_DEPLOY_VERSION }}"
               }
             })
+
+  update-main:
+    # Keeps main on the latest release.
+    # This job opens a PR that bumps the versions on main to the release
+    # and pins the integration fixtures on main to the released images.
+    if: ${{ needs.release.outputs.changed_charts != '' }}
+    needs: [release, verify-tag]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          token: ${{ secrets.FIFTYONE_GITHUB_TOKEN }}
+
+      - name: Open main update PR
+        env:
+          GH_TOKEN: ${{ secrets.FIFTYONE_GITHUB_TOKEN }}
+          VERSION: "${{ needs.verify-tag.outputs.version }}"
+        run: |
+          set -euo pipefail
+
+          git config user.name "voxel51-bot"
+          git config user.email "voxel51-bot@users.noreply.github.com"
+
+          branch="release-sync/v${VERSION}"
+          git checkout -b "${branch}"
+
+          main_version=$(yq ".version" helm/fiftyone-teams-app/Chart.yaml)
+          newest=$(printf '%s\n%s\n' "${main_version}" "${VERSION}" | sort -V | tail -1)
+          if [[ "${newest}" == "${VERSION}" ]]; then
+            ./utils/bump-version.sh \
+              --from "${main_version}" \
+              --to "${VERSION}"
+          else
+            echo "::notice::main is on ${main_version}, newer than ${VERSION}. Leaving the versions on main alone."
+          fi
+
+          ./utils/bump-fixtures.sh \
+            --app-version "v${VERSION}" \
+            --api-version "v${VERSION}" \
+            --teams-app-version "v${VERSION}" \
+            --cas-version "v${VERSION}"
+
+          git add --all
+          if git diff --cached --quiet; then
+            echo "main is already on v${VERSION}"
+            exit 0
+          fi
+
+          title="chore(release): update main to v${VERSION}"
+          git commit -m "${title}"
+          git push origin "${branch}"
+          gh pr create \
+            --base main \
+            --head "${branch}" \
+            --title "${title}" \
+            --body "Bumps the versions on \`main\` to \`v${VERSION}\` and pins the integration test fixtures to the images released with \`${GITHUB_REF_NAME}\`. Opened by the Release Charts workflow."

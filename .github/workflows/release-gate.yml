@@ -1,0 +1,103 @@
+name: Release Gate
+
+# Blocks PRs to `release/*` branches
+# unless the change landed on `main` first.
+# This check passes only these PRs:
+#
+# - cherry-picks of commits already on `main`
+# - PRs labeled `release-only-fix`
+# - PRs labeled `version-bump`
+#
+# Every other change merges to `main`
+# and reaches a release branch by cherry-pick.
+# The only commits on a release branch that `main` doesn't have are:
+#
+# - release-only fixes
+# - version bumps
+# - the integration-fixture pins that the release-candidate deploy pushes
+#
+# After the release, a PR pins the fixtures on `main` to the release.
+# So you never need to merge a release branch back to `main`.
+
+on:
+  pull_request:
+    types:
+      - edited
+      - labeled
+      - opened
+      - reopened
+      - synchronize
+      - unlabeled
+    branches:
+      - release/v**
+
+concurrency:
+  group: release-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  release-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The ancestry checks need the full commit history,
+          # but not the file contents.
+          fetch-depth: 0
+          filter: blob:none
+      - name: Gate release branch PR
+        env:
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          has_label() { echo "$LABELS" | grep -q "\"$1\""; }
+
+          # The release process makes its own version-bump commits.
+          if has_label "version-bump"; then
+            echo "Version bump PR. OK."
+            exit 0
+          fi
+
+          # Use this label only for a fix that applies to the release branch
+          # and can't land on main first.
+          # Adding the label shows someone made that choice on purpose.
+          if has_label "release-only-fix"; then
+            echo "Release-only fix. OK."
+            exit 0
+          fi
+
+          # Every other PR must contain only cherry-picks of commits on main.
+          # `git cherry-pick -x` records the source commit's SHA,
+          # and that commit must be on main.
+          # The gate rejects merge commits,
+          # because they can hide conflict fixes that no one checked.
+          # Rebase cherry-pick branches instead of merging into them.
+          git fetch --quiet origin main
+          if [ -n "$(git rev-list --merges "$BASE_SHA..$HEAD_SHA")" ]; then
+            echo "::error::Merge commits are not allowed in release PRs. Rebase instead."
+            exit 1
+          fi
+          bad=0
+          for sha in $(git rev-list "$BASE_SHA..$HEAD_SHA"); do
+            src=$(git log -1 --format=%B "$sha" \
+              | sed -nE 's/^\(cherry picked from commit ([0-9a-f]{40})\)$/\1/p' \
+              | tail -1)
+            if [ -z "$src" ]; then
+              echo "::error::$sha has no '(cherry picked from commit ...)' trailer."
+              echo "Merge the change on main first, then cherry-pick with -x or the"
+              echo "'Cherry-Pick to Release' workflow. If the fix truly applies only to"
+              echo "this release branch, add the 'release-only-fix' label."
+              bad=1
+            elif ! git merge-base --is-ancestor "$src" origin/main 2>/dev/null; then
+              echo "::error::$sha claims source $src, which is not on main."
+              bad=1
+            fi
+          done
+          [ "$bad" -eq 0 ] || exit 1
+          echo "Cherry-picks of main commits. OK."
