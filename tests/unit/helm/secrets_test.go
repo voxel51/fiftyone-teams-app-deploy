@@ -267,6 +267,17 @@ func (s *secretsTemplateTest) TestType() {
 	}
 }
 
+// No chart template reads cookieSecret,
+// so the default Secret should not carry it.
+func (s *secretsTemplateTest) TestDefaultDataHasNoCookieSecret() {
+	output := helm.RenderTemplate(s.T(), &helm.Options{}, s.chartPath, s.releaseName, s.templates)
+
+	var secret corev1.Secret
+	helm.UnmarshalK8SYaml(s.T(), output, &secret)
+
+	s.NotContains(secret.Data, "cookieSecret", "Default secret data should not include cookieSecret.")
+}
+
 func (s *secretsTemplateTest) TestData() {
 	testCases := []struct {
 		name     string
@@ -277,7 +288,6 @@ func (s *secretsTemplateTest) TestData() {
 			"defaultValues",
 			nil,
 			map[string]string{
-				"cookieSecret":            "",
 				"encryptionKey":           "",
 				"fiftyoneDatabaseName":    "",
 				"mongodbConnectionString": "",
@@ -286,13 +296,11 @@ func (s *secretsTemplateTest) TestData() {
 		{
 			"overrideSecretFiftyone",
 			map[string]string{
-				"secret.fiftyone.cookieSecret":            "test-cookie-secret",
 				"secret.fiftyone.encryptionKey":           "test-encryption-key",
 				"secret.fiftyone.fiftyoneDatabaseName":    "test-fiftyone-database",
 				"secret.fiftyone.mongodbConnectionString": "test-mongodb-connection-string",
 			},
 			map[string]string{
-				"cookieSecret":            "test-cookie-secret",
 				"encryptionKey":           "test-encryption-key",
 				"fiftyoneDatabaseName":    "test-fiftyone-database",
 				"mongodbConnectionString": "test-mongodb-connection-string",
