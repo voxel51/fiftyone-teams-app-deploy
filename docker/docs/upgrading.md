@@ -20,6 +20,7 @@
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
     - [FiftyOne Enterprise v2.26+ Compose Files Moved to `docker/`](#fiftyone-enterprise-v226-compose-files-moved-to-docker)
+    - [FiftyOne Enterprise v2.26+ Invitations and Service Accounts](#fiftyone-enterprise-v226-invitations-and-service-accounts)
     - [FiftyOne Enterprise v2.25+ Activity Analytics](#fiftyone-enterprise-v225-activity-analytics)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators](#fiftyone-enterprise-v223-service-orchestrators)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
@@ -225,8 +226,17 @@ To upgrade:
 1. Copy your `compose.override.yaml` and `.env` files
    into the `docker` directory,
    then `cd` into it.
-   Don't copy the other `compose*.yaml` files from your old directory.
-   The v2.26 files in the `docker` directory replace them.
+   Don't copy these Compose files from your old directory,
+   because the v2.26 files in the `docker` directory replace them:
+
+    - `compose.yaml`
+    - `compose.plugins.yaml`
+    - `compose.dedicated-plugins.yaml`
+    - `compose.delegated-operators.yaml`
+    - `compose.delegated-operators.gpu.yaml`
+    - `compose.agenticlabeler.yaml`
+    - `compose.activity.yaml`
+
 1. In the `.env` and `compose.override.yaml` files,
    update relative paths
    (such as `LOCAL_LICENSE_FILE_DIR` and bind mount sources)
@@ -317,6 +327,106 @@ To upgrade:
    The script prints the command.
    Keep your other old volumes
    until you've checked the data in the new stack.
+
+#### FiftyOne Enterprise v2.26+ Invitations and Service Accounts
+
+FiftyOne Enterprise v2.26.0 changes how `teams-cas` stores invitations
+and service accounts.
+
+**Upgrading needs no extra step.**
+The first time a v2.26 `teams-cas` starts,
+it updates the stored data before it serves requests:
+
+- Each pending invitation becomes a pending user.
+  That user holds a seat of the invited role
+  until someone accepts or revokes the invitation,
+  or the invitation expires.
+- Service accounts move into their own collection,
+  and their group memberships move with them.
+
+`teams-cas` can safely repeat each step,
+so several `teams-cas` replicas can start at the same time.
+If the update fails,
+`teams-cas` exits and tries again the next time it starts.
+
+**What changes for administrators:**
+
+- Pending invitations count toward the license's seat limits.
+  When an organization reaches its limit for a role,
+  `teams-cas` refuses new invitations for that role,
+  the same way it refuses new users.
+  An expired invitation frees its seat.
+- Invitations are on by default
+  for organizations that never changed the setting.
+
+**Rolling back to v2.25 needs one extra step,**
+because a v2.25 `teams-cas` can't read the data in its v2.26 form.
+Until you do that step,
+v2.25 doesn't list service accounts
+and counts too many seats for pending invitations.
+
+1. From the `docker` directory,
+   stop v2.26 with the `-f` options you use for `up`.
+   Don't add `-v`, so your volumes stay.
+   For example:
+
+   ```shell
+   docker compose \
+     -f compose.yaml \
+     -f compose.plugins.yaml \
+     -f compose.override.yaml \
+     down
+   ```
+
+   Then run the same command with `ps --all` in place of `down`,
+   and check that it lists no containers.
+   If a v2.26 `teams-cas` starts,
+   it converts the data to the v2.26 form again.
+1. Go back to the v2.25.2 files.
+   In a git clone of this repository, run:
+
+   ```shell
+   git checkout fiftyone-teams-app-2.25.2
+   ```
+
+   Otherwise, download and unpack
+   [the v2.25.2 files](https://github.com/voxel51/fiftyone-teams-app-deploy/archive/refs/tags/fiftyone-teams-app-2.25.2.tar.gz).
+1. Start v2.25.2 from the directory you used before the upgrade,
+   `docker/internal-auth` or `docker/legacy-auth`,
+   with the `-f` options you used for v2.25.2.
+   That directory still has the `.env` and `compose.override.yaml`
+   from before the upgrade.
+   - Compose uses that directory's project name again,
+     so v2.25.2 uses the volumes it had before the upgrade.
+     Changes made after the upgrade,
+     such as plugins you installed,
+     are only in the `voxel51_*` volumes.
+   - If you set your own project name,
+     v2.25.2 uses the same volumes as v2.26.
+1. Get a `fiftyone-migrator` release with the `rollback` command
+   from Voxel51 support.
+   Run it against the deployment's databases,
+   with a dry run first:
+
+   ```shell
+   export CAS_DATABASE_URI=<the teams-cas MongoDB connection string>
+   export CAS_DATABASE_NAME=<the teams-cas database name>
+   export FIFTYONE_DATABASE_URI=<the FiftyOne MongoDB connection string>
+   export FIFTYONE_DATABASE_NAME=<the FiftyOne database name>
+
+   # Shows what would be undone
+   fiftyone-migrator rollback 2.25.1 --include cas --dry-run
+
+   fiftyone-migrator rollback 2.25.1 --include cas
+   ```
+
+   The command returns invitations, service accounts, and their groups
+   to the form v2.25 uses.
+   You can run it again safely.
+   It works whether or not anyone ran `fiftyone-migrator`
+   on the deployment before.
+
+Upgrading to v2.26 again later needs no extra step.
 
 #### FiftyOne Enterprise v2.25+ Activity Analytics
 
