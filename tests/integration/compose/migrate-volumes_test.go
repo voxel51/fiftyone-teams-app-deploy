@@ -297,22 +297,7 @@ func TestMigrateVolumesFailsWhenVolumeListFails(t *testing.T) {
 	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
 	createSourceVolume(t, "legacy-auth", "plugin/fiftyone.yml", "name: my-plugin")
 
-	// A docker wrapper that fails only `docker compose ... config --volumes`
-	// and passes every other command to the real docker.
-	realDocker, err := exec.LookPath("docker")
-	require.NoError(t, err)
-	shimDir := t.TempDir()
-	shim := fmt.Sprintf(`#!/bin/sh
-for arg in "$@"; do
-  if [ "$arg" = "--volumes" ]; then
-    echo "simulated failure" >&2
-    exit 1
-  fi
-done
-exec %q "$@"
-`, realDocker)
-	require.NoError(t, os.WriteFile(filepath.Join(shimDir, "docker"), []byte(shim), 0o755))
-	e.env = []string{"PATH=" + shimDir + string(os.PathListSeparator) + os.Getenv("PATH")}
+	e.env = failingDockerPath(t, `[ "$arg" = "--volumes" ]`)
 
 	out, code := e.migrate()
 
@@ -358,4 +343,41 @@ func TestMigrateVolumesIgnoresOtherProjectNamesWithoutFromProject(t *testing.T) 
 
 	require.Equal(t, 0, code, out)
 	require.Equal(t, "1000:1000\nfrom: teammate", readFile(t, e.destVolume(), "plugin/fiftyone.yml"))
+}
+
+// failingDockerPath returns a PATH setting whose docker wrapper fails
+// when the shell condition matches the current argument ($arg)
+// or the whole command line ($*),
+// and passes every other command to the real docker.
+func failingDockerPath(t *testing.T, condition string) []string {
+	t.Helper()
+	realDocker, err := exec.LookPath("docker")
+	require.NoError(t, err)
+	shimDir := t.TempDir()
+	shim := fmt.Sprintf(`#!/bin/sh
+for arg in "$@"; do
+  if %s; then
+    echo "simulated failure" >&2
+    exit 1
+  fi
+done
+exec %q "$@"
+`, condition, realDocker)
+	require.NoError(t, os.WriteFile(filepath.Join(shimDir, "docker"), []byte(shim), 0o755))
+	return []string{"PATH=" + shimDir + string(os.PathListSeparator) + os.Getenv("PATH")}
+}
+
+// If docker can't list volumes, for example because of socket permissions,
+// the script must fail instead of reporting that there was nothing to copy.
+func TestMigrateVolumesFailsWhenVolumeLsFails(t *testing.T) {
+	e := newMigrateEnv(t, "compose.yaml", "compose.plugins.yaml")
+	createSourceVolume(t, "legacy-auth", "plugin/fiftyone.yml", "name: my-plugin")
+	e.env = failingDockerPath(t, `[ "$1 $2" = "volume ls" ]`)
+
+	out, code := e.migrate()
+
+	require.Equal(t, 1, code, out)
+	require.NotContains(t, out, "skipped")
+	require.Contains(t, out, "docker volume ls")
+	require.False(t, volumeExists(e.destVolume()), "no destination volume should be created")
 }
