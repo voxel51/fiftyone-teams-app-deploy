@@ -587,7 +587,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 		{
 			"dedicatedPluginsTeamsCas",
 			"teams-cas",
-			[]string{composeFile, composePluginsFile},
+			[]string{composeFile, composeDedicatedPluginsFile},
 			s.dotEnvFiles,
 			[]string{
 				"CAS_DATABASE_NAME=fiftyone-cas",

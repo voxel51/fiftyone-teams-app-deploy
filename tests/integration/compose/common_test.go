@@ -98,9 +98,11 @@ func checkOrchestratorRegisteredWithRetries(subT *testing.T, dockerOptions *dock
 	execArgs = append(execArgs, "exec", "-T", container, "python", "-c", orchestratorUpdatedAtScript, instanceID)
 
 	var updatedAt time.Time
+	var lastErr error
 	registered := false
 	for startedAtErr == nil {
 		output, err := docker.RunDockerComposeE(subT, dockerOptions, execArgs...)
+		lastErr = err
 		if err == nil {
 			lines := strings.Split(strings.TrimSpace(output), "\n")
 			if seconds, parseErr := strconv.ParseFloat(strings.TrimSpace(lines[len(lines)-1]), 64); parseErr == nil {
@@ -123,7 +125,7 @@ func checkOrchestratorRegisteredWithRetries(subT *testing.T, dockerOptions *dock
 			t.Fatalf("%s - %s - could not read the container start time %q: %v", tc, container, startedAtOutput, startedAtErr)
 		}
 		if !registered {
-			t.Errorf("%s - %s - orchestrator %q should be registered after the container started at %s (last updated_at: %s)", tc, container, instanceID, startedAt, updatedAt)
+			t.Errorf("%s - %s - orchestrator %q should be registered after the container started at %s (last updated_at: %s, last exec error: %v)", tc, container, instanceID, startedAt, updatedAt, lastErr)
 		}
 	})
 }

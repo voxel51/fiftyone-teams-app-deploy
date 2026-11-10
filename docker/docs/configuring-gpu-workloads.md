@@ -94,14 +94,16 @@ services:
 ```
 
 Add the snippet to your `compose.override.yaml`.
-Redeploy the stack with the plugins and delegated operators files,
-which define `plugins-vol` and `teams-do`,
-and wait for the `teams-do` containers to be deployed:
+Redeploy the stack with your usual `-f` files.
+They need to include a plugins file and the delegated operators file,
+which define `plugins-vol` and `teams-do`.
+Then wait for the `teams-do` containers to be deployed.
+For example, with dedicated plugins:
 
 ```shell
 docker compose \
   -f compose.yaml \
-  -f compose.plugins.yaml \
+  -f compose.dedicated-plugins.yaml \
   -f compose.delegated-operators.yaml \
   -f compose.override.yaml \
   up -d

@@ -500,10 +500,11 @@ Please refer to the
 
 > [!IMPORTANT]
 > Upgrading from a version before v2.26?
-> Follow the
-> [v2.26 upgrade steps](./docs/upgrading.md#fiftyone-enterprise-v226-compose-files-moved-to-docker)
-> instead.
-> They stop the old stack and move your plugins to the new project.
+> Use the [upgrade guide](./docs/upgrading.md) instead of the steps below.
+> Follow the section for the version you're upgrading from,
+> and the
+> [v2.26 upgrade steps](./docs/upgrading.md#fiftyone-enterprise-v226-compose-files-moved-to-docker),
+> which stop the old stack and move your plugins to the new project.
 
 The recommended upgrade path is:
 
