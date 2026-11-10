@@ -187,52 +187,38 @@ secretEnv:
 ## Connect FiftyOne Enterprise
 
 Set these in the values of the fiftyone-teams-app chart, for a release named
-`inference` with the token in the Secret `inference-token`. No chart change is
-needed: every component takes `env` and `secretEnv`. FiftyOne Enterprise must
-run in the namespace of this chart. The short Service names below resolve
-there. Their full names are `inference.<namespace>.svc.cluster.local` and
+`inference` with the token in the Secret `inference-token`. FiftyOne
+Enterprise must run in the namespace of this chart. The short Service names
+below resolve there. Their full names are
+`inference.<namespace>.svc.cluster.local` and
 `inference-labeler.<namespace>.svc.cluster.local`, such as
 `http://inference.fiftyone-teams.svc.cluster.local:8080`.
 
-| Variable                    | Value                                                     |
-| --------------------------- | --------------------------------------------------------- |
-| `FIFTYONE_INFERENCE_URL`    | `http://inference:8080`                                   |
-| `FIFTYONE_INFERENCE_TOKEN`  | the shared token, from its Secret                         |
-| `LABELER_SERVICE_URL`       | `http://inference-labeler:8080`, with an LLM only         |
-| `LABELER_SERVICE_AUTH`      | `static-token`, with an LLM only: sends the shared token  |
-| `LABELER_TEST_TRANSPORT`    | `operator`, with an LLM only: Run test uses this labeler  |
-| `LABELER_RUN_MODE`          | `saas`, with an LLM only: Run is a delegated operator     |
-| `LABELER_DELEGATION_TARGET` | `agentic-labeler`, with an LLM only: the job that runs it |
-
 ```yaml
-appSettings:
-  env: &inferenceEnv
-    FIFTYONE_INFERENCE_URL: http://inference:8080
-    LABELER_SERVICE_URL: http://inference-labeler:8080
-    LABELER_SERVICE_AUTH: static-token
-    LABELER_TEST_TRANSPORT: operator
-    LABELER_RUN_MODE: saas
-    LABELER_DELEGATION_TARGET: agentic-labeler
-  secretEnv: &inferenceSecretEnv
-    FIFTYONE_INFERENCE_TOKEN:
-      secretName: inference-token
-      secretKey: token
-pluginsSettings:
-  env: *inferenceEnv
-  secretEnv: *inferenceSecretEnv
-delegatedOperatorDeployments:
-  template:
-    env: *inferenceEnv
-    secretEnv: *inferenceSecretEnv
-delegatedOperatorJobTemplates:
-  template:
-    env: *inferenceEnv
-    secretEnv: *inferenceSecretEnv
+inference:
+  url: http://inference:8080
+  tokenSecret: inference-token
+  labeler:
+    # With an LLM only
+    url: http://inference-labeler:8080
 ```
 
-`fiftyone-app` serves the App's model features, and the plugins and delegated
-operators run the model operators, so each needs the variables.
-`pluginsSettings` applies with dedicated plugins only.
+The chart then sets these variables on `fiftyone-app`, the dedicated plugins,
+each delegated operator deployment, each delegated operator job template and
+each service orchestrator. `fiftyone-app` serves the App's model features, and
+the others run the model operators. A variable set in a component's own `env`
+or `secretEnv` wins.
+
+| Variable                       | Value                                                     |
+| ------------------------------ | --------------------------------------------------------- |
+| `FIFTYONE_INFERENCE_URL`       | `inference.url`                                           |
+| `FIFTYONE_INFERENCE_TOKEN`     | the key `token` of the Secret `inference.tokenSecret`     |
+| `FIFTYONE_INFERENCE_TENANT_ID` | `inference.tenantId`, when set                            |
+| `LABELER_SERVICE_URL`          | `inference.labeler.url`, with an LLM only                 |
+| `LABELER_SERVICE_AUTH`         | `static-token`, with an LLM only: sends the shared token  |
+| `LABELER_TEST_TRANSPORT`       | `operator`, with an LLM only: Run test uses this labeler  |
+| `LABELER_RUN_MODE`             | `job`, with an LLM only: Run is a delegated operator      |
+| `LABELER_DELEGATION_TARGET`    | `agentic-labeler`, with an LLM only: the job that runs it |
 
 **The org of each call.** FiftyOne Enterprise names the caller's CAS org
 (`user.organization.id`) as the tenant of each call. Never set
@@ -240,13 +226,10 @@ operators run the model operators, so each needs the variables.
 act as a SaaS tenant. `FIFTYONE_INFERENCE_TENANT_ID` is only the fallback for
 calls with no user, such as builtin services started by the reconcile:
 
-- Several orgs: leave it unset.
-- One org: add `FIFTYONE_INFERENCE_TENANT_ID: <org id>` to the
-  `inferenceEnv` anchor above, set to that org's id, the `organizationId` of
+- Several orgs: leave `inference.tenantId` empty. Set, it also sends every
+  labeler run as that one org.
+- One org: set `inference.tenantId` to that org's id, the `organizationId` of
   its license (the same as `user.organization.id`), never a made up name.
-  Do not repeat `delegatedOperatorJobTemplates` or
-  `delegatedOperatorDeployments` elsewhere in the values: Helm keeps the last
-  of two equal keys, and the other would drop the anchors.
 
 **Labeler runs.** With an LLM, each Run is a Kubernetes Job on CPU, from
 the job template `agentic-labeler`, which calls the LLM through this
@@ -291,12 +274,11 @@ delegatedOperatorJobTemplates:
       enabled: false
 ```
 
-Merge these keys into the `delegatedOperatorJobTemplates` block above. The
-job gets the template's env and secretEnv too. Each run names the org and
-user who started it. The chart registers
-the job as an orchestrator in a post-upgrade hook, which Argo CD runs only
-after a healthy sync. Stop any per-user labeler service still running before
-the upgrade.
+The job gets the inference variables and the template's env and secretEnv
+too. Each run names the org and user who started it. The chart registers the
+job as an orchestrator in a post-upgrade hook, which Argo CD runs only after
+a healthy sync. Stop any per-user labeler service still running before the
+upgrade.
 
 {{ template "chart.requirementsSection" . }}
 

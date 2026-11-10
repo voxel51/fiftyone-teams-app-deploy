@@ -64,6 +64,7 @@ delegated operators are activity producers too. */}}
 {{- include "activity.enabled-env" .ctx }}
 {{- include "activity.org-id-env" .ctx }}
 {{- include "activity.mongo-db-env" .ctx }}
+{{- include "fiftyone-teams-app.inference-env" . }}
 {{- end }}
 {{- range $key, $val := .env }}
 - name: {{ $key }}
