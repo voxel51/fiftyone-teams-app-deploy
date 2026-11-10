@@ -1092,6 +1092,10 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | fiftyoneMq.redis.podSecurityContext | object | `{}` | Security context for the Redis pod. [Reference][security-context]. |
 | fiftyoneMq.redis.resources | object | `{}` | Resources for the Redis container. [Reference][resources]. |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
+| inference.labeler.url | string | `""` | URL of the inference chart's labeler, such as `http://inference-labeler:8080`. Needs `inference.url`. Empty: no labeler. |
+| inference.tenantId | string | `""` | With one org only: its id, the `organizationId` of its license. The org of calls with no user, such as builtin services. Empty with several orgs. |
+| inference.tokenSecret | string | `""` | Existing Secret holding the inference service's shared token under the key `token`. Needed with `inference.url`. |
+| inference.url | string | `""` | URL of the inference service, such as `http://inference:8080`. Empty: FiftyOne does not use one. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |
