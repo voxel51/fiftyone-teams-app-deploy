@@ -297,6 +297,52 @@ Common Init Containers
 {{- end }}
 
 {{/*
+Env that connects FiftyOne to the fiftyone-inference chart, when
+`inference.url` is set. A name in the component's own env or secretEnv wins.
+Inputs (dict):
+  ctx       - root context (.)
+  env       - the component's env
+  secretEnv - the component's secretEnv
+*/}}
+{{- define "fiftyone-teams-app.inference-env" -}}
+{{- $inference := .ctx.Values.inference }}
+{{- if and $inference.labeler.url (not $inference.url) }}
+{{- fail "inference.labeler.url is set but inference.url is empty: the labeler calls the LLM through the inference service. Set inference.url too." }}
+{{- end }}
+{{- if $inference.url }}
+{{- if not $inference.tokenSecret }}
+{{- fail "inference.url is set but inference.tokenSecret is empty: the inference service refuses calls without its shared token. Set inference.tokenSecret to the Secret holding it under the key `token`." }}
+{{- end }}
+{{- $own := merge (dict) (.env | default dict) (.secretEnv | default dict) }}
+{{- $vars := dict "FIFTYONE_INFERENCE_URL" $inference.url }}
+{{- if $inference.tenantId }}
+{{- $_ := set $vars "FIFTYONE_INFERENCE_TENANT_ID" $inference.tenantId }}
+{{- end }}
+{{- if $inference.labeler.url }}
+{{- $vars = merge $vars (dict
+    "LABELER_SERVICE_URL" $inference.labeler.url
+    "LABELER_SERVICE_AUTH" "static-token"
+    "LABELER_TEST_TRANSPORT" "operator"
+    "LABELER_RUN_MODE" "job"
+    "LABELER_DELEGATION_TARGET" "agentic-labeler") }}
+{{- end }}
+{{- range $key, $val := $vars }}
+{{- if not (hasKey $own $key) }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end }}
+{{- if not (hasKey $own "FIFTYONE_INFERENCE_TOKEN") }}
+- name: FIFTYONE_INFERENCE_TOKEN
+  valueFrom:
+    secretKeyRef:
+      name: {{ $inference.tokenSecret }}
+      key: token
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create a merged list of environment variables for delegated-operator-executor
 */}}
 {{- define "delegated-operator-deployments.env-vars-list" }}
@@ -335,6 +381,7 @@ Create a merged list of environment variables for delegated-operator-executor
 {{- include "activity.enabled-env" .ctx }}
 {{- include "activity.org-id-env" .ctx }}
 {{- include "activity.mongo-db-env" .ctx }}
+{{- include "fiftyone-teams-app.inference-env" . }}
 {{- end }}
 {{- range $key, $val := .env }}
 - name: {{ $key }}
@@ -455,6 +502,7 @@ Create a merged list of environment variables for fiftyone-app
       key: encryptionKey
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
+{{- include "fiftyone-teams-app.inference-env" (dict "ctx" . "env" .Values.appSettings.env "secretEnv" .Values.appSettings.secretEnv) }}
 {{- range $key, $val := .Values.appSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -576,6 +624,7 @@ Create a merged list of environment variables for fiftyone-teams-plugins
       key: encryptionKey
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
+{{- include "fiftyone-teams-app.inference-env" (dict "ctx" . "env" .Values.pluginsSettings.env "secretEnv" .Values.pluginsSettings.secretEnv) }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

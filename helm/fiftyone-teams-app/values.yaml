@@ -1321,6 +1321,24 @@ fiftyoneMq:
 # -- Container image registry keys. [Reference][image-pull-secrets].
 imagePullSecrets: []
 
+# Connection to the fiftyone-inference chart. Sets its env on fiftyone-app,
+# teams-plugins and the delegated operators. A name set in a component's own
+# `env` or `secretEnv` wins.
+inference:
+  # -- URL of the inference service, such as `http://inference:8080`. Empty:
+  # FiftyOne does not use one.
+  url: ""
+  # -- Existing Secret holding the inference service's shared token under the
+  # key `token`. Needed with `inference.url`.
+  tokenSecret: ""
+  # -- With one org only: its id, the `organizationId` of its license. The org
+  # of calls with no user, such as builtin services. Empty with several orgs.
+  tenantId: ""
+  labeler:
+    # -- URL of the inference chart's labeler, such as
+    # `http://inference-labeler:8080`. Needs `inference.url`. Empty: no labeler.
+    url: ""
+
 ingress:
   # -- Ingress annotations. [Reference][annotations].
   annotations: {}
