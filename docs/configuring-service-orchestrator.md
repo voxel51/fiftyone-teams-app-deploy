@@ -57,7 +57,7 @@ On Docker Compose, size the host itself; see the
 The builtin services are declared in
 [docker/builtin_services.yaml](../docker/builtin_services.yaml)
 and bind mounted into the `teams-api` service
-(see [docker/common-services.yaml](../docker/common-services.yaml)).
+(see [docker/compose.yaml](../docker/compose.yaml)).
 At startup, the `teams-api` container performs a reconciliation where
 entries are deep-merged by `id` onto the definitions packaged in `fiftyone`.
 Edit

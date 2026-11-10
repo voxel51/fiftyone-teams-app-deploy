@@ -71,7 +71,6 @@ func (s *topologyAuthHelmTest) TestHelmInstall() {
 				"appSettings.topologySpreadConstraints[0].maxSkew":                "1",
 				"appSettings.topologySpreadConstraints[0].topologyKey":            "kubernetes.io/hostname",
 				"appSettings.topologySpreadConstraints[0].whenUnsatisfiable":      "ScheduleAnyway",
-				"casSettings.env.FIFTYONE_AUTH_MODE":                              "internal",
 				"casSettings.env.CAS_DATABASE_NAME":                               "cas-top-dp-" + suffix,
 				"casSettings.topologySpreadConstraints[0].maxSkew":                "1",
 				"casSettings.topologySpreadConstraints[0].topologyKey":            "kubernetes.io/hostname",
@@ -203,7 +202,7 @@ func (s *topologyAuthHelmTest) TestHelmInstall() {
 			}
 
 			// create license-file secret
-			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFileInternal)
+			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFile)
 			defer k8s.KubectlDeleteFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 			k8s.KubectlApplyFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 

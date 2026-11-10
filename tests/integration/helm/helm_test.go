@@ -1,5 +1,5 @@
-//go:build kubeall || helm || integration || integrationHelmLegacyAuth
-// +build kubeall helm integration integrationHelmLegacyAuth
+//go:build kubeall || helm || integration || integrationHelm
+// +build kubeall helm integration integrationHelm
 
 package integration
 
@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type legacyAuthHelmTest struct {
+type helmTest struct {
 	suite.Suite
 	chartPath   string
 	namespace   string
@@ -30,15 +30,16 @@ type legacyAuthHelmTest struct {
 	valuesFiles []string
 }
 
-func TestHelmLegacyAuth(t *testing.T) {
+func TestHelm(t *testing.T) {
 	t.Parallel()
 
 	helmChartPath, err := filepath.Abs(chartPath)
 	require.NoError(t, err)
+
 	kubeCtx := defineKubeCtx()
 	integrationValuesPath, err := filepath.Abs(integrationValues)
 
-	suite.Run(t, &legacyAuthHelmTest{
+	suite.Run(t, &helmTest{
 		Suite:     suite.Suite{},
 		chartPath: helmChartPath,
 		namespace: "fiftyone-" + strings.ToLower(random.UniqueId()),
@@ -49,37 +50,29 @@ func TestHelmLegacyAuth(t *testing.T) {
 	})
 }
 
-func (s *legacyAuthHelmTest) TestHelmInstall() {
+func (s *helmTest) TestHelmInstall() {
 	testCases := []struct {
 		name     string
 		values   map[string]string
 		expected []serviceValidations
 	}{
+		// The secretEnv values don't matter, just that they mount as expected
 		{
 			"builtinPlugins",
 			map[string]string{
 				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":      "fiftyone-teams-secrets", // pragma: allowlist secret
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "cookieSecret",           // pragma: allowlist secret
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "encryptionKey",          // pragma: allowlist secret
 				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":      "fiftyone-teams-secrets", // pragma: allowlist secret
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "cookieSecret",           // pragma: allowlist secret
-				"casSettings.env.FIFTYONE_AUTH_MODE":                             "legacy",
-				"casSettings.env.CAS_DATABASE_NAME":                              "cas-leg-bp-" + suffix,
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "encryptionKey",          // pragma: allowlist secret
+				"casSettings.env.CAS_DATABASE_NAME":                              "cas-int-bp-" + suffix,
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":      "fiftyone-teams-secrets", // pragma: allowlist secret
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "cookieSecret",           // pragma: allowlist secret
-				"secret.fiftyone.fiftyoneDatabaseName":                           "fiftyone-leg-bp-" + suffix,
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":       "encryptionKey",          // pragma: allowlist secret
+				"secret.fiftyone.fiftyoneDatabaseName":                           "fiftyone-int-bp-" + suffix,
 				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
-				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "encryptionKey",          // pragma: allowlist secret
 			},
-			/* Why the ternary? This is a first iteration against a live kube
-			 * cluster. We don't have things like wildcard certificates,
-			 * external DNS, etc. deployed in the ephemeral clusters.
-			 * To avoid making our tests run TOO long, we will omit the
-			 * URL checks until we come up with a good solution to those
-			 * issues. If we're running on minikube, it is safe to assume
-			 * that we have used skaffold to deploy things like certificates
-			 * that we can use for DNS, so we will still use those URL checks.
-			 */
 			[]serviceValidations{
+				// ordering first, because teams-api startup connects to teams-cas
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
@@ -115,48 +108,57 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			"sharedPlugins", // plugins run in fiftyone-app deployment
 			map[string]string{
 				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                                                     "/opt/plugins",
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
 				"apiSettings.volumes[0].name":                                                                              "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                                                   "pvc-leg-sp-" + suffix,
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                                                   "pvc-int-sp-" + suffix,
 				"apiSettings.volumeMounts[0].name":                                                                         "plugins-vol",
 				"apiSettings.volumeMounts[0].mountPath":                                                                    "/opt/plugins",
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "encryptionKey",          // pragma: allowlist secret
 				"appSettings.env.FIFTYONE_PLUGINS_DIR":                                                                     "/opt/plugins",
 				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "encryptionKey",          // pragma: allowlist secret
 				"appSettings.volumes[0].name":                                                                              "plugins-vol-ro",
-				"appSettings.volumes[0].persistentVolumeClaim.claimName":                                                   "pvc-leg-sp-" + suffix,
+				"appSettings.volumes[0].persistentVolumeClaim.claimName":                                                   "pvc-int-sp-" + suffix,
 				"appSettings.volumes[0].persistentVolumeClaim.readOnly":                                                    "true",
 				"appSettings.volumeMounts[0].name":                                                                         "plugins-vol-ro",
 				"appSettings.volumeMounts[0].mountPath":                                                                    "/opt/plugins",
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                                                       "legacy",
-				"casSettings.env.CAS_DATABASE_NAME":                                                                        "cas-leg-sp-" + suffix,
+				"casSettings.env.CAS_DATABASE_NAME":                                                                        "cas-int-sp-" + suffix,
 				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "encryptionKey",          // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                       "true",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.replicaCount":                                  "1",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "encryptionKey",          // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].mountPath":                     "/opt/plugins",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].name":                          "plugins-vol-ro",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].name":                               "plugins-vol-ro",
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].persistentVolumeClaim.claimName":    "pvc-leg-sp-" + suffix,
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].persistentVolumeClaim.claimName":    "pvc-int-sp-" + suffix,
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].persistentVolumeClaim.readOnly":     "true",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.env.FIFTYONE_PLUGINS_DIR":                                  "/opt/plugins",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.replicaCount":                                              "1",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":             "fiftyone-teams-secrets", // pragma: allowlist secret
-				"delegatedOperatorJobTemplates.jobs.cpu-default.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":              "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorJobTemplates.jobs.cpu-default.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":              "encryptionKey",          // pragma: allowlist secret
 				"delegatedOperatorJobTemplates.jobs.cpu-default.volumeMounts[0].mountPath":                                 "/opt/plugins",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.volumeMounts[0].name":                                      "plugins-vol-ro",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.volumes[0].name":                                           "plugins-vol-ro",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.volumes[0].persistentVolumeClaim.claimName":                "pvc-int-dp-" + suffix,
 				"delegatedOperatorJobTemplates.jobs.cpu-default.volumes[0].persistentVolumeClaim.readOnly":                 "true",
-				"secret.fiftyone.fiftyoneDatabaseName":                                                                     "fiftyone-leg-sp-" + suffix,
+				"secret.fiftyone.fiftyoneDatabaseName":                                                                     "fiftyone-int-sp-" + suffix,
 				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                           "fiftyone-teams-secrets", // pragma: allowlist secret
-				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                            "cookieSecret",           // pragma: allowlist secret
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                            "encryptionKey",          // pragma: allowlist secret
 			},
+			/* Why the ternary? This is a first iteration against a live kube
+			 * cluster. We don't have things like wildcard certificates,
+			 * external DNS, etc. deployed in the ephemeral clusters.
+			 * To avoid making our tests run TOO long, we will omit the
+			 * URL checks until we come up with a good solution to those
+			 * issues. If we're running on minikube, it is safe to assume
+			 * that we have used skaffold to deploy things like certificates
+			 * that we can use for DNS, so we will still use those URL checks.
+			 */
 			[]serviceValidations{
+				// ordering teams-cas first, because teams-api startup connects to teams-cas
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
@@ -185,7 +187,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 					httpResponseCode: 0,
 					log:              "Executor started",
 				},
-				// ordering this last to avoid test flakes where testing for log before the container is running
+				// ordering fiftyone-app this last to avoid test flakes where testing for log before the container is running
 				{
 					name:             "fiftyone-app",
 					url:              "",
@@ -198,33 +200,33 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 		{
 			"dedicatedPlugins", // plugins run in plugins deployment
 			map[string]string{
-				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                                                     "/opt/plugins",
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
-				"apiSettings.volumes[0].name":                                                                              "plugins-vol",
-				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                                                   "pv-fiftyone-leg-dp-" + suffix,
-				"apiSettings.volumeMounts[0].name":                                                                         "plugins-vol",
-				"apiSettings.volumeMounts[0].mountPath":                                                                    "/opt/plugins",
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
-				"casSettings.env.FIFTYONE_AUTH_MODE":                                                                       "legacy",
-				"casSettings.env.CAS_DATABASE_NAME":                                                                        "cas-leg-dp-" + suffix,
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                                                "fiftyone-teams-secrets", // pragma: allowlist secret
-				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                                                 "cookieSecret",           // pragma: allowlist secret
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_PLUGINS_DIR":                      "/opt/plugins",
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                                       "true",
+				"apiSettings.env.FIFTYONE_PLUGINS_DIR":                                                "/opt/plugins",
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                           "fiftyone-teams-secrets", // pragma: allowlist secret
+				"apiSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                            "encryptionKey",          // pragma: allowlist secret
+				"apiSettings.volumes[0].name":                                                         "plugins-vol",
+				"apiSettings.volumes[0].persistentVolumeClaim.claimName":                              "pvc-int-dp-" + suffix,
+				"apiSettings.volumeMounts[0].name":                                                    "plugins-vol",
+				"apiSettings.volumeMounts[0].mountPath":                                               "/opt/plugins",
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                           "fiftyone-teams-secrets", // pragma: allowlist secret
+				"appSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                            "encryptionKey",          // pragma: allowlist secret
+				"casSettings.env.CAS_DATABASE_NAME":                                                   "cas-int-dp-" + suffix,
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":                           "fiftyone-teams-secrets", // pragma: allowlist secret
+				"casSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":                            "encryptionKey",          // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.env.FIFTYONE_PLUGINS_DIR": "/opt/plugins",
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.enabled":                  "true",
+
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.replicaCount":                                  "1",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "encryptionKey",          // pragma: allowlist secret
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].mountPath":                     "/opt/plugins",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumeMounts[0].name":                          "plugins-vol-ro",
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].name":                               "plugins-vol-ro",
-				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].persistentVolumeClaim.claimName":    "pv-fiftyone-leg-dp-" + suffix,
+				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].persistentVolumeClaim.claimName":    "pvc-int-dp-" + suffix,
 				"delegatedOperatorDeployments.deployments.teamsDoCpuDefault.volumes[0].persistentVolumeClaim.readOnly":     "true",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.env.FIFTYONE_PLUGINS_DIR":                                  "/opt/plugins",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.replicaCount":                                              "1",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":             "fiftyone-teams-secrets", // pragma: allowlist secret
-				"delegatedOperatorJobTemplates.jobs.cpu-default.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":              "cookieSecret",           // pragma: allowlist secret
+				"delegatedOperatorJobTemplates.jobs.cpu-default.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":              "encryptionKey",          // pragma: allowlist secret
 				"delegatedOperatorJobTemplates.jobs.cpu-default.volumeMounts[0].mountPath":                                 "/opt/plugins",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.volumeMounts[0].name":                                      "plugins-vol-ro",
 				"delegatedOperatorJobTemplates.jobs.cpu-default.volumes[0].name":                                           "plugins-vol-ro",
@@ -233,17 +235,18 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				"pluginsSettings.enabled":                                        "true",
 				"pluginsSettings.env.FIFTYONE_PLUGINS_DIR":                       "/opt/plugins",
 				"pluginsSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName":  "fiftyone-teams-secrets", // pragma: allowlist secret
-				"pluginsSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":   "cookieSecret",           // pragma: allowlist secret
+				"pluginsSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":   "encryptionKey",          // pragma: allowlist secret
 				"pluginsSettings.volumes[0].name":                                "plugins-vol-ro",
-				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName":     "pv-fiftyone-leg-dp-" + suffix,
+				"pluginsSettings.volumes[0].persistentVolumeClaim.claimName":     "pvc-int-dp-" + suffix,
 				"pluginsSettings.volumes[0].persistentVolumeClaim.readOnly":      "true",
 				"pluginsSettings.volumeMounts[0].name":                           "plugins-vol-ro",
 				"pluginsSettings.volumeMounts[0].mountPath":                      "/opt/plugins",
-				"secret.fiftyone.fiftyoneDatabaseName":                           "fiftyone-leg-dp-" + suffix,
+				"secret.fiftyone.fiftyoneDatabaseName":                           "fiftyone-int-dp-" + suffix,
 				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretName": "fiftyone-teams-secrets", // pragma: allowlist secret
-				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "cookieSecret",           // pragma: allowlist secret
+				"teamsAppSettings.secretEnv.AN_ADDITIONAL_SECRET_ENV.secretKey":  "encryptionKey",          // pragma: allowlist secret
 			},
 			[]serviceValidations{
+				// ordering teams-cas first, because teams-api startup connects to teams-cas
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
@@ -279,7 +282,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 					httpResponseCode: 0,
 					log:              "Executor started",
 				},
-				// ordering this last to avoid test flakes where testing for log before the container is running
+				// ordering fiftyone-app this last to avoid test flakes where testing for log before the container is running
 				{
 					name:             "fiftyone-app",
 					url:              "",
@@ -363,7 +366,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 			}
 
 			// create license-file secret
-			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFileLegacy)
+			base64EncodedLicenseFile := getBase64EncodedStringOfFile(licenseFile)
 			defer k8s.KubectlDeleteFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 			k8s.KubectlApplyFromString(subT, kubectlOptions, licenseFileSecretTemplateYaml+base64EncodedLicenseFile)
 
@@ -373,16 +376,16 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				ValuesFiles:    s.valuesFiles,
 			}
 			releaseName := fmt.Sprintf(
-				"%s-legacy-%s",
+				"%s-%s",
 				strings.ToLower(testCase.name),
 				strings.ToLower(random.UniqueId()),
 			)
 			defer helm.Delete(subT, helmOptions, releaseName, true)
 			helm.Install(subT, helmOptions, s.chartPath, releaseName)
 
-			// Validate system health
 			enforceReady(subT, kubectlOptions, testCase.expected)
 
+			// Validate system health
 			for _, expected := range testCase.expected {
 				logger.Log(subT, fmt.Sprintf("Validating service %s...", expected.name))
 
@@ -400,7 +403,7 @@ func (s *legacyAuthHelmTest) TestHelmInstall() {
 				checkPodLogsWithRetries(subT, kubectlOptions, pods, testCase.name, expected.name, expected.log)
 
 				// Validate endpoint response
-				// Skip fiftyone-app, teams-plugins, amd teams-do-cpu-default because they do not have callable endpoints that return a response payload.
+				// Skip fiftyone-app, teams-plugins, and teams-do-cpu-default because they do not have callable endpoints that return a response payload.
 				if expected.url != "" {
 					// Validate url endpoint response is expected
 					validate_endpoint(subT, expected.url, expected.responsePayload, expected.httpResponseCode)

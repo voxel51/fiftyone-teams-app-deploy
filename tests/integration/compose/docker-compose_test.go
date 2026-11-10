@@ -1,5 +1,5 @@
-//go:build docker || compose || integration || integrationComposeLegacyAuth
-// +build docker compose integration integrationComposeLegacyAuth
+//go:build docker || compose || integration || integrationCompose
+// +build docker compose integration integrationCompose
 
 package integration
 
@@ -10,27 +10,27 @@ import (
 
 	"path/filepath"
 
+	"github.com/compose-spec/compose-go/v2/dotenv"
+
 	"github.com/gruntwork-io/terratest/modules/docker"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/compose-spec/compose-go/v2/dotenv"
 )
 
 const (
-	dockerLegacyAuthDir = "../../../docker/legacy-auth"
+	dockerDir = "../../../docker"
 )
 
-var legacyAuthComposeFile = "compose.yaml"
-var legacyAuthComposePluginsFile = "compose.plugins.yaml"
-var legacyAuthComposeDedicatedPluginsFile = "compose.dedicated-plugins.yaml"
-var legacyAuthComposeDelegatedOperationsFile = "compose.delegated-operators.yaml"
-var legacyAuthEnvTemplateFilePath = filepath.Join(dockerLegacyAuthDir, "env.template")
+var composeFile = "compose.yaml"
+var composePluginsFile = "compose.plugins.yaml"
+var composeDedicatedPluginsFile = "compose.dedicated-plugins.yaml"
+var composeDelegatedOperationsFile = "compose.delegated-operators.yaml"
+var envTemplateFilePath = filepath.Join(dockerDir, "env.template")
 
-type commonServicesLegacyAuthDockerComposeUpTest struct {
+type dockerComposeUpTest struct {
 	suite.Suite
 	composeFilePath      string
 	dotEnvFiles          []string
@@ -39,10 +39,10 @@ type commonServicesLegacyAuthDockerComposeUpTest struct {
 	overrideFilesDO      []string
 }
 
-func TestDockerComposeUpLegacyAuth(t *testing.T) {
+func TestDockerComposeUp(t *testing.T) {
 	t.Parallel()
 
-	_, err := filepath.Abs(dockerLegacyAuthDir)
+	_, err := filepath.Abs(dockerDir)
 	require.NoError(t, err)
 
 	// Set the override files used for the tests
@@ -57,16 +57,15 @@ func TestDockerComposeUpLegacyAuth(t *testing.T) {
 	overrideFilesPlugins = append(overrideFilesPlugins, mongodbComposeFilePlugins)
 
 	var overrideFilesDO []string
-	overrideFilesDO = append(overrideFilesDO, legacyAuthComposePluginsFile)
 	overrideFilesDO = append(overrideFilesDO, overrideFiles...)
 	overrideFilesDO = append(overrideFilesDO, mongodbComposeFileDO)
 
-	suite.Run(t, &commonServicesLegacyAuthDockerComposeUpTest{
+	suite.Run(t, &dockerComposeUpTest{
 		Suite:           suite.Suite{},
-		composeFilePath: dockerLegacyAuthDir,
+		composeFilePath: dockerDir,
 		dotEnvFiles: []string{
-			legacyAuthEnvTemplateFilePath,
-			legacyAuthEnvFixtureFilePath,
+			envTemplateFilePath,
+			fixtureEnvFilePath,
 		},
 		overrideFiles:        overrideFiles,
 		overrideFilesPlugins: overrideFilesPlugins,
@@ -74,17 +73,17 @@ func TestDockerComposeUpLegacyAuth(t *testing.T) {
 	})
 }
 
-func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
+func (s *dockerComposeUpTest) TestDockerComposeUp() {
 	testCases := []struct {
 		name          string
-		composeFile   string
+		composeFiles  []string
 		overrideFiles []string
 		envFiles      []string // file paths to ".env" files with additional environment variable data
 		expected      []serviceValidations
 	}{
 		{
 			"compose",
-			legacyAuthComposeFile,
+			[]string{composeFile},
 			s.overrideFiles,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -121,7 +120,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 		},
 		{
 			"composePlugins",
-			legacyAuthComposePluginsFile,
+			[]string{composeFile, composePluginsFile},
 			s.overrideFiles,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -158,7 +157,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 		},
 		{
 			"composeDedicatedPlugins",
-			legacyAuthComposeDedicatedPluginsFile,
+			[]string{composeFile, composeDedicatedPluginsFile},
 			s.overrideFilesPlugins,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -202,7 +201,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 		},
 		{
 			"composeDelegatedOperations",
-			legacyAuthComposeDelegatedOperationsFile,
+			[]string{composeFile, composePluginsFile, composeDelegatedOperationsFile},
 			s.overrideFilesDO,
 			s.dotEnvFiles,
 			[]serviceValidations{
@@ -240,7 +239,8 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 					url:              "",
 					responsePayload:  "",
 					httpResponseCode: 0,
-					log:              "Registering executor builtin",
+					log:              "",
+					orchestrator:     "builtin",
 				},
 			},
 		},
@@ -261,8 +261,9 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 			//
 			// ```shell
 			// docker compose \
-			//   -f tests/fixtures/docker/compose.override.mongodb.yaml \
-			//   --env-file tests/fixtures/docker/integration_legacy_auth.env
+			//   -f compose.yaml \
+			//   -f ../tests/fixtures/docker/compose.override.mongodb.yaml \
+			//   --env-file ../tests/fixtures/docker/integration.env
 
 			//   up -d
 			// ```
@@ -273,7 +274,7 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 
 			dockerOptions := &docker.Options{
 				ProjectName: "fiftyone-" + strings.ToLower(random.UniqueId()),
-				WorkingDir:  dockerLegacyAuthDir,
+				WorkingDir:  dockerDir,
 				EnvVars:     environmentVariables,
 			}
 
@@ -283,7 +284,10 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 			argsConfig := []string{}
 			argsUp := []string{}
 			argsDown := []string{}
-			args := []string{"-f", testCase.composeFile}
+			args := []string{}
+			for _, composeFile := range testCase.composeFiles {
+				args = append(args, "-f", composeFile)
+			}
 
 			for _, overrideFile := range testCase.overrideFiles {
 				args = append(args, "-f", overrideFile)
@@ -320,6 +324,8 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 			// Validate system health
 			for _, expected := range testCase.expected {
 				logger.Log(subT, fmt.Sprintf("Validating service %s...", expected.name))
+
+				// Validate that docker compose started the container.
 				// Compose CLI v2.x emitted two spaces between `-1` and
 				// `Started`; v5.x emits one. Match either with \s+.
 				s.Regexp(fmt.Sprintf(`Container %s-%s-1\s+Started`, dockerOptions.ProjectName, expected.name), output, fmt.Sprintf("%s - %s - docker compose output should contain service container started", testCase.name, expected.name))
@@ -327,11 +333,16 @@ func (s *commonServicesLegacyAuthDockerComposeUpTest) TestDockerComposeUp() {
 				// Validate endpoint response
 				// Skip fiftyone-app and teams-plugins because they do not have callable endpoints that return a response payload.
 				if expected.url != "" {
+					// Validate url endpoint response is expected
 					validate_endpoint(subT, expected.url, expected.responsePayload, expected.httpResponseCode)
 				}
-
 				// Validate log output is expected
 				checkContainerLogsWithRetries(subT, dockerOptions, expected.name, testCase.name, expected.log)
+
+				// Validate that a delegated operator worker registered its orchestrator
+				if expected.orchestrator != "" {
+					checkOrchestratorRegisteredWithRetries(subT, dockerOptions, args, expected.name, testCase.name, expected.orchestrator)
+				}
 			}
 		})
 	}
