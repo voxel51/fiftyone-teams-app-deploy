@@ -20,6 +20,7 @@
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 or Higher](#from-fiftyone-enterprise-version-200-or-higher)
     - [FiftyOne Enterprise v2.26+ Legacy Authentication Mode Removed](#fiftyone-enterprise-v226-legacy-authentication-mode-removed)
+    - [FiftyOne Enterprise v2.26+ Invitations and Service Accounts](#fiftyone-enterprise-v226-invitations-and-service-accounts)
     - [FiftyOne Enterprise v2.25+ Activity Core](#fiftyone-enterprise-v225-activity-core)
     - [FiftyOne Enterprise v2.23+ Service Orchestrators and Auto-registration](#fiftyone-enterprise-v223-service-orchestrators-and-auto-registration)
     - [FiftyOne Enterprise v2.22+ Multimodal Datasets](#fiftyone-enterprise-v222-multimodal-datasets)
@@ -138,6 +139,101 @@ Before you upgrade, update your `values.yaml`:
 1. Remove `casSettings.env.FIFTYONE_AUTH_MODE` if it's set.
 1. Remove `secret.fiftyone.cookieSecret` if it's set.
    No FiftyOne Enterprise service reads it.
+
+#### FiftyOne Enterprise v2.26+ Invitations and Service Accounts
+
+FiftyOne Enterprise v2.26.0 changes how `teams-cas` stores invitations
+and service accounts.
+
+**Upgrading needs no extra step.**
+The first time a v2.26 `teams-cas` starts,
+it updates the stored data before it serves requests:
+
+- Each pending invitation becomes a pending user.
+  That user holds a seat of the invited role
+  until someone accepts or revokes the invitation,
+  or the invitation expires.
+- Service accounts move into their own collection,
+  and their group memberships move with them.
+
+`teams-cas` can safely repeat each step,
+so several `teams-cas` replicas can start at the same time.
+If the update fails,
+`teams-cas` exits and tries again the next time it starts.
+
+**What changes for administrators:**
+
+- Pending invitations count toward the license's seat limits.
+  When an organization reaches its limit for a role,
+  `teams-cas` refuses new invitations for that role,
+  the same way it refuses new users.
+  An expired invitation frees its seat.
+- Invitations are on by default
+  for organizations that never changed the setting.
+
+**Rolling back to v2.25 needs one extra step,**
+because a v2.25 `teams-cas` can't read the data in its v2.26 form.
+Until you do that step,
+v2.25 doesn't list service accounts
+and counts too many seats for pending invitations.
+
+1. Roll the release back to v2.25.
+   If the release history still has the v2.25 revision,
+   roll back to it:
+
+   ```shell
+   helm history <release> --namespace <namespace>
+   helm rollback <release> <v2.25 revision> \
+     --namespace <namespace> \
+     --wait
+   ```
+
+   If that revision is no longer in the history,
+   install the v2.25.2 chart with the values you used for v2.25.2.
+   Without `--version`, Helm installs the latest chart.
+
+   ```shell
+   helm upgrade <release> voxel51/fiftyone-teams-app \
+     --namespace <namespace> \
+     --version 2.25.2 \
+     --values <your v2.25.2 values file> \
+     --wait
+   ```
+
+   If Argo CD or another GitOps tool manages the release,
+   set the chart version back to `2.25.2` in your Git repository instead.
+1. Check that no v2.26 `teams-cas` pod is still running or terminating:
+
+   ```shell
+   kubectl get pods --namespace <namespace>
+   ```
+
+   If a v2.26 `teams-cas` starts,
+   it converts the data to the v2.26 form again.
+1. Get a `fiftyone-migrator` release with the `rollback` command
+   from Voxel51 support.
+   Run it against the deployment's databases,
+   with a dry run first:
+
+   ```shell
+   export CAS_DATABASE_URI=<the teams-cas MongoDB connection string>
+   export CAS_DATABASE_NAME=<the teams-cas database name>
+   export FIFTYONE_DATABASE_URI=<the FiftyOne MongoDB connection string>
+   export FIFTYONE_DATABASE_NAME=<the FiftyOne database name>
+
+   # Shows what would be undone
+   fiftyone-migrator rollback 2.25.1 --include cas --dry-run
+
+   fiftyone-migrator rollback 2.25.1 --include cas
+   ```
+
+   The command returns invitations, service accounts, and their groups
+   to the form v2.25 uses.
+   You can run it again safely.
+   It works whether or not anyone ran `fiftyone-migrator`
+   on the deployment before.
+
+Upgrading to v2.26 again later needs no extra step.
 
 #### FiftyOne Enterprise v2.25+ Activity Core
 
