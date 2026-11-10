@@ -225,6 +225,8 @@ To upgrade:
 1. Copy your `compose.override.yaml` and `.env` files
    into the `docker` directory,
    then `cd` into it.
+   Don't copy the other `compose*.yaml` files from your old directory.
+   The v2.26 files in the `docker` directory replace them.
 1. In the `.env` and `compose.override.yaml` files,
    update relative paths
    (such as `LOCAL_LICENSE_FILE_DIR` and bind mount sources)
