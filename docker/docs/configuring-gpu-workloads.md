@@ -68,7 +68,7 @@ See `docker/compose.delegated-operators.gpu.yaml` for an example.
 ```yaml
 services:
   teams-do-with-gpu:
-    image: voxel51/fiftyone-teams-cv-full:v2.25.2
+    image: voxel51/fiftyone-teams-cv-full:v2.26.0
     command: >
       /bin/sh -c "fiftyone delegated launch -t remote  -n 'teams-do-with-gpu' -m"
     environment:

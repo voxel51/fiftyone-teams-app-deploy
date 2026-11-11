@@ -1,6 +1,6 @@
 SHELL := $(SHELL) -e
 ASDF := $(shell asdf where golang)
-VERSION ?= 2.25.2
+VERSION ?= 2.26.0
 
 # Help
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))

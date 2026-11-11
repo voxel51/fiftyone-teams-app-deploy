@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Replaces every reference to one release version with another,
-# like 2.25.2 with 2.26.0,
+# like 2.26.0 with 2.26.0,
 # in the chart, Docker Compose files, skaffold.yaml, and docs.
 # bump-fixtures.sh pins the integration test fixtures separately,
 # so this script leaves tests/fixtures alone.
