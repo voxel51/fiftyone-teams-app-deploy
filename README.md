@@ -15,7 +15,7 @@
 # fiftyone-teams-app
 
 <!-- markdownlint-disable line-length -->
-![Version: 2.25.2](https://img.shields.io/badge/Version-2.25.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.25.2](https://img.shields.io/badge/AppVersion-v2.25.2-informational?style=flat-square)
+![Version: 2.26.0](https://img.shields.io/badge/Version-2.26.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.26.0](https://img.shields.io/badge/AppVersion-v2.26.0-informational?style=flat-square)
 
 FiftyOne Enterprise is the enterprise version of the open source [FiftyOne](https://github.com/voxel51/fiftyone) project.
 The FiftyOne Enterprise Helm chart is the recommended way to install and configure FiftyOne Enterprise on Kubernetes.
@@ -27,28 +27,29 @@ Please contact Voxel51 for more information regarding FiftyOne Enterprise.
 
 ## Important
 
-### Version 2.24+
+### Version 2.25+
 
 #### Activity Core
 
 Activity Core is the basis for activity tracking across FiftyOne Enterprise
-2.24+. It records operator runs, annotation and review decisions, and
+2.25+. It records operator runs, annotation and review decisions, and
 sample/label mutations, and rolls them up into the data that the features
 built on it read — annotation metrics, the Audit Log, the Jobs pages, and
 more to come.
 
-Activity Core is opt-in; nothing changes on upgrade unless you enable it.
-It requires two settings together — `activitySettings.enabled` (tells the
-existing workloads to emit, and adds the worker `Deployment`s) and
-`fiftyoneMq.enabled` (the queue Redis carrying events between them).
-Enabling one without the other fails the render.
+Activity Core is on by default. The chart renders the activity workers and
+a queue Redis, and tells the existing workloads to emit. To turn it off,
+set both
+`activitySettings.enabled` (the producer env and worker `Deployment`s) and
+`fiftyoneMq.enabled` (the queue Redis carrying events between them) to
+`false`. Turning off only the queue fails the render.
 
 The bundled queue Redis claims a `PersistentVolumeClaim` by default, so a
 default `StorageClass` is required unless you disable persistence or supply
 your own claim.
 Please refer to
 
-- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v224-activity-core)
+- [upgrade documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/upgrading.md#fiftyone-enterprise-v225-activity-core)
   for what changes on upgrade, cluster requirements, and resource impact
 - [configuring activity core](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-activity-core.md)
   for full details, including external Redis and multi-organization
@@ -492,15 +493,6 @@ Please review these notes, and the
 [Pluggable Authentication](https://docs.voxel51.com/enterprise/pluggable_auth.html)
 documentation before completing your upgrade.
 
-Voxel51 recommends upgrading your deployment using
-[`legacy` authentication mode][legacy-auth-mode]
-and migrating to
-[`internal` authentication mode][internal-auth-mode]
-after confirming your initial upgrade was successful.
-
-Please contact your Voxel51 customer success representative for assistance
-in migrating to internal mode.
-
 The CAS service requires changes to your `values.yaml` files.
 A brief summary of those changes include
 
@@ -606,9 +598,6 @@ secret:
     # -- MongoDB Connection String. [Reference][mongodb-connection-string].
     mongodbConnectionString: ""
 
-    # -- A randomly generated string for cookie encryption.
-    # To generate, run `openssl rand -hex 32`.
-    cookieSecret: ""
     # -- Encryption key for storage credentials. [Reference][fiftyone-encryption-key].
     encryptionKey: ""
     # -- A randomly generated string for CAS Authentication.
@@ -832,7 +821,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| activitySettings.enabled | bool | `false` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. The UI surfaces that read the result are separate, default-off opt-ins through `teamsAppSettings.env` (`VFF_WF_ACTIVITY` for the workflow Activity tab + label History panel, `VFF_WF_METRIC` for the pre-release Metrics tab). Enable `fiftyoneMq.enabled` alongside this; the chart fails the render if only one of the two is on. |
+| activitySettings.enabled | bool | `true` | Controls whether the Activity Core worker Deployments are rendered and whether the producer workloads (teams-api, fiftyone-app, teams-plugins, and the delegated operators) are told to emit. On by default: the Audit Log, the Jobs pages, and the annotation Metrics tab all read what it records. To turn Activity Core off, set both this and `fiftyoneMq.enabled` to `false`; the chart fails the render if this is on and the queue is off. |
 | activitySettings.image.pullPolicy | string | `"IfNotPresent"` | Worker image pull policy. [Reference][image-pull-policy]. |
 | activitySettings.image.repository | string | `"voxel51/fiftyone-activity"` | Worker image. |
 | activitySettings.image.tag | string | `""` | Worker image tag. Defaults to the chart `appVersion`. |
@@ -844,9 +833,9 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.liveness.periodSeconds | int | `30` | How often (in seconds) to perform the liveness probe for the workers. [Reference][probes]. |
 | activitySettings.liveness.timeoutSeconds | int | `5` | Number of seconds after which the liveness probe times out for the workers. [Reference][probes]. |
 | activitySettings.mongo.database | string | `""` | Database holding the activity_* collections. When empty, they are co-located in the per-deployment FiftyOne database. Set a name to use a dedicated database. |
-| activitySettings.orgId | string | `""` | Organization that the deployment-wide rollups are attributed to. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Leave empty: a single-org deployment is discovered automatically. Set it only when the deployment holds several organizations, where the deployment-wide counts cannot be attributed to one of them — the workers log which one to name. |
+| activitySettings.orgId | string | `""` | Organization stamped on the events the workers record themselves (the database watch), which carry no request to take one from. This is the organization's `id` FIELD (its slug), not the Mongo `_id`. Per-request events and the dataset and sample counts (read by `teams-api` from CAS) carry the organization without it. |
 | activitySettings.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resources for the worker containers. [Reference][resources]. |
-| activitySettings.snapshotIntervalMs | string | `""` | Snapshot interval in milliseconds. Defaults to hourly, matching the bucket the state metrics roll up by. |
+| activitySettings.watch.enabled | bool | `true` | Controls whether the rollup worker watches the FiftyOne database's change stream, recording writes no service reported (such as direct database edits). Needs a replica set; on a standalone MongoDB it records nothing and logs why. |
 | activitySettings.workers.ingest.command | list | `["fiftyone-activity-ingest-worker"]` | Entrypoint for the ingest worker. |
 | activitySettings.workers.ingest.replicaCount | int | `2` | Number of ingest worker replicas. |
 | activitySettings.workers.prune.command | list | `["fiftyone-activity-prune-worker"]` | Entrypoint for the prune worker, which enforces the event store size cap. Without it only the time-based TTL applies. |
@@ -856,9 +845,6 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | activitySettings.workers.rollup.command | list | `["fiftyone-activity-rollup-worker"]` | Entrypoint for the rollup worker. |
 | activitySettings.workers.rollup.recreate | bool | `true` | Use the `Recreate` strategy. The rollup worker owns a repeatable schedule, so only one replica may reconcile it. |
 | activitySettings.workers.rollup.replicaCount | int | `1` | Number of rollup worker replicas. Keep at 1. |
-| activitySettings.workers.snapshot.command | list | `["fiftyone-activity-snapshot-worker"]` | Entrypoint for the snapshot worker. |
-| activitySettings.workers.snapshot.recreate | bool | `true` | Use the `Recreate` strategy. The snapshot worker owns a repeatable schedule, and two replicas would double-count a bucket. |
-| activitySettings.workers.snapshot.replicaCount | int | `1` | Number of snapshot worker replicas. Keep at 1. |
 | apiSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-api`. [Reference][affinity]. |
 | apiSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-api` deployment. [Reference][annotations]. |
 | apiSettings.dnsName | string | `""` | Controls whether `teams-api` is added to the chart's ingress. When an empty string, a rule for `teams-api` is not added to the chart managed ingress. When not an empty string, becomes the value to the `host` in the ingress' rule and set `ingress.api` too. Additionally, the `apiSettings.dnsName` is used by `teams-api` to generate the `API_EXTERNAL_URL` environment variable for configuring external orchestrators. |
@@ -982,12 +968,11 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | appSettings.volumes | list | `[]` | Volumes for `fiftyone-app`. [Reference][volumes]. |
 | casSettings.affinity | object | `{}` | Affinity and anti-affinity for `teams-cas`. [Reference][affinity]. |
 | casSettings.deploymentAnnotations | object | `{}` | Annotations for the `teams-cas` deployment. [Reference][annotations]. |
-| casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email NOTE: This is currently not supported when `FIFTYONE_AUTH_MODE: internal` |
+| casSettings.enable_invitations | bool | `true` | Allow ADMINs to invite users by email |
 | casSettings.env.CAS_DATABASE_NAME | string | `"cas"` | Provide the name for the CAS database. When multiple deployments use the same database instance, set `CAS_DATABASE_NAME` to a unique value for each deployment. |
 | casSettings.env.CAS_DEFAULT_USER_ROLE | string | `"GUEST"` | Set the default user role for new users One of `GUEST`, `COLLABORATOR`, `MEMBER`, `ADMIN` |
 | casSettings.env.CAS_MONGODB_URI_KEY | string | `"mongodbConnectionString"` | The key from `secret.fiftyone.name` that contains the CAS MongoDB Connection String. |
 | casSettings.env.DEBUG | string | `"cas:*,-cas:*:debug"` | Set the log level for CAS examples: `DEBUG: cas:*` - shows all CAS logs `DEBUG: cas:*:info` - shows all CAS INFO logs `DEBUG: cas:*,-cas:*:debug` - shows all CAS logs except DEBUG logs |
-| casSettings.env.FIFTYONE_AUTH_MODE | string | `"legacy"` | Configure Authentication Mode. One of `legacy` or `internal` |
 | casSettings.image.pullPolicy | string | `"Always"` | Instruct when the kubelet should pull (download) the specified image. One of `IfNotPresent`, `Always` or `Never`. [Reference][image-pull-policy]. |
 | casSettings.image.repository | string | `"voxel51/fiftyone-teams-cas"` | Container image for `teams-cas`. |
 | casSettings.image.tag | string | `""` | Image tag for `teams-cas`. Defaults to the chart version. |
@@ -1094,17 +1079,17 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | delegatedOperatorJobTemplates.template.volumeMounts | list | `[]` | Volume mounts for delegated-operator-executor pods. [Reference][volumes]. |
 | delegatedOperatorJobTemplates.template.volumes | list | `[]` | Volumes for `delegated-operator-executor`. [Reference][volumes]. |
 | fiftyoneLicenseSecrets | list | `["fiftyone-license"]` | List of secrets for FiftyOne Enterprise Licenses (one per org) |
-| fiftyoneMq.enabled | bool | `false` | Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL` environment variable are rendered. |
+| fiftyoneMq.enabled | bool | `true` | Controls whether the queue Redis and the `FIFTYONE_MQ_REDIS_URL` environment variable are rendered. On by default, paired with `activitySettings.enabled`. |
 | fiftyoneMq.redis.containerSecurityContext | object | `{}` | Security context for the Redis container. [Reference][container-security-context]. |
 | fiftyoneMq.redis.enabled | bool | `true` | Controls whether the bundled Redis Deployment and Service are rendered. Set to `false` when using `fiftyoneMq.redis.external.url`. |
 | fiftyoneMq.redis.external.url | string | `""` | URL of an external Redis. When set, the bundled Redis is not rendered and the workloads are wired to this URL instead. The instance must use the `noeviction` maxmemory policy. An evicting policy drops queued jobs. |
-| fiftyoneMq.redis.image | string | `"redis:7-alpine"` | Redis image for the bundled queue backend. |
+| fiftyoneMq.redis.image | string | `"redis:8-alpine"` | Redis image for the bundled queue backend. |
 | fiftyoneMq.redis.maxmemory | string | `"200mb"` | Memory limit for the bundled Redis. |
-| fiftyoneMq.redis.persistence.enabled | bool | `true` | Whether to provision a `PersistentVolumeClaim` for the bundled queue Redis `/data` directory, where its append-only file (AOF) lives. Defaults to `true` to prevent queued activities from being lost on pod reschedules. Disabling it writes the AOF to an `emptyDir`, which survives a container restart but is lost on a pod reschedule (node drain, eviction, `kubectl delete pod`, chart upgrade). Requires a default `StorageClass`, or set `storageClass` / `existingClaim`.  When enabling this alongside a non-empty `fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's redis GID so the mounted `/data` stays writable.  This bounds one loss window rather than making the pipeline durable end to end: the in-process emit buffer is cleared when an enqueue fails, and enqueuing is not atomic with the domain change the event describes. Tracked as `FOEPD-4411`. |
+| fiftyoneMq.redis.persistence.enabled | bool | `true` | Whether to provision a `PersistentVolumeClaim` for the bundled queue Redis `/data` directory, where its append-only file (AOF) lives. Defaults to `true` to prevent queued activities from being lost on pod reschedules. Disabling it writes the AOF to an `emptyDir`, which survives a container restart but is lost on a pod reschedule (node drain, eviction, `kubectl delete pod`, chart upgrade). Requires a default `StorageClass`, or set `storageClass` / `existingClaim`.  When overriding `fiftyoneMq.redis.podSecurityContext`, keep `fsGroup` set to the image's redis GID so the mounted `/data` stays writable.  This bounds one loss window rather than making the pipeline durable end to end: the in-process emit buffer is cleared when an enqueue fails, and enqueuing is not atomic with the domain change the event describes. Tracked as `FOEPD-4411`. |
 | fiftyoneMq.redis.persistence.existingClaim | string | `""` | Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to bind the queue Redis to. When set, `size` and `storageClass` are ignored. Has no effect when `persistence.enabled` is `false`. |
 | fiftyoneMq.redis.persistence.size | string | `"1Gi"` | Storage size for the queue Redis `PersistentVolumeClaim`. The AOF holds in-flight jobs rather than event history, so this only needs to cover the queue's peak backlog. |
 | fiftyoneMq.redis.persistence.storageClass | string | `""` | `StorageClass` name for the queue Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |
-| fiftyoneMq.redis.podSecurityContext | object | `{}` | Security context for the Redis pod. [Reference][security-context]. |
+| fiftyoneMq.redis.podSecurityContext | object | `{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999}` | Pod-level security attributes for the queue Redis. UID 999 matches the `redis` user in the `redis:8-alpine` image; `runAsGroup` and `fsGroup` set GID 999 so the mounted `/data` volume is group-writable. The `redis:8` entrypoint no longer chowns a data directory holding anything besides `*.rdb` and `appendonlydir`, so a fresh volume with `lost+found` stays root-owned without these. `fsGroup` only takes effect when the volume's storage driver applies it; CSI drivers with `fsGroupPolicy: None` do not, so on such storage make `/data` writable by UID 999 before Redis starts. [Reference][security-context]. |
 | fiftyoneMq.redis.resources | object | `{}` | Resources for the Redis container. [Reference][resources]. |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
@@ -1177,7 +1162,6 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | pluginsSettings.volumeMounts | list | `[]` | Volume mounts for `teams-plugins` pods. [Reference][volumes]. |
 | pluginsSettings.volumes | list | `[]` | Volumes for `teams-plugins`. [Reference][volumes]. |
 | secret.create | bool | `true` | Controls whether to create the secret named `secret.name`. |
-| secret.fiftyone.cookieSecret | string | `""` | A randomly generated string for cookie encryption. To generate, run `openssl rand -hex 32`. |
 | secret.fiftyone.encryptionKey | string | `""` | Encryption key for storage credentials. [Reference][fiftyone-encryption-key]. |
 | secret.fiftyone.fiftyoneAuthSecret | string | `""` | A randomly generated string for CAS Authentication. This can be any string you care to use generated by any mechanism you   prefer. This is used for inter-service authentication and for the SuperUser to  authenticate at the CAS UI to configure the Central Authentication Service. |
 | secret.fiftyone.fiftyoneDatabaseName | string | `""` | MongoDB Database Name for FiftyOne Enterprise. |
@@ -1200,7 +1184,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.env.FIFTYONE_APP_ALLOW_MEDIA_EXPORT | bool | `true` | When `false`, disables media export options |
 | teamsAppSettings.env.FIFTYONE_APP_ANONYMOUS_ANALYTICS_ENABLED | bool | `true` | Controls whether anonymous analytics are captured for the application. Set to false to opt-out of anonymous analytics. |
 | teamsAppSettings.env.FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS | string | `"kubernetes"` | Deployment characteristics for the `teams-app`. `kubernetes`: Indicates the app is running in a Kubernetes environment. `docker`: Indicates the app is running in a Docker environment. `kubernetes,managed`: Indicates the app is running in a managed Kubernetes environment |
-| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.25.2"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==2.25.2`). |
+| teamsAppSettings.env.FIFTYONE_APP_TEAMS_SDK_RECOMMENDED_VERSION | string | `"2.26.0"` | The recommended fiftyone SDK version that will be displayed in the install modal (i.e. `pip install ... fiftyone==2.26.0`). |
 | teamsAppSettings.env.FIFTYONE_APP_THEME | string | `"dark"` | The default theme configuration. `dark`: Theme will be dark when user visits for the first time. `light`: Theme will be light theme when user visits for the first time. `always-dark`: Sets dark theme on each refresh (overrides user theme changes in the app). `always-light`: Sets light theme on each refresh (overrides user theme changes in the app). |
 | teamsAppSettings.env.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED | bool | `false` | Disable duplicate atom/selector key checking that generated false-positive errors. [Reference][recoil-env]. |
 | teamsAppSettings.fiftyoneApiOverride | string | `""` | Overrides the `FIFTYONE_API_URI` environment variable. When set `FIFTYONE_API_URI` controls the value shown in the API Key Modal providing guidance for connecting to the FiftyOne Enterprise API. `FIFTYONE_API_URI` uses the value from apiSettings.dnsName if it is set, or uses the teamsAppSettings.dnsName |
@@ -1245,16 +1229,16 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | teamsAppSettings.volumeMounts | list | `[]` | Volume mounts for `teams-app` pods. [Reference][volumes]. |
 | teamsAppSettings.volumes | list | `[]` | Volumes for `teams-app` pods. [Reference][volumes]. |
 | telemetry.enabled | bool | `true` | When `false`, no telemetry resources or sidecars are rendered and the FiftyOne UI's delegated-operator log viewer will be empty. |
-| telemetry.rbac.create | bool | `true` | When `false`, the telemetry `Role`/`RoleBinding` granting the sidecar `pods/log` read access are not rendered. Set `false` only when the install identity cannot create namespaced RBAC AND `serviceAccounts` points at an existing account that already carries `pods/log` (e.g. the teams-api RBAC SA). On Kubernetes the sidecar tails container logs via the `pods/log` API; without this grant those calls return `403`, so the delegated-operator log viewer stays empty. The Settings → Metrics dashboard is unaffected — metrics use the pod's shared process namespace, not the Kubernetes API. |
+| telemetry.rbac.create | bool | `true` | When `false`, the telemetry `Role`/`RoleBinding` granting the sidecar `pods/log` read access are not rendered. Set `false` only when the install identity cannot create namespaced RBAC AND `serviceAccounts` points at an existing account that already carries `pods/log` (e.g. the teams-api RBAC SA). On Kubernetes the sidecar tails container logs via the `pods/log` API; without this grant those calls return `403`, so the delegated-operator log viewer stays empty. The Settings → Monitoring → System Health dashboard is unaffected — metrics use the pod's shared process namespace, not the Kubernetes API. |
 | telemetry.redis.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Container-level security attributes for the telemetry Redis. `readOnlyRootFilesystem` is safe because writes go to the `/data` volume. [Reference][container-security-context]. |
 | telemetry.redis.external.url | string | `""` | URL of an external Redis to use instead of the bundled one (e.g. `redis://my-redis.example.com:6379`). |
-| telemetry.redis.image | string | `"redis:7-alpine"` | Container image for the telemetry Redis Deployment. |
+| telemetry.redis.image | string | `"redis:8-alpine"` | Container image for the telemetry Redis Deployment. |
 | telemetry.redis.maxmemory | string | `"400mb"` | `--maxmemory` flag passed to `redis-server`. |
 | telemetry.redis.persistence.enabled | bool | `false` | Whether to provision a `PersistentVolumeClaim` for the bundled telemetry Redis. Defaults to `false` (emptyDir) so the chart installs without a default `StorageClass`. Archives flush to MongoDB every ~10 minutes, so a Redis pod restart only drops the in-window dashboard backscroll and any live op buffers. |
 | telemetry.redis.persistence.existingClaim | string | `""` | Name of an existing `PersistentVolumeClaim` (in `namespace.name`) to bind the telemetry Redis to. When set, `size` and `storageClass` above are ignored. Has no effect when `persistence.enabled` is `false`. |
 | telemetry.redis.persistence.size | string | `"1Gi"` | Storage size for the telemetry Redis `PersistentVolumeClaim`. |
 | telemetry.redis.persistence.storageClass | string | `""` | `StorageClass` name for the telemetry Redis `PersistentVolumeClaim`. Leave unset to use the cluster's default `StorageClass`. |
-| telemetry.redis.podSecurityContext | object | `{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999}` | Pod-level security attributes for the telemetry Redis. UID/GID 999 matches the `redis` user in the `redis:7-alpine` image; `fsGroup` keeps the mounted `/data` volume group-writable. [Reference][security-context]. |
+| telemetry.redis.podSecurityContext | object | `{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999}` | Pod-level security attributes for the telemetry Redis. UID 999 matches the `redis` user in the `redis:8-alpine` image (whose primary GID is 1000); `runAsGroup` and `fsGroup` set GID 999 so the mounted `/data` volume is group-writable. [Reference][security-context]. |
 | telemetry.redis.resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"512Mi"}}` | Resource requests/limits for the telemetry Redis container. [Reference][resources]. |
 | telemetry.serviceAccounts | list | `[]` | ServiceAccount names (in `namespace.name`) bound to the telemetry pod-logs Role. When empty, the RoleBinding binds the chart's main app service account. The teams-api sidecar uses the teams-api RBAC service account, which already grants `pods/log` GET via `api-role.yaml`. |
 | telemetry.sidecar.extraVolumeMounts | list | `[]` | Additional volume mounts for the `telemetry-sidecar` container, e.g. to mount the same CA certs the app containers use. [Reference][volumes]. |
@@ -1285,9 +1269,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 [ingress-rules]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
 [ingress]: https://kubernetes.io/docs/concepts/services-networking/ingress/
 [init-containers]: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-[internal-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#internal-mode
 [labels-and-selectors]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-[legacy-auth-mode]: https://docs.voxel51.com/enterprise/pluggable_auth.html#legacy-mode
 [mongodb-connection-string]: https://www.mongodb.com/docs/manual/reference/connection-string/
 [node-selector]: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 [pod-disruption-budget]: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
