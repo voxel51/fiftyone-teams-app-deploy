@@ -144,6 +144,8 @@ func (s *activityArchiveEnvTemplateTest) TestPruneWorkerCarriesTheSameBudget() {
 
 func (s *activityArchiveEnvTemplateTest) TestNothingRendersWithActivityOff() {
 	env := s.apiEnv(map[string]string{
+		"activitySettings.enabled":            "false",
+		"fiftyoneMq.enabled":                  "false",
 		"activitySettings.archive.bucketPath": "gs://archive",
 	})
 	for name := range env {
