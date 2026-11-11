@@ -95,6 +95,12 @@ When overriding `fiftyoneMq.redis.podSecurityContext` with persistence
 enabled, keep `fsGroup` set to the image's redis GID so the mounted
 `/data` stays writable.
 
+`fsGroup` only takes effect when the volume's storage driver applies it.
+CSI drivers with `fsGroupPolicy: None` leave a fresh volume root-owned, so
+on such storage make `/data` writable by UID 999 before Redis starts, for
+example with a pre-provisioned volume passed as
+`fiftyoneMq.redis.persistence.existingClaim`.
+
 This bounds one loss window rather than making the pipeline durable end
 to end: the in-process emit buffer is cleared when an enqueue fails, and
 enqueuing is not atomic with the domain change the event describes.

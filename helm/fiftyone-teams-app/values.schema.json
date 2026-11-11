@@ -2982,7 +2982,7 @@
               "type": "object"
             },
             "podSecurityContext": {
-              "description": "Pod-level security attributes for the queue Redis. UID 999 matches\nthe `redis` user in the `redis:8-alpine` image; `runAsGroup` and\n`fsGroup` set GID 999 so the mounted `/data` volume is group-writable.\nThe `redis:8` entrypoint no longer chowns a data directory holding\nanything besides `*.rdb` and `appendonlydir`, so a fresh volume with\n`lost+found` stays root-owned without these. [Reference][security-context].",
+              "description": "Pod-level security attributes for the queue Redis. UID 999 matches\nthe `redis` user in the `redis:8-alpine` image; `runAsGroup` and\n`fsGroup` set GID 999 so the mounted `/data` volume is group-writable.\nThe `redis:8` entrypoint no longer chowns a data directory holding\nanything besides `*.rdb` and `appendonlydir`, so a fresh volume with\n`lost+found` stays root-owned without these. `fsGroup` only takes\neffect when the volume's storage driver applies it; CSI drivers with\n`fsGroupPolicy: None` do not, so on such storage make `/data` writable\nby UID 999 before Redis starts. [Reference][security-context].",
               "properties": {
                 "fsGroup": {
                   "default": 999,
