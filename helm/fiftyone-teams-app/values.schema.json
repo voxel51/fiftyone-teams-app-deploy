@@ -2950,7 +2950,7 @@
               "properties": {
                 "enabled": {
                   "default": true,
-                  "description": "Whether to provision a `PersistentVolumeClaim` for the bundled queue\nRedis `/data` directory, where its append-only file (AOF) lives.\nDefaults to `true` to prevent queued activities from being lost on pod\nreschedules. Disabling it writes the AOF to an `emptyDir`, which\nsurvives a container restart but is lost on a pod reschedule (node\ndrain, eviction, `kubectl delete pod`, chart upgrade). Requires a\ndefault `StorageClass`, or set `storageClass` / `existingClaim`.\n\nWhen enabling this alongside a non-empty\n`fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's\nredis GID so the mounted `/data` stays writable.\n\nThis bounds one loss window rather than making the pipeline durable end\nto end: the in-process emit buffer is cleared when an enqueue fails,\nand enqueuing is not atomic with the domain change the event describes.\nTracked as `FOEPD-4411`.",
+                  "description": "Whether to provision a `PersistentVolumeClaim` for the bundled queue\nRedis `/data` directory, where its append-only file (AOF) lives.\nDefaults to `true` to prevent queued activities from being lost on pod\nreschedules. Disabling it writes the AOF to an `emptyDir`, which\nsurvives a container restart but is lost on a pod reschedule (node\ndrain, eviction, `kubectl delete pod`, chart upgrade). Requires a\ndefault `StorageClass`, or set `storageClass` / `existingClaim`.\n\nWhen overriding `fiftyoneMq.redis.podSecurityContext`, keep `fsGroup`\nset to the image's redis GID so the mounted `/data` stays writable.\n\nThis bounds one loss window rather than making the pipeline durable end\nto end: the in-process emit buffer is cleared when an enqueue fails,\nand enqueuing is not atomic with the domain change the event describes.\nTracked as `FOEPD-4411`.",
                   "title": "enabled",
                   "type": "boolean"
                 },
@@ -2982,7 +2982,29 @@
               "type": "object"
             },
             "podSecurityContext": {
-              "description": "Security context for the Redis pod. [Reference][security-context].",
+              "description": "Pod-level security attributes for the queue Redis. UID 999 matches\nthe `redis` user in the `redis:8-alpine` image; `runAsGroup` and\n`fsGroup` set GID 999 so the mounted `/data` volume is group-writable.\nThe `redis:8` entrypoint no longer chowns a data directory holding\nanything besides `*.rdb` and `appendonlydir`, so a fresh volume with\n`lost+found` stays root-owned without these. [Reference][security-context].",
+              "properties": {
+                "fsGroup": {
+                  "default": 999,
+                  "title": "fsGroup",
+                  "type": "integer"
+                },
+                "runAsGroup": {
+                  "default": 999,
+                  "title": "runAsGroup",
+                  "type": "integer"
+                },
+                "runAsNonRoot": {
+                  "default": true,
+                  "title": "runAsNonRoot",
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "default": 999,
+                  "title": "runAsUser",
+                  "type": "integer"
+                }
+              },
               "required": [],
               "title": "podSecurityContext",
               "type": "object"

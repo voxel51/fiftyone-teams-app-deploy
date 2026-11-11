@@ -190,6 +190,25 @@ func (s *fiftyoneMqRedisDeploymentTemplateTest) TestContainer() {
 	s.EqualValues(6379, containers[0].Ports[0].ContainerPort)
 }
 
+func (s *fiftyoneMqRedisDeploymentTemplateTest) TestPodSecurityContextDefault() {
+	options := &helm.Options{SetValues: mqRedisEnabled(nil)}
+
+	deployment := s.renderDeployment(options)
+
+	// A fresh PVC holds `lost+found`, so the redis:8 entrypoint skips its
+	// chown and `/data` must be writable through fsGroup instead.
+	podSecurityContext := deployment.Spec.Template.Spec.SecurityContext
+	s.Require().NotNil(podSecurityContext, "pod securityContext should be set by default")
+	s.Require().NotNil(podSecurityContext.RunAsNonRoot)
+	s.True(*podSecurityContext.RunAsNonRoot)
+	s.Require().NotNil(podSecurityContext.RunAsUser)
+	s.EqualValues(999, *podSecurityContext.RunAsUser)
+	s.Require().NotNil(podSecurityContext.RunAsGroup)
+	s.EqualValues(999, *podSecurityContext.RunAsGroup)
+	s.Require().NotNil(podSecurityContext.FSGroup)
+	s.EqualValues(999, *podSecurityContext.FSGroup)
+}
+
 func (s *fiftyoneMqRedisDeploymentTemplateTest) TestImageOverride() {
 	options := &helm.Options{SetValues: mqRedisEnabled(map[string]string{
 		"fiftyoneMq.redis.image": "my-registry/redis:custom",

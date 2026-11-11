@@ -91,9 +91,9 @@ fiftyoneMq:
       enabled: false
 ```
 
-When enabling persistence alongside a non-empty
-`fiftyoneMq.redis.podSecurityContext`, set `fsGroup` to the image's
-redis GID so the mounted `/data` stays writable.
+When overriding `fiftyoneMq.redis.podSecurityContext` with persistence
+enabled, keep `fsGroup` set to the image's redis GID so the mounted
+`/data` stays writable.
 
 This bounds one loss window rather than making the pipeline durable end
 to end: the in-process emit buffer is cleared when an enqueue fails, and
