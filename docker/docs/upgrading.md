@@ -382,27 +382,27 @@ and counts too many seats for pending invitations.
    and check that it lists no containers.
    If a v2.26 `teams-cas` starts,
    it converts the data to the v2.26 form again.
-1. Go back to the v2.26.0 files.
+1. Go back to the v2.25.2 files.
    In a git clone of this repository, run:
 
    ```shell
-   git checkout fiftyone-teams-app-2.26.0
+   git checkout fiftyone-teams-app-2.25.2
    ```
 
    Otherwise, download and unpack
-   [the v2.26.0 files](https://github.com/voxel51/fiftyone-teams-app-deploy/archive/refs/tags/fiftyone-teams-app-2.26.0.tar.gz).
-1. Start v2.26.0 from the directory you used before the upgrade,
+   [the v2.25.2 files](https://github.com/voxel51/fiftyone-teams-app-deploy/archive/refs/tags/fiftyone-teams-app-2.25.2.tar.gz).
+1. Start v2.25.2 from the directory you used before the upgrade,
    `docker/internal-auth` or `docker/legacy-auth`,
-   with the `-f` options you used for v2.26.0.
+   with the `-f` options you used for v2.25.2.
    That directory still has the `.env` and `compose.override.yaml`
    from before the upgrade.
    - Compose uses that directory's project name again,
-     so v2.26.0 uses the volumes it had before the upgrade.
+     so v2.25.2 uses the volumes it had before the upgrade.
      Changes made after the upgrade,
      such as plugins you installed,
      are only in the `voxel51_*` volumes.
    - If you set your own project name,
-     v2.26.0 uses the same volumes as v2.26.
+     v2.25.2 uses the same volumes as v2.26.
 1. Get a `fiftyone-migrator` release with the `rollback` command
    from Voxel51 support.
    Run it against the deployment's databases,

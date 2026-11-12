@@ -189,19 +189,19 @@ and counts too many seats for pending invitations.
    ```
 
    If that revision is no longer in the history,
-   install the v2.26.0 chart with the values you used for v2.26.0.
+   install the v2.25.2 chart with the values you used for v2.25.2.
    Without `--version`, Helm installs the latest chart.
 
    ```shell
    helm upgrade <release> voxel51/fiftyone-teams-app \
      --namespace <namespace> \
-     --version 2.26.0 \
-     --values <your v2.26.0 values file> \
+     --version 2.25.2 \
+     --values <your v2.25.2 values file> \
      --wait
    ```
 
    If Argo CD or another GitOps tool manages the release,
-   set the chart version back to `2.26.0` in your Git repository instead.
+   set the chart version back to `2.25.2` in your Git repository instead.
 1. Check that no v2.26 `teams-cas` pod is still running or terminating:
 
    ```shell
