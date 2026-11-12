@@ -121,6 +121,8 @@ quickstart  0.21.2
    fiftyone migrate --info
    ```
 
+<!-- bump-version: off -->
+
 #### FiftyOne Enterprise v2.26+ Legacy Authentication Mode Removed
 
 FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode.
@@ -234,6 +236,8 @@ and counts too many seats for pending invitations.
    on the deployment before.
 
 Upgrading to v2.26 again later needs no extra step.
+
+<!-- bump-version: on -->
 
 #### FiftyOne Enterprise v2.25+ Activity Core
 
