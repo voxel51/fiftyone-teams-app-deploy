@@ -5,6 +5,11 @@
 # in the chart, Docker Compose files, skaffold.yaml, and docs.
 # bump-fixtures.sh pins the integration test fixtures separately,
 # so this script leaves tests/fixtures alone.
+#
+# Lines between `bump-version: off` and `bump-version: on` markers
+# (like `<!-- bump-version: off -->` in Markdown) keep their versions.
+# Use them for text that names an earlier release on purpose,
+# such as the rollback steps in the upgrade guides.
 
 set -euo pipefail
 
@@ -81,15 +86,27 @@ cd "${GIT_ROOT}"
 
 # git grep -F finds candidates; the perl pattern skips matches that are
 # part of a longer version, like 12.25.2 or 2.25.20.
-pattern="(?<![0-9.])${FROM_VERSION//./\\.}(?![0-9])"
+export BUMP_PATTERN="(?<![0-9.])${FROM_VERSION//./\\.}(?![0-9])"
+export BUMP_TO="${TO_VERSION}"
 
-if ! git grep --quiet -I -F "${FROM_VERSION}" -- . ':(exclude)tests/fixtures'; then
+# This script's own examples name versions on purpose.
+pathspec=(. ':(exclude)tests/fixtures' ':(exclude)utils/bump-version.sh')
+
+if ! git grep --quiet -I -F "${FROM_VERSION}" -- "${pathspec[@]}"; then
   log_error "No files reference ${FROM_VERSION}."
   exit 1
 fi
 
-git grep -z -l -I -F "${FROM_VERSION}" -- . ':(exclude)tests/fixtures' |
-  xargs -0 perl -pi -e "s/${pattern}/${TO_VERSION}/g"
+# $skip resets at the end of each file,
+# so a missing `on` marker can't leak into the next one.
+# shellcheck disable=SC2016
+git grep -z -l -I -F "${FROM_VERSION}" -- "${pathspec[@]}" |
+  xargs -0 perl -pi -e '
+    $skip = 1 if /bump-version: off/;
+    $skip = 0 if /bump-version: on/;
+    s/$ENV{BUMP_PATTERN}/$ENV{BUMP_TO}/g unless $skip;
+    $skip = 0 if eof;
+  '
 
 log_info "Replaced ${FROM_VERSION} with ${TO_VERSION} in:"
 git diff --name-only
