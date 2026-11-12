@@ -104,7 +104,7 @@ func (s *dockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-cas",
 					url:              "http://127.0.0.1:3030/cas/api",
-					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              "",
 				},
@@ -141,7 +141,7 @@ func (s *dockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-cas",
 					url:              "http://127.0.0.1:3030/cas/api",
-					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              "",
 				},
@@ -178,7 +178,7 @@ func (s *dockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-cas",
 					url:              "http://127.0.0.1:3030/cas/api",
-					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              "",
 				},
@@ -222,7 +222,7 @@ func (s *dockerComposeUpTest) TestDockerComposeUp() {
 				{
 					name:             "teams-cas",
 					url:              "http://127.0.0.1:3030/cas/api",
-					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
+					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
 					log:              "",
 				},

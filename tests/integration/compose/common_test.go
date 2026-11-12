@@ -4,7 +4,9 @@
 package integration
 
 import (
+	"encoding/json"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -37,7 +39,48 @@ type serviceValidations struct {
 func validate_endpoint(t *testing.T, url string, expectedBody string, expectedStatus int) {
 	maxRetries := 10
 	timeBetweenRetries := 3 * time.Second
-	http_helper.HttpGetWithRetry(t, url, nil, expectedStatus, expectedBody, maxRetries, timeBetweenRetries)
+	http_helper.HttpGetWithRetryWithCustomValidation(t, url, nil, maxRetries, timeBetweenRetries,
+		func(status int, body string) bool {
+			return status == expectedStatus && bodyMatches(expectedBody, body)
+		},
+	)
+}
+
+// bodyMatches reports whether a response body matches the expected one.
+// When the expected body is a JSON object,
+// the response only needs the same values for those keys,
+// so a service can add fields to its health response
+// (like CAS's compatibilityVersion) without failing the test.
+func bodyMatches(expected string, actual string) bool {
+	var want, got map[string]any
+	if json.Unmarshal([]byte(expected), &want) != nil {
+		return actual == expected
+	}
+	if json.Unmarshal([]byte(actual), &got) != nil {
+		return false
+	}
+	return containsJSON(want, got)
+}
+
+func containsJSON(want map[string]any, got map[string]any) bool {
+	for key, wantValue := range want {
+		gotValue, ok := got[key]
+		if !ok {
+			return false
+		}
+		wantMap, wantIsMap := wantValue.(map[string]any)
+		gotMap, gotIsMap := gotValue.(map[string]any)
+		if wantIsMap && gotIsMap {
+			if !containsJSON(wantMap, gotMap) {
+				return false
+			}
+			continue
+		}
+		if !reflect.DeepEqual(wantValue, gotValue) {
+			return false
+		}
+	}
+	return true
 }
 
 func get_logs(t *testing.T, dockerOptions *docker.Options, container string) string {
