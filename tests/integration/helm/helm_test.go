@@ -76,7 +76,7 @@ func (s *helmTest) TestHelmInstall() {
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
 					httpResponseCode: 200,
 					log:              "FiftyOne CAS starting up",
 				},
@@ -92,7 +92,7 @@ func (s *helmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "teams-app server listening on",
 				},
 				// ordering this last to avoid test flakes where testing for log before the container is running
 				{
@@ -162,7 +162,7 @@ func (s *helmTest) TestHelmInstall() {
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
 					httpResponseCode: 200,
 					log:              "FiftyOne CAS starting up",
 				},
@@ -178,7 +178,7 @@ func (s *helmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "teams-app server listening on",
 				},
 				{
 					name:             "teams-do-cpu-default",
@@ -250,7 +250,7 @@ func (s *helmTest) TestHelmInstall() {
 				{
 					name:             "teams-cas",
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/cas/api", ""),
-					responsePayload:  `{"status":"available"}`,
+					responsePayload:  `{"status":"available","compatibilityVersion":1}`,
 					httpResponseCode: 200,
 					log:              "FiftyOne CAS starting up",
 				},
@@ -266,7 +266,7 @@ func (s *helmTest) TestHelmInstall() {
 					url:              ternary(s.context == "minikube", "https://local.fiftyone.ai/api/hello", ""),
 					responsePayload:  `{"status":"available"}`,
 					httpResponseCode: 200,
-					log:              " ✓ Ready in",
+					log:              "teams-app server listening on",
 				},
 				{
 					name:             "teams-plugins",

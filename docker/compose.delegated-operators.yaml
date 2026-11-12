@@ -16,7 +16,7 @@
 #     up -d
 services:
   teams-do:
-    image: voxel51/fiftyone-teams-cv-full:v2.25.2
+    image: voxel51/fiftyone-teams-cv-full:v2.26.0
     # Telemetry default-on requires teams-do to share its PID namespace
     # with a single sidecar (compose's `pid: "service:<name>"` only joins
     # one replica). Force replicas=1 to keep the 1:1 pairing deterministic.
@@ -55,7 +55,7 @@ services:
       - telemetry-socket:/tmp/telemetry
 
   teams-do-telemetry:
-    image: voxel51/telemetry-sidecar:v2.25.2
+    image: voxel51/telemetry-sidecar:v2.26.0
     pid: "service:teams-do"
     user: "1000:1000"
     cap_drop:
@@ -100,7 +100,7 @@ services:
   # distinct orchestrator name so it surfaces separately in the
   # Settings → Monitoring → System Health page.
   teams-do-2:
-    image: voxel51/fiftyone-teams-cv-full:v2.25.2
+    image: voxel51/fiftyone-teams-cv-full:v2.26.0
     profiles: ["do-2", "do-3"]
     deploy:
       replicas: 1
@@ -131,7 +131,7 @@ services:
       - telemetry-socket-2:/tmp/telemetry
 
   teams-do-2-telemetry:
-    image: voxel51/telemetry-sidecar:v2.25.2
+    image: voxel51/telemetry-sidecar:v2.26.0
     profiles: ["do-2", "do-3"]
     pid: "service:teams-do-2"
     user: "1000:1000"
@@ -172,7 +172,7 @@ services:
   # Slot 3 — included by the `do-3` profile. Mirror of slot 2 with its
   # own socket volume and orchestrator name.
   teams-do-3:
-    image: voxel51/fiftyone-teams-cv-full:v2.25.2
+    image: voxel51/fiftyone-teams-cv-full:v2.26.0
     profiles: ["do-3"]
     deploy:
       replicas: 1
@@ -203,7 +203,7 @@ services:
       - telemetry-socket-3:/tmp/telemetry
 
   teams-do-3-telemetry:
-    image: voxel51/telemetry-sidecar:v2.25.2
+    image: voxel51/telemetry-sidecar:v2.26.0
     profiles: ["do-3"]
     pid: "service:teams-do-3"
     user: "1000:1000"
