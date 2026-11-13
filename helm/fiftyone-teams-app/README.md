@@ -1092,6 +1092,10 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | fiftyoneMq.redis.podSecurityContext | object | `{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999}` | Pod-level security attributes for the queue Redis. UID 999 matches the `redis` user in the `redis:8-alpine` image; `runAsGroup` and `fsGroup` set GID 999 so the mounted `/data` volume is group-writable. The `redis:8` entrypoint no longer chowns a data directory holding anything besides `*.rdb` and `appendonlydir`, so a fresh volume with `lost+found` stays root-owned without these. `fsGroup` only takes effect when the volume's storage driver applies it; CSI drivers with `fsGroupPolicy: None` do not, so on such storage make `/data` writable by UID 999 before Redis starts. [Reference][security-context]. |
 | fiftyoneMq.redis.resources | object | `{}` | Resources for the Redis container. [Reference][resources]. |
 | imagePullSecrets | list | `[]` | Container image registry keys. [Reference][image-pull-secrets]. |
+| inference.labeler.url | string | `""` | URL of the inference chart's labeler, such as `http://inference-labeler:8080`. Needs `inference.url`. Empty: no labeler. |
+| inference.tenantId | string | `""` | With one org only: its id, the `organizationId` of its license. The org of calls with no user, such as builtin services. Empty with several orgs. |
+| inference.tokenSecret | string | `""` | Existing Secret holding the inference service's shared token under the key `token`. Needed with `inference.url`. |
+| inference.url | string | `""` | URL of the inference service, such as `http://inference:8080`. Empty: FiftyOne does not use one. |
 | ingress.annotations | object | `{}` | Ingress annotations. [Reference][annotations]. |
 | ingress.api | object | `{"path":"/*","pathType":"ImplementationSpecific"}` | The ingress rule values for teams-api, when `apiSettings.dnsName` is not empty. [Reference][ingress-rules]. |
 | ingress.className | string | `""` | Name of the ingress class.  When empty, a default Ingress class should be defined. When not empty, this value will be the Ingress class name. [Reference][ingress-default-ingress-class] |

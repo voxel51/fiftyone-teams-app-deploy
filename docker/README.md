@@ -68,6 +68,7 @@ regarding FiftyOne Enterprise.
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Telemetry](#telemetry)
   - [Activity Analytics](#activity-analytics)
+  - [Inference Service](#inference-service)
   - [Model Server](#model-server)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
@@ -228,6 +229,7 @@ Voxel51 publishes the following private FiftyOne Enterprise images to Docker
 Hub:
 
 - `voxel51/agentic-labeler` ← Agentic Labeler service (VLM inference)
+- `voxel51/agentic-labeler-cpu` ← Agentic Labeler through the inference service
 - `voxel51/fiftyone-app`
 - `voxel51/fiftyone-app-gpt`
 - `voxel51/fiftyone-app-torch` ← for text similarity / PyTorch support
@@ -235,6 +237,7 @@ Hub:
 - `voxel51/fiftyone-teams-app`
 - `voxel51/fiftyone-teams-cas`
 - `voxel51/fiftyone-teams-cv-full` ← full CV/ML environment
+- `voxel51/inference` ← inference service
 - `voxel51/telemetry-sidecar` ← supports logs and metrics throughout the deployment
 
 > :closed_lock_with_key: For access, contact your Voxel51 support team to obtain
@@ -648,6 +651,210 @@ Please refer to the
 [Activity Analytics configuration documentation](./docs/configuring-activity-analytics.md)
 for full details, including how to turn it off.
 
+### Inference Service
+
+The FiftyOne inference service runs the App's model features, such as
+embeddings, similarity and segmentation, on a model server instead of in the
+FiftyOne Enterprise containers. With an LLM, it also runs the shared agentic
+labeling service. It ships in the `compose.inference.yaml` overlay, and
+calls the model server at `MODEL_SERVER_URL`: run one first, on this worker
+or another, as the [Model Server](#model-server) section says. The overlay
+declares every model the model server image serves (`MODEL_SERVER_PRELOAD`
+picks what loads at start, the others load on their first request), and a
+new release brings new ones.
+
+1. Set these in `.env`:
+
+    ```shell
+    # Every caller sends it. At least 32 characters.
+    INFERENCE_SHARED_TOKEN=<the output of: openssl rand -hex 32>
+    # The model server, when not compose.model-server.yaml on this worker
+    MODEL_SERVER_URL=http://<model server address>:<MODEL_SERVER_BIND_PORT>
+    # The model server's token, when it requires one
+    MODEL_SERVER_TOKEN=<the model server's MODEL_SERVER_TOKEN>
+    ```
+
+    The service reads the licenses from `LOCAL_LICENSE_FILE_DIR`, as
+    `teams-cas` does, one per CAS org: list each file, comma separated, in
+    `LICENSE_KEY_FILE_PATHS`. Each call is admitted against the license of
+    the org it names, which FiftyOne Enterprise sets to the caller's CAS org.
+    A call that names no org is a 401, and one whose org has no license here
+    a 403. An unexpired license admits every call of its org, an expired one
+    none. A new org's license needs a restart.
+
+1. Point FiftyOne Enterprise at it in `compose.override.yaml`. Name only the
+   services in your `-f` set, and each `teams-do-N` slot you run: a service
+   named here and in no other file is created, incomplete:
+
+    ```yaml
+    x-inference-env: &inference-env
+      FIFTYONE_INFERENCE_URL: http://inference:8080
+      FIFTYONE_INFERENCE_TOKEN: ${INFERENCE_SHARED_TOKEN}
+      # With the labeler only: it checks the shared token
+      LABELER_SERVICE_URL: http://inference-labeler:8080
+      LABELER_SERVICE_AUTH: static-token
+      # Run test in the App goes to this labeler
+      LABELER_TEST_TRANSPORT: operator
+      # Run goes to the labeler's runs worker, inference-labeler-runs
+      LABELER_RUN_MODE: job
+      LABELER_DELEGATION_TARGET: agentic-labeler
+
+    services:
+      fiftyone-app:
+        environment: *inference-env
+      teams-plugins:
+        environment: *inference-env
+      teams-do:
+        environment: *inference-env
+    ```
+
+    FiftyOne Enterprise names the caller's CAS org (`user.organization.id`)
+    as the tenant of each call. Never set `FIFTYONE_TENANT_ID`: it overrides
+    that org, and makes FiftyOne Enterprise act as a SaaS tenant.
+    `FIFTYONE_INFERENCE_TENANT_ID` is only the fallback for calls with no
+    user, such as builtin services. With several orgs, leave it unset. With
+    one org, add it to `inference-env` set to that org's id, the
+    `organizationId` of its license (the same as `user.organization.id`),
+    never a made up name.
+
+1. Add the overlay to your usual `-f` set, here with the model server on
+   this worker:
+
+    ```shell
+    docker compose \
+      -f compose.yaml \
+      -f compose.dedicated-plugins.yaml \
+      -f compose.delegated-operators.yaml \
+      -f compose.model-server.yaml \
+      -f compose.inference.yaml \
+      -f compose.override.yaml \
+      up -d
+    ```
+
+To add an LLM, declare it in `BACKENDS` in `compose.override.yaml`, with its
+API key, after a copy of the model-server backend of `compose.inference.yaml`
+(an override replaces the whole variable), and run the agentic labeler with
+the `labeler` profile (`COMPOSE_PROFILES=labeler` in `.env`, or `do-2,labeler`
+with delegated operator slots). The profile runs two containers, both on CPU:
+`inference-labeler` for Run test, and `inference-labeler-runs`, the delegated
+operator worker `agentic-labeler` that runs each Run. Both call the LLM
+through the inference service. Each run names the org and user who started
+it. Do not also use `compose.agenticlabeler.yaml`: its GPU worker has the
+same name. Do not start the `agentic-labeler` service in Settings, then
+Services: it would run on this worker. By default the labeler calls
+`gpt-6-sol-responses` on the Responses API, with its examples as uploaded
+files, which needs OpenAI's own API:
+
+```yaml
+services:
+  inference:
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      BACKENDS: |
+        # Copy the model-server backend of compose.inference.yaml here
+        - kind: openai
+          id: openai
+          baseUrl: https://api.openai.com/v1
+          auth: { mode: bearer-token, tokenEnv: OPENAI_API_KEY }
+          openaiHosted: true
+          files: true
+          models:
+            - name: gpt-6-sol-responses
+              backendModelId: gpt-6-sol
+              contextWindow: 1050000
+              tasks: [generation]
+              wireFormat: openai-responses
+              allowedTemplateKwargs: []
+              limits: { maxImagesPerRequest: 1500 }
+```
+
+Any other OpenAI compatible API, such as vLLM or Azure OpenAI, is called on
+Chat Completions with images inline. Declare its vision model with
+`tasks: [generation]`, `wireFormat: openai-chat` and
+`limits.maxImagesPerRequest`, and set the labeler's config by hand from them
+(the Helm chart does this for you):
+
+```yaml
+services:
+  inference:
+    environment:
+      VLLM_API_KEY: ${VLLM_API_KEY}
+      BACKENDS: |
+        # Copy the model-server backend of compose.inference.yaml here
+        - kind: openai
+          id: vllm
+          baseUrl: http://vllm.internal:8000/v1
+          auth: { mode: bearer-token, tokenEnv: VLLM_API_KEY }
+          models:
+            - name: qwen3-vl
+              backendModelId: Qwen/Qwen3-VL-32B-Instruct
+              tasks: [generation]
+              wireFormat: openai-chat
+              limits: { maxImagesPerRequest: 64 }
+  inference-labeler:
+    environment:
+      LABELER_CONFIG_FILE: /app/configs/remote-vllm-openai.json
+      LABELER_ENGINE_CONFIG: >-
+        {"base_url_env": "LABELER_INFERENCE_BASE_URL", "api_key_env": null,
+        "model": "qwen3-vl", "max_pixels": 1048576, "structured_output": "auto",
+        "max_images": 64}
+  inference-labeler-runs:
+    environment:
+      LABELER_CONFIG_FILE: /app/configs/remote-vllm-openai.json
+      LABELER_ENGINE_CONFIG: >-
+        {"base_url_env": "LABELER_INFERENCE_BASE_URL", "api_key_env": null,
+        "model": "qwen3-vl", "max_pixels": 1048576, "structured_output": "auto",
+        "max_images": 64, "default_headers_env": {"x-voxel-tenant-id":
+        "FIFTYONE_INFERENCE_TENANT_ID", "x-voxel-principal-id":
+        "FIFTYONE_INFERENCE_PRINCIPAL_ID"}}
+```
+
+In `LABELER_ENGINE_CONFIG`, `default_headers_env` makes the runs worker name
+the org of each run, which the inference service requires. `model` is the
+model's `name`, `api_key_env:
+null` makes the labeler send `INFERENCE_SHARED_TOKEN` to the inference
+service, `max_pixels` limits the size of each image, which the labeler
+requires, and `structured_output: auto` constrains classification with a JSON
+schema (`response_format`), which the host must support. `max_images` is the
+model's `limits.maxImagesPerRequest`, and the labeler's only limit: images are
+sent inline, so it bounds how many examples a test may carry and each request
+under the inference service's `MAX_BODY_BYTES`. Do not set
+`LABELER_MODEL_LIMITS`: the labeler's image token estimate is Gemma's, so a
+context window sizes the examples wrong for other models. The labeler's
+prompts and parsing are written for Gemma, so check the labels on your model.
+
+Things to know:
+
+- The service reads the token at start only, and accepts one token. To
+  rotate it, change `INFERENCE_SHARED_TOKEN` and recreate the stack: every
+  caller switches at once, and the old token is refused.
+- The token proves a caller is part of the deployment, nothing more: any
+  holder can call as any organization. The labeler checks the same token,
+  then trusts the organization its callers name. It publishes no port: only
+  containers of this project reach it. The model server checks no token
+  unless `MODEL_SERVER_TOKEN` is set: see the [Model Server](#model-server)
+  section.
+- The labeler fetches media itself, by default only from public addresses,
+  over https on port 443. For media in a private object store, set on
+  `inference-labeler` the store's host names in `LABELER_FETCH_ALLOWED_HOSTS`,
+  its private address ranges in `LABELER_FETCH_ALLOWED_NETWORKS`, its port in
+  `LABELER_FETCH_ALLOWED_PORTS` when not 443, and
+  `LABELER_FETCH_ALLOW_HTTP: "true"` for plain http. Lists are JSON strings,
+  not YAML lists. A MinIO at `http://minio:9000`:
+
+  ```yaml
+  services:
+    inference-labeler:
+      environment:
+        LABELER_FETCH_ALLOWED_HOSTS: '["minio"]'
+        LABELER_FETCH_ALLOWED_NETWORKS: '["172.16.0.0/12"]'
+        LABELER_FETCH_ALLOWED_PORTS: '[9000]'
+        LABELER_FETCH_ALLOW_HTTP: "true"
+  ```
+
+- One job at once needs about 4 GB of memory in the labeler.
+- For a GPU model server, see the [Model Server](#model-server) section.
+
 ### Model Server
 
 The FiftyOne model server runs the models the inference service routes
@@ -910,6 +1117,8 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `GRAPHQL_DEFAULT_LIMIT`                      | Default GraphQL limit for results                                                                                                                                                                                                                                              | No                        |
 | `HTTP_PROXY_URL`                             | The URL for your environment http proxy                                                                                                                                                                                                                                        | No                        |
 | `HTTPS_PROXY_URL`                            | The URL for your environment https proxy                                                                                                                                                                                                                                       | No                        |
+| `INFERENCE_MAX_BODY_BYTES`                   | Largest request body in bytes the inference service accepts; the default is `67108864`                                                                                                                                                                                         | No                        |
+| `INFERENCE_SHARED_TOKEN`                     | The token every caller of the inference service sends, at least 32 characters; see [Inference Service](#inference-service)                                                                                                                                                     | Inference overlay only    |
 | `LOCAL_LICENSE_FILE_DIR`                     | Location of the directory that contains the FiftyOne Enterprise license file on the local server.                                                                                                                                                                              | Yes                       |
 | `MODEL_SERVER_ALLOWED_MEDIA_PREFIXES`        | JSON list of the scheme and host prefixes the model server fetches media from, such as `["https://minio.internal"]`; the default `[]` means any                                                                                                                                | No                        |
 | `MODEL_SERVER_ALLOWED_MODELS`                | JSON list of the models the model server serves at all; the default `[]` means any zoo model                                                                                                                                                                                   | No                        |
@@ -920,7 +1129,8 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `MODEL_SERVER_MAX_LOADED_MODELS`             | Models the model server keeps loaded at once, least recently used evicted first; the default is `6`                                                                                                                                                                            | No                        |
 | `MODEL_SERVER_PRELOAD`                       | JSON list of the models the model server loads at start; the default is `["siglip-base-patch16-224-torch"]`                                                                                                                                                                    | No                        |
 | `MODEL_SERVER_TOKEN`                         | Bearer token the model server requires on every call but `/healthz` and `/readyz`, `/metrics` included; empty means none                                                                                                                                                       | No                        |
-| `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the list of FiftyOne services (`fiftyone-app, teams-api,teams-app,teams-cas` must be included, `teams-plugins` should be included for dedicated plugins configurations)               | No                        |
+| `MODEL_SERVER_URL`                           | The model server the inference service calls; the default `http://model-server:8080` is `compose.model-server.yaml` on the same worker                                                                                                                                         | No                        |
+| `NO_PROXY_LIST`                              | The list of servers that should bypass the proxy; if a proxy is in use this must include the FiftyOne services (`fiftyone-app,teams-api,teams-app,teams-cas`), plus `teams-plugins` for dedicated plugins and `inference,inference-labeler,model-server` with inference        | No                        |
 
 <!-- Reference Links -->
 [docker-install]: https://docs.docker.com/engine/install/

@@ -3039,6 +3039,45 @@
       "title": "imagePullSecrets",
       "type": "array"
     },
+    "inference": {
+      "description": "Connection to the fiftyone-inference chart. Sets its env on fiftyone-app,\nteams-plugins and the delegated operators. A name set in a component's own\n`env` or `secretEnv` wins.",
+      "properties": {
+        "labeler": {
+          "properties": {
+            "url": {
+              "default": "",
+              "description": "URL of the inference chart's labeler, such as\n`http://inference-labeler:8080`. Needs `inference.url`. Empty: no labeler.",
+              "title": "url",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "labeler",
+          "type": "object"
+        },
+        "tenantId": {
+          "default": "",
+          "description": "With one org only: its id, the `organizationId` of its license. The org\nof calls with no user, such as builtin services. Empty with several orgs.",
+          "title": "tenantId",
+          "type": "string"
+        },
+        "tokenSecret": {
+          "default": "",
+          "description": "Existing Secret holding the inference service's shared token under the\nkey `token`. Needed with `inference.url`.",
+          "title": "tokenSecret",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "description": "URL of the inference service, such as `http://inference:8080`. Empty:\nFiftyOne does not use one.",
+          "title": "url",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "inference",
+      "type": "object"
+    },
     "ingress": {
       "properties": {
         "annotations": {
