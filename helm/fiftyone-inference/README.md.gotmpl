@@ -40,22 +40,22 @@ endpoint. Install this chart in the namespace of FiftyOne Enterprise.
   labeler and the FiftyOne Enterprise pods together: a caller with the old
   token is refused from the restart on. A change to `sharedToken.value`
   restarts the inference service and the labeler.
-- **Model servers.** The chart ships the declarations of every model the
-  voxel51 model server image serves (`catalog/model-server.yaml`), so a
-  chart upgrade brings new models with no values edit. It points them at
-  the fiftyone-model-server release `modelServer.name` in this namespace,
-  `model-server` by default, with `modelServer.replicas` pods, 1 by
-  default: one URL per pod, `http://<name>-<i>:8080` for i from 0. With
-  `modelServer.replicas: 3`, these are `http://model-server-0:8080`,
-  `http://model-server-1:8080` and `http://model-server-2:8080`. Set the same
-  `replicas` as that release. For model servers in another namespace or
-  cluster, list one URL per box in `modelServer.urls`, which is then used
-  instead. A box need not preload every
+- **Model servers.** The service reads the models from the model servers
+  (`GET /models`), so a model server upgrade brings new models with no values
+  edit. The chart points the service at the fiftyone-model-server release
+  `modelServer.name` in this namespace, `model-server` by default, with
+  `modelServer.replicas` pods, 1 by default: one URL per pod,
+  `http://<name>-<i>:8080` for i from 0. With `modelServer.replicas: 3`, these
+  are `http://model-server-0:8080`, `http://model-server-1:8080` and
+  `http://model-server-2:8080`. Set the same `replicas` as that release. For
+  model servers in another namespace or cluster, list one URL per box in
+  `modelServer.urls`, which is then used instead. A box need not preload every
   model: the service asks each box which models it holds (`GET /models`), and
   for each model prefers the boxes that hold it. Set `allowedModels` on each
   box, or a box answers that it holds any model and loads one on its first
   request. The model server admits only pods labelled `app: inference`, which
-  the inference pod is. Set `modelServer.enabled: false` to declare no model server.
+  the inference pod is. Set `modelServer.enabled: false` to declare no model
+  server.
 - **Your backends.** `backends` adds your own to the service's `BACKENDS`
   setting, in YAML, such as an LLM.
 - **LLM and the agentic labeler.** A backend of `kind: openai` is an LLM

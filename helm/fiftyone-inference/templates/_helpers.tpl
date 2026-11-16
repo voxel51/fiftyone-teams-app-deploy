@@ -96,13 +96,14 @@ BACKENDS: the shipped model server backend, unless off, then yours.
 {{- $endpoints = append $endpoints (dict "url" .) }}
 {{- end }}
 {{- /* The service keeps the last of two backends with one id, so a second
-model-server would take over the shipped models */}}
+model-server would take over the shipped backend */}}
 {{- range .Values.backends }}
 {{- if and (kindIs "map" .) (eq (.id | default "") "model-server") }}
 {{- fail "backends: the id model-server is the shipped model server backend's: name yours otherwise, or set modelServer.enabled to false" }}
 {{- end }}
 {{- end }}
-{{- $shipped := .Files.Get "catalog/model-server.yaml" | fromYaml }}
+{{- /* No models: the service reads them from the model servers */}}
+{{- $shipped := dict "id" "model-server" "kind" "model-server" "auth" (dict "mode" "none") }}
 {{- if .Values.modelServer.tokenSecret }}
 {{- /* The model servers' token, from MODEL_SERVER_TOKEN */}}
 {{- $_ := set $shipped "auth" (dict "mode" "bearer-token" "tokenEnv" "MODEL_SERVER_TOKEN") }}

@@ -146,7 +146,7 @@
       "properties": {
         "enabled": {
           "default": true,
-          "description": "Declare the model server backend this chart ships: every model the\nvoxel51 model server image serves (`catalog/model-server.yaml`). A chart\nupgrade brings the new ones. Off leaves only `backends`.",
+          "description": "Declare the model server backend: the service reads its models from\nthe model servers, so a model server upgrade brings the new ones. Off\nleaves only `backends`.",
           "title": "enabled",
           "type": "boolean"
         },

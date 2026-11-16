@@ -658,10 +658,11 @@ embeddings, similarity and segmentation, on a model server instead of in the
 FiftyOne Enterprise containers. With an LLM, it also runs the shared agentic
 labeling service. It ships in the `compose.inference.yaml` overlay, and
 calls the model server at `MODEL_SERVER_URL`: run one first, on this worker
-or another, as the [Model Server](#model-server) section says. The overlay
-declares every model the model server image serves (`MODEL_SERVER_PRELOAD`
-picks what loads at start, the others load on their first request), and a
-new release brings new ones.
+or another, as the [Model Server](#model-server) section says. The service
+reads the models from the model server: every model its image serves, or
+those in `MODEL_SERVER_ALLOWED_MODELS` when set (`MODEL_SERVER_PRELOAD` picks
+what loads at start, the others load on their first request). A new model
+server release brings new ones.
 
 1. Set these in `.env`:
 

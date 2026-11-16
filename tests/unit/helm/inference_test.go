@@ -560,7 +560,7 @@ func (s *inferenceTemplateTest) TestServiceTheTeamsAppCalls() {
 	s.Equal(deployment.Spec.Selector.MatchLabels, service.Spec.Selector)
 }
 
-// Every model the model server image serves, shipped with the chart
+// The model server backend, whose models the service reads from the boxes
 func (s *inferenceTemplateTest) TestShippedModelServerBackend() {
 	backendsFor := func(values map[string]string, json map[string]string) []map[string]any {
 		options := &helm.Options{SetValues: values, SetJsonValues: json}
@@ -570,16 +570,9 @@ func (s *inferenceTemplateTest) TestShippedModelServerBackend() {
 	}
 
 	shipped := backendsFor(withToken(nil), nil)[0]
-	var names []string
-	for _, model := range shipped["models"].([]any) {
-		names = append(names, model.(map[string]any)["name"].(string))
-	}
-	s.Equal([]string{
-		"qwen3-vl-embedding-2b-torch",
-		"segment-anything-2-hiera-large-image-torch",
-		"segment-anything-2-hiera-large-video-torch",
-		"siglip-base-patch16-224-torch",
-	}, names)
+	s.Equal("model-server", shipped["id"])
+	s.Equal("model-server", shipped["kind"])
+	s.NotContains(shipped, "models")
 	s.Equal(map[string]any{"mode": "none"}, shipped["auth"])
 
 	// One endpoint per pod of the model server release, in order
@@ -621,7 +614,7 @@ func (s *inferenceTemplateTest) TestShippedModelServerBackend() {
 	s.ErrorContains(err, "modelServer: no model server URL")
 
 	// The service keeps the last backend of an id, so a second model-server
-	// would take over the shipped models
+	// would take over the shipped backend
 	duplicate := withToken(map[string]string{
 		"backends[0].kind":    "model-server",
 		"backends[0].id":      "model-server",
