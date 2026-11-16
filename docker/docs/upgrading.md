@@ -19,6 +19,7 @@
 - [Upgrading From Previous Versions](#upgrading-from-previous-versions)
   - [A Note On Database Migrations](#a-note-on-database-migrations)
   - [From FiftyOne Enterprise Version 2.0.0 and Later](#from-fiftyone-enterprise-version-200-and-later)
+    - [FiftyOne Enterprise v2.28+ Inference Service](#fiftyone-enterprise-v228-inference-service)
     - [FiftyOne Enterprise v2.26+ Compose Files Moved to `docker/`](#fiftyone-enterprise-v226-compose-files-moved-to-docker)
     - [FiftyOne Enterprise v2.26+ Invitations and Service Accounts](#fiftyone-enterprise-v226-invitations-and-service-accounts)
     - [FiftyOne Enterprise v2.25+ Activity Analytics](#fiftyone-enterprise-v225-activity-analytics)
@@ -106,6 +107,29 @@ quickstart  0.21.2
    ```shell
    fiftyone migrate --info
    ```
+
+#### FiftyOne Enterprise v2.28+ Inference Service
+
+FiftyOne Enterprise v2.28.0 can send its model calls to an inference service:
+SAM2 segmentation, embeddings and the agentic labeler.
+The service and its model server come from two new compose files,
+`compose.inference.yaml` and `compose.model-server.yaml`.
+It is optional.
+Without them, FiftyOne Enterprise works as before.
+
+To move an existing deployment to the inference service:
+
+1. In `Settings -> Services`, stop the `annotation-ai` service,
+   and with an LLM the `agentic-labeler` service too.
+   A labeler service left running takes labeler runs.
+1. With an LLM, stop using `compose.agenticlabeler.yaml`.
+   Its GPU worker has the same name, `agentic-labeler`,
+   as the worker that runs labeler runs with the inference service.
+   Do not start the `agentic-labeler` service again:
+   it would run on that worker.
+1. Add the model server and the inference service,
+   as the [Model Server](../README.md#model-server)
+   and [Inference Service](../README.md#inference-service) sections say.
 
 #### FiftyOne Enterprise v2.26+ Compose Files Moved to `docker/`
 
