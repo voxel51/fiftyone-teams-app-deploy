@@ -29,7 +29,6 @@ jobs:
               - 'docker/*.yaml'
               - 'docker/env.template'
               - 'docker/migrate-volumes.sh'
-              - 'helm/fiftyone-inference/catalog/**'
               - 'tests/fixtures/docker/**'
               - 'tests/integration/compose/**'
               - 'tests/unit/compose/**'

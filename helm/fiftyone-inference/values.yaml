@@ -36,9 +36,9 @@ sharedToken:
   value: ""
 
 modelServer:
-  # -- Declare the model server backend this chart ships: every model the
-  # voxel51 model server image serves (`catalog/model-server.yaml`). A chart
-  # upgrade brings the new ones. Off leaves only `backends`.
+  # -- Declare the model server backend: the service reads its models from
+  # the model servers, so a model server upgrade brings the new ones. Off
+  # leaves only `backends`.
   enabled: true
   # @schema
   # type: string

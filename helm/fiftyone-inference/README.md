@@ -43,22 +43,22 @@ endpoint. Install this chart in the namespace of FiftyOne Enterprise.
   labeler and the FiftyOne Enterprise pods together: a caller with the old
   token is refused from the restart on. A change to `sharedToken.value`
   restarts the inference service and the labeler.
-- **Model servers.** The chart ships the declarations of every model the
-  voxel51 model server image serves (`catalog/model-server.yaml`), so a
-  chart upgrade brings new models with no values edit. It points them at
-  the fiftyone-model-server release `modelServer.name` in this namespace,
-  `model-server` by default, with `modelServer.replicas` pods, 1 by
-  default: one URL per pod, `http://<name>-<i>:8080` for i from 0. With
-  `modelServer.replicas: 3`, these are `http://model-server-0:8080`,
-  `http://model-server-1:8080` and `http://model-server-2:8080`. Set the same
-  `replicas` as that release. For model servers in another namespace or
-  cluster, list one URL per box in `modelServer.urls`, which is then used
-  instead. A box need not preload every
+- **Model servers.** The service reads the models from the model servers
+  (`GET /models`), so a model server upgrade brings new models with no values
+  edit. The chart points the service at the fiftyone-model-server release
+  `modelServer.name` in this namespace, `model-server` by default, with
+  `modelServer.replicas` pods, 1 by default: one URL per pod,
+  `http://<name>-<i>:8080` for i from 0. With `modelServer.replicas: 3`, these
+  are `http://model-server-0:8080`, `http://model-server-1:8080` and
+  `http://model-server-2:8080`. Set the same `replicas` as that release. For
+  model servers in another namespace or cluster, list one URL per box in
+  `modelServer.urls`, which is then used instead. A box need not preload every
   model: the service asks each box which models it holds (`GET /models`), and
   for each model prefers the boxes that hold it. Set `allowedModels` on each
   box, or a box answers that it holds any model and loads one on its first
   request. The model server admits only pods labelled `app: inference`, which
-  the inference pod is. Set `modelServer.enabled: false` to declare no model server.
+  the inference pod is. Set `modelServer.enabled: false` to declare no model
+  server.
 - **Your backends.** `backends` adds your own to the service's `BACKENDS`
   setting, in YAML, such as an LLM.
 - **LLM and the agentic labeler.** A backend of `kind: openai` is an LLM
@@ -306,7 +306,7 @@ Kubernetes: `>=1.31-0`
 | labeler.resources | object | `{"limits":{},"requests":{}}` | Labeler container resources. |
 | licenseSecrets | list | `["fiftyone-license"]` | Existing Secrets holding the FiftyOne Enterprise licenses, one per org, under the key `license`: the ones the fiftyone-teams-app chart mounts for CAS (its `fiftyoneLicenseSecrets`). Each call is admitted against the license of the org it names: unexpired, it admits every call, expired, none. A new org's license needs a restart. |
 | maxBodyBytes | int | `67108864` | Largest request body in bytes. Images are sent inline, so this is large. |
-| modelServer.enabled | bool | `true` | Declare the model server backend this chart ships: every model the voxel51 model server image serves (`catalog/model-server.yaml`). A chart upgrade brings the new ones. Off leaves only `backends`. |
+| modelServer.enabled | bool | `true` | Declare the model server backend: the service reads its models from the model servers, so a model server upgrade brings the new ones. Off leaves only `backends`. |
 | modelServer.name | string | `"model-server"` | Name of the fiftyone-model-server release in this namespace: its release name, or its `nameOverride`. |
 | modelServer.replicas | int | `1` | Its `replicas`. The model servers are then `http://<name>-<i>:8080` for i from 0, one per pod. |
 | modelServer.tokenSecret | string | `""` | Existing Secret holding the model servers' bearer token under the key `token`: the fiftyone-model-server chart's `token` (its Secret `<name>-token` from `token.value`, or your own). Empty: the model servers check no token. |

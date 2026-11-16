@@ -5,7 +5,6 @@ package unit
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -138,16 +137,10 @@ func TestDockerComposeInference(t *testing.T) {
 	}
 }
 
-// The compose overlay declares the same model server models as the Helm
-// chart's catalog, so the two cannot drift
-func TestDockerComposeInferenceCatalog(t *testing.T) {
+// The compose overlay declares the model server with no models: the service
+// reads them from it
+func TestDockerComposeInferenceModelServer(t *testing.T) {
 	t.Parallel()
-
-	raw, err := os.ReadFile("../../../helm/fiftyone-inference/catalog/model-server.yaml")
-	require.NoError(t, err)
-	var catalog map[string]any
-	require.NoError(t, yaml.Unmarshal(raw, &catalog))
-	require.NotEmpty(t, catalog["models"])
 
 	for _, dir := range inferenceComposeDirs {
 		project, err := inferenceProject(t, dir, inferenceEnv, nil)
@@ -158,19 +151,12 @@ func TestDockerComposeInferenceCatalog(t *testing.T) {
 		require.NoError(t, yaml.Unmarshal([]byte(*inference.Environment["BACKENDS"]), &backends), dir)
 
 		require.Len(t, backends, 1, dir)
-		// The chart adds the endpoints, compose names its one box. Both set
-		// the auth: without a token, the catalog's none, which an absent auth
-		// is too
-		require.Equal(t, map[string]any{"mode": "none"}, catalog["auth"])
+		require.Equal(t, "model-server", backends[0]["id"], dir)
+		require.Equal(t, "model-server", backends[0]["kind"], dir)
+		require.Equal(t, "http://model-server:8080", backends[0]["baseUrl"], dir)
+		// Without a token, an absent auth is none
 		require.Nil(t, backends[0]["auth"], dir)
-		delete(backends[0], "baseUrl")
-		delete(backends[0], "auth")
-		expected := map[string]any{}
-		for key, value := range catalog {
-			expected[key] = value
-		}
-		delete(expected, "auth")
-		require.Equal(t, expected, backends[0], dir)
+		require.NotContains(t, backends[0], "models", dir)
 	}
 }
 
