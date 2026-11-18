@@ -27,7 +27,7 @@ on:
         description: "Merged main PR number to cherry-pick"
         required: true
       release_branch:
-        description: "Target release branch, e.g. release/v2.26.0"
+        description: "Target release branch, e.g. release/v2.27.0"
         required: true
   # PRs come from branches in this repo,
   # so the pull_request trigger is enough.
