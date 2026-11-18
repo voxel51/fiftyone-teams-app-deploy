@@ -123,7 +123,7 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.26+ Legacy Authentication Mode Removed
 
-FiftyOne Enterprise v2.27.0 removes the `legacy` authentication mode.
+FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode.
 Every deployment uses the Central Authentication Service (CAS)
 with its users, roles, and groups stored in MongoDB.
 The chart no longer sets `casSettings.env.FIFTYONE_AUTH_MODE`,
@@ -142,7 +142,7 @@ Before you upgrade, update your `values.yaml`:
 
 #### FiftyOne Enterprise v2.26+ Invitations and Service Accounts
 
-FiftyOne Enterprise v2.27.0 changes how `teams-cas` stores invitations
+FiftyOne Enterprise v2.26.0 changes how `teams-cas` stores invitations
 and service accounts.
 
 **Upgrading needs no extra step.**

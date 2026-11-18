@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Replaces every reference to one release version with another,
-# like 2.25.2 with 2.27.0,
+# like 2.25.2 with 2.26.0,
 # in the chart, Docker Compose files, skaffold.yaml, and docs.
 # bump-fixtures.sh pins the integration test fixtures separately,
 # so this script leaves tests/fixtures alone.
@@ -23,7 +23,7 @@ print_usage() {
   echo "options:"
   echo "-h, --help               Show brief help"
   echo "-f, --from=FROM_VERSION  Version to replace (default: version in Chart.yaml)"
-  echo "-t, --to=TO_VERSION      New version, like 2.27.0 (required)"
+  echo "-t, --to=TO_VERSION      New version, like 2.26.0 (required)"
 }
 
 parse_arguments() {

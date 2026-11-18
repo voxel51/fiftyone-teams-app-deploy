@@ -109,7 +109,7 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.26+ Compose Files Moved to `docker/`
 
-FiftyOne Enterprise v2.27.0 removes the `legacy` authentication mode
+FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode
 and the `FIFTYONE_AUTH_MODE` environment variable.
 It also removes the `internal-auth` and `legacy-auth` directories
 and `common-services.yaml`.
@@ -330,7 +330,7 @@ To upgrade:
 
 #### FiftyOne Enterprise v2.26+ Invitations and Service Accounts
 
-FiftyOne Enterprise v2.27.0 changes how `teams-cas` stores invitations
+FiftyOne Enterprise v2.26.0 changes how `teams-cas` stores invitations
 and service accounts.
 
 **Upgrading needs no extra step.**
