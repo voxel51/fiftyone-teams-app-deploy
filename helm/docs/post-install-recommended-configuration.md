@@ -300,3 +300,6 @@ We recommend starting with these plugins:
 
 To use plugins with custom dependencies (e.g. `transformers`), build and use
 [Custom Plugin Images](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/docs/custom-plugins.md).
+
+If your plugins load scripts from a CDN or embed iframes, see
+[Configuring the Content Security Policy](../../docs/configuring-content-security-policy.md).

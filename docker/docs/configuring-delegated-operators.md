@@ -54,3 +54,6 @@ Set `FIFTYONE_DELEGATED_OPERATION_LOG_PATH` to `configured_path`.
 
 To use plugins with custom dependencies, build and use
 [Custom Plugins Images](../../docs/custom-plugins.md).
+
+If your plugins load scripts from a CDN or embed iframes, see
+[Configuring the Content Security Policy](../../docs/configuring-content-security-policy.md).
