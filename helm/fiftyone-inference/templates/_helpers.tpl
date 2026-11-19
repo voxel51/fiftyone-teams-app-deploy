@@ -82,6 +82,12 @@ BACKENDS: the shipped model server backend, unless off, then yours.
 {{- $backends := list }}
 {{- if .Values.modelServer.enabled }}
 {{- $urls := .Values.modelServer.urls | default list }}
+{{- if .Values.modelServer.endpointsSecret }}
+{{- if $urls }}
+{{- fail "modelServer: set urls or endpointsSecret, not both" }}
+{{- end }}
+{{- /* None here: the endpoint file lists them, and can drop any of them */}}
+{{- else }}
 {{- if not $urls }}
 {{- /* The fiftyone-model-server chart's Service per pod */}}
 {{- range $i := until (int .Values.modelServer.replicas) }}
@@ -90,6 +96,7 @@ BACKENDS: the shipped model server backend, unless off, then yours.
 {{- end }}
 {{- if not $urls }}
 {{- fail "modelServer: no model server URL. Set modelServer.replicas to at least 1, or modelServer.urls" }}
+{{- end }}
 {{- end }}
 {{- $endpoints := list }}
 {{- range $urls }}

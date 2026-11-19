@@ -644,6 +644,52 @@ func (s *inferenceTemplateTest) TestModelServerToken() {
 	s.NotContains(envOf(deployment.Spec.Template.Spec.Containers[0]), "MODEL_SERVER_TOKEN")
 }
 
+// Model servers behind a gateway, from an endpoint file the service re-reads
+func (s *inferenceTemplateTest) TestModelServersFromAnEndpointFile() {
+	deployment := s.deployment(withToken(map[string]string{
+		"modelServer.endpointsSecret": "gateway-endpoints",
+		"modelServer.tokenSecret":     "gateway-token",
+	}), "templates/deployment.yaml")
+	spec := deployment.Spec.Template.Spec
+	env := envOf(spec.Containers[0])
+
+	// No endpoint in BACKENDS: one named there could not be dropped by the file
+	shipped := backendsOf(env["BACKENDS"].Value)[0]
+	s.Equal("model-server", shipped["id"])
+	s.Equal([]any{}, shipped["endpoints"])
+	s.Equal(map[string]any{"mode": "bearer-token", "tokenEnv": "MODEL_SERVER_TOKEN"}, shipped["auth"])
+	s.Equal("/etc/inference/endpoints/endpoints.json", env["ENDPOINTS_FILE"].Value)
+
+	var mounted bool
+	for _, mount := range spec.Containers[0].VolumeMounts {
+		if mount.Name == "endpoints" {
+			mounted = true
+			s.Equal("/etc/inference/endpoints", mount.MountPath)
+		}
+	}
+	s.True(mounted)
+	var source string
+	for _, volume := range spec.Volumes {
+		if volume.Name == "endpoints" {
+			source = volume.Secret.SecretName
+			s.Equal("endpoints.json", volume.Secret.Items[0].Key)
+		}
+	}
+	s.Equal("gateway-endpoints", source)
+
+	// Without it, nothing of the file
+	plain := s.deployment(withToken(nil), "templates/deployment.yaml")
+	s.NotContains(envOf(plain.Spec.Template.Spec.Containers[0]), "ENDPOINTS_FILE")
+	s.Len(plain.Spec.Template.Spec.Volumes, 1)
+
+	// One source of boxes, not two
+	_, err := helm.RenderTemplateE(s.T(), &helm.Options{SetValues: withToken(map[string]string{
+		"modelServer.endpointsSecret": "gateway-endpoints",
+		"modelServer.urls[0]":         "http://box-a:8080",
+	})}, s.chartPath, s.releaseName, []string{"templates/deployment.yaml"})
+	s.ErrorContains(err, "modelServer: set urls or endpointsSecret, not both")
+}
+
 // At least one license
 func (s *inferenceTemplateTest) TestRefusesNoLicense() {
 	_, err := helm.RenderTemplateE(s.T(), &helm.Options{SetValues: withToken(nil), SetJsonValues: map[string]string{"licenseSecrets": "[]"}}, s.chartPath, s.releaseName, []string{})

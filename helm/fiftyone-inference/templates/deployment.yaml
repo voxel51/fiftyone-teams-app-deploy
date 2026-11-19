@@ -63,6 +63,11 @@ spec:
             - name: {{ $name }}
               value: {{ $value | quote }}
             {{- end }}
+            {{- if and .Values.modelServer.enabled .Values.modelServer.endpointsSecret }}
+            # Re-read every 15 s, so a box list change needs no restart
+            - name: ENDPOINTS_FILE
+              value: /etc/inference/endpoints/endpoints.json
+            {{- end }}
             {{- if and .Values.modelServer.enabled .Values.modelServer.tokenSecret }}
             # The model servers' bearer token
             - name: MODEL_SERVER_TOKEN
@@ -103,7 +108,20 @@ spec:
             - name: license
               mountPath: /opt/fiftyone/licenses
               readOnly: true
+            {{- if and .Values.modelServer.enabled .Values.modelServer.endpointsSecret }}
+            - name: endpoints
+              mountPath: /etc/inference/endpoints
+              readOnly: true
+            {{- end }}
       volumes:
+        {{- if and .Values.modelServer.enabled .Values.modelServer.endpointsSecret }}
+        - name: endpoints
+          secret:
+            secretName: {{ .Values.modelServer.endpointsSecret }}
+            items:
+              - key: endpoints.json
+                path: endpoints.json
+        {{- end }}
         # One file per org, /opt/fiftyone/licenses/<Secret>
         - name: license
           projected:
