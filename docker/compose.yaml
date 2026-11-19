@@ -72,6 +72,9 @@ services:
       # enqueues activity events here. Unset = bridged events are dropped.
       FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
       FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
+      # How much of Settings > Billing teams-api serves: full, status (no
+      # invoice estimate) or off. See docs/configuring-billing-reporting.md.
+      FIFTYONE_BILLING_REPORTING: ${FIFTYONE_BILLING_REPORTING:-full}
       FIFTYONE_SERVICE_POD_READY_TIMEOUT_S: ${FIFTYONE_SERVICE_POD_READY_TIMEOUT_S:-1800}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
       GRAPHQL_DEFAULT_LIMIT: ${GRAPHQL_DEFAULT_LIMIT}
