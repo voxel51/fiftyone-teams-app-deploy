@@ -68,6 +68,13 @@ modelServer:
   # -- The model servers, one URL per box, used instead of `name` and
   # `replicas` when set: for model servers in another namespace or cluster.
   urls: []
+  # -- Existing Secret holding the model servers in an endpoint file, under
+  # the key `endpoints.json`, used instead of `name`, `replicas` and `urls`
+  # when set: for model servers behind a gateway. The service re-reads it, so
+  # a box list change needs no restart. Each entry names the backend
+  # `model-server`:
+  # `{"endpoints": [{"id": "box-0", "backend": "model-server", "url": "http://..."}]}`.
+  endpointsSecret: ""
 
 # @schema
 # type: array

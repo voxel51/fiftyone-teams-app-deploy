@@ -150,6 +150,12 @@
           "title": "enabled",
           "type": "boolean"
         },
+        "endpointsSecret": {
+          "default": "",
+          "description": "Existing Secret holding the model servers in an endpoint file, under\nthe key `endpoints.json`, used instead of `name`, `replicas` and `urls`\nwhen set: for model servers behind a gateway. The service re-reads it, so\na box list change needs no restart. Each entry names the backend\n`model-server`:\n`{\"endpoints\": [{\"id\": \"box-0\", \"backend\": \"model-server\", \"url\": \"http://...\"}]}`.",
+          "title": "endpointsSecret",
+          "type": "string"
+        },
         "name": {
           "default": "model-server",
           "description": "Name of the fiftyone-model-server release in this namespace: its\nrelease name, or its `nameOverride`.",
