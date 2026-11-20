@@ -1,0 +1,147 @@
+{{- $persistence := .Values.weights.persistence }}
+{{- if and $persistence.enabled $persistence.existingClaim (gt (int .Values.replicas) 1) }}
+{{- fail "weights.persistence.existingClaim takes one pod: a ReadWriteOnce claim cannot be shared. Leave it empty for a claim per pod" }}
+{{- end }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "model-server.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "model-server.labels" . | nindent 4 }}
+spec:
+  # Each pod is a box with its own Service: the inference service limits runs
+  # per box and keeps a video propagation on the box that started it
+  replicas: {{ .Values.replicas }}
+  serviceName: {{ include "model-server.name" . }}-headless
+  # All pods start at once: one slow model load does not hold up the others
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      {{- include "model-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.token.value }}
+        # The token is read at start only
+        checksum/token: {{ . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "model-server.labels" . | nindent 8 }}
+    spec:
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
+      {{- with .Values.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: model-server
+          image: {{ printf "%s:%s" (required "image.repository is required" .Values.image.repository) (required "image.tag is required" .Values.image.tag) | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "model-server.name" . }}
+          {{- with include "model-server.tokenSecret" . }}
+          env:
+            # Every call but the probes then needs it as a bearer
+            - name: MODEL_SERVER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key: token
+          {{- end }}
+          {{- /* gpu.count wins over a nvidia.com/gpu set in resources */}}
+          {{- $resources := deepCopy (.Values.resources | default dict) }}
+          {{- if .Values.gpu.enabled }}
+          {{- $_ := set $resources "limits" (merge (dict "nvidia.com/gpu" .Values.gpu.count) ($resources.limits | default dict)) }}
+          {{- $_ := set $resources "requests" (merge (dict "nvidia.com/gpu" .Values.gpu.count) ($resources.requests | default dict)) }}
+          {{- end }}
+          {{- with $resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: weights
+              mountPath: /models
+          # Nothing listens until the preload is done, downloads included
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+          # 503 after repeated GPU out of memory errors, so a sick box restarts
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 30
+            failureThreshold: 3
+          # 503 while nothing is loaded
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+      {{- if not (and $persistence.enabled (not $persistence.existingClaim)) }}
+      volumes:
+        - name: weights
+          {{- if $persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $persistence.existingClaim }}
+          {{- else if .Values.weights.sizeLimit }}
+          emptyDir:
+            sizeLimit: {{ .Values.weights.sizeLimit }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- end }}
+  {{- if and $persistence.enabled (not $persistence.existingClaim) }}
+  # A claim per pod, weights-<name>-<i>. Scaling in keeps the claims, and
+  # scaling out again reuses them
+  volumeClaimTemplates:
+    - metadata:
+        name: weights
+        # Selector labels only: a claim template cannot change, so no chart
+        # version here
+        labels:
+          {{- include "model-server.selectorLabels" . | nindent 10 }}
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- with $persistence.storageClass }}
+        storageClassName: {{ . | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ $persistence.size }}
+  {{- end }}
