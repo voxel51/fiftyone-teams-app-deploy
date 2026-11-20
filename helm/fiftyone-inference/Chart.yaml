@@ -1,0 +1,13 @@
+---
+apiVersion: v2
+name: fiftyone-inference
+description: |
+  The FiftyOne inference service: FiftyOne Enterprise sends it embeddings,
+  predictions, segmentation and LLM calls, and it routes them to model servers
+  and to your LLM endpoint. With an LLM, it also runs the shared agentic
+  labeling service.
+type: application
+version: 0.1.0
+appVersion: "v2.25.1"
+icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
+kubeVersion: ">=1.31-0"
