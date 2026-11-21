@@ -627,12 +627,18 @@ for questions regarding storage and encryption.
 
 ### Billing Page
 
-Deployments with a usage-based billing license show admins a
-Settings → Billing page with the reporting status, the current quarter's
-invoice estimate, and the reporting actions.
-Set `FIFTYONE_BILLING_REPORTING` in `apiSettings.env` to `status` to hide the
-estimate, or to `off` to hide the page and refuse its reads and actions in
-`teams-api`.
+Deployments with a usage-based billing license
+show admins a Settings → Billing page.
+The page shows the reporting status,
+the current quarter's invoice estimate,
+and the reporting actions.
+
+To limit what the page shows,
+set `FIFTYONE_BILLING_REPORTING` in `apiSettings.env` to one of these values:
+
+- `status` hides the invoice estimate.
+- `off` hides the page,
+  and `teams-api` refuses its reads and actions.
 
 Please refer to the
 [billing page configuration documentation](https://github.com/voxel51/fiftyone-teams-app-deploy/blob/main/helm/docs/configuring-billing-reporting.md)
