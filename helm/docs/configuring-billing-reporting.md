@@ -14,35 +14,55 @@
 
 # Configuring the Billing Page
 
-Deployments with a usage-based billing license get a **Settings > Billing**
-page in the FiftyOne Enterprise App. Admins see the reporting status, the
-current quarter's invoice estimate, and the reporting actions: submit a usage
-report now, or, on air-gapped deployments, download the usage report and
-upload the enablement token Customer Success returns.
+Deployments with a usage-based billing license
+get a **Settings > Billing** page in the FiftyOne Enterprise App.
+On this page, admins see:
 
-`FIFTYONE_BILLING_REPORTING` on `teams-api` sets how much of that page the
-deployment serves:
+- The reporting status
+- The current quarter's invoice estimate
+- The reporting actions:
+  - Submit a usage report now
+  - On air-gapped deployments,
+    download the usage report
+    and upload the enablement token that Customer Success sends back
 
-| Value            | Settings > Billing                                    | `teams-api`                                                                   |
-| ---------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `full` (default) | Status, invoice estimate and reporting actions        | Serves everything                                                             |
-| `status`         | Status and reporting actions, without the estimate    | Never returns the invoice estimate                                            |
-| `off`            | Hidden from the settings navigation, with its queries | Refuses the billing details query and the submit, download and upload actions |
+`FIFTYONE_BILLING_REPORTING` on `teams-api`
+sets how much of that page the deployment serves:
 
-`teams-api` enforces the value, so the API refuses the same reads and actions
-the page hides. An unrecognized value is treated as `off`.
+| Value            | Settings > Billing                                       | `teams-api`                                                                    |
+| ---------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `full` (default) | Shows status, invoice estimate, and reporting actions    | Serves everything                                                              |
+| `status`         | Shows status and reporting actions, but no estimate      | Never returns the invoice estimate                                             |
+| `off`            | Hidden from the settings menu, and its queries don't run | Refuses the billing details query and the submit, download, and upload actions |
 
-The setting does not change usage reporting itself: `teams-cas` keeps
-reporting on its normal schedule, and admins still see the banner when the
-enablement token is due for renewal or has expired.
+`teams-api` enforces the value,
+so the API refuses the same reads and actions that the page hides.
+`teams-api` treats an unrecognized value as `off`.
 
-## Setting it
+The setting doesn't change usage reporting itself.
+`teams-cas` keeps reporting on its normal schedule.
+Admins still see the banner
+when the enablement token is due for renewal or has expired.
 
-Set the value in `apiSettings.env` in your `values.yaml`, then upgrade the
-release:
+## Set the value
+
+Set the value in `apiSettings.env` in your `values.yaml`:
 
 ```yaml
 apiSettings:
   env:
-    FIFTYONE_BILLING_REPORTING: status
+    FIFTYONE_BILLING_REPORTING: <BILLING_VALUE>
 ```
+
+Then upgrade the release:
+
+```shell
+helm upgrade fiftyone-teams-app voxel51/fiftyone-teams-app \
+  --namespace your-namespace-here \
+  --version your-current-chart-version-here \
+  -f ./values.yaml
+```
+
+Keep `--version` at the chart version you already run.
+Without it, Helm upgrades to the latest chart version.
+To find your current version, run `helm list --namespace your-namespace-here`.

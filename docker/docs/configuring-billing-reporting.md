@@ -14,36 +14,58 @@
 
 # Configuring the Billing Page
 
-Deployments with a usage-based billing license get a **Settings > Billing**
-page in the FiftyOne Enterprise App. Admins see the reporting status, the
-current quarter's invoice estimate, and the reporting actions: submit a usage
-report now, or, on air-gapped deployments, download the usage report and
-upload the enablement token Customer Success returns.
+Deployments with a usage-based billing license
+get a **Settings > Billing** page in the FiftyOne Enterprise App.
+On this page, admins see:
 
-`FIFTYONE_BILLING_REPORTING` on `teams-api` sets how much of that page the
-deployment serves:
+- The reporting status
+- The current quarter's invoice estimate
+- The reporting actions:
+  - Submit a usage report now
+  - On air-gapped deployments,
+    download the usage report
+    and upload the enablement token that Customer Success sends back
 
-| Value            | Settings > Billing                                    | `teams-api`                                                                   |
-| ---------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `full` (default) | Status, invoice estimate and reporting actions        | Serves everything                                                             |
-| `status`         | Status and reporting actions, without the estimate    | Never returns the invoice estimate                                            |
-| `off`            | Hidden from the settings navigation, with its queries | Refuses the billing details query and the submit, download and upload actions |
+The `teams-api` service environment variable `FIFTYONE_BILLING_REPORTING`
+sets how much the billing page shows:
 
-`teams-api` enforces the value, so the API refuses the same reads and actions
-the page hides. An unrecognized value is treated as `off`.
+| Value            | Settings > Billing                                       | `teams-api`                                                                    |
+| ---------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `full` (default) | Shows status, invoice estimate, and reporting actions    | Serves everything                                                              |
+| `status`         | Shows status and reporting actions, but no estimate      | Never returns the invoice estimate                                             |
+| `off`            | Hidden from the settings menu, and its queries don't run | Refuses the billing details query and the submit, download, and upload actions |
 
-The setting does not change usage reporting itself: `teams-cas` keeps
-reporting on its normal schedule, and admins still see the banner when the
-enablement token is due for renewal or has expired.
+`teams-api` enforces the value,
+so the API refuses the same reads and actions that the page hides.
+`teams-api` treats an unrecognized value as `off`.
 
-## Setting it
+The setting doesn't change usage reporting itself.
+`teams-cas` keeps reporting on its normal schedule.
+Admins still see the banner
+when the enablement token is due for renewal or has expired.
 
-Set the value in your `.env` file, then recreate `teams-api`:
+## Set the value
+
+Set the value in your `.env` file:
 
 ```shell
-FIFTYONE_BILLING_REPORTING=status
+FIFTYONE_BILLING_REPORTING=<BILLING_VALUE>
 ```
 
+Then run your usual `docker compose ... up -d` command
+with the same `-f` files you deploy with.
+Docker Compose recreates `teams-api` with the new value.
+For example, with dedicated plugins:
+
 ```shell
-docker compose up -d teams-api
+docker compose \
+  -f compose.yaml \
+  -f compose.dedicated-plugins.yaml \
+  -f compose.override.yaml \
+  up -d
 ```
+
+If you leave out the `-f` files,
+Docker Compose loads only `compose.yaml` and `compose.override.yaml`.
+On a deployment with plugins,
+that recreates `teams-api` without its plugin settings.
