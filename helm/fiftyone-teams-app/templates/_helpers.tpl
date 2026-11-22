@@ -382,6 +382,7 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- include "activity.enabled-env" . }}
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
+{{- include "workflows.schedule-api-uri-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -443,6 +444,7 @@ Create a merged list of environment variables for fiftyone-app
 {{- include "activity.enabled-env" . }}
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
+{{- include "workflows.schedule-enabled-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -564,6 +566,7 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 {{- include "activity.enabled-env" . }}
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
+{{- include "workflows.schedule-enabled-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -618,11 +621,7 @@ Create a merged list of environment variables for fiftyone-teams-app
 - name: FIFTYONE_TEAMS_PROXY_URL
   value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
 - name: FIFTYONE_TEAMS_PLUGIN_URL
-{{- if .Values.pluginsSettings.enabled }}
-  value: {{ printf "http://%s:%.0f" .Values.pluginsSettings.service.name (float64 .Values.pluginsSettings.service.port) | quote }}
-{{- else }}
-  value: {{ printf "http://%s:%.0f" .Values.appSettings.service.name (float64 .Values.appSettings.service.port) | quote }}
-{{- end }}
+  value: {{ include "fiftyone-teams-app.plugin-server-url" . | quote }}
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
 {{- range $key, $val := .Values.teamsAppSettings.env }}

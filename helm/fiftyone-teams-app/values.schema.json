@@ -4753,6 +4753,27 @@
       "required": [],
       "title": "telemetry",
       "type": "object"
+    },
+    "workflowSettings": {
+      "description": "Annotation workflows.",
+      "properties": {
+        "schedules": {
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Controls whether workflows can run on a schedule. When `true`,\n`teams-api` runs the sweep that fires the workflows *On Schedule* stage,\nposting each due tick to the in-cluster plugin server\n(`FIFTYONE_WORKFLOW_SCHEDULE_API_URI`: `teams-plugins` when\n`pluginsSettings.enabled`, otherwise `fiftyone-app`), and `fiftyone-app`\nand `teams-plugins` offer that stage\n(`FIFTYONE_WORKFLOW_SCHEDULE_ENABLED`). When `false`, the stage is not\noffered and nothing is swept. Requires `fiftyone-app`, `teams-api` and\n`teams-cas` images that include the feature. No additional secret is\nneeded: each tick runs as the user who started the workflow.",
+              "title": "enabled",
+              "type": "boolean"
+            }
+          },
+          "required": [],
+          "title": "schedules",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "workflowSettings",
+      "type": "object"
     }
   },
   "required": [],
