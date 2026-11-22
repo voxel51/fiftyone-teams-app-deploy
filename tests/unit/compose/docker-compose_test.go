@@ -350,6 +350,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"FIFTYONE_WORKFLOW_SCHEDULE_ENABLED=",
 			},
 		},
 		{
@@ -373,6 +374,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"FIFTYONE_WORKFLOW_SCHEDULE_API_URI=",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
 				"MONGO_DEFAULT_DB=fiftyone",
@@ -442,6 +444,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"FIFTYONE_WORKFLOW_SCHEDULE_ENABLED=",
 			},
 		},
 		{
@@ -465,6 +468,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"FIFTYONE_WORKFLOW_SCHEDULE_API_URI=",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
 				"MONGO_DEFAULT_DB=fiftyone",
@@ -534,6 +538,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SIGNED_URL_EXPIRATION=24",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"FIFTYONE_WORKFLOW_SCHEDULE_ENABLED=",
 			},
 		},
 		{
@@ -557,6 +562,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_SERVICE_POD_READY_TIMEOUT_S=1800",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"FIFTYONE_WORKFLOW_SCHEDULE_API_URI=",
 				"GRAPHQL_DEFAULT_LIMIT=10",
 				"LOGGING_LEVEL=INFO",
 				"MONGO_DEFAULT_DB=fiftyone",
@@ -625,6 +631,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"FIFTYONE_ACTIVITY_ORG_ID=",
 				"FIFTYONE_MQ_REDIS_URL=redis://fiftyone-mq-redis:6379/0",
 				"FIFTYONE_TELEMETRY_REDIS_URL=redis://telemetry-redis:6379",
+				"FIFTYONE_WORKFLOW_SCHEDULE_ENABLED=",
 			},
 		},
 		{
