@@ -75,6 +75,12 @@ modelServer:
   # `model-server`:
   # `{"endpoints": [{"id": "box-0", "backend": "model-server", "url": "http://..."}]}`.
   endpointsSecret: ""
+  # -- Find the model servers by DNS instead of `replicas`, `urls` or
+  # `endpointsSecret`: each ready pod of the release `name`'s headless
+  # Service `<name>-headless` is a box, so pods its autoscaler adds and
+  # removes join and leave the pool with no change here. Needs an inference
+  # image with ENDPOINTS_DNS.
+  dns: false
 
 # @schema
 # type: array

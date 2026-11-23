@@ -144,6 +144,12 @@
     },
     "modelServer": {
       "properties": {
+        "dns": {
+          "default": false,
+          "description": "Find the model servers by DNS instead of `replicas`, `urls` or\n`endpointsSecret`: each ready pod of the release `name`'s headless\nService `\u003cname\u003e-headless` is a box, so pods its autoscaler adds and\nremoves join and leave the pool with no change here. Needs an inference\nimage with ENDPOINTS_DNS.",
+          "title": "dns",
+          "type": "boolean"
+        },
         "enabled": {
           "default": true,
           "description": "Declare the model server backend: the service reads its models from\nthe model servers, so a model server upgrade brings the new ones. Off\nleaves only `backends`.",

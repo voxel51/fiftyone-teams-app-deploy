@@ -68,6 +68,12 @@ spec:
             - name: ENDPOINTS_FILE
               value: /etc/inference/endpoints/endpoints.json
             {{- end }}
+            {{- if and .Values.modelServer.enabled .Values.modelServer.dns }}
+            # Each ready pod of the model server's headless Service is a box,
+            # resolved again every 10 s, as an autoscaler adds and removes them
+            - name: ENDPOINTS_DNS
+              value: {{ list (dict "backend" "model-server" "host" (printf "%s-headless" .Values.modelServer.name) "port" 8080) | toJson | quote }}
+            {{- end }}
             {{- if and .Values.modelServer.enabled .Values.modelServer.tokenSecret }}
             # The model servers' bearer token
             - name: MODEL_SERVER_TOKEN

@@ -52,7 +52,10 @@ endpoint. Install this chart in the namespace of FiftyOne Enterprise.
   are `http://model-server-0:8080`, `http://model-server-1:8080` and
   `http://model-server-2:8080`. Set the same `replicas` as that release. For
   model servers in another namespace or cluster, list one URL per box in
-  `modelServer.urls`, which is then used instead. A box need not preload every
+  `modelServer.urls`, which is then used instead. With the model server
+  chart's `autoscaling`, set `modelServer.dns` instead: each ready pod of its
+  headless Service is a box, so pods it adds and removes join and leave the
+  pool with no change here. A box need not preload every
   model: the service asks each box which models it holds (`GET /models`), and
   for each model prefers the boxes that hold it. Set `allowedModels` on each
   box, or a box answers that it holds any model and loads one on its first
@@ -306,6 +309,7 @@ Kubernetes: `>=1.31-0`
 | labeler.resources | object | `{"limits":{},"requests":{}}` | Labeler container resources. |
 | licenseSecrets | list | `["fiftyone-license"]` | Existing Secrets holding the FiftyOne Enterprise licenses, one per org, under the key `license`: the ones the fiftyone-teams-app chart mounts for CAS (its `fiftyoneLicenseSecrets`). Each call is admitted against the license of the org it names: unexpired, it admits every call, expired, none. A new org's license needs a restart. |
 | maxBodyBytes | int | `67108864` | Largest request body in bytes. Images are sent inline, so this is large. |
+| modelServer.dns | bool | `false` | Find the model servers by DNS instead of `replicas`, `urls` or `endpointsSecret`: each ready pod of the release `name`'s headless Service `<name>-headless` is a box, so pods its autoscaler adds and removes join and leave the pool with no change here. Needs an inference image with ENDPOINTS_DNS. |
 | modelServer.enabled | bool | `true` | Declare the model server backend: the service reads its models from the model servers, so a model server upgrade brings the new ones. Off leaves only `backends`. |
 | modelServer.endpointsSecret | string | `""` | Existing Secret holding the model servers in an endpoint file, under the key `endpoints.json`, used instead of `name`, `replicas` and `urls` when set: for model servers behind a gateway. The service re-reads it, so a box list change needs no restart. Each entry names the backend `model-server`: `{"endpoints": [{"id": "box-0", "backend": "model-server", "url": "http://..."}]}`. |
 | modelServer.name | string | `"model-server"` | Name of the fiftyone-model-server release in this namespace: its release name, or its `nameOverride`. |

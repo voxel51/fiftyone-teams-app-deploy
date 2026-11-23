@@ -82,11 +82,15 @@ BACKENDS: the shipped model server backend, unless off, then yours.
 {{- $backends := list }}
 {{- if .Values.modelServer.enabled }}
 {{- $urls := .Values.modelServer.urls | default list }}
-{{- if .Values.modelServer.endpointsSecret }}
-{{- if $urls }}
-{{- fail "modelServer: set urls or endpointsSecret, not both" }}
+{{- $sources := 0 }}
+{{- if $urls }}{{ $sources = add1 $sources }}{{ end }}
+{{- if .Values.modelServer.endpointsSecret }}{{ $sources = add1 $sources }}{{ end }}
+{{- if .Values.modelServer.dns }}{{ $sources = add1 $sources }}{{ end }}
+{{- if gt $sources 1 }}
+{{- fail "modelServer: set one of urls, endpointsSecret or dns" }}
 {{- end }}
-{{- /* None here: the endpoint file lists them, and can drop any of them */}}
+{{- if or .Values.modelServer.endpointsSecret .Values.modelServer.dns }}
+{{- /* None here: the endpoint file or DNS lists them, and can drop any */}}
 {{- else }}
 {{- if not $urls }}
 {{- /* The fiftyone-model-server chart's Service per pod */}}

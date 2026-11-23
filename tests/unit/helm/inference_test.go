@@ -687,7 +687,39 @@ func (s *inferenceTemplateTest) TestModelServersFromAnEndpointFile() {
 		"modelServer.endpointsSecret": "gateway-endpoints",
 		"modelServer.urls[0]":         "http://box-a:8080",
 	})}, s.chartPath, s.releaseName, []string{"templates/deployment.yaml"})
-	s.ErrorContains(err, "modelServer: set urls or endpointsSecret, not both")
+	s.ErrorContains(err, "modelServer: set one of urls, endpointsSecret or dns")
+}
+
+// Model servers found by DNS, as an autoscaler adds and removes them
+func (s *inferenceTemplateTest) TestModelServersByDns() {
+	deployment := s.deployment(withToken(map[string]string{
+		"modelServer.dns":  "true",
+		"modelServer.name": "gpu",
+	}), "templates/deployment.yaml")
+	env := envOf(deployment.Spec.Template.Spec.Containers[0])
+
+	// No endpoint in BACKENDS: DNS lists them, and drops any
+	s.Equal([]any{}, backendsOf(env["BACKENDS"].Value)[0]["endpoints"])
+	var targets []map[string]any
+	s.Require().NoError(json.Unmarshal([]byte(env["ENDPOINTS_DNS"].Value), &targets))
+	s.Equal([]map[string]any{{"backend": "model-server", "host": "gpu-headless", "port": float64(8080)}}, targets)
+
+	// Off, nothing of it
+	plain := s.deployment(withToken(nil), "templates/deployment.yaml")
+	s.NotContains(envOf(plain.Spec.Template.Spec.Containers[0]), "ENDPOINTS_DNS")
+
+	// One source of boxes
+	for _, other := range []map[string]string{
+		{"modelServer.urls[0]": "http://box-a:8080"},
+		{"modelServer.endpointsSecret": "gateway-endpoints"},
+	} {
+		values := withToken(map[string]string{"modelServer.dns": "true"})
+		for key, value := range other {
+			values[key] = value
+		}
+		_, err := helm.RenderTemplateE(s.T(), &helm.Options{SetValues: values}, s.chartPath, s.releaseName, []string{"templates/deployment.yaml"})
+		s.ErrorContains(err, "modelServer: set one of urls, endpointsSecret or dns")
+	}
 }
 
 // At least one license
