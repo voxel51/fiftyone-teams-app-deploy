@@ -37,6 +37,15 @@
       "title": "automountServiceAccountToken",
       "type": "boolean"
     },
+    "declarations": {
+      "description": "Declarations of zoo models the image does not declare, in the fields of\nthe model server's `catalog.py` (`name`, `tasks` and the rest): the\ninference service adds them to its catalog, and the App lists them, with\nno rebuild. One named as a built-in replaces it. Allow each in\n`allowedModels` when that is set. See the README for an example.",
+      "items": {
+        "required": [],
+        "type": "object"
+      },
+      "title": "declarations",
+      "type": "array"
+    },
     "env": {
       "description": "Environment variables, by name. The defaults are the SAM2 video\nsettings of the SaaS boxes: frames decoded on demand rather than the whole\nclip, and the propagation and cache sizes of a 48 GB GPU. Set one to `null`\nto drop it.",
       "properties": {

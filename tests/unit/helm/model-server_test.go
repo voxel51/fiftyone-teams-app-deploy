@@ -130,11 +130,13 @@ func (s *modelServerTemplateTest) TestRefusesWhatCannotWork() {
 func (s *modelServerTemplateTest) TestSettings() {
 	var config corev1.ConfigMap
 	helm.UnmarshalK8SYaml(s.T(), s.render(minimal(map[string]string{
-		"preload[1]":              "qwen3-vl-embedding-2b-torch",
-		"allowedModels[0]":        "siglip-base-patch16-224-torch",
-		"allowedMediaPrefixes[0]": "gs://media",
-		"maxLoadedModels":         "3",
-		"env.EXTRA":               "on",
+		"preload[1]":               "qwen3-vl-embedding-2b-torch",
+		"allowedModels[0]":         "siglip-base-patch16-224-torch",
+		"allowedMediaPrefixes[0]":  "gs://media",
+		"maxLoadedModels":          "3",
+		"env.EXTRA":                "on",
+		"declarations[0].name":     "clip-vit-base32-torch",
+		"declarations[0].tasks[0]": "embedding",
 	}), "templates/configmap.yaml"), &config)
 
 	s.Equal(`["siglip-base-patch16-224-torch","qwen3-vl-embedding-2b-torch"]`, config.Data["MODEL_SERVER_PRELOAD"])
@@ -147,6 +149,7 @@ func (s *modelServerTemplateTest) TestSettings() {
 	s.Equal("/models/hf", config.Data["HF_HOME"])
 	s.Equal("/models/torch", config.Data["TORCH_HOME"])
 	s.Equal("on", config.Data["EXTRA"])
+	s.Equal(`[{"name":"clip-vit-base32-torch","tasks":["embedding"]}]`, config.Data["MODEL_SERVER_DECLARATIONS"])
 	// SAM2 video as on the SaaS boxes
 	s.Equal("1", config.Data["FIFTYONE_SAM2_LAZY_FRAMES"])
 	s.Equal("4", config.Data["FIFTYONE_SAM2_PROPAGATION_CONCURRENCY"])

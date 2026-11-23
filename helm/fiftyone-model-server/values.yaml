@@ -52,6 +52,18 @@ allowedMediaPrefixes: []
 # -- Models kept loaded at once, least recently used evicted first.
 maxLoadedModels: 6
 
+# @schema
+# type: array
+# items:
+#   type: object
+# @schema
+# -- Declarations of zoo models the image does not declare, in the fields of
+# the model server's `catalog.py` (`name`, `tasks` and the rest): the
+# inference service adds them to its catalog, and the App lists them, with
+# no rebuild. One named as a built-in replaces it. Allow each in
+# `allowedModels` when that is set. See the README for an example.
+declarations: []
+
 # -- Environment variables, by name. The defaults are the SAM2 video
 # settings of the SaaS boxes: frames decoded on demand rather than the whole
 # clip, and the propagation and cache sizes of a 48 GB GPU. Set one to `null`

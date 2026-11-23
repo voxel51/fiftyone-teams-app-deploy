@@ -74,6 +74,8 @@ func TestDockerComposeModelServer(t *testing.T) {
 		require.Equal(t, "[]", *service.Environment["MODEL_SERVER_ALLOWED_MODEL_KWARGS"])
 		require.Equal(t, "[]", *service.Environment["MODEL_SERVER_ALLOWED_MEDIA_PREFIXES"])
 		require.Equal(t, "6", *service.Environment["MODEL_SERVER_MAX_LOADED_MODELS"])
+		// No model besides the image's
+		require.Equal(t, "[]", *service.Environment["MODEL_SERVER_DECLARATIONS"])
 		// SAM2 video as on the SaaS boxes
 		require.Equal(t, "1", *service.Environment["FIFTYONE_SAM2_LAZY_FRAMES"])
 		require.Equal(t, "4", *service.Environment["FIFTYONE_SAM2_PROPAGATION_CONCURRENCY"])
@@ -107,6 +109,7 @@ func TestDockerComposeModelServer(t *testing.T) {
 			`MODEL_SERVER_ALLOWED_MEDIA_PREFIXES=["https://minio.internal"]`,
 			"MODEL_SERVER_MAX_LOADED_MODELS=2",
 			"MODEL_SERVER_TOKEN=test-model-server-token",
+			`MODEL_SERVER_DECLARATIONS=[{"name":"clip-vit-base32-torch","tasks":["embedding"]}]`,
 			"FIFTYONE_SAM2_LAZY_FRAMES=0",
 			"FIFTYONE_SAM2_PROPAGATION_CONCURRENCY=1",
 			"FIFTYONE_SAM2_VIDEO_CACHE_SIZE=1",
@@ -121,6 +124,7 @@ func TestDockerComposeModelServer(t *testing.T) {
 		require.Equal(t, `["classes"]`, *service.Environment["MODEL_SERVER_ALLOWED_MODEL_KWARGS"])
 		require.Equal(t, `["https://minio.internal"]`, *service.Environment["MODEL_SERVER_ALLOWED_MEDIA_PREFIXES"])
 		require.Equal(t, "2", *service.Environment["MODEL_SERVER_MAX_LOADED_MODELS"])
+		require.Equal(t, `[{"name":"clip-vit-base32-torch","tasks":["embedding"]}]`, *service.Environment["MODEL_SERVER_DECLARATIONS"])
 		require.Equal(t, "test-model-server-token", *service.Environment["MODEL_SERVER_TOKEN"])
 		require.Equal(t, "0", *service.Environment["FIFTYONE_SAM2_LAZY_FRAMES"])
 		require.Equal(t, "1", *service.Environment["FIFTYONE_SAM2_PROPAGATION_CONCURRENCY"])

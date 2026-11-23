@@ -75,6 +75,36 @@ helm install model-server ./helm/fiftyone-model-server \
   --set 'preload[0]=siglip-base-patch16-224-torch'
 ```
 
+## Serve another zoo model
+
+The image declares the models it ships with. To serve another zoo model,
+declare it in `declarations`, and add it to `allowedModels` when that is set:
+a model left out of that list leaves the catalog. The inference service adds
+it to its catalog within about a minute, and the App lists it, with no
+rebuild. CLIP as an embedding model, beside the image's models:
+
+```yaml
+allowedModels:
+  - clip-vit-base32-torch
+  - qwen3-vl-embedding-2b-torch
+  - segment-anything-2-hiera-large-image-torch
+  - segment-anything-2-hiera-large-video-torch
+  - siglip-base-patch16-224-torch
+declarations:
+  - name: clip-vit-base32-torch
+    tasks: [embedding, prediction]
+    dimensions: 512
+    maxMediaPerRequest: 32
+    supportsText: true
+    supportsLogits: true
+    modelKwargs: [classes, text_prompt]
+    tags: [embeddings, zero-shot]
+```
+
+It works for zoo models whose task the model server runs (embedding,
+prediction, propagation) and whose packages are in the image. The model
+server refuses to start on a name the zoo lacks or a task it does not run.
+
 ## Requirements
 
 Kubernetes: `>=1.31-0`
@@ -90,6 +120,7 @@ Kubernetes: `>=1.31-0`
 | allowedModelKwargs | list | `[]` | Model arguments this box passes to the zoo loader. Empty means any. Set it when anything besides the inference service can reach the box: some loader arguments are filesystem paths. |
 | allowedModels | list | `[]` | Models this box serves at all. Empty means any zoo model, which lets a caller fill the disk with weights. Set it to the same list as the inference service declares for this box. |
 | automountServiceAccountToken | bool | `false` | Mount the service account token. Off: the model server calls no Kubernetes API. |
+| declarations | list | `[]` | Declarations of zoo models the image does not declare, in the fields of the model server's `catalog.py` (`name`, `tasks` and the rest): the inference service adds them to its catalog, and the App lists them, with no rebuild. One named as a built-in replaces it. Allow each in `allowedModels` when that is set. See the README for an example. |
 | env | object | `{"FIFTYONE_SAM2_FEATURE_CACHE_SIZE":"16","FIFTYONE_SAM2_LAZY_FRAMES":"1","FIFTYONE_SAM2_PROPAGATION_CONCURRENCY":"4","FIFTYONE_SAM2_VIDEO_CACHE_SIZE":"4"}` | Environment variables, by name. The defaults are the SAM2 video settings of the SaaS boxes: frames decoded on demand rather than the whole clip, and the propagation and cache sizes of a 48 GB GPU. Set one to `null` to drop it. |
 | gpu.count | int | `1` | GPUs requested when `gpu.enabled`. |
 | gpu.enabled | bool | `false` | Request GPUs. Off runs on CPU, which is enough for small models such as SigLIP and too slow for SAM2 or video. |

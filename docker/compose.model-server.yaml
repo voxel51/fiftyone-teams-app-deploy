@@ -41,6 +41,9 @@ services:
       MODEL_SERVER_TOKEN: ${MODEL_SERVER_TOKEN:-}
       # Models kept loaded at once, least recently used evicted first
       MODEL_SERVER_MAX_LOADED_MODELS: ${MODEL_SERVER_MAX_LOADED_MODELS:-6}
+      # JSON list of zoo models the image does not declare, which the
+      # inference service then adds with no rebuild
+      MODEL_SERVER_DECLARATIONS: '${MODEL_SERVER_DECLARATIONS:-[]}'
       # SAM2 video as on the SaaS boxes: frames decoded on demand rather
       # than the whole clip, and the propagation and cache sizes of a 48 GB
       # GPU

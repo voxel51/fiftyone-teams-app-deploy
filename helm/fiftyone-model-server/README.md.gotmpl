@@ -72,6 +72,36 @@ helm install model-server ./helm/fiftyone-model-server \
   --set 'preload[0]=siglip-base-patch16-224-torch'
 ```
 
+## Serve another zoo model
+
+The image declares the models it ships with. To serve another zoo model,
+declare it in `declarations`, and add it to `allowedModels` when that is set:
+a model left out of that list leaves the catalog. The inference service adds
+it to its catalog within about a minute, and the App lists it, with no
+rebuild. CLIP as an embedding model, beside the image's models:
+
+```yaml
+allowedModels:
+  - clip-vit-base32-torch
+  - qwen3-vl-embedding-2b-torch
+  - segment-anything-2-hiera-large-image-torch
+  - segment-anything-2-hiera-large-video-torch
+  - siglip-base-patch16-224-torch
+declarations:
+  - name: clip-vit-base32-torch
+    tasks: [embedding, prediction]
+    dimensions: 512
+    maxMediaPerRequest: 32
+    supportsText: true
+    supportsLogits: true
+    modelKwargs: [classes, text_prompt]
+    tags: [embeddings, zero-shot]
+```
+
+It works for zoo models whose task the model server runs (embedding,
+prediction, propagation) and whose packages are in the image. The model
+server refuses to start on a name the zoo lacks or a task it does not run.
+
 {{ template "chart.requirementsSection" . }}
 
 ## Values
