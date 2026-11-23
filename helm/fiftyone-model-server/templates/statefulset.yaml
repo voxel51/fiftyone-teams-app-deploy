@@ -1,5 +1,5 @@
 {{- $persistence := .Values.weights.persistence }}
-{{- if and $persistence.enabled $persistence.existingClaim (gt (int .Values.replicas) 1) }}
+{{- if and $persistence.enabled $persistence.existingClaim (gt (int (include "model-server.maxPods" .)) 1) }}
 {{- fail "weights.persistence.existingClaim takes one pod: a ReadWriteOnce claim cannot be shared. Leave it empty for a claim per pod" }}
 {{- end }}
 apiVersion: apps/v1
@@ -12,7 +12,9 @@ metadata:
 spec:
   # Each pod is a box with its own Service: the inference service limits runs
   # per box and keeps a video propagation on the box that started it
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicas }}
+  {{- end }}
   serviceName: {{ include "model-server.name" . }}-headless
   # All pods start at once: one slow model load does not hold up the others
   podManagementPolicy: Parallel
@@ -57,6 +59,8 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      # Runs in flight finish before the pod is killed
+      terminationGracePeriodSeconds: {{ .Values.drain.terminationGracePeriodSeconds }}
       containers:
         - name: model-server
           image: {{ printf "%s:%s" (required "image.repository is required" .Values.image.repository) (required "image.tag is required" .Values.image.tag) | quote }}
@@ -90,6 +94,14 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+          {{- if gt (int .Values.drain.preStopSeconds) 0 }}
+          lifecycle:
+            # Already out of the Services and their DNS: callers stop sending
+            # new work before the server stops taking connections
+            preStop:
+              sleep:
+                seconds: {{ .Values.drain.preStopSeconds }}
+          {{- end }}
           volumeMounts:
             - name: weights
               mountPath: /models

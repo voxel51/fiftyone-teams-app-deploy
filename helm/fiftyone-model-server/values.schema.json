@@ -37,6 +37,50 @@
       "title": "automountServiceAccountToken",
       "type": "boolean"
     },
+    "autoscaling": {
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Scale the pods with a HorizontalPodAutoscaler instead of `replicas`.\nPoint the inference chart at them by DNS (`modelServer.dns`), so boxes\njoin and leave its pool as they come and go.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "maxReplicas": {
+          "default": 4,
+          "description": "Most pods. A Service `\u003cname\u003e-\u003ci\u003e` exists for each, ready for the pod.",
+          "minimum": 1,
+          "title": "maxReplicas",
+          "type": "integer"
+        },
+        "metrics": {
+          "description": "Metrics to scale on instead, as the HorizontalPodAutoscaler's\n`metrics` (autoscaling/v2). Pod or external metrics, such as GPU use,\nneed a metrics adapter in the cluster.",
+          "items": {
+            "required": [],
+            "type": "object"
+          },
+          "title": "metrics",
+          "type": "array"
+        },
+        "minReplicas": {
+          "default": 1,
+          "description": "Fewest pods.",
+          "minimum": 1,
+          "title": "minReplicas",
+          "type": "integer"
+        },
+        "targetCPUUtilizationPercentage": {
+          "default": 70,
+          "description": "Average CPU use to keep across pods, in percent of each pod's CPU\nrequest, which `resources` must then set. Used when `metrics` is empty.",
+          "maximum": 100,
+          "minimum": 1,
+          "title": "targetCPUUtilizationPercentage",
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "title": "autoscaling",
+      "type": "object"
+    },
     "declarations": {
       "description": "Declarations of zoo models the image does not declare, in the fields of\nthe model server's `catalog.py` (`name`, `tasks` and the rest): the\ninference service adds them to its catalog, and the App lists them, with\nno rebuild. One named as a built-in replaces it. Allow each in\n`allowedModels` when that is set. See the README for an example.",
       "items": {
@@ -45,6 +89,27 @@
       },
       "title": "declarations",
       "type": "array"
+    },
+    "drain": {
+      "properties": {
+        "preStopSeconds": {
+          "default": 45,
+          "description": "Seconds a stopping pod keeps serving before it stops taking new\nconnections: callers that find boxes by DNS stop sending it new work\nfirst. Longer than the inference service's DNS refresh (10 s) plus the\ncluster DNS cache (often 30 s).",
+          "minimum": 0,
+          "title": "preStopSeconds",
+          "type": "integer"
+        },
+        "terminationGracePeriodSeconds": {
+          "default": 600,
+          "description": "Seconds a stopping pod gets to finish what it is running, video\npropagations included, before it is killed.",
+          "minimum": 0,
+          "title": "terminationGracePeriodSeconds",
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "title": "drain",
+      "type": "object"
     },
     "env": {
       "description": "Environment variables, by name. The defaults are the SAM2 video\nsettings of the SaaS boxes: frames decoded on demand rather than the whole\nclip, and the propagation and cache sizes of a 48 GB GPU. Set one to `null`\nto drop it.",
@@ -248,7 +313,7 @@
     },
     "replicas": {
       "default": 1,
-      "description": "Model server pods. Each is its own box, reached at its own Service\n`\u003cname\u003e-\u003ci\u003e` (`http://\u003cname\u003e-\u003ci\u003e:8080`, i from 0): list every URL in the\ninference chart. Not autoscaled.",
+      "description": "Model server pods. Each is its own box, reached at its own Service\n`\u003cname\u003e-\u003ci\u003e` (`http://\u003cname\u003e-\u003ci\u003e:8080`, i from 0): list every URL in the\ninference chart. Ignored with `autoscaling.enabled`.",
       "minimum": 1,
       "title": "replicas",
       "type": "integer"

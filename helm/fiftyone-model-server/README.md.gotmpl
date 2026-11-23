@@ -72,6 +72,29 @@ helm install model-server ./helm/fiftyone-model-server \
   --set 'preload[0]=siglip-base-patch16-224-torch'
 ```
 
+## Autoscaling
+
+With `autoscaling.enabled`, a HorizontalPodAutoscaler sets the number of
+pods, between `autoscaling.minReplicas` and `autoscaling.maxReplicas`, on
+CPU use by default (set a CPU request in `resources`) or on
+`autoscaling.metrics`. Point the inference chart at the pods by DNS
+(`modelServer.dns`): it resolves the headless Service `<name>-headless`,
+which lists the ready pods, so new pods join its pool and leaving ones
+drop out with no change to its values.
+
+A pod that stops, scaled in or replaced, first waits `drain.preStopSeconds`
+while callers stop sending it new work, then finishes what it is running,
+for up to `drain.terminationGracePeriodSeconds`.
+
+Turning `autoscaling.enabled` on for a release that ran with `replicas`
+stops every pod but the first: the upgrade removes the StatefulSet's
+replica count, which then defaults to 1, and the others drain and restart
+with their models loading again. An `autoscaling.minReplicas` at least the
+old `replicas` brings them back as soon as they have stopped, rather than
+when load calls for them. Upgrade at a quiet time. Rollouts
+replace one pod at a time, each waiting for its runs, so allow
+`helm upgrade --wait` a longer `--timeout` than its 5 minutes.
+
 ## Serve another zoo model
 
 The image declares the models it ships with. To serve another zoo model,

@@ -9,8 +9,61 @@ nameOverride: ""
 # @schema
 # -- Model server pods. Each is its own box, reached at its own Service
 # `<name>-<i>` (`http://<name>-<i>:8080`, i from 0): list every URL in the
-# inference chart. Not autoscaled.
+# inference chart. Ignored with `autoscaling.enabled`.
 replicas: 1
+
+autoscaling:
+  # -- Scale the pods with a HorizontalPodAutoscaler instead of `replicas`.
+  # Point the inference chart at them by DNS (`modelServer.dns`), so boxes
+  # join and leave its pool as they come and go.
+  enabled: false
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Fewest pods.
+  minReplicas: 1
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Most pods. A Service `<name>-<i>` exists for each, ready for the pod.
+  maxReplicas: 4
+  # @schema
+  # type: integer
+  # minimum: 1
+  # maximum: 100
+  # @schema
+  # -- Average CPU use to keep across pods, in percent of each pod's CPU
+  # request, which `resources` must then set. Used when `metrics` is empty.
+  targetCPUUtilizationPercentage: 70
+  # @schema
+  # type: array
+  # items:
+  #   type: object
+  # @schema
+  # -- Metrics to scale on instead, as the HorizontalPodAutoscaler's
+  # `metrics` (autoscaling/v2). Pod or external metrics, such as GPU use,
+  # need a metrics adapter in the cluster.
+  metrics: []
+
+drain:
+  # @schema
+  # type: integer
+  # minimum: 0
+  # @schema
+  # -- Seconds a stopping pod keeps serving before it stops taking new
+  # connections: callers that find boxes by DNS stop sending it new work
+  # first. Longer than the inference service's DNS refresh (10 s) plus the
+  # cluster DNS cache (often 30 s).
+  preStopSeconds: 45
+  # @schema
+  # type: integer
+  # minimum: 0
+  # @schema
+  # -- Seconds a stopping pod gets to finish what it is running, video
+  # propagations included, before it is killed.
+  terminationGracePeriodSeconds: 600
 
 image:
   # @schema

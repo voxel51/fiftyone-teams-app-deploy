@@ -75,6 +75,29 @@ helm install model-server ./helm/fiftyone-model-server \
   --set 'preload[0]=siglip-base-patch16-224-torch'
 ```
 
+## Autoscaling
+
+With `autoscaling.enabled`, a HorizontalPodAutoscaler sets the number of
+pods, between `autoscaling.minReplicas` and `autoscaling.maxReplicas`, on
+CPU use by default (set a CPU request in `resources`) or on
+`autoscaling.metrics`. Point the inference chart at the pods by DNS
+(`modelServer.dns`): it resolves the headless Service `<name>-headless`,
+which lists the ready pods, so new pods join its pool and leaving ones
+drop out with no change to its values.
+
+A pod that stops, scaled in or replaced, first waits `drain.preStopSeconds`
+while callers stop sending it new work, then finishes what it is running,
+for up to `drain.terminationGracePeriodSeconds`.
+
+Turning `autoscaling.enabled` on for a release that ran with `replicas`
+stops every pod but the first: the upgrade removes the StatefulSet's
+replica count, which then defaults to 1, and the others drain and restart
+with their models loading again. An `autoscaling.minReplicas` at least the
+old `replicas` brings them back as soon as they have stopped, rather than
+when load calls for them. Upgrade at a quiet time. Rollouts
+replace one pod at a time, each waiting for its runs, so allow
+`helm upgrade --wait` a longer `--timeout` than its 5 minutes.
+
 ## Serve another zoo model
 
 The image declares the models it ships with. To serve another zoo model,
@@ -120,7 +143,14 @@ Kubernetes: `>=1.31-0`
 | allowedModelKwargs | list | `[]` | Model arguments this box passes to the zoo loader. Empty means any. Set it when anything besides the inference service can reach the box: some loader arguments are filesystem paths. |
 | allowedModels | list | `[]` | Models this box serves at all. Empty means any zoo model, which lets a caller fill the disk with weights. Set it to the same list as the inference service declares for this box. |
 | automountServiceAccountToken | bool | `false` | Mount the service account token. Off: the model server calls no Kubernetes API. |
+| autoscaling.enabled | bool | `false` | Scale the pods with a HorizontalPodAutoscaler instead of `replicas`. Point the inference chart at them by DNS (`modelServer.dns`), so boxes join and leave its pool as they come and go. |
+| autoscaling.maxReplicas | int | `4` | Most pods. A Service `<name>-<i>` exists for each, ready for the pod. |
+| autoscaling.metrics | list | `[]` | Metrics to scale on instead, as the HorizontalPodAutoscaler's `metrics` (autoscaling/v2). Pod or external metrics, such as GPU use, need a metrics adapter in the cluster. |
+| autoscaling.minReplicas | int | `1` | Fewest pods. |
+| autoscaling.targetCPUUtilizationPercentage | int | `70` | Average CPU use to keep across pods, in percent of each pod's CPU request, which `resources` must then set. Used when `metrics` is empty. |
 | declarations | list | `[]` | Declarations of zoo models the image does not declare, in the fields of the model server's `catalog.py` (`name`, `tasks` and the rest): the inference service adds them to its catalog, and the App lists them, with no rebuild. One named as a built-in replaces it. Allow each in `allowedModels` when that is set. See the README for an example. |
+| drain.preStopSeconds | int | `45` | Seconds a stopping pod keeps serving before it stops taking new connections: callers that find boxes by DNS stop sending it new work first. Longer than the inference service's DNS refresh (10 s) plus the cluster DNS cache (often 30 s). |
+| drain.terminationGracePeriodSeconds | int | `600` | Seconds a stopping pod gets to finish what it is running, video propagations included, before it is killed. |
 | env | object | `{"FIFTYONE_SAM2_FEATURE_CACHE_SIZE":"16","FIFTYONE_SAM2_LAZY_FRAMES":"1","FIFTYONE_SAM2_PROPAGATION_CONCURRENCY":"4","FIFTYONE_SAM2_VIDEO_CACHE_SIZE":"4"}` | Environment variables, by name. The defaults are the SAM2 video settings of the SaaS boxes: frames decoded on demand rather than the whole clip, and the propagation and cache sizes of a 48 GB GPU. Set one to `null` to drop it. |
 | gpu.count | int | `1` | GPUs requested when `gpu.enabled`. |
 | gpu.enabled | bool | `false` | Request GPUs. Off runs on CPU, which is enough for small models such as SigLIP and too slow for SAM2 or video. |
@@ -136,7 +166,7 @@ Kubernetes: `>=1.31-0`
 | podAnnotations | object | `{}` | Pod annotations. |
 | podSecurityContext | object | `{}` | Pod security context. |
 | preload | list | `[]` | Models loaded at startup, by zoo name. Required: `/readyz` answers 503 until one is loaded, so with none the pod never becomes Ready. Name the models the inference service routes to this box. |
-| replicas | int | `1` | Model server pods. Each is its own box, reached at its own Service `<name>-<i>` (`http://<name>-<i>:8080`, i from 0): list every URL in the inference chart. Not autoscaled. |
+| replicas | int | `1` | Model server pods. Each is its own box, reached at its own Service `<name>-<i>` (`http://<name>-<i>:8080`, i from 0): list every URL in the inference chart. Ignored with `autoscaling.enabled`. |
 | resources | object | `{"limits":{},"requests":{}}` | Container resources. With `gpu.enabled`, `nvidia.com/gpu` is set to `gpu.count` in requests and limits. |
 | securityContext | object | `{}` | Container security context. |
 | service.annotations | object | `{}` | Service annotations, such as `networking.gke.io/load-balancer-type: Internal`. |

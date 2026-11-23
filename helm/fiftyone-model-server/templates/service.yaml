@@ -18,7 +18,7 @@ spec:
     - name: http
       port: 8080
       targetPort: http
-{{- range $i := until (int .Values.replicas) }}
+{{- range $i := until (int (include "model-server.maxPods" .)) }}
 ---
 # One Service per box, <name>-<i>, so a caller reaches the box it means
 apiVersion: v1

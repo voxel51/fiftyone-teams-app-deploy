@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	appsv1 "k8s.io/api/apps/v1"
+	autoscalingv2 "k8s.io/api/autoscaling/v2"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -282,6 +283,76 @@ func (s *modelServerTemplateTest) TestWeightsOnAClaimPerPod() {
 	existing["replicas"] = "2"
 	_, err := helm.RenderTemplateE(s.T(), &helm.Options{SetValues: existing}, s.chartPath, s.releaseName, []string{})
 	s.ErrorContains(err, "weights.persistence.existingClaim takes one pod")
+
+	// Nor shared by the pods an autoscaler may start
+	existing["replicas"] = "1"
+	existing["autoscaling.enabled"] = "true"
+	existing["autoscaling.maxReplicas"] = "2"
+	_, err = helm.RenderTemplateE(s.T(), &helm.Options{SetValues: existing}, s.chartPath, s.releaseName, []string{})
+	s.ErrorContains(err, "weights.persistence.existingClaim takes one pod")
+}
+
+// Autoscaled, the HorizontalPodAutoscaler owns the pod count, and every pod
+// it may start has its Service ready
+func (s *modelServerTemplateTest) TestAutoscaling() {
+	values := minimal(map[string]string{
+		"autoscaling.enabled":     "true",
+		"autoscaling.minReplicas": "2",
+		"autoscaling.maxReplicas": "5",
+		"replicas":                "1",
+	})
+	var set appsv1.StatefulSet
+	helm.UnmarshalK8SYaml(s.T(), s.render(values, "templates/statefulset.yaml"), &set)
+	s.Nil(set.Spec.Replicas)
+	s.Len(s.services(values), 5+1)
+
+	var hpa autoscalingv2.HorizontalPodAutoscaler
+	helm.UnmarshalK8SYaml(s.T(), s.render(values, "templates/hpa.yaml"), &hpa)
+	s.Equal("StatefulSet", hpa.Spec.ScaleTargetRef.Kind)
+	s.Equal(set.Name, hpa.Spec.ScaleTargetRef.Name)
+	s.Equal(int32(2), *hpa.Spec.MinReplicas)
+	s.Equal(int32(5), hpa.Spec.MaxReplicas)
+	s.Equal(corev1.ResourceCPU, hpa.Spec.Metrics[0].Resource.Name)
+	s.Equal(int32(70), *hpa.Spec.Metrics[0].Resource.Target.AverageUtilization)
+
+	// Metrics of its own replace CPU
+	custom := &helm.Options{SetValues: values, SetJsonValues: map[string]string{
+		"autoscaling.metrics": `[{"type":"Pods","pods":{"metric":{"name":"busy_runs"},"target":{"type":"AverageValue","averageValue":"2"}}}]`,
+	}}
+	var own autoscalingv2.HorizontalPodAutoscaler
+	helm.UnmarshalK8SYaml(s.T(), helm.RenderTemplate(s.T(), custom, s.chartPath, s.releaseName, []string{"templates/hpa.yaml"}), &own)
+	s.Len(own.Spec.Metrics, 1)
+	s.Equal("busy_runs", own.Spec.Metrics[0].Pods.Metric.Name)
+
+	// Off, none is rendered
+	_, err := helm.RenderTemplateE(s.T(), &helm.Options{SetValues: minimal(nil)}, s.chartPath, s.releaseName, []string{"templates/hpa.yaml"})
+	s.ErrorContains(err, "could not find template")
+
+	// Not a load balancer per pod it may start
+	lb := minimal(map[string]string{
+		"autoscaling.enabled":                 "true",
+		"service.type":                        "LoadBalancer",
+		"service.loadBalancerSourceRanges[0]": "10.0.0.0/8",
+	})
+	_, err = helm.RenderTemplateE(s.T(), &helm.Options{SetValues: lb}, s.chartPath, s.releaseName, []string{})
+	s.ErrorContains(err, "autoscaling with a LoadBalancer")
+
+	// A range the autoscaler cannot keep
+	values["autoscaling.maxReplicas"] = "1"
+	_, err = helm.RenderTemplateE(s.T(), &helm.Options{SetValues: values}, s.chartPath, s.releaseName, []string{})
+	s.ErrorContains(err, "autoscaling.maxReplicas must be at least autoscaling.minReplicas")
+}
+
+// A stopping pod finishes its runs, and leaves DNS before it stops serving
+func (s *modelServerTemplateTest) TestDrain() {
+	var set appsv1.StatefulSet
+	helm.UnmarshalK8SYaml(s.T(), s.render(minimal(nil), "templates/statefulset.yaml"), &set)
+	s.Equal(int64(600), *set.Spec.Template.Spec.TerminationGracePeriodSeconds)
+	s.Equal(int64(45), set.Spec.Template.Spec.Containers[0].Lifecycle.PreStop.Sleep.Seconds)
+
+	var immediate appsv1.StatefulSet
+	helm.UnmarshalK8SYaml(s.T(), s.render(minimal(map[string]string{"drain.preStopSeconds": "0"}), "templates/statefulset.yaml"), &immediate)
+	s.Nil(immediate.Spec.Template.Spec.Containers[0].Lifecycle)
 }
 
 // Each pod is a box with its own Service

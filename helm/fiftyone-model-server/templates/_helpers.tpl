@@ -30,3 +30,20 @@ The Secret holding the bearer token, under the key "token", or nothing.
 {{- printf "%s-token" (include "model-server.name" .) }}
 {{- end }}
 {{- end }}
+
+{{/*
+How many pods may exist: each gets its own Service.
+*/}}
+{{- define "model-server.maxPods" -}}
+{{- if .Values.autoscaling.enabled }}
+{{- if eq .Values.service.type "LoadBalancer" }}
+{{- fail "autoscaling with a LoadBalancer would make a load balancer per pod it may start: autoscaled pods are found by DNS inside the cluster" }}
+{{- end }}
+{{- if lt (int .Values.autoscaling.maxReplicas) (int .Values.autoscaling.minReplicas) }}
+{{- fail "autoscaling.maxReplicas must be at least autoscaling.minReplicas" }}
+{{- end }}
+{{- .Values.autoscaling.maxReplicas | int }}
+{{- else }}
+{{- .Values.replicas | int }}
+{{- end }}
+{{- end }}
