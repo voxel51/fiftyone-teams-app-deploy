@@ -30,5 +30,14 @@
 To use these instructions, you will need Auth0 information and
 Docker Hub credentials provided by Voxel51.
 
+## Using an AI Coding Agent
+
+This repo includes an [`AGENTS.md`](./AGENTS.md) runbook for AI coding agents
+(Claude Code, Codex, Cursor, Gemini CLI, etc.) helping you deploy or upgrade.
+Point your agent at this repo and see
+[How to invoke this runbook](./AGENTS.md#how-to-invoke-this-runbook) for
+example prompts — following it directly avoids common gaps like skipped
+delegated operators or plugin configuration.
+
 If you are interested in FiftyOne Enterprise, please contact
 [Voxel51](https://voxel51.com/book-a-demo).
