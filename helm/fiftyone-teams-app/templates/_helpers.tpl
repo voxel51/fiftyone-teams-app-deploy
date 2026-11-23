@@ -383,6 +383,7 @@ Create a merged list of environment variables for fiftyone-teams-api
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
 {{- include "workflows.schedule-api-uri-env" . }}
+{{- include "workflows.trigger-api-uri-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -445,6 +446,7 @@ Create a merged list of environment variables for fiftyone-app
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
 {{- include "workflows.schedule-enabled-env" . }}
+{{- include "workflows.dataset-events-enabled-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
@@ -567,6 +569,7 @@ Create a merged list of environment variables for fiftyone-teams-plugins
 {{- include "activity.mongo-db-env" . }}
 {{- include "activity.org-id-env" . }}
 {{- include "workflows.schedule-enabled-env" . }}
+{{- include "workflows.dataset-events-enabled-env" . }}
 - name: FIFTYONE_DATABASE_URI
   valueFrom:
     secretKeyRef:
