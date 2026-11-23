@@ -256,6 +256,32 @@
               "required": [],
               "title": "rollup",
               "type": "object"
+            },
+            "trigger": {
+              "properties": {
+                "command": {
+                  "description": "Entrypoint for the trigger worker, which delivers dataset events\nto annotation workflows. Rendered only when\n`workflowSettings.datasetEvents.enabled`.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "command",
+                  "type": "array"
+                },
+                "replicaCount": {
+                  "default": 1,
+                  "description": "Number of trigger worker replicas.",
+                  "title": "replicaCount",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "trigger",
+              "type": "object"
             }
           },
           "required": [],
@@ -4757,6 +4783,19 @@
     "workflowSettings": {
       "description": "Annotation workflows.",
       "properties": {
+        "datasetEvents": {
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "Controls whether workflows can react to their dataset changing (the\n*On Samples Added to Dataset* and *On Samples Deleted* stages). When\n`true`, the Activity Core ingest and rollup workers publish sample\nchanges for workflows (`FIFTYONE_ACTIVITY_WORKFLOWS_TOPIC_ENABLED`), a\ntrigger worker is rendered that posts each batch to `teams-api`,\n`teams-api` runs it on the in-cluster plugin server as the user who\nstarted the workflow (`FIFTYONE_WORKFLOW_TRIGGER_API_URI`), and\n`fiftyone-app` and `teams-plugins` offer those stages\n(`FIFTYONE_WORKFLOW_DATASET_EVENTS_ENABLED`). When `false`, the stages\nare not offered and nothing is delivered. Requires\n`activitySettings.enabled`, `activitySettings.watch.enabled` and a\nMongoDB replica set. No additional secret is needed: the trigger worker\nnames itself to `teams-api` with `secret.fiftyone.fiftyoneAuthSecret`.",
+              "title": "enabled",
+              "type": "boolean"
+            }
+          },
+          "required": [],
+          "title": "datasetEvents",
+          "type": "object"
+        },
         "schedules": {
           "properties": {
             "enabled": {
