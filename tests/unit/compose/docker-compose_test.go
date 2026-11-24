@@ -616,7 +616,7 @@ func (s *dockerComposeTest) TestServiceEnvironment() {
 				"API_URL=http://teams-api:8000",
 				"FIFTYONE_AUTH_SECRET=test-fiftyone-auth-secret",
 				"FIFTYONE_CAS_PUBLIC_URL=https://example.fiftyone.ai/cas/api",
-				"FIFTYONE_CAS_SERVICE_AUTH_MODE=insecure-dev",
+				"FIFTYONE_CAS_SERVICE_AUTH_MODE=insecure-dev", // pragma: allowlist secret
 				"FIFTYONE_CAS_URL=http://teams-cas:3000/cas/api",
 				"FIFTYONE_DATABASE_ADMIN=false",
 				"FIFTYONE_DATABASE_NAME=fiftyone",
