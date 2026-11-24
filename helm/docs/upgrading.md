@@ -161,6 +161,11 @@ To move an existing deployment to the inference service:
    the runs of the stopped services cannot be deleted.
    Do not start those services again: they have no orchestrator left.
 
+Upgrade the fiftyone-model-server and fiftyone-inference releases
+with `--reset-then-reuse-values` (Helm 3.14 or later), not `--reuse-values`.
+`--reuse-values` keeps your values but not the defaults a new chart version adds,
+so the upgrade fails to render.
+
 #### FiftyOne Enterprise v2.26+ Legacy Authentication Mode Removed
 
 FiftyOne Enterprise v2.26.0 removes the `legacy` authentication mode.
