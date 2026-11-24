@@ -2606,11 +2606,11 @@ func (s *deploymentTeamsAppTemplateTest) TestActivityFlagIsNotMisspelled() {
 // TestChartRendersNoUIFlags pins that the chart sets neither UI flag on
 // teams-app, with Activity Core on or off.
 //
-// VFF_WF_METRIC gates nothing from v2.27.0: the Metrics tab is always shown.
-// VFF_WF_ACTIVITY defaults on in the v2.27.0+ app code, so rendering it
+// VFF_WF_METRIC gates nothing from v2.27.1: the Metrics tab is always shown.
+// VFF_WF_ACTIVITY defaults on in the v2.27.1+ app code, so rendering it
 // "true" adds nothing there -- and against a v2.25.x image it would reveal
 // the workflow Activity debug tab and its raw event log, which were deleted
-// in v2.27.0. Leaving both unset is right for every image.
+// in v2.27.1. Leaving both unset is right for every image.
 func (s *deploymentTeamsAppTemplateTest) TestChartRendersNoUIFlags() {
 	for name, setValues := range map[string]map[string]string{
 		"default": {},
