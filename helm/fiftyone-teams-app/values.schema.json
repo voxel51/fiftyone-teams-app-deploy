@@ -152,6 +152,12 @@
               "description": "Controls whether the rollup worker watches the FiftyOne database's\nchange stream, recording writes no service reported (such as direct\ndatabase edits). Needs a replica set; on a standalone MongoDB it records\nnothing and logs why.",
               "title": "enabled",
               "type": "boolean"
+            },
+            "pollFallback": {
+              "default": false,
+              "description": "Controls whether the rollup worker falls back to scanning for changed\nsamples every 60 seconds when MongoDB is not a replica set\n(`FIFTYONE_ACTIVITY_WATCH_POLL_ENABLED`). A development fallback: it\nsees no deletes and no field-level detail, and edits between two scans\ncount once. With `workflowSettings.datasetEvents.enabled`, it is also\nwhat tells a workflow that samples were added, up to a minute late. Has\nno effect on a replica set, where the change stream is used. Run a\nreplica set in production instead.",
+              "title": "pollFallback",
+              "type": "boolean"
             }
           },
           "required": [],

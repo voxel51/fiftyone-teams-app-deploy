@@ -61,6 +61,15 @@ activitySettings:
     # database edits). Needs a replica set; on a standalone MongoDB it records
     # nothing and logs why.
     enabled: true
+    # -- Controls whether the rollup worker falls back to scanning for changed
+    # samples every 60 seconds when MongoDB is not a replica set
+    # (`FIFTYONE_ACTIVITY_WATCH_POLL_ENABLED`). A development fallback: it
+    # sees no deletes and no field-level detail, and edits between two scans
+    # count once. With `workflowSettings.datasetEvents.enabled`, it is also
+    # what tells a workflow that samples were added, up to a minute late. Has
+    # no effect on a replica set, where the change stream is used. Run a
+    # replica set in production instead.
+    pollFallback: false
   # -- Resources for the worker containers. [Reference][resources].
   resources:
     requests:

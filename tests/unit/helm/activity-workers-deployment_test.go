@@ -300,6 +300,37 @@ func (s *activityWorkersDeploymentTemplateTest) TestRollupWatchesByDefault() {
 	}
 }
 
+// The standalone-MongoDB fallback is a development aid, so it is off unless
+// asked for, and only the worker that hosts the watch can run it.
+func (s *activityWorkersDeploymentTemplateTest) TestRollupPollFallbackIsOptIn() {
+	const pollEnv = "FIFTYONE_ACTIVITY_WATCH_POLL_ENABLED"
+
+	for _, d := range s.renderWorkers(activityEnabled(nil)) {
+		_, ok := envByName(d.Spec.Template.Spec.Containers[0])[pollEnv]
+		s.False(ok, "%s must not poll by default", d.ObjectMeta.Name)
+	}
+
+	for _, d := range s.renderWorkers(activityEnabled(map[string]string{
+		"activitySettings.watch.pollFallback": "true",
+	})) {
+		poll, ok := envByName(d.Spec.Template.Spec.Containers[0])[pollEnv]
+		if strings.Contains(d.ObjectMeta.Name, "rollup") {
+			s.True(ok, "the rollup worker hosts the fallback")
+			s.Equal("true", poll.Value)
+		} else {
+			s.False(ok, "%s does not host the fallback", d.ObjectMeta.Name)
+		}
+	}
+
+	for _, d := range s.renderWorkers(activityEnabled(map[string]string{
+		"activitySettings.watch.enabled":      "false",
+		"activitySettings.watch.pollFallback": "true",
+	})) {
+		_, ok := envByName(d.Spec.Template.Spec.Containers[0])[pollEnv]
+		s.False(ok, "%s must not poll when the watch is off", d.ObjectMeta.Name)
+	}
+}
+
 func (s *activityWorkersDeploymentTemplateTest) TestRollupWatchOptOut() {
 	deployments := s.renderWorkers(activityEnabled(map[string]string{
 		"activitySettings.watch.enabled": "false",

@@ -103,6 +103,10 @@ spec:
             {{- if and (eq $name "rollup") $a.watch.enabled }}
             - name: FIFTYONE_ACTIVITY_WATCH_ENABLED
               value: "true"
+            {{- if $a.watch.pollFallback }}
+            - name: FIFTYONE_ACTIVITY_WATCH_POLL_ENABLED
+              value: "true"
+            {{- end }}
             {{- end }}
             {{- if $a.liveness.enabled }}
             - name: FIFTYONE_MQ_HEARTBEAT_FILE
