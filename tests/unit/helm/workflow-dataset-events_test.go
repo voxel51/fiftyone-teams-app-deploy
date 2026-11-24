@@ -50,6 +50,8 @@ const (
 	workflowTriggerURIEnv    = "FIFTYONE_ACTIVITY_TRIGGER_API_URI"
 	workflowTriggerKeyEnv    = "FIFTYONE_ACTIVITY_TRIGGER_API_KEY"
 	workflowRelayURIEnv      = "FIFTYONE_WORKFLOW_TRIGGER_API_URI"
+	workflowRelayKeyEnv      = "FIFTYONE_WORKFLOW_TRIGGER_API_KEY"
+	workflowTriggerSecretKey = "workflowTriggerKey" // pragma: allowlist secret
 	workflowDatasetEventsEnv = "FIFTYONE_WORKFLOW_DATASET_EVENTS_ENABLED"
 	triggerWorkerCommand     = "fiftyone-activity-trigger-worker"
 	workersTemplate          = "templates/activity-workers-deployment.yaml"
@@ -57,6 +59,7 @@ const (
 
 var workflowDatasetEventsOn = map[string]string{
 	"workflowSettings.datasetEvents.enabled": "true",
+	"secret.fiftyone.workflowTriggerKey":     "test-trigger-key",
 }
 
 func mergeValues(values ...map[string]string) map[string]string {
@@ -182,8 +185,7 @@ func (s *workflowDatasetEventsTemplateTest) TestIngestAndRollupPublishWhenEnable
 }
 
 // The trigger worker posts to the relay on teams-api, and names itself with
-// the deployment's auth secret, read from the chart's secret and never
-// rendered as a value.
+// its own key, read from the chart's secret and never rendered as a value.
 func (s *workflowDatasetEventsTemplateTest) TestTriggerWorkerPostsToTheRelay() {
 	testCases := []struct {
 		name     string
@@ -214,12 +216,7 @@ func (s *workflowDatasetEventsTemplateTest) TestTriggerWorkerPostsToTheRelay() {
 
 			s.Equal(tc.expected, env[workflowTriggerURIEnv].Value)
 
-			key := env[workflowTriggerKeyEnv]
-			s.Empty(key.Value)
-			s.Require().NotNil(key.ValueFrom)
-			s.Require().NotNil(key.ValueFrom.SecretKeyRef)
-			s.Equal("fiftyone-teams-secrets", key.ValueFrom.SecretKeyRef.Name)
-			s.Equal("fiftyoneAuthSecret", key.ValueFrom.SecretKeyRef.Key)
+			s.isTheTriggerKey(env[workflowTriggerKeyEnv], "fiftyone-teams-secrets")
 
 			// It reads subscriptions and the queue like every other worker.
 			s.Contains(env, "FIFTYONE_ACTIVITY_MONGO_URI")
@@ -227,6 +224,80 @@ func (s *workflowDatasetEventsTemplateTest) TestTriggerWorkerPostsToTheRelay() {
 			s.Contains(env, "FIFTYONE_MQ_REDIS_URL")
 		})
 	}
+}
+
+// isTheTriggerKey asserts an env entry reads the trigger key from a secret.
+func (s *workflowDatasetEventsTemplateTest) isTheTriggerKey(
+	key corev1.EnvVar, secretName string,
+) {
+	s.Empty(key.Value)
+	s.Require().NotNil(key.ValueFrom)
+	s.Require().NotNil(key.ValueFrom.SecretKeyRef)
+	s.Equal(secretName, key.ValueFrom.SecretKeyRef.Name)
+	s.Equal(workflowTriggerSecretKey, key.ValueFrom.SecretKeyRef.Key)
+}
+
+// The key opens the relay route and nothing else, so only the worker that
+// presents it and teams-api that checks it read it, and it is never the
+// deployment's auth secret.
+func (s *workflowDatasetEventsTemplateTest) TestOnlyTheWorkerAndApiHoldTheKey() {
+	workers := s.workers(workflowDatasetEventsOn)
+	for command, container := range workers {
+		for name, e := range containerEnv(container) {
+			if e.ValueFrom == nil || e.ValueFrom.SecretKeyRef == nil { // pragma: allowlist secret
+				continue
+			}
+			isKey := e.ValueFrom.SecretKeyRef.Key == workflowTriggerSecretKey
+			s.Equal(
+				command == triggerWorkerCommand && name == workflowTriggerKeyEnv,
+				isKey,
+				command+" "+name,
+			)
+			if command == triggerWorkerCommand {
+				s.NotEqual("fiftyoneAuthSecret", e.ValueFrom.SecretKeyRef.Key, name)
+			}
+		}
+	}
+
+	api := s.workloadEnv("templates/api-deployment.yaml", workflowDatasetEventsOn)
+	s.isTheTriggerKey(api[workflowRelayKeyEnv], "fiftyone-teams-secrets")
+
+	dedicated := map[string]string{"pluginsSettings.enabled": "true"}
+	for _, tc := range []struct {
+		template string
+		values   map[string]string
+	}{
+		{"templates/app-deployment.yaml", map[string]string{}},
+		{"templates/plugins-deployment.yaml", dedicated},
+	} {
+		s.Run(tc.template, func() {
+			env := s.workloadEnv(tc.template, workflowDatasetEventsOn, tc.values)
+			for name, e := range env {
+				if e.ValueFrom != nil && e.ValueFrom.SecretKeyRef != nil { // pragma: allowlist secret
+					s.NotEqual(workflowTriggerSecretKey, e.ValueFrom.SecretKeyRef.Key, name)
+				}
+			}
+		})
+	}
+}
+
+// An install that brings its own secret names the one holding the key.
+func (s *workflowDatasetEventsTemplateTest) TestTheKeyCanLiveInAnExistingSecret() {
+	existing := map[string]string{
+		"workflowSettings.datasetEvents.enabled":    "true",
+		"workflowSettings.datasetEvents.secretName": "workflow-trigger-key",
+		"secret.create": "false",
+	}
+
+	workers := s.workers(existing)
+	container, ok := workers[triggerWorkerCommand]
+	s.Require().True(ok, "the trigger worker must render")
+	s.isTheTriggerKey(
+		containerEnv(container)[workflowTriggerKeyEnv], "workflow-trigger-key",
+	)
+
+	api := s.workloadEnv("templates/api-deployment.yaml", existing)
+	s.isTheTriggerKey(api[workflowRelayKeyEnv], "workflow-trigger-key")
 }
 
 // teams-api relays to whichever service runs the plugins, and the plugin
@@ -260,8 +331,9 @@ func (s *workflowDatasetEventsTemplateTest) TestApiRelaysAndPluginServersOfferWh
 	}
 }
 
-// Dataset events come from Activity Core's database watch. With either off
-// the stages would be offered and never fire, so the render fails instead.
+// Dataset events come from Activity Core's database watch, delivered by a
+// worker that needs a key. Without any of them the stages would be offered
+// and never fire, so the render fails instead.
 func (s *workflowDatasetEventsTemplateTest) TestRenderFailsWithoutWhatFeedsIt() {
 	testCases := []struct {
 		name     string
@@ -280,6 +352,11 @@ func (s *workflowDatasetEventsTemplateTest) TestRenderFailsWithoutWhatFeedsIt() 
 			"watchOff",
 			map[string]string{"activitySettings.watch.enabled": "false"},
 			"activitySettings.watch.enabled is false",
+		},
+		{
+			"noKey",
+			map[string]string{"secret.fiftyone.workflowTriggerKey": ""},
+			"the trigger worker has no key",
 		},
 	}
 

@@ -4787,9 +4787,15 @@
           "properties": {
             "enabled": {
               "default": false,
-              "description": "Controls whether workflows can react to their dataset changing (the\n*On Samples Added to Dataset* and *On Samples Deleted* stages). When\n`true`, the Activity Core ingest and rollup workers publish sample\nchanges for workflows (`FIFTYONE_ACTIVITY_WORKFLOWS_TOPIC_ENABLED`), a\ntrigger worker is rendered that posts each batch to `teams-api`,\n`teams-api` runs it on the in-cluster plugin server as the user who\nstarted the workflow (`FIFTYONE_WORKFLOW_TRIGGER_API_URI`), and\n`fiftyone-app` and `teams-plugins` offer those stages\n(`FIFTYONE_WORKFLOW_DATASET_EVENTS_ENABLED`). When `false`, the stages\nare not offered and nothing is delivered. Requires\n`activitySettings.enabled`, `activitySettings.watch.enabled` and a\nMongoDB replica set. No additional secret is needed: the trigger worker\nnames itself to `teams-api` with `secret.fiftyone.fiftyoneAuthSecret`.",
+              "description": "Controls whether workflows can react to their dataset changing (the\n*On Samples Added to Dataset* and *On Samples Deleted* stages). When\n`true`, the Activity Core ingest and rollup workers publish sample\nchanges for workflows (`FIFTYONE_ACTIVITY_WORKFLOWS_TOPIC_ENABLED`), a\ntrigger worker is rendered that posts each batch to `teams-api`,\n`teams-api` runs it on the in-cluster plugin server as the user who\nstarted the workflow (`FIFTYONE_WORKFLOW_TRIGGER_API_URI`), and\n`fiftyone-app` and `teams-plugins` offer those stages\n(`FIFTYONE_WORKFLOW_DATASET_EVENTS_ENABLED`). When `false`, the stages\nare not offered and nothing is delivered. Requires\n`activitySettings.enabled`, `activitySettings.watch.enabled`, a MongoDB\nreplica set, and a key for the trigger worker (see `secretName`).",
               "title": "enabled",
               "type": "boolean"
+            },
+            "secretName": {
+              "default": "",
+              "description": "Name of the secret that holds the trigger worker's key under\n`workflowTriggerKey`: a random string that only the trigger worker and\n`teams-api` read, good for nothing but delivering dataset events. When\nempty, `secret.name` is used; with `secret.create`, set the key in\n`secret.fiftyone.workflowTriggerKey`.",
+              "title": "secretName",
+              "type": "string"
             }
           },
           "required": [],
