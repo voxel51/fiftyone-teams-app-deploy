@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "inference.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "inference.chartLabels" . | nindent 4 }}
+    {{- include "inference.selectorLabels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "inference.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
