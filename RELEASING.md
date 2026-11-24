@@ -80,7 +80,10 @@ until `Chart.yaml` matches the branch name.
 
 1. Replace every reference to the previous version with `X.Y.Z`.
    The script updates the chart, Docker Compose files, `skaffold.yaml`, and docs.
-   It doesn't change the integration test fixtures.
+   It doesn't change the integration test fixtures,
+   or text between `<!-- bump-version: off -->` and `<!-- bump-version: on -->`.
+   Wrap upgrade notes and rollback steps for a specific release in those markers,
+   so later releases keep the versions they name.
 
     ```shell
     ./utils/bump-version.sh --to X.Y.Z
