@@ -514,6 +514,8 @@ Create a merged list of environment variables for fiftyone-teams-cas
   value: {{ include "teams-cas.license-key-file-paths" . | quote }}
 - name: NEXTAUTH_URL
   value: {{ printf "https://%s/cas/api/auth" .Values.teamsAppSettings.dnsName | quote }}
+- name: CAS_OAUTH_RESOURCE
+  value: {{ printf "https://%s/api/proxy/fiftyone-teams" .Values.teamsAppSettings.dnsName | quote }}
 - name: TEAMS_API_DATABASE_NAME
   valueFrom:
     secretKeyRef:
@@ -576,6 +578,12 @@ Create a merged list of environment variables for fiftyone-teams-plugins
       key: encryptionKey
 {{- include "telemetry.redis-url-env" . }}
 {{- include "fiftyone-mq.redis-url-env" . }}
+- name: FIFTYONE_CAS_URL
+  value: {{ printf "http://%s:%.0f/cas/api" .Values.casSettings.service.name (float64 .Values.casSettings.service.port) | quote }}
+- name: FIFTYONE_CAS_PUBLIC_URL
+  value: {{ printf "https://%s/cas/api" .Values.teamsAppSettings.dnsName | quote }}
+- name: FIFTYONE_MCP_RESOURCE_URL
+  value: {{ printf "https://%s/api/proxy/fiftyone-teams" .Values.teamsAppSettings.dnsName | quote }}
 {{- range $key, $val := .Values.pluginsSettings.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

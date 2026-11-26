@@ -21,6 +21,15 @@ services:
     environment:
       FIFTYONE_TEAMS_PLUGIN_URL: ${FIFTYONE_TEAMS_PLUGIN_URL}
 
+  teams-cas:
+    environment:
+      # Agent gateway (MCP/CLI): off by default. See
+      # docker/docs/configuring-plugins.md.
+      CAS_DEVICE_AUTH_ENABLED: ${CAS_DEVICE_AUTH_ENABLED:-false}
+      CAS_AGENT_SCOPE_ENABLED: ${CAS_AGENT_SCOPE_ENABLED:-false}
+      CAS_SERVICE_AUTH_ALLOWED: ${CAS_SERVICE_AUTH_ALLOWED:-}
+      CAS_OAUTH_RESOURCE: ${CAS_OAUTH_RESOURCE:-${BASE_URL}/api/proxy/fiftyone-teams}
+
   teams-plugins:
     image: voxel51/fiftyone-app-torch:v2.27.0
     environment:
@@ -36,6 +45,12 @@ services:
       FIFTYONE_MEDIA_CACHE_APP_IMAGES: false
       FIFTYONE_MEDIA_CACHE_SIZE_BYTES: -1
       FIFTYONE_PLUGINS_DIR: /opt/plugins
+      # Agent gateway (MCP/CLI): only used once CAS_AGENT_SCOPE_ENABLED is
+      # on above. See docker/docs/configuring-plugins.md.
+      FIFTYONE_CAS_URL: ${FIFTYONE_CAS_URL:-http://teams-cas:3000/cas/api}
+      FIFTYONE_CAS_PUBLIC_URL: ${FIFTYONE_CAS_PUBLIC_URL:-${BASE_URL}/cas/api}
+      FIFTYONE_MCP_RESOURCE_URL: ${FIFTYONE_MCP_RESOURCE_URL:-${BASE_URL}/api/proxy/fiftyone-teams}
+      FIFTYONE_CAS_SERVICE_AUTH_MODE: ${FIFTYONE_CAS_SERVICE_AUTH_MODE:-insecure-dev}
       # Activity Analytics is on by default and this flag is the only gate.
       # The queue URL below says *where* to emit, never *whether*: it
       # carries a default, so "unset" and "explicitly local" look
