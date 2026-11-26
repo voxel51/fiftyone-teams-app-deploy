@@ -68,6 +68,7 @@ regarding FiftyOne Enterprise.
   - [Secrets And Sensitive Data](#secrets-and-sensitive-data)
   - [Telemetry](#telemetry)
   - [Activity Analytics](#activity-analytics)
+  - [Billing Page](#billing-page)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
   - [Storage Credentials and `FIFTYONE_ENCRYPTION_KEY`](#storage-credentials-and-fiftyone_encryption_key)
@@ -647,6 +648,25 @@ Please refer to the
 [Activity Analytics configuration documentation](./docs/configuring-activity-analytics.md)
 for full details, including how to turn it off.
 
+### Billing Page
+
+Deployments with a usage-based billing license
+show admins a Settings → Billing page.
+The page shows the reporting status,
+the current quarter's invoice estimate,
+and the reporting actions.
+
+To limit what the page shows,
+set `FIFTYONE_BILLING_REPORTING` to one of these values:
+
+- `status` hides the invoice estimate.
+- `off` hides the page,
+  and `teams-api` refuses its reads and actions.
+
+Please refer to the
+[billing page configuration documentation](./docs/configuring-billing-reporting.md)
+for full details.
+
 ### Snapshot Archival
 
 Since version v1.5, FiftyOne Enterprise supports
@@ -834,6 +854,7 @@ If containers show unhealthy states (e.g., `Restarting`, `Exited`):
 | `FIFTYONE_APP_DEPLOYMENT_CHARACTERISTICS`    | Deployment characteristics for the `teams-app`                                                                                                                                                                                                                                 | No                        |
 | `FIFTYONE_API_URI`                           | The URI to be displayed in the `Install FiftyOne` Modal and `API Keys` configuration screens                                                                                                                                                                                   | No                        |
 | `FIFTYONE_AUTH_SECRET`                       | The secret used for services to authenticate with `teams-cas`; also used to login to the SuperAdmin UI                                                                                                                                                                         | Yes                       |
+| `FIFTYONE_BILLING_REPORTING`                 | How much of the Settings → Billing page `teams-api` serves: `full` (default), `status` (without the invoice estimate) or `off`                                                                                                                                                 | No                        |
 | `FIFTYONE_CAS_PUBLIC_URL`                    | The publicly-reachable URL for `teams-cas`, used by `teams-plugins` to build OAuth discovery docs; defaults to `${BASE_URL}/cas/api`                                                                                                                                           | No                        |
 | `FIFTYONE_CAS_SERVICE_AUTH_MODE`             | How `teams-plugins` authenticates to CAS's internal key-resolution endpoint; `insecure-dev` is the only option that works without a GCP service account, and the default                                                                                                       | No                        |
 | `FIFTYONE_CAS_URL`                           | The internal URL that `teams-plugins` should use to communicate with `teams-cas`; defaults to `http://teams-cas:3000/cas/api`                                                                                                                                                  | No                        |
