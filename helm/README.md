@@ -617,6 +617,21 @@ Follow this upgrade path:
    >   --values values.yaml
    > ```
 
+1. Voxel51 recommends upgrading your datasets to the new version.
+   From a machine with the FiftyOne SDK for the new release installed
+   (`Account > Install FiftyOne` in the FiftyOne Enterprise UI), run:
+
+   ```shell
+   FIFTYONE_DATABASE_ADMIN=true fiftyone migrate --all
+   fiftyone migrate --info
+   ```
+
+   > **Note**: Set `FIFTYONE_DATABASE_ADMIN=true` only for this command.
+   > Keep it `false` in your `values.yaml`.
+   > Some releases change dataset schemas (for example, v2.26),
+   > and SDK users on older versions need this migration
+   > to keep reading datasets edited on the new version.
+
 For full upgrade guidance, including version-specific migration notes,
 refer to [Upgrading](./docs/upgrading.md).
 
