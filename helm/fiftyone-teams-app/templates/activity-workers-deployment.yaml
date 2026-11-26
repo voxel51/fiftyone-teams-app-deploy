@@ -6,7 +6,13 @@ the fiftyone-mq helper.
 {{- if .Values.activitySettings.enabled }}
 {{- $a := .Values.activitySettings }}
 {{- range $name, $w := $a.workers }}
-{{- if ne $w.enabled false }}
+{{- /* The trigger worker has no switch of its own: it renders with the
+       workflow stages it delivers to. */}}
+{{- $render := ne $w.enabled false }}
+{{- if eq $name "trigger" }}
+{{- $render = and $render $.Values.workflowSettings.datasetEvents.enabled }}
+{{- end }}
+{{- if $render }}
 {{- $args := dict "ctx" $ "worker" $name }}
 {{- $full := include "activity.worker.name" $args }}
 apiVersion: apps/v1
@@ -91,9 +97,16 @@ spec:
             {{- with (include "activity.org-id-env" $ | trim) }}
             {{- . | nindent 12 }}
             {{- end }}
+            {{- with (include "workflows.activity-worker-env" $args | trim) }}
+            {{- . | nindent 12 }}
+            {{- end }}
             {{- if and (eq $name "rollup") $a.watch.enabled }}
             - name: FIFTYONE_ACTIVITY_WATCH_ENABLED
               value: "true"
+            {{- if $a.watch.pollFallback }}
+            - name: FIFTYONE_ACTIVITY_WATCH_POLL_ENABLED
+              value: "true"
+            {{- end }}
             {{- end }}
             {{- if $a.liveness.enabled }}
             - name: FIFTYONE_MQ_HEARTBEAT_FILE

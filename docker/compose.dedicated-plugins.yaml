@@ -66,6 +66,10 @@ services:
       FIFTYONE_MQ_REDIS_URL: ${FIFTYONE_MQ_REDIS_URL:-redis://fiftyone-mq-redis:6379/0}
       FIFTYONE_ACTIVITY_ORG_ID: ${FIFTYONE_ACTIVITY_ORG_ID}
       FIFTYONE_TELEMETRY_REDIS_URL: ${FIFTYONE_TELEMETRY_REDIS_URL:-redis://telemetry-redis:6379}
+      # Workflow schedules (off unless set): when `true`, this service offers
+      # the workflows On Schedule stage. Set it together with
+      # FIFTYONE_WORKFLOW_SCHEDULE_API_URI, or nothing fires the schedules.
+      FIFTYONE_WORKFLOW_SCHEDULE_ENABLED: ${FIFTYONE_WORKFLOW_SCHEDULE_ENABLED}
       # If you are routing through a proxy server you will want to set
       #  HTTP_PROXY_URL, HTTPS_PROXY_URL, and NO_PROXY_LIST in your .env
       #  then add the following environment variables to your

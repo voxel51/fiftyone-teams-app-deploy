@@ -61,6 +61,15 @@ activitySettings:
     # database edits). Needs a replica set; on a standalone MongoDB it records
     # nothing and logs why.
     enabled: true
+    # -- Controls whether the rollup worker falls back to scanning for changed
+    # samples every 60 seconds when MongoDB is not a replica set
+    # (`FIFTYONE_ACTIVITY_WATCH_POLL_ENABLED`). A development fallback: it
+    # sees no deletes and no field-level detail, and edits between two scans
+    # count once. With `workflowSettings.datasetEvents.enabled`, it is also
+    # what tells a workflow that samples were added, up to a minute late. Has
+    # no effect on a replica set, where the change stream is used. Run a
+    # replica set in production instead.
+    pollFallback: false
   # -- Resources for the worker containers. [Reference][resources].
   resources:
     requests:
@@ -98,6 +107,13 @@ activitySettings:
       # -- Use the `Recreate` strategy. The rollup worker owns a repeatable
       # schedule, so only one replica may reconcile it.
       recreate: true
+    trigger:
+      # -- Entrypoint for the trigger worker, which delivers dataset events
+      # to annotation workflows. Rendered only when
+      # `workflowSettings.datasetEvents.enabled`.
+      command: ["fiftyone-activity-trigger-worker"]
+      # -- Number of trigger worker replicas.
+      replicaCount: 1
 
 # yaml-language-server: $schema=values.schema.json
 # FiftyOne Enterprise API (`teams-api`)
@@ -1998,3 +2014,38 @@ telemetry:
   # service account. The teams-api sidecar uses the teams-api RBAC service
   # account, which already grants `pods/log` GET via `api-role.yaml`.
   serviceAccounts: []
+
+# Annotation workflows.
+workflowSettings:
+  datasetEvents:
+    # -- Controls whether workflows can react to their dataset changing (the
+    # *On Samples Added to Dataset* and *On Samples Deleted* stages). When
+    # `true`, the Activity Core ingest and rollup workers publish sample
+    # changes for workflows (`FIFTYONE_ACTIVITY_WORKFLOWS_TOPIC_ENABLED`), a
+    # trigger worker is rendered that posts each batch to `teams-api`,
+    # `teams-api` runs it on the in-cluster plugin server as the user who
+    # started the workflow (`FIFTYONE_WORKFLOW_TRIGGER_API_URI`), and
+    # `fiftyone-app` and `teams-plugins` offer those stages
+    # (`FIFTYONE_WORKFLOW_DATASET_EVENTS_ENABLED`). When `false`, the stages
+    # are not offered and nothing is delivered. Requires
+    # `activitySettings.enabled`, `activitySettings.watch.enabled`, a MongoDB
+    # replica set, and a key for the trigger worker (see `secretName`).
+    enabled: false
+    # -- Name of the secret that holds the trigger worker's key under
+    # `workflowTriggerKey`: a random string that only the trigger worker and
+    # `teams-api` read, good for nothing but delivering dataset events. When
+    # empty, `secret.name` is used; with `secret.create`, set the key in
+    # `secret.fiftyone.workflowTriggerKey`.
+    secretName: ""
+  schedules:
+    # -- Controls whether workflows can run on a schedule. When `true`,
+    # `teams-api` runs the sweep that fires the workflows *On Schedule* stage,
+    # posting each due tick to the in-cluster plugin server
+    # (`FIFTYONE_WORKFLOW_SCHEDULE_API_URI`: `teams-plugins` when
+    # `pluginsSettings.enabled`, otherwise `fiftyone-app`), and `fiftyone-app`
+    # and `teams-plugins` offer that stage
+    # (`FIFTYONE_WORKFLOW_SCHEDULE_ENABLED`). When `false`, the stage is not
+    # offered and nothing is swept. Requires `fiftyone-app`, `teams-api` and
+    # `teams-cas` images that include the feature. No additional secret is
+    # needed: each tick runs as the user who started the workflow.
+    enabled: false
