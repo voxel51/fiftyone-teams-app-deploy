@@ -1998,3 +1998,18 @@ telemetry:
   # service account. The teams-api sidecar uses the teams-api RBAC service
   # account, which already grants `pods/log` GET via `api-role.yaml`.
   serviceAccounts: []
+
+# Annotation workflows.
+workflowSettings:
+  schedules:
+    # -- Controls whether workflows can run on a schedule. When `true`,
+    # `teams-api` runs the sweep that fires the workflows *On Schedule* stage,
+    # posting each due tick to the in-cluster plugin server
+    # (`FIFTYONE_WORKFLOW_SCHEDULE_API_URI`: `teams-plugins` when
+    # `pluginsSettings.enabled`, otherwise `fiftyone-app`), and `fiftyone-app`
+    # and `teams-plugins` offer that stage
+    # (`FIFTYONE_WORKFLOW_SCHEDULE_ENABLED`). When `false`, the stage is not
+    # offered and nothing is swept. Requires `fiftyone-app`, `teams-api` and
+    # `teams-cas` images that include the feature. No additional secret is
+    # needed: each tick runs as the user who started the workflow.
+    enabled: false

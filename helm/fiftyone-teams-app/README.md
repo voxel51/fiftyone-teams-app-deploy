@@ -1252,6 +1252,7 @@ If pods show unhealthy states (e.g., `0/1`, `CrashLoopBackOff`, `Pending`):
 | telemetry.sidecar.image.tag | string | `""` | Image tag for `telemetry-sidecar`. Defaults to `Chart.AppVersion`. |
 | telemetry.sidecar.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"512Mi"}}` | Resource requests/limits for each `telemetry-sidecar` container. |
 | telemetry.sidecar.stackSampling | bool | `true` | Set `false` if your cluster's admission policy won't permit the `SYS_PTRACE` capability that the delegated-operator sidecar uses for `py-spy` stack sampling; the rest of telemetry keeps working without it. |
+| workflowSettings.schedules.enabled | bool | `false` | Controls whether workflows can run on a schedule. When `true`, `teams-api` runs the sweep that fires the workflows *On Schedule* stage, posting each due tick to the in-cluster plugin server (`FIFTYONE_WORKFLOW_SCHEDULE_API_URI`: `teams-plugins` when `pluginsSettings.enabled`, otherwise `fiftyone-app`), and `fiftyone-app` and `teams-plugins` offer that stage (`FIFTYONE_WORKFLOW_SCHEDULE_ENABLED`). When `false`, the stage is not offered and nothing is swept. Requires `fiftyone-app`, `teams-api` and `teams-cas` images that include the feature. No additional secret is needed: each tick runs as the user who started the workflow. |
 
 <!-- markdownlint-enable MD060 -->
 
