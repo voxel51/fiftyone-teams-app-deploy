@@ -175,7 +175,7 @@ func (s *inferenceTemplateTest) TestLicenseModeWithTheModelServer() {
 	env := envOf(container)
 
 	s.Equal(int32(1), *deployment.Spec.Replicas)
-	s.Equal("voxel51/inference:v2.25.1", container.Image)
+	s.Equal("voxel51/inference:v2.28.0", container.Image)
 	s.Equal("shared-token", env["AUTH_MODE"].Value)
 	s.Equal("license", env["BILLING_MODE"].Value)
 	s.Equal("/opt/fiftyone/licenses/fiftyone-license", env["LICENSE_KEY_FILE_PATHS"].Value)
@@ -272,7 +272,7 @@ func (s *inferenceTemplateTest) TestLabelerWithAnLlm() {
 
 	s.Equal("inference-labeler", deployment.Name)
 	s.Equal(int32(1), *deployment.Spec.Replicas)
-	s.Equal("voxel51/agentic-labeler-cpu:v2.25.1", container.Image)
+	s.Equal("voxel51/agentic-labeler-cpu:v2.28.0", container.Image)
 	s.Equal("shared", env["LABELER_SERVICE_MODE"].Value)
 	s.Equal("http://inference:8080", env["FIFTYONE_INFERENCE_URL"].Value)
 	s.Equal("inference-token", env["FIFTYONE_INFERENCE_TOKEN"].ValueFrom.SecretKeyRef.Name)
@@ -509,7 +509,7 @@ func (s *inferenceTemplateTest) TestLabelerOnOpenAIWithFiles() {
 		// Wins over an earlier compatible backend
 		"second": withLlm(map[string]string{
 			"backends[1].kind":                 "openai",
-			"backends[1].id":                   "openai",
+			"backends[1].id":                   "openai-files",
 			"backends[1].baseUrl":              "https://api.openai.com/v1",
 			"backends[1].openaiHosted":         "true",
 			"backends[1].files":                "true",
@@ -624,6 +624,22 @@ func (s *inferenceTemplateTest) TestShippedModelServerBackend() {
 	s.ErrorContains(err, "backends: the id model-server is the shipped model server backend's")
 	duplicate["modelServer.enabled"] = "false"
 	s.Equal("model-server", backendsFor(duplicate, nil)[0]["id"])
+
+	// Two of your own backends with one id are refused, with or without the
+	// shipped backend
+	twice := withToken(map[string]string{
+		"backends[0].kind":    "model-server",
+		"backends[0].id":      "box",
+		"backends[0].baseUrl": "http://box-a:8080",
+		"backends[1].kind":    "model-server",
+		"backends[1].id":      "box",
+		"backends[1].baseUrl": "http://box-b:8080",
+	})
+	_, err = helm.RenderTemplateE(s.T(), &helm.Options{SetValues: twice}, s.chartPath, s.releaseName, []string{})
+	s.ErrorContains(err, "backends: two backends have the id box")
+	twice["modelServer.enabled"] = "false"
+	_, err = helm.RenderTemplateE(s.T(), &helm.Options{SetValues: twice}, s.chartPath, s.releaseName, []string{})
+	s.ErrorContains(err, "backends: two backends have the id box")
 
 	// An empty URL is refused by the schema
 	_, err = helm.RenderTemplateE(s.T(), &helm.Options{SetValues: withToken(nil), SetJsonValues: map[string]string{"modelServer.urls": `[""]`}}, s.chartPath, s.releaseName, []string{})

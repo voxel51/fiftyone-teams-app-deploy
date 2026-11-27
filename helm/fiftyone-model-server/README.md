@@ -8,62 +8,103 @@ sends embeddings, predictions and segmentation to. One pod is one box, in
 the same cluster as FiftyOne Enterprise or in a separate GPU cluster.
 Preview: the image is not published yet.
 
-The FiftyOne inference service routes embeddings, predictions and
-segmentation to model servers. This chart deploys them, one box per pod. The
-inference service reaches a box by URL only, so a box can run in a separate
-GPU cluster.
+The FiftyOne inference service routes embeddings, predictions
+and segmentation to model servers.
+This chart deploys them,
+one box per pod.
+The inference service reaches a box only by URL,
+so a box can run in a separate GPU cluster.
 
 ## What to know before installing
 
-- **The model server checks no token by default.** Set `token.value`, or
-  `token.secretName` for your own Secret with the key `token`, and every call
-  but the probes (`/healthz`, `/readyz`) then needs
-  `Authorization: Bearer <token>`, `/metrics` included: anything that scrapes
-  it must send the token. Give the same Secret to the fiftyone-inference
-  chart, `modelServer.tokenSecret`, which then sends it. To change the
-  token, change the Secret, then restart the model servers and the inference
-  service: both read it at start only, and a change to `token.value`
-  restarts the model servers alone. With or without a token, only the
-  inference service should reach it:
-  - In the same cluster, the default NetworkPolicy admits only pods labelled
-    `app: inference` in this namespace. For an inference service in another
-    namespace, add a `namespaceSelector` to the peer in `networkPolicy.from`.
-  - From another cluster, use `service.type: LoadBalancer` with
-    `service.loadBalancerSourceRanges` set to the calling cluster's pod range,
-    and an internal load balancer annotation for your cloud. Each pod gets
-    its own load balancer. The
-    NetworkPolicy then admits those ranges too, and
-    `service.externalTrafficPolicy: Local` keeps the caller's address so it
-    can.
-- **One box per pod.** `replicas` sets how many pods run, 1 by default. The
-  inference service limits how many video runs each box takes and keeps a run
-  on the box that started it, so pods do not share one URL: each pod has its
-  own Service, `<name>-<i>` with i from 0, where `<name>` is the release name
-  or `nameOverride`. For release `model-server` with `replicas: 3`, the URLs
-  are `http://model-server-0:8080`, `http://model-server-1:8080` and
-  `http://model-server-2:8080`. List them all in the fiftyone-inference
-  chart (`modelServer.replicas`, or `modelServer.urls`). Pods are not
-  autoscaled.
-- **`preload` is required.** The pod reports Ready only once a model is
-  loaded. Nothing answers until the preload is done, so the first start
-  includes downloading the weights.
-- **Weights.** By default they go to an `emptyDir`: a new pod downloads them
-  again, and they count as the pod's ephemeral storage, so request enough of
-  it (GKE Autopilot gives 1Gi otherwise). Set `weights.persistence.enabled`
-  to keep them on a claim instead: one claim per pod, `weights-<name>-<i>`.
-  Scaling in keeps the claims of the pods removed, and scaling out again
-  reuses them: delete a claim yourself once you no longer need it.
-  `helm uninstall` keeps the claims too, and a reinstall uses them again.
-  `weights.persistence.existingClaim` takes one pod only, as a ReadWriteOnce
-  claim cannot be shared.
-  `weights.persistence` `enabled`, `size`, `storageClass` and `existingClaim`
-  cannot change after install: to change them, run
-  `kubectl delete statefulset <name> --cascade=orphan`, then upgrade.
-  Existing claims keep their old size until you resize them yourself.
-- **GPU.** `gpu.enabled` requests `gpu.count` GPUs. Use `nodeSelector` and
-  `tolerations` for your GPU nodes. On CPU, small models such as SigLIP work,
-  but SAM2 and video models are too slow for the inference service's
-  timeouts.
+- **The model server checks no token by default.**
+  To require one, set either:
+  - `token.value`
+  - `token.secretName`, for your own Secret with the key `token`
+
+  Every call then needs `Authorization: Bearer <token>`,
+  except the probes (`/healthz` and `/readyz`).
+  This includes `/metrics`,
+  so anything that scrapes it must send the token.
+  Give the same Secret to the fiftyone-inference chart
+  in `modelServer.tokenSecret`,
+  and it sends the token for you.
+
+  To change the token, change the Secret.
+  Then restart the model servers and the inference service.
+  Both read the token only at start.
+  A change to `token.value` restarts only the model servers.
+
+  With or without a token,
+  only the inference service should reach the model server:
+  - **Same cluster.**
+    The default NetworkPolicy admits only pods labeled `app: inference`
+    in this namespace.
+    For an inference service in another namespace,
+    add a `namespaceSelector` to the peer in `networkPolicy.from`.
+  - **Another cluster.**
+    Set `service.type: LoadBalancer`
+    and set `service.loadBalancerSourceRanges`
+    to the calling cluster's pod range.
+    Add your cloud's annotation for an internal load balancer.
+    Each pod gets its own load balancer.
+    The NetworkPolicy then admits those ranges too.
+    Set `service.externalTrafficPolicy: Local`
+    so the NetworkPolicy sees the caller's real address.
+- **One box per pod.**
+  `replicas` sets how many pods run
+  (default 1).
+  The inference service limits how many video runs each box takes,
+  and it keeps a run on the box that started it.
+  So pods don't share one URL.
+  Each pod has its own Service, `<name>-<i>`,
+  with `i` counting from 0.
+  `<name>` is the release name or `nameOverride`.
+  For example, release `model-server` with `replicas: 3` gives
+  `http://model-server-0:8080`,
+  `http://model-server-1:8080`
+  and `http://model-server-2:8080`.
+  List them all in the fiftyone-inference chart
+  with `modelServer.replicas` or `modelServer.urls`.
+  `replicas` doesn't autoscale pods.
+  To autoscale, see [Autoscaling](#autoscaling).
+- **You must set `preload`.**
+  The pod reports Ready only after a model loads.
+  Nothing answers until preload finishes,
+  so the first start includes downloading the weights.
+- **Weights.**
+  By default, the weights go to an `emptyDir`:
+  - A new pod downloads them again.
+  - They count toward the pod's ephemeral storage,
+    so request enough of it.
+    GKE Autopilot gives 1Gi otherwise.
+
+  To keep the weights on a claim instead,
+  set `weights.persistence.enabled`.
+  Each pod gets one claim,
+  `weights-<name>-<i>`:
+  - When you scale in,
+    the claims of the removed pods stay.
+    When you scale out again,
+    new pods reuse them.
+    Delete a claim yourself once you no longer need it.
+  - `helm uninstall` keeps the claims too,
+    and a reinstall uses them again.
+  - `weights.persistence.existingClaim` supports one pod only,
+    because pods can't share a ReadWriteOnce claim.
+  - You can't change `weights.persistence`
+    `enabled`, `size`, `storageClass` or `existingClaim`
+    after install.
+    To change them, run
+    `kubectl delete statefulset <name> --cascade=orphan`,
+    then upgrade.
+    Existing claims keep their old size until you resize them yourself.
+- **GPU.**
+  `gpu.enabled` requests `gpu.count` GPUs.
+  Use `nodeSelector` and `tolerations` to place pods on your GPU nodes.
+  Small models such as SigLIP work on CPU.
+  SAM2 and video models are too slow on CPU
+  for the inference service's timeouts.
 
 ## Install
 
@@ -77,34 +118,60 @@ helm install model-server ./helm/fiftyone-model-server \
 
 ## Autoscaling
 
-With `autoscaling.enabled`, a HorizontalPodAutoscaler sets the number of
-pods, between `autoscaling.minReplicas` and `autoscaling.maxReplicas`, on
-CPU use by default (set a CPU request in `resources`) or on
-`autoscaling.metrics`. Point the inference chart at the pods by DNS
-(`modelServer.dns`): it resolves the headless Service `<name>-headless`,
-which lists the ready pods, so new pods join its pool and leaving ones
-drop out with no change to its values.
+Set `autoscaling.enabled`
+to let a HorizontalPodAutoscaler set the number of pods.
+It keeps the count between `autoscaling.minReplicas`
+and `autoscaling.maxReplicas`.
+By default, it scales on CPU use,
+so set a CPU request in `resources`.
+To scale on other metrics, set `autoscaling.metrics`.
 
-A pod that stops, scaled in or replaced, first waits `drain.preStopSeconds`
-while callers stop sending it new work, then finishes what it is running,
-for up to `drain.terminationGracePeriodSeconds`.
+Point the inference chart at the pods by DNS
+with `modelServer.dns`.
+The inference service resolves the headless Service `<name>-headless`,
+which lists the ready pods.
+New pods join its pool and stopping pods leave it,
+with no change to its values.
 
-Turning `autoscaling.enabled` on for a release that ran with `replicas`
-stops every pod but the first: the upgrade removes the StatefulSet's
-replica count, which then defaults to 1, and the others drain and restart
-with their models loading again. An `autoscaling.minReplicas` at least the
-old `replicas` brings them back as soon as they have stopped, rather than
-when load calls for them. Upgrade at a quiet time. Rollouts
-replace one pod at a time, each waiting for its runs, so allow
-`helm upgrade --wait` a longer `--timeout` than its 5 minutes.
+When a pod stops,
+because it scaled in or got replaced:
+
+1. It waits `drain.preStopSeconds`
+   while callers stop sending it new work.
+1. It finishes its current work,
+   for up to `drain.terminationGracePeriodSeconds`.
+
+Turning on `autoscaling.enabled`
+for a release that ran with `replicas`
+stops every pod but the first.
+The upgrade removes the StatefulSet's replica count,
+which then defaults to 1.
+The other pods drain and restart,
+and their models load again.
+Set `autoscaling.minReplicas` to at least the old `replicas`
+to bring them back as soon as they stop,
+rather than when load calls for them.
+Upgrade at a quiet time.
+
+Rollouts replace one pod at a time,
+and each pod waits for its runs.
+So give `helm upgrade --wait` a longer `--timeout`
+than its default 5 minutes.
 
 ## Serve another zoo model
 
-The image declares the models it ships with. To serve another zoo model,
-declare it in `declarations`, and add it to `allowedModels` when that is set:
-a model left out of that list leaves the catalog. The inference service adds
-it to its catalog within about a minute, and the App lists it, with no
-rebuild. CLIP as an embedding model, beside the image's models:
+The image declares the models it ships with.
+To serve another zoo model:
+
+1. Declare it in `declarations`.
+1. If you set `allowedModels`, add it there too.
+   A model left out of that list drops out of the catalog.
+
+The inference service adds the model to its catalog within about a minute,
+and the App lists it.
+You don't need to rebuild the image.
+This example adds CLIP as an embedding model
+next to the image's models:
 
 ```yaml
 allowedModels:
@@ -124,9 +191,15 @@ declarations:
     tags: [embeddings, zero-shot]
 ```
 
-It works for zoo models whose task the model server runs (embedding,
-prediction, propagation) and whose packages are in the image. The model
-server refuses to start on a name the zoo lacks or a task it does not run.
+This works for zoo models that meet both conditions:
+
+- The model server runs the model's task:
+  embedding, prediction or propagation.
+- The image contains the model's packages.
+
+The model server won't start
+if a name isn't in the zoo
+or a task isn't one it runs.
 
 ## Requirements
 

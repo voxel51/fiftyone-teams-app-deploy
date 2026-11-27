@@ -126,44 +126,50 @@ quickstart  0.21.2
 
 #### FiftyOne Enterprise v2.28+ Inference Service
 
-FiftyOne Enterprise v2.28.0 can send its model calls to an inference service:
-SAM2 segmentation, embeddings and the agentic labeler.
-The service and its model servers come from two new charts,
+FiftyOne Enterprise v2.28.0 can send its model calls to an inference service.
+These calls include SAM2 segmentation, embeddings and the agentic labeler.
+Two new charts provide the service and its model servers:
 [fiftyone-inference](../fiftyone-inference/README.md)
 and [fiftyone-model-server](../fiftyone-model-server/README.md).
-It is optional.
-Without `inference.url`, FiftyOne Enterprise works as before.
+The inference service is optional.
+If you don't set `inference.url`,
+FiftyOne Enterprise works as before.
 
 To move an existing deployment to the inference service:
 
-1. In `Settings -> Services`, stop the `annotation-ai` service,
-   and with an LLM the `agentic-labeler` service too.
+1. In `Settings -> Services`, stop the `annotation-ai` service.
+   With an LLM, also stop the `agentic-labeler` service.
    A labeler service left running takes labeler runs.
 1. Install the fiftyone-model-server chart,
    then the fiftyone-inference chart.
-   Their images are private, like the FiftyOne Enterprise images:
-   set each chart's `imagePullSecrets`.
+   Their images are private, like the FiftyOne Enterprise images,
+   so set each chart's `imagePullSecrets`.
    Ask your Voxel51 support team for the model server image.
 1. In this chart, set the `inference` values.
-   With an LLM, also add the `agentic-labeler` job template
-   and turn off `serviceOrchestrators`,
-   as the [fiftyone-inference](../fiftyone-inference/README.md) README says.
-   Without an LLM, keep the service orchestrators:
-   the agentic labeler still runs on them.
-1. With an LLM, after the upgrade, check that `agentic-labeler`
-   is in `Settings -> Orchestrators`.
+   - With an LLM,
+     also add the `agentic-labeler` job template
+     and turn off `serviceOrchestrators`.
+     The [fiftyone-inference](../fiftyone-inference/README.md) README
+     shows how.
+   - Without an LLM, keep the service orchestrators.
+     The agentic labeler still runs on them.
+1. With an LLM, after the upgrade,
+   check that `agentic-labeler` appears in `Settings -> Orchestrators`.
    The chart registers it in a post-upgrade hook,
-   which Argo CD runs only after a healthy sync.
+   and Argo CD runs that hook only after a healthy sync.
 1. If you turned off the service orchestrators,
    delete `cpuServiceOrc` and `gpuServiceOrc`
    in `Settings -> Orchestrators`.
    While they stay registered,
-   the runs of the stopped services cannot be deleted.
-   Do not start those services again: they have no orchestrator left.
+   you can't delete the runs of the stopped services.
+   Don't start those services again,
+   because they have no orchestrator left.
 
-Upgrade the fiftyone-model-server and fiftyone-inference releases
-with `--reset-then-reuse-values` (Helm 3.14 or later), not `--reuse-values`.
-`--reuse-values` keeps your values but not the defaults a new chart version adds,
+To upgrade the fiftyone-model-server and fiftyone-inference releases,
+use `--reset-then-reuse-values` (Helm 3.14 or later),
+not `--reuse-values`.
+`--reuse-values` keeps your values
+but drops the defaults that a new chart version adds,
 so the upgrade fails to render.
 
 #### FiftyOne Enterprise v2.26+ Legacy Authentication Mode Removed

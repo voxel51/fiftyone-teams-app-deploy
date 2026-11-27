@@ -1337,13 +1337,15 @@ imagePullSecrets: []
 # `env` or `secretEnv` wins.
 inference:
   # -- URL of the inference service, such as `http://inference:8080`. Empty:
-  # FiftyOne does not use one.
+  # the chart sets no inference env. A component that sets
+  # `FIFTYONE_INFERENCE_URL` in its own `env` still uses the inference service.
   url: ""
   # -- Existing Secret holding the inference service's shared token under the
   # key `token`. Needed with `inference.url`.
   tokenSecret: ""
   # -- With one org only: its id, the `organizationId` of its license. The org
-  # of calls with no user, such as builtin services. Empty with several orgs.
+  # of calls with no user, such as builtin services. Empty with several orgs:
+  # the service then refuses calls with no user and no org with a 401.
   tenantId: ""
   labeler:
     # -- URL of the inference chart's labeler, such as

@@ -69,6 +69,8 @@ regarding FiftyOne Enterprise.
   - [Telemetry](#telemetry)
   - [Activity Analytics](#activity-analytics)
   - [Inference Service](#inference-service)
+    - [Add an LLM and the agentic labeler](#add-an-llm-and-the-agentic-labeler)
+    - [Things to know](#things-to-know)
   - [Model Server](#model-server)
   - [Snapshot Archival](#snapshot-archival)
   - [Static Banner Configuration](#static-banner-configuration)
@@ -653,16 +655,30 @@ for full details, including how to turn it off.
 
 ### Inference Service
 
-The FiftyOne inference service runs the App's model features, such as
-embeddings, similarity and segmentation, on a model server instead of in the
-FiftyOne Enterprise containers. With an LLM, it also runs the shared agentic
-labeling service. It ships in the `compose.inference.yaml` overlay, and
-calls the model server at `MODEL_SERVER_URL`: run one first, on this worker
-or another, as the [Model Server](#model-server) section says. The service
-reads the models from the model server: every model its image serves, or
-those in `MODEL_SERVER_ALLOWED_MODELS` when set (`MODEL_SERVER_PRELOAD` picks
-what loads at start, the others load on their first request). A new model
-server release brings new ones.
+The FiftyOne inference service runs the App's model features
+on a model server
+instead of in the FiftyOne Enterprise containers.
+These features include embeddings, similarity and segmentation.
+With an LLM,
+it also runs the shared agentic labeling service.
+
+The service ships in the `compose.inference.yaml` overlay.
+It calls the model server at `MODEL_SERVER_URL`,
+so run a model server first,
+on this worker or another.
+See the [Model Server](#model-server) section.
+
+The service asks the model server which models it serves:
+
+- By default, every model in the model server's image.
+- When you set `MODEL_SERVER_ALLOWED_MODELS`,
+  only the models in that list.
+
+`MODEL_SERVER_PRELOAD` picks which models load at start.
+The others load on their first request.
+A new model server release brings its new models with it.
+
+To add the inference service:
 
 1. Set these in `.env`:
 
@@ -675,17 +691,25 @@ server release brings new ones.
     MODEL_SERVER_TOKEN=<the model server's MODEL_SERVER_TOKEN>
     ```
 
-    The service reads the licenses from `LOCAL_LICENSE_FILE_DIR`, as
-    `teams-cas` does, one per CAS org: list each file, comma separated, in
-    `LICENSE_KEY_FILE_PATHS`. Each call is admitted against the license of
-    the org it names, which FiftyOne Enterprise sets to the caller's CAS org.
-    A call that names no org is a 401, and one whose org has no license here
-    a 403. An unexpired license admits every call of its org, an expired one
-    none. A new org's license needs a restart.
+   The service reads the licenses from `LOCAL_LICENSE_FILE_DIR`,
+   as `teams-cas` does,
+   one per CAS org.
+   List each license file in `LICENSE_KEY_FILE_PATHS`,
+   separated by commas.
 
-1. Point FiftyOne Enterprise at it in `compose.override.yaml`. Name only the
-   services in your `-f` set, and each `teams-do-N` slot you run: a service
-   named here and in no other file is created, incomplete:
+   FiftyOne Enterprise names the caller's CAS org on each call,
+   and the service checks the call against that org's license:
+   - A call that names no org gets a 401.
+   - A call whose org has no license here gets a 403.
+   - An unexpired license admits every call of its org.
+     An expired license admits none.
+   - A license for a new org needs a restart.
+
+1. Point FiftyOne Enterprise at the service in `compose.override.yaml`.
+   Name only the services in your `-f` set,
+   and each `teams-do-N` slot you run.
+   If you name a service here that no other file defines,
+   Compose creates it, and it won't be complete:
 
     ```yaml
     x-inference-env: &inference-env
@@ -709,17 +733,23 @@ server release brings new ones.
         environment: *inference-env
     ```
 
-    FiftyOne Enterprise names the caller's CAS org (`user.organization.id`)
-    as the tenant of each call. Never set `FIFTYONE_TENANT_ID`: it overrides
-    that org, and makes FiftyOne Enterprise act as a SaaS tenant.
-    `FIFTYONE_INFERENCE_TENANT_ID` is only the fallback for calls with no
-    user, such as builtin services. With several orgs, leave it unset. With
-    one org, add it to `inference-env` set to that org's id, the
-    `organizationId` of its license (the same as `user.organization.id`),
-    never a made up name.
+   FiftyOne Enterprise sends the caller's CAS org (`user.organization.id`)
+   as the tenant of each call.
+   Never set `FIFTYONE_TENANT_ID`.
+   It overrides that org
+   and makes FiftyOne Enterprise act as a SaaS tenant.
 
-1. Add the overlay to your usual `-f` set, here with the model server on
-   this worker:
+   `FIFTYONE_INFERENCE_TENANT_ID` is only the fallback for calls with no user,
+   such as built-in services:
+   - **Several orgs:** leave it unset.
+   - **One org:** add it to `inference-env`,
+     set to that org's ID.
+     This is the `organizationId` of its license,
+     the same as `user.organization.id`.
+     Never use a made-up name.
+
+1. Add the overlay to your usual `-f` set.
+   This example runs the model server on this worker:
 
     ```shell
     docker compose \
@@ -732,19 +762,36 @@ server release brings new ones.
       up -d
     ```
 
-To add an LLM, declare it in `BACKENDS` in `compose.override.yaml`, with its
-API key, after a copy of the model-server backend of `compose.inference.yaml`
-(an override replaces the whole variable), and run the agentic labeler with
-the `labeler` profile (`COMPOSE_PROFILES=labeler` in `.env`, or `do-2,labeler`
-with delegated operator slots). The profile runs two containers, both on CPU:
-`inference-labeler` for Run test, and `inference-labeler-runs`, the delegated
-operator worker `agentic-labeler` that runs each Run. Both call the LLM
-through the inference service. Each run names the org and user who started
-it. Do not also use `compose.agenticlabeler.yaml`: its GPU worker has the
-same name. Do not start the `agentic-labeler` service in Settings, then
-Services: it would run on this worker. By default the labeler calls
-`gpt-6-sol-responses` on the Responses API, with its examples as uploaded
-files, which needs OpenAI's own API:
+#### Add an LLM and the agentic labeler
+
+To add an LLM:
+
+1. Declare it in `BACKENDS` in `compose.override.yaml`,
+   with its API key.
+   An override replaces the whole variable,
+   so first copy the model server backend from `compose.inference.yaml`.
+1. Run the agentic labeler with the `labeler` profile.
+   Set `COMPOSE_PROFILES=labeler` in `.env`,
+   or `do-2,labeler` with delegated operator slots.
+
+The profile runs two containers, both on CPU:
+
+- `inference-labeler`, for Run test
+- `inference-labeler-runs`,
+  the delegated operator worker `agentic-labeler` that runs each Run
+
+Both containers call the LLM through the inference service.
+Each run names the org and user who started it.
+
+Don't also use `compose.agenticlabeler.yaml`,
+because its GPU worker has the same name.
+Don't start the `agentic-labeler` service
+in `Settings -> Services`,
+because it would run on this worker.
+
+By default, the labeler calls `gpt-6-sol-responses` on the Responses API
+and sends its examples as uploaded files.
+This needs OpenAI's own API:
 
 ```yaml
 services:
@@ -769,11 +816,16 @@ services:
               limits: { maxImagesPerRequest: 1500 }
 ```
 
-Any other OpenAI compatible API, such as vLLM or Azure OpenAI, is called on
-Chat Completions with images inline. Declare its vision model with
-`tasks: [generation]`, `wireFormat: openai-chat` and
-`limits.maxImagesPerRequest`, and set the labeler's config by hand from them
-(the Helm chart does this for you):
+The labeler calls any other OpenAI-compatible API,
+such as vLLM or Azure OpenAI,
+on Chat Completions with images inline.
+Declare the API's vision model with
+`tasks: [generation]`,
+`wireFormat: openai-chat`
+and `limits.maxImagesPerRequest`.
+Then set the labeler's config by hand to match.
+The Helm chart does this for you,
+but Docker Compose doesn't:
 
 ```yaml
 services:
@@ -810,38 +862,62 @@ services:
         "FIFTYONE_INFERENCE_PRINCIPAL_ID"}}
 ```
 
-In `LABELER_ENGINE_CONFIG`, `default_headers_env` makes the runs worker name
-the org of each run, which the inference service requires. `model` is the
-model's `name`, `api_key_env:
-null` makes the labeler send `INFERENCE_SHARED_TOKEN` to the inference
-service, `max_pixels` limits the size of each image, which the labeler
-requires, and `structured_output: auto` constrains classification with a JSON
-schema (`response_format`), which the host must support. `max_images` is the
-model's `limits.maxImagesPerRequest`, and the labeler's only limit: images are
-sent inline, so it bounds how many examples a test may carry and each request
-under the inference service's `MAX_BODY_BYTES`. Do not set
-`LABELER_MODEL_LIMITS`: the labeler's image token estimate is Gemma's, so a
-context window sizes the examples wrong for other models. The labeler's
-prompts and parsing are written for Gemma, so check the labels on your model.
+In `LABELER_ENGINE_CONFIG`:
 
-Things to know:
+- `default_headers_env` makes the runs worker name the org of each run.
+  The inference service requires this.
+- `model` is the model's `name`.
+- `api_key_env: null` makes the labeler send `INFERENCE_SHARED_TOKEN`
+  to the inference service.
+- `max_pixels` limits the size of each image.
+  The labeler requires it.
+- `structured_output: auto` constrains classification
+  with a JSON schema (`response_format`),
+  so the host must support that.
+- `max_images` is the model's `limits.maxImagesPerRequest`,
+  and it's the labeler's only limit.
+  Because the labeler sends images inline,
+  this limit bounds how many examples a test can carry.
+  It also keeps each request under the inference service's `MAX_BODY_BYTES`.
 
-- The service reads the token at start only, and accepts one token. To
-  rotate it, change `INFERENCE_SHARED_TOKEN` and recreate the stack: every
-  caller switches at once, and the old token is refused.
-- The token proves a caller is part of the deployment, nothing more: any
-  holder can call as any organization. The labeler checks the same token,
-  then trusts the organization its callers name. It publishes no port: only
-  containers of this project reach it. The model server checks no token
-  unless `MODEL_SERVER_TOKEN` is set: see the [Model Server](#model-server)
-  section.
-- The labeler fetches media itself, by default only from public addresses,
-  over https on port 443. For media in a private object store, set on
-  `inference-labeler` the store's host names in `LABELER_FETCH_ALLOWED_HOSTS`,
-  its private address ranges in `LABELER_FETCH_ALLOWED_NETWORKS`, its port in
-  `LABELER_FETCH_ALLOWED_PORTS` when not 443, and
-  `LABELER_FETCH_ALLOW_HTTP: "true"` for plain http. Lists are JSON strings,
-  not YAML lists. A MinIO at `http://minio:9000`:
+Don't set `LABELER_MODEL_LIMITS`.
+The labeler estimates image tokens for Gemma,
+so a context window sizes the examples wrong for other models.
+We wrote the labeler's prompts and parsing for Gemma,
+so check the labels it produces on your model.
+
+#### Things to know
+
+- **Token rotation.**
+  The service reads the token only at start,
+  and it accepts only one token.
+  To rotate it,
+  change `INFERENCE_SHARED_TOKEN` and recreate the stack.
+  Every caller switches at once,
+  and the service refuses the old token.
+- **Token scope.**
+  The token only proves that a caller is part of the deployment.
+  Anyone who has it can call as any organization.
+  The labeler checks the same token,
+  then trusts the organization its callers name.
+  The labeler publishes no port,
+  so only containers in this Compose project reach it.
+  The model server checks no token
+  unless you set `MODEL_SERVER_TOKEN`.
+  See the [Model Server](#model-server) section.
+- **Labeler media.**
+  The labeler fetches media itself.
+  By default, it fetches only from public addresses,
+  over https on port 443.
+  For media in a private object store,
+  set these on `inference-labeler`:
+  - `LABELER_FETCH_ALLOWED_HOSTS`: the store's host names
+  - `LABELER_FETCH_ALLOWED_NETWORKS`: the store's private address ranges
+  - `LABELER_FETCH_ALLOWED_PORTS`: the store's port, when not 443
+  - `LABELER_FETCH_ALLOW_HTTP`: `"true"` for plain http
+
+  Write lists as JSON strings, not YAML lists.
+  For example, for a MinIO at `http://minio:9000`:
 
   ```yaml
   services:
@@ -853,21 +929,28 @@ Things to know:
         LABELER_FETCH_ALLOW_HTTP: "true"
   ```
 
-- One job at once needs about 4 GB of memory in the labeler.
-- For a GPU model server, see the [Model Server](#model-server) section.
+- **Labeler memory.**
+  Each job running at once needs about 4 GB of memory in the labeler.
+- **GPU.**
+  For a GPU model server,
+  see the [Model Server](#model-server) section.
 
 ### Model Server
 
-The FiftyOne model server runs the models the inference service routes
-embeddings, predictions and segmentation to. It ships in
-`compose.model-server.yaml`, on CPU, and works on any host. Set its image in
-`.env`, from your Voxel51 support team:
+The FiftyOne model server runs the models
+that the inference service sends embeddings, predictions and segmentation to.
+It ships in `compose.model-server.yaml`,
+runs on CPU,
+and works on any host.
+Ask your Voxel51 support team for its image,
+and set it in `.env`:
 
 ```shell
 MODEL_SERVER_IMAGE=<repository>:<tag>
 ```
 
-On the worker that runs FiftyOne Enterprise, add it to your usual `-f` set:
+On the worker that runs FiftyOne Enterprise,
+add it to your usual `-f` set:
 
 ```shell
 docker compose \
@@ -879,35 +962,51 @@ docker compose \
   up -d
 ```
 
-On another worker, copy `compose.model-server.yaml` there, and
-`compose.model-server.gpu.yaml` for a GPU, with a `.env` setting
-`MODEL_SERVER_IMAGE` and `MODEL_SERVER_BIND_ADDRESS`, the worker's own
-address. Start the model server alone:
+To run it on another worker:
 
-```shell
-docker compose -f compose.model-server.yaml up -d
-```
+1. Copy `compose.model-server.yaml` to that worker.
+   For a GPU, also copy `compose.model-server.gpu.yaml`.
+1. Create a `.env` there that sets:
+   - `MODEL_SERVER_IMAGE`
+   - `MODEL_SERVER_BIND_ADDRESS`, the worker's own address
+1. Start the model server alone:
 
-For NVIDIA GPUs, add `compose.model-server.gpu.yaml` after
-`compose.model-server.yaml`, and set `NVIDIA_GPU_COUNT` in `.env` (the
-default is `1`). It needs a Linux host with the NVIDIA driver,
-nvidia-container-toolkit and the `nvidia` runtime configured in dockerd. SAM2
-and video models are too slow on CPU.
+   ```shell
+   docker compose -f compose.model-server.yaml up -d
+   ```
 
-To require a bearer token, set `MODEL_SERVER_TOKEN`. Every call but
-`/healthz` and `/readyz` then needs `Authorization: Bearer <token>`,
-`/metrics` included, so anything that scrapes it must send the token. Give the
-inference service the same `MODEL_SERVER_TOKEN`.
+For NVIDIA GPUs,
+add `compose.model-server.gpu.yaml` after `compose.model-server.yaml`.
+Set `NVIDIA_GPU_COUNT` in `.env`
+(default `1`).
+The GPU file needs a Linux host with:
+
+- the NVIDIA driver
+- nvidia-container-toolkit
+- the `nvidia` runtime configured in dockerd
+
+SAM2 and video models are too slow on CPU.
+
+To require a bearer token, set `MODEL_SERVER_TOKEN`.
+Every call then needs `Authorization: Bearer <token>`,
+except `/healthz` and `/readyz`.
+This includes `/metrics`,
+so anything that scrapes it must send the token.
+Give the inference service the same `MODEL_SERVER_TOKEN`.
 
 > [!WARNING]
-> Without `MODEL_SERVER_TOKEN` the model server checks no token. Its port is
-> bound to `127.0.0.1` by default, so only its own host reaches it. When you
-> bind it to another address, firewall `MODEL_SERVER_BIND_PORT` so that only
-> the FiftyOne Enterprise host can reach it. Docker's published ports skip ufw
-> and firewalld: use the `DOCKER-USER` iptables chain or a cloud security
-> group. Where more than the inference service can reach it, also set
-> `MODEL_SERVER_ALLOWED_MODELS`, `MODEL_SERVER_ALLOWED_MODEL_KWARGS` and
-> `MODEL_SERVER_ALLOWED_MEDIA_PREFIXES`.
+> Without `MODEL_SERVER_TOKEN`, the model server checks no token.
+> By default, it binds its port to `127.0.0.1`,
+> so only its own host reaches it.
+> When you bind it to another address,
+> firewall `MODEL_SERVER_BIND_PORT`
+> so only the FiftyOne Enterprise host can reach it.
+> Docker's published ports bypass ufw and firewalld,
+> so use the `DOCKER-USER` iptables chain or a cloud security group.
+> If anything besides the inference service can reach it,
+> also set `MODEL_SERVER_ALLOWED_MODELS`,
+> `MODEL_SERVER_ALLOWED_MODEL_KWARGS`
+> and `MODEL_SERVER_ALLOWED_MEDIA_PREFIXES`.
 
 ### Snapshot Archival
 
