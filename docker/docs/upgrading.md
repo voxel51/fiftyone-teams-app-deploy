@@ -125,9 +125,28 @@ To move an existing deployment to the inference service:
 1. In `Settings -> Services`, stop the `annotation-ai` service.
    With an LLM, also stop the `agentic-labeler` service.
    A labeler service left running takes labeler runs.
-1. With an LLM, stop using `compose.agenticlabeler.yaml`.
+1. With an LLM, remove the containers of `compose.agenticlabeler.yaml`,
+   then stop using that file.
    Its GPU worker has the same name, `agentic-labeler`,
    as the worker that runs labeler runs with the inference service.
+   If you only drop the file,
+   its containers keep running and take labeler runs.
+   Run this with your usual `-f` set,
+   including `compose.agenticlabeler.yaml`:
+
+   ```shell
+   docker compose \
+     -f compose.yaml \
+     -f compose.dedicated-plugins.yaml \
+     -f compose.delegated-operators.yaml \
+     -f compose.agenticlabeler.yaml \
+     -f compose.override.yaml \
+     rm \
+     --stop \
+     --force \
+     agentic-labeler agentic-labeler-telemetry
+   ```
+
    Don't start the `agentic-labeler` service again,
    because it would run on that worker.
 1. Add the model server and the inference service.

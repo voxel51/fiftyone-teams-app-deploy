@@ -121,6 +121,17 @@ model-server would take over the shipped backend */}}
 {{- end }}
 {{- $backends = append $backends (set $shipped "endpoints" $endpoints) }}
 {{- end }}
+{{- /* The labeler calls the first LLM backend, which the service would drop
+for a later one with the same id */}}
+{{- $seen := dict }}
+{{- range .Values.backends }}
+{{- if and (kindIs "map" .) .id }}
+{{- if hasKey $seen (toString .id) }}
+{{- fail (printf "backends: two backends have the id %v. The service keeps only the last one, so give each backend its own id" .id) }}
+{{- end }}
+{{- $_ := set $seen (toString .id) true }}
+{{- end }}
+{{- end }}
 {{- $backends = concat $backends (.Values.backends | default list) }}
 {{- if $backends }}
 {{- toYaml $backends }}

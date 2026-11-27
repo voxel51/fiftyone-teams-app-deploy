@@ -3057,7 +3057,7 @@
         },
         "tenantId": {
           "default": "",
-          "description": "With one org only: its id, the `organizationId` of its license. The org\nof calls with no user, such as builtin services. Empty with several orgs.",
+          "description": "With one org only: its id, the `organizationId` of its license. The org\nof calls with no user, such as builtin services. Empty with several orgs:\nthe service then refuses calls with no user and no org with a 401.",
           "title": "tenantId",
           "type": "string"
         },
@@ -3069,7 +3069,7 @@
         },
         "url": {
           "default": "",
-          "description": "URL of the inference service, such as `http://inference:8080`. Empty:\nFiftyOne does not use one.",
+          "description": "URL of the inference service, such as `http://inference:8080`. Empty:\nthe chart sets no inference env. A component that sets\n`FIFTYONE_INFERENCE_URL` in its own `env` still uses the inference service.",
           "title": "url",
           "type": "string"
         }
