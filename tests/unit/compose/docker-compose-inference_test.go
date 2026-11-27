@@ -55,7 +55,7 @@ func TestDockerComposeInference(t *testing.T) {
 
 		inference, err := project.GetService("inference")
 		require.NoError(t, err)
-		require.Equal(t, "voxel51/inference:v2.25.1", inference.Image)
+		require.Equal(t, "voxel51/inference:v2.28.0", inference.Image)
 		require.Equal(t, "shared-token", *inference.Environment["AUTH_MODE"])
 		require.Equal(t, "test-0123456789abcdef0123456789abcdef", *inference.Environment["AUTH_SHARED_TOKEN"])
 		require.Equal(t, "license", *inference.Environment["BILLING_MODE"])
@@ -88,7 +88,7 @@ func TestDockerComposeInference(t *testing.T) {
 		require.NoError(t, err, dir)
 		labeler, err := project.GetService("inference-labeler")
 		require.NoError(t, err, dir)
-		require.Equal(t, "voxel51/agentic-labeler-cpu:v2.25.1", labeler.Image)
+		require.Equal(t, "voxel51/agentic-labeler-cpu:v2.28.0", labeler.Image)
 		require.Empty(t, labeler.Ports, dir)
 		require.Equal(t, "always", labeler.Restart)
 		require.Equal(t, "3m0s", labeler.StopGracePeriod.String())
@@ -104,7 +104,7 @@ func TestDockerComposeInference(t *testing.T) {
 		// Runs: a CPU delegated operator worker on the lane the App queues to
 		runs, err := project.GetService("inference-labeler-runs")
 		require.NoError(t, err, dir)
-		require.Equal(t, "voxel51/agentic-labeler-cpu:v2.25.1", runs.Image)
+		require.Equal(t, "voxel51/agentic-labeler-cpu:v2.28.0", runs.Image)
 		require.Contains(t, strings.Join(runs.Command, " "), "fiftyone delegated launch -t remote -m -n agentic-labeler", dir)
 		require.Empty(t, runs.Ports, dir)
 		require.Empty(t, runs.Deploy, dir)

@@ -1,7 +1,7 @@
 # fiftyone-inference
 
 <!-- markdownlint-disable-next-line line-length -->
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.25.1](https://img.shields.io/badge/AppVersion-v2.25.1-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.28.0](https://img.shields.io/badge/AppVersion-v2.28.0-informational?style=flat-square)
 
 The FiftyOne inference service: FiftyOne Enterprise sends it embeddings,
 predictions, segmentation and LLM calls, and it routes them to model servers
@@ -361,7 +361,7 @@ delegatedOperatorJobTemplates:
     agentic-labeler:
       image:
         repository: voxel51/agentic-labeler-cpu
-        tag: v2.25.1
+        tag: v2.28.0
       resources:
         limits:
           cpu: 2

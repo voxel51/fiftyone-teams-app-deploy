@@ -8,6 +8,6 @@ description: |
   labeling service.
 type: application
 version: 0.1.0
-appVersion: "v2.25.1"
+appVersion: "v2.28.0"
 icon: https://voxel51.com/images/logo/voxel51-logo-horz-color-600dpi.png
 kubeVersion: ">=1.31-0"

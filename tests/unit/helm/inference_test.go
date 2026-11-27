@@ -175,7 +175,7 @@ func (s *inferenceTemplateTest) TestLicenseModeWithTheModelServer() {
 	env := envOf(container)
 
 	s.Equal(int32(1), *deployment.Spec.Replicas)
-	s.Equal("voxel51/inference:v2.25.1", container.Image)
+	s.Equal("voxel51/inference:v2.28.0", container.Image)
 	s.Equal("shared-token", env["AUTH_MODE"].Value)
 	s.Equal("license", env["BILLING_MODE"].Value)
 	s.Equal("/opt/fiftyone/licenses/fiftyone-license", env["LICENSE_KEY_FILE_PATHS"].Value)
@@ -272,7 +272,7 @@ func (s *inferenceTemplateTest) TestLabelerWithAnLlm() {
 
 	s.Equal("inference-labeler", deployment.Name)
 	s.Equal(int32(1), *deployment.Spec.Replicas)
-	s.Equal("voxel51/agentic-labeler-cpu:v2.25.1", container.Image)
+	s.Equal("voxel51/agentic-labeler-cpu:v2.28.0", container.Image)
 	s.Equal("shared", env["LABELER_SERVICE_MODE"].Value)
 	s.Equal("http://inference:8080", env["FIFTYONE_INFERENCE_URL"].Value)
 	s.Equal("inference-token", env["FIFTYONE_INFERENCE_TOKEN"].ValueFrom.SecretKeyRef.Name)
